@@ -28,7 +28,7 @@ import { styles } from './accordion-root.css.js'
 export class HelixAccordion extends HelixBaseAccordion {
   /** Removes the surrounding surface, leaving only the separating rules. */
   @property({ reflect: true })
-  appearance: 'outlined' | 'plain' = 'outlined'
+  appearance?: 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = styles
 }

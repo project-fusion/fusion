@@ -32,6 +32,26 @@ const BOX_SIZING = css`
  */
 export class HelixElement extends LitElement {
   /**
+   * The element's semantics, set without touching the DOM.
+   *
+   * Every component that is a landmark, a list item, or a cell used to write
+   * `role` onto its own host in `willUpdate`. That is an attribute the element
+   * adds to itself after it upgrades, so a React consumer's server markup never
+   * has it and hydration reports a mismatch on every one of them.
+   * `ElementInternals` exists for exactly this: it sets the implicit role an
+   * author's `role` attribute still overrides, and it writes nothing.
+   *
+   * Available during server rendering: Lit's shim implements
+   * `attachInternals`, verified, so nothing here needs a guard.
+   */
+  protected readonly internals: ElementInternals
+
+  constructor() {
+    super()
+    this.internals = this.attachInternals()
+  }
+
+  /**
    * Prepends the shadow-root reset to every subclass's styles, so no component
    * has to remember to include it.
    */

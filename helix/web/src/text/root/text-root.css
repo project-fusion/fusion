@@ -14,16 +14,23 @@
   display: block;
 }
 
+/* Body is the base rather than a ramp of its own, so anything with no
+   appearance and no pairing already reads as body text. */
 [part="text"] {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
   margin: var(--helix-space-none);
 }
 
 /* One rule per appearance, each setting the four things that move together.
    Exposing them separately would offer a few hundred combinations of which a
    handful are right; this is the handful. */
-:host([data-appearance="display"]) [part="text"] {
+:host([appearance="display"]) [part="text"],
+:host(:not([appearance])[as="h1"]) [part="text"] {
   font-family: var(--helix-font-display);
   font-size: var(--helix-text-3xl);
   font-weight: var(--helix-weight-semibold);
@@ -31,42 +38,42 @@
   line-height: var(--helix-leading-tight);
 }
 
-:host([data-appearance="heading"]) [part="text"] {
+:host([appearance="heading"]) [part="text"],
+:host(:not([appearance])[as="h2"]) [part="text"] {
   font-size: var(--helix-text-2xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
 }
 
-:host([data-appearance="subheading"]) [part="text"] {
+:host([appearance="subheading"]) [part="text"],
+:host(:not([appearance])[as="h3"]) [part="text"] {
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
 }
 
-:host([data-appearance="title"]) [part="text"] {
+:host([appearance="title"]) [part="text"],
+:host(:not([appearance])[as="h4"]) [part="text"] {
   font-size: var(--helix-text-lg);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-tight);
 }
 
-:host([data-appearance="body"]) [part="text"] {
-  font-size: var(--helix-text-md);
-  font-weight: var(--helix-weight-regular);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
-}
-
-:host([data-appearance="body-strong"]) [part="text"] {
+:host([appearance="body-strong"]) [part="text"],
+:host(:not([appearance])[as="h5"]) [part="text"],
+:host(:not([appearance])[as="h6"]) [part="text"],
+:host(:not([appearance])[as="strong"]) [part="text"] {
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
   letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-normal);
 }
 
-:host([data-appearance="caption"]) [part="text"] {
+/* No pairing: no element means "caption", so it is always deliberate. */
+:host([appearance="caption"]) [part="text"] {
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-regular);
   letter-spacing: var(--helix-tracking-normal);
@@ -75,14 +82,16 @@
 
 /* Wider tracking rather than capitals: a label reads as a label from its size
    and spacing, and uppercase costs legibility. */
-:host([data-appearance="label"]) [part="text"] {
+:host([appearance="label"]) [part="text"],
+:host(:not([appearance])[as="label"]) [part="text"] {
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   letter-spacing: var(--helix-tracking-wide);
   line-height: var(--helix-leading-normal);
 }
 
-:host([data-appearance="code"]) [part="text"] {
+:host([appearance="code"]) [part="text"],
+:host(:not([appearance])[as="code"]) [part="text"] {
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-regular);

@@ -32,11 +32,11 @@ import { styles } from './tag-root.css.js'
 export class HelixTag extends HelixBaseTag {
   /** Which status the tag reports. */
   @property({ reflect: true })
-  appearance: 'neutral' | 'primary' | 'success' | 'warning' | 'danger' = 'neutral'
+  appearance?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger'
 
   /** Height and inset of the tag. */
   @property({ reflect: true })
-  size: 'sm' | 'md' = 'md'
+  size?: 'sm' | 'md'
 
   static override styles: CSSResultGroup = styles
 }

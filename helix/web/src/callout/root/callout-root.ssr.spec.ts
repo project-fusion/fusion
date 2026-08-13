@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hostAttributes, hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -12,11 +12,12 @@ describe('callout server output', () => {
     expect(markup).toContain('role="img"')
   })
 
-  test('the note role is rendered, not applied on connect', () => {
-    // On the host, written in `willUpdate`, which the server does call.
-    expect(hostTag(ssr(html`<helix-callout>x</helix-callout>`), 'helix-callout')).toContain(
-      'role="note"',
-    )
+  test('the host carries nothing the consumer did not write', () => {
+    // The note role goes through `ElementInternals`, which writes no attribute.
+    // Writing `role` onto the host in `willUpdate` put it in the served markup,
+    // but a React consumer renders the tag themselves and their markup never
+    // has it, so hydration reported a mismatch on every callout on the page.
+    expect(hostAttributes(ssr(html`<helix-callout>x</helix-callout>`), 'helix-callout')).toEqual([])
   })
 
   test('the default icon ships as slot fallback, so a replacement needs no JavaScript', () => {

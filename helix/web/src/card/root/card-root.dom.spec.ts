@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, slotted } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role, slotted } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -78,7 +78,7 @@ describe('card regions', () => {
   test('carries the group role', async () => {
     const card = await mount('<helix-card>Body</helix-card>')
     // On the host, since the host is the box.
-    expect(card.getAttribute('role')).toBe('group')
+    expect(role(card)).toBe('group')
   })
 
   test('a consumer-supplied name is left alone', async () => {

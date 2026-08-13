@@ -16,6 +16,7 @@
   background-color: var(--divider-color, var(--helix-color-border));
 }
 
+:host(:not([orientation])) [part="line"],
 :host([orientation="horizontal"]) [part="line"] {
   block-size: var(--_divider-thickness);
   inline-size: 100%;

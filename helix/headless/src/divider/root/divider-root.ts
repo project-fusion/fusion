@@ -27,10 +27,10 @@ import { property } from 'lit/decorators.js'
 export class HelixBaseDivider extends HelixElement {
   /** Which way the rule runs. */
   @property({ reflect: true })
-  orientation: 'horizontal' | 'vertical' = 'horizontal'
+  orientation?: 'horizontal' | 'vertical'
 
   protected override render(): TemplateResult {
-    return html`<div part="line" role="separator" aria-orientation=${this.orientation}></div>`
+    return html`<div part="line" role="separator" aria-orientation=${this.orientation ?? 'horizontal'}></div>`
   }
 }
 

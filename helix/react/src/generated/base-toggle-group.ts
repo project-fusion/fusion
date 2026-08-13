@@ -16,9 +16,9 @@ swaps is two things changing at once and reads as a flicker, while one that
 moves is a single object the eye follows, and it says where the selection
 came from as well as where it went.
 
-Its position and width are measured from the selected item and written to the
-host as custom properties, because labels are different lengths and no
-proportion of the group is the right answer. Measurement is client-side by
+Its position and width are measured from the selected item and written onto
+the indicator as custom properties, because labels are different lengths and
+no proportion of the group is the right answer. Measurement is client-side by
 necessity, so the server renders the indicator hidden and it fades in once it
 has somewhere to be, which is the harmless direction: it appears rather than
 jumping from a wrong place.

@@ -36,7 +36,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-base-tree-item')
 export class HelixBaseTreeItem extends HelixElement {
   /** Identifies the item to the consumer, carried in `SelectionChange`. */
-  @property({ reflect: true })
+  @property()
   value = ''
 
   /** Whether this item is the current one. */
@@ -47,9 +47,16 @@ export class HelixBaseTreeItem extends HelixElement {
   @property({ reflect: true, type: Boolean })
   expanded = false
 
-  /** Depth from the root, set by the tree so indentation needs no CSS nesting. */
-  @property({ attribute: 'level', reflect: true, type: Number })
-  level = 1
+  /**
+   * Depth from the root, set by the tree so indentation needs no CSS nesting.
+   *
+   * Not reflected. The tree assigns this after it upgrades, so an attribute
+   * here would be a change to markup the consumer rendered and hydration would
+   * report it. The indent it drives is written onto the row instead, inside the
+   * shadow root, which is not part of the tree React hydrates.
+   */
+  @property({ attribute: 'level', type: Number })
+  level?: number
 
   /** Whether this item holds the tree's single tab stop. */
   @state()
@@ -97,10 +104,14 @@ export class HelixBaseTreeItem extends HelixElement {
         role="treeitem"
         aria-expanded=${this.branch ? (this.expanded ? 'true' : 'false') : nothing}
         aria-selected=${this.selected ? 'true' : 'false'}
-        aria-level=${this.level}
+        aria-level=${this.level ?? 1}
         tabindex=${this.focusable ? '0' : '-1'}
       >
-        <div part="row" @click=${this.handleRowClick}>
+        <div
+          part="row"
+          style="--_tree-level: ${this.level ?? 1}"
+          @click=${this.handleRowClick}
+        >
           ${
             this.branch
               ? html`<svg part="toggle" viewBox=${caretDown.viewBox} aria-hidden="true">

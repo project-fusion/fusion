@@ -6,6 +6,16 @@ import { property } from 'lit/decorators.js'
 const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'])
 
 /**
+ * A control that owns its tab stop rather than taking one on its host.
+ *
+ * Checked as a property rather than with `instanceof`, for the same reason the
+ * control list is: a toolbar holds anything, so the contract has to be
+ * something a foreign element can satisfy.
+ */
+const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: boolean } =>
+  'focusable' in node
+
+/**
  * @summary A group of controls that share one tab stop.
  *
  * @description
@@ -36,7 +46,7 @@ export class HelixBaseToolbar extends HelixElement {
 
   /** Which way the arrow keys move. */
   @property({ reflect: true })
-  orientation: 'horizontal' | 'vertical' = 'horizontal'
+  orientation?: 'horizontal' | 'vertical'
 
   /**
    * Focusable controls, in document order.
@@ -54,10 +64,41 @@ export class HelixBaseToolbar extends HelixElement {
     })
   }
 
+  /**
+   * Moves the single tab stop to one control.
+   *
+   * Prefers the control's own `focusable` property to writing `tabindex` on it.
+   * The attribute is a change to markup the consumer rendered, which a React
+   * consumer's hydration reports and does not patch up; a control that offers
+   * the property moves the stop inside its own shadow root instead.
+   *
+   * `tabindex` stays as the fallback, because a toolbar has to hold controls
+   * this package has never heard of.
+   */
   private setTabStop(active: HTMLElement | undefined): void {
     for (const control of this.controls) {
-      control.tabIndex = control === active ? 0 : -1
+      const stop = control === active
+      if (ownsTabStop(control)) {
+        control.focusable = stop
+      } else {
+        control.tabIndex = stop ? 0 : -1
+      }
     }
+  }
+
+  /**
+   * Sets the first tab stop once every custom control has upgraded.
+   *
+   * A custom element has no properties at all before it upgrades, so a pass
+   * that ran first would find no `focusable`, take the `tabindex` fallback, and
+   * write the very attribute this exists to avoid.
+   */
+  private async claimTabStop(): Promise<void> {
+    const pending = [...new Set(this.controls.map((control) => control.localName))].filter((name) =>
+      name.includes('-'),
+    )
+    await Promise.all(pending.map((name) => customElements.whenDefined(name)))
+    this.setTabStop(this.controls[0])
   }
 
   private readonly handleFocusIn = (event: FocusEvent): void => {
@@ -67,9 +108,19 @@ export class HelixBaseToolbar extends HelixElement {
     }
   }
 
+  /**
+   * The orientation in force.
+   *
+   * Unset is horizontal, and stays unset: the default is the absent attribute,
+   * so a reflected default cannot appear on the host after hydration.
+   */
+  private get axis(): 'horizontal' | 'vertical' {
+    return this.orientation ?? 'horizontal'
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    const forward = this.orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown'
-    const back = this.orientation === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'
+    const forward = this.axis === 'horizontal' ? 'ArrowRight' : 'ArrowDown'
+    const back = this.axis === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'
     if (!KEYS.has(event.key)) {
       return
     }
@@ -114,12 +165,12 @@ export class HelixBaseToolbar extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    this.setTabStop(this.controls[0])
+    void this.claimTabStop()
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="toolbar" role="toolbar" aria-label=${this.label} aria-orientation=${this.orientation}>
-      <slot @slotchange=${() => this.setTabStop(this.controls[0])}></slot>
+    return html`<div part="toolbar" role="toolbar" aria-label=${this.label} aria-orientation=${this.axis}>
+      <slot @slotchange=${() => this.claimTabStop()}></slot>
     </div>`
   }
 }

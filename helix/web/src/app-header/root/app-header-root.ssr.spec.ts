@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hasPart, hostAttributes, hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -15,7 +15,7 @@ describe('app header server output', () => {
     // The scroll listener is attached on connect, which the server never calls,
     // so rendering here proves the element does not touch `window` to render.
     expect(markup).toContain('<helix-app-header')
-    expect(withoutStyles(markup)).toContain('role="banner"')
+    expect(hostAttributes(markup, 'helix-app-header')).toEqual([])
     expect(withoutStyles(markup)).toContain('<slot name="brand">')
     // The banner is full width and the row inside it is what centres.
     expect(hasPart(markup, 'content')).toBe(true)

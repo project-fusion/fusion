@@ -44,7 +44,7 @@ export class HelixBaseBreadcrumbsItem extends HelixElement {
     // On the host, because the item is an `<ol>` child in the flat tree and the
     // role has to be there for the list to have items. Set here rather than in
     // `connectedCallback`, which the server never calls; verified to serialize.
-    this.setAttribute('role', 'listitem')
+    this.internals.role = 'listitem'
   }
 
   protected override render(): TemplateResult {

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -37,7 +37,7 @@ describe('callout severity', () => {
 
   test('is announced as a note', async () => {
     const callout = await mount('<helix-callout>x</helix-callout>')
-    expect(callout.getAttribute('role')).toBe('note')
+    expect(role(callout)).toBe('note')
   })
 })
 

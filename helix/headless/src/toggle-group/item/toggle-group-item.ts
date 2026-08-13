@@ -29,7 +29,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-base-toggle-group-item')
 export class HelixBaseToggleGroupItem extends HelixElement {
   /** Identifies the item to the group. */
-  @property({ reflect: true })
+  @property()
   value = ''
 
   /** Makes the item a link rather than a radio. */

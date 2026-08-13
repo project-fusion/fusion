@@ -27,7 +27,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-base-tabs-tab')
 export class HelixBaseTabsTab extends HelixElement {
   /** Identifies the tab, and pairs it with the panel of the same value. */
-  @property({ reflect: true })
+  @property()
   value = ''
 
   /** Whether this tab is the current one. */

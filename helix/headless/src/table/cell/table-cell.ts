@@ -30,7 +30,7 @@ export class HelixBaseTableCell extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // In `willUpdate`, which the server does call, unlike `connectedCallback`.
-    this.setAttribute('role', this.header ? 'columnheader' : 'cell')
+    this.internals.role = this.header ? 'columnheader' : 'cell'
   }
 
   protected override render(): TemplateResult {

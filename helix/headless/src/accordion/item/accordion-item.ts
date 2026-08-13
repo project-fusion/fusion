@@ -60,7 +60,7 @@ export class HelixBaseAccordionItem extends WithOpen(HelixElement) {
    * have two.
    */
   @property({ attribute: 'chevron-placement', reflect: true })
-  chevronPlacement: 'auto' | 'start' | 'end' | 'none' = 'auto'
+  chevronPlacement?: 'auto' | 'start' | 'end' | 'none'
 
   /** The chevron, or nothing when suppressed. */
   private renderChevron(): TemplateResult | typeof nothing {

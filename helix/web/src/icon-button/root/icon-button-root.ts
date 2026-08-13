@@ -32,11 +32,11 @@ import { styles } from './icon-button-root.css.js'
 export class HelixIconButton extends HelixBaseButton {
   /** How much visual weight the button carries. */
   @property({ reflect: true })
-  appearance: 'primary' | 'neutral' | 'subtle' | 'danger' = 'subtle'
+  appearance?: 'primary' | 'neutral' | 'subtle' | 'danger'
 
   /** Edge length of the control. */
   @property({ reflect: true })
-  size: 'sm' | 'md' | 'lg' = 'md'
+  size?: 'sm' | 'md' | 'lg'
 
   static override styles: CSSResultGroup = styles
 }

@@ -40,7 +40,7 @@ export class HelixBaseTabs extends HelixElement {
   label = 'Tabs'
 
   /** Value of the selected tab. */
-  @property({ reflect: true })
+  @property()
   value = ''
 
   /**

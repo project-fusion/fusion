@@ -26,7 +26,7 @@ export class HelixBaseTableRow extends HelixElement {
     // and no rows, which is a broken table rather than a plain one.
     //
     // Set in `willUpdate`, which the server does call, unlike `connectedCallback`.
-    this.setAttribute('role', 'row')
+    this.internals.role = 'row'
   }
 
   protected override render(): TemplateResult {

@@ -53,6 +53,16 @@
               "attribute": "source"
             },
             {
+              "kind": "field",
+              "name": "stage",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "description": "Where the previewed markup goes. Present from the first render.",
+              "readonly": true
+            },
+            {
               "kind": "method",
               "name": "applyStyles",
               "privacy": "private",
@@ -62,6 +72,20 @@
                 }
               },
               "description": "Puts the stylesheet inside the preview, after the markup.\n\nRe-created whenever the markup is, because setting `innerHTML` removes it\nalong with everything else."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
             },
             {
               "kind": "method",
@@ -153,231 +177,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/sandbox/source/sandbox-source.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/sandbox/source/sandbox-source.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/sandbox/source/sandbox-source.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A real `<textarea>`, not a contenteditable div with a syntax highlighter over\nit. Undo, selection, spellcheck suppression, mobile keyboards, and screen\nreader support all come from the platform, and every one of them is\nexpensive to rebuild and easy to get subtly wrong.\n\nTab inserts two spaces rather than leaving the field, because a code pane\nthat cannot indent is not one. Escape then Tab still moves focus out, which\nis the documented escape hatch for exactly this trade.",
-          "name": "HelixSandboxSource",
-          "cssProperties": [
-            {
-              "description": "Fill behind the source.",
-              "name": "--sandbox-source-background"
-            },
-            {
-              "description": "Minimum height of the pane.",
-              "name": "--sandbox-source-min-block-size"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The editable region.",
-              "name": "source"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The source being edited.",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "'html'",
-              "description": "Which source this pane holds, echoed in every `SourceChange`.\n\n`html` and `css` are what the sandbox root routes on; any other name is\npassed through untouched for a consumer wiring their own panes.",
-              "attribute": "name",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "fieldLabel",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Example source'",
-              "description": "Accessible name for the editable region.",
-              "attribute": "field-label"
-            },
-            {
-              "kind": "field",
-              "name": "tabIndents",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "description": "Whether Tab indents rather than moving focus.",
-              "attribute": "tab-indents",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "escaped",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false",
-              "description": "Set by Escape, so the next Tab leaves the field."
-            },
-            {
-              "kind": "field",
-              "name": "handleInput",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixSourceChangeEvent"
-              },
-              "description": "Fired when the source is edited.",
-              "name": "SourceChange",
-              "reactProp": "onSourceChange"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The source being edited.",
-              "fieldName": "value"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "'html'",
-              "description": "Which source this pane holds, echoed in every `SourceChange`.\n\n`html` and `css` are what the sandbox root routes on; any other name is\npassed through untouched for a consumer wiring their own panes.",
-              "fieldName": "name"
-            },
-            {
-              "name": "field-label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Example source'",
-              "description": "Accessible name for the editable region.",
-              "fieldName": "fieldLabel"
-            },
-            {
-              "name": "tab-indents",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "description": "Whether Tab indents rather than moving focus.",
-              "fieldName": "tabIndents"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Editable source for a sandbox preview.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/sandbox/source",
-            "aliases": [
-              "Editor",
-              "Code pane"
-            ],
-            "tier": "styled",
-            "group": "Sandbox",
-            "part": "Source"
-          },
-          "tagName": "helix-sandbox-source",
-          "customElement": true,
-          "modulePath": "src/sandbox/source/sandbox-source.ts",
-          "definitionPath": "src/sandbox/source/sandbox-source.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixSandboxSource",
-          "declaration": {
-            "name": "HelixSandboxSource",
-            "module": "src/sandbox/source/sandbox-source.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-sandbox-source",
-          "declaration": {
-            "name": "HelixSandboxSource",
-            "module": "src/sandbox/source/sandbox-source.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/sandbox/root/sandbox-root.css.ts",
       "declarations": [
         {
@@ -439,9 +238,8 @@
               "kind": "field",
               "name": "orientation",
               "type": {
-                "text": "'horizontal' | 'vertical'"
+                "text": "'horizontal' | 'vertical' | undefined"
               },
-              "default": "'horizontal'",
               "description": "Whether the panes sit side by side or stacked.",
               "attribute": "orientation",
               "reflects": true
@@ -511,6 +309,16 @@
             },
             {
               "kind": "field",
+              "name": "axis",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "privacy": "private",
+              "description": "The orientation in force.\n\nUnset is horizontal, and stays unset: the default is the absent attribute,\nso a reflected default cannot appear on the host after hydration.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true
@@ -542,7 +350,21 @@
                   "text": "void"
                 }
               },
-              "description": "Writes the split to the host.\n\nGuarded, because the server's element shim has no `style`, and a `<style>`\nelement cannot carry it either: Lit rejects expressions inside one. The\nserver therefore renders the stylesheet's default split, which is the same\n45% this property defaults to."
+              "description": "Writes the split into the shadow root's own stylesheet.\n\nInto a `<style>` rather than onto `this.style`, because an inline style on\nthe host is an attribute the element gives itself once it upgrades, and a\nReact consumer's server markup does not have it: hydration reports the\nmismatch and does not patch it up. The shadow root is not part of the tree\nReact hydrates.\n\nFilled imperatively because Lit rejects expressions inside `<style>`, which\nis why the template carries a static empty one. The server renders the\nstylesheet's default split, which is the same 45% this property defaults\nto."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
             },
             {
               "kind": "method",
@@ -574,9 +396,8 @@
             {
               "name": "orientation",
               "type": {
-                "text": "'horizontal' | 'vertical'"
+                "text": "'horizontal' | 'vertical' | undefined"
               },
-              "default": "'horizontal'",
               "description": "Whether the panes sit side by side or stacked.",
               "fieldName": "orientation"
             },
@@ -638,6 +459,243 @@
           "declaration": {
             "name": "HelixSandbox",
             "module": "src/sandbox/root/sandbox-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/source/sandbox-source.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/sandbox/source/sandbox-source.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/source/sandbox-source.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A real `<textarea>`, not a contenteditable div with a syntax highlighter over\nit. Undo, selection, spellcheck suppression, mobile keyboards, and screen\nreader support all come from the platform, and every one of them is\nexpensive to rebuild and easy to get subtly wrong.\n\nTab inserts two spaces rather than leaving the field, because a code pane\nthat cannot indent is not one. Escape then Tab still moves focus out, which\nis the documented escape hatch for exactly this trade.",
+          "name": "HelixSandboxSource",
+          "cssProperties": [
+            {
+              "description": "Fill behind the source.",
+              "name": "--sandbox-source-background"
+            },
+            {
+              "description": "Minimum height of the pane.",
+              "name": "--sandbox-source-min-block-size"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The editable region.",
+              "name": "source"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The source being edited.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "'html'",
+              "description": "Which source this pane holds, echoed in every `SourceChange`.\n\n`html` and `css` are what the sandbox root routes on; any other name is\npassed through untouched for a consumer wiring their own panes.\n\nNot reflected: nothing selects on it, so it keeps a real default instead.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "fieldLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Example source'",
+              "description": "Accessible name for the editable region.",
+              "attribute": "field-label"
+            },
+            {
+              "kind": "field",
+              "name": "tabIndents",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether Tab indents rather than moving focus.",
+              "attribute": "tab-indents"
+            },
+            {
+              "kind": "field",
+              "name": "escaped",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Set by Escape, so the next Tab leaves the field."
+            },
+            {
+              "kind": "field",
+              "name": "handleInput",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSourceChangeEvent"
+              },
+              "description": "Fired when the source is edited.",
+              "name": "SourceChange",
+              "reactProp": "onSourceChange"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The source being edited.",
+              "fieldName": "value"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "'html'",
+              "description": "Which source this pane holds, echoed in every `SourceChange`.\n\n`html` and `css` are what the sandbox root routes on; any other name is\npassed through untouched for a consumer wiring their own panes.\n\nNot reflected: nothing selects on it, so it keeps a real default instead.",
+              "fieldName": "name"
+            },
+            {
+              "name": "field-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Example source'",
+              "description": "Accessible name for the editable region.",
+              "fieldName": "fieldLabel"
+            },
+            {
+              "name": "tab-indents",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether Tab indents rather than moving focus.",
+              "fieldName": "tabIndents"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Editable source for a sandbox preview.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/sandbox/source",
+            "aliases": [
+              "Editor",
+              "Code pane"
+            ],
+            "tier": "styled",
+            "group": "Sandbox",
+            "part": "Source"
+          },
+          "tagName": "helix-sandbox-source",
+          "customElement": true,
+          "modulePath": "src/sandbox/source/sandbox-source.ts",
+          "definitionPath": "src/sandbox/source/sandbox-source.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSandboxSource",
+          "declaration": {
+            "name": "HelixSandboxSource",
+            "module": "src/sandbox/source/sandbox-source.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-sandbox-source",
+          "declaration": {
+            "name": "HelixSandboxSource",
+            "module": "src/sandbox/source/sandbox-source.ts"
           }
         }
       ]

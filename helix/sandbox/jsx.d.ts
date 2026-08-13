@@ -224,61 +224,6 @@ previewed and not the sandbox around it. */
   textContent?: string | number;
 };
 
-/** `HelixSandboxSource` component event */
-export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
-  HelixSandboxSource,
-  E
->;
-/** `SourceChange` event type */
-export type HelixSandboxSourceSourceChangeElementEvent =
-  HelixSandboxSourceElementEvent<HelixSourceChangeEvent>;
-
-export type HelixSandboxSourceProps = {
-  /** The source being edited. */
-  value?: HelixSandboxSource["value"];
-  /** Which source this pane holds, echoed in every `SourceChange`.
-
-`html` and `css` are what the sandbox root routes on; any other name is
-passed through untouched for a consumer wiring their own panes. */
-  name?: HelixSandboxSource["name"];
-  /** Accessible name for the editable region. */
-  "field-label"?: HelixSandboxSource["fieldLabel"];
-  /** Accessible name for the editable region. */
-  fieldLabel?: HelixSandboxSource["fieldLabel"];
-  /** Whether Tab indents rather than moving focus. */
-  "tab-indents"?: HelixSandboxSource["tabIndents"];
-  /** Whether Tab indents rather than moving focus. */
-  tabIndents?: HelixSandboxSource["tabIndents"];
-
-  /** Fired when the source is edited. */
-  onSourceChange?: (e: HelixSandboxSourceSourceChangeElementEvent) => void;
-};
-
-export type HelixSandboxSourceSolidJsProps = {
-  /** The source being edited. */
-  "prop:value"?: HelixSandboxSource["value"];
-  /** Which source this pane holds, echoed in every `SourceChange`.
-
-`html` and `css` are what the sandbox root routes on; any other name is
-passed through untouched for a consumer wiring their own panes. */
-  "prop:name"?: HelixSandboxSource["name"];
-  /** Accessible name for the editable region. */
-  "attr:field-label"?: HelixSandboxSource["fieldLabel"];
-  /** Accessible name for the editable region. */
-  "prop:fieldLabel"?: HelixSandboxSource["fieldLabel"];
-  /** Whether Tab indents rather than moving focus. */
-  "bool:tab-indents"?: HelixSandboxSource["tabIndents"];
-  /** Whether Tab indents rather than moving focus. */
-  "prop:tabIndents"?: HelixSandboxSource["tabIndents"];
-  /** Fired when the source is edited. */
-  "on:SourceChange"?: (e: HelixSandboxSourceSourceChangeElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type HelixSandboxProps = {
   /** Whether the panes sit side by side or stacked. */
   orientation?: HelixSandbox["orientation"];
@@ -299,6 +244,65 @@ export type HelixSandboxSolidJsProps = {
   "attr:separator-label"?: HelixSandbox["separatorLabel"];
   /** Accessible name for the divider. */
   "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixSandboxSource` component event */
+export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
+  HelixSandboxSource,
+  E
+>;
+/** `SourceChange` event type */
+export type HelixSandboxSourceSourceChangeElementEvent =
+  HelixSandboxSourceElementEvent<HelixSourceChangeEvent>;
+
+export type HelixSandboxSourceProps = {
+  /** The source being edited. */
+  value?: HelixSandboxSource["value"];
+  /** Which source this pane holds, echoed in every `SourceChange`.
+
+`html` and `css` are what the sandbox root routes on; any other name is
+passed through untouched for a consumer wiring their own panes.
+
+Not reflected: nothing selects on it, so it keeps a real default instead. */
+  name?: HelixSandboxSource["name"];
+  /** Accessible name for the editable region. */
+  "field-label"?: HelixSandboxSource["fieldLabel"];
+  /** Accessible name for the editable region. */
+  fieldLabel?: HelixSandboxSource["fieldLabel"];
+  /** Whether Tab indents rather than moving focus. */
+  "tab-indents"?: HelixSandboxSource["tabIndents"];
+  /** Whether Tab indents rather than moving focus. */
+  tabIndents?: HelixSandboxSource["tabIndents"];
+
+  /** Fired when the source is edited. */
+  onSourceChange?: (e: HelixSandboxSourceSourceChangeElementEvent) => void;
+};
+
+export type HelixSandboxSourceSolidJsProps = {
+  /** The source being edited. */
+  "prop:value"?: HelixSandboxSource["value"];
+  /** Which source this pane holds, echoed in every `SourceChange`.
+
+`html` and `css` are what the sandbox root routes on; any other name is
+passed through untouched for a consumer wiring their own panes.
+
+Not reflected: nothing selects on it, so it keeps a real default instead. */
+  "prop:name"?: HelixSandboxSource["name"];
+  /** Accessible name for the editable region. */
+  "attr:field-label"?: HelixSandboxSource["fieldLabel"];
+  /** Accessible name for the editable region. */
+  "prop:fieldLabel"?: HelixSandboxSource["fieldLabel"];
+  /** Whether Tab indents rather than moving focus. */
+  "bool:tab-indents"?: HelixSandboxSource["tabIndents"];
+  /** Whether Tab indents rather than moving focus. */
+  "prop:tabIndents"?: HelixSandboxSource["tabIndents"];
+  /** Fired when the source is edited. */
+  "on:SourceChange"?: (e: HelixSandboxSourceSourceChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -332,51 +336,6 @@ export type CustomElements = {
    */
   "helix-sandbox-preview": Partial<
     HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents
-  >;
-
-  /**
-   * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
-   * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
-   * reader support all come from the platform, and every one of them is
-   * expensive to rebuild and easy to get subtly wrong.
-   *
-   * Tab inserts two spaces rather than leaving the field, because a code pane
-   * that cannot indent is not one. Escape then Tab still moves focus out, which
-   * is the documented escape hatch for exactly this trade.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
-   *
-   * `html` and `css` are what the sandbox root routes on; any other name is
-   * passed through untouched for a consumer wiring their own panes.
-   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
-   * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `SourceChange`: Fired when the source is edited.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
-   * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `source`: The editable region.
-   */
-  "helix-sandbox-source": Partial<
-    HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
   >;
 
   /**
@@ -425,6 +384,53 @@ export type CustomElements = {
   "helix-sandbox": Partial<
     HelixSandboxProps & BaseProps<HelixSandbox> & BaseEvents
   >;
+
+  /**
+   * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
+   * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
+   * reader support all come from the platform, and every one of them is
+   * expensive to rebuild and easy to get subtly wrong.
+   *
+   * Tab inserts two spaces rather than leaving the field, because a code pane
+   * that cannot indent is not one. Escape then Tab still moves focus out, which
+   * is the documented escape hatch for exactly this trade.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   *
+   * `html` and `css` are what the sandbox root routes on; any other name is
+   * passed through untouched for a consumer wiring their own panes.
+   *
+   * Not reflected: nothing selects on it, so it keeps a real default instead.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SourceChange`: Fired when the source is edited.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
+   * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `source`: The editable region.
+   */
+  "helix-sandbox-source": Partial<
+    HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
+  >;
 };
 
 export type CustomElementsSolidJs = {
@@ -455,54 +461,6 @@ export type CustomElementsSolidJs = {
     HelixSandboxPreviewProps &
       HelixSandboxPreviewSolidJsProps &
       BaseProps<HelixSandboxPreview> &
-      BaseEvents
-  >;
-
-  /**
-   * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
-   * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
-   * reader support all come from the platform, and every one of them is
-   * expensive to rebuild and easy to get subtly wrong.
-   *
-   * Tab inserts two spaces rather than leaving the field, because a code pane
-   * that cannot indent is not one. Escape then Tab still moves focus out, which
-   * is the documented escape hatch for exactly this trade.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
-   *
-   * `html` and `css` are what the sandbox root routes on; any other name is
-   * passed through untouched for a consumer wiring their own panes.
-   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
-   * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `SourceChange`: Fired when the source is edited.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
-   * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `source`: The editable region.
-   */
-  "helix-sandbox-source": Partial<
-    HelixSandboxSourceProps &
-      HelixSandboxSourceSolidJsProps &
-      BaseProps<HelixSandboxSource> &
       BaseEvents
   >;
 
@@ -555,17 +513,67 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixSandbox> &
       BaseEvents
   >;
+
+  /**
+   * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
+   * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
+   * reader support all come from the platform, and every one of them is
+   * expensive to rebuild and easy to get subtly wrong.
+   *
+   * Tab inserts two spaces rather than leaving the field, because a code pane
+   * that cannot indent is not one. Escape then Tab still moves focus out, which
+   * is the documented escape hatch for exactly this trade.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   *
+   * `html` and `css` are what the sandbox root routes on; any other name is
+   * passed through untouched for a consumer wiring their own panes.
+   *
+   * Not reflected: nothing selects on it, so it keeps a real default instead.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SourceChange`: Fired when the source is edited.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
+   * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `source`: The editable region.
+   */
+  "helix-sandbox-source": Partial<
+    HelixSandboxSourceProps &
+      HelixSandboxSourceSolidJsProps &
+      BaseProps<HelixSandboxSource> &
+      BaseEvents
+  >;
 };
 
 export type CustomCssProperties = {
-  /** Fill behind the source. */
-  "--sandbox-source-background"?: string;
-  /** Minimum height of the pane. */
-  "--sandbox-source-min-block-size"?: string;
   /** Minimum height of the sandbox. */
   "--sandbox-min-block-size"?: string;
   /** Colour of the divider. */
   "--sandbox-separator-color"?: string;
+  /** Fill behind the source. */
+  "--sandbox-source-background"?: string;
+  /** Minimum height of the pane. */
+  "--sandbox-source-min-block-size"?: string;
 };
 
 declare module "react" {

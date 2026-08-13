@@ -52,7 +52,7 @@ export interface BaseTreeItemProps extends BaseProps {
   expanded?: boolean
   /** Whether this item holds the tree's single tab stop. */
   focusable?: boolean
-  /** Depth from the root, set by the tree so indentation needs no CSS nesting. */
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting. Not reflected. The tree assigns this after it upgrades, so an attribute here would be a change to markup the consumer rendered and hydration would report it. The indent it drives is written onto the row instead, inside the shadow root, which is not part of the tree React hydrates. */
   level?: number
   /** Whether this item is the current one. */
   selected?: boolean

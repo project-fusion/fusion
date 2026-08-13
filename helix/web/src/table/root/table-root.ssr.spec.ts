@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostTag, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hostAttributes, hostTag, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -16,11 +16,12 @@ describe('table server output', () => {
     expect(partTag(markup, 'table')).toContain('aria-label="Attributes"')
   })
 
-  test('rows and cells carry their roles on the host, written before hydration', () => {
-    // Set in `willUpdate`, which the server does call, unlike
-    // `connectedCallback`. Without it the served table has no structure.
-    expect(hostTag(markup, 'helix-table-row')).toContain('role="row"')
-    expect(hostTag(markup, 'helix-table-cell')).toContain('role="columnheader"')
+  test('rows and cells put their structure on internals, not on the host', () => {
+    // The roles are real, and a DOM spec asserts them. What the host must not
+    // do is write them as attributes: the consumer's server markup has only
+    // what they typed, so anything added on upgrade is a hydration mismatch.
+    expect(hostAttributes(markup, 'helix-table-row')).toEqual([])
+    expect(hostAttributes(markup, 'helix-table-cell')).toEqual(['header'])
   })
 
   test('the content is in the markup for a crawler', () => {
