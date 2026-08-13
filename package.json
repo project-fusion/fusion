@@ -1,0 +1,37 @@
+{
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.0",
+    "@types/bun": "^1.3.14",
+    "@types/node": "^22.10.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "license": "UNLICENSED",
+  "name": "@fusion-io/source",
+  "packageManager": "bun@1.1.43",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "check": "biome check --write .",
+    "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
+    "dev": "turbo run dev",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "rs:build": "cargo build --workspace",
+    "rs:check": "cargo clippy --workspace --all-targets -- -D warnings",
+    "rs:fmt": "cargo fmt --all",
+    "rs:test": "cargo test --workspace",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "verify": "bun run check && bun run typecheck && bun run test && bun run rs:check && bun run rs:test"
+  },
+  "version": "0.0.1",
+  "workspaces": [
+    "helix/*",
+    "marketing/*",
+    "tooling/*"
+  ]
+}

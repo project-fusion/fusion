@@ -1,0 +1,29 @@
+# Local-only artifacts, per-machine. Never committed.
+.local/
+
+# Dependencies
+node_modules/
+.pnp.*
+
+# Build output
+dist/
+target/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# Env
+.env
+.env.*
+!.env.template
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+bun-debug.log*

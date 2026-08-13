@@ -1,0 +1,74 @@
+/**
+ * Helix base layer. Light-DOM reset and document defaults.
+ *
+ * Shadow DOM gets `box-sizing: border-box` from HelixElement.finalizeStyles,
+ * so component CSS can rely on border-box on both sides of the boundary.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--helix-color-background);
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  line-height: var(--helix-leading-normal);
+  margin: 0;
+  /* Wide content scrolls inside its own container. The page never scrolls
+     horizontally. */
+  overflow-x: clip;
+}
+
+:where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) {
+  margin: 0;
+}
+
+:where(ul, ol) {
+  margin: 0;
+  padding: 0;
+}
+
+:where(img, picture, video, canvas, svg) {
+  display: block;
+  max-inline-size: 100%;
+}
+
+:where(input, button, textarea, select) {
+  font: inherit;
+}
+
+:where(a) {
+  color: var(--helix-color-primary);
+}
+
+:where(code, kbd, samp, pre) {
+  font-family: var(--helix-font-mono);
+}
+
+/* A flex or grid descendant defaults to min-width: auto, which propagates the
+   intrinsic min-content width of unbreakable inner content up the layout tree
+   and inflates ancestors past the viewport. */
+:where(.helix-scroll) {
+  min-inline-size: 0;
+  overflow-x: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

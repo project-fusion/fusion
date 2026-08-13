@@ -1,0 +1,222 @@
+//! Provenance. The spine of Cortex.
+//!
+//! Every memory, context assembly, tool call, and output is a node with edges
+//! to whatever produced it. That single property is what makes three things
+//! possible, none of which can be retrofitted:
+//!
+//! - **`why()`** answers "what produced this output", which is what most AI
+//!   stacks cannot do at all.
+//! - **Replay** re-runs a trace against a different model or prompt and diffs
+//!   the result, which is how you regression-test a non-deterministic system.
+//! - **Cascading deletion** removes a memory *and everything derived from it*,
+//!   which is what makes a user's right to delete real rather than nominal.
+
+use std::collections::{HashMap, HashSet};
+
+use chrono::{DateTime, Utc};
+use cortex_core::Id;
+use serde::{Deserialize, Serialize};
+
+/// What a node represents.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NodeKind {
+    /// Raw input from outside the system.
+    Source,
+    /// A stored memory, episodic or semantic.
+    Memory,
+    /// A context window assembled for a specific task.
+    Context,
+    /// A tool invocation and its result.
+    ToolCall,
+    /// Model output.
+    Output,
+}
+
+/// A single node in the provenance graph.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Node {
+    pub created_at: DateTime<Utc>,
+    /// Nodes this one was derived from. Empty for a `Source`.
+    pub derived_from: Vec<Id>,
+    pub id: Id,
+    pub kind: NodeKind,
+    /// Kind-specific detail: model id, prompt version, tool name, scores.
+    pub metadata: serde_json::Value,
+}
+
+impl Node {
+    #[must_use]
+    pub fn new(kind: NodeKind, derived_from: Vec<Id>) -> Self {
+        Self {
+            created_at: Utc::now(),
+            derived_from,
+            id: Id::new(),
+            kind,
+            metadata: serde_json::Value::Null,
+        }
+    }
+}
+
+/// An in-memory provenance graph.
+///
+/// The storage-backed implementations (`SQLite` and `Postgres`) hold the same shape
+/// behind a trait; this one is the reference used by tests and by the local
+/// tier before a store is attached.
+#[derive(Clone, Debug, Default)]
+pub struct Graph {
+    /// Reverse index: node -> nodes that derive from it. Maintained on insert
+    /// so cascading deletion does not require a full scan.
+    dependents: HashMap<Id, Vec<Id>>,
+    nodes: HashMap<Id, Node>,
+}
+
+impl Graph {
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn insert(&mut self, node: Node) -> Id {
+        let id = node.id;
+        for parent in &node.derived_from {
+            self.dependents.entry(*parent).or_default().push(id);
+        }
+        self.nodes.insert(id, node);
+        id
+    }
+
+    #[must_use]
+    pub fn get(&self, id: Id) -> Option<&Node> {
+        self.nodes.get(&id)
+    }
+
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.nodes.len()
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.nodes.is_empty()
+    }
+
+    /// Returns the full derivation of a node: everything it came from,
+    /// transitively, in breadth-first order from the node itself.
+    ///
+    /// This is the query the product rests on. "Why did the system say that?"
+    #[must_use]
+    pub fn why(&self, id: Id) -> Vec<&Node> {
+        let mut seen = HashSet::new();
+        let mut queue = vec![id];
+        let mut out = Vec::new();
+
+        while let Some(current) = queue.pop() {
+            if !seen.insert(current) {
+                continue;
+            }
+            if let Some(node) = self.nodes.get(&current) {
+                out.push(node);
+                queue.extend(node.derived_from.iter().copied());
+            }
+        }
+
+        out
+    }
+
+    /// Deletes a node and everything transitively derived from it.
+    ///
+    /// Returns the ids removed. Deleting a memory must also remove the
+    /// summaries, embeddings, and outputs computed from it, or "delete" is a
+    /// promise the system cannot keep.
+    pub fn delete_cascade(&mut self, id: Id) -> Vec<Id> {
+        let mut removed = Vec::new();
+        let mut queue = vec![id];
+        let mut seen = HashSet::new();
+
+        while let Some(current) = queue.pop() {
+            if !seen.insert(current) {
+                continue;
+            }
+            if self.nodes.remove(&current).is_some() {
+                removed.push(current);
+            }
+            if let Some(children) = self.dependents.remove(&current) {
+                queue.extend(children);
+            }
+        }
+
+        // Drop dangling parent references so the graph stays consistent.
+        for node in self.nodes.values_mut() {
+            node.derived_from.retain(|parent| !seen.contains(parent));
+        }
+
+        removed
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// source -> memory -> context -> output
+    fn chain() -> (Graph, Id, Id, Id) {
+        let mut graph = Graph::new();
+        let source = graph.insert(Node::new(NodeKind::Source, vec![]));
+        let memory = graph.insert(Node::new(NodeKind::Memory, vec![source]));
+        let context = graph.insert(Node::new(NodeKind::Context, vec![memory]));
+        let output = graph.insert(Node::new(NodeKind::Output, vec![context]));
+        (graph, source, memory, output)
+    }
+
+    #[test]
+    fn why_walks_the_full_derivation() {
+        let (graph, source, _, output) = chain();
+        let trace = graph.why(output);
+
+        assert_eq!(trace.len(), 4, "output plus three ancestors");
+        assert!(trace.iter().any(|n| n.id == source));
+        assert!(trace.iter().any(|n| n.id == output));
+    }
+
+    #[test]
+    fn why_terminates_on_cycles() {
+        let mut graph = Graph::new();
+        let a = graph.insert(Node::new(NodeKind::Source, vec![]));
+        let b = graph.insert(Node::new(NodeKind::Memory, vec![a]));
+        // Force a cycle, which a buggy writer could produce.
+        if let Some(node) = graph.nodes.get_mut(&a) {
+            node.derived_from.push(b);
+        }
+
+        assert_eq!(graph.why(b).len(), 2);
+    }
+
+    #[test]
+    fn deleting_a_memory_removes_everything_derived_from_it() {
+        let (mut graph, source, memory, output) = chain();
+
+        let removed = graph.delete_cascade(memory);
+
+        assert_eq!(removed.len(), 3, "memory, context, and output");
+        assert!(
+            graph.get(output).is_none(),
+            "derived output must not survive"
+        );
+        assert!(graph.get(source).is_some(), "ancestors are not touched");
+        assert_eq!(graph.len(), 1);
+    }
+
+    #[test]
+    fn cascade_leaves_no_dangling_references() {
+        let (mut graph, source, memory, _) = chain();
+        graph.delete_cascade(memory);
+
+        for node in graph.nodes.values() {
+            for parent in &node.derived_from {
+                assert!(graph.nodes.contains_key(parent), "dangling parent {parent}");
+            }
+        }
+        assert!(graph.get(source).is_some());
+    }
+}

@@ -1,0 +1,38 @@
+{
+  "dependencies": {
+    "@helix-io/core": "workspace:*",
+    "@helix-io/headless": "workspace:*",
+    "@helix-io/styles": "workspace:*"
+  },
+  "description": "Styled component tier. Extends the headless tier with token-driven presentation.",
+  "devDependencies": {
+    "lit": "^3.2.1"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "UNLICENSED",
+  "main": "./dist/index.js",
+  "name": "@helix-io/web",
+  "peerDependencies": {
+    "lit": "^3.2.1"
+  },
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "sideEffects": true,
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "version": "0.0.1"
+}

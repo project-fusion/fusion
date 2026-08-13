@@ -1,0 +1,151 @@
+import { describe, expect, test } from 'bun:test'
+import { deriveTheme, toCss } from './derive.js'
+import { contrastRatio, isOutOfGamut, lightnessForContrast, type Oklch } from './oklch.js'
+
+const BRAND: Oklch = { chroma: 0.19, hue: 258, lightness: 0.58 }
+
+describe('contrast math', () => {
+  test('white on black is the maximum ratio', () => {
+    const white: Oklch = { chroma: 0, hue: 0, lightness: 1 }
+    const black: Oklch = { chroma: 0, hue: 0, lightness: 0 }
+    expect(contrastRatio(white, black)).toBeCloseTo(21, 0)
+  })
+
+  test('a color has no contrast with itself', () => {
+    expect(contrastRatio(BRAND, BRAND)).toBeCloseTo(1, 5)
+  })
+
+  test('ratio is symmetric', () => {
+    const bg: Oklch = { chroma: 0, hue: 0, lightness: 0.98 }
+    expect(contrastRatio(BRAND, bg)).toBeCloseTo(contrastRatio(bg, BRAND), 10)
+  })
+})
+
+describe('lightnessForContrast', () => {
+  const light: Oklch = { chroma: 0, hue: 0, lightness: 0.985 }
+  const dark: Oklch = { chroma: 0, hue: 0, lightness: 0.15 }
+
+  test('solves for AA against a light background', () => {
+    const solved = lightnessForContrast({ chroma: 0.19, hue: 258 }, light, 4.5)
+    expect(contrastRatio(solved, light)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  test('solves for AA against a dark background', () => {
+    const solved = lightnessForContrast({ chroma: 0.19, hue: 258 }, dark, 4.5)
+    expect(contrastRatio(solved, dark)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  test('solves for AAA when asked', () => {
+    const solved = lightnessForContrast({ chroma: 0, hue: 0 }, light, 7)
+    expect(contrastRatio(solved, light)).toBeGreaterThanOrEqual(7)
+  })
+
+  test('returns the least extreme lightness that still passes', () => {
+    const solved = lightnessForContrast({ chroma: 0, hue: 0 }, light, 4.5)
+    const ratio = contrastRatio(solved, light)
+    // Comfortably passing but not maxed out: proves it is solving, not clamping.
+    expect(ratio).toBeGreaterThanOrEqual(4.5)
+    expect(ratio).toBeLessThan(9)
+  })
+
+  test('preserves hue and chroma, moving only lightness', () => {
+    const solved = lightnessForContrast({ chroma: 0.19, hue: 258 }, light, 4.5)
+    expect(solved.hue).toBe(258)
+    expect(solved.chroma).toBe(0.19)
+  })
+})
+
+describe('deriveTheme', () => {
+  test('light theme passes its contrast target with no violations', () => {
+    const theme = deriveTheme({ brand: BRAND })
+    expect(theme.violations).toEqual([])
+  })
+
+  test('dark theme passes its contrast target with no violations', () => {
+    const theme = deriveTheme({ brand: BRAND, scheme: 'dark' })
+    expect(theme.violations).toEqual([])
+  })
+
+  test('holds at an AAA target', () => {
+    const theme = deriveTheme({ brand: BRAND, contrastTarget: 7 })
+    expect(theme.violations).toEqual([])
+  })
+
+  test('every foreground token meets the target against its pairing', () => {
+    const target = 4.5
+    const theme = deriveTheme({ brand: BRAND, contrastTarget: target })
+    const paired = theme.tokens.filter(
+      (t) => t.contrast !== undefined && t.name.includes('foreground'),
+    )
+
+    expect(paired.length).toBeGreaterThan(0)
+    for (const t of paired) {
+      expect(t.contrast).toBeGreaterThanOrEqual(target)
+    }
+  })
+
+  test('holds across the full hue circle, both schemes', () => {
+    for (const scheme of ['light', 'dark'] as const) {
+      for (let hue = 0; hue < 360; hue += 15) {
+        const theme = deriveTheme({ brand: { chroma: 0.15, hue, lightness: 0.6 }, scheme })
+        expect(theme.violations, `${scheme} hue ${hue}`).toEqual([])
+      }
+    }
+  })
+
+  // Regression: foregrounds were solved against `background` only. In a dark
+  // theme `surface` is lighter than `background`, so light text lost contrast
+  // inside cards and dialogs while the page itself passed.
+  test('text passes on surface, not just on background', () => {
+    for (const scheme of ['light', 'dark'] as const) {
+      const theme = deriveTheme({ brand: BRAND, scheme })
+      const find = (name: string) => theme.tokens.find((t) => t.name === name)?.value
+      const surface = find('color-surface')
+      const foregroundMuted = find('color-foreground-muted')
+
+      if (!surface || !foregroundMuted) {
+        throw new Error(`${scheme} theme is missing surface or foreground tokens`)
+      }
+      expect(
+        contrastRatio(foregroundMuted, surface),
+        `${scheme} muted on surface`,
+      ).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  test('no derived token falls outside the sRGB gamut', () => {
+    for (const scheme of ['light', 'dark'] as const) {
+      const theme = deriveTheme({ brand: BRAND, scheme })
+      const outside = theme.tokens.filter((t) => isOutOfGamut(t.value)).map((t) => t.name)
+      expect(outside, `${scheme} scheme`).toEqual([])
+    }
+  })
+
+  test('gamut mapping is reported rather than applied silently', () => {
+    // A near-white surface carrying brand tint cannot be rendered as authored.
+    const theme = deriveTheme({ brand: BRAND })
+    const background = theme.tokens.find((t) => t.name === 'color-background')
+    if (!background) {
+      throw new Error('theme is missing a background token')
+    }
+    expect(background.chromaReduced).toBe(true)
+    expect(isOutOfGamut(background.value)).toBe(false)
+  })
+
+  test('emits valid CSS custom properties', () => {
+    const css = toCss(deriveTheme({ brand: BRAND }))
+    expect(css).toStartWith(':root {')
+    expect(css).toContain('--helix-color-primary: #')
+    expect(css).toContain('--helix-seed-density: 1')
+  })
+})
+
+describe('gamut detection', () => {
+  test('flags a chroma no display can render', () => {
+    expect(isOutOfGamut({ chroma: 0.4, hue: 258, lightness: 0.6 })).toBe(true)
+  })
+
+  test('accepts an ordinary color', () => {
+    expect(isOutOfGamut({ chroma: 0.05, hue: 258, lightness: 0.6 })).toBe(false)
+  })
+})
