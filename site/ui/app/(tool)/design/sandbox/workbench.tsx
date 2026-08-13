@@ -3,7 +3,7 @@
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
 import type { HelixOpenChangeEvent, HelixSelectionChangeEvent } from '@helix-io/web'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Family } from '../../../lib/catalog'
+import type { Family } from '../../../../lib/catalog'
 
 /**
  * The sandbox workbench: source files, a live preview, and the example tree.
@@ -118,7 +118,7 @@ export function SandboxWorkbench({ families }: Props) {
   return (
     <>
       <helix-flex align="center" class="workbenchHeader" gap="md">
-        <helix-link appearance="quiet" href="/">
+        <helix-link appearance="quiet" href="/design">
           <helix-flex align="baseline" gap="2xs" inline>
             <helix-text appearance="body-strong">Helix</helix-text>
             <helix-text appearance="label" tone="subtle">
@@ -148,7 +148,7 @@ export function SandboxWorkbench({ families }: Props) {
           <helix-button appearance="subtle" onClick={share} size="sm">
             {copied ? 'Copied' : 'Share'}
           </helix-button>
-          <helix-button appearance="subtle" href={`/components/${family.slug}`} size="sm">
+          <helix-button appearance="subtle" href={`/design/components/${family.slug}`} size="sm">
             API
           </helix-button>
           {narrow && (

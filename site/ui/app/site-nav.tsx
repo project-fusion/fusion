@@ -1,40 +1,36 @@
 'use client'
 
 import type { HelixOpenChangeEvent } from '@helix-io/web'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FusionLogo } from './fusion-logo'
 import { PreferencesDrawer } from './preferences'
-
-/** The verticals, in the order the company is organised. Design leads. */
-const VERTICALS = [
-  { href: '#design', label: 'Design' },
-  { href: '#mind', label: 'Mind' },
-  { href: '#energy', label: 'Energy' },
-  { href: '#capital', label: 'Capital' },
-]
+import { VERTICALS } from './verticals'
 
 /**
  * Site navigation: the verticals, centred in the banner.
  *
- * A toggle group in `nav` mode: the items are real links inside a navigation
- * landmark, and the selection is marked by an indicator that travels between
- * them. Not tabs, and the difference is not cosmetic: a tab controls a panel
- * and announces itself inside a `tablist`, so borrowing the role would promise
- * panels that do not exist. The moving marker is the part that was wanted, and
- * it does not require the wrong semantics to get.
+ * A toggle group in `nav` mode, so the items are real links inside a navigation
+ * landmark and the selection is marked by an indicator that travels between
+ * them. Not tabs: a tab controls a panel and announces itself inside a
+ * `tablist`, and these are routes. The moving marker was the part that was
+ * wanted, and it does not need the wrong semantics to get.
  *
- * **The header and the drawer are siblings, and have to be.** `backdrop-filter`
- * on the header's material makes it a containing block for `position: fixed`
- * descendants, so a drawer rendered inside it is positioned against the header
- * rather than the viewport and comes out one header tall. Any overlay belonging
- * to a translucent surface has to live beside it, not in it. That is also why
- * this component owns the header rather than being slotted into one.
+ * The current item comes from the pathname, so it is right on a cold load of
+ * any URL rather than only after a click.
+ *
+ * **The header and the drawers are siblings, and have to be.** A filter, which
+ * `backdrop-filter` is, makes an element a containing block for
+ * `position: fixed` descendants: a drawer rendered inside the header is
+ * positioned against the header, comes out one header tall, and shoves the
+ * layout around. That is also why this component owns the header rather than
+ * being slotted into one, and why the header is flat by default.
  */
 export function SiteNav() {
+  const pathname = usePathname()
   const [narrow, setNarrow] = useState(false)
   const [open, setOpen] = useState(false)
   const [prefsOpen, setPrefsOpen] = useState(false)
-  const [current, setCurrent] = useState('')
 
   useEffect(() => {
     const query = window.matchMedia('(max-width: 48rem)')
@@ -44,35 +40,20 @@ export function SiteNav() {
     return () => query.removeEventListener('change', sync)
   }, [])
 
-  // Marks the section being read, so the nav says where you are rather than
-  // only where you can go.
-  useEffect(() => {
-    const sections = VERTICALS.map((entry) => document.querySelector(entry.href)).filter(Boolean)
-    if (sections.length === 0) {
-      return
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting)
-        if (visible[0]?.target.id) {
-          setCurrent(`#${visible[0].target.id}`)
-        }
-      },
-      { rootMargin: '-45% 0px -45% 0px' },
-    )
-    for (const section of sections) {
-      observer.observe(section as Element)
-    }
-    return () => observer.disconnect()
-  }, [])
+  // The deepest matching vertical, so `/design/components/card` still marks
+  // Design rather than nothing.
+  const current =
+    VERTICALS.map((vertical) => vertical.href)
+      .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+      .sort((a, b) => b.length - a.length)[0] ?? ''
 
   return (
     <>
-      <helix-app-header nav-align="center">
+      <helix-app-header>
         <helix-link appearance="quiet" href="/" slot="brand">
           <helix-flex align="center" gap="xs" inline>
             <FusionLogo size="1.5rem" />
-            <helix-text class="wordmark" appearance="body-strong">
+            <helix-text appearance="body-strong" class="wordmark">
               Fusion
             </helix-text>
           </helix-flex>
@@ -80,9 +61,13 @@ export function SiteNav() {
 
         {!narrow && (
           <helix-toggle-group appearance="plain" label="Verticals" nav value={current}>
-            {VERTICALS.map((entry) => (
-              <helix-toggle-group-item href={entry.href} key={entry.href} value={entry.href}>
-                {entry.label}
+            {VERTICALS.map((vertical) => (
+              <helix-toggle-group-item
+                href={vertical.href}
+                key={vertical.href}
+                value={vertical.href}
+              >
+                {vertical.label}
               </helix-toggle-group-item>
             ))}
           </helix-toggle-group>
@@ -122,9 +107,14 @@ export function SiteNav() {
         placement="end"
       >
         <helix-flex align="start" class="navDrawer" direction="column" gap="lg">
-          {VERTICALS.map((entry) => (
-            <helix-link href={entry.href} key={entry.href} onClick={() => setOpen(false)} size="lg">
-              {entry.label}
+          {VERTICALS.map((vertical) => (
+            <helix-link
+              href={vertical.href}
+              key={vertical.href}
+              onClick={() => setOpen(false)}
+              size="lg"
+            >
+              {vertical.label}
             </helix-link>
           ))}
           <helix-button appearance="primary" href="mailto:hello@fusion.dev" size="lg">

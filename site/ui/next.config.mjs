@@ -21,7 +21,7 @@ const config = {
   reactStrictMode: true,
   // Helix ships ESM from workspace packages; Next has to compile it rather
   // than treat it as prebuilt CommonJS.
-  transpilePackages: ['@helix-io/core', '@helix-io/headless', '@helix-io/react', '@helix-io/web'],
+  transpilePackages: ['@helix-io/core', '@helix-io/headless', '@helix-io/sandbox', '@helix-io/web'],
 }
 
 export default config

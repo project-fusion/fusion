@@ -1,64 +1,15 @@
+import { stageAppearance, VERTICALS } from '../verticals'
+
 /**
- * The Fusion marketing page.
+ * The Fusion landing page.
  *
  * Copy comes from the strategy docs rather than being written fresh, so the
  * site and the plan cannot drift: the thesis is `docs/00-thesis.md` and the
- * constraint is the one in `CLAUDE.md`. Stage labels are the honest ones.
- * Active ships with users, Building is real work with nothing shipped,
- * Declared is committed direction with no work started. None are softened here.
+ * constraint is the one in `CLAUDE.md`.
  *
- * A server component with no client boundary of its own. The elements upgrade
- * from the layout's single registration.
+ * A server component with no client boundary of its own. Elements upgrade from
+ * the single registration in the root layout.
  */
-
-/** The two cores. Products are built on top of them, never instead of them. */
-const substrates = [
-  {
-    name: 'Helix',
-    stage: 'Building',
-    summary:
-      'The DNA. A design system in web components with a token layer that derives an accessible palette from intent, so the framework underneath stays swappable.',
-    vertical: 'Fusion Design',
-  },
-  {
-    name: 'Cortex',
-    stage: 'Building',
-    summary:
-      'The mind. Memory, provenance, and context: what a system knows, where it learned it, and how much of it to trust.',
-    vertical: 'Fusion Mind',
-  },
-] as const
-
-/** Design leads, because it is the one with something to show. */
-const verticals = [
-  {
-    body: 'Interface. Helix lives here: a design system in web components, with a token layer that derives an accessible palette from a brand colour rather than from a spreadsheet of hexes.',
-    id: 'design',
-    name: 'Fusion Design',
-    stage: 'Building',
-  },
-  {
-    body: 'Intelligence. Cortex lives here: memory, provenance, and context. What a system knows, where it learned it, and how much of it to trust.',
-    id: 'mind',
-    name: 'Fusion Mind',
-    stage: 'Building',
-  },
-  {
-    body: 'The literal sun, and what it powers. Cheap energy is half of why sovereignty stops being a principle and starts being something you can run. No product yet.',
-    id: 'energy',
-    name: 'Fusion Energy',
-    stage: 'Declared',
-  },
-  {
-    body: 'Allocation. Committed direction with no work started, and it is listed here rather than left off so the map is the whole map.',
-    id: 'capital',
-    name: 'Fusion Capital',
-    stage: 'Declared',
-  },
-] as const
-
-const stageAppearance = (stage: string) =>
-  stage === 'Active' ? 'success' : stage === 'Building' ? 'warning' : 'neutral'
 
 const questions = [
   {
@@ -91,7 +42,7 @@ export default function Home() {
           <helix-text appearance="code" tone="subtle">
             Fusion Development Group
           </helix-text>
-          <helix-text class="heroTitle" as="h1">
+          <helix-text as="h1" class="heroTitle">
             Developing for humanity
           </helix-text>
           <helix-text as="p" class="heroLede" tone="muted">
@@ -103,8 +54,8 @@ export default function Home() {
             <helix-button appearance="primary" href="mailto:hello@fusion.dev" size="lg">
               Start a conversation
             </helix-button>
-            <helix-button href="#substrates" size="lg">
-              See the substrates
+            <helix-button href="/design" size="lg">
+              See what is shipping
             </helix-button>
           </helix-flex>
         </helix-flex>
@@ -125,37 +76,7 @@ export default function Home() {
         </helix-flex>
       </section>
 
-      <section className="band" id="substrates">
-        <helix-flex class="shell" direction="column" gap="lg">
-          <helix-flex direction="column" gap="2xs">
-            <helix-text as="h2">Two substrates</helix-text>
-            <helix-text as="p" tone="muted">
-              Not products. The layers products are built on.
-            </helix-text>
-          </helix-flex>
-
-          <helix-grid gap="md" min="20rem">
-            {substrates.map((substrate) => (
-              <helix-card appearance="outlined" aria-label={substrate.name} key={substrate.name}>
-                <helix-flex align="center" gap="sm" justify="between" slot="header">
-                  <helix-text as="h3" appearance="title">
-                    {substrate.name}
-                  </helix-text>
-                  <helix-tag appearance={stageAppearance(substrate.stage)} size="sm">
-                    {substrate.stage}
-                  </helix-tag>
-                </helix-flex>
-                <helix-text tone="muted">{substrate.summary}</helix-text>
-                <helix-text appearance="label" slot="footer" tone="subtle">
-                  {substrate.vertical}
-                </helix-text>
-              </helix-card>
-            ))}
-          </helix-grid>
-        </helix-flex>
-      </section>
-
-      <section className="band" id="verticals">
+      <section className="band">
         <helix-flex class="shell" direction="column" gap="lg">
           <helix-flex direction="column" gap="2xs">
             <helix-text as="h2">Verticals</helix-text>
@@ -164,25 +85,30 @@ export default function Home() {
             </helix-text>
           </helix-flex>
 
-          <helix-flex direction="column" gap="xl">
-            {verticals.map((vertical) => (
-              <helix-flex direction="column" gap="sm" id={vertical.id} key={vertical.id}>
-                <helix-flex align="center" gap="sm" wrap>
-                  <helix-text as="h3">{vertical.name}</helix-text>
+          <helix-grid gap="md" min="17rem">
+            {VERTICALS.map((vertical) => (
+              <helix-card appearance="outlined" aria-label={vertical.name} key={vertical.href}>
+                <helix-flex align="center" gap="sm" justify="between" slot="header">
+                  <helix-text as="h3" appearance="title">
+                    {vertical.name}
+                  </helix-text>
                   <helix-tag appearance={stageAppearance(vertical.stage)} size="sm">
                     {vertical.stage}
                   </helix-tag>
                 </helix-flex>
-                <helix-text as="p" class="verticalBody" tone="muted">
-                  {vertical.body}
+                <helix-text appearance="caption" tone="muted">
+                  {vertical.summary}
                 </helix-text>
-              </helix-flex>
+                <helix-button appearance="subtle" href={vertical.href} size="sm" slot="footer">
+                  Open
+                </helix-button>
+              </helix-card>
             ))}
-          </helix-flex>
+          </helix-grid>
         </helix-flex>
       </section>
 
-      <section className="band" id="questions">
+      <section className="band">
         <helix-flex class="shell" direction="column" gap="lg">
           <helix-text as="h2">Questions</helix-text>
           <helix-accordion>
@@ -200,7 +126,9 @@ export default function Home() {
 
       <section className="band closing">
         <helix-flex align="center" class="shell" direction="column" gap="md">
-          <helix-text as="h2">Solo, and shipping</helix-text>
+          <helix-text as="h2" appearance="heading">
+            Solo, and shipping
+          </helix-text>
           <helix-text as="p" class="closingLede" tone="muted">
             We take on interface and intelligence work the substrates make faster to do well. If
             that is what you need, say so plainly and we will tell you whether we are the right

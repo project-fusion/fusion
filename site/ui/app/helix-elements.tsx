@@ -1,6 +1,7 @@
 'use client'
 
 import '@helix-io/web'
+import '@helix-io/sandbox'
 
 /**
  * Registers every Helix element the site uses.

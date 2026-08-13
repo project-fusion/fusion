@@ -45,8 +45,7 @@
   "workspaces": [
     "cortex/docs",
     "helix/*",
-    "marketing/*",
-    "sandbox/*",
+    "site/*",
     "tooling/*"
   ]
 }
