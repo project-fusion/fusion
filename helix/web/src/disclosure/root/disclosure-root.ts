@@ -1,6 +1,7 @@
+import { customElement } from '@helix-io/core'
 import { HelixBaseDisclosure } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { styles } from './disclosure-root.css.js'
 
 /**

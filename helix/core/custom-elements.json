@@ -38,6 +38,43 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/custom-element.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "customElement",
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Registers a custom element, once.\n\nA drop-in replacement for Lit's `@customElement` that does not throw when the\ntag is already registered.\n\nThe duplicate is not hypothetical. Next.js evaluates a module in both the\nserver and client graphs, so a component imported by a server component and a\nclient component runs its registration twice against one registry, and\n`customElements.define` throws:\n\n> Failed to execute 'define': the name \"helix-card\" has already been used\n\nThat failure takes down the whole prerender, and it appears only once an app\nmixes server and client usage of the same component, which is exactly what a\nreal app does.\n\nThe analyzer detects `@customElement` **by decorator name**, not by where it\nis imported from, so the manifest still records `tagName` and nothing\ndownstream changes."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "customElement",
+          "declaration": {
+            "name": "customElement",
+            "module": "src/custom-element.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "tagName",
+          "declaration": {
+            "name": "target",
+            "module": "src/custom-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/events.ts",
       "declarations": [
         {
@@ -141,6 +178,14 @@
           "declaration": {
             "name": "createSheet",
             "module": "./create-sheet.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "customElement",
+          "declaration": {
+            "name": "customElement",
+            "module": "./custom-element.js"
           }
         },
         {

@@ -1,6 +1,5 @@
-import { HelixElement, WithOpen } from '@helix-io/core'
+import { customElement, HelixElement, WithOpen } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
-import { customElement } from 'lit/decorators.js'
 
 /** Shadow-DOM id linking the trigger's aria-controls to the content region. */
 const CONTENT_ID = 'content'

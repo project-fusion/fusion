@@ -1,6 +1,6 @@
+import { customElement } from '@helix-io/core'
 import { HelixBaseCardBody } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { customElement } from 'lit/decorators.js'
 import { styles } from './card-body.css.js'
 
 /**

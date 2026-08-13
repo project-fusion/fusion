@@ -1,6 +1,6 @@
-import { HelixElement } from '@helix-io/core'
+import { customElement, HelixElement } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 
 /**
  * Monotonic suffix for generated ids.

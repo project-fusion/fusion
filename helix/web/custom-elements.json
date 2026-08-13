@@ -309,6 +309,9 @@
               "inheritedFrom": {
                 "name": "WithOpen",
                 "module": "src/mixins/with-open.ts"
+              },
+              "type": {
+                "text": "setOpen(next: boolean) => void"
               }
             },
             {
@@ -424,7 +427,9 @@
             "part": "Root"
           },
           "tagName": "helix-disclosure",
-          "customElement": true
+          "customElement": true,
+          "modulePath": "src/disclosure/root/disclosure-root.ts",
+          "definitionPath": "src/disclosure/root/disclosure-root.ts"
         }
       ],
       "exports": [
@@ -442,123 +447,6 @@
           "declaration": {
             "name": "HelixDisclosure",
             "module": "src/disclosure/root/disclosure-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/body/card-body.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/card/body/card-body.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/body/card-body.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Carries the card's inset and muted foreground so content does not need to restate either.",
-          "name": "HelixCardBody",
-          "cssProperties": [
-            {
-              "description": "Inset, inherited from the card unless overridden.",
-              "name": "--card-padding"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The region.",
-              "name": "container",
-              "inheritedFrom": {
-                "name": "HelixBaseCardBody",
-                "module": "src/card/body/card-body.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The card's content.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseCardBody",
-                "module": "src/card/body/card-body.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseCardBody",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Holds a card's main content.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/card",
-            "tier": "styled",
-            "group": "Card",
-            "part": "Body"
-          },
-          "tagName": "helix-card-body",
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCardBody",
-          "declaration": {
-            "name": "HelixCardBody",
-            "module": "src/card/body/card-body.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-card-body",
-          "declaration": {
-            "name": "HelixCardBody",
-            "module": "src/card/body/card-body.ts"
           }
         }
       ]
@@ -658,7 +546,9 @@
             "part": "Footer"
           },
           "tagName": "helix-card-footer",
-          "customElement": true
+          "customElement": true,
+          "modulePath": "src/card/footer/card-footer.ts",
+          "definitionPath": "src/card/footer/card-footer.ts"
         }
       ],
       "exports": [
@@ -676,6 +566,283 @@
           "declaration": {
             "name": "HelixCardFooter",
             "module": "src/card/footer/card-footer.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/body/card-body.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/card/body/card-body.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/body/card-body.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Carries the card's inset and muted foreground so content does not need to restate either.",
+          "name": "HelixCardBody",
+          "cssProperties": [
+            {
+              "description": "Inset, inherited from the card unless overridden.",
+              "name": "--card-padding"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The region.",
+              "name": "container",
+              "inheritedFrom": {
+                "name": "HelixBaseCardBody",
+                "module": "src/card/body/card-body.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The card's content.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseCardBody",
+                "module": "src/card/body/card-body.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseCardBody",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Holds a card's main content.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/card",
+            "tier": "styled",
+            "group": "Card",
+            "part": "Body"
+          },
+          "tagName": "helix-card-body",
+          "customElement": true,
+          "modulePath": "src/card/body/card-body.ts",
+          "definitionPath": "src/card/body/card-body.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCardBody",
+          "declaration": {
+            "name": "HelixCardBody",
+            "module": "src/card/body/card-body.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-card-body",
+          "declaration": {
+            "name": "HelixCardBody",
+            "module": "src/card/body/card-body.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/title/card-title.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/card/title/card-title.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/title/card-title.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders as a heading whose level the consumer sets, because the correct level\ndepends on the surrounding document.",
+          "name": "HelixCardTitle",
+          "cssParts": [
+            {
+              "description": "The heading element.",
+              "name": "heading",
+              "inheritedFrom": {
+                "name": "HelixBaseCardTitle",
+                "module": "src/card/title/card-title.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The title text.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseCardTitle",
+                "module": "src/card/title/card-title.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "readyEvent",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-card-title-ready'",
+              "description": "Internal signal that a title is ready to be referenced by its card.",
+              "inheritedFrom": {
+                "name": "HelixBaseCardTitle",
+                "module": "src/card/title/card-title.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "level",
+              "type": {
+                "text": "1 | 2 | 3 | 4 | 5 | 6"
+              },
+              "default": "3",
+              "description": "Heading level, 1 through 6.",
+              "attribute": "level",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCardTitle",
+                "module": "src/card/title/card-title.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseCardTitle",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Names the card that contains it.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/card",
+            "tier": "styled",
+            "group": "Card",
+            "part": "Title"
+          },
+          "tagName": "helix-card-title",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "level",
+              "type": {
+                "text": "1 | 2 | 3 | 4 | 5 | 6"
+              },
+              "default": "3",
+              "description": "Heading level, 1 through 6.",
+              "fieldName": "level",
+              "inheritedFrom": {
+                "name": "HelixBaseCardTitle",
+                "module": "src/card/title/card-title.ts"
+              }
+            }
+          ],
+          "modulePath": "src/card/title/card-title.ts",
+          "definitionPath": "src/card/title/card-title.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCardTitle",
+          "declaration": {
+            "name": "HelixCardTitle",
+            "module": "src/card/title/card-title.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-card-title",
+          "declaration": {
+            "name": "HelixCardTitle",
+            "module": "src/card/title/card-title.ts"
           }
         }
       ]
@@ -775,7 +942,9 @@
             "part": "Header"
           },
           "tagName": "helix-card-header",
-          "customElement": true
+          "customElement": true,
+          "modulePath": "src/card/header/card-header.ts",
+          "definitionPath": "src/card/header/card-header.ts"
         }
       ],
       "exports": [
@@ -1011,7 +1180,9 @@
             "part": "Root"
           },
           "tagName": "helix-card",
-          "customElement": true
+          "customElement": true,
+          "modulePath": "src/card/root/card-root.ts",
+          "definitionPath": "src/card/root/card-root.ts"
         }
       ],
       "exports": [
@@ -1029,162 +1200,6 @@
           "declaration": {
             "name": "HelixCard",
             "module": "src/card/root/card-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/title/card-title.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/card/title/card-title.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/title/card-title.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Renders as a heading whose level the consumer sets, because the correct level\ndepends on the surrounding document.",
-          "name": "HelixCardTitle",
-          "cssParts": [
-            {
-              "description": "The heading element.",
-              "name": "heading",
-              "inheritedFrom": {
-                "name": "HelixBaseCardTitle",
-                "module": "src/card/title/card-title.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The title text.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseCardTitle",
-                "module": "src/card/title/card-title.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "readyEvent",
-              "type": {
-                "text": "string"
-              },
-              "static": true,
-              "readonly": true,
-              "default": "'helix-card-title-ready'",
-              "description": "Internal signal that a title is ready to be referenced by its card.",
-              "inheritedFrom": {
-                "name": "HelixBaseCardTitle",
-                "module": "src/card/title/card-title.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "level",
-              "type": {
-                "text": "1 | 2 | 3 | 4 | 5 | 6"
-              },
-              "default": "3",
-              "description": "Heading level, 1 through 6.",
-              "attribute": "level",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCardTitle",
-                "module": "src/card/title/card-title.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseCardTitle",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Names the card that contains it.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/card",
-            "tier": "styled",
-            "group": "Card",
-            "part": "Title"
-          },
-          "tagName": "helix-card-title",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "level",
-              "type": {
-                "text": "1 | 2 | 3 | 4 | 5 | 6"
-              },
-              "default": "3",
-              "description": "Heading level, 1 through 6.",
-              "fieldName": "level",
-              "inheritedFrom": {
-                "name": "HelixBaseCardTitle",
-                "module": "src/card/title/card-title.ts"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCardTitle",
-          "declaration": {
-            "name": "HelixCardTitle",
-            "module": "src/card/title/card-title.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-card-title",
-          "declaration": {
-            "name": "HelixCardTitle",
-            "module": "src/card/title/card-title.ts"
           }
         }
       ]

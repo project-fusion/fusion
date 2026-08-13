@@ -1,16 +1,12 @@
 import '@helix-io/web/card'
 
 /**
- * Uses the custom elements directly rather than the React wrappers.
+ * Uses the custom elements directly.
  *
- * The wrappers are client components, and a client boundary loses declarative
- * shadow DOM: the shadow root is not server-rendered, so the component arrives
- * unstyled until the bundle upgrades it. Measured on this page, the wrapper
- * cost 10.1 kB of route JavaScript against 121 B, and gave up DSD and
- * server-rendered ARIA to do it.
- *
- * Reach for `@helix-io/react` inside client components, where a boundary
- * already exists and typed event callbacks and refs are worth having.
+ * Elements written as JSX keep declarative shadow DOM in server *and* client
+ * components alike. What loses it is the React wrapper, which builds elements
+ * through `createElement` rather than JSX, a path Lit SSR does not intercept.
+ * Measured here: 121 B of route JavaScript with DSD, against 10.1 kB without.
  */
 export default function Home() {
   return (

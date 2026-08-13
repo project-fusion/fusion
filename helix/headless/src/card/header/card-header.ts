@@ -1,6 +1,5 @@
-import { HelixElement } from '@helix-io/core'
+import { customElement, HelixElement } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
-import { customElement } from 'lit/decorators.js'
 
 /**
  * @summary Holds a card's title and any actions that apply to the whole card.

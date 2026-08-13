@@ -1,6 +1,5 @@
-import { HelixElement } from '@helix-io/core'
+import { customElement, HelixElement } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { customElement } from 'lit/decorators.js'
 import { HelixBaseCardTitle } from '../title/card-title.js'
 
 /**

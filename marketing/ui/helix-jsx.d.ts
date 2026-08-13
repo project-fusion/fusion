@@ -1,16 +1,8 @@
-import type { HTMLAttributes } from 'react'
-
 /**
- * Hand-written for this experiment. If this approach wins, the generator emits
- * it from the manifest, so JSX types stay in step with the elements.
+ * Generated JSX types for Helix custom elements.
+ *
+ * Emitted by `@wc-toolkit/jsx-types` from the same manifest the React wrappers
+ * read, so `<helix-card appearance="wrong">` is a type error rather than a
+ * silent no-op.
  */
-declare module 'react' {
-  namespace JSX {
-    interface IntrinsicElements {
-      'helix-card': HTMLAttributes<HTMLElement> & { appearance?: 'outlined' | 'elevated' | 'plain' }
-      'helix-card-body': HTMLAttributes<HTMLElement>
-      'helix-card-header': HTMLAttributes<HTMLElement>
-      'helix-card-title': HTMLAttributes<HTMLElement> & { level?: number }
-    }
-  }
-}
+import '@helix-io/web/jsx'

@@ -15,11 +15,13 @@
     "./*": {
       "types": "./dist/*/index.d.ts",
       "default": "./dist/*/index.js"
-    }
+    },
+    "./jsx": "./jsx.d.ts"
   },
   "files": [
     "custom-elements.json",
-    "dist"
+    "dist",
+    "jsx.d.ts"
   ],
   "customElements": "custom-elements.json",
   "sideEffects": true,
