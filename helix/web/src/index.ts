@@ -1,6 +1,2 @@
-export { HelixCard } from './card/card.js'
-export { HelixCardBody } from './card/card-body.js'
-export { HelixCardFooter } from './card/card-footer.js'
-export { HelixCardHeader } from './card/card-header.js'
-export { HelixCardTitle } from './card/card-title.js'
-export { HelixDisclosure } from './disclosure/disclosure.js'
+export * from './card/index.js'
+export * from './disclosure/index.js'

@@ -177,6 +177,61 @@ with consumer restraint, hierarchy from type and space rather than color,
 borders over shadows, motion as feedback only. The current tokens are a working
 default, not that direction.
 
+## One folder per part
+
+Every part of a component owns a folder, holding its markup, its styles, and its
+spec:
+
+```
+helix/web/src/card/
+  index.ts                  re-exports each part
+  root/
+    card-root.ts
+    card-root.css
+    card-root.spec.ts
+  header/
+    card-header.ts
+    card-header.css
+  …
+```
+
+The folder is what the composition plugin reads, so `Card.Header` follows from
+the layout rather than from a naming convention on a filename. It also keeps a
+part's three files adjacent instead of scattered across three trees.
+
+Specs are `*.spec.ts`, colocated with what they cover, and excluded from
+`tsconfig` so they never reach `dist`.
+
+## Styles are CSS files, not tagged templates
+
+Component styles are authored in a sibling `.css` file and imported:
+
+```ts
+import { styles } from './card-root.css.js'
+
+static override styles: CSSResultGroup = styles
+```
+
+`bun run styles` compiles each `.css` into a generated `.css.ts` that calls
+`createSheet`. The generated files are gitignored build output; never edit one.
+
+Real CSS files get real CSS tooling: syntax highlighting, the formatter, the
+token linter, and diffs that read as CSS rather than as a string inside a
+template literal.
+
+The generated intermediate exists because none of the direct routes work
+everywhere. `import './x.css'` is not something tsc understands, `?inline` is a
+bundler convention that would force every consumer onto the same bundler, and
+import attributes (`with { type: 'css' }`) are not portable enough yet. A
+generated `.css.ts` is ordinary TypeScript: tsc emits it, and it works in any
+consumer regardless of tooling.
+
+## Config files are TypeScript
+
+`custom-elements-manifest.config.ts`, not `.mjs`. The analyzer CLI runs under
+bun, which resolves TypeScript natively, so the config gets type-checked against
+`Config` instead of failing at runtime on a typo.
+
 ## Tokens: primitives are private, semantics are the API
 
 Two layers in `@helix-io/styles`, and components see only the second.
@@ -244,9 +299,9 @@ Groups come from the file layout via the `helix-composition` plugin, where the
 directory is the group and the file is the part:
 
 ```
-src/card/card.ts         ->  Card.Root
-src/card/card-header.ts  ->  Card.Header
-src/scroll-area/…        ->  ScrollArea.Root
+src/card/root/card-root.ts        ->  Card.Root
+src/card/header/card-header.ts    ->  Card.Header
+src/scroll-area/root/…            ->  ScrollArea.Root
 ```
 
 The headless tier is a **parallel family**, `BaseCard.Root` alongside
@@ -256,9 +311,8 @@ prefix keeps the two adjacent in autocomplete. Both tiers register elements
 (`helix-base-card` and `helix-card`) because an unregistered element can only be
 subclassed, which is not what "independently consumable" means.
 
-**Both tiers ship the same file name.** `helix/headless/src/card/card.ts` and
-`helix/web/src/card/card.ts`. The package says which tier; the file name is the
-part. A `-base` suffix would make the part `Base` instead of `Root`.
+**Both tiers ship the same paths.** `helix/headless/src/card/root/card-root.ts`
+and `helix/web/src/card/root/card-root.ts`. The package says which tier.
 
 Deriving groups from tag names instead is ambiguous exactly where it matters:
 `helix-scroll-area` is one component and `helix-card-header` is part of another,

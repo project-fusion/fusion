@@ -254,7 +254,7 @@ describe('createHelixCemConfig', () => {
     expect(names.at(-1)).toBe('custom')
   })
 
-  test('test files are excluded so specs do not enter the manifest', () => {
-    expect(createHelixCemConfig({ tier: 'styled' }).exclude).toContain('src/**/*.test.ts')
+  test('specs are excluded so they do not enter the manifest', () => {
+    expect(createHelixCemConfig({ tier: 'styled' }).exclude).toContain('src/**/*.spec.ts')
   })
 })

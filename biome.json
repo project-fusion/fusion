@@ -16,7 +16,8 @@
       "!**/target",
       "!**/.turbo",
       "!**/node_modules",
-      "!**/custom-elements.json"
+      "!**/custom-elements.json",
+      "!**/*.css.ts"
     ]
   },
   "formatter": {

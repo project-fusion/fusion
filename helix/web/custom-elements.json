@@ -9,57 +9,107 @@
       "exports": [
         {
           "kind": "js",
-          "name": "HelixCard",
+          "name": "*",
           "declaration": {
-            "name": "HelixCard",
-            "module": "./card/card.js"
+            "name": "*",
+            "module": "src/card/index.js"
           }
         },
         {
           "kind": "js",
-          "name": "HelixCardBody",
+          "name": "*",
           "declaration": {
-            "name": "HelixCardBody",
-            "module": "./card/card-body.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixCardFooter",
-          "declaration": {
-            "name": "HelixCardFooter",
-            "module": "./card/card-footer.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixCardHeader",
-          "declaration": {
-            "name": "HelixCardHeader",
-            "module": "./card/card-header.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixCardTitle",
-          "declaration": {
-            "name": "HelixCardTitle",
-            "module": "./card/card-title.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixDisclosure",
-          "declaration": {
-            "name": "HelixDisclosure",
-            "module": "./disclosure/disclosure.js"
+            "name": "*",
+            "module": "src/disclosure/index.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/card-body.ts",
+      "path": "src/card/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/card/body/card-body.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/card/footer/card-footer.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/card/header/card-header.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/card/root/card-root.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/card/title/card-title.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/disclosure/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/disclosure/root/disclosure-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/body/card-body.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/card/body/card-body.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/body/card-body.ts",
       "declarations": [
         {
           "kind": "class",
@@ -146,7 +196,7 @@
               "name": "",
               "inheritedFrom": {
                 "name": "HelixBaseCardBody",
-                "module": "src/card/card-body.ts"
+                "module": "src/card/body/card-body.ts"
               }
             }
           ],
@@ -163,7 +213,7 @@
           "name": "HelixCardBody",
           "declaration": {
             "name": "HelixCardBody",
-            "module": "src/card/card-body.ts"
+            "module": "src/card/body/card-body.ts"
           }
         },
         {
@@ -171,14 +221,34 @@
           "name": "helix-card-body",
           "declaration": {
             "name": "HelixCardBody",
-            "module": "src/card/card-body.ts"
+            "module": "src/card/body/card-body.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/card-footer.ts",
+      "path": "src/card/footer/card-footer.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/card/footer/card-footer.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/footer/card-footer.ts",
       "declarations": [
         {
           "kind": "class",
@@ -265,7 +335,7 @@
               "name": "",
               "inheritedFrom": {
                 "name": "HelixBaseCardFooter",
-                "module": "src/card/card-footer.ts"
+                "module": "src/card/footer/card-footer.ts"
               }
             }
           ],
@@ -282,7 +352,7 @@
           "name": "HelixCardFooter",
           "declaration": {
             "name": "HelixCardFooter",
-            "module": "src/card/card-footer.ts"
+            "module": "src/card/footer/card-footer.ts"
           }
         },
         {
@@ -290,14 +360,34 @@
           "name": "helix-card-footer",
           "declaration": {
             "name": "HelixCardFooter",
-            "module": "src/card/card-footer.ts"
+            "module": "src/card/footer/card-footer.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/card-header.ts",
+      "path": "src/card/header/card-header.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/card/header/card-header.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/header/card-header.ts",
       "declarations": [
         {
           "kind": "class",
@@ -384,7 +474,7 @@
               "name": "",
               "inheritedFrom": {
                 "name": "HelixBaseCardHeader",
-                "module": "src/card/card-header.ts"
+                "module": "src/card/header/card-header.ts"
               }
             }
           ],
@@ -401,7 +491,7 @@
           "name": "HelixCardHeader",
           "declaration": {
             "name": "HelixCardHeader",
-            "module": "src/card/card-header.ts"
+            "module": "src/card/header/card-header.ts"
           }
         },
         {
@@ -409,157 +499,34 @@
           "name": "helix-card-header",
           "declaration": {
             "name": "HelixCardHeader",
-            "module": "src/card/card-header.ts"
+            "module": "src/card/header/card-header.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/card-title.ts",
+      "path": "src/card/root/card-root.css.ts",
       "declarations": [
         {
-          "kind": "class",
-          "description": "Titles name the card that contains them.",
-          "name": "HelixCardTitle",
-          "cssParts": [
-            {
-              "description": "The heading element.",
-              "name": "heading"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "level",
-              "type": {
-                "text": "1 | 2 | 3 | 4 | 5 | 6"
-              },
-              "default": "3",
-              "description": "Heading level rendered, 1 through 6.\n\nA card's title is a heading, and its correct level depends on the document\naround it, which the component cannot know. Defaulting to 3 and letting the\nconsumer correct it beats hard-coding a level that is wrong half the time.",
-              "attribute": "level",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCardTitle",
-                "module": "src/card/card-title.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "emit",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "detail",
-                  "optional": true,
-                  "type": {
-                    "text": "T"
-                  }
-                }
-              ],
-              "description": "Dispatches a composed, bubbling CustomEvent. Kebab-case names map to React\n`onFooBar` props through the wrapper generator, so event names are part of\nthe public API and should be treated as such.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseCardTitle",
-            "package": "@helix-io/headless"
-          },
-          "tagName": "helix-card-title",
-          "customElement": true,
-          "slots": [
-            {
-              "description": "The title text.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseCardTitle",
-                "module": "src/card/card-title.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "level",
-              "type": {
-                "text": "1 | 2 | 3 | 4 | 5 | 6"
-              },
-              "default": "3",
-              "description": "Heading level rendered, 1 through 6.\n\nA card's title is a heading, and its correct level depends on the document\naround it, which the component cannot know. Defaulting to 3 and letting the\nconsumer correct it beats hard-coding a level that is wrong half the time.",
-              "fieldName": "level",
-              "inheritedFrom": {
-                "name": "HelixBaseCardTitle",
-                "module": "src/card/card-title.ts"
-              }
-            }
-          ],
-          "helix": {
-            "tier": "styled",
-            "group": "Card",
-            "part": "Title"
-          }
+          "kind": "variable",
+          "name": "styles"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixCardTitle",
+          "name": "styles",
           "declaration": {
-            "name": "HelixCardTitle",
-            "module": "src/card/card-title.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-card-title",
-          "declaration": {
-            "name": "HelixCardTitle",
-            "module": "src/card/card-title.ts"
+            "name": "styles",
+            "module": "src/card/root/card-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/card.ts",
+      "path": "src/card/root/card-root.ts",
       "declarations": [
         {
           "kind": "class",
@@ -623,7 +590,7 @@
               "description": "Cached so a re-render does not clear a name that has not changed.",
               "inheritedFrom": {
                 "name": "HelixBaseCard",
-                "module": "src/card/card.ts"
+                "module": "src/card/root/card-root.ts"
               }
             },
             {
@@ -638,7 +605,7 @@
               "description": "Points the region at the first descendant title, if there is one.\n\nSearches the light DOM rather than the shadow root: the title is the\nconsumer's child, not ours. `querySelector` reaches nested titles, so a\ntitle inside a header still names the card.",
               "inheritedFrom": {
                 "name": "HelixBaseCard",
-                "module": "src/card/card.ts"
+                "module": "src/card/root/card-root.ts"
               }
             },
             {
@@ -647,7 +614,7 @@
               "privacy": "protected",
               "inheritedFrom": {
                 "name": "HelixBaseCard",
-                "module": "src/card/card.ts"
+                "module": "src/card/root/card-root.ts"
               }
             },
             {
@@ -738,7 +705,7 @@
               "name": "",
               "inheritedFrom": {
                 "name": "HelixBaseCard",
-                "module": "src/card/card.ts"
+                "module": "src/card/root/card-root.ts"
               }
             }
           ],
@@ -755,7 +722,7 @@
           "name": "HelixCard",
           "declaration": {
             "name": "HelixCard",
-            "module": "src/card/card.ts"
+            "module": "src/card/root/card-root.ts"
           }
         },
         {
@@ -763,61 +730,197 @@
           "name": "helix-card",
           "declaration": {
             "name": "HelixCard",
-            "module": "src/card/card.ts"
+            "module": "src/card/root/card-root.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/index.ts",
-      "declarations": [],
+      "path": "src/card/title/card-title.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixCard",
+          "name": "styles",
           "declaration": {
-            "name": "HelixCard",
-            "module": "./card.js"
+            "name": "styles",
+            "module": "src/card/title/card-title.css.ts"
           }
-        },
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/title/card-title.ts",
+      "declarations": [
         {
-          "kind": "js",
-          "name": "HelixCardBody",
-          "declaration": {
-            "name": "HelixCardBody",
-            "module": "./card-body.js"
+          "kind": "class",
+          "description": "Titles name the card that contains them.",
+          "name": "HelixCardTitle",
+          "cssParts": [
+            {
+              "description": "The heading element.",
+              "name": "heading"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "level",
+              "type": {
+                "text": "1 | 2 | 3 | 4 | 5 | 6"
+              },
+              "default": "3",
+              "description": "Heading level rendered, 1 through 6.\n\nA card's title is a heading, and its correct level depends on the document\naround it, which the component cannot know. Defaulting to 3 and letting the\nconsumer correct it beats hard-coding a level that is wrong half the time.",
+              "attribute": "level",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCardTitle",
+                "module": "src/card/title/card-title.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "emit",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "detail",
+                  "optional": true,
+                  "type": {
+                    "text": "T"
+                  }
+                }
+              ],
+              "description": "Dispatches a composed, bubbling CustomEvent. Kebab-case names map to React\n`onFooBar` props through the wrapper generator, so event names are part of\nthe public API and should be treated as such.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseCardTitle",
+            "package": "@helix-io/headless"
+          },
+          "tagName": "helix-card-title",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The title text.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseCardTitle",
+                "module": "src/card/title/card-title.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "level",
+              "type": {
+                "text": "1 | 2 | 3 | 4 | 5 | 6"
+              },
+              "default": "3",
+              "description": "Heading level rendered, 1 through 6.\n\nA card's title is a heading, and its correct level depends on the document\naround it, which the component cannot know. Defaulting to 3 and letting the\nconsumer correct it beats hard-coding a level that is wrong half the time.",
+              "fieldName": "level",
+              "inheritedFrom": {
+                "name": "HelixBaseCardTitle",
+                "module": "src/card/title/card-title.ts"
+              }
+            }
+          ],
+          "helix": {
+            "tier": "styled",
+            "group": "Card",
+            "part": "Title"
           }
-        },
-        {
-          "kind": "js",
-          "name": "HelixCardFooter",
-          "declaration": {
-            "name": "HelixCardFooter",
-            "module": "./card-footer.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixCardHeader",
-          "declaration": {
-            "name": "HelixCardHeader",
-            "module": "./card-header.js"
-          }
-        },
+        }
+      ],
+      "exports": [
         {
           "kind": "js",
           "name": "HelixCardTitle",
           "declaration": {
             "name": "HelixCardTitle",
-            "module": "./card-title.js"
+            "module": "src/card/title/card-title.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-card-title",
+          "declaration": {
+            "name": "HelixCardTitle",
+            "module": "src/card/title/card-title.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/disclosure/disclosure.ts",
+      "path": "src/disclosure/root/disclosure-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/disclosure/root/disclosure-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/disclosure/root/disclosure-root.ts",
       "declarations": [
         {
           "kind": "class",
@@ -989,7 +1092,7 @@
               "privacy": "protected",
               "inheritedFrom": {
                 "name": "HelixBaseDisclosure",
-                "module": "src/disclosure/disclosure.ts"
+                "module": "src/disclosure/root/disclosure-root.ts"
               }
             },
             {
@@ -1106,7 +1209,7 @@
               "name": "summary",
               "inheritedFrom": {
                 "name": "HelixBaseDisclosure",
-                "module": "src/disclosure/disclosure.ts"
+                "module": "src/disclosure/root/disclosure-root.ts"
               }
             },
             {
@@ -1114,7 +1217,7 @@
               "name": "",
               "inheritedFrom": {
                 "name": "HelixBaseDisclosure",
-                "module": "src/disclosure/disclosure.ts"
+                "module": "src/disclosure/root/disclosure-root.ts"
               }
             }
           ],
@@ -1125,7 +1228,7 @@
               "reactProp": "onOpenChange",
               "inheritedFrom": {
                 "name": "HelixBaseDisclosure",
-                "module": "src/disclosure/disclosure.ts"
+                "module": "src/disclosure/root/disclosure-root.ts"
               }
             }
           ],
@@ -1142,7 +1245,7 @@
           "name": "HelixDisclosure",
           "declaration": {
             "name": "HelixDisclosure",
-            "module": "src/disclosure/disclosure.ts"
+            "module": "src/disclosure/root/disclosure-root.ts"
           }
         },
         {
@@ -1150,22 +1253,7 @@
           "name": "helix-disclosure",
           "declaration": {
             "name": "HelixDisclosure",
-            "module": "src/disclosure/disclosure.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/disclosure/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/disclosure/disclosure.js"
+            "module": "src/disclosure/root/disclosure-root.ts"
           }
         }
       ]

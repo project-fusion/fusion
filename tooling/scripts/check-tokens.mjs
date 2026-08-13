@@ -84,7 +84,7 @@ const walk = function* (dir) {
     const full = join(dir, entry)
     if (statSync(full).isDirectory()) {
       yield* walk(full)
-    } else if (/\.(?:css|ts)$/.test(entry) && !entry.endsWith('.test.ts')) {
+    } else if (/\.(?:css|ts)$/.test(entry) && !entry.endsWith('.spec.ts')) {
       yield full
     }
   }

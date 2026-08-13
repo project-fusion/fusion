@@ -1,6 +1,7 @@
 import { HelixBaseCardHeader } from '@helix-io/headless'
-import { type CSSResultGroup, css } from 'lit'
+import type { CSSResultGroup } from 'lit'
 import { customElement } from 'lit/decorators.js'
+import { styles } from './card-header.css.js'
 
 /**
  * Headers hold a card's title and any actions that apply to the whole card.
@@ -11,20 +12,7 @@ import { customElement } from 'lit/decorators.js'
  */
 @customElement('helix-card-header')
 export class HelixCardHeader extends HelixBaseCardHeader {
-  static override styles: CSSResultGroup = css`
-    :host {
-      display: block;
-    }
-
-    [part='container'] {
-      padding: var(--_card-inset, var(--helix-space-md));
-      align-items: center;
-      border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-      display: flex;
-      gap: var(--helix-space-sm);
-      justify-content: space-between;
-    }
-  `
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

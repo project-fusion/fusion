@@ -6,6 +6,7 @@ node_modules/
 .pnp.*
 
 # Build output
+*.css.ts
 dist/
 target/
 .next/

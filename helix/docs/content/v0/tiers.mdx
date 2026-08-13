@@ -35,7 +35,8 @@ The styled tier extends it and adds only presentation. Token references live
 here.
 
 ```ts
-// headless: no CSS, no tokens
+// headless/src/disclosure/root/disclosure-root.ts
+// no CSS, no tokens
 export class HelixBaseDisclosure extends WithOpen(HelixElement) {
   protected override render() {
     return html`
@@ -48,18 +49,24 @@ export class HelixBaseDisclosure extends WithOpen(HelixElement) {
   }
 }
 
-// styled: extends the base, adds presentation only
+// web/src/disclosure/root/disclosure-root.ts
+// extends the base, adds presentation only
+import { styles } from './disclosure-root.css.js'
+
 @customElement('helix-disclosure')
 export class HelixDisclosure extends HelixBaseDisclosure {
   @property({ reflect: true })
   appearance: 'outlined' | 'plain' = 'outlined'
 
-  static override styles = css`
-    [part='trigger'] {
-      min-block-size: var(--helix-size-control);
-      padding: var(--disclosure-padding, var(--helix-space-sm));
-    }
-  `
+  static override styles: CSSResultGroup = styles
+}
+```
+
+```css
+/* web/src/disclosure/root/disclosure-root.css */
+[part='trigger'] {
+  min-block-size: var(--helix-size-control);
+  padding: var(--disclosure-padding, var(--helix-space-sm));
 }
 ```
 

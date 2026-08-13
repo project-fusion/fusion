@@ -47,7 +47,7 @@ export const createHelixCemConfig = ({
     // members, events, slots, and parts inherited across package boundaries,
     // stamping each with `inheritedFrom`.
     dependencies: true,
-    exclude: ['src/**/*.test.ts', 'src/**/*.d.ts'],
+    exclude: ['src/**/*.spec.ts', 'src/**/*.d.ts'],
     globs,
     litelement: true,
     outdir: '.',

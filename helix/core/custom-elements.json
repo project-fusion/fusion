@@ -4,6 +4,40 @@
   "modules": [
     {
       "kind": "javascript-module",
+      "path": "src/create-sheet.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSheet",
+          "return": {
+            "type": {
+              "text": "CSSResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createSheet",
+          "declaration": {
+            "name": "createSheet",
+            "module": "src/create-sheet.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/helix-element.ts",
       "declarations": [
         {
@@ -86,6 +120,14 @@
       "path": "src/index.ts",
       "declarations": [],
       "exports": [
+        {
+          "kind": "js",
+          "name": "createSheet",
+          "declaration": {
+            "name": "createSheet",
+            "module": "./create-sheet.js"
+          }
+        },
         {
           "kind": "js",
           "name": "HelixElement",

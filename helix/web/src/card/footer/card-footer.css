@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+[part="container"] {
+  padding: var(--_card-inset, var(--helix-space-md));
+  align-items: center;
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-xs);
+  justify-content: flex-end;
+}

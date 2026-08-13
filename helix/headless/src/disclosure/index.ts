@@ -1,1 +1,1 @@
-export * from './disclosure.js'
+export * from './root/disclosure-root.js'

@@ -1,6 +1,7 @@
 import { HelixBaseCardBody } from '@helix-io/headless'
-import { type CSSResultGroup, css } from 'lit'
+import type { CSSResultGroup } from 'lit'
 import { customElement } from 'lit/decorators.js'
+import { styles } from './card-body.css.js'
 
 /**
  * Bodies hold a card's main content.
@@ -11,17 +12,7 @@ import { customElement } from 'lit/decorators.js'
  */
 @customElement('helix-card-body')
 export class HelixCardBody extends HelixBaseCardBody {
-  static override styles: CSSResultGroup = css`
-    :host {
-      display: block;
-    }
-
-    [part='container'] {
-      padding: var(--_card-inset, var(--helix-space-md));
-      color: var(--helix-color-foreground-muted);
-      line-height: var(--helix-leading-normal);
-    }
-  `
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

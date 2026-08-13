@@ -26,8 +26,9 @@
     "./dist/**/*.js"
   ],
   "scripts": {
-    "analyze": "cem analyze --config custom-elements-manifest.config.mjs",
+    "analyze": "cem analyze --config custom-elements-manifest.config.ts",
     "build": "tsc -p tsconfig.json",
+    "styles": "node ../../tooling/scripts/build-styles.mjs .",
     "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

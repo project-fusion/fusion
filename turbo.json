@@ -3,17 +3,21 @@
   "tasks": {
     "analyze": {
       "dependsOn": ["^build", "build"],
-      "inputs": ["src/**", "custom-elements-manifest.config.mjs"],
+      "inputs": ["src/**", "custom-elements-manifest.config.ts"],
       "outputs": ["custom-elements.json"]
     },
     "build": {
-      "dependsOn": ["^build", "^analyze"],
+      "dependsOn": ["^build", "^analyze", "styles"],
       "inputs": ["src/**", "scripts/**", "tsconfig.json", "package.json"],
       "outputs": ["dist/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "styles": {
+      "inputs": ["src/**/*.css"],
+      "outputs": ["src/**/*.css.ts"]
     },
     "test": {
       "dependsOn": ["^build"],

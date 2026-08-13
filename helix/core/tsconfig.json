@@ -3,7 +3,7 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "exclude": ["src/**/*.test.ts"],
+  "exclude": ["src/**/*.spec.ts"],
   "extends": "../../tsconfig.base.json",
   "include": ["src/**/*"]
 }

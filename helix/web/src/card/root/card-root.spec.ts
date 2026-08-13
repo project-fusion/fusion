@@ -3,8 +3,8 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator'
 
 beforeAll(async () => {
   GlobalRegistrator.register()
-  await import('./index.js')
-  await import('../disclosure/disclosure.js')
+  await import('../index.js')
+  await import('../../disclosure/index.js')
 })
 
 type Updatable = HTMLElement & { updateComplete?: Promise<unknown> }
