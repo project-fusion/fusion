@@ -1,5 +1,6 @@
 import type { Config } from '@custom-elements-manifest/analyzer'
 import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
+import { declaredEvents } from './plugins/declared-events.js'
 import { helixTier } from './plugins/helix-tier.js'
 import { reactEvents } from './plugins/react-events.js'
 import type { HelixMetadata, Plugin } from './types.js'
@@ -30,16 +31,22 @@ export const createHelixCemConfig = ({
 }: HelixCemOptions): Config => {
   const helixPlugins: Plugin[] = [
     helixTier(tier),
+    // Must precede the linter: it validates declared events, not inferred ones.
+    declaredEvents(),
     reactEvents(),
     ...(lint === false ? [] : [conventionLint(lint)]),
     ...plugins,
   ]
 
   return {
-    exclude: ['src/**/*.test.ts', 'src/**/*.d.ts'],
-    globs,
     // Teaches the analyzer to read Lit's `@property`, `@customElement`, and
     // friends. Without it every decorated field is invisible to the manifest.
+    // Pulls in dependencies' manifests so applyInheritancePlugin can resolve
+    // members, events, slots, and parts inherited across package boundaries,
+    // stamping each with `inheritedFrom`.
+    dependencies: true,
+    exclude: ['src/**/*.test.ts', 'src/**/*.d.ts'],
+    globs,
     litelement: true,
     outdir: '.',
     packagejson: true,
@@ -63,4 +70,4 @@ export type {
 } from './types.js'
 export { eachComponent, isComponent, isCustomElement } from './types.js'
 export type { ConventionLintOptions }
-export { conventionLint, helixTier, reactEvents }
+export { conventionLint, declaredEvents, helixTier, reactEvents }

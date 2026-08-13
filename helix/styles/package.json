@@ -1,5 +1,10 @@
 {
+  "name": "@helix-io/styles",
   "description": "Design tokens and base layer. Pure CSS, no JavaScript.",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
   "exports": {
     "./base.css": "./src/base.css",
     "./tokens.css": "./src/tokens.css"
@@ -7,14 +12,9 @@
   "files": [
     "src"
   ],
-  "license": "UNLICENSED",
-  "name": "@helix-io/styles",
-  "private": true,
+  "sideEffects": true,
+  "scripts": {},
   "publishConfig": {
     "access": "public"
-  },
-  "scripts": {},
-  "sideEffects": true,
-  "type": "module",
-  "version": "0.0.1"
+  }
 }

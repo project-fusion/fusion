@@ -1,33 +1,38 @@
 {
+  "name": "@helix-io/core",
   "description": "Helix element primitives: base classes, mixins, decorators, utilities.",
-  "devDependencies": {
-    "lit": "^3.2.1"
-  },
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "default": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "files": [
+    "custom-elements.json",
     "dist"
   ],
-  "license": "UNLICENSED",
-  "main": "./dist/index.js",
-  "name": "@helix-io/core",
-  "peerDependencies": {
-    "lit": "^3.2.1"
-  },
-  "private": true,
-  "publishConfig": {
-    "access": "public"
-  },
+  "customElements": "custom-elements.json",
+  "sideEffects": false,
   "scripts": {
+    "analyze": "cem analyze --config custom-elements-manifest.config.mjs",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "sideEffects": false,
-  "type": "module",
-  "types": "./dist/index.d.ts",
-  "version": "0.0.1"
+  "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@helix-io/cem": "workspace:*",
+    "lit": "^3.2.1"
+  },
+  "peerDependencies": {
+    "lit": "^3.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

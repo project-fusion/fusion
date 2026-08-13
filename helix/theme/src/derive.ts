@@ -62,15 +62,70 @@ const token = (name: string, raw: Oklch, against?: Oklch): DerivedToken => {
 }
 
 /**
+ * Rejects inputs that would silently produce a theme reporting no violations.
+ *
+ * `violations` is the only safety mechanism this module has, and it fails
+ * *open* on non-finite numbers: every `ratio < target` comparison against NaN
+ * is false, so a theme derived from a NaN brand color passes every check and
+ * emits `#000000` everywhere. Bad input has to be rejected rather than
+ * confidently approved.
+ */
+const assertUsableIntent = ({
+  brand,
+  contrastTarget,
+  density,
+  radius,
+}: Required<ThemeIntent>): void => {
+  const finite = (label: string, value: number): void => {
+    if (!Number.isFinite(value)) {
+      throw new TypeError(`deriveTheme: ${label} must be a finite number, received ${value}`)
+    }
+  }
+
+  finite('brand.chroma', brand.chroma)
+  finite('brand.hue', brand.hue)
+  finite('brand.lightness', brand.lightness)
+  finite('contrastTarget', contrastTarget)
+  finite('density', density)
+  finite('radius', radius)
+
+  if (brand.chroma < 0) {
+    throw new RangeError(`deriveTheme: brand.chroma must not be negative, received ${brand.chroma}`)
+  }
+  if (brand.lightness < 0 || brand.lightness > 1) {
+    throw new RangeError(
+      `deriveTheme: brand.lightness must be between 0 and 1, received ${brand.lightness}`,
+    )
+  }
+  // 1 is "no contrast at all" and 21 is black on white. Anything outside that
+  // is not a target, it is a typo.
+  if (contrastTarget < 1 || contrastTarget > 21) {
+    throw new RangeError(
+      `deriveTheme: contrastTarget must be between 1 and 21, received ${contrastTarget}`,
+    )
+  }
+  if (density <= 0) {
+    throw new RangeError(`deriveTheme: density must be positive, received ${density}`)
+  }
+  if (radius < 0) {
+    throw new RangeError(`deriveTheme: radius must not be negative, received ${radius}`)
+  }
+}
+
+/**
  * Computes a complete token set from intent inputs.
  *
  * Foreground colors are solved for their contrast target rather than picked and
  * then audited, so a passing theme is guaranteed by construction. Anything that
  * could not reach its target at the requested chroma is reported in
  * `violations` rather than silently shipped.
+ *
+ * @throws {TypeError} when any numeric input is not finite.
+ * @throws {RangeError} when an input is outside the range it is meaningful in.
  */
 export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   const resolved: Required<ThemeIntent> = { ...DEFAULTS, ...intent }
+  assertUsableIntent(resolved)
   const { brand, contrastTarget, scheme } = resolved
 
   const neutral = { chroma: 0.008, hue: brand.hue }

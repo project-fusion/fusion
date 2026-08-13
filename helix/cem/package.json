@@ -1,34 +1,34 @@
 {
+  "name": "@helix-io/cem",
   "description": "Shared custom-elements-manifest analyzer configuration and Helix plugins.",
-  "devDependencies": {
-    "@custom-elements-manifest/analyzer": "^0.11.0"
-  },
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "default": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "files": [
     "dist"
   ],
-  "license": "UNLICENSED",
-  "main": "./dist/index.js",
-  "name": "@helix-io/cem",
-  "peerDependencies": {
-    "@custom-elements-manifest/analyzer": "^0.11.0"
-  },
-  "private": true,
-  "publishConfig": {
-    "access": "public"
-  },
+  "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "sideEffects": false,
-  "type": "module",
-  "types": "./dist/index.d.ts",
-  "version": "0.0.1"
+  "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0"
+  },
+  "peerDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

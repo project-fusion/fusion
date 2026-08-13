@@ -19,9 +19,6 @@
     "helix/cem": {
       "name": "@helix-io/cem",
       "version": "0.0.1",
-      "dependencies": {
-        "custom-elements-manifest": "^2.1.0",
-      },
       "devDependencies": {
         "@custom-elements-manifest/analyzer": "^0.11.0",
       },
@@ -33,6 +30,8 @@
       "name": "@helix-io/core",
       "version": "0.0.1",
       "devDependencies": {
+        "@custom-elements-manifest/analyzer": "^0.11.0",
+        "@helix-io/cem": "helix/cem",
         "lit": "^3.2.1",
       },
       "peerDependencies": {
@@ -137,9 +136,9 @@
 
     "@github/catalyst": ["@github/catalyst@1.8.1", "", {}, "sha512-dnN4WWpbeuQvA17LvsGdlXEueJdBk9y+I+WO5pdNpoHNOXPsFcz3hJrq1iRmdsNgQOf4S8e83axtwIxvG62eWA=="],
 
-    "@helix-io/cem": ["@helix-io/cem@workspace:helix/cem", { "dependencies": { "custom-elements-manifest": "^2.1.0" }, "devDependencies": { "@custom-elements-manifest/analyzer": "^0.11.0" }, "peerDependencies": { "@custom-elements-manifest/analyzer": "^0.11.0" } }],
+    "@helix-io/cem": ["@helix-io/cem@workspace:helix/cem", { "devDependencies": { "@custom-elements-manifest/analyzer": "^0.11.0" }, "peerDependencies": { "@custom-elements-manifest/analyzer": "^0.11.0" } }],
 
-    "@helix-io/core": ["@helix-io/core@workspace:helix/core", { "devDependencies": { "lit": "^3.2.1" }, "peerDependencies": { "lit": "^3.2.1" } }],
+    "@helix-io/core": ["@helix-io/core@workspace:helix/core", { "devDependencies": { "@custom-elements-manifest/analyzer": "^0.11.0", "@helix-io/cem": "helix/cem", "lit": "^3.2.1" }, "peerDependencies": { "lit": "^3.2.1" } }],
 
     "@helix-io/docs": ["@helix-io/docs@workspace:helix/docs", {}],
 
@@ -263,7 +262,7 @@
 
     "comment-parser": ["comment-parser@1.2.4", "", {}, "sha512-pm0b+qv+CkWNriSTMsfnjChF9kH0kxz55y44Wo5le9qLxMj5xDQAaEd9ZN1ovSuk9CsrncWaFwgpOMg7ClJwkw=="],
 
-    "custom-elements-manifest": ["custom-elements-manifest@2.1.0", "", {}, "sha512-4TU+YhBQpCGYWonsZVTOPx6aYJXenOiSRT7TNGvDB7ipa4SZSJKed1DYXG77XKL9JFZ86sDSDVkwgv1mqw3V3A=="],
+    "custom-elements-manifest": ["custom-elements-manifest@1.0.0", "", {}, "sha512-j59k0ExGCKA8T6Mzaq+7axc+KVHwpEphEERU7VZ99260npu/p/9kd+Db+I3cGKxHkM5y6q5gnlXn00mzRQkX2A=="],
 
     "debounce": ["debounce@1.2.1", "", {}, "sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug=="],
 
@@ -344,8 +343,6 @@
     "typical": ["typical@4.0.0", "", {}, "sha512-VAH4IvQ7BDFYglMd7BPRDfLgxZZX4O4TFcRDA6EN5X7erNJJq+McIEp8np9aVtxrCJ6qx4GTYVfOWNjcqwZgRw=="],
 
     "undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
-
-    "@custom-elements-manifest/analyzer/custom-elements-manifest": ["custom-elements-manifest@1.0.0", "", {}, "sha512-j59k0ExGCKA8T6Mzaq+7axc+KVHwpEphEERU7VZ99260npu/p/9kd+Db+I3cGKxHkM5y6q5gnlXn00mzRQkX2A=="],
 
     "@custom-elements-manifest/analyzer/typescript": ["typescript@5.4.5", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ=="],
 

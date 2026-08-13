@@ -75,12 +75,17 @@ impl Fact {
     /// Forgetting is an operation, not an omission. A memory system that never
     /// lowers its confidence in stale claims is a memory system that confidently
     /// tells you things that stopped being true.
+    /// Elapsed time is clamped at zero: a negative age would *raise* confidence
+    /// above what was recorded, which is not decay running backwards, it is a
+    /// clock skew or an unset timestamp producing a fact the system believes
+    /// more than anything it was ever told.
     #[must_use]
     pub fn decayed_confidence(&self, days: f32, half_life_days: f32) -> f32 {
-        if half_life_days <= 0.0 {
+        if half_life_days <= 0.0 || !days.is_finite() {
             return self.confidence;
         }
-        self.confidence * 0.5_f32.powf(days / half_life_days)
+        let elapsed = days.max(0.0);
+        (self.confidence * 0.5_f32.powf(elapsed / half_life_days)).clamp(0.0, self.confidence)
     }
 }
 
@@ -105,16 +110,46 @@ impl Memory {
         id
     }
 
-    /// Adds a distilled fact, superseding any current fact it replaces.
+    /// Adds a distilled fact, superseding the lineage that `supersedes` belongs
+    /// to.
+    ///
+    /// The id may point anywhere in a chain, not only at its head. Callers hold
+    /// whichever id they happened to read, and pointing at an already-superseded
+    /// fact would otherwise overwrite that link: the lineage forks, the earlier
+    /// replacement stays current, and the store reports two current facts that
+    /// were meant to be one.
     pub fn assert_fact(&mut self, fact: Fact, supersedes: Option<Id>) -> Id {
         let id = fact.id;
         if let Some(old) = supersedes {
-            if let Some(previous) = self.facts.iter_mut().find(|f| f.id == old) {
-                previous.superseded_by = Some(id);
+            if let Some(head) = self.lineage_head(old) {
+                if let Some(previous) = self.facts.iter_mut().find(|f| f.id == head) {
+                    previous.superseded_by = Some(id);
+                }
             }
         }
         self.facts.push(fact);
         id
+    }
+
+    /// Walks a supersession chain to the fact that is still current.
+    ///
+    /// Returns `None` if the id is unknown. Terminates on a cycle, which a
+    /// corrupted store could contain.
+    fn lineage_head(&self, from: Id) -> Option<Id> {
+        let mut seen = std::collections::HashSet::new();
+        let mut current = self.facts.iter().find(|f| f.id == from)?;
+
+        while let Some(next) = current.superseded_by {
+            if !seen.insert(current.id) {
+                break;
+            }
+            match self.facts.iter().find(|f| f.id == next) {
+                Some(fact) => current = fact,
+                None => break,
+            }
+        }
+
+        Some(current.id)
     }
 
     /// Current facts only, most confident first.
@@ -169,6 +204,31 @@ mod tests {
     }
 
     #[test]
+    fn superseding_mid_chain_does_not_fork_the_lineage() {
+        let mut memory = Memory::new();
+        let trace = Id::new();
+        let episode = memory.record(Episode::new("x", trace));
+
+        let first = memory.assert_fact(Fact::new("a", vec![episode], 0.5), None);
+        memory.assert_fact(Fact::new("b", vec![episode], 0.6), Some(first));
+        // A caller holding the original id supersedes again.
+        let third = memory.assert_fact(Fact::new("c", vec![episode], 0.7), Some(first));
+
+        let current = memory.current_facts();
+        assert_eq!(current.len(), 1, "a lineage has exactly one current fact");
+        assert_eq!(current[0].id, third);
+    }
+
+    #[test]
+    fn decay_never_exceeds_the_recorded_confidence() {
+        let fact = Fact::new("x", vec![], 0.8);
+        // Clock skew or an unset timestamp must not manufacture confidence.
+        assert!(fact.decayed_confidence(-30.0, 30.0) <= 0.8);
+        assert!(fact.decayed_confidence(f32::NAN, 30.0) <= 0.8);
+        assert!(fact.decayed_confidence(f32::INFINITY, 30.0) <= 0.8);
+    }
+
+    #[test]
     fn confidence_decays_toward_zero() {
         let fact = Fact::new("x", vec![], 1.0);
         assert!((fact.decayed_confidence(0.0, 30.0) - 1.0).abs() < f32::EPSILON);
@@ -195,3 +255,4 @@ mod tests {
         assert!((Fact::new("x", vec![], -3.0).confidence).abs() < f32::EPSILON);
     }
 }
+

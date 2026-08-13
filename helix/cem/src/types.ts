@@ -43,10 +43,12 @@ export interface HelixEvent extends Documented {
  */
 export interface HelixMetadata {
   /**
-   * Which layer of the design system the component belongs to. The React
-   * wrapper generator only wraps `styled`; the docs site renders both.
+   * Which layer of the design system the declaration belongs to. The React
+   * wrapper generator wraps only `styled`. `core` holds element primitives and
+   * mixins, which are not components but must be analyzed so dependents can
+   * inherit from them.
    */
-  tier?: 'headless' | 'styled'
+  tier?: 'core' | 'headless' | 'styled'
 }
 
 /**

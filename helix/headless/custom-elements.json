@@ -23,7 +23,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Disclosures let users show and hide a section of related content.\n\nThe headless tier owns structure, accessibility wiring, and state. It ships\nno CSS and references no tokens: styling is the styled tier's job. Consumers\nwho want to bring their own styling entirely can use this tier directly.\n\n`open` and `defaultOpen` come from the `WithOpen` mixin, and the analyzer\ncannot follow a mixin into another package, so the event it emits is declared\nhere. Any mixin-provided API a component exposes has to be documented on the\ncomponent or it is invisible to tooling.",
+          "description": "Disclosures let users show and hide a section of related content.\n\nThe headless tier owns structure, accessibility wiring, and state. It ships\nno CSS and references no tokens: styling is the styled tier's job. Consumers\nwho want to bring their own styling entirely can use this tier directly.\n\n`open`, `defaultOpen`, `isOpen`, and `setOpen` come from the `WithOpen` mixin\nand resolve into this component's manifest automatically, because\n`@helix-io/core` publishes one and the analyzer runs with\n`dependencies: true`.\n\nThe event is declared here rather than inferred. It is dispatched through a\ngeneric helper, and the analyzer can only record the parameter identifier of\na dynamic dispatch, not the name it resolves to at runtime.",
           "name": "HelixDisclosureBase",
           "slots": [
             {
@@ -40,6 +40,151 @@
               "kind": "field",
               "name": "handleToggle",
               "privacy": "protected"
+            },
+            {
+              "attribute": "open",
+              "default": "undefined",
+              "description": "Whether the element is open. Setting this puts the element into\ncontrolled mode: the consumer owns the value from that point on.",
+              "kind": "field",
+              "name": "open",
+              "reflects": true,
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            },
+            {
+              "attribute": "default-open",
+              "default": "false",
+              "description": "Initial open state for uncontrolled use. Ignored once `open` is set.",
+              "kind": "field",
+              "name": "defaultOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            },
+            {
+              "default": "false",
+              "kind": "field",
+              "name": "internalOpen",
+              "privacy": "private",
+              "type": {
+                "text": "boolean"
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            },
+            {
+              "description": "The resolved open state, whichever mode the element is in.",
+              "kind": "field",
+              "name": "isOpen",
+              "readonly": true,
+              "type": {
+                "text": "boolean"
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isControlled",
+              "privacy": "private",
+              "readonly": true,
+              "type": {
+                "text": "boolean"
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            },
+            {
+              "description": "Requests an open-state change. In uncontrolled mode the element updates\nitself; in controlled mode it only notifies and waits for the consumer.",
+              "kind": "method",
+              "name": "setOpen",
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            },
+            {
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "kind": "method",
+              "name": "finalizeStyles",
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "static": true,
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "description": "Dispatches a composed, bubbling CustomEvent. Kebab-case names map to React\n`onFooBar` props through the wrapper generator, so event names are part of\nthe public API and should be treated as such.",
+              "kind": "method",
+              "name": "emit",
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "detail",
+                  "optional": true,
+                  "type": {
+                    "text": "T"
+                  }
+                }
+              ],
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
             }
           ],
           "events": [
@@ -59,6 +204,34 @@
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
+          "attributes": [
+            {
+              "default": "undefined",
+              "description": "Whether the element is open. Setting this puts the element into\ncontrolled mode: the consumer owns the value from that point on.",
+              "fieldName": "open",
+              "name": "open",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            },
+            {
+              "default": "false",
+              "description": "Initial open state for uncontrolled use. Ignored once `open` is set.",
+              "fieldName": "defaultOpen",
+              "name": "default-open",
+              "type": {
+                "text": "boolean"
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            }
+          ],
           "helix": {
             "tier": "headless"
           }

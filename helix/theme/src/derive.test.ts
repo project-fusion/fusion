@@ -132,6 +132,38 @@ describe('deriveTheme', () => {
     expect(isOutOfGamut(background.value)).toBe(false)
   })
 
+  // `violations` fails open on non-finite input: every `ratio < target`
+  // comparison against NaN is false, so a garbage theme reported no problems
+  // and emitted #000000 everywhere.
+  describe('rejects input it cannot validate', () => {
+    const cases: Array<[string, () => unknown]> = [
+      ['NaN chroma', () => deriveTheme({ brand: { chroma: Number.NaN, hue: 0, lightness: 0.5 } })],
+      ['NaN hue', () => deriveTheme({ brand: { chroma: 0.1, hue: Number.NaN, lightness: 0.5 } })],
+      [
+        'Infinity lightness',
+        () => deriveTheme({ brand: { ...BRAND, lightness: Number.POSITIVE_INFINITY } }),
+      ],
+      ['negative chroma', () => deriveTheme({ brand: { chroma: -0.2, hue: 0, lightness: 0.5 } })],
+      ['lightness above 1', () => deriveTheme({ brand: { chroma: 0.1, hue: 0, lightness: 1.5 } })],
+      ['contrastTarget below 1', () => deriveTheme({ brand: BRAND, contrastTarget: 0 })],
+      ['contrastTarget above 21', () => deriveTheme({ brand: BRAND, contrastTarget: 25 })],
+      ['zero density', () => deriveTheme({ brand: BRAND, density: 0 })],
+      ['negative radius', () => deriveTheme({ brand: BRAND, radius: -1 })],
+    ]
+
+    for (const [label, fn] of cases) {
+      test(label, () => {
+        expect(fn).toThrow()
+      })
+    }
+
+    test('accepts the boundary values', () => {
+      expect(() => deriveTheme({ brand: { chroma: 0, hue: 0, lightness: 0 } })).not.toThrow()
+      expect(() => deriveTheme({ brand: { chroma: 0, hue: 360, lightness: 1 } })).not.toThrow()
+      expect(() => deriveTheme({ brand: BRAND, contrastTarget: 21 })).not.toThrow()
+    })
+  })
+
   test('emits valid CSS custom properties', () => {
     const css = toCss(deriveTheme({ brand: BRAND }))
     expect(css).toStartWith(':root {')

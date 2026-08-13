@@ -127,7 +127,25 @@ describe('createHelixCemConfig', () => {
     const names = (config.plugins ?? []).map((p) => (p as unknown as { name: string }).name)
 
     expect(config.litelement).toBe(true)
-    expect(names).toEqual(['helix-tier', 'helix-react-events', 'helix-convention-lint'])
+    // dependencies:true is what lets applyInheritancePlugin resolve members and
+    // events across package boundaries. Without it a component that extends a
+    // base in another package documents none of its inherited API.
+    expect(config.dependencies).toBe(true)
+    expect(names).toEqual([
+      'helix-tier',
+      'helix-declared-events',
+      'helix-react-events',
+      'helix-convention-lint',
+    ])
+  })
+
+  test('inferred events are dropped before the linter sees them', () => {
+    const names = (createHelixCemConfig({ tier: 'styled' }).plugins ?? []).map(
+      (p) => (p as unknown as { name: string }).name,
+    )
+    expect(names.indexOf('helix-declared-events')).toBeLessThan(
+      names.indexOf('helix-convention-lint'),
+    )
   })
 
   test('lint can be turned off', () => {

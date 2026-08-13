@@ -11,7 +11,7 @@
 //! - **Cascading deletion** removes a memory *and everything derived from it*,
 //!   which is what makes a user's right to delete real rather than nominal.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 use chrono::{DateTime, Utc};
 use cortex_core::Id;
@@ -105,13 +105,18 @@ impl Graph {
     /// transitively, in breadth-first order from the node itself.
     ///
     /// This is the query the product rests on. "Why did the system say that?"
+    ///
+    /// Breadth-first is load-bearing rather than incidental. The answer is read
+    /// by a person asking why an output happened, and its first entries should
+    /// be the immediate causes. A depth-first walk surfaces one arbitrary
+    /// ancestor chain to its root before mentioning the sibling that mattered.
     #[must_use]
     pub fn why(&self, id: Id) -> Vec<&Node> {
         let mut seen = HashSet::new();
-        let mut queue = vec![id];
+        let mut queue = VecDeque::from([id]);
         let mut out = Vec::new();
 
-        while let Some(current) = queue.pop() {
+        while let Some(current) = queue.pop_front() {
             if !seen.insert(current) {
                 continue;
             }
@@ -180,6 +185,24 @@ mod tests {
     }
 
     #[test]
+    fn why_returns_immediate_causes_before_distant_ones() {
+        let mut graph = Graph::new();
+        let root = graph.insert(Node::new(NodeKind::Source, vec![]));
+        let left = graph.insert(Node::new(NodeKind::Memory, vec![root]));
+        let right = graph.insert(Node::new(NodeKind::Memory, vec![root]));
+        let output = graph.insert(Node::new(NodeKind::Output, vec![left, right]));
+
+        let order: Vec<Id> = graph.why(output).iter().map(|n| n.id).collect();
+
+        assert_eq!(order[0], output, "the node itself comes first");
+        assert!(
+            order[1..3].contains(&left) && order[1..3].contains(&right),
+            "both immediate causes precede their shared ancestor"
+        );
+        assert_eq!(order[3], root, "the distant ancestor comes last");
+    }
+
+    #[test]
     fn why_terminates_on_cycles() {
         let mut graph = Graph::new();
         let a = graph.insert(Node::new(NodeKind::Source, vec![]));
@@ -220,3 +243,4 @@ mod tests {
         assert!(graph.get(source).is_some());
     }
 }
+

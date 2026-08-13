@@ -1,4 +1,25 @@
 {
+  "name": "@fusion-io/source",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "analyze": "turbo run analyze",
+    "build": "turbo run build",
+    "check": "bun run order && biome check --write .",
+    "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
+    "dev": "turbo run dev",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "order": "node tooling/scripts/order-manifests.mjs",
+    "rs:build": "cargo build --workspace",
+    "rs:check": "cargo clippy --workspace --all-targets -- -D warnings",
+    "rs:fmt": "cargo fmt --all",
+    "rs:test": "cargo test --workspace",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "verify": "biome ci . && bun run typecheck && bun run analyze && bun run test && bun run rs:check && bun run rs:test"
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",
     "@custom-elements-manifest/analyzer": "^0.11.0",
@@ -10,27 +31,7 @@
   "engines": {
     "bun": ">=1.1.0"
   },
-  "license": "UNLICENSED",
-  "name": "@fusion-io/source",
   "packageManager": "bun@1.1.43",
-  "private": true,
-  "scripts": {
-    "analyze": "turbo run analyze",
-    "build": "turbo run build",
-    "check": "biome check --write .",
-    "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
-    "dev": "turbo run dev",
-    "format": "biome format --write .",
-    "lint": "biome lint .",
-    "rs:build": "cargo build --workspace",
-    "rs:check": "cargo clippy --workspace --all-targets -- -D warnings",
-    "rs:fmt": "cargo fmt --all",
-    "rs:test": "cargo test --workspace",
-    "test": "turbo run test",
-    "typecheck": "turbo run typecheck",
-    "verify": "bun run check && bun run typecheck && bun run analyze && bun run test && bun run rs:check && bun run rs:test"
-  },
-  "version": "0.0.1",
   "workspaces": [
     "cortex/docs",
     "helix/*",

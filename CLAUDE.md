@@ -38,8 +38,27 @@ Fusion Development Group. Strategy lives in [`docs/`](docs/); start with
 | Lint and format | **Biome only** for TS/JS. `cargo fmt` + `clippy` for Rust |
 | Components | **Lit** with legacy decorators (`experimentalDecorators: true`, `useDefineForClassFields: false`) |
 
-`bun run verify` runs everything: format, typecheck, TS tests, clippy, Rust
-tests. It must pass before anything is called done.
+`bun run verify` runs everything: lint, typecheck, manifests, TS tests, clippy,
+Rust tests. It must pass before anything is called done.
+
+**`verify` never writes.** It runs `biome ci`, not `biome check --write`. A
+verification step that edits your files cannot tell you whether the files were
+correct, and in CI it reports success on a tree nobody reviewed. `bun run check`
+is the one that fixes things.
+
+### package.json key order
+
+Identity first (`name`, `description`, `version`), then how the package is
+consumed, then `scripts`, then everything else alphabetically. `bun run order`
+applies it and runs as part of `check`.
+
+Alphabetizing the whole file buries `name` under `devDependencies`. Worse,
+**`exports` conditions are order-sensitive**: they match top to bottom, so
+`types` must precede `default` or TypeScript resolves the runtime entry and
+reports the package as untyped. Biome's `useSortedKeys` assist reorders them and
+silently breaks resolution, which is why it is turned **off for package.json**
+in `biome.json` and `tooling/scripts/order-manifests.mjs` owns that file's
+ordering instead.
 
 Cargo is a first-class monorepo tool on its own. Do not put Rust behind Nx or
 Turbo; the wrapper adds indirection and takes away incremental compilation.
@@ -187,28 +206,53 @@ import { createHelixCemConfig } from '@helix-io/cem'
 export default createHelixCemConfig({ tier: 'styled' })
 ```
 
-Three plugins ship today. `helix-tier` stamps each component with its tier,
-because the React wrapper generator wraps only the styled tier and cannot infer
-that. `helix-react-events` records the generated prop name on each event
-(`open-change` becomes `onOpenChange`) so the React API is inspectable from the
+Four plugins ship today, and **order matters**: `helix-tier` stamps each
+component with its tier, because the wrapper generator wraps only the styled
+tier and cannot infer that. `helix-declared-events` drops inferred events (see
+below). `helix-react-events` records the generated prop on each event
+(`open-change` becomes `onOpenChange`) so the React API is readable from the
 manifest rather than implicit in the generator. `helix-convention-lint` enforces
 the conventions in this file and **fails the build** by default.
 
-Two things to know when writing a plugin:
+### Inheritance across packages works. Use it.
 
-- **Plugins are objects, not factories.** The analyzer's `Config` type says
-  `Array<() => unknown>`, but its runtime destructures hooks straight off each
+`createHelixCemConfig` sets `dependencies: true`, which collects dependencies'
+manifests so the analyzer's inheritance pass can resolve members, events, slots,
+and parts across package boundaries, stamping each with `inheritedFrom`.
+
+**Every package that ships classes others extend needs its own manifest**,
+including `@helix-io/core`, which ships no components but does ship the mixins.
+Without it, `open` and `defaultOpen` are missing from every component that uses
+`WithOpen`, and the omission is silent.
+
+Consequence for mixins: **document members on the mixin's inner class**, not
+only on the exported `declare class` interface. The interface is what TypeScript
+consumers read; the inner class is what the analyzer reads when resolving
+inherited members. Documenting only the interface leaves every inheriting
+component's API undescribed in tooling.
+
+### Events are declared, not inferred
+
+Use **`@event`**, not `@fires`. Both work; pick one so the codebase is
+greppable.
+
+The analyzer records an event for every `dispatchEvent` it can see, and when the
+call sits in a generic helper it records the *parameter identifier*.
+`HelixElement.emit(name, detail)` produced a phantom event called `name` on
+every element inheriting it. `helix-declared-events` drops events with no
+description, on the rule that a dispatch inside a mixin or base helper cannot be
+named by inference, so anything real is declared with `@event`.
+
+### Two analyzer facts that cost time
+
+- **Plugins are objects, not factories.** The `Config` type says
+  `Array<() => unknown>`, but the runtime destructures hooks straight off each
   element. The type is wrong; `createHelixCemConfig` casts at that one boundary.
+  Passing factories fails silently: manifests generate with none of your fields.
 - **Do not import `custom-elements-manifest/schema`.** The analyzer bundles its
   own copy, and two copies produce nominally distinct types that
   `exactOptionalPropertyTypes` refuses to unify. `@helix-io/cem` declares the
   manifest structurally in `types.ts` instead.
-
-**The analyzer cannot follow a mixin into another package.** `open` and
-`defaultOpen` come from `WithOpen` in `@helix-io/core`, so anything a component
-exposes through a mixin has to be documented on the component itself with
-`@fires`, `@property`, or similar. Undocumented mixin API is invisible to IDE
-tooltips, the wrapper generator, and any agent reading the manifest.
 
 ## Where does a fix live?
 
