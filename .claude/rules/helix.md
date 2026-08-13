@@ -149,9 +149,14 @@ with no shadow root and arrives unstyled until the bundle upgrades it.
 makes this type-safe: `appearance="wrong"` is an error rather than a silent
 no-op. Consumers reference `@helix-io/web/jsx`.
 
-That leaves `@helix-io/react` worth reaching for only where typed event
-callbacks and refs earn 10 kB, which is interactive client surfaces, not
-content.
+**React 19 binds custom events natively.** It strips `on` from the prop and uses
+the remainder verbatim as the event name, so `onhelix-open-change` listens for
+`helix-open-change`. `onHelixOpenChange` also binds, to an event named
+`HelixOpenChange` that nothing dispatches, which looks identical to doing
+nothing. Use the exact event name; the generated types already do.
+
+That leaves `@helix-io/react` with no job. It is held pending Wave 3 rather than
+kept.
 
 **Registration is guarded.** Components use `customElement` from
 `@helix-io/core`, not from `lit/decorators.js`. Next evaluates a module in both
