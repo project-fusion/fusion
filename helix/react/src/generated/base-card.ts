@@ -2,19 +2,13 @@
 import { type BaseProps, createComponent } from '../create-component.js'
 
 /**
- * Cards group related content and actions into a single surface.
+ * Composed of regions rather than slots on one element, so a header, body, or
+footer can be styled, omitted, and reordered independently.
 
-The root owns the surface and the accessible name. Its parts are separate
-elements rather than slots on one element, because a card's regions are
-independently styleable, independently omittable, and frequently reordered:
-`Card.Header`, `Card.Title`, `Card.Body`, `Card.Footer`.
-
-**Naming is coordinated, not assumed.** A card that groups content needs an
-accessible name or it is an unlabelled group, which screen readers announce
-as noise. Rather than requiring every consumer to pass `aria-label`, the root
-looks for a `helix-card-title` in its light DOM and points at it. That
-coordination is the whole reason these are compound components: a title
-nested three levels down still names the card that contains it.
+A card needs an accessible name or screen readers announce an unlabelled
+group. Set `aria-labelledby` or `aria-label` yourself for a name that is
+present in server-rendered HTML; otherwise the card adopts the first
+`Card.Title` beneath it once it is in a browser.
  *
  * Renders `<helix-base-card>`.
  */
@@ -27,10 +21,7 @@ const BaseCardRoot = createComponent<BaseCardProps>({
 })
 
 /**
- * Bodies hold a card's main content.
-
-A separate element rather than a slot on the root, so it can be styled,
-omitted, and reordered independently.
+ * Carries the card's inset and muted foreground so content does not need to restate either.
  *
  * Renders `<helix-base-card-body>`.
  */
@@ -43,10 +34,7 @@ const BaseCardBody = createComponent<BaseCardBodyProps>({
 })
 
 /**
- * Footers hold actions that conclude a card, such as confirm and cancel.
-
-A separate element rather than a slot on the root, so it can be styled,
-omitted, and reordered independently.
+ * Aligns its content to the end, so buttons sit where a user expects to finish.
  *
  * Renders `<helix-base-card-footer>`.
  */
@@ -59,10 +47,7 @@ const BaseCardFooter = createComponent<BaseCardFooterProps>({
 })
 
 /**
- * Headers hold a card's title and any actions that apply to the whole card.
-
-A separate element rather than a slot on the root, so it can be styled,
-omitted, and reordered independently.
+ * Sits above the body, separated by a rule. Omit it entirely for a card that needs no heading.
  *
  * Renders `<helix-base-card-header>`.
  */
@@ -75,16 +60,14 @@ const BaseCardHeader = createComponent<BaseCardHeaderProps>({
 })
 
 /**
- * Titles name the card that contains them.
-
-The element ensures it has an id, because `Card.Root` names itself by
-pointing `aria-labelledby` at this title and cannot point at an element with
-no id. Consumers may set their own id and it is left alone.
+ * Ensures it has an id, because `Card.Root` names itself by pointing
+`aria-labelledby` at this element and cannot reference one without an id. A
+consumer-supplied id is left alone.
  *
  * Renders `<helix-base-card-title>`.
  */
 export interface BaseCardTitleProps extends BaseProps {
-  /** Heading level rendered, 1 through 6. A card's title is a heading, and its correct level depends on the document around it, which the component cannot know. Defaulting to 3 and letting the consumer correct it beats hard-coding a level that is wrong half the time. */
+  /** Heading level, 1 through 6. */
   level?: 1 | 2 | 3 | 4 | 5 | 6
 }
 

@@ -14,11 +14,21 @@ const BOX_SIZING = css`
 `
 
 /**
- * Base class for every Helix element.
+ * @summary Base class every Helix element extends.
  *
- * Owns only what is universal: shadow-root normalization and the shared
- * lifecycle surface. Anything visual belongs in the styled tier; anything
- * component-specific belongs in the component.
+ * @description
+ * Owns only what is universal: normalizing `box-sizing` inside the shadow root,
+ * so component CSS can rely on border-box on both sides of the boundary.
+ *
+ * There is deliberately no `emit(name, detail)` helper. A dispatch through a
+ * generic helper cannot be named by the manifest analyzer, which recorded the
+ * parameter identifier and produced a phantom event on every element that
+ * inherited it. Components dispatch concrete event classes from `events.ts`,
+ * which the analyzer and TypeScript can both see.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/core/helix-element
  */
 export class HelixElement extends LitElement {
   /**
@@ -29,21 +39,5 @@ export class HelixElement extends LitElement {
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
     return [BOX_SIZING, ...LitElement.finalizeStyles(styles)]
-  }
-
-  /**
-   * Dispatches a composed, bubbling CustomEvent. Kebab-case names map to React
-   * `onFooBar` props through the wrapper generator, so event names are part of
-   * the public API and should be treated as such.
-   */
-  protected emit<T>(name: string, detail?: T): boolean {
-    return this.dispatchEvent(
-      new CustomEvent<T | undefined>(name, {
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-        detail,
-      }),
-    )
   }
 }

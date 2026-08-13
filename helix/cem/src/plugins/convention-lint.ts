@@ -76,6 +76,19 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
           'Description contains an em or en dash.',
         )
 
+        // These live only as comments unless helix-metadata carries them into
+        // the manifest, and only there can the docs site render a status badge
+        // or an agent know what is stable.
+        for (const field of ['since', 'status', 'documentation'] as const) {
+          check(
+            Boolean(declaration.helix?.[field]),
+            `documented-${field}`,
+            path,
+            declaration.name,
+            `Missing @${field} in the class JSDoc.`,
+          )
+        }
+
         for (const member of declaration.members ?? []) {
           if (member.privacy && member.privacy !== 'public') {
             continue

@@ -15,33 +15,31 @@ const CONTENT_ID = 'content'
 const TRIGGER_ID = 'trigger'
 
 /**
- * Disclosures let users show and hide a section of related content.
+ * @summary Shows and hides a section of related content.
  *
- * The headless tier owns structure, accessibility wiring, and state. It ships
- * no CSS and references no tokens: styling is the styled tier's job. Consumers
- * who want to bring their own styling entirely can use this tier directly.
+ * @description
+ * Content stays mounted when closed and is hidden by the styled tier's CSS, so
+ * an open and close transition is possible and the text is present in
+ * server-rendered HTML. Closed content is `inert`, keeping it out of the tab
+ * order and the accessibility tree without removing it from the box tree.
  *
- * `open`, `defaultOpen`, `isOpen`, and `setOpen` come from the `WithOpen` mixin
- * and resolve into this component's manifest automatically, because
- * `@helix-io/core` publishes one and the analyzer runs with
- * `dependencies: true`.
+ * Slated to become `Accordion.Item`: a disclosure is an accordion with one
+ * section, and shipping both means two implementations of one behavior.
  *
- * Content stays mounted when closed and is hidden by the styled tier's CSS.
- * Unmounting it made an open/close transition impossible, and `hidden` is
- * `display: none`, which cannot transition either. `inert` keeps closed content
- * out of the tab order and the accessibility tree without removing it from the
- * box tree.
- *
- * The event is declared here rather than inferred. It is dispatched through a
- * generic helper, and the analyzer can only record the parameter identifier of
- * a dynamic dispatch, not the name it resolves to at runtime.
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/disclosure
+ * @alias Collapsible
+ * @alias Expander
  *
  * @slot summary - The always-visible trigger content.
  * @slot - The content revealed when open.
+ * @csspart container - The outer wrapper.
+ * @csspart trigger - The clickable summary row.
+ * @csspart content - The revealed region.
+ * @csspart content-inner - Padding wrapper inside the animated region.
  *
- * @event open-change - Fired when the disclosure is opened or closed. Carries
- * `{ open: boolean }`. In controlled mode this is the only signal; the element
- * does not update itself.
+ * @event {HelixOpenChangeEvent} open-change - Fired when the disclosure opens or closes.
  */
 @customElement('helix-base-disclosure')
 export class HelixBaseDisclosure extends WithOpen(HelixElement) {

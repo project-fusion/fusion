@@ -1,48 +1,76 @@
 import { HelixElement } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 
 /**
  * Monotonic suffix for generated ids.
  *
- * Deliberately a counter rather than a random value: ids must be stable across
- * a server render and the client hydration that follows it, and a random id
- * differs between the two, which React reports as a hydration mismatch.
+ * A counter rather than a random value because ids must be identical across a
+ * server render and the hydration that follows it, and a random id differs
+ * between the two.
  */
 let sequence = 0
 
 /**
- * Titles name the card that contains them.
+ * @summary Names the card that contains it.
  *
- * The element ensures it has an id, because `Card.Root` names itself by
- * pointing `aria-labelledby` at this title and cannot point at an element with
- * no id. Consumers may set their own id and it is left alone.
+ * @description
+ * Ensures it has an id, because `Card.Root` names itself by pointing
+ * `aria-labelledby` at this element and cannot reference one without an id. A
+ * consumer-supplied id is left alone.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - The title text.
+ * @csspart heading - The heading element.
  */
 @customElement('helix-base-card-title')
 export class HelixBaseCardTitle extends HelixElement {
-  /**
-   * Heading level rendered, 1 through 6.
-   *
-   * A card's title is a heading, and its correct level depends on the document
-   * around it, which the component cannot know. Defaulting to 3 and letting the
-   * consumer correct it beats hard-coding a level that is wrong half the time.
-   */
+  /** Internal signal that a title is ready to be referenced by its card. */
+  static readonly readyEvent = 'helix-card-title-ready'
+
+  /** Heading level, 1 through 6. */
   @property({ reflect: true, type: Number })
   level: 1 | 2 | 3 | 4 | 5 | 6 = 3
 
-  override connectedCallback(): void {
-    super.connectedCallback()
+  /**
+   * Assigns an id in `willUpdate`, which SSR calls, rather than
+   * `connectedCallback`, which it does not.
+   *
+   * The guard is what makes hydration safe: the server writes the id into the
+   * HTML, the client sees it already present and skips generation, so the two
+   * agree regardless of the counter's state in either environment.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
     if (!this.id) {
       sequence += 1
       this.id = `helix-card-title-${sequence}`
     }
   }
 
+  /**
+   * Announces this title to the card containing it.
+   *
+   * A parent cannot poll for a child that has not upgraded yet: the card's
+   * first render can happen before this element has assigned its id, and
+   * nothing would re-trigger the read. The child announcing itself handles
+   * every ordering, including insertion long after mount.
+   *
+   * This is the descendant-registration pattern every compound component
+   * needs (Tabs and Tab, Accordion and Item, Select and Option). It should
+   * become a controller in `@helix-io/core` on its second use.
+   */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.dispatchEvent(new Event(HelixBaseCardTitle.readyEvent, { bubbles: true, composed: true }))
+  }
+
   protected override render(): TemplateResult {
-    // Lit cannot interpolate a tag name, and a card title is a heading whose
-    // level the consumer controls, so the role carries the semantics instead.
+    // Lit cannot interpolate a tag name, and the correct heading level depends
+    // on the surrounding document, so the role carries the semantics.
     return html`
       <div aria-level=${this.level} part="heading" role="heading">
         <slot></slot>

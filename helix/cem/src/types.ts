@@ -42,6 +42,21 @@ export interface HelixEvent extends Documented {
  * obvious to a downstream consumer which fields are ours.
  */
 export interface HelixMetadata {
+  /** Other names people search for. Tag is also a Chip. */
+  aliases?: string[]
+
+  /** URL of the component's documentation page. */
+  documentation?: string
+
+  /** Version the component was introduced in. */
+  since?: string
+
+  /**
+   * Stability contract. `experimental` may change without a major version;
+   * `stable` is bound by semver; `deprecated` names its replacement.
+   */
+  status?: 'deprecated' | 'experimental' | 'stable'
+
   /**
    * Composition family this component belongs to, from its directory.
    * `Card.Root` and `Card.Header` share the group `Card`.

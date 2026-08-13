@@ -4,8 +4,20 @@ import { customElement, property } from 'lit/decorators.js'
 import { styles } from './card-root.css.js'
 
 /**
- * Cards group related content and actions into a single surface.
+ * @summary Groups related content and actions into a single surface.
  *
+ * @description
+ * Set `aria-labelledby` or `aria-label` for a name present in server-rendered
+ * HTML; otherwise the card adopts the first `Card.Title` beneath it once in a
+ * browser.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/card
+ * @alias Panel
+ * @alias Surface
+ *
+ * @slot - Card regions, typically Header, Body, and Footer.
  * @csspart container - The card surface.
  *
  * @cssproperty --card-background-color - Surface behind the card.

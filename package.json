@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "license": "UNLICENSED",
+  "customElements": "custom-elements.json",
   "scripts": {
     "analyze": "turbo run analyze",
     "build": "turbo run build",

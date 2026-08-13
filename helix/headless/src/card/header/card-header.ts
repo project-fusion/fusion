@@ -3,12 +3,17 @@ import { html, type TemplateResult } from 'lit'
 import { customElement } from 'lit/decorators.js'
 
 /**
- * Headers hold a card's title and any actions that apply to the whole card.
+ * @summary Holds a card's title and any actions that apply to the whole card.
  *
- * A separate element rather than a slot on the root, so it can be styled,
- * omitted, and reordered independently.
+ * @description
+ * Sits above the body, separated by a rule. Omit it entirely for a card that needs no heading.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - Title and actions.
+ * @csspart container - The region.
  */
 @customElement('helix-base-card-header')
 export class HelixBaseCardHeader extends HelixElement {

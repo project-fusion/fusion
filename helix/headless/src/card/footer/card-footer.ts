@@ -3,12 +3,17 @@ import { html, type TemplateResult } from 'lit'
 import { customElement } from 'lit/decorators.js'
 
 /**
- * Footers hold actions that conclude a card, such as confirm and cancel.
+ * @summary Holds actions that conclude a card, such as confirm and cancel.
  *
- * A separate element rather than a slot on the root, so it can be styled,
- * omitted, and reordered independently.
+ * @description
+ * Aligns its content to the end, so buttons sit where a user expects to finish.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - Actions, typically buttons.
+ * @csspart container - The region.
  */
 @customElement('helix-base-card-footer')
 export class HelixBaseCardFooter extends HelixElement {

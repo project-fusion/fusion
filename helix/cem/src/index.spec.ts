@@ -5,9 +5,19 @@ import { helixTier } from './plugins/helix-tier.js'
 import { reactEvents, toReactProp } from './plugins/react-events.js'
 import type { HelixContext, HelixDeclaration, HelixManifest } from './types.js'
 
-/** The component root, which every real Helix class descends from. */
+/**
+ * The component root, which every real Helix class descends from.
+ *
+ * Carries the metadata contract because the linter walks every component in the
+ * manifest, including this one.
+ */
 const ROOT: HelixDeclaration = {
   description: 'Base class for every Helix element.',
+  helix: {
+    documentation: 'https://helix.fusion.dev/core/helix-element',
+    since: '0.1.0',
+    status: 'experimental',
+  },
   kind: 'class',
   name: 'HelixElement',
 }
@@ -88,11 +98,32 @@ describe('reactEvents', () => {
 })
 
 describe('conventionLint', () => {
+  /** The metadata @since, @status, and @documentation carry, now required. */
+  const DOCUMENTED = {
+    helix: {
+      documentation: 'https://helix.fusion.dev/components/thing',
+      since: '0.1.0',
+      status: 'experimental',
+    },
+  } as const
+
   const lintOf = (declaration: Partial<HelixDeclaration>) => () =>
     run(
       conventionLint({ failOn: 'error' }),
-      manifest({ description: 'Does a thing.', ...declaration }),
+      manifest({ description: 'Does a thing.', ...DOCUMENTED, ...declaration }),
     )
+
+  test('rejects a component with no @since', () => {
+    expect(lintOf({ helix: { documentation: 'https://x', status: 'experimental' } })).toThrow(
+      /documented-since/,
+    )
+  })
+
+  test('rejects a component with no @status', () => {
+    expect(lintOf({ helix: { documentation: 'https://x', since: '0.1.0' } })).toThrow(
+      /documented-status/,
+    )
+  })
 
   test('passes a fully documented component', () => {
     expect(
@@ -227,6 +258,7 @@ describe('createHelixCemConfig', () => {
     expect(names).toEqual([
       'helix-tier',
       'helix-composition',
+      'helix-metadata',
       'helix-declared-events',
       'helix-react-events',
       'helix-convention-lint',

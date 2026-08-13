@@ -2,7 +2,9 @@
 import { type BaseProps, createComponent } from '../create-component.js'
 
 /**
- * Cards group related content and actions into a single surface.
+ * Set `aria-labelledby` or `aria-label` for a name present in server-rendered
+HTML; otherwise the card adopts the first `Card.Title` beneath it once in a
+browser.
  *
  * Renders `<helix-card>`.
  */
@@ -20,7 +22,7 @@ const CardRoot = createComponent<CardProps>({
 })
 
 /**
- * Bodies hold a card's main content.
+ * Carries the card's inset and muted foreground so content does not need to restate either.
  *
  * Renders `<helix-card-body>`.
  */
@@ -33,7 +35,7 @@ const CardBody = createComponent<CardBodyProps>({
 })
 
 /**
- * Footers hold actions that conclude a card, such as confirm and cancel.
+ * Aligns its content to the end, so buttons sit where a user expects to finish.
  *
  * Renders `<helix-card-footer>`.
  */
@@ -46,7 +48,7 @@ const CardFooter = createComponent<CardFooterProps>({
 })
 
 /**
- * Headers hold a card's title and any actions that apply to the whole card.
+ * Sits above the body, separated by a rule. Omit it entirely for a card that needs no heading.
  *
  * Renders `<helix-card-header>`.
  */
@@ -59,12 +61,13 @@ const CardHeader = createComponent<CardHeaderProps>({
 })
 
 /**
- * Titles name the card that contains them.
+ * Renders as a heading whose level the consumer sets, because the correct level
+depends on the surrounding document.
  *
  * Renders `<helix-card-title>`.
  */
 export interface CardTitleProps extends BaseProps {
-  /** Heading level rendered, 1 through 6. A card's title is a heading, and its correct level depends on the document around it, which the component cannot know. Defaulting to 3 and letting the consumer correct it beats hard-coding a level that is wrong half the time. */
+  /** Heading level, 1 through 6. */
   level?: 1 | 2 | 3 | 4 | 5 | 6
 }
 

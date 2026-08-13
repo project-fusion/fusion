@@ -4,8 +4,16 @@ import { customElement } from 'lit/decorators.js'
 import { styles } from './card-body.css.js'
 
 /**
- * Bodies hold a card's main content.
+ * @summary Holds a card's main content.
  *
+ * @description
+ * Carries the card's inset and muted foreground so content does not need to restate either.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/card
+ *
+ * @slot - The card's content.
  * @csspart container - The region.
  *
  * @cssproperty --card-padding - Inset, inherited from the card unless overridden.

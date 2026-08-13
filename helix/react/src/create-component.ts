@@ -46,8 +46,8 @@ export interface BaseProps {
  *
  * **Custom events.** React only knows how to bind its own synthetic event
  * names. `open-change` is not one, so `onOpenChange` is attached with
- * `addEventListener` directly and the detail is passed through, which is what
- * makes the callback receive `{ open: true }` rather than a raw Event.
+ * `addEventListener` directly. The callback receives the event, typed as the
+ * component's own `CustomEvent` subclass, so `event.detail.open` type-checks.
  *
  * **Non-attribute properties.** Attributes stringify. An object or array
  * crossing the boundary as an attribute arrives as `[object Object]`, so
@@ -81,10 +81,10 @@ export const createComponent = <Props extends BaseProps>({
         const listener = (event: Event): void => {
           const handler = handlers.current[propName]
           if (typeof handler === 'function') {
-            ;(handler as (detail: unknown, event: Event) => void)(
-              (event as CustomEvent).detail,
-              event,
-            )
+            // The event itself, not its detail. One argument, matching
+            // addEventListener, and `event.detail` stays explicit and typed
+            // through the generated CustomEvent subclass.
+            ;(handler as (event: Event) => void)(event)
           }
         }
         element.addEventListener(eventName, listener)

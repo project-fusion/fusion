@@ -1,67 +1,91 @@
 import { HelixElement } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { customElement } from 'lit/decorators.js'
-import { ifDefined } from 'lit/directives/if-defined.js'
+import { HelixBaseCardTitle } from '../title/card-title.js'
 
-/** Shadow-DOM id of the region, so a title outside the shadow root can name it. */
-const REGION_ID = 'region'
+/** Tags that can name a card. Either tier's title will do. */
+const TITLE_SELECTOR = 'helix-card-title, helix-base-card-title'
+
+const LABELLED_BY = 'aria-labelledby'
 
 /**
- * Cards group related content and actions into a single surface.
+ * @summary Groups related content and actions into a single surface.
  *
- * The root owns the surface and the accessible name. Its parts are separate
- * elements rather than slots on one element, because a card's regions are
- * independently styleable, independently omittable, and frequently reordered:
- * `Card.Header`, `Card.Title`, `Card.Body`, `Card.Footer`.
+ * @description
+ * Composed of regions rather than slots on one element, so a header, body, or
+ * footer can be styled, omitted, and reordered independently.
  *
- * **Naming is coordinated, not assumed.** A card that groups content needs an
- * accessible name or it is an unlabelled group, which screen readers announce
- * as noise. Rather than requiring every consumer to pass `aria-label`, the root
- * looks for a `helix-card-title` in its light DOM and points at it. That
- * coordination is the whole reason these are compound components: a title
- * nested three levels down still names the card that contains it.
+ * A card needs an accessible name or screen readers announce an unlabelled
+ * group. Set `aria-labelledby` or `aria-label` yourself for a name that is
+ * present in server-rendered HTML; otherwise the card adopts the first
+ * `Card.Title` beneath it once it is in a browser.
  *
- * @slot - The card's regions, typically Header, Body, and Footer.
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/card
+ * @alias Panel
+ * @alias Surface
+ *
+ * @slot - Card regions, typically Header, Body, and Footer.
+ * @csspart container - The card surface.
  */
 @customElement('helix-base-card')
 export class HelixBaseCard extends HelixElement {
-  /** Cached so a re-render does not clear a name that has not changed. */
-  private labelledBy: string | null = null
+  /** True when the consumer named the card, so adoption must not overwrite it. */
+  private consumerNamed = false
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.consumerNamed = this.hasAttribute(LABELLED_BY) || this.hasAttribute('aria-label')
+    this.addEventListener(HelixBaseCardTitle.readyEvent, this.handleTitleReady)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener(HelixBaseCardTitle.readyEvent, this.handleTitleReady)
+  }
+
+  private handleTitleReady = (): void => {
     this.adoptTitle()
   }
 
   /**
-   * Points the region at the first descendant title, if there is one.
+   * Sets the role, which needs no DOM access and so is safe on the server.
    *
-   * Searches the light DOM rather than the shadow root: the title is the
-   * consumer's child, not ours. `querySelector` reaches nested titles, so a
-   * title inside a header still names the card.
+   * ARIA belongs on the host rather than the shadow-DOM container because
+   * IDREFs do not cross shadow boundaries: a reference from inside the shadow
+   * root could never resolve to a title in the light DOM.
    */
-  protected adoptTitle(): void {
-    const title = this.querySelector('helix-card-title, helix-base-card-title')
-    // `||` rather than `??`: an element with no id has `id === ''`, which is
-    // not nullish, so `??` would accept it and emit `aria-labelledby=""`. An
-    // empty reference is worse than no reference, because it names the group
-    // as the empty string rather than leaving it unnamed.
-    const id = title?.id || null
-    if (id !== this.labelledBy) {
-      this.labelledBy = id
-      this.requestUpdate()
-    }
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.setAttribute('role', 'group')
   }
 
   /**
-   * Adopts again once the first render has happened.
+   * Adopts a title's id as the card's accessible name.
    *
-   * `connectedCallback` runs before a parser-created element's children exist,
-   * so the first pass finds nothing. `slotchange` is supposed to cover that and
-   * does in browsers, but it only fires on *initial* assignment in some
-   * implementations, so a card that depends solely on it renders unnamed under
-   * a DOM that does not. Both hooks, and `adoptTitle` is idempotent.
+   * Deliberately in `firstUpdated` rather than `willUpdate`: **SSR has no DOM.**
+   * The server-side element shim carries attributes but not tree traversal, so
+   * `querySelector` is undefined there and any parent-to-child coordination
+   * throws. Running here makes adoption a client-side enhancement over whatever
+   * the consumer set, which is what actually reaches the server.
    */
+  protected adoptTitle(): void {
+    if (this.consumerNamed) {
+      return
+    }
+
+    // `||` not `??`: an element with no id has `id === ''`, which is not
+    // nullish, and an empty reference names the group the empty string rather
+    // than leaving it unnamed.
+    const id = this.querySelector(TITLE_SELECTOR)?.id || null
+    if (id) {
+      this.setAttribute(LABELLED_BY, id)
+    } else {
+      this.removeAttribute(LABELLED_BY)
+    }
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.adoptTitle()
@@ -73,14 +97,9 @@ export class HelixBaseCard extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`
-      <section
-        id=${REGION_ID}
-        aria-labelledby=${ifDefined(this.labelledBy ?? undefined)}
-        part="container"
-        role="group"
-      >
+      <div part="container">
         <slot @slotchange=${this.handleSlotChange}></slot>
-      </section>
+      </div>
     `
   }
 }

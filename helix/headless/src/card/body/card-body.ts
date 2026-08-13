@@ -3,12 +3,17 @@ import { html, type TemplateResult } from 'lit'
 import { customElement } from 'lit/decorators.js'
 
 /**
- * Bodies hold a card's main content.
+ * @summary Holds a card's main content.
  *
- * A separate element rather than a slot on the root, so it can be styled,
- * omitted, and reordered independently.
+ * @description
+ * Carries the card's inset and muted foreground so content does not need to restate either.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - The card's content.
+ * @csspart container - The region.
  */
 @customElement('helix-base-card-body')
 export class HelixBaseCardBody extends HelixElement {

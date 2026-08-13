@@ -38,11 +38,49 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/events.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Fired when an element's open state changes, in either mode.",
+          "name": "HelixOpenChangeEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'open-change'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events.ts"
+          },
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixOpenChangeEvent",
+          "declaration": {
+            "name": "HelixOpenChangeEvent",
+            "module": "src/events.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/helix-element.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Base class for every Helix element.\n\nOwns only what is universal: shadow-root normalization and the shared\nlifecycle surface. Anything visual belongs in the styled tier; anything\ncomponent-specific belongs in the component.",
+          "description": "Owns only what is universal: normalizing `box-sizing` inside the shadow root,\nso component CSS can rely on border-box on both sides of the boundary.\n\nThere is deliberately no `emit(name, detail)` helper. A dispatch through a\ngeneric helper cannot be named by the manifest analyzer, which recorded the\nparameter identifier and produced a phantom event on every element that\ninherited it. Components dispatch concrete event classes from `events.ts`,\nwhich the analyzer and TypeScript can both see.",
           "name": "HelixElement",
           "members": [
             {
@@ -65,43 +103,20 @@
                 }
               ],
               "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it."
-            },
-            {
-              "kind": "method",
-              "name": "emit",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "detail",
-                  "optional": true,
-                  "type": {
-                    "text": "T"
-                  }
-                }
-              ],
-              "description": "Dispatches a composed, bubbling CustomEvent. Kebab-case names map to React\n`onFooBar` props through the wrapper generator, so event names are part of\nthe public API and should be treated as such."
             }
           ],
-          "events": [],
           "superclass": {
             "name": "LitElement",
             "package": "lit"
           },
-          "customElement": true,
+          "summary": "Base class every Helix element extends.",
           "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/core/helix-element",
             "tier": "core"
-          }
+          },
+          "customElement": true
         }
       ],
       "exports": [
@@ -130,10 +145,10 @@
         },
         {
           "kind": "js",
-          "name": "HelixElement",
+          "name": "HelixOpenChangeEvent",
           "declaration": {
-            "name": "HelixElement",
-            "module": "./helix-element.js"
+            "name": "HelixOpenChangeEvent",
+            "module": "./events.js"
           }
         },
         {
@@ -141,7 +156,15 @@
           "name": "OpenChangeDetail",
           "declaration": {
             "name": "OpenChangeDetail",
-            "module": "./mixins/with-open.js"
+            "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixElement",
+          "declaration": {
+            "name": "HelixElement",
+            "module": "./helix-element.js"
           }
         },
         {
@@ -194,7 +217,7 @@
               "type": {
                 "text": "boolean | undefined"
               },
-              "description": "Whether the element is open. Setting this puts the element into controlled\nmode: the consumer owns the value from that point on."
+              "description": "Whether the element is open. Setting this enters controlled mode."
             },
             {
               "kind": "method",
@@ -212,13 +235,14 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change. In uncontrolled mode the element updates\nitself; in controlled mode it only notifies and waits for the consumer."
+              "description": "Requests an open-state change."
             }
-          ]
+          ],
+          "helix": {}
         },
         {
           "kind": "mixin",
-          "description": "Grafts controlled and uncontrolled open state onto a base class.\n\nControlled mode is detected automatically: once a consumer sets `open`\nexplicitly, the element stops managing the value itself and only emits\n`open-change`. Uncontrolled consumers set `defaultOpen` and let the element\nown it.\n\nThe kebab-case `open-change` event maps to an `onOpenChange` React prop\nthrough the wrapper generator, so the event name is public API.\n\nSets `data-open` on the host whenever the element is open, in either mode.\nStyled tiers should select on that rather than on `[open]`, which is absent\nfor uncontrolled consumers.",
+          "description": "Grafts controlled and uncontrolled open state onto a base class.\n\nControlled mode is detected automatically: once a consumer sets `open`, the\nelement stops managing the value and only emits `open-change`. Uncontrolled\nconsumers set `defaultOpen` and let the element own it.\n\nSets `data-open` on the host whenever the element is open, in either mode.\nStyled tiers select on that rather than `[open]`, which is absent for\nuncontrolled consumers.",
           "name": "WithOpen",
           "members": [
             {
@@ -228,7 +252,7 @@
                 "text": "boolean | undefined"
               },
               "default": "undefined",
-              "description": "Whether the element is open. Setting this puts the element into\ncontrolled mode: the consumer owns the value from that point on.",
+              "description": "Whether the element is open. Setting this enters controlled mode.",
               "attribute": "open",
               "reflects": true
             },
@@ -246,10 +270,11 @@
               "kind": "field",
               "name": "internalOpen",
               "type": {
-                "text": "boolean"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
-              "default": "false"
+              "default": "undefined",
+              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree."
             },
             {
               "kind": "field",
@@ -271,17 +296,6 @@
             },
             {
               "kind": "method",
-              "name": "reflectResolvedState",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Mirrors the resolved state onto the host as `data-open`.\n\n`open` only reflects in controlled mode, so styling on `:host([open])`\nsilently does nothing for uncontrolled consumers. Presentation needs one\nselector that is true whenever the element is actually open, in either\nmode."
-            },
-            {
-              "kind": "method",
               "name": "setOpen",
               "return": {
                 "type": {
@@ -299,6 +313,13 @@
               "description": "Requests an open-state change. In uncontrolled mode the element updates\nitself; in controlled mode it only notifies and waits for the consumer."
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixOpenChangeEvent"
+              }
+            }
+          ],
           "attributes": [
             {
               "name": "open",
@@ -306,7 +327,7 @@
                 "text": "boolean | undefined"
               },
               "default": "undefined",
-              "description": "Whether the element is open. Setting this puts the element into\ncontrolled mode: the consumer owns the value from that point on.",
+              "description": "Whether the element is open. Setting this enters controlled mode.",
               "fieldName": "open"
             },
             {

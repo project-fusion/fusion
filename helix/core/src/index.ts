@@ -1,7 +1,4 @@
 export { createSheet } from './create-sheet.js'
+export { HelixOpenChangeEvent, type OpenChangeDetail } from './events.js'
 export { HelixElement } from './helix-element.js'
-export {
-  type OpenChangeDetail,
-  WithOpen,
-  type WithOpenInterface,
-} from './mixins/with-open.js'
+export { WithOpen, type WithOpenInterface } from './mixins/with-open.js'

@@ -4,8 +4,16 @@ import { customElement } from 'lit/decorators.js'
 import { styles } from './card-footer.css.js'
 
 /**
- * Footers hold actions that conclude a card, such as confirm and cancel.
+ * @summary Holds actions that conclude a card, such as confirm and cancel.
  *
+ * @description
+ * Aligns its content to the end, so buttons sit where a user expects to finish.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/card
+ *
+ * @slot - Actions, typically buttons.
  * @csspart container - The region.
  *
  * @cssproperty --card-padding - Inset, inherited from the card unless overridden.
