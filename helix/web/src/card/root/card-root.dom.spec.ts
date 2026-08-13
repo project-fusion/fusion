@@ -18,8 +18,10 @@ describe('card regions', () => {
     // The regions are slots in one shadow root, not separate custom elements
     // and not wrapper divs either.
     expect(card.querySelectorAll('helix-card-header, helix-card-content').length).toBe(0)
-    expect(part(card, 'container')).not.toBeNull()
-    expect(card.shadowRoot?.querySelectorAll('div').length).toBe(1)
+    // The host is the surface, so the shadow root holds only slots: no
+    // wrapper element at all.
+    expect(card.shadowRoot?.querySelectorAll('div').length).toBe(0)
+    expect(card.shadowRoot?.querySelectorAll('slot').length).toBe(4)
   })
 
   test('routes content to the right region', async () => {
@@ -75,7 +77,8 @@ describe('card regions', () => {
 
   test('carries the group role', async () => {
     const card = await mount('<helix-card>Body</helix-card>')
-    expect(part(card, 'container')?.getAttribute('role')).toBe('group')
+    // On the host, since the host is the box.
+    expect(card.getAttribute('role')).toBe('group')
   })
 
   test('a consumer-supplied name is left alone', async () => {

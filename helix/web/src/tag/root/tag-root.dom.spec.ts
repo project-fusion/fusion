@@ -9,7 +9,9 @@ beforeAll(async () => {
 describe('tag', () => {
   test('shows its label and nothing else by default', async () => {
     const tag = await mount('<helix-tag>Draft</helix-tag>')
-    expect(part(tag, 'tag')).not.toBeNull()
+    // The host is the box, so the shadow root holds the label slot and, when
+    // asked for, the remove control. Nothing else.
+    expect(tag.shadowRoot?.querySelector('slot')).not.toBeNull()
     expect(part(tag, 'remove')).toBeNull()
   })
 
