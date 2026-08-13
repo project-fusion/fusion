@@ -1,40 +1,40 @@
 import { describe, expect, test } from 'bun:test'
 import { createComponent } from './create-component.js'
-import { Disclosure, type DisclosureProps } from './generated/index.js'
+import { Accordion, type AccordionItemProps, type AccordionProps } from './generated/index.js'
 
 describe('generated composition namespace', () => {
   test('exposes parts through dot notation', () => {
-    expect(Disclosure.Root).toBeDefined()
-    expect(typeof Disclosure.Root).toBe('object')
+    expect(Accordion.Root).toBeDefined()
+    expect(Accordion.Item).toBeDefined()
   })
 
   test('the root renders its custom element', () => {
-    expect((Disclosure.Root as { displayName?: string }).displayName).toBe('helix-disclosure')
+    expect((Accordion.Root as { displayName?: string }).displayName).toBe('helix-accordion')
+    expect((Accordion.Item as { displayName?: string }).displayName).toBe('helix-accordion-item')
   })
 
   // The namespace object owns the bare group name, so the component itself has
   // to carry its part or the two collide in the generated module.
   test('the namespace is not the component', () => {
-    expect(Disclosure).not.toBe(Disclosure.Root)
+    expect(Accordion).not.toBe(Accordion.Root)
   })
 })
 
 describe('generated props', () => {
   // Compile-time assertions: this file failing to typecheck is the test.
   test('accepts documented props and the event callback', () => {
-    const props: DisclosureProps = {
-      appearance: 'outlined',
+    const props: AccordionItemProps = {
       defaultOpen: true,
       dense: false,
       onOpenChange: (event) => event.detail.open,
       open: true,
     }
-    expect(props.appearance).toBe('outlined')
+    expect(props.defaultOpen).toBe(true)
   })
 
   test('rejects a value outside the literal union', () => {
-    // @ts-expect-error 'ghost' is not one of the element's appearances.
-    const props: DisclosureProps = { appearance: 'ghost' }
+    // @ts-expect-error 'ghost' is not one of the accordion's appearances.
+    const props: AccordionProps = { appearance: 'ghost' }
     expect(props).toBeDefined()
   })
 
@@ -42,7 +42,7 @@ describe('generated props', () => {
   // that throws on assignment.
   test('omits read-only members', () => {
     // @ts-expect-error isOpen is readonly on the element and not authorable.
-    const props: DisclosureProps = { isOpen: true }
+    const props: AccordionItemProps = { isOpen: true }
     expect(props).toBeDefined()
   })
 })

@@ -1,12 +1,16 @@
 import type {
   Helix,
+  HelixBaseAccordion,
+  HelixBaseAccordionItem,
   HelixBaseAppHeader,
   HelixBaseButton,
+  HelixBaseCallout,
   HelixBaseCard,
-  HelixBaseDisclosure,
   HelixBaseDivider,
   HelixBaseIcon,
+  HelixBaseTag,
   HelixOpenChangeEvent,
+  HelixRemoveRequestEvent,
 } from '@helix-io/headless';
 
 /**
@@ -248,46 +252,76 @@ export type HelixBaseAppHeaderSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseCardProps = {};
+/** `HelixBaseAccordionItem` component event */
+export type HelixBaseAccordionItemElementEvent<E = Event> = TypedEvent<
+  HelixBaseAccordionItem,
+  E
+>;
+/** `OpenChange` event type */
+export type HelixBaseAccordionItemOpenChangeElementEvent =
+  HelixBaseAccordionItemElementEvent<HelixOpenChangeEvent>;
 
-export type HelixBaseCardSolidJsProps = {
+export type HelixBaseAccordionItemProps = {
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixBaseAccordionItem["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixBaseAccordionItem["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixBaseAccordionItem["defaultOpen"];
+
+  /** Fired when the item opens or closes. */
+  onOpenChange?: (e: HelixBaseAccordionItemOpenChangeElementEvent) => void;
+};
+
+export type HelixBaseAccordionItemSolidJsProps = {
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixBaseAccordionItem["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixBaseAccordionItem["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixBaseAccordionItem["defaultOpen"];
+  /** Fired when the item opens or closes. */
+  "on:OpenChange"?: (e: HelixBaseAccordionItemOpenChangeElementEvent) => void;
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
   textContent?: string | number;
 };
 
-/** `HelixBaseDisclosure` component event */
-export type HelixBaseDisclosureElementEvent<E = Event> = TypedEvent<
-  HelixBaseDisclosure,
-  E
->;
-/** `OpenChange` event type */
-export type HelixBaseDisclosureOpenChangeElementEvent =
-  HelixBaseDisclosureElementEvent<HelixOpenChangeEvent>;
-
-export type HelixBaseDisclosureProps = {
-  /** Whether the element is open. Setting this enters controlled mode. */
-  open?: HelixBaseDisclosure["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
-  "default-open"?: HelixBaseDisclosure["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
-  defaultOpen?: HelixBaseDisclosure["defaultOpen"];
-
-  /** Fired when the disclosure opens or closes. */
-  onOpenChange?: (e: HelixBaseDisclosureOpenChangeElementEvent) => void;
+export type HelixBaseAccordionProps = {
+  /** Whether more than one item may be open at once. */
+  multiple?: HelixBaseAccordion["multiple"];
 };
 
-export type HelixBaseDisclosureSolidJsProps = {
-  /** Whether the element is open. Setting this enters controlled mode. */
-  "prop:open"?: HelixBaseDisclosure["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
-  "bool:default-open"?: HelixBaseDisclosure["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
-  "prop:defaultOpen"?: HelixBaseDisclosure["defaultOpen"];
-  /** Fired when the disclosure opens or closes. */
-  "on:OpenChange"?: (e: HelixBaseDisclosureOpenChangeElementEvent) => void;
+export type HelixBaseAccordionSolidJsProps = {
+  /** Whether more than one item may be open at once. */
+  "prop:multiple"?: HelixBaseAccordion["multiple"];
 
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseCalloutProps = {
+  /** What kind of attention the passage needs. */
+  severity?: HelixBaseCallout["severity"];
+};
+
+export type HelixBaseCalloutSolidJsProps = {
+  /** What kind of attention the passage needs. */
+  "prop:severity"?: HelixBaseCallout["severity"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseCardProps = {};
+
+export type HelixBaseCardSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -321,6 +355,72 @@ export type HelixBaseDividerProps = {
 export type HelixBaseDividerSolidJsProps = {
   /** Which way the rule runs. */
   "prop:orientation"?: HelixBaseDivider["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseTag` component event */
+export type HelixBaseTagElementEvent<E = Event> = TypedEvent<HelixBaseTag, E>;
+/** `RemoveRequest` event type */
+export type HelixBaseTagRemoveRequestElementEvent =
+  HelixBaseTagElementEvent<HelixRemoveRequestEvent>;
+
+export type HelixBaseTagProps = {
+  /** Whether the tag offers a control to remove itself. */
+  removable?: HelixBaseTag["removable"];
+  /** Accessible name for the remove control.
+
+A property rather than text read from the tag, because naming the button
+"Remove Draft" would mean reading `textContent` and the server has no tree
+to read it from.
+
+The attribute is named explicitly. Lit lowercases a property name to get an
+attribute rather than dash-casing it, so this would otherwise be reachable
+only as `removelabel`, which nobody would guess and no linter would catch. */
+  "remove-label"?: HelixBaseTag["removeLabel"];
+  /** Accessible name for the remove control.
+
+A property rather than text read from the tag, because naming the button
+"Remove Draft" would mean reading `textContent` and the server has no tree
+to read it from.
+
+The attribute is named explicitly. Lit lowercases a property name to get an
+attribute rather than dash-casing it, so this would otherwise be reachable
+only as `removelabel`, which nobody would guess and no linter would catch. */
+  removeLabel?: HelixBaseTag["removeLabel"];
+
+  /** Fired when the reader asks to remove the tag. */
+  onRemoveRequest?: (e: HelixBaseTagRemoveRequestElementEvent) => void;
+};
+
+export type HelixBaseTagSolidJsProps = {
+  /** Whether the tag offers a control to remove itself. */
+  "prop:removable"?: HelixBaseTag["removable"];
+  /** Accessible name for the remove control.
+
+A property rather than text read from the tag, because naming the button
+"Remove Draft" would mean reading `textContent` and the server has no tree
+to read it from.
+
+The attribute is named explicitly. Lit lowercases a property name to get an
+attribute rather than dash-casing it, so this would otherwise be reachable
+only as `removelabel`, which nobody would guess and no linter would catch. */
+  "attr:remove-label"?: HelixBaseTag["removeLabel"];
+  /** Accessible name for the remove control.
+
+A property rather than text read from the tag, because naming the button
+"Remove Draft" would mean reading `textContent` and the server has no tree
+to read it from.
+
+The attribute is named explicitly. Lit lowercases a property name to get an
+attribute rather than dash-casing it, so this would otherwise be reachable
+only as `removelabel`, which nobody would guess and no linter would catch. */
+  "prop:removeLabel"?: HelixBaseTag["removeLabel"];
+  /** Fired when the reader asks to remove the tag. */
+  "on:RemoveRequest"?: (e: HelixBaseTagRemoveRequestElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -411,6 +511,134 @@ export type CustomElements = {
   >;
 
   /**
+   * Carries its own open state, which is why it is an element rather than a slot.
+   * Used alone it is a disclosure, and that is deliberate: shipping a separate
+   * `Disclosure` meant two implementations of one behavior, which is what this
+   * replaced.
+   *
+   * Content stays mounted when closed and is hidden by the styled tier's CSS, so
+   * it can animate and so the text is present in server-rendered HTML. Closed
+   * content is `inert`, keeping it out of the tab order and the accessibility
+   * tree without removing it from the box tree.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `OpenChange`: Fired when the item opens or closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `summary`: The always-visible trigger content.
+   * - `(default)`: The content revealed when open.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusTrigger() => void`: Moves focus to this item's trigger.
+   *
+   * The parent accordion drives arrow-key navigation and cannot reach the
+   * trigger itself, because it is inside this item's shadow root. Exposing the
+   * intent as a method keeps the parent out of the child's internals.
+   * - `setOpen(next: boolean) => void`: Requests an open-state change. In uncontrolled mode the element updates
+   * itself; in controlled mode it only notifies and waits for the consumer.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The outer wrapper.
+   * - `trigger`: The clickable summary row.
+   * - `content`: The revealed region.
+   * - `content-inner`: Padding wrapper inside the animated region.
+   */
+  "helix-base-accordion-item": Partial<
+    HelixBaseAccordionItemProps & BaseProps<HelixBaseAccordionItem> & BaseEvents
+  >;
+
+  /**
+   * Coordination is by event rather than by registration. Items dispatch
+   * `OpenChange`, which bubbles and is composed, so the accordion learns that one
+   * opened by listening to itself. No ready handshake, no child registry, and
+   * nothing to keep in step when items are added or removed.
+   *
+   * Items are matched with `instanceof HelixBaseAccordionItem`, never by tag
+   * name. A headless component that looked for `helix-accordion-item` would only
+   * work with the styled tier, which is the tier it is not allowed to know about.
+   *
+   * Every listener is attached on connect, so none of it runs on the server,
+   * where there is no tree to walk and no events to hear.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `multiple`: Whether more than one item may be open at once.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The accordion's items.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The stack of items.
+   */
+  "helix-base-accordion": Partial<
+    HelixBaseAccordionProps & BaseProps<HelixBaseAccordion> & BaseEvents
+  >;
+
+  /**
+   * `severity` lives on the headless tier rather than being an `appearance` on the
+   * styled one, because it is meaning and not decoration. It picks the icon and
+   * that icon's accessible name, so a reader who cannot see that the box is red
+   * still hears "Error". A callout whose severity existed only as a color would
+   * say nothing to them at all.
+   *
+   * The icon is the fallback content of a slot, so a consumer replaces it by
+   * slotting their own and the default disappears with no emptiness check. That
+   * is what slot fallback is for.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the passage needs.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The callout's content.
+   * - `icon`: Replaces the icon chosen by `severity`.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `callout`: The callout body.
+   * - `icon`: The icon region.
+   * - `content`: The content region.
+   */
+  "helix-base-callout": Partial<
+    HelixBaseCalloutProps & BaseProps<HelixBaseCallout> & BaseEvents
+  >;
+
+  /**
    * Regions are slots rather than separate elements, because a header, body, and
    * footer carry no state, no behavior, and no API of their own. Slotting them
    * costs one custom element instead of five and lets the consumer bring their
@@ -437,56 +665,6 @@ export type CustomElements = {
    */
   "helix-base-card": Partial<
     HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
-  >;
-
-  /**
-   * Content stays mounted when closed and is hidden by the styled tier's CSS, so
-   * an open and close transition is possible and the text is present in
-   * server-rendered HTML. Closed content is `inert`, keeping it out of the tab
-   * order and the accessibility tree without removing it from the box tree.
-   *
-   * Slated to become `Accordion.Item`: a disclosure is an accordion with one
-   * section, and shipping both means two implementations of one behavior.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `OpenChange`: Fired when the disclosure opens or closes.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `summary`: The always-visible trigger content.
-   * - `(default)`: The content revealed when open.
-   *
-   * ## Methods
-   *
-   * Methods that can be called to access component functionality.
-   *
-   * - `setOpen(next: boolean) => void`: Requests an open-state change. In uncontrolled mode the element updates
-   * itself; in controlled mode it only notifies and waits for the consumer.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The outer wrapper.
-   * - `trigger`: The clickable summary row.
-   * - `content`: The revealed region.
-   * - `content-inner`: Padding wrapper inside the animated region.
-   */
-  "helix-base-disclosure": Partial<
-    HelixBaseDisclosureProps & BaseProps<HelixBaseDisclosure> & BaseEvents
   >;
 
   /**
@@ -541,6 +719,54 @@ export type CustomElements = {
    */
   "helix-base-divider": Partial<
     HelixBaseDividerProps & BaseProps<HelixBaseDivider> & BaseEvents
+  >;
+
+  /**
+   * A tag is a label, and optionally a label the reader can take off. `removable`
+   * is what separates it from a badge: a badge reports a state the reader cannot
+   * change, a tag names something they can.
+   *
+   * Removing is a request, not an action. The tag dispatches `RemoveRequest` and
+   * does nothing else, because the consumer owns the list it sits in; taking the
+   * node out from under them would put their state and the document out of step.
+   * The event is cancelable, so `preventDefault()` is a refusal.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `removable`: Whether the tag offers a control to remove itself.
+   * - `remove-label`/`removeLabel`: Accessible name for the remove control.
+   *
+   * A property rather than text read from the tag, because naming the button
+   * "Remove Draft" would mean reading `textContent` and the server has no tree
+   * to read it from.
+   *
+   * The attribute is named explicitly. Lit lowercases a property name to get an
+   * attribute rather than dash-casing it, so this would otherwise be reachable
+   * only as `removelabel`, which nobody would guess and no linter would catch.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `RemoveRequest`: Fired when the reader asks to remove the tag.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tag's label.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tag`: The tag body.
+   * - `remove`: The remove button, when `removable`.
+   */
+  "helix-base-tag": Partial<
+    HelixBaseTagProps & BaseProps<HelixBaseTag> & BaseEvents
   >;
 };
 
@@ -633,6 +859,143 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Carries its own open state, which is why it is an element rather than a slot.
+   * Used alone it is a disclosure, and that is deliberate: shipping a separate
+   * `Disclosure` meant two implementations of one behavior, which is what this
+   * replaced.
+   *
+   * Content stays mounted when closed and is hidden by the styled tier's CSS, so
+   * it can animate and so the text is present in server-rendered HTML. Closed
+   * content is `inert`, keeping it out of the tab order and the accessibility
+   * tree without removing it from the box tree.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `OpenChange`: Fired when the item opens or closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `summary`: The always-visible trigger content.
+   * - `(default)`: The content revealed when open.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusTrigger() => void`: Moves focus to this item's trigger.
+   *
+   * The parent accordion drives arrow-key navigation and cannot reach the
+   * trigger itself, because it is inside this item's shadow root. Exposing the
+   * intent as a method keeps the parent out of the child's internals.
+   * - `setOpen(next: boolean) => void`: Requests an open-state change. In uncontrolled mode the element updates
+   * itself; in controlled mode it only notifies and waits for the consumer.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The outer wrapper.
+   * - `trigger`: The clickable summary row.
+   * - `content`: The revealed region.
+   * - `content-inner`: Padding wrapper inside the animated region.
+   */
+  "helix-base-accordion-item": Partial<
+    HelixBaseAccordionItemProps &
+      HelixBaseAccordionItemSolidJsProps &
+      BaseProps<HelixBaseAccordionItem> &
+      BaseEvents
+  >;
+
+  /**
+   * Coordination is by event rather than by registration. Items dispatch
+   * `OpenChange`, which bubbles and is composed, so the accordion learns that one
+   * opened by listening to itself. No ready handshake, no child registry, and
+   * nothing to keep in step when items are added or removed.
+   *
+   * Items are matched with `instanceof HelixBaseAccordionItem`, never by tag
+   * name. A headless component that looked for `helix-accordion-item` would only
+   * work with the styled tier, which is the tier it is not allowed to know about.
+   *
+   * Every listener is attached on connect, so none of it runs on the server,
+   * where there is no tree to walk and no events to hear.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `multiple`: Whether more than one item may be open at once.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The accordion's items.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The stack of items.
+   */
+  "helix-base-accordion": Partial<
+    HelixBaseAccordionProps &
+      HelixBaseAccordionSolidJsProps &
+      BaseProps<HelixBaseAccordion> &
+      BaseEvents
+  >;
+
+  /**
+   * `severity` lives on the headless tier rather than being an `appearance` on the
+   * styled one, because it is meaning and not decoration. It picks the icon and
+   * that icon's accessible name, so a reader who cannot see that the box is red
+   * still hears "Error". A callout whose severity existed only as a color would
+   * say nothing to them at all.
+   *
+   * The icon is the fallback content of a slot, so a consumer replaces it by
+   * slotting their own and the default disappears with no emptiness check. That
+   * is what slot fallback is for.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the passage needs.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The callout's content.
+   * - `icon`: Replaces the icon chosen by `severity`.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `callout`: The callout body.
+   * - `icon`: The icon region.
+   * - `content`: The content region.
+   */
+  "helix-base-callout": Partial<
+    HelixBaseCalloutProps &
+      HelixBaseCalloutSolidJsProps &
+      BaseProps<HelixBaseCallout> &
+      BaseEvents
+  >;
+
+  /**
    * Regions are slots rather than separate elements, because a header, body, and
    * footer carry no state, no behavior, and no API of their own. Slotting them
    * costs one custom element instead of five and lets the consumer bring their
@@ -661,59 +1024,6 @@ export type CustomElementsSolidJs = {
     HelixBaseCardProps &
       HelixBaseCardSolidJsProps &
       BaseProps<HelixBaseCard> &
-      BaseEvents
-  >;
-
-  /**
-   * Content stays mounted when closed and is hidden by the styled tier's CSS, so
-   * an open and close transition is possible and the text is present in
-   * server-rendered HTML. Closed content is `inert`, keeping it out of the tab
-   * order and the accessibility tree without removing it from the box tree.
-   *
-   * Slated to become `Accordion.Item`: a disclosure is an accordion with one
-   * section, and shipping both means two implementations of one behavior.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `OpenChange`: Fired when the disclosure opens or closes.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `summary`: The always-visible trigger content.
-   * - `(default)`: The content revealed when open.
-   *
-   * ## Methods
-   *
-   * Methods that can be called to access component functionality.
-   *
-   * - `setOpen(next: boolean) => void`: Requests an open-state change. In uncontrolled mode the element updates
-   * itself; in controlled mode it only notifies and waits for the consumer.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The outer wrapper.
-   * - `trigger`: The clickable summary row.
-   * - `content`: The revealed region.
-   * - `content-inner`: Padding wrapper inside the animated region.
-   */
-  "helix-base-disclosure": Partial<
-    HelixBaseDisclosureProps &
-      HelixBaseDisclosureSolidJsProps &
-      BaseProps<HelixBaseDisclosure> &
       BaseEvents
   >;
 
@@ -774,6 +1084,57 @@ export type CustomElementsSolidJs = {
     HelixBaseDividerProps &
       HelixBaseDividerSolidJsProps &
       BaseProps<HelixBaseDivider> &
+      BaseEvents
+  >;
+
+  /**
+   * A tag is a label, and optionally a label the reader can take off. `removable`
+   * is what separates it from a badge: a badge reports a state the reader cannot
+   * change, a tag names something they can.
+   *
+   * Removing is a request, not an action. The tag dispatches `RemoveRequest` and
+   * does nothing else, because the consumer owns the list it sits in; taking the
+   * node out from under them would put their state and the document out of step.
+   * The event is cancelable, so `preventDefault()` is a refusal.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `removable`: Whether the tag offers a control to remove itself.
+   * - `remove-label`/`removeLabel`: Accessible name for the remove control.
+   *
+   * A property rather than text read from the tag, because naming the button
+   * "Remove Draft" would mean reading `textContent` and the server has no tree
+   * to read it from.
+   *
+   * The attribute is named explicitly. Lit lowercases a property name to get an
+   * attribute rather than dash-casing it, so this would otherwise be reachable
+   * only as `removelabel`, which nobody would guess and no linter would catch.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `RemoveRequest`: Fired when the reader asks to remove the tag.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tag's label.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tag`: The tag body.
+   * - `remove`: The remove button, when `removable`.
+   */
+  "helix-base-tag": Partial<
+    HelixBaseTagProps &
+      HelixBaseTagSolidJsProps &
+      BaseProps<HelixBaseTag> &
       BaseEvents
   >;
 };

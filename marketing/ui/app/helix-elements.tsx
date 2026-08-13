@@ -1,10 +1,13 @@
 'use client'
 
+import '@helix-io/web/accordion'
 import '@helix-io/web/app-header'
 import '@helix-io/web/button'
+import '@helix-io/web/callout'
 import '@helix-io/web/card'
 import '@helix-io/web/divider'
 import '@helix-io/web/icon'
+import '@helix-io/web/tag'
 
 /**
  * Registers every Helix element used by the app.

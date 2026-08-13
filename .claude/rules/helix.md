@@ -210,6 +210,12 @@ a dispatch through one cannot be named by the analyzer.
 
 Every `@property` gets a one-line description.
 
+**A camelCase property needs an explicit `attribute`.** Lit lowercases a
+property name to derive its attribute rather than dash-casing it, so
+`removeLabel` is reachable only as `removelabel` unless it declares
+`@property({ attribute: 'remove-label' })`. Nothing warns: the attribute a
+consumer would guess simply does nothing.
+
 ## Use the elements directly
 
 **Write `<helix-card>` in JSX.** Plain custom elements, no wrapper, no patched

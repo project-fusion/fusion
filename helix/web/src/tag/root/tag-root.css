@@ -1,0 +1,78 @@
+:host {
+  display: inline-flex;
+
+  /* Every appearance is one status color, tinted for the fill and used at full
+     strength for the label. Deriving beats a token per status: the alternative
+     was eight tokens whose only job was to be a lighter version of one that
+     already existed, re-derived by every theme. */
+  --_tag-color: var(--helix-color-foreground-muted);
+  --_tag-text: var(--helix-text-xs);
+  --_tag-inset: var(--helix-space-xs);
+}
+
+:host([appearance="primary"]) {
+  --_tag-color: var(--helix-color-primary);
+}
+
+:host([appearance="success"]) {
+  --_tag-color: var(--helix-color-success);
+}
+
+:host([appearance="warning"]) {
+  --_tag-color: var(--helix-color-warning);
+}
+
+:host([appearance="danger"]) {
+  --_tag-color: var(--helix-color-danger);
+}
+
+:host([size="sm"]) {
+  --_tag-inset: var(--helix-space-2xs);
+}
+
+[part="tag"] {
+  align-items: center;
+  background-color: var(
+    --tag-background-color,
+    color-mix(in oklab, var(--_tag-color) 14%, transparent)
+  );
+  border: var(--helix-border-thin) solid color-mix(in oklab, var(--_tag-color) 28%, transparent);
+  border-radius: var(--tag-radii, var(--helix-radii-sm));
+  color: var(--tag-foreground-color, var(--_tag-color));
+  display: inline-flex;
+  font-size: var(--_tag-text);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  line-height: var(--helix-leading-tight);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--_tag-inset);
+  white-space: nowrap;
+}
+
+/* The remove control sits inside the tag's inline padding, so the tag does not
+   grow a second inset around it. */
+[part="remove"] {
+  background: none;
+  border: none;
+  border-radius: var(--helix-radii-sm);
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  margin-inline-end: calc(var(--_tag-inset) * -1);
+  padding: var(--helix-space-2xs);
+}
+
+[part="remove"]:hover {
+  background-color: color-mix(in oklab, var(--_tag-color) 20%, transparent);
+}
+
+[part="remove"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="remove"] svg {
+  block-size: 0.85em;
+  inline-size: 0.85em;
+  stroke-width: 2.5;
+}

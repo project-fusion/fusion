@@ -2,11 +2,12 @@ import { describe, expect, test } from 'bun:test'
 import type { HelixCard } from '@helix-io/web'
 import { createRef, type RefObject } from 'react'
 import {
+  Accordion,
+  AccordionItem,
+  type AccordionItemProps,
   BaseCard,
   Card,
   type CardProps,
-  Disclosure,
-  type DisclosureProps,
 } from './generated/index.js'
 
 const tagOf = (component: unknown): string | undefined =>
@@ -30,8 +31,19 @@ describe('composition namespaces', () => {
     expect(tagOf(Card.Root)).toBe('helix-card')
   })
 
-  test('a single-part family still uses Root', () => {
-    expect(Object.keys(Disclosure)).toEqual(['Root'])
+  // Accordion.Item is a separate element because it owns open state, which is
+  // exactly the test for a part earning an element rather than being a slot.
+  // Card's header carries none of the three, so Card has no Header.
+  test('a part carrying state becomes a member of the namespace', () => {
+    expect(Object.keys(Accordion)).toEqual(['Item', 'Root'])
+    expect(tagOf(Accordion.Root)).toBe('helix-accordion')
+    expect(tagOf(Accordion.Item)).toBe('helix-accordion-item')
+  })
+
+  test('the component itself is exported beside the namespace', () => {
+    // Named exports exist because a namespace object resolves to `undefined`
+    // through an RSC client-reference proxy.
+    expect(tagOf(AccordionItem)).toBe('helix-accordion-item')
   })
 })
 
@@ -95,7 +107,7 @@ describe('wrapper prop surface', () => {
   })
 
   test('an event callback receives the typed detail', () => {
-    const props: DisclosureProps = {
+    const props: AccordionItemProps = {
       onOpenChange: (event) => {
         const open: boolean = event.detail.open
         return open
@@ -105,7 +117,7 @@ describe('wrapper prop surface', () => {
   })
 
   test('rejects a handler that assumes the wrong detail shape', () => {
-    const props: DisclosureProps = {
+    const props: AccordionItemProps = {
       // @ts-expect-error `detail` carries `open`, not `expanded`.
       onOpenChange: (event) => event.detail.expanded,
     }

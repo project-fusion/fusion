@@ -1,0 +1,59 @@
+:host {
+  display: block;
+
+  --_callout-color: var(--helix-color-info);
+}
+
+:host([severity="success"]) {
+  --_callout-color: var(--helix-color-success);
+}
+
+:host([severity="warning"]) {
+  --_callout-color: var(--helix-color-warning);
+}
+
+:host([severity="danger"]) {
+  --_callout-color: var(--helix-color-danger);
+}
+
+[part="callout"] {
+  background-color: var(
+    --callout-background-color,
+    color-mix(in oklab, var(--_callout-color) 10%, transparent)
+  );
+  border-radius: var(--callout-radii, var(--helix-radii-md));
+  /* The bar is the severity in a form that survives greyscale, a monochrome
+     display, and a reader who does not separate the hues. Color alone would be
+     the only signal otherwise. */
+  border-inline-start: var(--helix-border-thick) solid var(--_callout-color);
+  color: var(--helix-color-foreground);
+  display: flex;
+  gap: var(--helix-space-sm);
+  padding: var(--helix-space-md);
+}
+
+[part="icon"] {
+  color: var(--_callout-color);
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+[part="icon"] svg {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+  stroke-width: 1.5;
+}
+
+/* A slotted replacement icon is sized the same way as the default, so swapping
+   it does not change the callout's rhythm. */
+slot[name="icon"]::slotted(*) {
+  --icon-size: var(--helix-size-icon);
+
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+[part="content"] {
+  line-height: var(--helix-leading-normal);
+  min-inline-size: 0;
+}

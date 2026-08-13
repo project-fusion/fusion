@@ -37,15 +37,15 @@ export const hostTag = (markup: string, tagName: string): string =>
  * Matches the tag rather than the bare `part="…"` string, so a selector in the
  * stylesheet cannot satisfy it.
  */
-export const hasPart = (markup: string, name: string): boolean =>
-  new RegExp(`<[a-z-]+\\s+part="${name}"`).test(withoutStyles(markup))
+export const hasPart = (markup: string, name: string): boolean => partTag(markup, name) !== ''
 
 /**
  * The opening tag of the element carrying the given part.
  *
- * Attribute bindings render across several lines, so this spans them rather
- * than assuming the tag is flat. Use it to assert on what a region actually
- * carries, as distinct from what the consumer wrote on the host.
+ * Attribute bindings render across several lines and `part` is rarely the first
+ * attribute, so this spans both rather than assuming the tag is flat or that
+ * `part` leads. Use it to assert on what a region actually carries, as distinct
+ * from what the consumer wrote on the host.
  */
 export const partTag = (markup: string, name: string): string =>
-  new RegExp(`<[a-z-]+\\s+part="${name}"[^>]*>`).exec(withoutStyles(markup))?.[0] ?? ''
+  new RegExp(`<[a-z-]+\\s[^>]*part="${name}"[^>]*>`).exec(withoutStyles(markup))?.[0] ?? ''
