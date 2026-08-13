@@ -1,110 +1,121 @@
-/* Site chrome. Reads Helix tokens like any other consumer, which makes this
-   site a standing test of whether the token layer is usable from outside. */
+/* Site and sandbox chrome. Reads Helix tokens like any other consumer, which
+   makes this app a standing test of whether the token layer is usable from
+   outside the design system. */
 
-.shell {
-  display: grid;
-  grid-template-columns: 16rem minmax(0, 1fr);
-  min-block-size: 100vh;
-}
+/* ─────────────────────────────────────────────────────────── site */
 
-.sidebar {
-  background-color: var(--helix-color-surface-sunken);
-  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
-  block-size: 100vh;
-  inset-block-start: 0;
-  overflow-y: auto;
-  padding: var(--helix-space-md);
-  position: sticky;
-}
-
-.brand {
-  align-items: baseline;
-  color: var(--helix-color-foreground);
-  display: flex;
-  gap: var(--helix-space-xs);
-  margin-block-end: var(--helix-space-md);
-  text-decoration: none;
-}
-
-.brand strong {
-  font-size: var(--helix-text-lg);
-  letter-spacing: var(--helix-tracking-tight);
-}
-
-.brand span {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
-}
-
-.navGroup {
-  margin-block-end: var(--helix-space-xs);
-}
-
-.navFamily {
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground);
-  display: block;
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
-  text-decoration: none;
-}
-
-.navFamily:hover {
-  background-color: var(--helix-color-surface-raised);
-}
-
-/* Examples are indented under their family with a rule rather than a bullet,
-   so the nesting reads at a glance without adding list semantics the sidebar
-   does not otherwise have. */
-.navExamples {
-  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-  display: flex;
-  flex-direction: column;
-  margin-inline-start: var(--helix-space-sm);
-  padding-inline-start: var(--helix-space-xs);
-}
-
-.navExample {
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-xs);
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
-  text-decoration: none;
-}
-
-.navExample:hover {
-  background-color: var(--helix-color-surface-raised);
-  color: var(--helix-color-foreground);
-}
-
-main {
-  min-inline-size: 0;
-  padding: var(--helix-space-xl);
+.siteMain {
+  margin-inline: auto;
+  max-inline-size: 72rem;
+  padding: var(--helix-space-xl) var(--helix-space-lg) var(--helix-space-3xl);
 }
 
 .page {
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-lg);
-  max-inline-size: 64rem;
+  min-inline-size: 0;
 }
 
-.pageHead h1 {
-  font-size: var(--helix-text-2xl);
+.hero {
+  padding-block: var(--helix-space-2xl);
 }
 
-.crumb {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-sm);
-  margin-block-end: var(--helix-space-2xs);
+.hero h1 {
+  font-size: var(--helix-text-3xl);
 }
 
 .lede {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-lg);
-  margin-block-start: var(--helix-space-sm);
-  max-inline-size: 60ch;
+  margin-block-start: var(--helix-space-md);
+  max-inline-size: 55ch;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-sm);
+  margin-block-start: var(--helix-space-xl);
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xl);
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats strong {
+  font-size: var(--helix-text-2xl);
+  letter-spacing: var(--helix-tracking-tight);
+}
+
+.stats span {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+}
+
+.cardGrid {
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  margin-block-start: var(--helix-space-lg);
+}
+
+.cardHead {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+}
+
+.cardHead h3 {
+  font-size: var(--helix-text-lg);
+}
+
+/* ─────────────────────────────────────────────────────────── docs */
+
+.docsShell {
+  display: grid;
+  gap: var(--helix-space-xl);
+  grid-template-columns: 12rem minmax(0, 1fr);
+}
+
+.docsNav {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  inset-block-start: var(--helix-space-lg);
+  position: sticky;
+}
+
+.docsNav a {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  text-decoration: none;
+}
+
+.docsNav a:hover {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+.docsNav a[aria-current="page"] {
+  background-color: var(--helix-color-primary-subtle);
+  color: var(--helix-color-primary);
+  font-weight: var(--helix-weight-medium);
+}
+
+.pageHead h1 {
+  font-size: var(--helix-text-2xl);
 }
 
 .chips {
@@ -137,44 +148,6 @@ main {
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-xs);
   margin-block-start: var(--helix-space-xs);
-}
-
-.cardGrid {
-  display: grid;
-  gap: var(--helix-space-md);
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-}
-
-.cardHead {
-  align-items: center;
-  display: flex;
-  gap: var(--helix-space-sm);
-  justify-content: space-between;
-}
-
-.cardHead h2 {
-  font-size: var(--helix-text-lg);
-}
-
-.exampleTabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-2xs);
-}
-
-.exampleTabs a {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-xs);
-  padding: var(--helix-space-2xs) var(--helix-space-sm);
-  text-decoration: none;
-}
-
-.exampleTabs a[aria-current="page"] {
-  background-color: var(--helix-color-primary-subtle);
-  border-color: var(--helix-color-border-accent);
-  color: var(--helix-color-primary);
 }
 
 .element {
@@ -252,13 +225,199 @@ main {
   margin-block-start: var(--helix-space-2xs);
 }
 
+/* ─────────────────────────────────────────────────────── sandbox */
+
+/* The tool owns the viewport. `dvh` rather than `vh`, so mobile browser chrome
+   appearing and disappearing does not leave the rail hanging off the bottom. */
+.sandboxShell {
+  block-size: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.workbenchHeader {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--helix-space-lg);
+  padding: var(--helix-space-sm) var(--helix-space-md);
+}
+
+.brand {
+  align-items: baseline;
+  color: var(--helix-color-foreground);
+  display: flex;
+  gap: var(--helix-space-xs);
+  text-decoration: none;
+}
+
+.brand strong {
+  letter-spacing: var(--helix-tracking-tight);
+}
+
+.brand span {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+}
+
+.workbenchTitle {
+  color: var(--helix-color-foreground-muted);
+  flex: 1 1 auto;
+  font-size: var(--helix-text-sm);
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workbenchTitle span {
+  color: var(--helix-color-foreground-subtle);
+  padding-inline: var(--helix-space-2xs);
+}
+
+.workbenchActions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--helix-space-xs);
+}
+
+.workbenchActions button,
+.workbenchActions a {
+  background: none;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+  text-decoration: none;
+}
+
+.workbenchActions button:hover,
+.workbenchActions a:hover {
+  border-color: var(--helix-color-border-strong);
+  color: var(--helix-color-foreground);
+}
+
+/* Sandbox on the left, examples on the right. The rail is last in the DOM as
+   well as on screen, so tab order reaches the thing being edited first. */
+.workbenchBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15rem;
+  min-block-size: 0;
+  flex: 1 1 auto;
+}
+
+.workbenchBody helix-sandbox {
+  --sandbox-min-block-size: 0;
+
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.sourcePane {
+  block-size: 100%;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+}
+
+.paneTabs {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.paneTabs button {
+  background: none;
+  border: none;
+  border-block-end: var(--helix-border-thick) solid transparent;
+  color: var(--helix-color-foreground-subtle);
+  cursor: pointer;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+}
+
+.paneTabs button[aria-selected="true"] {
+  border-block-end-color: var(--helix-color-primary);
+  color: var(--helix-color-foreground);
+}
+
+.sourcePane helix-sandbox-source {
+  flex: 1 1 auto;
+  min-block-size: 0;
+}
+
+.examplesRail {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+  min-block-size: 0;
+  overflow-y: auto;
+  padding: var(--helix-space-sm);
+}
+
+.railGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.railFamily {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-wide);
+  padding: var(--helix-space-xs) var(--helix-space-xs) var(--helix-space-2xs);
+  text-transform: uppercase;
+}
+
+.examplesRail button {
+  background: none;
+  border: none;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--helix-text-sm);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  text-align: start;
+}
+
+.examplesRail button:hover {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+.examplesRail button[aria-current="true"] {
+  background-color: var(--helix-color-primary-subtle);
+  color: var(--helix-color-primary);
+  font-weight: var(--helix-weight-medium);
+}
+
+.empty {
+  color: var(--helix-color-foreground-subtle);
+  padding: var(--helix-space-xl);
+}
+
 @media (max-width: 60rem) {
-  .shell {
+  .docsShell {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .sidebar {
-    block-size: auto;
-    position: static;
+  /* The rail moves under the sandbox rather than squeezing it. */
+  .workbenchBody {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .examplesRail {
+    border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+    border-inline-start: none;
+    max-block-size: 40vh;
   }
 }

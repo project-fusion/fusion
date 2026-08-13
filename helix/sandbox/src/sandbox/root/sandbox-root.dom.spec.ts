@@ -8,7 +8,14 @@ beforeAll(async () => {
 
 const wired = `
   <helix-sandbox>
-    <helix-sandbox-source slot="source" value="<p>one</p>"></helix-sandbox-source>
+    <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+    <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+  </helix-sandbox>`
+
+const withCss = `
+  <helix-sandbox>
+    <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+    <helix-sandbox-source slot="source" name="css" value="p { color: red }"></helix-sandbox-source>
     <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
   </helix-sandbox>`
 
@@ -28,6 +35,47 @@ describe('sandbox coordination', () => {
 
     expect(preview.source).toBe('<p>two</p>')
     expect(preview.innerHTML).toContain('two')
+  })
+
+  test('a stylesheet pane styles the preview, not the sandbox around it', async () => {
+    // The panes are told apart by name. Without it the root would have to
+    // identify senders by reference, which couples it to how they are arranged.
+    const sandbox = await mount(withCss)
+    const css = [...sandbox.querySelectorAll('helix-sandbox-source')].find(
+      (pane) => pane.getAttribute('name') === 'css',
+    ) as Updatable
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
+      source: string
+      styles: string
+    }
+    preview.source = '<p>one</p>'
+    await preview.updateComplete
+
+    const field = css.shadowRoot?.querySelector('textarea') as HTMLTextAreaElement
+    field.value = 'p { color: rebeccapurple }'
+    field.dispatchEvent(new Event('input'))
+    await preview.updateComplete
+
+    expect(preview.styles).toBe('p { color: rebeccapurple }')
+    // Inside the preview's own subtree, so it cannot reach the page.
+    expect(preview.querySelector('style')?.textContent).toBe('p { color: rebeccapurple }')
+  })
+
+  test('a markup edit keeps the stylesheet, which innerHTML would drop', async () => {
+    const sandbox = await mount(withCss)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
+      source: string
+      styles: string
+    }
+    preview.styles = 'p { color: red }'
+    preview.source = '<p>one</p>'
+    await preview.updateComplete
+
+    preview.source = '<p>two</p>'
+    await preview.updateComplete
+
+    expect(preview.querySelector('style')?.textContent).toBe('p { color: red }')
+    expect(preview.querySelectorAll('style')).toHaveLength(1)
   })
 
   test('the preview renders into the light DOM, under the page stylesheets', async () => {

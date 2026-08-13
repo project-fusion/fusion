@@ -29,6 +29,16 @@ export class HelixSandboxPreview extends HelixElement {
   source = ''
 
   /**
+   * Stylesheet applied to the preview.
+   *
+   * Scoped by being written into the preview's own subtree rather than the
+   * document, so an example that restyles `helix-card` restyles the one being
+   * previewed and not the sandbox around it.
+   */
+  @property()
+  styles = ''
+
+  /**
    * Renders into the light DOM.
    *
    * Lit renders into a shadow root by default; returning `this` opts out, which
@@ -53,6 +63,24 @@ export class HelixSandboxPreview extends HelixElement {
     if (changed.has('source')) {
       this.innerHTML = this.source
     }
+    if (changed.has('source') || changed.has('styles')) {
+      this.applyStyles()
+    }
+  }
+
+  /**
+   * Puts the stylesheet inside the preview, after the markup.
+   *
+   * Re-created whenever the markup is, because setting `innerHTML` removes it
+   * along with everything else.
+   */
+  private applyStyles(): void {
+    if (this.styles === '') {
+      return
+    }
+    const sheet = document.createElement('style')
+    sheet.textContent = this.styles
+    this.append(sheet)
   }
 }
 

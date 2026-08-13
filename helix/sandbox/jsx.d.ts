@@ -200,11 +200,23 @@ type BaseEvents = {
 export type HelixSandboxPreviewProps = {
   /** Markup to render. */
   source?: HelixSandboxPreview["source"];
+  /** Stylesheet applied to the preview.
+
+Scoped by being written into the preview's own subtree rather than the
+document, so an example that restyles `helix-card` restyles the one being
+previewed and not the sandbox around it. */
+  styles?: HelixSandboxPreview["styles"];
 };
 
 export type HelixSandboxPreviewSolidJsProps = {
   /** Markup to render. */
   "prop:source"?: HelixSandboxPreview["source"];
+  /** Stylesheet applied to the preview.
+
+Scoped by being written into the preview's own subtree rather than the
+document, so an example that restyles `helix-card` restyles the one being
+previewed and not the sandbox around it. */
+  "prop:styles"?: HelixSandboxPreview["styles"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -249,8 +261,13 @@ export type HelixSandboxSourceSourceChangeElementEvent =
   HelixSandboxSourceElementEvent<HelixSourceChangeEvent>;
 
 export type HelixSandboxSourceProps = {
-  /** The markup being edited. */
+  /** The source being edited. */
   value?: HelixSandboxSource["value"];
+  /** Which source this pane holds, echoed in every `SourceChange`.
+
+`html` and `css` are what the sandbox root routes on; any other name is
+passed through untouched for a consumer wiring their own panes. */
+  name?: HelixSandboxSource["name"];
   /** Accessible name for the editable region. */
   "field-label"?: HelixSandboxSource["fieldLabel"];
   /** Accessible name for the editable region. */
@@ -265,8 +282,13 @@ export type HelixSandboxSourceProps = {
 };
 
 export type HelixSandboxSourceSolidJsProps = {
-  /** The markup being edited. */
+  /** The source being edited. */
   "prop:value"?: HelixSandboxSource["value"];
+  /** Which source this pane holds, echoed in every `SourceChange`.
+
+`html` and `css` are what the sandbox root routes on; any other name is
+passed through untouched for a consumer wiring their own panes. */
+  "prop:name"?: HelixSandboxSource["name"];
   /** Accessible name for the editable region. */
   "attr:field-label"?: HelixSandboxSource["fieldLabel"];
   /** Accessible name for the editable region. */
@@ -302,16 +324,25 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `source`: Markup to render.
+   * - `styles`: Stylesheet applied to the preview.
+   *
+   * Scoped by being written into the preview's own subtree rather than the
+   * document, so an example that restyles `helix-card` restyles the one being
+   * previewed and not the sandbox around it.
    */
   "helix-sandbox-preview": Partial<
     HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents
   >;
 
   /**
-   * Coordination is by event, the same way the accordion does it: the source pane
-   * dispatches `SourceChange`, which bubbles, and the sandbox hands the new value
-   * to whatever preview is slotted into it. Neither child knows the other exists,
-   * so either can be replaced or used alone.
+   * Coordination is by event, the same way the accordion does it: a source pane
+   * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+   * whatever preview is slotted into it. Neither child knows the other exists, so
+   * either can be replaced or used alone.
+   *
+   * The event carries the pane's `name`, which is what lets one sandbox hold a
+   * markup pane and a stylesheet pane without the root identifying senders by
+   * reference. `css` becomes the preview's stylesheet; anything else is markup.
    *
    * The split is a real `role="separator"` with `aria-valuenow`, movable by
    * pointer and by arrow keys, because a divider that only responds to dragging
@@ -365,7 +396,11 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The markup being edited.
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   *
+   * `html` and `css` are what the sandbox root routes on; any other name is
+   * passed through untouched for a consumer wiring their own panes.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
    * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
    *
@@ -411,6 +446,11 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `source`: Markup to render.
+   * - `styles`: Stylesheet applied to the preview.
+   *
+   * Scoped by being written into the preview's own subtree rather than the
+   * document, so an example that restyles `helix-card` restyles the one being
+   * previewed and not the sandbox around it.
    */
   "helix-sandbox-preview": Partial<
     HelixSandboxPreviewProps &
@@ -420,10 +460,14 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Coordination is by event, the same way the accordion does it: the source pane
-   * dispatches `SourceChange`, which bubbles, and the sandbox hands the new value
-   * to whatever preview is slotted into it. Neither child knows the other exists,
-   * so either can be replaced or used alone.
+   * Coordination is by event, the same way the accordion does it: a source pane
+   * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+   * whatever preview is slotted into it. Neither child knows the other exists, so
+   * either can be replaced or used alone.
+   *
+   * The event carries the pane's `name`, which is what lets one sandbox hold a
+   * markup pane and a stylesheet pane without the root identifying senders by
+   * reference. `css` becomes the preview's stylesheet; anything else is markup.
    *
    * The split is a real `role="separator"` with `aria-valuenow`, movable by
    * pointer and by arrow keys, because a divider that only responds to dragging
@@ -480,7 +524,11 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The markup being edited.
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   *
+   * `html` and `css` are what the sandbox root routes on; any other name is
+   * passed through untouched for a consumer wiring their own panes.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
    * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
    *

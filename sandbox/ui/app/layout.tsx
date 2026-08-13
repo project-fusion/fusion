@@ -6,22 +6,25 @@ import './site.css'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { HelixElements } from './helix-elements'
-import { Sidebar } from './sidebar'
 
 export const metadata: Metadata = {
   description: 'Component sandbox and API reference for Helix.',
-  title: 'Helix Sandbox',
+  title: 'Helix',
 }
 
+/**
+ * Carries the token layers and element registration, and no chrome.
+ *
+ * The two route groups want different frames: the site has a header and a
+ * scrolling column, the sandbox owns the whole viewport. Putting either here
+ * would force the other to undo it.
+ */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
         <HelixElements />
-        <div className="shell">
-          <Sidebar />
-          <main>{children}</main>
-        </div>
+        {children}
       </body>
     </html>
   )

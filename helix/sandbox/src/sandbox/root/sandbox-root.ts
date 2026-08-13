@@ -16,10 +16,14 @@ const MAX = 85
  * @summary Pairs an editable source pane with a live preview.
  *
  * @description
- * Coordination is by event, the same way the accordion does it: the source pane
- * dispatches `SourceChange`, which bubbles, and the sandbox hands the new value
- * to whatever preview is slotted into it. Neither child knows the other exists,
- * so either can be replaced or used alone.
+ * Coordination is by event, the same way the accordion does it: a source pane
+ * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+ * whatever preview is slotted into it. Neither child knows the other exists, so
+ * either can be replaced or used alone.
+ *
+ * The event carries the pane's `name`, which is what lets one sandbox hold a
+ * markup pane and a stylesheet pane without the root identifying senders by
+ * reference. `css` becomes the preview's stylesheet; anything else is markup.
  *
  * The split is a real `role="separator"` with `aria-valuenow`, movable by
  * pointer and by arrow keys, because a divider that only responds to dragging
@@ -58,9 +62,13 @@ export class HelixSandbox extends HelixElement {
   private dragging = false
 
   private readonly handleSourceChange = (event: Event): void => {
-    const { value } = (event as HelixSourceChangeEvent).detail
+    const { name, value } = (event as HelixSourceChangeEvent).detail
     for (const preview of this.previews) {
-      preview.source = value
+      if (name === 'css') {
+        preview.styles = value
+      } else {
+        preview.source = value
+      }
     }
   }
 

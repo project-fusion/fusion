@@ -89,6 +89,14 @@ export class HelixRemoveRequestEvent extends CustomEvent<RemoveRequestDetail> {
 
 /** Detail carried by `SourceChange`. */
 export interface SourceChangeDetail {
+  /**
+   * Which source was edited, so one listener can serve several panes.
+   *
+   * A sandbox with a markup pane and a stylesheet pane emits the same event
+   * from both; without a name the parent would have to identify the sender by
+   * reference, which couples it to how the panes were arranged.
+   */
+  name: string
   /** The full source after the edit. */
   value: string
 }
