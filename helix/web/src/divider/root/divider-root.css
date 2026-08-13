@@ -1,0 +1,30 @@
+:host {
+  display: block;
+
+  --_divider-thickness: var(--divider-thickness, var(--helix-border-thin));
+}
+
+/* Stretches to the flex or grid parent rather than declaring a height, so a
+   divider between toolbar items matches the items without being told how tall
+   they are. */
+:host([orientation="vertical"]) {
+  align-self: stretch;
+  display: inline-block;
+}
+
+[part="line"] {
+  background-color: var(--divider-color, var(--helix-color-border));
+}
+
+:host([orientation="horizontal"]) [part="line"] {
+  block-size: var(--_divider-thickness);
+  inline-size: 100%;
+}
+
+:host([orientation="vertical"]) [part="line"] {
+  block-size: 100%;
+  inline-size: var(--_divider-thickness);
+  /* A stretched parent may resolve to zero height, in which case the rule would
+     vanish rather than degrade. One line of text is the sensible floor. */
+  min-block-size: 1em;
+}

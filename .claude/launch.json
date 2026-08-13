@@ -1,0 +1,17 @@
+{
+  "configurations": [
+    {
+      "name": "marketing",
+      "port": 3000,
+      "runtimeArgs": ["run", "--cwd", "marketing/ui", "dev"],
+      "runtimeExecutable": "bun"
+    },
+    {
+      "name": "marketing-prod",
+      "port": 3100,
+      "runtimeArgs": ["run", "--cwd", "marketing/ui", "next", "start", "--port", "3100"],
+      "runtimeExecutable": "bun"
+    }
+  ],
+  "version": "0.0.1"
+}

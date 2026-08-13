@@ -38,15 +38,39 @@ shipped one package in five files.
   three, so five elements became one and a title became a real `<h2>` the
   consumer writes. `Tabs.Tab`, `Select.Option`, and `Accordion.Item` do carry
   state, so they stay elements.
-- **Hide an omitted region with `:host(:has([slot='footer']))`**, which reaches
-  the host's light-DOM children in pure CSS and is therefore correct in
-  server-rendered markup, where the component cannot inspect its children.
+- **A region with no behavior is a bare `<slot>`, not a wrapped one.** A `<slot>`
+  is `display: contents` in the UA stylesheet, so an unassigned one generates no
+  box: no grid row, no flex item, no gap. A wrapper generates one either way, so
+  an omitted region paints an empty inset band and the component is forced to
+  detect its own emptiness. Measured on Card, same content: wrappers present but
+  empty rendered 85px against an ideal of 53px; bare slots rendered 53px with no
+  hiding logic at all.
 
-## SSR and Declarative Shadow DOM
+  It has to be layout rather than detection, because **the detection does not
+  exist**. `:host(:has([slot='header']))` is invalid CSS: `:has()` is not
+  allowed inside the functional `:host()`, so the rule is dropped at parse time
+  and the region stays hidden even when filled. Verified in Chrome 148 —
+  `:host`, `:host(*)`, and `:host([a])` report supported, `:host(:has(*))` does
+  not, and the compound `:host:has(...)` reports supported and still does not
+  work. JavaScript is not an option either: the server cannot inspect children.
 
-Every component renders on the server before any JavaScript runs. Lit SSR emits
-`<template shadowrootmode="open">` with styles inlined, so markup arrives
-styled. The flash risk is **not styling, it is state.**
+  The consequence is that the inset moves to the container and slotted content
+  is styled with `::slotted()`. Regions lose their `part`, which is the right
+  trade: a header is whatever element the consumer slotted, not a wrapper we put
+  around it. Keep a wrapper only where it carries something real, as `<nav>`
+  does in AppHeader, being a landmark whether or not it is filled.
+
+## Server rendering
+
+Every component must render on a server with no DOM. The app no longer ships
+declarative shadow DOM (see below), but Lit SSR still has to succeed: it is what
+the `*.ssr.spec.ts` suite exercises, and a component that touches the DOM to
+render is broken in any non-browser context.
+
+Shadow styles now arrive with the definition rather than in the markup, so the
+flash window is "before the element upgrades", covered by
+`@helix-io/web/elements.css`. Within that, the risk is still **state, not
+styling**.
 
 1. **Never initialize state in `connectedCallback`.** SSR does not call it.
    Derive from properties, or seed in `willUpdate`, which SSR does call.
@@ -66,6 +90,32 @@ styled. The flash risk is **not styling, it is state.**
 
 Specs split by environment: Lit SSR's shim and happy-dom both patch globals and
 cannot share a process. `*.dom.spec.ts` and `*.ssr.spec.ts` run separately.
+
+**Never assert structure against the raw SSR string.** Declarative shadow DOM
+inlines the component's stylesheet into the very markup being asserted, and that
+stylesheet names every part, host attribute, and token the component uses. So
+`toContain('part="media"')` passes on a *selector*, and
+`not.toContain('data-scrolled')` fails on a `:host([data-scrolled])` *rule* —
+both saying nothing about what rendered. This has produced a false pass twice,
+once hiding a stale build for several commits.
+
+Use the helpers in `web/src/testing/ssr.ts`: `withoutStyles`, `hasPart`,
+`partTag`, `hostTag`. Attribute bindings render across multiple lines, so match
+with `/<a\s+part="button"/`, never `'<a part="button"'`.
+
+**Reflect only what CSS selects on.** Reflection exists so a selector can reach a
+value. `href`, `target`, and `rel` reflected on Button until they were told not
+to, which wrote a destination onto a host that is not a link and put a bare
+`target rel` pair into every button ever rendered. `appearance`, `size`,
+`disabled`, and `orientation` reflect; the rest do not.
+
+**Shared test scaffolding lives in `web/src/testing/`**, excluded from the build
+in `tsconfig.json`. `registerDom()` is idempotent because bun runs every DOM
+spec in one process and `GlobalRegistrator.register()` throws on the second
+call. It also shims `attachInternals`, which happy-dom does not implement —
+Lit's server shim does, so the gap is the test double's alone and the fix
+belongs there. A guard in `HelixFormElement` would make production code
+defensive about a capability every browser has, and swallow a real failure.
 
 ## Tokens
 
@@ -88,6 +138,17 @@ looks correct and the component is quietly unstyled.
 
 Per-component hooks (`--card-padding`) are not Helix tokens and are exempt. They
 should default to a semantic token.
+
+**Typography and links are the base layer, not components.** The type scale
+lives on `h1`–`h6` in `base.css`, and anchor treatment on `:where(a)`. A `Text`
+component would take the heading level as a prop, which lets `size` be set
+independently of it, and that is how a page gets an `<h4>` styled like a title.
+A `Link` component would add a shadow boundary around an element that already
+carries everything a link needs. Styling the elements also reaches prose the
+design system never renders: markdown, a CMS, anything with an `<a>` in it.
+
+A component gets built when it has behavior. Presentation of native elements is
+a stylesheet.
 
 Styles are authored in sibling `.css` files. `bun run styles` compiles each into
 a generated `.css.ts` calling `createSheet`. Generated files are gitignored;
@@ -151,46 +212,62 @@ Every `@property` gets a one-line description.
 
 ## Use the elements directly
 
-**Write `<helix-card>` in JSX.** It keeps declarative shadow DOM in server *and*
-client components alike. Measured on the marketing home page: 121 B of route
-JavaScript with DSD, against 10.1 kB without.
+**Write `<helix-card>` in JSX.** Plain custom elements, no wrapper, no patched
+React.
 
-What loses DSD is the **React wrapper**, not the client boundary. Wrappers build
-elements through `createElement`, and Lit SSR's React integration only
-intercepts the JSX runtime, so a wrapped element server-renders as a bare tag
-with no shadow root and arrives unstyled until the bundle upgrades it.
-
-`jsx.d.ts`, generated by `@wc-toolkit/jsx-types` from the manifest, is what
-makes this type-safe: `appearance="wrong"` is an error rather than a silent
-no-op. Consumers reference `@helix-io/web/jsx`.
-
-**React 19 binds custom events natively.** It strips `on` from the prop and
-listens for the remainder verbatim, so the React prop is not a separate choice:
-it falls out of the event name.
+**Register once, in a client component.** A custom element registers as a side
+effect of importing its module, and that import has to be in the client graph to
+ever run. A server component's imports do not ship to the browser. So one client
+component holds every element import and renders `null`:
 
 ```tsx
-<helix-disclosure onOpenChange={(event) => setOpen(event.detail.open)}>
+'use client'
+import '@helix-io/web/card'
+export function HelixElements(): null {
+  return null
+}
 ```
 
-The generated JSX types reject a wrong prop name and a wrong `detail` field, so
-both mistakes are compile errors rather than silent no-ops.
+Render it once in the layout. **Pages stay server components**, because an
+unregistered tag is just an unknown element in the HTML that upgrades when the
+definition lands. Consumers are on the App Router; asking them to mark every
+page `'use client'` to use a button would not be a design system.
 
-**The state mixin owns the event.** `WithOpen` dispatches
-`HelixOpenChangeEvent` from `setOpen`, so property, default, and change event
-are one unit that cannot be half-adopted: a component cannot take the mixin and
-forget to announce the change. `WithChecked` ships `helix-checked-change`,
-`WithValue` ships `helix-value-change`, and so on. Controllers own behavior, not
-component-facing events, unless they own the state that changed.
+**Import `@helix-io/web/elements.css` beside the base layer.** It is generated
+from the element sources by `tooling/scripts/build-elements-css.mjs` and hides
+each tag with `:not(:defined)` until it upgrades, using `visibility` so the page
+does not reflow. Without it a card arrives as a run of unstyled text and then
+snaps into a card. CSS cannot select "any custom element", and a bare
+`:not(:defined)` would also catch Next's own dev overlay, so the tags are
+enumerated.
 
-That leaves `@helix-io/react` with no job. It is held pending Wave 3 rather than
-kept.
+### Why there is no declarative shadow DOM
 
-**Registration is guarded.** Components use `customElement` from
-`@helix-io/core`, not from `lit/decorators.js`. Next evaluates a module in both
-the server and client graphs, so an unguarded `customElements.define` throws and
-takes down the whole prerender the moment an app mixes server and client usage
-of one component. The analyzer detects the decorator by name, so the manifest is
-unaffected.
+`@lit-labs/nextjs` and `@lit-labs/ssr-react` were removed. They rendered DSD by
+monkey-patching `React.createElement` through a webpack `imports-loader` rule,
+and three things ended it:
+
+- **It cannot work with server components.** The patch runs only on the server;
+  the client copy is a deliberate passthrough, because it assumes the client
+  re-runs the same JSX and yields a tree with no `<template>`, matching the DOM
+  after the parser consumed the DSD. A server component is never re-run. Its
+  output, template included, is replayed from the flight payload through DOM
+  APIs, and **DSD does not activate for script-inserted nodes**. Measured: 12
+  templates left inert, no shadow root attached, React error #418.
+- **It hooks `config.webpack`, which Turbopack ignores**, so it would stop
+  working silently on that migration. We have already lost time to one silent
+  DSD failure.
+- **`@lit-labs/nextjs` has not published since July 2025.** There is no fixed
+  version to wait for.
+
+Marking pages `'use client'` did make it work, at 15.1 kB of route JavaScript.
+That is not the trade: it surrenders RSC on every page using a component, to
+keep an unmaintained patch to React.
+
+**Verify in a browser, never by grepping the HTML.** A string check passes on
+markup the browser then discards, which is exactly how the broken DSD survived
+several commits. The assertion that means something is
+`element.shadowRoot !== null` on a loaded page.
 
 ## React wrappers
 

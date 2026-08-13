@@ -19,26 +19,36 @@ import { html, type TemplateResult } from 'lit'
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
  *
+ * @slot media - Image or video that runs edge to edge, outside the inset.
  * @slot header - Title and any actions for the whole card.
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
  *
  * @csspart container - The card surface.
- * @csspart header - The header region.
- * @csspart body - The content region.
- * @csspart footer - The footer region.
  */
 @customElement('helix-base-card')
 export class HelixBaseCard extends HelixElement {
   protected override render(): TemplateResult {
-    // Each region wraps its slot so the styled tier can inset and separate it.
-    // A slot with no assigned content leaves its wrapper empty, which `:has()`
-    // collapses, so an omitted region costs no space.
+    // Bare slots, with no wrapper element around any of them. A `<slot>` is
+    // `display: contents` in the UA stylesheet, so an unassigned one generates
+    // no box at all: no grid row, no gap, nothing. A wrapper would generate one
+    // whether or not anything was slotted into it, which is what made an
+    // omitted region paint an empty inset band and forced the component to
+    // detect its own emptiness.
+    //
+    // Measured, same content: wrappers present but empty rendered 85px against
+    // an ideal of 53px, and bare slots rendered 53px with no hiding logic.
+    //
+    // It has to be layout rather than detection, because the detection does not
+    // exist. `:host(:has([slot='header']))` is invalid CSS, so the whole rule is
+    // dropped and the region stays hidden even when filled, and the component
+    // cannot inspect its children on the server to do it in JavaScript.
     return html`
       <div part="container" role="group">
-        <div part="header"><slot name="header"></slot></div>
-        <div part="body"><slot></slot></div>
-        <div part="footer"><slot name="footer"></slot></div>
+        <slot name="media"></slot>
+        <slot name="header"></slot>
+        <slot></slot>
+        <slot name="footer"></slot>
       </div>
     `
   }

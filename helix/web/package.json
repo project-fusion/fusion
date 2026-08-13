@@ -16,11 +16,13 @@
       "types": "./dist/*/index.d.ts",
       "default": "./dist/*/index.js"
     },
+    "./elements.css": "./elements.css",
     "./jsx": "./jsx.d.ts"
   },
   "files": [
     "custom-elements.json",
     "dist",
+    "elements.css",
     "jsx.d.ts"
   ],
   "customElements": "custom-elements.json",
@@ -28,7 +30,7 @@
   "scripts": {
     "analyze": "cem analyze --config custom-elements-manifest.config.ts",
     "build": "tsc -p tsconfig.json",
-    "styles": "node ../../tooling/scripts/build-styles.mjs .",
+    "styles": "node ../../tooling/scripts/build-styles.mjs . && node ../../tooling/scripts/build-elements-css.mjs .",
     "test": "bun run test:dom && bun run test:ssr",
     "test:dom": "bun test dom.spec",
     "test:ssr": "bun test ssr.spec",

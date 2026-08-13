@@ -162,6 +162,7 @@
   /* ======================================================== size ======== */
   --helix-size-control: calc(2.5rem * var(--_helix-seed-density));
   --helix-size-control-dense: calc(2rem * var(--_helix-seed-density));
+  --helix-size-control-large: calc(3rem * var(--_helix-seed-density));
   --helix-size-icon: 1.25rem;
   --helix-size-focus-ring: var(--helix-border-thick);
   --helix-size-focus-offset: 2px;

@@ -1,0 +1,61 @@
+:host {
+  display: block;
+}
+
+:host([sticky]) {
+  inset-block-start: 0;
+  position: sticky;
+  z-index: var(--helix-layer-sticky);
+}
+
+[part="bar"] {
+  align-items: center;
+  background-color: var(--app-header-background, var(--helix-material-translucent));
+  /* The blur is what makes the bar read as a pane of material over the page
+     rather than a band of flat color sitting on it. */
+  backdrop-filter: blur(var(--helix-material-blur-md));
+  block-size: var(--app-header-height, var(--helix-size-control-large));
+  border-block-end: var(--helix-border-thin) solid transparent;
+  display: flex;
+  gap: var(--helix-space-lg);
+  margin-inline: auto;
+  max-inline-size: var(--app-header-max-inline-size, 72rem);
+  padding-inline: var(--app-header-inset, var(--helix-space-lg));
+  transition:
+    border-color var(--helix-duration-normal) var(--helix-easing-standard),
+    box-shadow var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+/* Flat against the hero, lifted once content runs underneath. `data-scrolled`
+   is absent in the server's markup, which matches a fresh load at the top, so
+   the bar does not start lifted and settle. */
+:host([data-scrolled]) [part="bar"] {
+  border-block-end-color: var(--helix-material-border);
+  box-shadow: var(--helix-shadow-sm);
+}
+
+/* Brand and actions are bare slots, so an omitted one generates no flex item
+   and takes none of the bar's gap. Their slotted content is styled directly. */
+slot[name="brand"]::slotted(*) {
+  align-items: center;
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex: 0 0 auto;
+  font-weight: var(--helix-weight-semibold);
+  gap: var(--helix-space-xs);
+  letter-spacing: var(--helix-tracking-tight);
+}
+
+slot[name="actions"]::slotted(*) {
+  flex: 0 0 auto;
+}
+
+[part="nav"] {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  gap: var(--helix-space-md);
+  /* Long navigation scrolls inside the bar instead of widening the page. */
+  min-inline-size: 0;
+  overflow-x: auto;
+}

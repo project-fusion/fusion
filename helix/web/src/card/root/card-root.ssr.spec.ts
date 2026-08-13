@@ -1,10 +1,7 @@
 import { describe, expect, test } from 'bun:test'
-import { render } from '@lit-labs/ssr'
-import { collectResultSync } from '@lit-labs/ssr/lib/render-result.js'
 import { html } from 'lit'
+import { hasPart, ssr } from '../../testing/ssr.js'
 import '../index.js'
-
-const ssr = (template: ReturnType<typeof html>): string => collectResultSync(render(template))
 
 describe('card server output', () => {
   const markup = ssr(html`
@@ -24,9 +21,25 @@ describe('card server output', () => {
   })
 
   test('every region is present in the shadow root', () => {
-    for (const region of ['container', 'header', 'body', 'footer']) {
-      expect(markup, region).toContain(`part="${region}"`)
+    expect(hasPart(markup, 'container')).toBe(true)
+    for (const name of ['media', 'header', 'footer']) {
+      expect(markup, name).toContain(`<slot name="${name}">`)
     }
+  })
+
+  test('the horizontal layout is a template swap, not different markup', () => {
+    // Both orientations render the same regions, so orientation can change at
+    // runtime without re-rendering, and the server output is layout-agnostic.
+    const horizontal = ssr(html`
+      <helix-card orientation="horizontal">
+        <img slot="media" src="/cover.avif" alt="" />
+        Body
+      </helix-card>
+    `)
+    for (const name of ['media', 'header', 'footer']) {
+      expect(horizontal, name).toContain(`<slot name="${name}">`)
+    }
+    expect(horizontal).toMatch(/orientation="horizontal"/)
   })
 
   test('slotted content reaches the markup', () => {
@@ -35,10 +48,11 @@ describe('card server output', () => {
     expect(markup).toContain('slot="header"')
   })
 
-  test('an empty region is hidden by CSS, not by JavaScript', () => {
-    // The component cannot inspect its children on the server, so the rule has
-    // to be a selector rather than a lifecycle hook. Quote style is the
-    // formatter's choice, so match without it.
-    expect(markup).toMatch(/:host\(:has\(\[slot=["']?footer["']?\]\)\)/)
+  test('an omitted region needs no rule to hide it', () => {
+    // There is no wrapper to hide. An unassigned `<slot>` is `display: contents`
+    // and generates no box, which is what makes this correct on the server,
+    // where the component cannot inspect its own children.
+    expect(markup).not.toContain(':has(')
+    expect(markup).toContain('<slot name="footer">')
   })
 })

@@ -9,14 +9,23 @@
   --_card-inset: var(--card-padding, var(--helix-space-sm));
 }
 
+/* The inset lives on the container rather than on each region, because the
+   regions are bare slots now and a slot with nothing assigned generates no box
+   to hold padding. That is the whole point: an omitted region costs nothing
+   without the component having to detect that it is omitted. */
 [part="container"] {
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid var(--card-border-color, var(--helix-color-border));
   border-radius: var(--card-radii, var(--helix-radii-md));
-  color: var(--helix-color-foreground);
-  display: flex;
-  flex-direction: column;
+  color: var(--helix-color-foreground-muted);
+  display: grid;
+  gap: var(--helix-space-sm);
+  grid-template-columns: minmax(0, 1fr);
+  line-height: var(--helix-leading-normal);
+  /* Clips the media to the corner radius, so a full-bleed image needs no
+     corner handling of its own. */
   overflow: hidden;
+  padding: var(--_card-inset);
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
@@ -32,39 +41,45 @@
   border-color: transparent;
 }
 
-[part="header"],
-[part="body"],
-[part="footer"] {
-  padding: var(--_card-inset);
+/* Media is the one region that must escape the inset. A negative margin on all
+   sides pulls it back out to the border, and the container's `overflow: hidden`
+   trims it to the radius. */
+slot[name="media"]::slotted(*) {
+  block-size: auto;
+  display: block;
+  inline-size: calc(100% + var(--_card-inset) * 2);
+  margin: calc(var(--_card-inset) * -1);
+  margin-block-end: 0;
+  object-fit: cover;
 }
 
-/* An omitted region would still paint its inset and rule, leaving a stray band.
-   `:host(:has(...))` reaches the host's light-DOM children, so the region is
-   hidden unless the consumer actually slotted something. This is pure CSS, so
-   it is correct in server-rendered markup too, where the component cannot
-   inspect its own children. */
-[part="header"],
-[part="footer"] {
-  display: none;
+/* The header reads as the card's own voice rather than as body copy. */
+slot[name="header"]::slotted(*) {
+  color: var(--helix-color-foreground);
 }
 
-:host(:has([slot="header"])) [part="header"] {
-  align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  display: flex;
-  gap: var(--helix-space-sm);
-  justify-content: space-between;
+/* Trailing actions sit at the end of the line instead of stretching across it,
+   which is what a grid item does by default. */
+slot[name="footer"]::slotted(*) {
+  justify-self: end;
 }
 
-[part="body"] {
-  color: var(--helix-color-foreground-muted);
-  line-height: var(--helix-leading-normal);
+:host([orientation="horizontal"]) [part="container"] {
+  grid-template-columns: var(--card-media-size, 12rem) minmax(0, 1fr);
 }
 
-:host(:has([slot="footer"])) [part="footer"] {
-  align-items: center;
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
-  display: flex;
-  gap: var(--helix-space-xs);
-  justify-content: flex-end;
+/* Beside the stack, media occupies its own column for the full height of the
+   card, so it spans every row the other regions produce. */
+:host([orientation="horizontal"]) slot[name="media"]::slotted(*) {
+  block-size: calc(100% + var(--_card-inset) * 2);
+  grid-column: 1;
+  grid-row: 1 / -1;
+  inline-size: calc(100% + var(--_card-inset));
+  margin-inline-end: 0;
+}
+
+:host([orientation="horizontal"]) slot[name="header"]::slotted(*),
+:host([orientation="horizontal"]) slot[name="footer"]::slotted(*),
+:host([orientation="horizontal"]) slot:not([name])::slotted(*) {
+  grid-column: 2;
 }

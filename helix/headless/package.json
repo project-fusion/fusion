@@ -33,7 +33,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@helix-io/core": "workspace:*"
+    "@helix-io/core": "workspace:*",
+    "@helix-io/icons": "workspace:*"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
