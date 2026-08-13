@@ -70,14 +70,23 @@ export class HelixBaseDrawer extends WithOpen(HelixElement) {
     },
   })
 
+  /** Whether the trap and the dismisser are currently on. */
+  private engaged = false
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (!changed.has('open') && !changed.has('defaultOpen') && !this.hasUpdated) {
+
+    // Driven by `isOpen` rather than by which property changed. Uncontrolled
+    // state does not live on `open` at all, so watching that property meant the
+    // trap never engaged for the common case.
+    const shouldEngage = this.isOpen && this.modal
+    if (shouldEngage === this.engaged) {
       return
     }
+    this.engaged = shouldEngage
 
     const panel = this.renderRoot.querySelector<HTMLElement>('[part="panel"]')
-    if (this.isOpen && this.modal && panel) {
+    if (shouldEngage && panel) {
       this.trap.activate(panel)
       this.dismisser.activate()
     } else {

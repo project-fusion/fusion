@@ -19,6 +19,11 @@ import { html, type TemplateResult } from 'lit'
  * landmark the navigation needs whether or not anything is in it; the other two
  * are `display: contents` when unassigned and cost nothing.
  *
+ * The banner spans the viewport and the row inside it is what gets centred. A
+ * banner that is itself narrowed leaves its own background stopping short of
+ * the window edges, which reads as a floating bar rather than as the top of the
+ * page. That is a second element, not a max-width on the first.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases Masthead, Navbar, TopBar
@@ -28,7 +33,8 @@ import { html, type TemplateResult } from 'lit'
  * @slot - Primary navigation.
  * @slot actions - Trailing actions, such as a call to action.
  *
- * @csspart bar - The banner itself.
+ * @csspart bar - The full-width banner.
+ * @csspart content - The centred row inside it.
  * @csspart nav - The navigation region.
  */
 @customElement('helix-base-app-header')
@@ -54,9 +60,11 @@ export class HelixBaseAppHeader extends HelixElement {
   protected override render(): TemplateResult {
     return html`
       <header part="bar" role="banner">
-        <slot name="brand"></slot>
-        <nav part="nav"><slot></slot></nav>
-        <slot name="actions"></slot>
+        <div part="content">
+          <slot name="brand"></slot>
+          <nav part="nav"><slot></slot></nav>
+          <slot name="actions"></slot>
+        </div>
       </header>
     `
   }

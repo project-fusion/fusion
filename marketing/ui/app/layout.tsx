@@ -5,7 +5,9 @@ import '@helix-io/web/elements.css'
 import './site.css'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import { FusionLogo } from './fusion-logo'
 import { HelixElements } from './helix-elements'
+import { SiteNav } from './site-nav'
 
 export const metadata: Metadata = {
   description:
@@ -18,7 +20,27 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         <HelixElements />
-        {children}
+
+        <SiteNav />
+
+        <main>{children}</main>
+
+        <footer className="siteFooter">
+          <helix-flex class="shell" direction="column" gap="lg">
+            <helix-divider></helix-divider>
+            <helix-flex align="center" gap="md" justify="between" wrap>
+              <helix-flex align="center" gap="xs">
+                <FusionLogo size="1.25rem" />
+                <helix-text size="sm" tone="muted">
+                  Fusion Development Group
+                </helix-text>
+              </helix-flex>
+              <helix-text size="xs" tone="subtle">
+                Developing for humanity.
+              </helix-text>
+            </helix-flex>
+          </helix-flex>
+        </footer>
       </body>
     </html>
   )

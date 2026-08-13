@@ -1,59 +1,66 @@
-/* Page shell for the marketing site.
+/* Fusion marketing site.
  *
- * App layout, not design system: Helix ships components and tokens, and where
- * this particular site puts its margins is its own business. It reads the
- * tokens like any other consumer. */
+ * App layout only. Every component reads its own tokens, so what is left here
+ * is the page shell: how wide the content runs and how far apart the bands sit.
+ */
 
+/* One measure for the whole site, matching the header's own row, so the
+   wordmark lines up with the copy below it down the page. */
 .shell {
   margin-inline: auto;
   max-inline-size: 72rem;
   padding-inline: var(--helix-space-lg);
 }
 
-.hero {
-  padding-block: var(--helix-space-3xl);
-}
-
-.hero p {
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-lg);
-  margin-block-start: var(--helix-space-md);
-  max-inline-size: 46rem;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-sm);
-  margin-block-start: var(--helix-space-xl);
-}
-
-.section {
+.band {
   padding-block: var(--helix-space-2xl);
 }
 
-.section h2 {
-  margin-block-end: var(--helix-space-lg);
+/* Space rather than a rule between sections. Hierarchy comes from type and
+   space; a divider at every seam would be decoration doing what emptiness
+   already does. */
+.hero {
+  padding-block: var(--helix-space-3xl) var(--helix-space-2xl);
 }
 
-/* Cards sit on a responsive track rather than a fixed column count, so the
-   layout has no breakpoint to maintain. */
-.grid {
-  display: grid;
-  gap: var(--helix-space-md);
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+.heroTitle {
+  /* Larger than the scale's top step, because the hero is the one place on the
+     site where type is the whole design. */
+  font-size: clamp(var(--helix-text-3xl), 8vw, 4.5rem);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
 }
 
-/* A card header holding a title and a status side by side. The card places the
-   region; laying out two things inside it is the consumer's job, which is why
-   there is no wrapper element inside the component to do it. */
-.cardTitle {
-  align-items: center;
-  display: flex;
-  gap: var(--helix-space-sm);
-  justify-content: space-between;
+.heroLede {
+  max-inline-size: 46ch;
 }
 
-.section helix-callout {
-  margin-block-end: var(--helix-space-xl);
+.closing {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  text-align: center;
+}
+
+.closingLede {
+  max-inline-size: 52ch;
+}
+
+.siteFooter {
+  padding-block: var(--helix-space-xl) var(--helix-space-2xl);
+}
+
+@media (max-width: 48rem) {
+  .band,
+  .hero {
+    padding-block: var(--helix-space-xl);
+  }
+
+  .shell {
+    padding-inline: var(--helix-space-md);
+  }
+}
+
+/* The nav drawer's own inset. The drawer places the panel; what goes in it is
+   the site's business. */
+.navDrawer {
+  padding: var(--helix-space-lg);
 }

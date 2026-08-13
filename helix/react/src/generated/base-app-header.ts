@@ -19,6 +19,11 @@ scrolling.
 Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
 landmark the navigation needs whether or not anything is in it; the other two
 are `display: contents` when unassigned and cost nothing.
+
+The banner spans the viewport and the row inside it is what gets centred. A
+banner that is itself narrowed leaves its own background stopping short of
+the window edges, which reads as a floating bar rather than as the top of the
+page. That is a second element, not a max-width on the first.
  *
  * Renders `<helix-base-app-header>`.
  */

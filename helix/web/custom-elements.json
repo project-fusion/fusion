@@ -266,6 +266,29 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/breadcrumbs/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/breadcrumbs/item/breadcrumbs-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/breadcrumbs/root/breadcrumbs-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/app-header/index.ts",
       "declarations": [],
       "exports": [
@@ -326,44 +349,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/breadcrumbs/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/breadcrumbs/item/breadcrumbs-item.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/breadcrumbs/root/breadcrumbs-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/card/root/card-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/divider/index.ts",
       "declarations": [],
       "exports": [
@@ -373,6 +358,21 @@
           "declaration": {
             "name": "*",
             "module": "src/divider/root/divider-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/drawer/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/drawer/root/drawer-root.js"
           }
         }
       ]
@@ -394,7 +394,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/drawer/index.ts",
+      "path": "src/card/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -402,7 +402,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/drawer/root/drawer-root.js"
+            "module": "src/card/root/card-root.js"
           }
         }
       ]
@@ -469,6 +469,37 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/tabs/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tabs/panel/tabs-panel.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tabs/root/tabs-root.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tabs/tab/tabs-tab.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/link/index.ts",
       "declarations": [],
       "exports": [
@@ -478,6 +509,36 @@
           "declaration": {
             "name": "*",
             "module": "src/link/root/link-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/text/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/text/root/text-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tag/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tag/root/tag-root.js"
           }
         }
       ]
@@ -515,82 +576,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/tabs/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/tabs/panel/tabs-panel.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/tabs/root/tabs-root.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/tabs/tab/tabs-tab.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/tag/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/tag/root/tag-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/text/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/text/root/text-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/toolbar/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/toolbar/root/toolbar-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/tree/index.ts",
       "declarations": [],
       "exports": [
@@ -608,6 +593,21 @@
           "declaration": {
             "name": "*",
             "module": "src/tree/root/tree-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toolbar/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/toolbar/root/toolbar-root.js"
           }
         }
       ]
@@ -952,198 +952,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/app-header/root/app-header-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/app-header/root/app-header-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/app-header/root/app-header-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Sticky and translucent, drawn on the material tokens so the page content\nblurs behind it rather than being hidden by an opaque bar. The separating\nrule and shadow appear only once the page has scrolled, which keeps the bar\nflat against the hero and lifts it off the content afterwards.",
-          "name": "HelixAppHeader",
-          "cssProperties": [
-            {
-              "description": "Material behind the banner.",
-              "name": "--app-header-background"
-            },
-            {
-              "description": "Height of the banner.",
-              "name": "--app-header-height"
-            },
-            {
-              "description": "Inline padding of the banner.",
-              "name": "--app-header-inset"
-            },
-            {
-              "description": "Width the content is centered in.",
-              "name": "--app-header-max-inline-size"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The banner itself.",
-              "name": "bar",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "description": "The navigation region.",
-              "name": "nav",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "Wordmark or logo, at the inline start.",
-              "name": "brand",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "description": "Primary navigation.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "description": "Trailing actions, such as a call to action.",
-              "name": "actions",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "sticky",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "description": "Whether the banner sticks to the top of the viewport.",
-              "attribute": "sticky",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "handleScroll",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "sticky",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "description": "Whether the banner sticks to the top of the viewport.",
-              "fieldName": "sticky"
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseAppHeader",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Page-level banner holding brand, navigation, and actions.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/app-header",
-            "aliases": [
-              "Masthead",
-              "Navbar",
-              "TopBar"
-            ],
-            "tier": "styled",
-            "group": "AppHeader",
-            "part": "Root"
-          },
-          "tagName": "helix-app-header",
-          "customElement": true,
-          "modulePath": "src/app-header/root/app-header-root.ts",
-          "definitionPath": "src/app-header/root/app-header-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixAppHeader",
-          "declaration": {
-            "name": "HelixAppHeader",
-            "module": "src/app-header/root/app-header-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-app-header",
-          "declaration": {
-            "name": "HelixAppHeader",
-            "module": "src/app-header/root/app-header-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/accordion/root/accordion-root.css.ts",
       "declarations": [
         {
@@ -1349,6 +1157,561 @@
           "declaration": {
             "name": "HelixAccordion",
             "module": "src/accordion/root/accordion-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/app-header/root/app-header-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/app-header/root/app-header-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/app-header/root/app-header-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Sticky and translucent, drawn on the material tokens so the page content\nblurs behind it rather than being hidden by an opaque bar. The separating\nrule and shadow appear only once the page has scrolled, which keeps the bar\nflat against the hero and lifts it off the content afterwards.",
+          "name": "HelixAppHeader",
+          "cssProperties": [
+            {
+              "description": "Material behind the banner.",
+              "name": "--app-header-background"
+            },
+            {
+              "description": "Height of the banner.",
+              "name": "--app-header-height"
+            },
+            {
+              "description": "Inline padding of the banner.",
+              "name": "--app-header-inset"
+            },
+            {
+              "description": "Width the content is centered in.",
+              "name": "--app-header-max-inline-size"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The full-width banner.",
+              "name": "bar",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "The centred row inside it.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "The navigation region.",
+              "name": "nav",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "Wordmark or logo, at the inline start.",
+              "name": "brand",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "Primary navigation.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "Trailing actions, such as a call to action.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "sticky",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether the banner sticks to the top of the viewport.",
+              "attribute": "sticky",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "sticky",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether the banner sticks to the top of the viewport.",
+              "fieldName": "sticky"
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseAppHeader",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Page-level banner holding brand, navigation, and actions.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/app-header",
+            "aliases": [
+              "Masthead",
+              "Navbar",
+              "TopBar"
+            ],
+            "tier": "styled",
+            "group": "AppHeader",
+            "part": "Root"
+          },
+          "tagName": "helix-app-header",
+          "customElement": true,
+          "modulePath": "src/app-header/root/app-header-root.ts",
+          "definitionPath": "src/app-header/root/app-header-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixAppHeader",
+          "declaration": {
+            "name": "HelixAppHeader",
+            "module": "src/app-header/root/app-header-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-app-header",
+          "declaration": {
+            "name": "HelixAppHeader",
+            "module": "src/app-header/root/app-header-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/breadcrumbs/root/breadcrumbs-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/breadcrumbs/root/breadcrumbs-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/breadcrumbs/root/breadcrumbs-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A single wrapping line by default. The trail wraps rather than scrolling,\nbecause a truncated path tells the reader less than a two-line one.",
+          "name": "HelixBreadcrumbs",
+          "cssProperties": [
+            {
+              "description": "Space between items and separators.",
+              "name": "--breadcrumbs-gap"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The navigation landmark.",
+              "name": "nav",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "description": "The ordered list.",
+              "name": "list",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The trail's items, in order from root to current page.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Breadcrumb'",
+              "description": "Accessible name for the landmark.\n\nNamed rather than left bare because a page may hold more than one\nnavigation, and landmarks are how a screen-reader user chooses between them.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseBreadcrumbs",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Shows the path to the current page.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/breadcrumbs",
+            "aliases": [
+              "Breadcrumb",
+              "Crumbs"
+            ],
+            "tier": "styled",
+            "group": "Breadcrumbs",
+            "part": "Root"
+          },
+          "tagName": "helix-breadcrumbs",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Breadcrumb'",
+              "description": "Accessible name for the landmark.\n\nNamed rather than left bare because a page may hold more than one\nnavigation, and landmarks are how a screen-reader user chooses between them.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/breadcrumbs/root/breadcrumbs-root.ts",
+          "definitionPath": "src/breadcrumbs/root/breadcrumbs-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBreadcrumbs",
+          "declaration": {
+            "name": "HelixBreadcrumbs",
+            "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-breadcrumbs",
+          "declaration": {
+            "name": "HelixBreadcrumbs",
+            "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/breadcrumbs/item/breadcrumbs-item.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/breadcrumbs/item/breadcrumbs-item.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/breadcrumbs/item/breadcrumbs-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The separator is hidden on the first item with `:host(:first-child)`, so no\nitem needs to know its own index and the parent needs no coordination.",
+          "name": "HelixBreadcrumbsItem",
+          "cssProperties": [
+            {
+              "description": "Color of the separator.",
+              "name": "--breadcrumbs-separator-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The separator preceding the item.",
+              "name": "separator",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbsItem",
+                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+              }
+            },
+            {
+              "description": "The item's link, or its text when current.",
+              "name": "link",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbsItem",
+                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The item's label.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbsItem",
+                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+              }
+            },
+            {
+              "description": "Replaces the separator shown before this item.",
+              "name": "separator",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbsItem",
+                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the step leads. Ignored when the item is the current page.",
+              "attribute": "href",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbsItem",
+                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item is the page the reader is on.",
+              "attribute": "current",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbsItem",
+                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseBreadcrumbsItem",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One step in a breadcrumb trail.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/breadcrumbs",
+            "aliases": [
+              "Crumb"
+            ],
+            "tier": "styled",
+            "group": "Breadcrumbs",
+            "part": "Item"
+          },
+          "tagName": "helix-breadcrumbs-item",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the step leads. Ignored when the item is the current page.",
+              "fieldName": "href",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbsItem",
+                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+              }
+            },
+            {
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item is the page the reader is on.",
+              "fieldName": "current",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbsItem",
+                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+              }
+            }
+          ],
+          "modulePath": "src/breadcrumbs/item/breadcrumbs-item.ts",
+          "definitionPath": "src/breadcrumbs/item/breadcrumbs-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBreadcrumbsItem",
+          "declaration": {
+            "name": "HelixBreadcrumbsItem",
+            "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-breadcrumbs-item",
+          "declaration": {
+            "name": "HelixBreadcrumbsItem",
+            "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
           }
         }
       ]
@@ -2242,586 +2605,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/breadcrumbs/item/breadcrumbs-item.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/breadcrumbs/item/breadcrumbs-item.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/breadcrumbs/item/breadcrumbs-item.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "The separator is hidden on the first item with `:host(:first-child)`, so no\nitem needs to know its own index and the parent needs no coordination.",
-          "name": "HelixBreadcrumbsItem",
-          "cssProperties": [
-            {
-              "description": "Color of the separator.",
-              "name": "--breadcrumbs-separator-color"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The separator preceding the item.",
-              "name": "separator",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbsItem",
-                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-              }
-            },
-            {
-              "description": "The item's link, or its text when current.",
-              "name": "link",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbsItem",
-                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The item's label.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbsItem",
-                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-              }
-            },
-            {
-              "description": "Replaces the separator shown before this item.",
-              "name": "separator",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbsItem",
-                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Where the step leads. Ignored when the item is the current page.",
-              "attribute": "href",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbsItem",
-                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "current",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this item is the page the reader is on.",
-              "attribute": "current",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbsItem",
-                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseBreadcrumbsItem",
-            "package": "@helix-io/headless"
-          },
-          "summary": "One step in a breadcrumb trail.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/breadcrumbs",
-            "aliases": [
-              "Crumb"
-            ],
-            "tier": "styled",
-            "group": "Breadcrumbs",
-            "part": "Item"
-          },
-          "tagName": "helix-breadcrumbs-item",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Where the step leads. Ignored when the item is the current page.",
-              "fieldName": "href",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbsItem",
-                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-              }
-            },
-            {
-              "name": "current",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this item is the page the reader is on.",
-              "fieldName": "current",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbsItem",
-                "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-              }
-            }
-          ],
-          "modulePath": "src/breadcrumbs/item/breadcrumbs-item.ts",
-          "definitionPath": "src/breadcrumbs/item/breadcrumbs-item.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBreadcrumbsItem",
-          "declaration": {
-            "name": "HelixBreadcrumbsItem",
-            "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-breadcrumbs-item",
-          "declaration": {
-            "name": "HelixBreadcrumbsItem",
-            "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/breadcrumbs/root/breadcrumbs-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/breadcrumbs/root/breadcrumbs-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/breadcrumbs/root/breadcrumbs-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A single wrapping line by default. The trail wraps rather than scrolling,\nbecause a truncated path tells the reader less than a two-line one.",
-          "name": "HelixBreadcrumbs",
-          "cssProperties": [
-            {
-              "description": "Space between items and separators.",
-              "name": "--breadcrumbs-gap"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The navigation landmark.",
-              "name": "nav",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "description": "The ordered list.",
-              "name": "list",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The trail's items, in order from root to current page.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Breadcrumb'",
-              "description": "Accessible name for the landmark.\n\nNamed rather than left bare because a page may hold more than one\nnavigation, and landmarks are how a screen-reader user chooses between them.",
-              "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseBreadcrumbs",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Shows the path to the current page.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/breadcrumbs",
-            "aliases": [
-              "Breadcrumb",
-              "Crumbs"
-            ],
-            "tier": "styled",
-            "group": "Breadcrumbs",
-            "part": "Root"
-          },
-          "tagName": "helix-breadcrumbs",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Breadcrumb'",
-              "description": "Accessible name for the landmark.\n\nNamed rather than left bare because a page may hold more than one\nnavigation, and landmarks are how a screen-reader user chooses between them.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/breadcrumbs/root/breadcrumbs-root.ts",
-          "definitionPath": "src/breadcrumbs/root/breadcrumbs-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBreadcrumbs",
-          "declaration": {
-            "name": "HelixBreadcrumbs",
-            "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-breadcrumbs",
-          "declaration": {
-            "name": "HelixBreadcrumbs",
-            "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/root/card-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/card/root/card-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/root/card-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Regions are slots: `media`, `header`, the default slot for content, and\n`footer`. An omitted region takes no space, so a card with only content needs\nno wrapper markup at all.\n\n`media` runs edge to edge and clips to the card's corners, so an image needs\nno inset correction. Set `orientation=\"horizontal\"` to move it alongside the\nheader, content, and footer stack rather than above it.\n\nRegions are bare slots with no wrapper element, so an omitted one occupies no\nspace without the card having to detect that it is missing. Style slotted\ncontent directly rather than reaching for a part: a header is whatever\nelement you slotted, not a wrapper we put around it.",
-          "name": "HelixCard",
-          "cssProperties": [
-            {
-              "description": "Surface behind the card.",
-              "name": "--card-background-color"
-            },
-            {
-              "description": "Border color of the surface.",
-              "name": "--card-border-color"
-            },
-            {
-              "description": "Width of the media column when horizontal.",
-              "name": "--card-media-size"
-            },
-            {
-              "description": "Inset applied to each region.",
-              "name": "--card-padding"
-            },
-            {
-              "description": "Corner radius of the surface.",
-              "name": "--card-radii"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The card surface.",
-              "name": "container",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "Image or video that runs edge to edge, outside the inset.",
-              "name": "media",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            },
-            {
-              "description": "Title and any actions for the whole card.",
-              "name": "header",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            },
-            {
-              "description": "The card's main content.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            },
-            {
-              "description": "Actions that conclude the card.",
-              "name": "footer",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'outlined' | 'elevated' | 'plain'"
-              },
-              "default": "'outlined'",
-              "description": "How the card separates itself from the page.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "dense",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Tightens the inset for dense layouts.",
-              "attribute": "dense",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "orientation",
-              "type": {
-                "text": "'vertical' | 'horizontal'"
-              },
-              "default": "'vertical'",
-              "description": "Whether media sits above the content stack or beside it.",
-              "attribute": "orientation",
-              "reflects": true
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "appearance",
-              "type": {
-                "text": "'outlined' | 'elevated' | 'plain'"
-              },
-              "default": "'outlined'",
-              "description": "How the card separates itself from the page.",
-              "fieldName": "appearance"
-            },
-            {
-              "name": "dense",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Tightens the inset for dense layouts.",
-              "fieldName": "dense"
-            },
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'vertical' | 'horizontal'"
-              },
-              "default": "'vertical'",
-              "description": "Whether media sits above the content stack or beside it.",
-              "fieldName": "orientation"
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseCard",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Groups related content and actions into a single surface.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/card",
-            "aliases": [
-              "Panel",
-              "Surface"
-            ],
-            "tier": "styled",
-            "group": "Card",
-            "part": "Root"
-          },
-          "tagName": "helix-card",
-          "customElement": true,
-          "modulePath": "src/card/root/card-root.ts",
-          "definitionPath": "src/card/root/card-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCard",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/card/root/card-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-card",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/card/root/card-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/divider/root/divider-root.css.ts",
       "declarations": [
         {
@@ -2963,254 +2746,6 @@
           "declaration": {
             "name": "HelixDivider",
             "module": "src/divider/root/divider-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/disclosure/root/disclosure-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/disclosure/root/disclosure-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/flex/root/flex-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/flex/root/flex-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/flex/root/flex-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "The host is the flex container itself and the only child is a slot, so the\nelement adds no box of its own: `<helix-flex>` costs exactly the `<div>` it\nreplaces.\n\nThere is no separate Stack. A stack is this with `direction=\"column\"`, and a\nsecond element whose whole definition is one default of the first is a name\nto learn rather than a capability to gain.\n\nGap takes a space token name rather than a length, so spacing stays on the\nscale. A layout that can say `gap=\"13px\"` is one that will.\n\nPresentation only, so there is no headless tier: the split exists to keep\nbehavior separate from styling, and this is entirely styling.",
-          "name": "HelixFlex",
-          "slots": [
-            {
-              "description": "The items to lay out.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "direction",
-              "type": {
-                "text": "'row' | 'column'"
-              },
-              "default": "'row'",
-              "description": "Whether items run across or down.",
-              "attribute": "direction",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "gap",
-              "type": {
-                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
-              },
-              "default": "'none'",
-              "description": "Space between items, named on the space scale.",
-              "attribute": "gap",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "align",
-              "type": {
-                "text": "'start' | 'center' | 'end' | 'stretch' | 'baseline'"
-              },
-              "default": "'stretch'",
-              "description": "Alignment across the direction.",
-              "attribute": "align",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "justify",
-              "type": {
-                "text": "'start' | 'center' | 'end' | 'between' | 'around'"
-              },
-              "default": "'start'",
-              "description": "Distribution along the direction.",
-              "attribute": "justify",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "wrap",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether items wrap onto more lines.",
-              "attribute": "wrap",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "inline",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Flows with surrounding text instead of taking the full width.",
-              "attribute": "inline",
-              "reflects": true
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "direction",
-              "type": {
-                "text": "'row' | 'column'"
-              },
-              "default": "'row'",
-              "description": "Whether items run across or down.",
-              "fieldName": "direction"
-            },
-            {
-              "name": "gap",
-              "type": {
-                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
-              },
-              "default": "'none'",
-              "description": "Space between items, named on the space scale.",
-              "fieldName": "gap"
-            },
-            {
-              "name": "align",
-              "type": {
-                "text": "'start' | 'center' | 'end' | 'stretch' | 'baseline'"
-              },
-              "default": "'stretch'",
-              "description": "Alignment across the direction.",
-              "fieldName": "align"
-            },
-            {
-              "name": "justify",
-              "type": {
-                "text": "'start' | 'center' | 'end' | 'between' | 'around'"
-              },
-              "default": "'start'",
-              "description": "Distribution along the direction.",
-              "fieldName": "justify"
-            },
-            {
-              "name": "wrap",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether items wrap onto more lines.",
-              "fieldName": "wrap"
-            },
-            {
-              "name": "inline",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Flows with surrounding text instead of taking the full width.",
-              "fieldName": "inline"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Lays children out in a row or a column.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/flex",
-            "aliases": [
-              "Stack",
-              "Row",
-              "Column",
-              "HStack",
-              "VStack"
-            ],
-            "tier": "styled",
-            "group": "Flex",
-            "part": "Root"
-          },
-          "tagName": "helix-flex",
-          "customElement": true,
-          "modulePath": "src/flex/root/flex-root.ts",
-          "definitionPath": "src/flex/root/flex-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixFlex",
-          "declaration": {
-            "name": "HelixFlex",
-            "module": "src/flex/root/flex-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-flex",
-          "declaration": {
-            "name": "HelixFlex",
-            "module": "src/flex/root/flex-root.ts"
           }
         }
       ]
@@ -3474,6 +3009,20 @@
               }
             },
             {
+              "kind": "field",
+              "name": "engaged",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the trap and the dismisser are currently on.",
+              "inheritedFrom": {
+                "name": "HelixBaseDrawer",
+                "module": "src/drawer/root/drawer-root.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "finalizeStyles",
               "privacy": "protected",
@@ -3629,6 +3178,254 @@
           "declaration": {
             "name": "HelixDrawer",
             "module": "src/drawer/root/drawer-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/flex/root/flex-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/flex/root/flex-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/flex/root/flex-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The host is the flex container itself and the only child is a slot, so the\nelement adds no box of its own: `<helix-flex>` costs exactly the `<div>` it\nreplaces.\n\nThere is no separate Stack. A stack is this with `direction=\"column\"`, and a\nsecond element whose whole definition is one default of the first is a name\nto learn rather than a capability to gain.\n\nGap takes a space token name rather than a length, so spacing stays on the\nscale. A layout that can say `gap=\"13px\"` is one that will.\n\nPresentation only, so there is no headless tier: the split exists to keep\nbehavior separate from styling, and this is entirely styling.",
+          "name": "HelixFlex",
+          "slots": [
+            {
+              "description": "The items to lay out.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "direction",
+              "type": {
+                "text": "'row' | 'column'"
+              },
+              "default": "'row'",
+              "description": "Whether items run across or down.",
+              "attribute": "direction",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "gap",
+              "type": {
+                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
+              },
+              "default": "'none'",
+              "description": "Space between items, named on the space scale.",
+              "attribute": "gap",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "align",
+              "type": {
+                "text": "'start' | 'center' | 'end' | 'stretch' | 'baseline'"
+              },
+              "default": "'stretch'",
+              "description": "Alignment across the direction.",
+              "attribute": "align",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "justify",
+              "type": {
+                "text": "'start' | 'center' | 'end' | 'between' | 'around'"
+              },
+              "default": "'start'",
+              "description": "Distribution along the direction.",
+              "attribute": "justify",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "wrap",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether items wrap onto more lines.",
+              "attribute": "wrap",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "inline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Flows with surrounding text instead of taking the full width.",
+              "attribute": "inline",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "direction",
+              "type": {
+                "text": "'row' | 'column'"
+              },
+              "default": "'row'",
+              "description": "Whether items run across or down.",
+              "fieldName": "direction"
+            },
+            {
+              "name": "gap",
+              "type": {
+                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
+              },
+              "default": "'none'",
+              "description": "Space between items, named on the space scale.",
+              "fieldName": "gap"
+            },
+            {
+              "name": "align",
+              "type": {
+                "text": "'start' | 'center' | 'end' | 'stretch' | 'baseline'"
+              },
+              "default": "'stretch'",
+              "description": "Alignment across the direction.",
+              "fieldName": "align"
+            },
+            {
+              "name": "justify",
+              "type": {
+                "text": "'start' | 'center' | 'end' | 'between' | 'around'"
+              },
+              "default": "'start'",
+              "description": "Distribution along the direction.",
+              "fieldName": "justify"
+            },
+            {
+              "name": "wrap",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether items wrap onto more lines.",
+              "fieldName": "wrap"
+            },
+            {
+              "name": "inline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Flows with surrounding text instead of taking the full width.",
+              "fieldName": "inline"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Lays children out in a row or a column.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/flex",
+            "aliases": [
+              "Stack",
+              "Row",
+              "Column",
+              "HStack",
+              "VStack"
+            ],
+            "tier": "styled",
+            "group": "Flex",
+            "part": "Root"
+          },
+          "tagName": "helix-flex",
+          "customElement": true,
+          "modulePath": "src/flex/root/flex-root.ts",
+          "definitionPath": "src/flex/root/flex-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixFlex",
+          "declaration": {
+            "name": "HelixFlex",
+            "module": "src/flex/root/flex-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-flex",
+          "declaration": {
+            "name": "HelixFlex",
+            "module": "src/flex/root/flex-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/disclosure/root/disclosure-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/disclosure/root/disclosure-root.css.ts"
           }
         }
       ]
@@ -3826,7 +3623,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/icon/root/icon-root.css.ts",
+      "path": "src/card/root/card-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -3839,65 +3636,118 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/icon/root/icon-root.css.ts"
+            "module": "src/card/root/card-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/icon/root/icon-root.ts",
+      "path": "src/card/root/card-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the\ncolor of the text it sits in and a container can resize it without reaching\nfor a prop. Inside a button that hook is set in `em`, which keeps the icon in\nproportion as the button's own size changes.",
-          "name": "HelixIcon",
+          "description": "Regions are slots: `media`, `header`, the default slot for content, and\n`footer`. An omitted region takes no space, so a card with only content needs\nno wrapper markup at all.\n\n`media` runs edge to edge and clips to the card's corners, so an image needs\nno inset correction. Set `orientation=\"horizontal\"` to move it alongside the\nheader, content, and footer stack rather than above it.\n\nRegions are bare slots with no wrapper element, so an omitted one occupies no\nspace without the card having to detect that it is missing. Style slotted\ncontent directly rather than reaching for a part: a header is whatever\nelement you slotted, not a wrapper we put around it.",
+          "name": "HelixCard",
           "cssProperties": [
             {
-              "description": "Edge length of the icon's box.",
-              "name": "--icon-size"
+              "description": "Surface behind the card.",
+              "name": "--card-background-color"
+            },
+            {
+              "description": "Border color of the surface.",
+              "name": "--card-border-color"
+            },
+            {
+              "description": "Width of the media column when horizontal.",
+              "name": "--card-media-size"
+            },
+            {
+              "description": "Inset applied to each region.",
+              "name": "--card-padding"
+            },
+            {
+              "description": "Corner radius of the surface.",
+              "name": "--card-radii"
             }
           ],
           "cssParts": [
             {
-              "description": "The rendered SVG.",
-              "name": "svg",
+              "description": "The card surface.",
+              "name": "container",
               "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "Image or video that runs edge to edge, outside the inset.",
+              "name": "media",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            },
+            {
+              "description": "Title and any actions for the whole card.",
+              "name": "header",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            },
+            {
+              "description": "The card's main content.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            },
+            {
+              "description": "Actions that conclude the card.",
+              "name": "footer",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
               }
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "name",
+              "name": "appearance",
               "type": {
-                "text": "string"
+                "text": "'outlined' | 'elevated' | 'plain'"
               },
-              "default": "''",
-              "description": "Name of the icon in the Helix set.",
-              "attribute": "name",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
-              }
+              "default": "'outlined'",
+              "description": "How the card separates itself from the page.",
+              "attribute": "appearance",
+              "reflects": true
             },
             {
               "kind": "field",
-              "name": "label",
+              "name": "dense",
               "type": {
-                "text": "string"
+                "text": "boolean"
               },
-              "default": "''",
-              "description": "Accessible name, for an icon that is not decorative.",
-              "attribute": "label",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
-              }
+              "default": "false",
+              "description": "Tightens the inset for dense layouts.",
+              "attribute": "dense",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "description": "Whether media sits above the content stack or beside it.",
+              "attribute": "orientation",
+              "reflects": true
             },
             {
               "kind": "method",
@@ -3925,72 +3775,73 @@
               }
             }
           ],
+          "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'outlined' | 'elevated' | 'plain'"
+              },
+              "default": "'outlined'",
+              "description": "How the card separates itself from the page.",
+              "fieldName": "appearance"
+            },
+            {
+              "name": "dense",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Tightens the inset for dense layouts.",
+              "fieldName": "dense"
+            },
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "description": "Whether media sits above the content stack or beside it.",
+              "fieldName": "orientation"
+            }
+          ],
           "superclass": {
-            "name": "HelixBaseIcon",
+            "name": "HelixBaseCard",
             "package": "@helix-io/headless"
           },
-          "summary": "Renders a named icon from the Helix set.",
+          "summary": "Groups related content and actions into a single surface.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/icon",
+            "documentation": "https://helix.fusion.dev/components/card",
             "aliases": [
-              "Glyph",
-              "Symbol"
+              "Panel",
+              "Surface"
             ],
             "tier": "styled",
-            "group": "Icon",
+            "group": "Card",
             "part": "Root"
           },
-          "tagName": "helix-icon",
+          "tagName": "helix-card",
           "customElement": true,
-          "attributes": [
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name of the icon in the Helix set.",
-              "fieldName": "name",
-              "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
-              }
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, for an icon that is not decorative.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/icon/root/icon-root.ts",
-          "definitionPath": "src/icon/root/icon-root.ts"
+          "modulePath": "src/card/root/card-root.ts",
+          "definitionPath": "src/card/root/card-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixIcon",
+          "name": "HelixCard",
           "declaration": {
-            "name": "HelixIcon",
-            "module": "src/icon/root/icon-root.ts"
+            "name": "HelixCard",
+            "module": "src/card/root/card-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-icon",
+          "name": "helix-card",
           "declaration": {
-            "name": "HelixIcon",
-            "module": "src/icon/root/icon-root.ts"
+            "name": "HelixCard",
+            "module": "src/card/root/card-root.ts"
           }
         }
       ]
@@ -4163,6 +4014,177 @@
           "declaration": {
             "name": "HelixHeading",
             "module": "src/heading/root/heading-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon/root/icon-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/icon/root/icon-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon/root/icon-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the\ncolor of the text it sits in and a container can resize it without reaching\nfor a prop. Inside a button that hook is set in `em`, which keeps the icon in\nproportion as the button's own size changes.",
+          "name": "HelixIcon",
+          "cssProperties": [
+            {
+              "description": "Edge length of the icon's box.",
+              "name": "--icon-size"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The rendered SVG.",
+              "name": "svg",
+              "inheritedFrom": {
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name of the icon in the Helix set.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, for an icon that is not decorative.",
+              "attribute": "label",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseIcon",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Renders a named icon from the Helix set.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/icon",
+            "aliases": [
+              "Glyph",
+              "Symbol"
+            ],
+            "tier": "styled",
+            "group": "Icon",
+            "part": "Root"
+          },
+          "tagName": "helix-icon",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name of the icon in the Helix set.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, for an icon that is not decorative.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/icon/root/icon-root.ts",
+          "definitionPath": "src/icon/root/icon-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixIcon",
+          "declaration": {
+            "name": "HelixIcon",
+            "module": "src/icon/root/icon-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-icon",
+          "declaration": {
+            "name": "HelixIcon",
+            "module": "src/icon/root/icon-root.ts"
           }
         }
       ]
@@ -4600,658 +4622,6 @@
           "declaration": {
             "name": "HelixIconButton",
             "module": "src/icon-button/root/icon-button-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/link/root/link-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/link/root/link-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/link/root/link-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Renders a real `<a>`, so middle-click, copy-link-address, and the browser's\nown status bar all work without anything being reimplemented.\n\nA new browsing context gets `rel=\"noreferrer noopener\"` unless told\notherwise, because without it the opened page can reach back through\n`window.opener`, and it is marked with an indicator so the reader knows\nbefore they click rather than after.",
-          "name": "HelixLink",
-          "cssParts": [
-            {
-              "description": "The anchor.",
-              "name": "link"
-            }
-          ],
-          "slots": [
-            {
-              "description": "The link text.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Where the link goes.",
-              "attribute": "href"
-            },
-            {
-              "kind": "field",
-              "name": "target",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Browsing context, such as `_blank`.",
-              "attribute": "target"
-            },
-            {
-              "kind": "field",
-              "name": "rel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Relationship of the linked URL, defaulted when opening a new tab.",
-              "attribute": "rel"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'xs' | 'sm' | 'md' | 'lg'"
-              },
-              "default": "'md'",
-              "description": "Size on the type scale.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'default' | 'subtle' | 'quiet'"
-              },
-              "default": "'default'",
-              "description": "How much the link announces itself.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "underlineOnHover",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the underline waits for hover.",
-              "attribute": "underline-on-hover",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "resolvedRel",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Where the link goes.",
-              "fieldName": "href"
-            },
-            {
-              "name": "target",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Browsing context, such as `_blank`.",
-              "fieldName": "target"
-            },
-            {
-              "name": "rel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Relationship of the linked URL, defaulted when opening a new tab.",
-              "fieldName": "rel"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'xs' | 'sm' | 'md' | 'lg'"
-              },
-              "default": "'md'",
-              "description": "Size on the type scale.",
-              "fieldName": "size"
-            },
-            {
-              "name": "appearance",
-              "type": {
-                "text": "'default' | 'subtle' | 'quiet'"
-              },
-              "default": "'default'",
-              "description": "How much the link announces itself.",
-              "fieldName": "appearance"
-            },
-            {
-              "name": "underline-on-hover",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the underline waits for hover.",
-              "fieldName": "underlineOnHover"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Navigates to another page or resource.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/link",
-            "aliases": [
-              "Anchor",
-              "A"
-            ],
-            "tier": "styled",
-            "group": "Link",
-            "part": "Root"
-          },
-          "tagName": "helix-link",
-          "customElement": true,
-          "modulePath": "src/link/root/link-root.ts",
-          "definitionPath": "src/link/root/link-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixLink",
-          "declaration": {
-            "name": "HelixLink",
-            "module": "src/link/root/link-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-link",
-          "declaration": {
-            "name": "HelixLink",
-            "module": "src/link/root/link-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/root/table-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/table/root/table-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/root/table-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
-          "name": "HelixTable",
-          "cssProperties": [
-            {
-              "description": "Track list for the columns.",
-              "name": "--table-columns",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The grid.",
-              "name": "table",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The table's rows.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "columns",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
-              "attribute": "columns",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name for the table.",
-              "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseTable",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Tabular data laid out on a grid.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/table",
-            "tier": "styled",
-            "group": "Table",
-            "part": "Root"
-          },
-          "tagName": "helix-table",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "columns",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
-              "fieldName": "columns",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name for the table.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/table/root/table-root.ts",
-          "definitionPath": "src/table/root/table-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixTable",
-          "declaration": {
-            "name": "HelixTable",
-            "module": "src/table/root/table-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-table",
-          "declaration": {
-            "name": "HelixTable",
-            "module": "src/table/root/table-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/cell/table-cell.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/table/cell/table-cell.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/cell/table-cell.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
-          "name": "HelixTableCell",
-          "slots": [
-            {
-              "description": "The cell's content.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseTableCell",
-                "module": "src/table/cell/table-cell.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "header",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the cell heads its column.",
-              "attribute": "header",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseTableCell",
-                "module": "src/table/cell/table-cell.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseTableCell",
-            "package": "@helix-io/headless"
-          },
-          "summary": "One cell of a table.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/table",
-            "tier": "styled",
-            "group": "Table",
-            "part": "Cell"
-          },
-          "tagName": "helix-table-cell",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "header",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the cell heads its column.",
-              "fieldName": "header",
-              "inheritedFrom": {
-                "name": "HelixBaseTableCell",
-                "module": "src/table/cell/table-cell.ts"
-              }
-            }
-          ],
-          "modulePath": "src/table/cell/table-cell.ts",
-          "definitionPath": "src/table/cell/table-cell.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixTableCell",
-          "declaration": {
-            "name": "HelixTableCell",
-            "module": "src/table/cell/table-cell.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-table-cell",
-          "declaration": {
-            "name": "HelixTableCell",
-            "module": "src/table/cell/table-cell.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/row/table-row.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/table/row/table-row.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/row/table-row.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
-          "name": "HelixTableRow",
-          "slots": [
-            {
-              "description": "The row's cells.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseTableRow",
-                "module": "src/table/row/table-row.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseTableRow",
-            "package": "@helix-io/headless"
-          },
-          "summary": "One row of a table.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/table",
-            "tier": "styled",
-            "group": "Table",
-            "part": "Row"
-          },
-          "tagName": "helix-table-row",
-          "customElement": true,
-          "modulePath": "src/table/row/table-row.ts",
-          "definitionPath": "src/table/row/table-row.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixTableRow",
-          "declaration": {
-            "name": "HelixTableRow",
-            "module": "src/table/row/table-row.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-table-row",
-          "declaration": {
-            "name": "HelixTableRow",
-            "module": "src/table/row/table-row.ts"
           }
         }
       ]
@@ -5965,6 +5335,243 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/link/root/link-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/link/root/link-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/link/root/link-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders a real `<a>`, so middle-click, copy-link-address, and the browser's\nown status bar all work without anything being reimplemented.\n\nA new browsing context gets `rel=\"noreferrer noopener\"` unless told\notherwise, because without it the opened page can reach back through\n`window.opener`, and it is marked with an indicator so the reader knows\nbefore they click rather than after.",
+          "name": "HelixLink",
+          "cssParts": [
+            {
+              "description": "The anchor.",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The link text.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link goes.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Browsing context, such as `_blank`.",
+              "attribute": "target"
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Relationship of the linked URL, defaulted when opening a new tab.",
+              "attribute": "rel"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'xs' | 'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size on the type scale.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'default' | 'subtle' | 'quiet'"
+              },
+              "default": "'default'",
+              "description": "How much the link announces itself.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "underlineOnHover",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the underline waits for hover.",
+              "attribute": "underline-on-hover",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "resolvedRel",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link goes.",
+              "fieldName": "href"
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Browsing context, such as `_blank`.",
+              "fieldName": "target"
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Relationship of the linked URL, defaulted when opening a new tab.",
+              "fieldName": "rel"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'xs' | 'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size on the type scale.",
+              "fieldName": "size"
+            },
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'default' | 'subtle' | 'quiet'"
+              },
+              "default": "'default'",
+              "description": "How much the link announces itself.",
+              "fieldName": "appearance"
+            },
+            {
+              "name": "underline-on-hover",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the underline waits for hover.",
+              "fieldName": "underlineOnHover"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Navigates to another page or resource.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/link",
+            "aliases": [
+              "Anchor",
+              "A"
+            ],
+            "tier": "styled",
+            "group": "Link",
+            "part": "Root"
+          },
+          "tagName": "helix-link",
+          "customElement": true,
+          "modulePath": "src/link/root/link-root.ts",
+          "definitionPath": "src/link/root/link-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixLink",
+          "declaration": {
+            "name": "HelixLink",
+            "module": "src/link/root/link-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-link",
+          "declaration": {
+            "name": "HelixLink",
+            "module": "src/link/root/link-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/text/root/text-root.css.ts",
       "declarations": [
         {
@@ -6172,242 +5779,6 @@
           "declaration": {
             "name": "HelixText",
             "module": "src/text/root/text-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/toolbar/root/toolbar-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/toolbar/root/toolbar-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/toolbar/root/toolbar-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "No chrome of its own: a toolbar is a place controls sit, and a border around\nthem would be a second frame inside whatever already frames the bar.",
-          "name": "HelixToolbar",
-          "cssProperties": [
-            {
-              "description": "Space between controls.",
-              "name": "--toolbar-gap"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The toolbar container.",
-              "name": "toolbar",
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The toolbar's controls.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Toolbar'",
-              "description": "Accessible name for the toolbar.",
-              "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | 'vertical'"
-              },
-              "default": "'horizontal'",
-              "description": "Which way the arrow keys move.",
-              "attribute": "orientation",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "controls",
-              "type": {
-                "text": "HTMLElement[]"
-              },
-              "privacy": "private",
-              "description": "Focusable controls, in document order.\n\nAsks each child for its own focus target rather than matching tag names, so\na toolbar holds anything, including elements this package has never heard\nof. Client only: there is no tree to walk on the server.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "setTabStop",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "active",
-                  "type": {
-                    "text": "HTMLElement | undefined"
-                  }
-                }
-              ],
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleFocusIn",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseToolbar",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A group of controls that share one tab stop.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/toolbar",
-            "aliases": [
-              "Actions",
-              "Action bar"
-            ],
-            "tier": "styled",
-            "group": "Toolbar",
-            "part": "Root"
-          },
-          "tagName": "helix-toolbar",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Toolbar'",
-              "description": "Accessible name for the toolbar.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            },
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | 'vertical'"
-              },
-              "default": "'horizontal'",
-              "description": "Which way the arrow keys move.",
-              "fieldName": "orientation",
-              "inheritedFrom": {
-                "name": "HelixBaseToolbar",
-                "module": "src/toolbar/root/toolbar-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/toolbar/root/toolbar-root.ts",
-          "definitionPath": "src/toolbar/root/toolbar-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixToolbar",
-          "declaration": {
-            "name": "HelixToolbar",
-            "module": "src/toolbar/root/toolbar-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-toolbar",
-          "declaration": {
-            "name": "HelixToolbar",
-            "module": "src/toolbar/root/toolbar-root.ts"
           }
         }
       ]
@@ -6669,6 +6040,139 @@
           "declaration": {
             "name": "HelixTag",
             "module": "src/tag/root/tag-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/cell/table-cell.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/table/cell/table-cell.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/cell/table-cell.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
+          "name": "HelixTableCell",
+          "slots": [
+            {
+              "description": "The cell's content.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTableCell",
+                "module": "src/table/cell/table-cell.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "header",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the cell heads its column.",
+              "attribute": "header",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTableCell",
+                "module": "src/table/cell/table-cell.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTableCell",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One cell of a table.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/table",
+            "tier": "styled",
+            "group": "Table",
+            "part": "Cell"
+          },
+          "tagName": "helix-table-cell",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "header",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the cell heads its column.",
+              "fieldName": "header",
+              "inheritedFrom": {
+                "name": "HelixBaseTableCell",
+                "module": "src/table/cell/table-cell.ts"
+              }
+            }
+          ],
+          "modulePath": "src/table/cell/table-cell.ts",
+          "definitionPath": "src/table/cell/table-cell.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTableCell",
+          "declaration": {
+            "name": "HelixTableCell",
+            "module": "src/table/cell/table-cell.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-table-cell",
+          "declaration": {
+            "name": "HelixTableCell",
+            "module": "src/table/cell/table-cell.ts"
           }
         }
       ]
@@ -7051,6 +6555,288 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/table/root/table-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/table/root/table-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/root/table-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
+          "name": "HelixTable",
+          "cssProperties": [
+            {
+              "description": "Track list for the columns.",
+              "name": "--table-columns",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The grid.",
+              "name": "table",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The table's rows.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "columns",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
+              "attribute": "columns",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the table.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTable",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Tabular data laid out on a grid.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/table",
+            "tier": "styled",
+            "group": "Table",
+            "part": "Root"
+          },
+          "tagName": "helix-table",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "columns",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
+              "fieldName": "columns",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the table.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/table/root/table-root.ts",
+          "definitionPath": "src/table/root/table-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTable",
+          "declaration": {
+            "name": "HelixTable",
+            "module": "src/table/root/table-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-table",
+          "declaration": {
+            "name": "HelixTable",
+            "module": "src/table/root/table-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/row/table-row.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/table/row/table-row.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/row/table-row.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
+          "name": "HelixTableRow",
+          "slots": [
+            {
+              "description": "The row's cells.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTableRow",
+                "module": "src/table/row/table-row.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTableRow",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One row of a table.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/table",
+            "tier": "styled",
+            "group": "Table",
+            "part": "Row"
+          },
+          "tagName": "helix-table-row",
+          "customElement": true,
+          "modulePath": "src/table/row/table-row.ts",
+          "definitionPath": "src/table/row/table-row.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTableRow",
+          "declaration": {
+            "name": "HelixTableRow",
+            "module": "src/table/row/table-row.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-table-row",
+          "declaration": {
+            "name": "HelixTableRow",
+            "module": "src/table/row/table-row.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/tree/root/tree-root.css.ts",
       "declarations": [
         {
@@ -7352,6 +7138,242 @@
           "declaration": {
             "name": "HelixTree",
             "module": "src/tree/root/tree-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toolbar/root/toolbar-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/toolbar/root/toolbar-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toolbar/root/toolbar-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "No chrome of its own: a toolbar is a place controls sit, and a border around\nthem would be a second frame inside whatever already frames the bar.",
+          "name": "HelixToolbar",
+          "cssProperties": [
+            {
+              "description": "Space between controls.",
+              "name": "--toolbar-gap"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The toolbar container.",
+              "name": "toolbar",
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The toolbar's controls.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Toolbar'",
+              "description": "Accessible name for the toolbar.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Which way the arrow keys move.",
+              "attribute": "orientation",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "controls",
+              "type": {
+                "text": "HTMLElement[]"
+              },
+              "privacy": "private",
+              "description": "Focusable controls, in document order.\n\nAsks each child for its own focus target rather than matching tag names, so\na toolbar holds anything, including elements this package has never heard\nof. Client only: there is no tree to walk on the server.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setTabStop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "active",
+                  "type": {
+                    "text": "HTMLElement | undefined"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFocusIn",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseToolbar",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A group of controls that share one tab stop.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toolbar",
+            "aliases": [
+              "Actions",
+              "Action bar"
+            ],
+            "tier": "styled",
+            "group": "Toolbar",
+            "part": "Root"
+          },
+          "tagName": "helix-toolbar",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Toolbar'",
+              "description": "Accessible name for the toolbar.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Which way the arrow keys move.",
+              "fieldName": "orientation",
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/toolbar/root/toolbar-root.ts",
+          "definitionPath": "src/toolbar/root/toolbar-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixToolbar",
+          "declaration": {
+            "name": "HelixToolbar",
+            "module": "src/toolbar/root/toolbar-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-toolbar",
+          "declaration": {
+            "name": "HelixToolbar",
+            "module": "src/toolbar/root/toolbar-root.ts"
           }
         }
       ]
