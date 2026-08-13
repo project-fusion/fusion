@@ -456,6 +456,242 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/card/root/card-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/card/root/card-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/root/card-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Set `aria-labelledby` or `aria-label` for a name present in server-rendered\nHTML; otherwise the card adopts the first `Card.Title` beneath it once in a\nbrowser.",
+          "name": "HelixCard",
+          "cssProperties": [
+            {
+              "description": "Surface behind the card.",
+              "name": "--card-background-color"
+            },
+            {
+              "description": "Border color of the surface.",
+              "name": "--card-border-color"
+            },
+            {
+              "description": "Inset applied to each region.",
+              "name": "--card-padding"
+            },
+            {
+              "description": "Corner radius of the surface.",
+              "name": "--card-radii"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The card surface.",
+              "name": "container",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "Card regions, typically Header, Body, and Footer.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'outlined' | 'elevated' | 'plain'"
+              },
+              "default": "'outlined'",
+              "description": "How the card separates itself from the page.\n\n`outlined` is the default because a hairline is denser than a shadow,\nscales better, and needs no tuning per color scheme. `elevated` is for a\ncard that genuinely floats above the content behind it.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "dense",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Tightens the inset for dense layouts.",
+              "attribute": "dense",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "consumerNamed",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "True when the consumer named the card, so adoption must not overwrite it.\n\nResolved lazily on first update rather than in `connectedCallback`: the SSR\nrenderer applies template attributes around that hook, so reading them\nthere sees the element before the consumer's `aria-label` has landed.",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ownsLabel",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "True when this element set the label itself and may therefore clear it.",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "adoptedTitle",
+              "type": {
+                "text": "HelixBaseCardTitle | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The title that announced itself, if any.\n\nNot named `title`: that is `HTMLElement.title`, the tooltip attribute, so\nassigning to it would set a tooltip rather than track an element.\n\nHeld rather than queried. Querying would mean naming the tags that count,\nand the headless tier cannot know the styled tier's tag without depending\nupward on it. The title says what it is instead.",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleTitleReady",
+              "privacy": "private",
+              "description": "Adopts the announcing title, which is the event's target.\n\n`instanceof` rather than a tag check: the styled tier extends this one, so\na `helix-card-title` is a `HelixBaseCardTitle`, and the base never learns a\nname from the tier above it.",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "HelixBaseCard",
+                "module": "src/card/root/card-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'outlined' | 'elevated' | 'plain'"
+              },
+              "default": "'outlined'",
+              "description": "How the card separates itself from the page.\n\n`outlined` is the default because a hairline is denser than a shadow,\nscales better, and needs no tuning per color scheme. `elevated` is for a\ncard that genuinely floats above the content behind it.",
+              "fieldName": "appearance"
+            },
+            {
+              "name": "dense",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Tightens the inset for dense layouts.",
+              "fieldName": "dense"
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseCard",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Groups related content and actions into a single surface.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/card",
+            "aliases": [
+              "Panel",
+              "Surface"
+            ],
+            "tier": "styled",
+            "group": "Card",
+            "part": "Root"
+          },
+          "tagName": "helix-card",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCard",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "src/card/root/card-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-card",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "src/card/root/card-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/card/title/card-title.css.ts",
       "declarations": [
         {
@@ -606,228 +842,6 @@
           "declaration": {
             "name": "HelixCardTitle",
             "module": "src/card/title/card-title.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/root/card-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/card/root/card-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/root/card-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Set `aria-labelledby` or `aria-label` for a name present in server-rendered\nHTML; otherwise the card adopts the first `Card.Title` beneath it once in a\nbrowser.",
-          "name": "HelixCard",
-          "cssProperties": [
-            {
-              "description": "Surface behind the card.",
-              "name": "--card-background-color"
-            },
-            {
-              "description": "Border color of the surface.",
-              "name": "--card-border-color"
-            },
-            {
-              "description": "Inset applied to each region.",
-              "name": "--card-padding"
-            },
-            {
-              "description": "Corner radius of the surface.",
-              "name": "--card-radii"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The card surface.",
-              "name": "container",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "Card regions, typically Header, Body, and Footer.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'outlined' | 'elevated' | 'plain'"
-              },
-              "default": "'outlined'",
-              "description": "How the card separates itself from the page.\n\n`outlined` is the default because a hairline is denser than a shadow,\nscales better, and needs no tuning per color scheme. `elevated` is for a\ncard that genuinely floats above the content behind it.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "dense",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Tightens the inset for dense layouts.",
-              "attribute": "dense",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "consumerNamed",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false",
-              "description": "True when the consumer named the card, so adoption must not overwrite it.",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleTitleReady",
-              "privacy": "private",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "adoptTitle",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Adopts a title's id as the card's accessible name.\n\nDeliberately in `firstUpdated` rather than `willUpdate`: **SSR has no DOM.**\nThe server-side element shim carries attributes but not tree traversal, so\n`querySelector` is undefined there and any parent-to-child coordination\nthrows. Running here makes adoption a client-side enhancement over whatever\nthe consumer set, which is what actually reaches the server.",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleSlotChange",
-              "privacy": "protected",
-              "inheritedFrom": {
-                "name": "HelixBaseCard",
-                "module": "src/card/root/card-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "appearance",
-              "type": {
-                "text": "'outlined' | 'elevated' | 'plain'"
-              },
-              "default": "'outlined'",
-              "description": "How the card separates itself from the page.\n\n`outlined` is the default because a hairline is denser than a shadow,\nscales better, and needs no tuning per color scheme. `elevated` is for a\ncard that genuinely floats above the content behind it.",
-              "fieldName": "appearance"
-            },
-            {
-              "name": "dense",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Tightens the inset for dense layouts.",
-              "fieldName": "dense"
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseCard",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Groups related content and actions into a single surface.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/card",
-            "aliases": [
-              "Panel",
-              "Surface"
-            ],
-            "tier": "styled",
-            "group": "Card",
-            "part": "Root"
-          },
-          "tagName": "helix-card",
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCard",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/card/root/card-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-card",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/card/root/card-root.ts"
           }
         }
       ]

@@ -15,6 +15,7 @@ import { styles } from './card-title.css.js'
  * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - The title text.
+ *
  * @csspart heading - The heading element.
  */
 @customElement('helix-card-title')

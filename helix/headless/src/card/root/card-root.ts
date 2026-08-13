@@ -3,11 +3,6 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { customElement } from 'lit/decorators.js'
 import { HelixBaseCardTitle } from '../title/card-title.js'
 
-/** Tags that can name a card. Either tier's title will do. */
-const TITLE_SELECTOR = 'helix-card-title, helix-base-card-title'
-
-const LABELLED_BY = 'aria-labelledby'
-
 /**
  * @summary Groups related content and actions into a single surface.
  *
@@ -15,28 +10,47 @@ const LABELLED_BY = 'aria-labelledby'
  * Composed of regions rather than slots on one element, so a header, body, or
  * footer can be styled, omitted, and reordered independently.
  *
- * A card needs an accessible name or screen readers announce an unlabelled
- * group. Set `aria-labelledby` or `aria-label` yourself for a name that is
- * present in server-rendered HTML; otherwise the card adopts the first
- * `Card.Title` beneath it once it is in a browser.
+ * Set `aria-labelledby` or `aria-label` for a name present in server-rendered
+ * HTML. Otherwise the card adopts the first `Card.Title` beneath it once in a
+ * browser, however deeply nested.
  *
  * @since 0.1.0
  * @status experimental
+ * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
- * @alias Panel
- * @alias Surface
  *
  * @slot - Card regions, typically Header, Body, and Footer.
+ *
  * @csspart container - The card surface.
  */
 @customElement('helix-base-card')
 export class HelixBaseCard extends HelixElement {
-  /** True when the consumer named the card, so adoption must not overwrite it. */
-  private consumerNamed = false
+  /**
+   * True when the consumer named the card, so adoption must not overwrite it.
+   *
+   * Resolved lazily on first update rather than in `connectedCallback`: the SSR
+   * renderer applies template attributes around that hook, so reading them
+   * there sees the element before the consumer's `aria-label` has landed.
+   */
+  private consumerNamed: boolean | undefined = undefined
+
+  /** True when this element set the label itself and may therefore clear it. */
+  private ownsLabel = false
+
+  /**
+   * The title that announced itself, if any.
+   *
+   * Not named `title`: that is `HTMLElement.title`, the tooltip attribute, so
+   * assigning to it would set a tooltip rather than track an element.
+   *
+   * Held rather than queried. Querying would mean naming the tags that count,
+   * and the headless tier cannot know the styled tier's tag without depending
+   * upward on it. The title says what it is instead.
+   */
+  private adoptedTitle: HelixBaseCardTitle | null = null
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.consumerNamed = this.hasAttribute(LABELLED_BY) || this.hasAttribute('aria-label')
     this.addEventListener(HelixBaseCardTitle.readyEvent, this.handleTitleReady)
   }
 
@@ -45,54 +59,56 @@ export class HelixBaseCard extends HelixElement {
     this.removeEventListener(HelixBaseCardTitle.readyEvent, this.handleTitleReady)
   }
 
-  private handleTitleReady = (): void => {
-    this.adoptTitle()
+  /**
+   * Adopts the announcing title, which is the event's target.
+   *
+   * `instanceof` rather than a tag check: the styled tier extends this one, so
+   * a `helix-card-title` is a `HelixBaseCardTitle`, and the base never learns a
+   * name from the tier above it.
+   */
+  private handleTitleReady = (event: Event): void => {
+    if (event.target instanceof HelixBaseCardTitle) {
+      this.adoptedTitle = event.target
+      this.requestUpdate()
+    }
   }
 
   /**
-   * Sets the role, which needs no DOM access and so is safe on the server.
+   * Sets role and name. Both are attribute writes with no DOM access, so this
+   * is safe on the server, where the element shim has no tree to traverse.
    *
-   * ARIA belongs on the host rather than the shadow-DOM container because
-   * IDREFs do not cross shadow boundaries: a reference from inside the shadow
-   * root could never resolve to a title in the light DOM.
+   * ARIA goes on the host rather than the shadow container because IDREFs do
+   * not cross shadow boundaries: a reference from inside the shadow root could
+   * never resolve to a title in the light DOM.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.setAttribute('role', 'group')
-  }
 
-  /**
-   * Adopts a title's id as the card's accessible name.
-   *
-   * Deliberately in `firstUpdated` rather than `willUpdate`: **SSR has no DOM.**
-   * The server-side element shim carries attributes but not tree traversal, so
-   * `querySelector` is undefined there and any parent-to-child coordination
-   * throws. Running here makes adoption a client-side enhancement over whatever
-   * the consumer set, which is what actually reaches the server.
-   */
-  protected adoptTitle(): void {
+    this.consumerNamed ??=
+      (this.hasAttribute('aria-labelledby') && !this.ownsLabel) || this.hasAttribute('aria-label')
+
     if (this.consumerNamed) {
       return
     }
 
     // `||` not `??`: an element with no id has `id === ''`, which is not
-    // nullish, and an empty reference names the group the empty string rather
-    // than leaving it unnamed.
-    const id = this.querySelector(TITLE_SELECTOR)?.id || null
+    // nullish, and an empty reference names the group the empty string.
+    const id = (this.adoptedTitle?.isConnected && this.adoptedTitle.id) || null
     if (id) {
-      this.setAttribute(LABELLED_BY, id)
-    } else {
-      this.removeAttribute(LABELLED_BY)
+      this.setAttribute('aria-labelledby', id)
+      this.ownsLabel = true
+    } else if (this.ownsLabel) {
+      this.removeAttribute('aria-labelledby')
+      this.ownsLabel = false
     }
   }
 
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    this.adoptTitle()
-  }
-
   protected handleSlotChange = (): void => {
-    this.adoptTitle()
+    if (this.adoptedTitle && !this.contains(this.adoptedTitle)) {
+      this.adoptedTitle = null
+      this.requestUpdate()
+    }
   }
 
   protected override render(): TemplateResult {

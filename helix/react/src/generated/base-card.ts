@@ -5,10 +5,9 @@ import { type BaseProps, createComponent } from '../create-component.js'
  * Composed of regions rather than slots on one element, so a header, body, or
 footer can be styled, omitted, and reordered independently.
 
-A card needs an accessible name or screen readers announce an unlabelled
-group. Set `aria-labelledby` or `aria-label` yourself for a name that is
-present in server-rendered HTML; otherwise the card adopts the first
-`Card.Title` beneath it once it is in a browser.
+Set `aria-labelledby` or `aria-label` for a name present in server-rendered
+HTML. Otherwise the card adopts the first `Card.Title` beneath it once in a
+browser, however deeply nested.
  *
  * Renders `<helix-base-card>`.
  */

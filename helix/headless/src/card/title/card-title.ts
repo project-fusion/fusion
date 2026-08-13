@@ -24,6 +24,7 @@ let sequence = 0
  * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - The title text.
+ *
  * @csspart heading - The heading element.
  */
 @customElement('helix-base-card-title')

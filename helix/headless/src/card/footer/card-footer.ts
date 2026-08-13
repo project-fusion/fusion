@@ -13,6 +13,7 @@ import { customElement } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - Actions, typically buttons.
+ *
  * @csspart container - The region.
  */
 @customElement('helix-base-card-footer')

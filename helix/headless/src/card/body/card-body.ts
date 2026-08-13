@@ -13,6 +13,7 @@ import { customElement } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - The card's content.
+ *
  * @csspart container - The region.
  */
 @customElement('helix-base-card-body')

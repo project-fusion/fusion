@@ -14,6 +14,7 @@ import { styles } from './card-body.css.js'
  * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - The card's content.
+ *
  * @csspart container - The region.
  *
  * @cssproperty --card-padding - Inset, inherited from the card unless overridden.

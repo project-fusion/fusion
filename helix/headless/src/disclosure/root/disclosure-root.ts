@@ -28,12 +28,12 @@ const TRIGGER_ID = 'trigger'
  *
  * @since 0.1.0
  * @status experimental
+ * @aliases Collapsible, Expander
  * @documentation https://helix.fusion.dev/components/disclosure
- * @alias Collapsible
- * @alias Expander
  *
  * @slot summary - The always-visible trigger content.
  * @slot - The content revealed when open.
+ *
  * @csspart container - The outer wrapper.
  * @csspart trigger - The clickable summary row.
  * @csspart content - The revealed region.

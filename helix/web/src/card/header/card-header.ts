@@ -14,6 +14,7 @@ import { styles } from './card-header.css.js'
  * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - Title and actions.
+ *
  * @csspart container - The region.
  *
  * @cssproperty --card-padding - Inset, inherited from the card unless overridden.

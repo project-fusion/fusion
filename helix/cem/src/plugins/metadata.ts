@@ -2,7 +2,9 @@ import type { HelixDeclaration, Plugin } from '../types.js'
 
 /** Tags Helix reads that the CEM spec does not define. */
 const SINGLE = ['description', 'since', 'status', 'documentation'] as const
-const REPEATED = ['alias'] as const
+
+/** Comma-separated, so one tag rather than a stack of near-identical lines. */
+const LIST = ['aliases'] as const
 
 /** Values `@status` may take. Anything else is ignored rather than trusted. */
 const STATUSES = ['deprecated', 'experimental', 'stable'] as const
@@ -30,8 +32,8 @@ const text = (comment: unknown): string => {
  * `@status experimental` that cannot put a badge on a page or warn a consumer
  * is decoration.
  *
- * `@alias` repeats. It records the names people search for that are not the
- * component's own: Tag is also a Chip, Toast is also a Snackbar.
+ * `@aliases` is comma-separated. It records the names people search for that
+ * are not the component's own: Tag is also a Chip, Toast is also a Snackbar.
  */
 export const metadata = (): Plugin => ({
   analyzePhase({ moduleDoc, node, ts }) {
@@ -57,8 +59,13 @@ export const metadata = (): Plugin => ({
       if (!value) {
         continue
       }
-      if ((REPEATED as readonly string[]).includes(tagName)) {
-        aliases.push(value)
+      if ((LIST as readonly string[]).includes(tagName)) {
+        aliases.push(
+          ...value
+            .split(',')
+            .map((entry) => entry.trim())
+            .filter(Boolean),
+        )
       } else if ((SINGLE as readonly string[]).includes(tagName)) {
         found[tagName] = value
       }

@@ -13,11 +13,11 @@ import { styles } from './card-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
- * @alias Panel
- * @alias Surface
  *
  * @slot - Card regions, typically Header, Body, and Footer.
+ *
  * @csspart container - The card surface.
  *
  * @cssproperty --card-background-color - Surface behind the card.

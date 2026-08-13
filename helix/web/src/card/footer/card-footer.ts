@@ -14,6 +14,7 @@ import { styles } from './card-footer.css.js'
  * @documentation https://helix.fusion.dev/components/card
  *
  * @slot - Actions, typically buttons.
+ *
  * @csspart container - The region.
  *
  * @cssproperty --card-padding - Inset, inherited from the card unless overridden.
