@@ -1,6 +1,5 @@
-import type { HelixManifest, HelixMetadata, Plugin } from '../types.js'
+import type { HelixContext, HelixManifest, HelixMetadata, Plugin } from '../types.js'
 import { eachComponent } from '../types.js'
-
 /**
  * Stamps every Helix component with the design-system tier it belongs to.
  *
@@ -12,8 +11,11 @@ import { eachComponent } from '../types.js'
  */
 export const helixTier = (tier: NonNullable<HelixMetadata['tier']>): Plugin => ({
   name: 'helix-tier',
-  packageLinkPhase({ customElementsManifest }) {
-    for (const { declaration } of eachComponent(customElementsManifest as HelixManifest)) {
+  packageLinkPhase({ context, customElementsManifest }) {
+    for (const { declaration } of eachComponent(
+      customElementsManifest as HelixManifest,
+      context as HelixContext,
+    )) {
       declaration.helix = { ...declaration.helix, tier }
     }
   },

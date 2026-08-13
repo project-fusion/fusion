@@ -171,6 +171,12 @@ valuable. If styling leaks downward, we have shipped one package in five files.
   CSS already does layout. If a primitive is missing, add it to the design
   system rather than working around it in the app.
 
+**Visual direction** for the styling refresh lives in
+[`docs/08-visual-direction.md`](docs/08-visual-direction.md): enterprise density
+with consumer restraint, hierarchy from type and space rather than color,
+borders over shadows, motion as feedback only. The current tokens are a working
+default, not that direction.
+
 ## Theming is derivation, not override
 
 **Tokens are a function, not a table.** `@helix-io/theme` computes a complete

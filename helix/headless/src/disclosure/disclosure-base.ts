@@ -1,5 +1,5 @@
 import { HelixElement, WithOpen } from '@helix-io/core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, type TemplateResult } from 'lit'
 
 /** Shadow-DOM id linking the trigger's aria-controls to the content region. */
 const CONTENT_ID = 'content'
@@ -24,6 +24,12 @@ const TRIGGER_ID = 'trigger'
  * and resolve into this component's manifest automatically, because
  * `@helix-io/core` publishes one and the analyzer runs with
  * `dependencies: true`.
+ *
+ * Content stays mounted when closed and is hidden by the styled tier's CSS.
+ * Unmounting it made an open/close transition impossible, and `hidden` is
+ * `display: none`, which cannot transition either. `inert` keeps closed content
+ * out of the tab order and the accessibility tree without removing it from the
+ * box tree.
  *
  * The event is declared here rather than inferred. It is dispatched through a
  * generic helper, and the analyzer can only record the parameter identifier of
@@ -59,10 +65,12 @@ export class HelixDisclosureBase extends WithOpen(HelixElement) {
           id=${CONTENT_ID}
           aria-labelledby=${TRIGGER_ID}
           part="content"
-          ?hidden=${!open}
+          ?inert=${!open}
           role="region"
         >
-          ${open ? html`<slot></slot>` : nothing}
+          <div part="content-inner">
+            <slot></slot>
+          </div>
         </div>
       </div>
     `

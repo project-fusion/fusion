@@ -69,6 +69,8 @@ export interface HelixDeclaration extends Documented {
   members?: HelixMember[]
   slots?: Documented[]
   summary?: string
+  /** Immediate base class, used to walk to the component root. */
+  superclass?: { name: string; package?: string }
   tagName?: string
 }
 
@@ -81,6 +83,15 @@ export interface HelixManifest {
   modules?: HelixModule[]
 }
 
+/** Plugin context, narrowed to the part Helix reads. */
+export interface HelixContext {
+  /** Manifests of dependencies, collected when `dependencies: true`. */
+  thirdPartyCEMs?: HelixManifest[]
+}
+
+/** The class every Helix component descends from. */
+export const COMPONENT_ROOT = 'HelixElement'
+
 /** A problem found by a validating plugin. */
 export interface Violation {
   message: string
@@ -89,25 +100,75 @@ export interface Violation {
   subject: string
 }
 
-/** True for any class declaration, registered or not. */
-export const isComponent = (declaration: HelixDeclaration): boolean => declaration.kind === 'class'
-
 /** True only for declarations that register themselves as a custom element. */
 export const isCustomElement = (declaration: HelixDeclaration): boolean =>
-  isComponent(declaration) && declaration.customElement === true
+  declaration.kind === 'class' && declaration.customElement === true
+
+/** Indexes every class declaration by name across a set of manifests. */
+export const classIndex = (manifests: HelixManifest[]): Map<string, HelixDeclaration> => {
+  const index = new Map<string, HelixDeclaration>()
+  for (const manifest of manifests) {
+    for (const module of manifest.modules ?? []) {
+      for (const declaration of module.declarations ?? []) {
+        if (declaration.kind === 'class' && !index.has(declaration.name)) {
+          index.set(declaration.name, declaration)
+        }
+      }
+    }
+  }
+  return index
+}
+
+/**
+ * True when a declaration is `root` or descends from it.
+ *
+ * Walks the `superclass` chain, which crosses package boundaries as long as the
+ * dependency's manifest is in the index. Terminates on cycles, which a
+ * hand-edited manifest could contain.
+ */
+export const descendsFrom = (
+  declaration: HelixDeclaration,
+  index: Map<string, HelixDeclaration>,
+  root: string = COMPONENT_ROOT,
+): boolean => {
+  const seen = new Set<string>()
+  let current: HelixDeclaration | undefined = declaration
+
+  while (current && !seen.has(current.name)) {
+    if (current.name === root) {
+      return true
+    }
+    seen.add(current.name)
+    const parent: string | undefined = current.superclass?.name
+    current = parent === undefined ? undefined : index.get(parent)
+  }
+
+  return false
+}
 
 /**
  * Every Helix component in a manifest, paired with its module.
  *
- * Yields unregistered classes too, which is what lets the headless tier be
- * analyzed, documented, and linted on the same footing as the styled tier.
+ * A component is any class descending from `HelixElement`, registered or not.
+ * That covers the headless tier, which carries no `@customElement` decorator,
+ * while excluding utility classes and the `declare class` interfaces that back
+ * mixins. Keying on "is a class" instead would lint and stamp every exported
+ * class in the package, which is correct only until someone exports one that is
+ * not a component.
+ *
+ * Pass `context` so the superclass chain can be resolved across packages;
+ * without it, a component whose base lives in a dependency looks unrelated to
+ * `HelixElement` and is skipped.
  */
 export const eachComponent = function* (
   manifest: HelixManifest,
+  context?: HelixContext,
 ): Generator<{ declaration: HelixDeclaration; module: HelixModule }> {
+  const index = classIndex([manifest, ...(context?.thirdPartyCEMs ?? [])])
+
   for (const module of manifest.modules ?? []) {
     for (const declaration of module.declarations ?? []) {
-      if (isComponent(declaration)) {
+      if (declaration.kind === 'class' && descendsFrom(declaration, index)) {
         yield { declaration, module }
       }
     }

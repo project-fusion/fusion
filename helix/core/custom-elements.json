@@ -172,14 +172,11 @@
               ],
               "description": "Requests an open-state change. In uncontrolled mode the element updates\nitself; in controlled mode it only notifies and waits for the consumer."
             }
-          ],
-          "helix": {
-            "tier": "core"
-          }
+          ]
         },
         {
           "kind": "mixin",
-          "description": "Grafts controlled and uncontrolled open state onto a base class.\n\nControlled mode is detected automatically: once a consumer sets `open`\nexplicitly, the element stops managing the value itself and only emits\n`open-change`. Uncontrolled consumers set `defaultOpen` and let the element\nown it.\n\nThe kebab-case `open-change` event maps to an `onOpenChange` React prop\nthrough the wrapper generator, so the event name is public API.",
+          "description": "Grafts controlled and uncontrolled open state onto a base class.\n\nControlled mode is detected automatically: once a consumer sets `open`\nexplicitly, the element stops managing the value itself and only emits\n`open-change`. Uncontrolled consumers set `defaultOpen` and let the element\nown it.\n\nThe kebab-case `open-change` event maps to an `onOpenChange` React prop\nthrough the wrapper generator, so the event name is public API.\n\nSets `data-open` on the host whenever the element is open, in either mode.\nStyled tiers should select on that rather than on `[open]`, which is absent\nfor uncontrolled consumers.",
           "name": "WithOpen",
           "members": [
             {
@@ -229,6 +226,17 @@
               },
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "reflectResolvedState",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Mirrors the resolved state onto the host as `data-open`.\n\n`open` only reflects in controlled mode, so styling on `:host([open])`\nsilently does nothing for uncontrolled consumers. Presentation needs one\nselector that is true whenever the element is actually open, in either\nmode."
             },
             {
               "kind": "method",

@@ -1,4 +1,4 @@
-import type { HelixManifest, Plugin, Violation } from '../types.js'
+import type { HelixContext, HelixManifest, Plugin, Violation } from '../types.js'
 import { eachComponent } from '../types.js'
 
 export interface ConventionLintOptions {
@@ -29,7 +29,7 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
 
   return {
     name: 'helix-convention-lint',
-    packageLinkPhase({ customElementsManifest }) {
+    packageLinkPhase({ context, customElementsManifest }) {
       const violations: Violation[] = []
 
       const check = (
@@ -46,6 +46,7 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
 
       for (const { declaration, module } of eachComponent(
         customElementsManifest as HelixManifest,
+        context as HelixContext,
       )) {
         const path = module.path ?? 'unknown'
         const summary = declaration.summary ?? declaration.description ?? ''

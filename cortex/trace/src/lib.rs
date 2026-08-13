@@ -77,10 +77,17 @@ impl Graph {
         Self::default()
     }
 
+    /// Inserts a node and indexes it under each of its parents.
+    ///
+    /// Parents are deduplicated: a node listing the same parent twice would
+    /// otherwise be queued twice by every cascade that reaches it.
     pub fn insert(&mut self, node: Node) -> Id {
         let id = node.id;
         for parent in &node.derived_from {
-            self.dependents.entry(*parent).or_default().push(id);
+            let children = self.dependents.entry(*parent).or_default();
+            if !children.contains(&id) {
+                children.push(id);
+            }
         }
         self.nodes.insert(id, node);
         id
@@ -156,6 +163,16 @@ impl Graph {
             node.derived_from.retain(|parent| !seen.contains(parent));
         }
 
+        // Prune the reverse index too. Surviving nodes still list deleted
+        // children otherwise, so the index grows monotonically across a
+        // long-lived session and every later cascade re-walks ids that are
+        // already gone.
+        self.dependents.retain(|parent, _| self.nodes.contains_key(parent));
+        for children in self.dependents.values_mut() {
+            children.retain(|child| !seen.contains(child));
+        }
+        self.dependents.retain(|_, children| !children.is_empty());
+
         removed
     }
 }
@@ -228,6 +245,30 @@ mod tests {
         );
         assert!(graph.get(source).is_some(), "ancestors are not touched");
         assert_eq!(graph.len(), 1);
+    }
+
+    #[test]
+    fn cascade_prunes_the_reverse_index() {
+        let (mut graph, source, memory, _) = chain();
+
+        graph.delete_cascade(memory);
+
+        for (parent, children) in &graph.dependents {
+            assert!(graph.nodes.contains_key(parent), "index keyed on deleted {parent}");
+            for child in children {
+                assert!(graph.nodes.contains_key(child), "index points at deleted {child}");
+            }
+        }
+        assert!(graph.get(source).is_some());
+    }
+
+    #[test]
+    fn repeated_parents_are_indexed_once() {
+        let mut graph = Graph::new();
+        let source = graph.insert(Node::new(NodeKind::Source, vec![]));
+        let duplicated = graph.insert(Node::new(NodeKind::Memory, vec![source, source]));
+
+        assert_eq!(graph.dependents[&source], vec![duplicated]);
     }
 
     #[test]

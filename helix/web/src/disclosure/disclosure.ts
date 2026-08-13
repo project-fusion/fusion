@@ -7,7 +7,8 @@ import { customElement, property } from 'lit/decorators.js'
  *
  * @csspart container - The outer wrapper.
  * @csspart trigger - The clickable summary row.
- * @csspart content - The revealed region.
+ * @csspart content - The revealed region. Animates open and closed.
+ * @csspart content-inner - Padding wrapper inside the animated region.
  *
  * @cssproperty --disclosure-background-color - Surface behind the disclosure.
  * @cssproperty --disclosure-border-color - Border color of the container.
@@ -71,14 +72,36 @@ export class HelixDisclosure extends HelixDisclosureBase {
       outline-offset: calc(var(--helix-focus-ring-offset) * -1);
     }
 
+    /* Content stays in the box tree when closed so it can animate. A grid
+       collapsing from 0fr to 1fr is the only technique that transitions to the
+       content's intrinsic height without measuring it in JavaScript. */
     [part='content'] {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows var(--helix-duration-normal) var(--helix-ease-standard);
+    }
+
+    :host([data-open]) [part='content'] {
+      grid-template-rows: 1fr;
+    }
+
+    [part='content-inner'] {
+      /* The grid row is the thing being animated, so the child must be allowed
+         to be clipped below its own min-content height. */
+      min-block-size: 0;
+      overflow: hidden;
+    }
+
+    :host([data-open]) [part='content-inner'] {
       border-block-start: 1px solid var(--disclosure-border-color, var(--helix-color-border));
       color: var(--helix-color-foreground-muted);
       padding: var(--disclosure-padding, var(--helix-space-3) var(--helix-space-4));
     }
 
-    [part='content'][hidden] {
-      display: none;
+    @media (prefers-reduced-motion: reduce) {
+      [part='content'] {
+        transition: none;
+      }
     }
   `
 }

@@ -1,3 +1,4 @@
+import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixElement } from '../helix-element.js'
 
@@ -50,6 +51,10 @@ export declare class WithOpenInterface {
  *
  * The kebab-case `open-change` event maps to an `onOpenChange` React prop
  * through the wrapper generator, so the event name is public API.
+ *
+ * Sets `data-open` on the host whenever the element is open, in either mode.
+ * Styled tiers should select on that rather than on `[open]`, which is absent
+ * for uncontrolled consumers.
  */
 export const WithOpen = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from WithOpenInterface deliberately. The interface is
@@ -87,6 +92,24 @@ export const WithOpen = <T extends Constructor<HelixElement>>(Base: T) => {
     override connectedCallback(): void {
       super.connectedCallback()
       this.internalOpen = this.defaultOpen
+      this.reflectResolvedState()
+    }
+
+    /**
+     * Mirrors the resolved state onto the host as `data-open`.
+     *
+     * `open` only reflects in controlled mode, so styling on `:host([open])`
+     * silently does nothing for uncontrolled consumers. Presentation needs one
+     * selector that is true whenever the element is actually open, in either
+     * mode.
+     */
+    private reflectResolvedState(): void {
+      this.toggleAttribute('data-open', this.isOpen)
+    }
+
+    protected override willUpdate(changed: PropertyValues): void {
+      super.willUpdate(changed)
+      this.reflectResolvedState()
     }
 
     /**

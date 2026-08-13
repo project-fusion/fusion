@@ -23,7 +23,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Disclosures let users show and hide a section of related content.\n\nThe headless tier owns structure, accessibility wiring, and state. It ships\nno CSS and references no tokens: styling is the styled tier's job. Consumers\nwho want to bring their own styling entirely can use this tier directly.\n\n`open`, `defaultOpen`, `isOpen`, and `setOpen` come from the `WithOpen` mixin\nand resolve into this component's manifest automatically, because\n`@helix-io/core` publishes one and the analyzer runs with\n`dependencies: true`.\n\nThe event is declared here rather than inferred. It is dispatched through a\ngeneric helper, and the analyzer can only record the parameter identifier of\na dynamic dispatch, not the name it resolves to at runtime.",
+          "description": "Disclosures let users show and hide a section of related content.\n\nThe headless tier owns structure, accessibility wiring, and state. It ships\nno CSS and references no tokens: styling is the styled tier's job. Consumers\nwho want to bring their own styling entirely can use this tier directly.\n\n`open`, `defaultOpen`, `isOpen`, and `setOpen` come from the `WithOpen` mixin\nand resolve into this component's manifest automatically, because\n`@helix-io/core` publishes one and the analyzer runs with\n`dependencies: true`.\n\nContent stays mounted when closed and is hidden by the styled tier's CSS.\nUnmounting it made an open/close transition impossible, and `hidden` is\n`display: none`, which cannot transition either. `inert` keeps closed content\nout of the tab order and the accessibility tree without removing it from the\nbox tree.\n\nThe event is declared here rather than inferred. It is dispatched through a\ngeneric helper, and the analyzer can only record the parameter identifier of\na dynamic dispatch, not the name it resolves to at runtime.",
           "name": "HelixDisclosureBase",
           "slots": [
             {
@@ -103,6 +103,21 @@
               "readonly": true,
               "type": {
                 "text": "boolean"
+              },
+              "inheritedFrom": {
+                "name": "WithOpen",
+                "module": "src/mixins/with-open.ts"
+              }
+            },
+            {
+              "description": "Mirrors the resolved state onto the host as `data-open`.\n\n`open` only reflects in controlled mode, so styling on `:host([open])`\nsilently does nothing for uncontrolled consumers. Presentation needs one\nselector that is true whenever the element is actually open, in either\nmode.",
+              "kind": "method",
+              "name": "reflectResolvedState",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
               },
               "inheritedFrom": {
                 "name": "WithOpen",

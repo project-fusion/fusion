@@ -1,6 +1,5 @@
-import type { HelixManifest, Plugin } from '../types.js'
+import type { HelixContext, HelixManifest, Plugin } from '../types.js'
 import { eachComponent } from '../types.js'
-
 /**
  * Converts a kebab-case event name to its React prop.
  *
@@ -27,8 +26,11 @@ export const toReactProp = (eventName: string): string => {
  */
 export const reactEvents = (): Plugin => ({
   name: 'helix-react-events',
-  packageLinkPhase({ customElementsManifest }) {
-    for (const { declaration } of eachComponent(customElementsManifest as HelixManifest)) {
+  packageLinkPhase({ context, customElementsManifest }) {
+    for (const { declaration } of eachComponent(
+      customElementsManifest as HelixManifest,
+      context as HelixContext,
+    )) {
       for (const event of declaration.events ?? []) {
         event.reactProp = toReactProp(event.name)
       }

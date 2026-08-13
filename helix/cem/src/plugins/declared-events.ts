@@ -1,6 +1,5 @@
-import type { HelixManifest, Plugin } from '../types.js'
+import type { HelixContext, HelixManifest, Plugin } from '../types.js'
 import { eachComponent } from '../types.js'
-
 /**
  * Drops events the analyzer inferred rather than ones we declared.
  *
@@ -19,8 +18,11 @@ import { eachComponent } from '../types.js'
  */
 export const declaredEvents = (): Plugin => ({
   name: 'helix-declared-events',
-  packageLinkPhase({ customElementsManifest }) {
-    for (const { declaration } of eachComponent(customElementsManifest as HelixManifest)) {
+  packageLinkPhase({ context, customElementsManifest }) {
+    for (const { declaration } of eachComponent(
+      customElementsManifest as HelixManifest,
+      context as HelixContext,
+    )) {
       if (!declaration.events) {
         continue
       }

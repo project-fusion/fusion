@@ -3,12 +3,27 @@ import { createHelixCemConfig } from './index.js'
 import { conventionLint } from './plugins/convention-lint.js'
 import { helixTier } from './plugins/helix-tier.js'
 import { reactEvents, toReactProp } from './plugins/react-events.js'
-import type { HelixDeclaration, HelixManifest } from './types.js'
+import type { HelixContext, HelixDeclaration, HelixManifest } from './types.js'
+
+/** The component root, which every real Helix class descends from. */
+const ROOT: HelixDeclaration = {
+  description: 'Base class for every Helix element.',
+  kind: 'class',
+  name: 'HelixElement',
+}
 
 const manifest = (declaration: Partial<HelixDeclaration>): HelixManifest => ({
   modules: [
     {
-      declarations: [{ kind: 'class', name: 'HelixThing', ...declaration }],
+      declarations: [
+        ROOT,
+        {
+          kind: 'class',
+          name: 'HelixThing',
+          superclass: { name: 'HelixElement' },
+          ...declaration,
+        },
+      ],
       path: 'src/thing.ts',
     },
   ],
@@ -22,8 +37,20 @@ const run = (plugin: ReturnType<typeof helixTier>, customElementsManifest: Helix
   })
 }
 
-const first = (pkg: HelixManifest): HelixDeclaration =>
-  pkg.modules?.[0]?.declarations?.[0] ?? { name: 'missing' }
+const runWith = (
+  plugin: ReturnType<typeof helixTier>,
+  customElementsManifest: HelixManifest,
+  context: HelixContext,
+): void => {
+  plugin.packageLinkPhase?.({
+    context: context as never,
+    customElementsManifest: customElementsManifest as never,
+    ts: {} as never,
+  })
+}
+
+const subject = (pkg: HelixManifest): HelixDeclaration =>
+  pkg.modules?.[0]?.declarations?.find((d) => d.name === 'HelixThing') ?? { name: 'missing' }
 
 describe('toReactProp', () => {
   test('converts kebab-case to an on-prefixed camel prop', () => {
@@ -40,7 +67,7 @@ describe('helixTier', () => {
   test('stamps registered custom elements', () => {
     const pkg = manifest({ customElement: true, tagName: 'helix-thing' })
     run(helixTier('styled'), pkg)
-    expect(first(pkg).helix?.tier).toBe('styled')
+    expect(subject(pkg).helix?.tier).toBe('styled')
   })
 
   // The headless tier carries no @customElement decorator, so keying on
@@ -48,7 +75,7 @@ describe('helixTier', () => {
   test('stamps unregistered classes too', () => {
     const pkg = manifest({})
     run(helixTier('headless'), pkg)
-    expect(first(pkg).helix?.tier).toBe('headless')
+    expect(subject(pkg).helix?.tier).toBe('headless')
   })
 })
 
@@ -56,7 +83,7 @@ describe('reactEvents', () => {
   test('annotates each event with its generated React prop', () => {
     const pkg = manifest({ events: [{ description: 'Fired on change.', name: 'open-change' }] })
     run(reactEvents(), pkg)
-    expect(first(pkg).events?.[0]?.reactProp).toBe('onOpenChange')
+    expect(subject(pkg).events?.[0]?.reactProp).toBe('onOpenChange')
   })
 })
 
@@ -118,6 +145,72 @@ describe('conventionLint', () => {
         manifest({ members: [{ kind: 'field', name: 'x' }] }),
       ),
     ).not.toThrow()
+  })
+})
+
+describe('component predicate', () => {
+  // Keying on `kind === 'class'` linted and stamped every exported class,
+  // which is correct only until a package exports one that is not a component.
+  test('ignores a class that does not descend from HelixElement', () => {
+    const pkg: HelixManifest = {
+      modules: [
+        {
+          declarations: [
+            ROOT,
+            { kind: 'class', name: 'UrlBuilder' },
+            { kind: 'class', name: 'WithOpenInterface' },
+          ],
+          path: 'src/util.ts',
+        },
+      ],
+    }
+
+    run(helixTier('styled'), pkg)
+    const stamped = (pkg.modules?.[0]?.declarations ?? [])
+      .filter((d) => d.helix?.tier)
+      .map((d) => d.name)
+
+    expect(stamped).toEqual(['HelixElement'])
+  })
+
+  test('resolves the chain through a dependency manifest', () => {
+    const dependency: HelixManifest = {
+      modules: [{ declarations: [ROOT], path: 'src/index.ts' }],
+    }
+    const pkg: HelixManifest = {
+      modules: [
+        {
+          declarations: [
+            { kind: 'class', name: 'HelixThing', superclass: { name: 'HelixElement' } },
+          ],
+          path: 'src/thing.ts',
+        },
+      ],
+    }
+
+    // Without the dependency's manifest the base is unresolvable, so the
+    // component looks unrelated to HelixElement and is skipped entirely.
+    run(helixTier('styled'), pkg)
+    expect(subject(pkg).helix).toBeUndefined()
+
+    runWith(helixTier('styled'), pkg, { thirdPartyCEMs: [dependency] })
+    expect(subject(pkg).helix?.tier).toBe('styled')
+  })
+
+  test('terminates on a superclass cycle', () => {
+    const pkg: HelixManifest = {
+      modules: [
+        {
+          declarations: [
+            { kind: 'class', name: 'A', superclass: { name: 'B' } },
+            { kind: 'class', name: 'B', superclass: { name: 'A' } },
+          ],
+          path: 'src/cycle.ts',
+        },
+      ],
+    }
+
+    expect(() => run(helixTier('styled'), pkg)).not.toThrow()
   })
 })
 

@@ -62,12 +62,20 @@ export const createHelixCemConfig = ({
 
 export { toReactProp } from './plugins/react-events.js'
 export type {
+  HelixContext,
   HelixDeclaration,
   HelixEvent,
+  HelixManifest,
   HelixMetadata,
   Plugin,
   Violation,
 } from './types.js'
-export { eachComponent, isComponent, isCustomElement } from './types.js'
+export {
+  COMPONENT_ROOT,
+  classIndex,
+  descendsFrom,
+  eachComponent,
+  isCustomElement,
+} from './types.js'
 export type { ConventionLintOptions }
 export { conventionLint, declaredEvents, helixTier, reactEvents }
