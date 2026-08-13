@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hasPart, hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -17,6 +17,8 @@ describe('app header server output', () => {
     expect(markup).toContain('<helix-app-header')
     expect(withoutStyles(markup)).toContain('role="banner"')
     expect(withoutStyles(markup)).toContain('<slot name="brand">')
+    // The banner is full width and the row inside it is what centres.
+    expect(hasPart(markup, 'content')).toBe(true)
   })
 
   test('ships un-scrolled, which is what a fresh load shows', () => {

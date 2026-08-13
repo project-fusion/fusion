@@ -43,8 +43,11 @@ export class FocusTrapController implements ReactiveController {
     const delegating = [...this.container.querySelectorAll<HTMLElement>('*')].filter(
       (node) => node.shadowRoot?.delegatesFocus === true,
     )
+    // `getClientRects()` rather than `offsetParent`, which is null for anything
+    // inside a `position: fixed` container. A drawer is exactly that, so the
+    // offsetParent test excluded every control in the thing being trapped.
     return [...new Set([...found, ...delegating])].filter(
-      (node) => node.offsetParent !== null || node === document.activeElement,
+      (node) => node.getClientRects().length > 0,
     )
   }
 

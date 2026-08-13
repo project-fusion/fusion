@@ -1,27 +1,15 @@
 'use client'
 
-import '@helix-io/web/accordion'
-import '@helix-io/web/app-header'
-import '@helix-io/web/button'
-import '@helix-io/web/callout'
-import '@helix-io/web/card'
-import '@helix-io/web/divider'
-import '@helix-io/web/icon'
-import '@helix-io/web/tag'
+import '@helix-io/web'
 
 /**
- * Registers every Helix element used by the app.
+ * Registers every Helix element the site uses.
  *
- * A custom element registers as a side effect of importing its module, and that
- * import has to be in the client graph to ever run. A server component's
- * imports do not ship to the browser, so this is a client component and it is
- * the only one: rendering `<helix-card>` in JSX needs no client boundary of its
- * own, because an unregistered tag is just an unknown element in the HTML that
- * upgrades the moment the definition lands.
- *
- * That keeps pages as server components, which is the point of the App Router.
- *
- * Renders nothing. It exists for its imports.
+ * A custom element registers as a side effect of importing its module, and a
+ * server component's imports never reach the browser. This is the only client
+ * component on the site: pages stay server components, because an unregistered
+ * tag is an unknown element in the HTML that upgrades when the definition
+ * lands.
  */
 export function HelixElements(): null {
   return null
