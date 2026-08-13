@@ -38,7 +38,7 @@ const TRIGGER_ID = 'trigger'
  * @csspart content - The revealed region.
  * @csspart content-inner - Padding wrapper inside the animated region.
  *
- * @event {HelixOpenChangeEvent} helix-open-change - Fired when the disclosure opens or closes.
+ * @event {HelixOpenChangeEvent} OpenChange - Fired when the disclosure opens or closes.
  */
 @customElement('helix-base-disclosure')
 export class HelixBaseDisclosure extends WithOpen(HelixElement) {

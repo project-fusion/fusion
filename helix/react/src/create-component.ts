@@ -22,7 +22,7 @@ const useIsomorphicLayoutEffect = typeof document === 'undefined' ? useEffect : 
 export interface ComponentDefinition {
   /**
    * Custom event names the element dispatches, mapped to their React prop.
-   * `{ 'helix-open-change': 'onHelixOpenChange' }`.
+   * `{ OpenChange: 'onOpenChange' }`.
    */
   events: Record<string, string>
 
@@ -52,7 +52,7 @@ export interface BaseProps extends HTMLAttributes<HTMLElement> {}
  * Two things React does not do for custom elements, and this does:
  *
  * **Custom events.** React binds only event names it recognizes.
- * `helix-open-change` is not one, so `onHelixOpenChange` is attached with
+ * `OpenChange` is not one, so `onOpenChange` is attached with
  * `addEventListener` and the callback receives the event itself, typed as the
  * component's own `CustomEvent` subclass, so `event.detail` is typed.
  *

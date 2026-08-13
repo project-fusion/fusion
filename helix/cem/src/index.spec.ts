@@ -63,13 +63,15 @@ const subject = (pkg: HelixManifest): HelixDeclaration =>
   pkg.modules?.[0]?.declarations?.find((d) => d.name === 'HelixThing') ?? { name: 'missing' }
 
 describe('toReactProp', () => {
-  test('converts kebab-case to an on-prefixed camel prop', () => {
-    expect(toReactProp('helix-open-change')).toBe('onHelixOpenChange')
-    expect(toReactProp('value-change-complete')).toBe('onValueChangeComplete')
+  test('prefixes the event name verbatim', () => {
+    expect(toReactProp('OpenChange')).toBe('onOpenChange')
+    expect(toReactProp('ValueChangeComplete')).toBe('onValueChangeComplete')
   })
 
-  test('handles a single-word event', () => {
-    expect(toReactProp('toggle')).toBe('onToggle')
+  // React listens for the remainder of the prop character for character, so a
+  // transformed name binds an event nobody dispatches.
+  test('does not transform the name', () => {
+    expect(toReactProp('value-change')).toBe('onvalue-change')
   })
 })
 
@@ -92,10 +94,10 @@ describe('helixTier', () => {
 describe('reactEvents', () => {
   test('annotates each event with its generated React prop', () => {
     const pkg = manifest({
-      events: [{ description: 'Fired on change.', name: 'helix-open-change' }],
+      events: [{ description: 'Fired on change.', name: 'OpenChange' }],
     })
     run(reactEvents(), pkg)
-    expect(subject(pkg).events?.[0]?.reactProp).toBe('onHelixOpenChange')
+    expect(subject(pkg).events?.[0]?.reactProp).toBe('onOpenChange')
   })
 })
 
@@ -131,7 +133,7 @@ describe('conventionLint', () => {
     expect(
       lintOf({
         cssParts: [{ description: 'The wrapper.', name: 'container' }],
-        events: [{ description: 'Fired on change.', name: 'helix-open-change' }],
+        events: [{ description: 'Fired on change.', name: 'OpenChange' }],
         members: [{ description: 'Whether it is open.', kind: 'field', name: 'open' }],
       }),
     ).not.toThrow()
@@ -148,11 +150,17 @@ describe('conventionLint', () => {
   })
 
   test('rejects an undocumented event', () => {
-    expect(lintOf({ events: [{ name: 'helix-open-change' }] })).toThrow(/documented-event/)
+    expect(lintOf({ events: [{ name: 'OpenChange' }] })).toThrow(/documented-event/)
   })
 
-  test('rejects a non-kebab event name', () => {
-    expect(lintOf({ events: [{ description: 'x', name: 'openChange' }] })).toThrow(/kebab-events/)
+  test('rejects an event name that is not PascalCase', () => {
+    expect(lintOf({ events: [{ description: 'x', name: 'open-change' }] })).toThrow(/pascal-events/)
+  })
+
+  // `Change` would be bound by React's `onChange`, which is already wired to
+  // the native change event, so ours would never fire.
+  test('rejects a single-word event name', () => {
+    expect(lintOf({ events: [{ description: 'x', name: 'Change' }] })).toThrow(/compound-events/)
   })
 
   test('rejects an undocumented CSS part', () => {

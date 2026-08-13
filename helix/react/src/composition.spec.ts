@@ -110,18 +110,18 @@ describe('wrapper prop surface', () => {
 
   test('an event callback receives the typed detail', () => {
     const props: DisclosureProps = {
-      onHelixOpenChange: (event) => {
+      onOpenChange: (event) => {
         const open: boolean = event.detail.open
         return open
       },
     }
-    expect(props.onHelixOpenChange).toBeDefined()
+    expect(props.onOpenChange).toBeDefined()
   })
 
   test('rejects a handler that assumes the wrong detail shape', () => {
     const props: DisclosureProps = {
       // @ts-expect-error `detail` carries `open`, not `expanded`.
-      onHelixOpenChange: (event) => event.detail.expanded,
+      onOpenChange: (event) => event.detail.expanded,
     }
     expect(props).toBeDefined()
   })

@@ -4,8 +4,8 @@
  * A named class rather than `dispatchEvent(new CustomEvent(name, …))` for three
  * reasons, all of them about the type reaching a consumer:
  *
- * 1. `@event {HelixOpenChangeEvent} helix-open-change` puts the class name in
- *    the manifest, which is what lets the React generator emit a typed callback
+ * 1. `@event {HelixOpenChangeEvent} OpenChange` puts the class name in the
+ *    manifest, which is what lets the React generator emit a typed callback
  *    instead of `(detail: unknown)`.
  * 2. The augmentation of `HTMLElementEventMap` below types `addEventListener`
  *    for consumers writing plain HTML, who never see the React wrappers.
@@ -14,20 +14,30 @@
  */
 
 /**
- * Every event name is prefixed `helix-`.
+ * Event names are PascalCase.
  *
  * Events dispatched inside a shadow root are retargeted to look like they came
- * from the host, so an unprefixed name is indistinguishable from a native event
- * escaping a component's internals: a `<helix-input>` wrapping an `<input>`
- * would emit an `input` event that is not ours. The prefix also keeps React
- * from binding its own synthetic handler, which it does for any `on*` prop
- * whose name it recognizes.
+ * from the host, so a name that could collide with a native event is
+ * indistinguishable from one escaping a component's internals: a
+ * `<helix-input>` wrapping an `<input>` emits an `input` event that is not ours.
  *
- * The React prop keeps the prefix for the same reason: `onInput` would attach
- * React's listener, `onHelixInput` cannot.
+ * **Every native event name is lowercase**, so PascalCase cannot collide with
+ * one. That is the same protection a `helix-` prefix gives, achieved by casing.
+ *
+ * It also decides the React prop, which is not a separate choice: React strips
+ * `on` and uses the remainder verbatim, so `OpenChange` is `onOpenChange` and
+ * `helix-open-change` would have been `onhelix-open-change`.
+ *
+ * Two rules follow:
+ *
+ * 1. **Never a bare native name.** `Change` would be reached by React's
+ *    `onChange`, which its synthetic system has already claimed for the native
+ *    `change` event, so ours would never fire.
+ * 2. **Always compound.** `ValueChange`, `CheckedChange`, `OpenChange`. No
+ *    React synthetic handler is named for any of them.
  */
 
-/** Detail carried by `helix-open-change`. */
+/** Detail carried by `OpenChange`. */
 export interface OpenChangeDetail {
   /** The state the element is moving to. */
   open: boolean
@@ -35,7 +45,7 @@ export interface OpenChangeDetail {
 
 /** Fired when an element's open state changes, in either mode. */
 export class HelixOpenChangeEvent extends CustomEvent<OpenChangeDetail> {
-  static readonly eventName = 'helix-open-change'
+  static readonly eventName = 'OpenChange'
 
   constructor(detail: OpenChangeDetail) {
     super(HelixOpenChangeEvent.eventName, {
@@ -49,6 +59,6 @@ export class HelixOpenChangeEvent extends CustomEvent<OpenChangeDetail> {
 
 declare global {
   interface HTMLElementEventMap {
-    'helix-open-change': HelixOpenChangeEvent
+    OpenChange: HelixOpenChangeEvent
   }
 }

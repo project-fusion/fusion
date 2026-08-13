@@ -22,11 +22,11 @@ export interface BaseDisclosureProps extends BaseProps {
   /** Whether the element is open. Setting this enters controlled mode. */
   open?: boolean
   /** Fired when the disclosure opens or closes. */
-  onHelixOpenChange?: (event: HelixOpenChangeEvent) => void
+  onOpenChange?: (event: HelixOpenChangeEvent) => void
 }
 
 export const BaseDisclosureRoot = createComponent<HelixBaseDisclosure, BaseDisclosureProps>({
-  events: { 'helix-open-change': 'onHelixOpenChange' },
+  events: { OpenChange: 'onOpenChange' },
   properties: ['defaultOpen', 'open'],
   tagName: 'helix-base-disclosure',
 })

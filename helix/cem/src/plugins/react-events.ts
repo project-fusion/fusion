@@ -1,19 +1,16 @@
 import type { HelixContext, HelixManifest, Plugin } from '../types.js'
 import { eachComponent } from '../types.js'
 /**
- * Converts a kebab-case event name to its React prop.
+ * The React prop for an event.
  *
- * `open-change` becomes `onOpenChange`, matching what
- * `@wc-toolkit/react-wrappers` generates.
+ * `on` plus the event name **verbatim**, because that is exactly what React
+ * does: it strips `on` from the prop and listens for the remainder, character
+ * for character. Transforming the name here would produce a prop that binds an
+ * event nobody dispatches, which is indistinguishable from doing nothing.
+ *
+ * Event names are PascalCase, so `OpenChange` becomes `onOpenChange`.
  */
-export const toReactProp = (eventName: string): string => {
-  const pascal = eventName
-    .split('-')
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('')
-  return `on${pascal}`
-}
+export const toReactProp = (eventName: string): string => `on${eventName}`
 
 /**
  * Records the React prop name generated for each event.

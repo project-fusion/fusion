@@ -112,19 +112,26 @@ Only `@summary` is native CEM; the rest reach the manifest through
 `helix-metadata`. A `@status experimental` that lives only in a comment cannot
 badge a docs page or warn a consumer.
 
-Events are declared, never inferred, and **every name is prefixed `helix-`**:
+Events are declared, never inferred, and **names are PascalCase and compound**:
 
 ```ts
-@event {HelixOpenChangeEvent} helix-open-change - Fired when it opens.
+@event {HelixOpenChangeEvent} OpenChange - Fired when it opens.
 ```
 
-The prefix is not cosmetic. Events dispatched inside a shadow root are
-retargeted to look like they came from the host, so an unprefixed name is
-indistinguishable from a native event escaping a component's internals: a
-`<helix-input>` wrapping an `<input>` would emit an `input` event that is not
-ours. The React prop keeps the prefix for a second reason: React binds its own
-synthetic listener for any `on*` name it recognizes, so `onInput` would attach
-React's handler while `onHelixInput` cannot.
+Two rules, both enforced by `helix-convention-lint`:
+
+**PascalCase.** Events dispatched inside a shadow root are retargeted to look
+like they came from the host, so a name that could collide with a native event
+is indistinguishable from one escaping a component's internals. Every native
+event name is lowercase, so casing alone makes that collision impossible. This
+is the protection a `helix-` prefix used to provide.
+
+**Compound.** React strips `on` from a prop and listens for the remainder
+verbatim, so the event name decides the React API: `OpenChange` is
+`onOpenChange`. A single word is unreachable, because React's synthetic system
+has already claimed the prop: an event named `Change` would be bound by
+`onChange`, which React wires to the native `change`, so ours would never fire.
+`ValueChange`, `CheckedChange`, `OpenChange`.
 
 The type in braces is what lets the React generator emit
 `(event: HelixOpenChangeEvent) => void` instead of `(detail: unknown)`. Each
@@ -149,18 +156,16 @@ with no shadow root and arrives unstyled until the bundle upgrades it.
 makes this type-safe: `appearance="wrong"` is an error rather than a silent
 no-op. Consumers reference `@helix-io/web/jsx`.
 
-**React 19 binds custom events natively.** It strips `on` from the prop and uses
-the remainder verbatim as the event name, so the React prop is not a choice: it
-falls out of the event name.
+**React 19 binds custom events natively.** It strips `on` from the prop and
+listens for the remainder verbatim, so the React prop is not a separate choice:
+it falls out of the event name.
 
 ```tsx
-<helix-disclosure onhelix-open-change={(event) => setOpen(event.detail.open)}>
+<helix-disclosure onOpenChange={(event) => setOpen(event.detail.open)}>
 ```
 
-`onHelixOpenChange` also binds, to an event named `HelixOpenChange` that nothing
-dispatches, which is indistinguishable from doing nothing. The generated JSX
-types reject it, and reject a wrong `detail` field, so both mistakes are caught
-at compile time rather than at runtime.
+The generated JSX types reject a wrong prop name and a wrong `detail` field, so
+both mistakes are compile errors rather than silent no-ops.
 
 **The state mixin owns the event.** `WithOpen` dispatches
 `HelixOpenChangeEvent` from `setOpen`, so property, default, and change event

@@ -118,12 +118,31 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
             `${declaration.name}:${event.name}`,
             'Event has no description. Events are public API.',
           )
+          // React strips `on` from a prop and uses the remainder verbatim as
+          // the event name, so the name decides the React API. Two rules:
+          //
+          // PascalCase, because every native event name is lowercase, so
+          // casing alone makes a collision with one impossible. That matters
+          // because an event from inside a shadow root is retargeted to look
+          // like it came from the host.
+          //
+          // Compound, because a single word is reachable through a React
+          // synthetic handler that has already claimed it: an event named
+          // `Change` would be bound by `onChange`, which React wires to the
+          // native `change`, so ours would never fire.
           check(
-            event.name === event.name.toLowerCase() && !event.name.includes('_'),
-            'kebab-events',
+            /^[A-Z][A-Za-z0-9]*$/.test(event.name),
+            'pascal-events',
             path,
             `${declaration.name}:${event.name}`,
-            'Event names must be kebab-case so React prop generation is predictable.',
+            'Event names must be PascalCase, which cannot collide with a native event.',
+          )
+          check(
+            (event.name.match(/[A-Z]/g) ?? []).length >= 2,
+            'compound-events',
+            path,
+            `${declaration.name}:${event.name}`,
+            'Event names must be compound (OpenChange, not Change), or a React synthetic handler claims the prop.',
           )
         }
 

@@ -90,7 +90,7 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'helix-open-change'"
+              "default": "'OpenChange'"
             }
           ],
           "superclass": {
