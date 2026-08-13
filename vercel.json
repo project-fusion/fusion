@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bunx turbo run build --filter=@fusion-io/sandbox-ui...",
+  "framework": "nextjs",
+  "installCommand": "bun install",
+  "outputDirectory": "sandbox/ui/.next"
+}

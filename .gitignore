@@ -34,3 +34,5 @@ helix/*/elements.css
 
 # Generated sandbox page.
 sandbox/ui/dist/
+.vercel
+.env*

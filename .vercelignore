@@ -1,0 +1,23 @@
+# What the sandbox build does not need.
+#
+# The deploy runs from the repo root, because sandbox/ui is a workspace package
+# and its dependencies are built from source. That would otherwise upload the
+# whole company: strategy, the planning documents have no part
+# in building a component sandbox, so they do not leave the machine.
+# Leading slash matters: `docs/` is a gitignore-style pattern and would also
+# match `cortex/docs` and `helix/docs`, which are workspace members. Excluding
+# those breaks `bun install` before the build starts.
+/docs/
+
+# Build output and scratch, rebuilt on Vercel anyway.
+.claude/
+.local/
+target/
+**/.next/
+**/.turbo/
+**/dist/
+**/node_modules/
+
+# Rust, which nothing in this project builds.
+Cargo.lock
+Cargo.toml
