@@ -150,10 +150,24 @@ makes this type-safe: `appearance="wrong"` is an error rather than a silent
 no-op. Consumers reference `@helix-io/web/jsx`.
 
 **React 19 binds custom events natively.** It strips `on` from the prop and uses
-the remainder verbatim as the event name, so `onhelix-open-change` listens for
-`helix-open-change`. `onHelixOpenChange` also binds, to an event named
-`HelixOpenChange` that nothing dispatches, which looks identical to doing
-nothing. Use the exact event name; the generated types already do.
+the remainder verbatim as the event name, so the React prop is not a choice: it
+falls out of the event name.
+
+```tsx
+<helix-disclosure onhelix-open-change={(event) => setOpen(event.detail.open)}>
+```
+
+`onHelixOpenChange` also binds, to an event named `HelixOpenChange` that nothing
+dispatches, which is indistinguishable from doing nothing. The generated JSX
+types reject it, and reject a wrong `detail` field, so both mistakes are caught
+at compile time rather than at runtime.
+
+**The state mixin owns the event.** `WithOpen` dispatches
+`HelixOpenChangeEvent` from `setOpen`, so property, default, and change event
+are one unit that cannot be half-adopted: a component cannot take the mixin and
+forget to announce the change. `WithChecked` ships `helix-checked-change`,
+`WithValue` ships `helix-value-change`, and so on. Controllers own behavior, not
+component-facing events, unless they own the state that changed.
 
 That leaves `@helix-io/react` with no job. It is held pending Wave 3 rather than
 kept.
