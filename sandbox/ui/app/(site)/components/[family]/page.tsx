@@ -8,8 +8,9 @@ import { type ApiMember, families, findFamily } from '../../../../lib/catalog'
  * sandbox answers what it looks like. A reference that starts collecting
  * pictures stops being the place you can trust to be complete.
  *
- * The tables are still native `<table>`. A Table family is next; until it
- * exists, a real table beats a grid of divs pretending to be one.
+ * Tables are `helix-table`, a grid rather than a `<table>`: every column lines
+ * up across rows while each row stays a real element. The roles are declared,
+ * because a grid of divs is not a table to anything reading it.
  */
 
 export function generateStaticParams() {
@@ -25,29 +26,27 @@ function ApiTable({ caption, rows }: { caption: string; rows: ApiMember[] }) {
       <helix-text size="xs" tone="subtle" weight="semibold">
         {caption.toUpperCase()}
       </helix-text>
-      <table className="apiTable">
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.name}>
-              <td>
-                <helix-text mono size="xs" tone="primary">
-                  {row.name || '(default)'}
+      <helix-table columns="minmax(10rem, 18rem) minmax(0, 1fr)" label={caption}>
+        {rows.map((row) => (
+          <helix-table-row key={row.name}>
+            <helix-table-cell>
+              <helix-text mono size="xs" tone="primary">
+                {row.name || '(default)'}
+              </helix-text>
+              {row.type && (
+                <helix-text block mono size="xs" tone="subtle">
+                  {row.type}
                 </helix-text>
-                {row.type && (
-                  <helix-text block mono size="xs" tone="subtle">
-                    {row.type}
-                  </helix-text>
-                )}
-              </td>
-              <td>
-                <helix-text size="sm" tone="muted">
-                  {row.description.split('\n\n')[0]}
-                </helix-text>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              )}
+            </helix-table-cell>
+            <helix-table-cell>
+              <helix-text size="sm" tone="muted">
+                {row.description.split('\n\n')[0]}
+              </helix-text>
+            </helix-table-cell>
+          </helix-table-row>
+        ))}
+      </helix-table>
     </helix-flex>
   )
 }

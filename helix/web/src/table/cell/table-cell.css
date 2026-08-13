@@ -1,0 +1,16 @@
+:host {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  color: var(--helix-color-foreground-muted);
+  display: block;
+  font-size: var(--helix-text-sm);
+  min-inline-size: 0;
+  padding: var(--helix-space-xs) var(--helix-space-md) var(--helix-space-xs) var(--helix-space-none);
+}
+
+:host([header]) {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-wide);
+  text-transform: uppercase;
+}

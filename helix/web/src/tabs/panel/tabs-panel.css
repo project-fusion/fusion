@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+[part="panel"] {
+  min-inline-size: 0;
+  outline: none;
+  padding-block-start: var(--helix-space-md);
+}
+
+[part="panel"][hidden] {
+  display: none;
+}

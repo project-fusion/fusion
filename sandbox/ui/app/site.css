@@ -42,21 +42,6 @@
   white-space: pre-line;
 }
 
-.apiTable {
-  border-collapse: collapse;
-  inline-size: 100%;
-}
-
-.apiTable td {
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  padding: var(--helix-space-xs) var(--helix-space-md) var(--helix-space-xs) 0;
-  vertical-align: top;
-}
-
-.apiTable td:first-child {
-  inline-size: 16rem;
-}
-
 /* ─────────────────────────────────────────────────────── sandbox */
 
 /* The tool owns the viewport. `dvh` rather than `vh`, so mobile browser chrome
@@ -97,36 +82,31 @@
   overflow: hidden;
 }
 
-.sourcePane {
+/* The tabs own the pane, and the active panel takes the height left over, so
+   the editor fills its side of the split rather than sitting at its minimum. */
+.sourceTabs {
   block-size: 100%;
+  display: flex;
+  flex-direction: column;
   min-block-size: 0;
 }
 
-.paneTabs {
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  flex: 0 0 auto;
-}
-
-.paneTabs button {
-  background: none;
-  border: none;
-  border-block-end: var(--helix-border-thick) solid transparent;
-  color: var(--helix-color-foreground-subtle);
-  cursor: pointer;
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
-  padding: var(--helix-space-xs) var(--helix-space-sm);
-  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-.paneTabs button[aria-selected="true"] {
-  border-block-end-color: var(--helix-color-primary);
-  color: var(--helix-color-foreground);
-}
-
-.sourcePane helix-sandbox-source {
+.sourceTabs::part(panels) {
   flex: 1 1 auto;
   min-block-size: 0;
+}
+
+.sourceTabs helix-tabs-panel[selected] {
+  block-size: 100%;
+}
+
+.sourceTabs helix-tabs-panel::part(panel) {
+  block-size: 100%;
+  padding-block-start: 0;
+}
+
+.sourceTabs helix-sandbox-source {
+  block-size: 100%;
 }
 
 .examplesRail {
@@ -150,10 +130,6 @@
     position: static;
   }
 
-  .railToggle {
-    display: inline-flex;
-  }
-
   /* The header has to fit a phone. The path is the first thing to go: it
      repeats what the tree already shows, and the actions are the only part
      that cannot be recovered from elsewhere. */
@@ -165,33 +141,7 @@
     padding-inline: var(--helix-space-sm);
   }
 
-  /* One column, and the rail slides over the sandbox rather than taking width
-     from it. A 15rem rail on a 375px screen leaves nothing to preview in. */
   .workbenchBody {
     grid-template-columns: minmax(0, 1fr);
-    position: relative;
-  }
-
-  .examplesRail {
-    background-color: var(--helix-color-surface);
-    border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-    inline-size: min(18rem, 80vw);
-    inset-block: 0;
-    inset-inline-end: 0;
-    position: absolute;
-    transform: translateX(100%);
-    transition: transform var(--helix-duration-normal) var(--helix-easing-decelerate);
-    z-index: var(--helix-layer-overlay);
-  }
-
-  [data-rail-open="true"] .examplesRail {
-    box-shadow: var(--helix-shadow-lg);
-    transform: translateX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .examplesRail {
-    transition: none;
   }
 }

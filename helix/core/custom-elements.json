@@ -384,6 +384,30 @@
       "exports": [
         {
           "kind": "js",
+          "name": "DismissController",
+          "declaration": {
+            "name": "DismissController",
+            "module": "./controllers/dismiss.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "DismissOptions",
+          "declaration": {
+            "name": "DismissOptions",
+            "module": "./controllers/dismiss.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FocusTrapController",
+          "declaration": {
+            "name": "FocusTrapController",
+            "module": "./controllers/focus-trap.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "createSheet",
           "declaration": {
             "name": "createSheet",
@@ -492,6 +516,206 @@
           "declaration": {
             "name": "WithOpenInterface",
             "module": "./mixins/with-open.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/controllers/dismiss.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Closes an overlay on Escape or on a pointer press outside it.\n\nBoth, because they are different intentions with the same meaning: Escape is\nthe keyboard's way out and clicking away is the pointer's, and an overlay\nthat honours only one is one half its readers cannot dismiss.\n\nThe outside press is watched on `pointerdown` rather than `click`, so a press\nthat starts outside and drags across the overlay still counts as leaving\nrather than as interacting.",
+          "name": "DismissController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "host",
+              "type": {
+                "text": "ReactiveControllerHost & HTMLElement"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "host"
+            },
+            {
+              "kind": "field",
+              "name": "onDismiss",
+              "type": {
+                "text": "() => void"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "onDismiss"
+            },
+            {
+              "kind": "field",
+              "name": "active",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerDown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "activate",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Starts listening."
+            },
+            {
+              "kind": "method",
+              "name": "deactivate",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Stops listening."
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DismissController",
+          "declaration": {
+            "name": "DismissController",
+            "module": "src/controllers/dismiss.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/controllers/focus-trap.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Keeps Tab inside a container while it is open, and gives focus back after.\n\nA dialog that does not trap focus is one a keyboard user tabs straight out\nof, into a page they cannot see and cannot get back from. Restoring focus on\nrelease matters just as much: without it, closing a drawer drops the reader\nat the top of the document.",
+          "name": "FocusTrapController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "container",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "previous",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "focusable",
+              "type": {
+                "text": "HTMLElement[]"
+              },
+              "privacy": "private",
+              "description": "Everything inside the container the reader can reach with Tab.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "deepActiveElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element | null"
+                }
+              },
+              "description": "The truly focused element, following shadow roots down."
+            },
+            {
+              "kind": "method",
+              "name": "activate",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "container",
+                  "type": {
+                    "text": "HTMLElement"
+                  }
+                }
+              ],
+              "description": "Starts trapping, remembering where focus came from."
+            },
+            {
+              "kind": "method",
+              "name": "deactivate",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Stops trapping and returns focus to wherever it was."
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FocusTrapController",
+          "declaration": {
+            "name": "FocusTrapController",
+            "module": "src/controllers/focus-trap.ts"
           }
         }
       ]

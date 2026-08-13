@@ -1,0 +1,62 @@
+:host {
+  display: inline-flex;
+
+  --_icon-button-size: var(--icon-button-size, var(--helix-size-control));
+}
+
+:host([size="sm"]) {
+  --_icon-button-size: var(--icon-button-size, var(--helix-size-control-dense));
+}
+
+:host([size="lg"]) {
+  --_icon-button-size: var(--icon-button-size, var(--helix-size-control-large));
+}
+
+/* Square by construction: one dimension for both axes, so the control stays a
+   circle-of-influence around the glyph rather than drifting wider as the icon
+   changes. */
+[part="button"] {
+  align-items: center;
+  background-color: transparent;
+  block-size: var(--_icon-button-size);
+  border: var(--helix-border-thin) solid transparent;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--_icon-button-size);
+  justify-content: center;
+  padding: var(--helix-space-none);
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="button"]:hover {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+[part="button"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host([appearance="primary"]) [part="button"] {
+  background-color: var(--helix-color-primary);
+  color: var(--helix-color-foreground-on-accent);
+}
+
+:host([appearance="neutral"]) [part="button"] {
+  background-color: var(--helix-color-surface);
+  border-color: var(--helix-color-border);
+}
+
+:host([appearance="danger"]) [part="button"] {
+  color: var(--helix-color-danger);
+}
+
+:host([disabled]) [part="button"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

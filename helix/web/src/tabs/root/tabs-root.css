@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+[part="tabs"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-2xs);
+  overflow-x: auto;
+}
+
+[part="panels"] {
+  min-inline-size: 0;
+}

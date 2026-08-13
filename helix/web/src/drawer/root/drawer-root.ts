@@ -1,0 +1,45 @@
+import { customElement } from '@helix-io/core'
+import { HelixBaseDrawer } from '@helix-io/headless'
+import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
+import { styles } from './drawer-root.css.js'
+
+/**
+ * @summary A panel that slides in from an edge.
+ *
+ * @description
+ * The panel translates and the scrim fades, both on transform and opacity only,
+ * which is the one place motion is allowed to carry the work: the surface at
+ * rest is flat and the movement is what says something happened.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @aliases Sheet, Sidebar, Panel, Off-canvas
+ * @documentation https://helix.fusion.dev/components/drawer
+ *
+ * @slot - The drawer's content.
+ * @slot header - Content pinned above the scrolling area.
+ *
+ * @csspart scrim - The cover over the page behind.
+ * @csspart panel - The sliding panel.
+ * @csspart header - The header region.
+ * @csspart content - The scrolling content region.
+ *
+ * @event {HelixOpenChangeEvent} OpenChange - Fired when the drawer opens or closes.
+ *
+ * @cssproperty --drawer-size - Width or height of the panel.
+ */
+@customElement('helix-drawer')
+export class HelixDrawer extends HelixBaseDrawer {
+  /** Removes the panel's own surface, for a drawer inside another surface. */
+  @property({ reflect: true })
+  appearance: 'surface' | 'plain' = 'surface'
+
+  static override styles: CSSResultGroup = styles
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'helix-drawer': HelixDrawer
+  }
+}

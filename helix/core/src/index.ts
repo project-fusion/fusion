@@ -1,3 +1,5 @@
+export { DismissController, type DismissOptions } from './controllers/dismiss.js'
+export { FocusTrapController } from './controllers/focus-trap.js'
 export { createSheet } from './create-sheet.js'
 export { customElement } from './custom-element.js'
 export {

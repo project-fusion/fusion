@@ -1,0 +1,13 @@
+:host {
+  display: inline-flex;
+}
+
+[part="toolbar"] {
+  align-items: center;
+  display: flex;
+  gap: var(--toolbar-gap, var(--helix-space-2xs));
+}
+
+:host([orientation="vertical"]) [part="toolbar"] {
+  flex-direction: column;
+}
