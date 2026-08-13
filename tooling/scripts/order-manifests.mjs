@@ -44,7 +44,7 @@ const PRIORITY = [
  */
 const CONDITIONS = ['types', 'browser', 'node', 'import', 'require', 'module', 'default']
 
-const IGNORED = new Set(['.git', '.local', '.turbo', 'dist', 'node_modules', 'target'])
+const IGNORED = new Set(['.git', '.local', '.next', '.turbo', 'dist', 'node_modules', 'target'])
 
 const sortByList = (obj, list) => {
   const rest = Object.keys(obj)

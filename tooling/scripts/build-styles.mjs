@@ -20,7 +20,7 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
-const IGNORED = new Set(['.git', '.local', '.turbo', 'dist', 'node_modules', 'target'])
+const IGNORED = new Set(['.git', '.local', '.next', '.turbo', 'dist', 'node_modules', 'target'])
 
 /** The styles package ships raw CSS to consumers; it has no components. */
 const SKIP = /helix[/\\]styles[/\\]/
