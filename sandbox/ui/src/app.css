@@ -1,0 +1,314 @@
+/* Sandbox chrome. Reads Helix tokens like any other consumer, so the sandbox
+   itself is a test of whether the token layer is usable from outside. */
+
+body {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  min-block-size: 100vh;
+}
+
+#sidebar {
+  background-color: var(--helix-color-surface-sunken);
+  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  overflow-y: auto;
+  padding: var(--helix-space-md);
+  position: sticky;
+  inset-block-start: 0;
+  block-size: 100vh;
+}
+
+#brand {
+  align-items: baseline;
+  display: flex;
+  gap: var(--helix-space-xs);
+  margin-block-end: var(--helix-space-sm);
+}
+
+#brand strong {
+  font-size: var(--helix-text-lg);
+  letter-spacing: var(--helix-tracking-tight);
+}
+
+#brand span {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+}
+
+#search {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  font: inherit;
+  font-size: var(--helix-text-sm);
+  inline-size: 100%;
+  margin-block-end: var(--helix-space-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+.aliases {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  margin-block-start: var(--helix-space-xs);
+}
+
+a.chip {
+  text-decoration: none;
+}
+
+#nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+#nav h4 {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-wide);
+  margin-block: var(--helix-space-sm) var(--helix-space-2xs);
+  text-transform: uppercase;
+}
+
+#nav a {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  text-decoration: none;
+}
+
+#nav a:hover {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+#nav a.active {
+  background-color: var(--helix-color-primary-subtle);
+  color: var(--helix-color-primary);
+  font-weight: var(--helix-weight-medium);
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-lg);
+  max-inline-size: 64rem;
+  padding: var(--helix-space-xl);
+}
+
+#topbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#theme {
+  background: none;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+}
+
+#meta h2 {
+  font-size: var(--helix-text-2xl);
+}
+
+.chips {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs);
+  margin-block-start: var(--helix-space-xs);
+}
+
+.chips code {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+}
+
+.chip {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  padding: 0 var(--helix-space-xs);
+}
+
+/* Stage labels are honest here too: experimental is stated, never softened. */
+.chip-experimental {
+  border-color: var(--helix-color-warning);
+  color: var(--helix-color-warning);
+}
+
+.chip-stable {
+  border-color: var(--helix-color-success);
+  color: var(--helix-color-success);
+}
+
+.summary {
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-lg);
+  margin-block-start: var(--helix-space-sm);
+}
+
+.description {
+  color: var(--helix-color-foreground-muted);
+  margin-block-start: var(--helix-space-sm);
+  max-inline-size: 60ch;
+  white-space: pre-line;
+}
+
+/* The preview sits on the page background rather than a surface, so a
+   component's own surface color is visible as a distinct layer. */
+#stage {
+  align-items: center;
+  background-color: var(--helix-color-background);
+  border: var(--helix-border-thin) dashed var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  display: flex;
+  min-block-size: 10rem;
+  padding: var(--helix-space-lg);
+}
+
+#stage[data-wrapper="block"] > * {
+  inline-size: 100%;
+}
+
+#stage[data-wrapper="inline"] {
+  justify-content: center;
+}
+
+.panels {
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.panel h3,
+#reference h3 {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-wide);
+  margin-block-end: var(--helix-space-sm);
+  text-transform: uppercase;
+}
+
+.control {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  margin-block-end: var(--helix-space-md);
+}
+
+.control label {
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+}
+
+.control input[type="text"],
+.control select {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  font: inherit;
+  font-size: var(--helix-text-sm);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+.control input[type="checkbox"] {
+  inline-size: fit-content;
+}
+
+.hint {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+}
+
+.empty {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+}
+
+#snippet {
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  display: block;
+  font-size: var(--helix-text-xs);
+  overflow-x: auto;
+  padding: var(--helix-space-sm);
+  white-space: pre;
+}
+
+#log {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  max-block-size: 12rem;
+  overflow-y: auto;
+}
+
+.logLine {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-sm);
+  padding-block: var(--helix-space-2xs);
+}
+
+.logLine code {
+  color: var(--helix-color-primary);
+}
+
+/* Its own class rather than a bare type selector: `#brand span` also matches
+   `span` at a higher specificity, and two unrelated rules competing over one
+   element type is how a later edit breaks an earlier one. */
+.logDetail {
+  color: var(--helix-color-foreground-subtle);
+}
+
+#reference section {
+  margin-block-end: var(--helix-space-lg);
+}
+
+#reference table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+#reference td {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  font-size: var(--helix-text-sm);
+  padding: var(--helix-space-xs) var(--helix-space-sm) var(--helix-space-xs) 0;
+  vertical-align: top;
+}
+
+#reference td:first-child {
+  inline-size: 16rem;
+}
+
+#reference code {
+  color: var(--helix-color-primary);
+  font-size: var(--helix-text-xs);
+}
+
+@media (max-width: 60rem) {
+  body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #sidebar {
+    block-size: auto;
+    position: static;
+  }
+}

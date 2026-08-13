@@ -46,6 +46,7 @@
     "cortex/docs",
     "helix/*",
     "marketing/*",
+    "sandbox/*",
     "tooling/*"
   ]
 }

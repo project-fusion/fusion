@@ -1,0 +1,43 @@
+:host {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--breadcrumbs-gap, var(--helix-space-2xs));
+}
+
+[part="separator"] {
+  color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-subtle));
+  display: inline-flex;
+  user-select: none;
+}
+
+/* Each item draws the separator that precedes it, and the first one hides it.
+   Structural pseudo-classes are valid inside `:host()`, unlike `:has()`, so
+   this needs no index, no parent coordination, and no JavaScript.
+
+   After the base rule, not before it: an override that only works because it
+   happens to set a different property is one edit away from silently losing. */
+:host(:first-child) [part="separator"] {
+  display: none;
+}
+
+[part="link"] {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  text-decoration: none;
+}
+
+a[part="link"]:hover {
+  color: var(--helix-color-primary);
+  text-decoration: underline;
+}
+
+[part="link"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The current page reads as where you are, not as somewhere you can go. */
+:host([current]) [part="link"] {
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-medium);
+}

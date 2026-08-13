@@ -60,6 +60,22 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/avatar/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/breadcrumbs/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/button/index.js"
           }
         },
@@ -107,36 +123,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/button/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/button/root/button-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/app-header/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/app-header/root/app-header-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/accordion/index.ts",
       "declarations": [],
       "exports": [
@@ -154,6 +140,21 @@
           "declaration": {
             "name": "*",
             "module": "src/accordion/root/accordion-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/avatar/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/avatar/root/avatar-root.js"
           }
         }
       ]
@@ -190,7 +191,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/icon/index.ts",
+      "path": "src/app-header/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -198,7 +199,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/icon/root/icon-root.js"
+            "module": "src/app-header/root/app-header-root.js"
           }
         }
       ]
@@ -220,6 +221,59 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/button/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/button/root/button-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/breadcrumbs/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/breadcrumbs/item/breadcrumbs-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/breadcrumbs/root/breadcrumbs-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/icon/root/icon-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/tag/index.ts",
       "declarations": [],
       "exports": [
@@ -229,394 +283,6 @@
           "declaration": {
             "name": "*",
             "module": "src/tag/root/tag-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/button/root/button-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Renders a real `<button>`, or an `<a>` when `href` is set, so activation,\nfocus, and the browser's own affordances come from the platform rather than\nfrom key handlers. `delegatesFocus` puts focus on that inner control, and it\nserializes into the server's markup, so the button is keyboard reachable\nbefore any JavaScript loads.\n\nForm submission is explicit. A `<button type=\"submit\">` inside a shadow root\nsubmits nothing, because the form is on the other side of the boundary, so\nthe inner control is always `type=\"button\"` and this element calls\n`requestSubmit()` on its form instead. That routes through validation, unlike\n`submit()`.",
-          "name": "HelixBaseButton",
-          "cssParts": [
-            {
-              "description": "The inner button or anchor.",
-              "name": "button"
-            }
-          ],
-          "slots": [
-            {
-              "description": "The button's label.",
-              "name": ""
-            },
-            {
-              "description": "Content before the label, usually an icon.",
-              "name": "start"
-            },
-            {
-              "description": "Content after the label.",
-              "name": "end"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "type",
-              "type": {
-                "text": "'button' | 'submit' | 'reset'"
-              },
-              "default": "'button'",
-              "description": "What activating the button does to its form.",
-              "attribute": "type"
-            },
-            {
-              "kind": "field",
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Navigates to this URL instead of acting on a form.",
-              "attribute": "href"
-            },
-            {
-              "kind": "field",
-              "name": "target",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Browsing context for `href`, such as `_blank`.",
-              "attribute": "target"
-            },
-            {
-              "kind": "field",
-              "name": "rel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Relationship of the linked URL, defaulted when `target` opens a new tab.",
-              "attribute": "rel"
-            },
-            {
-              "kind": "field",
-              "name": "shadowRootOptions",
-              "type": {
-                "text": "ShadowRootInit"
-              },
-              "static": true,
-              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
-              "description": "Moves focus to the inner control, so the host is never the focus target."
-            },
-            {
-              "kind": "field",
-              "name": "resolvedRel",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "description": "`rel` as sent, including the safety default.\n\nA new browsing context gets `noreferrer noopener` unless the consumer said\notherwise, because without it the opened page can reach back through\n`window.opener`.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleClick",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "formAssociated",
-              "type": {
-                "text": "boolean"
-              },
-              "static": true,
-              "readonly": true,
-              "default": "true",
-              "description": "Opts the element into form ownership, labels, and submission.",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's form-facing API.\n\nAvailable during server rendering too: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
-              "attribute": "disabled",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "form",
-              "type": {
-                "text": "HTMLFormElement | null"
-              },
-              "description": "The form this control belongs to, if any.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "labels",
-              "type": {
-                "text": "NodeList"
-              },
-              "description": "Labels associated with this control.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "type",
-              "type": {
-                "text": "'button' | 'submit' | 'reset'"
-              },
-              "default": "'button'",
-              "description": "What activating the button does to its form.",
-              "fieldName": "type"
-            },
-            {
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Navigates to this URL instead of acting on a form.",
-              "fieldName": "href"
-            },
-            {
-              "name": "target",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Browsing context for `href`, such as `_blank`.",
-              "fieldName": "target"
-            },
-            {
-              "name": "rel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Relationship of the linked URL, defaulted when `target` opens a new tab.",
-              "fieldName": "rel"
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
-              "fieldName": "disabled",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixFormElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Triggers an action, submits a form, or navigates.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/button",
-            "tier": "headless",
-            "group": "BaseButton",
-            "part": "Root"
-          },
-          "tagName": "helix-base-button",
-          "customElement": true,
-          "modulePath": "src/button/root/button-root.ts",
-          "definitionPath": "src/button/root/button-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseButton",
-          "declaration": {
-            "name": "HelixBaseButton",
-            "module": "src/button/root/button-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-button",
-          "declaration": {
-            "name": "HelixBaseButton",
-            "module": "src/button/root/button-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/app-header/root/app-header-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Tracks whether the page has scrolled and reflects it as `data-scrolled`, so\nthe styled tier can lift the bar off the page without a scroll handler of its\nown. Scroll position is the one piece of state the server genuinely cannot\nknow, so it is read on connect rather than derived: a fresh load starts at\nthe top, which is what the server rendered, and a reload part-way down\ncorrects on hydration.\n\nThe listener is passive and reads `scrollY` only, so it never blocks\nscrolling.\n\nBrand and actions are bare slots. `<nav>` keeps its wrapper because it is a\nlandmark the navigation needs whether or not anything is in it; the other two\nare `display: contents` when unassigned and cost nothing.",
-          "name": "HelixBaseAppHeader",
-          "cssParts": [
-            {
-              "description": "The banner itself.",
-              "name": "bar"
-            },
-            {
-              "description": "The navigation region.",
-              "name": "nav"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Wordmark or logo, at the inline start.",
-              "name": "brand"
-            },
-            {
-              "description": "Primary navigation.",
-              "name": ""
-            },
-            {
-              "description": "Trailing actions, such as a call to action.",
-              "name": "actions"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "handleScroll",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Page-level banner holding brand, navigation, and actions.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/app-header",
-            "aliases": [
-              "Masthead",
-              "Navbar",
-              "TopBar"
-            ],
-            "tier": "headless",
-            "group": "BaseAppHeader",
-            "part": "Root"
-          },
-          "tagName": "helix-base-app-header",
-          "customElement": true,
-          "modulePath": "src/app-header/root/app-header-root.ts",
-          "definitionPath": "src/app-header/root/app-header-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseAppHeader",
-          "declaration": {
-            "name": "HelixBaseAppHeader",
-            "module": "src/app-header/root/app-header-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-app-header",
-          "declaration": {
-            "name": "HelixBaseAppHeader",
-            "module": "src/app-header/root/app-header-root.ts"
           }
         }
       ]
@@ -1018,6 +684,185 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/avatar/root/avatar-root.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "initialsOf",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Initials for a name: first letter of the first and last words.\n\nA pure function of the name, so the server and the client agree without\neither of them measuring anything."
+        },
+        {
+          "kind": "class",
+          "description": "The fallback is the reason this is an element. An image that fails to load\nleaves a broken icon and no name, so the avatar listens for the error and\nfalls back to initials derived from `name`.\n\n`name` is required for the accessible name whether or not there is an image,\nbecause an avatar with no name tells a screen-reader user nothing. Initials\nare hidden from assistive technology: they are a visual shorthand for the\nname that is already announced, and would otherwise be read out letter by\nletter after it.",
+          "name": "HelixBaseAvatar",
+          "cssParts": [
+            {
+              "description": "The avatar body.",
+              "name": "avatar"
+            },
+            {
+              "description": "The image, when one is loading or loaded.",
+              "name": "image"
+            },
+            {
+              "description": "The initials shown when there is no usable image.",
+              "name": "initials"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Replaces the image and initials entirely, for an icon.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Image to show. Falls back to initials if it fails to load.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name of the person or entity. Used for the label and the initials.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "failed",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the image failed.\n\nState rather than a property: it is the element's own observation, not\nsomething a consumer sets, and it starts false on the server because the\nserver cannot know whether an image will load."
+            },
+            {
+              "kind": "field",
+              "name": "handleError",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Image to show. Falls back to initials if it fails to load.",
+              "fieldName": "src"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name of the person or entity. Used for the label and the initials.",
+              "fieldName": "name"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Represents a person or entity with an image or their initials.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/avatar",
+            "aliases": [
+              "Profile picture",
+              "Gravatar"
+            ],
+            "tier": "headless",
+            "group": "BaseAvatar",
+            "part": "Root"
+          },
+          "tagName": "helix-base-avatar",
+          "customElement": true,
+          "modulePath": "src/avatar/root/avatar-root.ts",
+          "definitionPath": "src/avatar/root/avatar-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "initialsOf",
+          "declaration": {
+            "name": "initialsOf",
+            "module": "src/avatar/root/avatar-root.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBaseAvatar",
+          "declaration": {
+            "name": "HelixBaseAvatar",
+            "module": "src/avatar/root/avatar-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-avatar",
+          "declaration": {
+            "name": "HelixBaseAvatar",
+            "module": "src/avatar/root/avatar-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/callout/root/callout-root.ts",
       "declarations": [
         {
@@ -1244,6 +1089,636 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/app-header/root/app-header-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Tracks whether the page has scrolled and reflects it as `data-scrolled`, so\nthe styled tier can lift the bar off the page without a scroll handler of its\nown. Scroll position is the one piece of state the server genuinely cannot\nknow, so it is read on connect rather than derived: a fresh load starts at\nthe top, which is what the server rendered, and a reload part-way down\ncorrects on hydration.\n\nThe listener is passive and reads `scrollY` only, so it never blocks\nscrolling.\n\nBrand and actions are bare slots. `<nav>` keeps its wrapper because it is a\nlandmark the navigation needs whether or not anything is in it; the other two\nare `display: contents` when unassigned and cost nothing.",
+          "name": "HelixBaseAppHeader",
+          "cssParts": [
+            {
+              "description": "The banner itself.",
+              "name": "bar"
+            },
+            {
+              "description": "The navigation region.",
+              "name": "nav"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Wordmark or logo, at the inline start.",
+              "name": "brand"
+            },
+            {
+              "description": "Primary navigation.",
+              "name": ""
+            },
+            {
+              "description": "Trailing actions, such as a call to action.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Page-level banner holding brand, navigation, and actions.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/app-header",
+            "aliases": [
+              "Masthead",
+              "Navbar",
+              "TopBar"
+            ],
+            "tier": "headless",
+            "group": "BaseAppHeader",
+            "part": "Root"
+          },
+          "tagName": "helix-base-app-header",
+          "customElement": true,
+          "modulePath": "src/app-header/root/app-header-root.ts",
+          "definitionPath": "src/app-header/root/app-header-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseAppHeader",
+          "declaration": {
+            "name": "HelixBaseAppHeader",
+            "module": "src/app-header/root/app-header-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-app-header",
+          "declaration": {
+            "name": "HelixBaseAppHeader",
+            "module": "src/app-header/root/app-header-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/button/root/button-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders a real `<button>`, or an `<a>` when `href` is set, so activation,\nfocus, and the browser's own affordances come from the platform rather than\nfrom key handlers. `delegatesFocus` puts focus on that inner control, and it\nserializes into the server's markup, so the button is keyboard reachable\nbefore any JavaScript loads.\n\nForm submission is explicit. A `<button type=\"submit\">` inside a shadow root\nsubmits nothing, because the form is on the other side of the boundary, so\nthe inner control is always `type=\"button\"` and this element calls\n`requestSubmit()` on its form instead. That routes through validation, unlike\n`submit()`.",
+          "name": "HelixBaseButton",
+          "cssParts": [
+            {
+              "description": "The inner button or anchor.",
+              "name": "button"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The button's label.",
+              "name": ""
+            },
+            {
+              "description": "Content before the label, usually an icon.",
+              "name": "start"
+            },
+            {
+              "description": "Content after the label.",
+              "name": "end"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "What activating the button does to its form.",
+              "attribute": "type"
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Navigates to this URL instead of acting on a form.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Browsing context for `href`, such as `_blank`.",
+              "attribute": "target"
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Relationship of the linked URL, defaulted when `target` opens a new tab.",
+              "attribute": "rel"
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
+              "description": "Moves focus to the inner control, so the host is never the focus target."
+            },
+            {
+              "kind": "field",
+              "name": "resolvedRel",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "`rel` as sent, including the safety default.\n\nA new browsing context gets `noreferrer noopener` unless the consumer said\notherwise, because without it the opened page can reach back through\n`window.opener`.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleClick",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's form-facing API.\n\nAvailable during server rendering too: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "What activating the button does to its form.",
+              "fieldName": "type"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Navigates to this URL instead of acting on a form.",
+              "fieldName": "href"
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Browsing context for `href`, such as `_blank`.",
+              "fieldName": "target"
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Relationship of the linked URL, defaulted when `target` opens a new tab.",
+              "fieldName": "rel"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixFormElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Triggers an action, submits a form, or navigates.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/button",
+            "tier": "headless",
+            "group": "BaseButton",
+            "part": "Root"
+          },
+          "tagName": "helix-base-button",
+          "customElement": true,
+          "modulePath": "src/button/root/button-root.ts",
+          "definitionPath": "src/button/root/button-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseButton",
+          "declaration": {
+            "name": "HelixBaseButton",
+            "module": "src/button/root/button-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-button",
+          "declaration": {
+            "name": "HelixBaseButton",
+            "module": "src/button/root/button-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/breadcrumbs/item/breadcrumbs-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An element rather than a slot because it carries API of its own: `href`,\nwhether it is the current page, and the separator that precedes it.\n\nEach item renders its own separator and hides it with `:host(:first-child)`,\nso the trail needs no index and no coordination from the parent. Structural\npseudo-classes are allowed inside `:host()`, unlike `:has()`, and this was\nverified in a browser before being relied on.\n\nThe current page is a `<span>`, not a link. Linking a page to itself is a\nknown screen-reader annoyance, and `aria-current=\"page\"` is what actually\nconveys position.",
+          "name": "HelixBaseBreadcrumbsItem",
+          "cssParts": [
+            {
+              "description": "The separator preceding the item.",
+              "name": "separator"
+            },
+            {
+              "description": "The item's link, or its text when current.",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The item's label.",
+              "name": ""
+            },
+            {
+              "description": "Replaces the separator shown before this item.",
+              "name": "separator"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the step leads. Ignored when the item is the current page.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item is the page the reader is on.",
+              "attribute": "current",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the step leads. Ignored when the item is the current page.",
+              "fieldName": "href"
+            },
+            {
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item is the page the reader is on.",
+              "fieldName": "current"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One step in a breadcrumb trail.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/breadcrumbs",
+            "aliases": [
+              "Crumb"
+            ],
+            "tier": "headless",
+            "group": "BaseBreadcrumbs",
+            "part": "Item"
+          },
+          "tagName": "helix-base-breadcrumbs-item",
+          "customElement": true,
+          "modulePath": "src/breadcrumbs/item/breadcrumbs-item.ts",
+          "definitionPath": "src/breadcrumbs/item/breadcrumbs-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseBreadcrumbsItem",
+          "declaration": {
+            "name": "HelixBaseBreadcrumbsItem",
+            "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-breadcrumbs-item",
+          "declaration": {
+            "name": "HelixBaseBreadcrumbsItem",
+            "module": "src/breadcrumbs/item/breadcrumbs-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/divider/root/divider-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The separator role lives on the rule inside the shadow root rather than on\nthe host. A role does not need to cross the shadow boundary the way an IDREF\ndoes, and putting it on the rendered element means the semantics are in the\nserver's markup with no attribute written during a lifecycle the server never\nruns.\n\nUse `orientation=\"vertical\"` between items on one line, such as inside a\ntoolbar. A vertical divider stretches to its flex parent rather than setting\na height of its own.",
+          "name": "HelixBaseDivider",
+          "cssParts": [
+            {
+              "description": "The rule itself.",
+              "name": "line"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Which way the rule runs.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Which way the rule runs.",
+              "fieldName": "orientation"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Separates content into groups with a rule.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/divider",
+            "aliases": [
+              "Separator",
+              "Rule"
+            ],
+            "tier": "headless",
+            "group": "BaseDivider",
+            "part": "Root"
+          },
+          "tagName": "helix-base-divider",
+          "customElement": true,
+          "modulePath": "src/divider/root/divider-root.ts",
+          "definitionPath": "src/divider/root/divider-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseDivider",
+          "declaration": {
+            "name": "HelixBaseDivider",
+            "module": "src/divider/root/divider-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-divider",
+          "declaration": {
+            "name": "HelixBaseDivider",
+            "module": "src/divider/root/divider-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/icon/root/icon-root.ts",
       "declarations": [
         {
@@ -1369,29 +1844,38 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/divider/root/divider-root.ts",
+      "path": "src/breadcrumbs/root/breadcrumbs-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "The separator role lives on the rule inside the shadow root rather than on\nthe host. A role does not need to cross the shadow boundary the way an IDREF\ndoes, and putting it on the rendered element means the semantics are in the\nserver's markup with no attribute written during a lifecycle the server never\nruns.\n\nUse `orientation=\"vertical\"` between items on one line, such as inside a\ntoolbar. A vertical divider stretches to its flex parent rather than setting\na height of its own.",
-          "name": "HelixBaseDivider",
+          "description": "A navigation landmark wrapping a list. `role=\"list\"` is set explicitly on the\n`<ol>` even though it is already a list: removing the markers with\n`list-style: none` strips list semantics in Safari, and a breadcrumb trail\nalways removes its markers.\n\nItems are slotted rather than wrapped, so they are `<ol>` children in the flat\ntree and each carries `role=\"listitem\"` itself.",
+          "name": "HelixBaseBreadcrumbs",
           "cssParts": [
             {
-              "description": "The rule itself.",
-              "name": "line"
+              "description": "The navigation landmark.",
+              "name": "nav"
+            },
+            {
+              "description": "The ordered list.",
+              "name": "list"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The trail's items, in order from root to current page.",
+              "name": ""
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "orientation",
+              "name": "label",
               "type": {
-                "text": "'horizontal' | 'vertical'"
+                "text": "string"
               },
-              "default": "'horizontal'",
-              "description": "Which way the rule runs.",
-              "attribute": "orientation",
-              "reflects": true
+              "default": "'Breadcrumb'",
+              "description": "Accessible name for the landmark.\n\nNamed rather than left bare because a page may hold more than one\nnavigation, and landmarks are how a screen-reader user chooses between them.",
+              "attribute": "label"
             },
             {
               "kind": "method",
@@ -1421,53 +1905,53 @@
           ],
           "attributes": [
             {
-              "name": "orientation",
+              "name": "label",
               "type": {
-                "text": "'horizontal' | 'vertical'"
+                "text": "string"
               },
-              "default": "'horizontal'",
-              "description": "Which way the rule runs.",
-              "fieldName": "orientation"
+              "default": "'Breadcrumb'",
+              "description": "Accessible name for the landmark.\n\nNamed rather than left bare because a page may hold more than one\nnavigation, and landmarks are how a screen-reader user chooses between them.",
+              "fieldName": "label"
             }
           ],
           "superclass": {
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "Separates content into groups with a rule.",
+          "summary": "Shows the path to the current page.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/divider",
+            "documentation": "https://helix.fusion.dev/components/breadcrumbs",
             "aliases": [
-              "Separator",
-              "Rule"
+              "Breadcrumb",
+              "Crumbs"
             ],
             "tier": "headless",
-            "group": "BaseDivider",
+            "group": "BaseBreadcrumbs",
             "part": "Root"
           },
-          "tagName": "helix-base-divider",
+          "tagName": "helix-base-breadcrumbs",
           "customElement": true,
-          "modulePath": "src/divider/root/divider-root.ts",
-          "definitionPath": "src/divider/root/divider-root.ts"
+          "modulePath": "src/breadcrumbs/root/breadcrumbs-root.ts",
+          "definitionPath": "src/breadcrumbs/root/breadcrumbs-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseDivider",
+          "name": "HelixBaseBreadcrumbs",
           "declaration": {
-            "name": "HelixBaseDivider",
-            "module": "src/divider/root/divider-root.ts"
+            "name": "HelixBaseBreadcrumbs",
+            "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-divider",
+          "name": "helix-base-breadcrumbs",
           "declaration": {
-            "name": "HelixBaseDivider",
-            "module": "src/divider/root/divider-root.ts"
+            "name": "HelixBaseBreadcrumbs",
+            "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
           }
         }
       ]

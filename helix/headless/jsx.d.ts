@@ -3,6 +3,9 @@ import type {
   HelixBaseAccordion,
   HelixBaseAccordionItem,
   HelixBaseAppHeader,
+  HelixBaseAvatar,
+  HelixBaseBreadcrumbs,
+  HelixBaseBreadcrumbsItem,
   HelixBaseButton,
   HelixBaseCallout,
   HelixBaseCard,
@@ -11,6 +14,7 @@ import type {
   HelixBaseTag,
   HelixOpenChangeEvent,
   HelixRemoveRequestEvent,
+  initialsOf,
 } from '@helix-io/headless';
 
 /**
@@ -204,54 +208,6 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
-export type HelixBaseButtonProps = {
-  /** What activating the button does to its form. */
-  type?: HelixBaseButton["type"];
-  /** Navigates to this URL instead of acting on a form. */
-  href?: HelixBaseButton["href"];
-  /** Browsing context for `href`, such as `_blank`. */
-  target?: HelixBaseButton["target"];
-  /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
-  rel?: HelixBaseButton["rel"];
-  /** Whether the control is non-interactive.
-
-Reflected, because the styled tier selects on it, and mirrored to
-`aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
-  disabled?: HelixBaseButton["disabled"];
-};
-
-export type HelixBaseButtonSolidJsProps = {
-  /** What activating the button does to its form. */
-  "prop:type"?: HelixBaseButton["type"];
-  /** Navigates to this URL instead of acting on a form. */
-  "prop:href"?: HelixBaseButton["href"];
-  /** Browsing context for `href`, such as `_blank`. */
-  "prop:target"?: HelixBaseButton["target"];
-  /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
-  "prop:rel"?: HelixBaseButton["rel"];
-  /** Whether the control is non-interactive.
-
-Reflected, because the styled tier selects on it, and mirrored to
-`aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
-  "prop:disabled"?: HelixBaseButton["disabled"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseAppHeaderProps = {};
-
-export type HelixBaseAppHeaderSolidJsProps = {
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 /** `HelixBaseAccordionItem` component event */
 export type HelixBaseAccordionItemElementEvent<E = Event> = TypedEvent<
   HelixBaseAccordionItem,
@@ -304,6 +260,25 @@ export type HelixBaseAccordionSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixBaseAvatarProps = {
+  /** Image to show. Falls back to initials if it fails to load. */
+  src?: HelixBaseAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  name?: HelixBaseAvatar["name"];
+};
+
+export type HelixBaseAvatarSolidJsProps = {
+  /** Image to show. Falls back to initials if it fails to load. */
+  "prop:src"?: HelixBaseAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  "prop:name"?: HelixBaseAvatar["name"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixBaseCalloutProps = {
   /** What kind of attention the passage needs. */
   severity?: HelixBaseCallout["severity"];
@@ -322,6 +297,88 @@ export type HelixBaseCalloutSolidJsProps = {
 export type HelixBaseCardProps = {};
 
 export type HelixBaseCardSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseAppHeaderProps = {};
+
+export type HelixBaseAppHeaderSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseButtonProps = {
+  /** What activating the button does to its form. */
+  type?: HelixBaseButton["type"];
+  /** Navigates to this URL instead of acting on a form. */
+  href?: HelixBaseButton["href"];
+  /** Browsing context for `href`, such as `_blank`. */
+  target?: HelixBaseButton["target"];
+  /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
+  rel?: HelixBaseButton["rel"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixBaseButton["disabled"];
+};
+
+export type HelixBaseButtonSolidJsProps = {
+  /** What activating the button does to its form. */
+  "prop:type"?: HelixBaseButton["type"];
+  /** Navigates to this URL instead of acting on a form. */
+  "prop:href"?: HelixBaseButton["href"];
+  /** Browsing context for `href`, such as `_blank`. */
+  "prop:target"?: HelixBaseButton["target"];
+  /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
+  "prop:rel"?: HelixBaseButton["rel"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixBaseButton["disabled"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseBreadcrumbsItemProps = {
+  /** Where the step leads. Ignored when the item is the current page. */
+  href?: HelixBaseBreadcrumbsItem["href"];
+  /** Whether this item is the page the reader is on. */
+  current?: HelixBaseBreadcrumbsItem["current"];
+};
+
+export type HelixBaseBreadcrumbsItemSolidJsProps = {
+  /** Where the step leads. Ignored when the item is the current page. */
+  "prop:href"?: HelixBaseBreadcrumbsItem["href"];
+  /** Whether this item is the page the reader is on. */
+  "prop:current"?: HelixBaseBreadcrumbsItem["current"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseDividerProps = {
+  /** Which way the rule runs. */
+  orientation?: HelixBaseDivider["orientation"];
+};
+
+export type HelixBaseDividerSolidJsProps = {
+  /** Which way the rule runs. */
+  "prop:orientation"?: HelixBaseDivider["orientation"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -347,14 +404,20 @@ export type HelixBaseIconSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseDividerProps = {
-  /** Which way the rule runs. */
-  orientation?: HelixBaseDivider["orientation"];
+export type HelixBaseBreadcrumbsProps = {
+  /** Accessible name for the landmark.
+
+Named rather than left bare because a page may hold more than one
+navigation, and landmarks are how a screen-reader user chooses between them. */
+  label?: HelixBaseBreadcrumbs["label"];
 };
 
-export type HelixBaseDividerSolidJsProps = {
-  /** Which way the rule runs. */
-  "prop:orientation"?: HelixBaseDivider["orientation"];
+export type HelixBaseBreadcrumbsSolidJsProps = {
+  /** Accessible name for the landmark.
+
+Named rather than left bare because a page may hold more than one
+navigation, and landmarks are how a screen-reader user chooses between them. */
+  "prop:label"?: HelixBaseBreadcrumbs["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -429,87 +492,6 @@ only as `removelabel`, which nobody would guess and no linter would catch. */
 };
 
 export type CustomElements = {
-  /**
-   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
-   * focus, and the browser's own affordances come from the platform rather than
-   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
-   * serializes into the server's markup, so the button is keyboard reachable
-   * before any JavaScript loads.
-   *
-   * Form submission is explicit. A `<button type="submit">` inside a shadow root
-   * submits nothing, because the form is on the other side of the boundary, so
-   * the inner control is always `type="button"` and this element calls
-   * `requestSubmit()` on its form instead. That routes through validation, unlike
-   * `submit()`.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `type`: What activating the button does to its form.
-   * - `href`: Navigates to this URL instead of acting on a form.
-   * - `target`: Browsing context for `href`, such as `_blank`.
-   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
-   * - `end`: Content after the label.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `button`: The inner button or anchor.
-   */
-  "helix-base-button": Partial<
-    HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
-  >;
-
-  /**
-   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
-   * the styled tier can lift the bar off the page without a scroll handler of its
-   * own. Scroll position is the one piece of state the server genuinely cannot
-   * know, so it is read on connect rather than derived: a fresh load starts at
-   * the top, which is what the server rendered, and a reload part-way down
-   * corrects on hydration.
-   *
-   * The listener is passive and reads `scrollY` only, so it never blocks
-   * scrolling.
-   *
-   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
-   * landmark the navigation needs whether or not anything is in it; the other two
-   * are `display: contents` when unassigned and cost nothing.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `brand`: Wordmark or logo, at the inline start.
-   * - `(default)`: Primary navigation.
-   * - `actions`: Trailing actions, such as a call to action.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `bar`: The banner itself.
-   * - `nav`: The navigation region.
-   */
-  "helix-base-app-header": Partial<
-    HelixBaseAppHeaderProps & BaseProps<HelixBaseAppHeader> & BaseEvents
-  >;
-
   /**
    * Carries its own open state, which is why it is an element rather than a slot.
    * Used alone it is a disclosure, and that is deliberate: shipping a separate
@@ -603,6 +585,42 @@ export type CustomElements = {
   >;
 
   /**
+   * The fallback is the reason this is an element. An image that fails to load
+   * leaves a broken icon and no name, so the avatar listens for the error and
+   * falls back to initials derived from `name`.
+   *
+   * `name` is required for the accessible name whether or not there is an image,
+   * because an avatar with no name tells a screen-reader user nothing. Initials
+   * are hidden from assistive technology: they are a visual shorthand for the
+   * name that is already announced, and would otherwise be read out letter by
+   * letter after it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
+   */
+  "helix-base-avatar": Partial<
+    HelixBaseAvatarProps & BaseProps<HelixBaseAvatar> & BaseEvents
+  >;
+
+  /**
    * `severity` lives on the headless tier rather than being an `appearance` on the
    * styled one, because it is meaning and not decoration. It picks the icon and
    * that icon's accessible name, so a reader who cannot see that the box is red
@@ -668,30 +686,124 @@ export type CustomElements = {
   >;
 
   /**
-   * Icons are data rather than components, so the set is a plain record of path
-   * strings and this element is the only thing that knows how to draw one. A name
-   * with no match renders nothing at all instead of an empty box, so a typo
-   * cannot leave a hole in a layout that looks deliberate.
+   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
+   * the styled tier can lift the bar off the page without a scroll handler of its
+   * own. Scroll position is the one piece of state the server genuinely cannot
+   * know, so it is read on connect rather than derived: a fresh load starts at
+   * the top, which is what the server rendered, and a reload part-way down
+   * corrects on hydration.
    *
-   * An icon is decorative by default and hidden from assistive technology. Give
-   * it a `label` only when the icon is the sole carrier of meaning, such as
-   * inside a button with no text.
+   * The listener is passive and reads `scrollY` only, so it never blocks
+   * scrolling.
    *
-   * ## Attributes & Properties
+   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
+   * landmark the navigation needs whether or not anything is in it; the other two
+   * are `display: contents` when unassigned and cost nothing.
    *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   * ## Slots
    *
-   * - `name`: Name of the icon in the Helix set.
-   * - `label`: Accessible name, for an icon that is not decorative.
+   * Areas where markup can be added to the component.
+   *
+   * - `brand`: Wordmark or logo, at the inline start.
+   * - `(default)`: Primary navigation.
+   * - `actions`: Trailing actions, such as a call to action.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `svg`: The rendered SVG.
+   * - `bar`: The banner itself.
+   * - `nav`: The navigation region.
    */
-  "helix-base-icon": Partial<
-    HelixBaseIconProps & BaseProps<HelixBaseIcon> & BaseEvents
+  "helix-base-app-header": Partial<
+    HelixBaseAppHeaderProps & BaseProps<HelixBaseAppHeader> & BaseEvents
+  >;
+
+  /**
+   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
+   * focus, and the browser's own affordances come from the platform rather than
+   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
+   * serializes into the server's markup, so the button is keyboard reachable
+   * before any JavaScript loads.
+   *
+   * Form submission is explicit. A `<button type="submit">` inside a shadow root
+   * submits nothing, because the form is on the other side of the boundary, so
+   * the inner control is always `type="button"` and this element calls
+   * `requestSubmit()` on its form instead. That routes through validation, unlike
+   * `submit()`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-base-button": Partial<
+    HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
+  >;
+
+  /**
+   * An element rather than a slot because it carries API of its own: `href`,
+   * whether it is the current page, and the separator that precedes it.
+   *
+   * Each item renders its own separator and hides it with `:host(:first-child)`,
+   * so the trail needs no index and no coordination from the parent. Structural
+   * pseudo-classes are allowed inside `:host()`, unlike `:has()`, and this was
+   * verified in a browser before being relied on.
+   *
+   * The current page is a `<span>`, not a link. Linking a page to itself is a
+   * known screen-reader annoyance, and `aria-current="page"` is what actually
+   * conveys position.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `href`: Where the step leads. Ignored when the item is the current page.
+   * - `current`: Whether this item is the page the reader is on.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The item's label.
+   * - `separator`: Replaces the separator shown before this item.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `separator`: The separator preceding the item.
+   * - `link`: The item's link, or its text when current.
+   */
+  "helix-base-breadcrumbs-item": Partial<
+    HelixBaseBreadcrumbsItemProps &
+      BaseProps<HelixBaseBreadcrumbsItem> &
+      BaseEvents
   >;
 
   /**
@@ -719,6 +831,68 @@ export type CustomElements = {
    */
   "helix-base-divider": Partial<
     HelixBaseDividerProps & BaseProps<HelixBaseDivider> & BaseEvents
+  >;
+
+  /**
+   * Icons are data rather than components, so the set is a plain record of path
+   * strings and this element is the only thing that knows how to draw one. A name
+   * with no match renders nothing at all instead of an empty box, so a typo
+   * cannot leave a hole in a layout that looks deliberate.
+   *
+   * An icon is decorative by default and hidden from assistive technology. Give
+   * it a `label` only when the icon is the sole carrier of meaning, such as
+   * inside a button with no text.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `name`: Name of the icon in the Helix set.
+   * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rendered SVG.
+   */
+  "helix-base-icon": Partial<
+    HelixBaseIconProps & BaseProps<HelixBaseIcon> & BaseEvents
+  >;
+
+  /**
+   * A navigation landmark wrapping a list. `role="list"` is set explicitly on the
+   * `<ol>` even though it is already a list: removing the markers with
+   * `list-style: none` strips list semantics in Safari, and a breadcrumb trail
+   * always removes its markers.
+   *
+   * Items are slotted rather than wrapped, so they are `<ol>` children in the flat
+   * tree and each carries `role="listitem"` itself.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the landmark.
+   *
+   * Named rather than left bare because a page may hold more than one
+   * navigation, and landmarks are how a screen-reader user chooses between them.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The trail's items, in order from root to current page.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `nav`: The navigation landmark.
+   * - `list`: The ordered list.
+   */
+  "helix-base-breadcrumbs": Partial<
+    HelixBaseBreadcrumbsProps & BaseProps<HelixBaseBreadcrumbs> & BaseEvents
   >;
 
   /**
@@ -771,93 +945,6 @@ export type CustomElements = {
 };
 
 export type CustomElementsSolidJs = {
-  /**
-   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
-   * focus, and the browser's own affordances come from the platform rather than
-   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
-   * serializes into the server's markup, so the button is keyboard reachable
-   * before any JavaScript loads.
-   *
-   * Form submission is explicit. A `<button type="submit">` inside a shadow root
-   * submits nothing, because the form is on the other side of the boundary, so
-   * the inner control is always `type="button"` and this element calls
-   * `requestSubmit()` on its form instead. That routes through validation, unlike
-   * `submit()`.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `type`: What activating the button does to its form.
-   * - `href`: Navigates to this URL instead of acting on a form.
-   * - `target`: Browsing context for `href`, such as `_blank`.
-   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
-   * - `end`: Content after the label.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `button`: The inner button or anchor.
-   */
-  "helix-base-button": Partial<
-    HelixBaseButtonProps &
-      HelixBaseButtonSolidJsProps &
-      BaseProps<HelixBaseButton> &
-      BaseEvents
-  >;
-
-  /**
-   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
-   * the styled tier can lift the bar off the page without a scroll handler of its
-   * own. Scroll position is the one piece of state the server genuinely cannot
-   * know, so it is read on connect rather than derived: a fresh load starts at
-   * the top, which is what the server rendered, and a reload part-way down
-   * corrects on hydration.
-   *
-   * The listener is passive and reads `scrollY` only, so it never blocks
-   * scrolling.
-   *
-   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
-   * landmark the navigation needs whether or not anything is in it; the other two
-   * are `display: contents` when unassigned and cost nothing.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `brand`: Wordmark or logo, at the inline start.
-   * - `(default)`: Primary navigation.
-   * - `actions`: Trailing actions, such as a call to action.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `bar`: The banner itself.
-   * - `nav`: The navigation region.
-   */
-  "helix-base-app-header": Partial<
-    HelixBaseAppHeaderProps &
-      HelixBaseAppHeaderSolidJsProps &
-      BaseProps<HelixBaseAppHeader> &
-      BaseEvents
-  >;
-
   /**
    * Carries its own open state, which is why it is an element rather than a slot.
    * Used alone it is a disclosure, and that is deliberate: shipping a separate
@@ -957,6 +1044,45 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The fallback is the reason this is an element. An image that fails to load
+   * leaves a broken icon and no name, so the avatar listens for the error and
+   * falls back to initials derived from `name`.
+   *
+   * `name` is required for the accessible name whether or not there is an image,
+   * because an avatar with no name tells a screen-reader user nothing. Initials
+   * are hidden from assistive technology: they are a visual shorthand for the
+   * name that is already announced, and would otherwise be read out letter by
+   * letter after it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
+   */
+  "helix-base-avatar": Partial<
+    HelixBaseAvatarProps &
+      HelixBaseAvatarSolidJsProps &
+      BaseProps<HelixBaseAvatar> &
+      BaseEvents
+  >;
+
+  /**
    * `severity` lives on the headless tier rather than being an `appearance` on the
    * styled one, because it is meaning and not decoration. It picks the icon and
    * that icon's accessible name, so a reader who cannot see that the box is red
@@ -1028,32 +1154,130 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Icons are data rather than components, so the set is a plain record of path
-   * strings and this element is the only thing that knows how to draw one. A name
-   * with no match renders nothing at all instead of an empty box, so a typo
-   * cannot leave a hole in a layout that looks deliberate.
+   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
+   * the styled tier can lift the bar off the page without a scroll handler of its
+   * own. Scroll position is the one piece of state the server genuinely cannot
+   * know, so it is read on connect rather than derived: a fresh load starts at
+   * the top, which is what the server rendered, and a reload part-way down
+   * corrects on hydration.
    *
-   * An icon is decorative by default and hidden from assistive technology. Give
-   * it a `label` only when the icon is the sole carrier of meaning, such as
-   * inside a button with no text.
+   * The listener is passive and reads `scrollY` only, so it never blocks
+   * scrolling.
    *
-   * ## Attributes & Properties
+   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
+   * landmark the navigation needs whether or not anything is in it; the other two
+   * are `display: contents` when unassigned and cost nothing.
    *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   * ## Slots
    *
-   * - `name`: Name of the icon in the Helix set.
-   * - `label`: Accessible name, for an icon that is not decorative.
+   * Areas where markup can be added to the component.
+   *
+   * - `brand`: Wordmark or logo, at the inline start.
+   * - `(default)`: Primary navigation.
+   * - `actions`: Trailing actions, such as a call to action.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `svg`: The rendered SVG.
+   * - `bar`: The banner itself.
+   * - `nav`: The navigation region.
    */
-  "helix-base-icon": Partial<
-    HelixBaseIconProps &
-      HelixBaseIconSolidJsProps &
-      BaseProps<HelixBaseIcon> &
+  "helix-base-app-header": Partial<
+    HelixBaseAppHeaderProps &
+      HelixBaseAppHeaderSolidJsProps &
+      BaseProps<HelixBaseAppHeader> &
+      BaseEvents
+  >;
+
+  /**
+   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
+   * focus, and the browser's own affordances come from the platform rather than
+   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
+   * serializes into the server's markup, so the button is keyboard reachable
+   * before any JavaScript loads.
+   *
+   * Form submission is explicit. A `<button type="submit">` inside a shadow root
+   * submits nothing, because the form is on the other side of the boundary, so
+   * the inner control is always `type="button"` and this element calls
+   * `requestSubmit()` on its form instead. That routes through validation, unlike
+   * `submit()`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-base-button": Partial<
+    HelixBaseButtonProps &
+      HelixBaseButtonSolidJsProps &
+      BaseProps<HelixBaseButton> &
+      BaseEvents
+  >;
+
+  /**
+   * An element rather than a slot because it carries API of its own: `href`,
+   * whether it is the current page, and the separator that precedes it.
+   *
+   * Each item renders its own separator and hides it with `:host(:first-child)`,
+   * so the trail needs no index and no coordination from the parent. Structural
+   * pseudo-classes are allowed inside `:host()`, unlike `:has()`, and this was
+   * verified in a browser before being relied on.
+   *
+   * The current page is a `<span>`, not a link. Linking a page to itself is a
+   * known screen-reader annoyance, and `aria-current="page"` is what actually
+   * conveys position.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `href`: Where the step leads. Ignored when the item is the current page.
+   * - `current`: Whether this item is the page the reader is on.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The item's label.
+   * - `separator`: Replaces the separator shown before this item.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `separator`: The separator preceding the item.
+   * - `link`: The item's link, or its text when current.
+   */
+  "helix-base-breadcrumbs-item": Partial<
+    HelixBaseBreadcrumbsItemProps &
+      HelixBaseBreadcrumbsItemSolidJsProps &
+      BaseProps<HelixBaseBreadcrumbsItem> &
       BaseEvents
   >;
 
@@ -1084,6 +1308,74 @@ export type CustomElementsSolidJs = {
     HelixBaseDividerProps &
       HelixBaseDividerSolidJsProps &
       BaseProps<HelixBaseDivider> &
+      BaseEvents
+  >;
+
+  /**
+   * Icons are data rather than components, so the set is a plain record of path
+   * strings and this element is the only thing that knows how to draw one. A name
+   * with no match renders nothing at all instead of an empty box, so a typo
+   * cannot leave a hole in a layout that looks deliberate.
+   *
+   * An icon is decorative by default and hidden from assistive technology. Give
+   * it a `label` only when the icon is the sole carrier of meaning, such as
+   * inside a button with no text.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `name`: Name of the icon in the Helix set.
+   * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rendered SVG.
+   */
+  "helix-base-icon": Partial<
+    HelixBaseIconProps &
+      HelixBaseIconSolidJsProps &
+      BaseProps<HelixBaseIcon> &
+      BaseEvents
+  >;
+
+  /**
+   * A navigation landmark wrapping a list. `role="list"` is set explicitly on the
+   * `<ol>` even though it is already a list: removing the markers with
+   * `list-style: none` strips list semantics in Safari, and a breadcrumb trail
+   * always removes its markers.
+   *
+   * Items are slotted rather than wrapped, so they are `<ol>` children in the flat
+   * tree and each carries `role="listitem"` itself.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the landmark.
+   *
+   * Named rather than left bare because a page may hold more than one
+   * navigation, and landmarks are how a screen-reader user chooses between them.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The trail's items, in order from root to current page.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `nav`: The navigation landmark.
+   * - `list`: The ordered list.
+   */
+  "helix-base-breadcrumbs": Partial<
+    HelixBaseBreadcrumbsProps &
+      HelixBaseBreadcrumbsSolidJsProps &
+      BaseProps<HelixBaseBreadcrumbs> &
       BaseEvents
   >;
 
