@@ -20,7 +20,6 @@ import { styles } from './tag-root.css.js'
  *
  * @slot - The tag's label.
  *
- * @csspart tag - The tag body.
  * @csspart remove - The remove button, when `removable`.
  *
  * @event {HelixRemoveRequestEvent} RemoveRequest - Fired when the reader asks to remove the tag.

@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 
 /**
  * @summary Groups related content and actions into a single surface.
@@ -9,6 +9,11 @@ import { html, type TemplateResult } from 'lit'
  * footer carry no state, no behavior, and no API of their own. Slotting them
  * costs one custom element instead of five and lets the consumer bring their
  * own markup, so a title can be a real `<h2>` rather than an emulated one.
+ *
+ * The host is the surface. A wrapper `<div part="container">` would be a second
+ * box doing nothing the host cannot: the element itself takes the border, the
+ * radius, and the grid, and a consumer styles `helix-card` rather than reaching
+ * through `::part`. One node instead of two, on every card on the page.
  *
  * Name the card with `aria-label` or `aria-labelledby`. That is the only
  * naming that survives server rendering: reading a title out of the light DOM
@@ -23,11 +28,16 @@ import { html, type TemplateResult } from 'lit'
  * @slot header - Title and any actions for the whole card.
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
- *
- * @csspart container - The card surface.
  */
 @customElement('helix-base-card')
 export class HelixBaseCard extends HelixElement {
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    // On the host, since the host is the box. Set here rather than in
+    // `connectedCallback`, which the server never calls.
+    this.setAttribute('role', 'group')
+  }
+
   protected override render(): TemplateResult {
     // Bare slots, with no wrapper element around any of them. A `<slot>` is
     // `display: contents` in the UA stylesheet, so an unassigned one generates
@@ -44,12 +54,10 @@ export class HelixBaseCard extends HelixElement {
     // dropped and the region stays hidden even when filled, and the component
     // cannot inspect its children on the server to do it in JavaScript.
     return html`
-      <div part="container" role="group">
-        <slot name="media"></slot>
-        <slot name="header"></slot>
-        <slot></slot>
-        <slot name="footer"></slot>
-      </div>
+      <slot name="media"></slot>
+      <slot name="header"></slot>
+      <slot></slot>
+      <slot name="footer"></slot>
     `
   }
 }

@@ -1,5 +1,25 @@
+/* The host is the box. Heights are defined rather than falling out of padding,
+   so a tag beside a control lines up predictably: 24px at md, 20px at sm,
+   against a 40px control and a 32px dense one. */
 :host {
+  align-items: center;
+  background-color: var(
+    --tag-background-color,
+    color-mix(in oklab, var(--_tag-color) 14%, transparent)
+  );
+  block-size: var(--_tag-height);
+  border: var(--helix-border-thin) solid color-mix(in oklab, var(--_tag-color) 28%, transparent);
+  border-radius: var(--tag-radii, var(--helix-radii-sm));
+  color: var(--tag-foreground-color, var(--_tag-color));
   display: inline-flex;
+  font-size: var(--_tag-text);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  line-height: var(--helix-leading-tight);
+  padding-inline: var(--_tag-inset);
+  white-space: nowrap;
+
+  --_tag-height: var(--helix-size-tag);
 
   /* Every appearance is one status color, tinted for the fill and used at full
      strength for the label. Deriving beats a token per status: the alternative
@@ -27,26 +47,9 @@
 }
 
 :host([size="sm"]) {
+  --_tag-height: var(--helix-size-tag-dense);
   --_tag-inset: var(--helix-space-2xs);
-}
-
-[part="tag"] {
-  align-items: center;
-  background-color: var(
-    --tag-background-color,
-    color-mix(in oklab, var(--_tag-color) 14%, transparent)
-  );
-  border: var(--helix-border-thin) solid color-mix(in oklab, var(--_tag-color) 28%, transparent);
-  border-radius: var(--tag-radii, var(--helix-radii-sm));
-  color: var(--tag-foreground-color, var(--_tag-color));
-  display: inline-flex;
-  font-size: var(--_tag-text);
-  font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-2xs);
-  line-height: var(--helix-leading-tight);
-  padding-block: var(--helix-space-2xs);
-  padding-inline: var(--_tag-inset);
-  white-space: nowrap;
+  --_tag-text: var(--helix-text-xs);
 }
 
 /* The remove control sits inside the tag's inline padding, so the tag does not

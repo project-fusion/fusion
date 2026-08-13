@@ -11,6 +11,11 @@ footer carry no state, no behavior, and no API of their own. Slotting them
 costs one custom element instead of five and lets the consumer bring their
 own markup, so a title can be a real `<h2>` rather than an emulated one.
 
+The host is the surface. A wrapper `<div part="container">` would be a second
+box doing nothing the host cannot: the element itself takes the border, the
+radius, and the grid, and a consumer styles `helix-card` rather than reaching
+through `::part`. One node instead of two, on every card on the page.
+
 Name the card with `aria-label` or `aria-labelledby`. That is the only
 naming that survives server rendering: reading a title out of the light DOM
 needs a DOM, and the server has none.

@@ -25,6 +25,7 @@ import { styles } from './accordion-item.css.js'
  *
  * @csspart container - The outer wrapper.
  * @csspart trigger - The clickable summary row.
+ * @csspart chevron - The open and close indicator.
  * @csspart content - The revealed region.
  * @csspart content-inner - Padding wrapper inside the animated region.
  *

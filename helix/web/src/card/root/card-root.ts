@@ -31,8 +31,6 @@ import { styles } from './card-root.css.js'
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
  *
- * @csspart container - The card surface.
- *
  * @cssproperty --card-background-color - Surface behind the card.
  * @cssproperty --card-border-color - Border color of the surface.
  * @cssproperty --card-media-size - Width of the media column when horizontal.

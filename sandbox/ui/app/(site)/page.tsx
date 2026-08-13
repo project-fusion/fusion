@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <helix-flex direction="column" gap="2xl">
       <helix-flex class="hero" direction="column" gap="lg">
-        <helix-heading level={1}>Helix</helix-heading>
+        <helix-text level={1}>Helix</helix-text>
         <helix-text block class="lede" size="lg" tone="muted">
           The design system Fusion products are built on. Web components, so the framework stays
           swappable, and a token layer that themes them.
@@ -31,9 +31,9 @@ export default function Home() {
           { label: 'examples', value: examples },
         ].map((stat) => (
           <helix-flex direction="column" key={stat.label}>
-            <helix-heading level={3} size="2xl">
+            <helix-text level={3} size="2xl">
               {stat.value}
-            </helix-heading>
+            </helix-text>
             <helix-text size="sm" tone="subtle">
               {stat.label}
             </helix-text>
@@ -42,14 +42,14 @@ export default function Home() {
       </helix-flex>
 
       <helix-flex direction="column" gap="lg">
-        <helix-heading level={2}>Components</helix-heading>
+        <helix-text level={2}>Components</helix-text>
         <helix-grid gap="md" min="17rem">
           {families.map((family) => (
             <helix-card appearance="outlined" aria-label={family.label} key={family.slug}>
               <helix-flex align="center" gap="sm" justify="between" slot="header">
-                <helix-heading level={3} size="lg">
+                <helix-text level={3} size="lg">
                   {family.label}
-                </helix-heading>
+                </helix-text>
                 {family.status && (
                   <helix-tag
                     appearance={family.status === 'stable' ? 'success' : 'warning'}

@@ -1,6 +1,6 @@
 import { customElement, HelixElement } from '@helix-io/core'
 import { check, danger, type HelixIcon, info, warning } from '@helix-io/icons'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /** Icon and accessible name for each severity. */
@@ -33,12 +33,17 @@ const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
  * @slot - The callout's content.
  * @slot icon - Replaces the icon chosen by `severity`.
  *
- * @csspart callout - The callout body.
  * @csspart icon - The icon region.
  * @csspart content - The content region.
  */
 @customElement('helix-base-callout')
 export class HelixBaseCallout extends HelixElement {
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    // On the host, since the host is the box.
+    this.setAttribute('role', 'note')
+  }
+
   /** What kind of attention the passage needs. */
   @property({ reflect: true })
   severity: 'info' | 'success' | 'warning' | 'danger' = 'info'
@@ -47,8 +52,7 @@ export class HelixBaseCallout extends HelixElement {
     const { icon, label } =
       SEVERITIES[this.severity] ?? (SEVERITIES.info as { icon: HelixIcon; label: string })
 
-    return html`<div part="callout" role="note">
-      <span part="icon">
+    return html`<span part="icon">
         <slot name="icon">
           <svg
             viewBox=${icon.viewBox}
@@ -63,8 +67,7 @@ export class HelixBaseCallout extends HelixElement {
           </svg>
         </slot>
       </span>
-      <div part="content"><slot></slot></div>
-    </div>`
+      <div part="content"><slot></slot></div>`
   }
 }
 

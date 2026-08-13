@@ -21,6 +21,31 @@
   min-block-size: var(--helix-size-control-dense);
 }
 
+/* Rotation rather than a swapped glyph: opening is a short movement, not a
+   substitution. The surface stays flat and the motion carries the change. */
+[part="chevron"] {
+  block-size: 1em;
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+  inline-size: 1em;
+  transform: rotate(-90deg);
+  transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host([chevron-placement="start"]) [part="chevron"] {
+  margin-inline-end: var(--helix-space-xs);
+}
+
+:host([data-open]) [part="chevron"] {
+  transform: rotate(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="chevron"] {
+    transition: none;
+  }
+}
+
 [part="trigger"]:hover {
   background-color: var(--helix-color-primary-subtle);
 }

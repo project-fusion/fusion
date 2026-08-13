@@ -6,26 +6,34 @@ import '@helix-io/web/text'
 import type { HelixText } from '@helix-io/web'
 
 /**
- * For text that is not a heading. Headings have their own element, because a
-heading carries an outline level and this does not; asking one element to do
-both is what leads to a page whose outline is a styling accident.
+ * One component rather than two. A separate `Heading` differed from this only
+in which tag it rendered and what its size defaulted to, and both are
+expressible as a property. Two components meant two places to add a tone and
+two contracts to keep aligned.
 
-`block` makes it a paragraph rather than an inline run. It stays inline by
-default because most text sits inside something else.
+`level` renders a real `<h1>` through `<h6>` and nothing else does. Without
+it this is a `<span>`, so text is never accidentally structural: a heading is
+something you ask for.
+
+Size follows `level` unless overridden, so a heading is correct by doing
+nothing. Setting both is the deliberate exception, for the case where a
+section's second heading must look smaller without lying about the outline.
  *
  * Renders `<helix-text>`.
  */
 export interface TextProps extends BaseProps {
   /** Renders as a block, for a paragraph rather than an inline run. */
   block?: boolean
+  /** Outline level. Renders a real heading tag; omit for ordinary text. */
+  level?: 0 | 1 | 2 | 3 | 4 | 5 | 6
   /** Uses the monospace family, for code and identifiers. */
   mono?: boolean
-  /** Size on the type scale. */
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Size on the type scale. Defaults to the one matching `level`. */
+  size?: '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
   /** Colour role for the text. */
   tone?: 'default' | 'muted' | 'subtle' | 'primary' | 'danger'
-  /** Weight on the weight scale. */
-  weight?: 'regular' | 'medium' | 'semibold'
+  /** Weight on the weight scale. Headings default to semibold. */
+  weight?: '' | 'regular' | 'medium' | 'semibold'
 }
 
 export const TextRoot = createComponent<HelixText, TextProps>({

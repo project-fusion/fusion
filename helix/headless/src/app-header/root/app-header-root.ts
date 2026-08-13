@@ -1,5 +1,6 @@
 import { customElement, HelixElement } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 
 /**
  * @summary Page-level banner holding brand, navigation, and actions.
@@ -39,6 +40,16 @@ import { html, type TemplateResult } from 'lit'
  */
 @customElement('helix-base-app-header')
 export class HelixBaseAppHeader extends HelixElement {
+  /**
+   * Where the navigation sits in the bar.
+   *
+   * `center` puts it in the middle of the banner rather than beside the brand,
+   * which reads as the site's spine when the nav is the primary thing in the
+   * header rather than an afterthought next to a logo.
+   */
+  @property({ attribute: 'nav-align', reflect: true })
+  navAlign: 'start' | 'center' = 'start'
+
   private readonly handleScroll = (): void => {
     this.toggleAttribute('data-scrolled', window.scrollY > 0)
   }

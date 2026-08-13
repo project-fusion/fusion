@@ -7,10 +7,10 @@
   padding: var(--helix-space-xs) var(--helix-space-md) var(--helix-space-xs) var(--helix-space-none);
 }
 
+/* Weight and colour carry the header, not capitals. Uppercase costs
+   legibility and is read letter by letter by some screen readers. */
 :host([header]) {
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-wide);
-  text-transform: uppercase;
 }

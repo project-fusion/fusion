@@ -27,7 +27,10 @@ page. That is a second element, not a max-width on the first.
  *
  * Renders `<helix-base-app-header>`.
  */
-export interface BaseAppHeaderProps extends BaseProps {}
+export interface BaseAppHeaderProps extends BaseProps {
+  /** Where the navigation sits in the bar. `center` puts it in the middle of the banner rather than beside the brand, which reads as the site's spine when the nav is the primary thing in the header rather than an afterthought next to a logo. */
+  navAlign?: 'start' | 'center'
+}
 
 export const BaseAppHeaderRoot = createComponent<HelixBaseAppHeader, BaseAppHeaderProps>({
   events: {},

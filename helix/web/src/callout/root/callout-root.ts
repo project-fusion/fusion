@@ -22,7 +22,6 @@ import { styles } from './callout-root.css.js'
  * @slot - The callout's content.
  * @slot icon - Replaces the icon chosen by `severity`.
  *
- * @csspart callout - The callout body.
  * @csspart icon - The icon region.
  * @csspart content - The content region.
  *

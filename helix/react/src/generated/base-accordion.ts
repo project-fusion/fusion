@@ -49,6 +49,8 @@ tree without removing it from the box tree.
  * Renders `<helix-base-accordion-item>`.
  */
 export interface BaseAccordionItemProps extends BaseProps {
+  /** Where the open indicator sits, or whether there is one. `auto` resolves to `end`, which is where a reader scanning a list of summaries expects it: the label starts at the same x on every row, and the indicator is found once at the edge rather than shifting with the text. `start` is for a tree-like reading, where the indicator leads the label. `none` is for a row that carries its own affordance and would otherwise have two. */
+  chevronPlacement?: 'auto' | 'start' | 'end' | 'none'
   /** Initial open state for uncontrolled use. Ignored once `open` is set. */
   defaultOpen?: boolean
   /** Whether the element is open. Setting this enters controlled mode. */

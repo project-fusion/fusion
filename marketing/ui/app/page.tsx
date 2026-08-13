@@ -29,11 +29,32 @@ const substrates = [
   },
 ] as const
 
+/** Design leads, because it is the one with something to show. */
 const verticals = [
-  { name: 'Fusion Design', stage: 'Building', what: 'Interface. Helix lives here.' },
-  { name: 'Fusion Mind', stage: 'Building', what: 'Intelligence. Cortex lives here.' },
-  { name: 'Fusion Energy', stage: 'Declared', what: 'The literal sun, and what it powers.' },
-  { name: 'Fusion Capital', stage: 'Declared', what: 'Allocation. No product yet.' },
+  {
+    body: 'Interface. Helix lives here: a design system in web components, with a token layer that derives an accessible palette from a brand colour rather than from a spreadsheet of hexes.',
+    id: 'design',
+    name: 'Fusion Design',
+    stage: 'Building',
+  },
+  {
+    body: 'Intelligence. Cortex lives here: memory, provenance, and context. What a system knows, where it learned it, and how much of it to trust.',
+    id: 'mind',
+    name: 'Fusion Mind',
+    stage: 'Building',
+  },
+  {
+    body: 'The literal sun, and what it powers. Cheap energy is half of why sovereignty stops being a principle and starts being something you can run. No product yet.',
+    id: 'energy',
+    name: 'Fusion Energy',
+    stage: 'Declared',
+  },
+  {
+    body: 'Allocation. Committed direction with no work started, and it is listed here rather than left off so the map is the whole map.',
+    id: 'capital',
+    name: 'Fusion Capital',
+    stage: 'Declared',
+  },
 ] as const
 
 const stageAppearance = (stage: string) =>
@@ -68,11 +89,11 @@ export default function Home() {
       <section className="hero">
         <helix-flex class="shell" direction="column" gap="lg">
           <helix-text mono size="xs" tone="subtle" weight="medium">
-            FUSION DEVELOPMENT GROUP
+            Fusion Development Group
           </helix-text>
-          <helix-heading class="heroTitle" level={1}>
+          <helix-text class="heroTitle" level={1}>
             Developing for humanity
-          </helix-heading>
+          </helix-text>
           <helix-text block class="heroLede" size="lg" tone="muted">
             Intelligence and energy are collapsing in cost at the same moment. We build the stack
             that makes sovereignty practical, starting with the two substrates everything else
@@ -107,7 +128,7 @@ export default function Home() {
       <section className="band" id="substrates">
         <helix-flex class="shell" direction="column" gap="lg">
           <helix-flex direction="column" gap="2xs">
-            <helix-heading level={2}>Two substrates</helix-heading>
+            <helix-text level={2}>Two substrates</helix-text>
             <helix-text block size="lg" tone="muted">
               Not products. The layers products are built on.
             </helix-text>
@@ -117,9 +138,9 @@ export default function Home() {
             {substrates.map((substrate) => (
               <helix-card appearance="outlined" aria-label={substrate.name} key={substrate.name}>
                 <helix-flex align="center" gap="sm" justify="between" slot="header">
-                  <helix-heading level={3} size="lg">
+                  <helix-text level={3} size="lg">
                     {substrate.name}
-                  </helix-heading>
+                  </helix-text>
                   <helix-tag appearance={stageAppearance(substrate.stage)} size="sm">
                     {substrate.stage}
                   </helix-tag>
@@ -137,40 +158,35 @@ export default function Home() {
       <section className="band" id="verticals">
         <helix-flex class="shell" direction="column" gap="lg">
           <helix-flex direction="column" gap="2xs">
-            <helix-heading level={2}>Verticals</helix-heading>
+            <helix-text level={2}>Verticals</helix-text>
             <helix-text block size="lg" tone="muted">
               Stage labels are honest. Building means real work with nothing shipped.
             </helix-text>
           </helix-flex>
 
-          <helix-table columns="minmax(8rem, 14rem) minmax(0, 1fr) auto" label="Verticals">
-            <helix-table-row>
-              <helix-table-cell header>Vertical</helix-table-cell>
-              <helix-table-cell header>What it covers</helix-table-cell>
-              <helix-table-cell header>Stage</helix-table-cell>
-            </helix-table-row>
+          <helix-flex direction="column" gap="xl">
             {verticals.map((vertical) => (
-              <helix-table-row key={vertical.name}>
-                <helix-table-cell>
-                  <helix-text weight="medium">{vertical.name}</helix-text>
-                </helix-table-cell>
-                <helix-table-cell>
-                  <helix-text tone="muted">{vertical.what}</helix-text>
-                </helix-table-cell>
-                <helix-table-cell>
+              <helix-flex direction="column" gap="sm" id={vertical.id} key={vertical.id}>
+                <helix-flex align="center" gap="sm" wrap>
+                  <helix-text level={3} size="xl">
+                    {vertical.name}
+                  </helix-text>
                   <helix-tag appearance={stageAppearance(vertical.stage)} size="sm">
                     {vertical.stage}
                   </helix-tag>
-                </helix-table-cell>
-              </helix-table-row>
+                </helix-flex>
+                <helix-text block class="verticalBody" tone="muted">
+                  {vertical.body}
+                </helix-text>
+              </helix-flex>
             ))}
-          </helix-table>
+          </helix-flex>
         </helix-flex>
       </section>
 
       <section className="band" id="questions">
         <helix-flex class="shell" direction="column" gap="lg">
-          <helix-heading level={2}>Questions</helix-heading>
+          <helix-text level={2}>Questions</helix-text>
           <helix-accordion>
             {questions.map((entry) => (
               <helix-accordion-item key={entry.question}>
@@ -186,9 +202,9 @@ export default function Home() {
 
       <section className="band closing">
         <helix-flex align="center" class="shell" direction="column" gap="md">
-          <helix-heading level={2} size="2xl">
+          <helix-text level={2} size="2xl">
             Solo, and shipping
-          </helix-heading>
+          </helix-text>
           <helix-text block class="closingLede" size="lg" tone="muted">
             We take on interface and intelligence work the substrates make faster to do well. If
             that is what you need, say so plainly and we will tell you whether we are the right

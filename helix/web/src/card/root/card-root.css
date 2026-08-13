@@ -1,5 +1,21 @@
+/* The host is the surface. A wrapper would be a second box doing nothing this
+   one cannot, on every card on the page. */
 :host {
-  display: block;
+  background-color: var(--card-background-color, var(--helix-color-surface));
+  border: var(--helix-border-thin) solid var(--card-border-color, var(--helix-color-border));
+  border-radius: var(--card-radii, var(--helix-radii-md));
+  color: var(--helix-color-foreground-muted);
+  display: grid;
+  gap: var(--helix-space-sm);
+  grid-template-columns: minmax(0, 1fr);
+  line-height: var(--helix-leading-normal);
+  /* Clips the media to the corner radius, so a full-bleed image needs no
+     corner handling of its own. */
+  overflow: hidden;
+  padding: var(--_card-inset);
+  transition:
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 
   /* One inset for every region, so dense narrows them together. */
   --_card-inset: var(--card-padding, var(--helix-space-md));
@@ -31,12 +47,12 @@
     box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host([appearance="elevated"]) [part="container"] {
+:host([appearance="elevated"]) {
   border-color: transparent;
   box-shadow: var(--helix-shadow-md);
 }
 
-:host([appearance="plain"]) [part="container"] {
+:host([appearance="plain"]) {
   background-color: transparent;
   border-color: transparent;
 }
