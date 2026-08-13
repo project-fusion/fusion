@@ -1,0 +1,97 @@
+:host {
+  --_drawer-size: var(--drawer-size, 20rem);
+}
+
+[part="scrim"] {
+  background-color: var(--helix-color-overlay);
+  inset: 0;
+  opacity: 0;
+  position: fixed;
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+  z-index: var(--helix-layer-overlay);
+}
+
+:host([data-open]) [part="scrim"] {
+  opacity: 1;
+}
+
+[part="scrim"][hidden] {
+  display: none;
+}
+
+/* Transform and opacity only. The surface at rest is flat; the movement is
+   what says something happened. */
+[part="panel"] {
+  background-color: var(--helix-color-surface);
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  position: fixed;
+  transition: transform var(--helix-duration-normal) var(--helix-easing-decelerate);
+  z-index: var(--helix-layer-overlay);
+}
+
+:host([appearance="plain"]) [part="panel"] {
+  background-color: transparent;
+}
+
+:host([placement="end"]) [part="panel"] {
+  block-size: 100%;
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  inline-size: min(var(--_drawer-size), 100%);
+  inset-block: 0;
+  inset-inline-end: 0;
+  transform: translateX(100%);
+}
+
+:host([placement="start"]) [part="panel"] {
+  block-size: 100%;
+  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
+  inline-size: min(var(--_drawer-size), 100%);
+  inset-block: 0;
+  inset-inline-start: 0;
+  transform: translateX(-100%);
+}
+
+:host([placement="bottom"]) [part="panel"] {
+  block-size: min(var(--_drawer-size), 100%);
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  inset-block-end: 0;
+  inset-inline: 0;
+  transform: translateY(100%);
+}
+
+:host([placement="top"]) [part="panel"] {
+  block-size: min(var(--_drawer-size), 100%);
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  inset-block-start: 0;
+  inset-inline: 0;
+  transform: translateY(-100%);
+}
+
+:host([data-open]) [part="panel"] {
+  box-shadow: var(--helix-shadow-lg);
+  transform: translate(0, 0);
+}
+
+[part="header"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  flex: 0 0 auto;
+}
+
+:host(:not(:has([slot="header"]))) [part="header"] {
+  display: none;
+}
+
+[part="content"] {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="panel"],
+  [part="scrim"] {
+    transition: none;
+  }
+}

@@ -20,6 +20,8 @@ export interface ButtonProps extends BaseProps {
   disabled?: boolean
   /** Navigates to this URL instead of acting on a form. */
   href?: string
+  /** Accessible name, for a button whose content is not text. Lives here rather than only on `IconButton` so the two share one render. An icon-only button without it is a control a screen reader announces as "button" and nothing else. */
+  label?: string
   /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
   rel?: string
   /** Height and inset of the control. */

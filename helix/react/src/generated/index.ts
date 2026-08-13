@@ -28,8 +28,28 @@ export { BaseButton, type BaseButtonProps, BaseButtonRoot } from './base-button.
 export { BaseCallout, type BaseCalloutProps, BaseCalloutRoot } from './base-callout.js'
 export { BaseCard, type BaseCardProps, BaseCardRoot } from './base-card.js'
 export { BaseDivider, type BaseDividerProps, BaseDividerRoot } from './base-divider.js'
+export { BaseDrawer, type BaseDrawerProps, BaseDrawerRoot } from './base-drawer.js'
 export { BaseIcon, type BaseIconProps, BaseIconRoot } from './base-icon.js'
+export {
+  BaseTable,
+  BaseTableCell,
+  type BaseTableCellProps,
+  type BaseTableProps,
+  BaseTableRoot,
+  BaseTableRow,
+  type BaseTableRowProps,
+} from './base-table.js'
+export {
+  BaseTabs,
+  BaseTabsPanel,
+  type BaseTabsPanelProps,
+  type BaseTabsProps,
+  BaseTabsRoot,
+  BaseTabsTab,
+  type BaseTabsTabProps,
+} from './base-tabs.js'
 export { BaseTag, type BaseTagProps, BaseTagRoot } from './base-tag.js'
+export { BaseToolbar, type BaseToolbarProps, BaseToolbarRoot } from './base-toolbar.js'
 export {
   BaseTree,
   BaseTreeItem,
@@ -48,11 +68,32 @@ export { Button, type ButtonProps, ButtonRoot } from './button.js'
 export { Callout, type CalloutProps, CalloutRoot } from './callout.js'
 export { Card, type CardProps, CardRoot } from './card.js'
 export { Divider, type DividerProps, DividerRoot } from './divider.js'
+export { Drawer, type DrawerProps, DrawerRoot } from './drawer.js'
 export { Flex, type FlexProps, FlexRoot } from './flex.js'
 export { Grid, type GridProps, GridRoot } from './grid.js'
 export { Heading, type HeadingProps, HeadingRoot } from './heading.js'
 export { Icon, type IconProps, IconRoot } from './icon.js'
+export { IconButton, type IconButtonProps, IconButtonRoot } from './icon-button.js'
 export { Link, type LinkProps, LinkRoot } from './link.js'
+export {
+  Table,
+  TableCell,
+  type TableCellProps,
+  type TableProps,
+  TableRoot,
+  TableRow,
+  type TableRowProps,
+} from './table.js'
+export {
+  Tabs,
+  TabsPanel,
+  type TabsPanelProps,
+  type TabsProps,
+  TabsRoot,
+  TabsTab,
+  type TabsTabProps,
+} from './tabs.js'
 export { Tag, type TagProps, TagRoot } from './tag.js'
 export { Text, type TextProps, TextRoot } from './text.js'
+export { Toolbar, type ToolbarProps, ToolbarRoot } from './toolbar.js'
 export { Tree, TreeItem, type TreeItemProps, type TreeProps, TreeRoot } from './tree.js'

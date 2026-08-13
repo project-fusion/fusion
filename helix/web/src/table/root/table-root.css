@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+[part="table"] {
+  display: grid;
+  /* One grid for the whole table, which is what aligns every column across
+     every row. Rows are `display: contents` so their cells land here. */
+  grid-template-columns: var(--table-columns, minmax(0, 1fr));
+  inline-size: 100%;
+}

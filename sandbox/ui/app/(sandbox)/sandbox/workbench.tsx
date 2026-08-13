@@ -1,12 +1,12 @@
 'use client'
 
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
-import type { HelixSelectionChangeEvent } from '@helix-io/web'
+import type { HelixOpenChangeEvent, HelixSelectionChangeEvent } from '@helix-io/web'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../lib/catalog'
 
 /**
- * The sandbox workbench: source panes, a live preview, and the example tree.
+ * The sandbox workbench: source files, a live preview, and the example tree.
  *
  * What you are looking at lives in the URL, so the address bar is the share
  * format. How you are looking at it, the split and the preview theme, is local
@@ -96,6 +96,25 @@ export function SandboxWorkbench({ families }: Props) {
 
   const activeValue = `${family.slug}/${example.slug}`
 
+  const tree = (
+    <helix-tree
+      label="Examples"
+      onSelectionChange={(event: HelixSelectionChangeEvent) => select(event.detail.value)}
+      value={activeValue}
+    >
+      {withExamples.map((entry) => (
+        <helix-tree-item expanded={entry.slug === family.slug} key={entry.slug} value={entry.slug}>
+          {entry.label}
+          {entry.examples.map((item) => (
+            <helix-tree-item key={item.slug} slot="children" value={`${entry.slug}/${item.slug}`}>
+              {item.label}
+            </helix-tree-item>
+          ))}
+        </helix-tree-item>
+      ))}
+    </helix-tree>
+  )
+
   return (
     <>
       <helix-flex align="center" class="workbenchHeader" gap="md">
@@ -118,7 +137,7 @@ export function SandboxWorkbench({ families }: Props) {
           </helix-text>
         </helix-flex>
 
-        <helix-flex align="center" gap="2xs">
+        <helix-toolbar label="Sandbox actions">
           <helix-button
             appearance="subtle"
             onClick={() => setPreviewTheme(previewTheme === 'light' ? 'dark' : 'light')}
@@ -132,51 +151,46 @@ export function SandboxWorkbench({ families }: Props) {
           <helix-button appearance="subtle" href={`/components/${family.slug}`} size="sm">
             API
           </helix-button>
-          {/* Only reachable at narrow widths, where the rail is a drawer. */}
-          <helix-button
-            appearance="subtle"
-            class="railToggle"
-            onClick={() => setRailOpen(!railOpen)}
-            size="sm"
-          >
-            Examples
-          </helix-button>
-        </helix-flex>
+          {narrow && (
+            <helix-button appearance="subtle" onClick={() => setRailOpen(true)} size="sm">
+              Examples
+            </helix-button>
+          )}
+        </helix-toolbar>
       </helix-flex>
 
-      <div className="workbenchBody" data-rail-open={railOpen ? 'true' : 'false'}>
+      <div className="workbenchBody">
         <helix-sandbox orientation={narrow ? 'vertical' : 'horizontal'} split={narrow ? 50 : 45}>
-          <helix-flex class="sourcePane" direction="column" slot="source">
-            <helix-flex class="paneTabs" gap="none" role="tablist">
-              {(['html', 'css'] as const).map((name) => (
-                <button
-                  aria-selected={pane === name}
-                  key={name}
-                  onClick={() => setPane(name)}
-                  role="tab"
-                  type="button"
-                >
-                  {name === 'html' ? 'index.html' : 'styles.css'}
-                </button>
-              ))}
-            </helix-flex>
-            {/* Both panes stay mounted and one is hidden, so switching tabs
-                does not discard what was typed in the other. */}
-            <helix-sandbox-source
-              field-label="Example markup"
-              hidden={pane !== 'html'}
-              key={`${activeValue}-html`}
-              name="html"
-              value={example.html}
-            ></helix-sandbox-source>
-            <helix-sandbox-source
-              field-label="Example stylesheet"
-              hidden={pane !== 'css'}
-              key={`${activeValue}-css`}
-              name="css"
-              value=""
-            ></helix-sandbox-source>
-          </helix-flex>
+          {/* Panels stay mounted and hidden, so switching files does not
+              discard what was typed in the other. */}
+          <helix-tabs
+            class="sourceTabs"
+            label="Files"
+            onSelectionChange={(event: HelixSelectionChangeEvent) =>
+              setPane(event.detail.value as 'html' | 'css')
+            }
+            slot="source"
+            value={pane}
+          >
+            <helix-tabs-tab value="html">index.html</helix-tabs-tab>
+            <helix-tabs-tab value="css">styles.css</helix-tabs-tab>
+            <helix-tabs-panel slot="panels" value="html">
+              <helix-sandbox-source
+                field-label="Example markup"
+                key={`${activeValue}-html`}
+                name="html"
+                value={example.html}
+              ></helix-sandbox-source>
+            </helix-tabs-panel>
+            <helix-tabs-panel slot="panels" value="css">
+              <helix-sandbox-source
+                field-label="Example stylesheet"
+                key={`${activeValue}-css`}
+                name="css"
+                value=""
+              ></helix-sandbox-source>
+            </helix-tabs-panel>
+          </helix-tabs>
 
           <helix-sandbox-preview
             data-theme={previewTheme}
@@ -185,32 +199,20 @@ export function SandboxWorkbench({ families }: Props) {
           ></helix-sandbox-preview>
         </helix-sandbox>
 
-        <aside className="examplesRail">
-          <helix-tree
+        {/* A real drawer on a phone: focus trapped, Escape closes, page behind
+            covered. The CSS transform it replaced was none of those. */}
+        {narrow ? (
+          <helix-drawer
             label="Examples"
-            onSelectionChange={(event: HelixSelectionChangeEvent) => select(event.detail.value)}
-            value={activeValue}
+            onOpenChange={(event: HelixOpenChangeEvent) => setRailOpen(event.detail.open)}
+            open={railOpen}
+            placement="end"
           >
-            {withExamples.map((entry) => (
-              <helix-tree-item
-                expanded={entry.slug === family.slug}
-                key={entry.slug}
-                value={entry.slug}
-              >
-                {entry.label}
-                {entry.examples.map((item) => (
-                  <helix-tree-item
-                    key={item.slug}
-                    slot="children"
-                    value={`${entry.slug}/${item.slug}`}
-                  >
-                    {item.label}
-                  </helix-tree-item>
-                ))}
-              </helix-tree-item>
-            ))}
-          </helix-tree>
-        </aside>
+            {tree}
+          </helix-drawer>
+        ) : (
+          <aside className="examplesRail">{tree}</aside>
+        )}
       </div>
     </>
   )

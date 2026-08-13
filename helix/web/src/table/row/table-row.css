@@ -1,0 +1,6 @@
+/* The row generates no box of its own, so its cells become items of the
+   table's grid. The element still exists, which is what makes a row
+   selectable, hideable, and interactive. */
+:host {
+  display: contents;
+}

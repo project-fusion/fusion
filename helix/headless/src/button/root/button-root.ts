@@ -51,6 +51,16 @@ export class HelixBaseButton extends HelixFormElement {
   @property()
   rel = ''
 
+  /**
+   * Accessible name, for a button whose content is not text.
+   *
+   * Lives here rather than only on `IconButton` so the two share one render.
+   * An icon-only button without it is a control a screen reader announces as
+   * "button" and nothing else.
+   */
+  @property()
+  label = ''
+
   /** Moves focus to the inner control, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixFormElement.shadowRootOptions,
@@ -102,6 +112,7 @@ export class HelixBaseButton extends HelixFormElement {
     if (this.href) {
       return html`<a
         part="button"
+        aria-label=${this.label || nothing}
         href=${this.disabled ? nothing : this.href}
         target=${this.target || nothing}
         rel=${this.resolvedRel || nothing}
@@ -116,6 +127,7 @@ export class HelixBaseButton extends HelixFormElement {
     return html`<button
       part="button"
       type="button"
+      aria-label=${this.label || nothing}
       ?disabled=${this.disabled}
       @click=${this.handleClick}
     >
