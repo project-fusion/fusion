@@ -301,6 +301,27 @@ wrappers drift from the element API the first time someone adds a property.
 - **`BaseProps` extends React's `HTMLAttributes`**, so `onClick`, `className`,
   `style`, ARIA, and `data-*` work and typecheck alongside the generated props.
 
+## The sandbox
+
+`sandbox/ui` builds one self-contained HTML file from the manifests plus
+colocated examples. No server, no framework, no network requests.
+
+- **Examples are `.examples/*.html` colocated with the component**, read off
+  disk at build time. `default.html` is the headline preview; every other slug
+  is a named variant. A map in the sandbox package would be one more thing to
+  forget, and forgetting it looks exactly like a component with no examples.
+- **Nothing else is written down.** Components, properties, slots, parts,
+  events, and CSS custom properties come from the manifest, so a literal union
+  becomes a select holding exactly the values that compile.
+- **The markup is the single source of truth.** Property controls rewrite the
+  example text and typing in it re-renders the preview. A read-only snippet
+  beside an editable preview is two versions of one thing, one of them wrong.
+- **The sandbox is not a Helix component.** The previous one was: the design
+  system exported `HelixSandboxEditorBase`, `HelixSandboxTerminalBase`,
+  `HelixSandboxResizeHandleBase`, and seven more from its public barrel, which
+  put 119 kB of 1.22 MB, roughly a tenth of the library, into every consumer's
+  install as tooling for one internal site. A code editor is an app component.
+
 ## Tree-shaking
 
 One family per module, subpath exports (`@helix-io/react/disclosure`) so
