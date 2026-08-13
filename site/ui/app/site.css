@@ -10,62 +10,249 @@
 /* Fusion marketing site.
  *
  * App layout only. Every component reads its own tokens, so what is left here
- * is the page shell: how wide the content runs and how far apart the bands sit.
+ * is the page shell: how far the content is inset and how far apart the bands
+ * sit.
  */
 
-/* One measure for the whole site, matching the header's own row, so the
-   wordmark lines up with the copy below it down the page. */
+:root {
+  /* The page runs edge to edge and the inset is what holds it off the sides.
+     It scales with the viewport rather than stepping at a breakpoint, so the
+     margin reads as deliberate at every width instead of only at three. */
+  --site-inset: clamp(var(--helix-space-lg), 6vw, 7rem);
+
+  /* Space between one idea and the next. Large on purpose: the page is a
+     sequence of single statements, and what separates them is emptiness. */
+  --site-band: clamp(var(--helix-space-3xl), 12vh, 9rem);
+
+  /* Display type past the component scale's top step.
+     Helix stops at `3xl` because that is the largest size a component should
+     ever set for itself. A marketing hero is not a component, so its sizes are
+     the site's own and are named here rather than left as clamps scattered
+     through the stylesheet. */
+  --site-text-hero: clamp(2.75rem, 9vw, 6.5rem);
+  --site-text-section: clamp(2rem, 4.5vw, 3.25rem);
+}
+
+/* Full width, held off the edges by the inset. Nothing is centred in a measure
+   any more; text that needs a measure asks for one. */
 .shell {
-  margin-inline: auto;
-  max-inline-size: 72rem;
-  padding-inline: var(--helix-space-lg);
+  inline-size: 100%;
+  padding-inline: var(--site-inset);
+}
+
+/* A reading measure, for prose only. Layout is full width; a line of text is
+   not, because past about 70 characters the eye loses the line. */
+.measure {
+  max-inline-size: 62ch;
+}
+
+.measureTight {
+  max-inline-size: 46ch;
 }
 
 .band {
-  padding-block: var(--helix-space-2xl);
+  padding-block: var(--site-band);
 }
 
-/* Space rather than a rule between sections. Hierarchy comes from type and
-   space; a divider at every seam would be decoration doing what emptiness
-   already does. */
+/* The header spans the viewport, so its own centring is turned off and it
+   takes the page's inset instead. */
+helix-app-header {
+  --app-header-inset: var(--site-inset);
+  --app-header-max-inline-size: none;
+}
+
+/* ============================================================ hero ======= */
+
+/* Tall enough that the claim is the only thing on screen. Not a full viewport:
+   a sliver of what follows is what tells the reader there is more. */
 .hero {
-  padding-block: var(--helix-space-3xl) var(--helix-space-2xl);
+  align-items: center;
+  display: flex;
+  min-block-size: min(82vh, 46rem);
+  padding-block: var(--site-band);
 }
 
 .heroTitle {
-  /* Larger than the scale's top step, because the hero is the one place on the
-     site where type is the whole design. */
-  font-size: clamp(var(--helix-text-3xl), 8vw, 4.5rem);
+  /* Past the scale's top step, because the hero is the one place on the site
+     where type is the whole design. */
+  font-size: var(--site-text-hero);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.heroLede {
+  font-size: clamp(var(--helix-text-lg), 2.2vw, var(--helix-text-xl));
+  line-height: var(--helix-leading-normal);
+}
+
+/* ============================================================ sections === */
+
+/* One statement, set large and centred, with nothing else in the band. This is
+   the constraint, and it is the only thing on the site set as a quotation. */
+.statement {
+  margin-inline: auto;
+  max-inline-size: 32ch;
+  text-align: center;
+}
+
+.statementText {
+  font-size: clamp(var(--helix-text-xl), 4vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  text-wrap: balance;
+}
+
+/* A section's own heading block: eyebrow, title, one line of context. */
+.sectionTitle {
+  font-size: var(--site-text-section);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  text-wrap: balance;
+}
+
+/* The two substrates, side by side and given room. Not cards: they are the
+   whole point of the section, so they are set as panels with air rather than
+   as two of something. */
+.substrate {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block-start: var(--helix-space-lg);
+}
+
+.substrateName {
+  font-size: clamp(var(--helix-text-xl), 3vw, var(--helix-text-2xl));
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
 }
 
-.heroLede {
-  max-inline-size: 46ch;
+/* A vertical is a row rather than a card. Four cards make four boxes competing
+   for the same attention; four rules down the page make a list that reads. */
+.verticalRow {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block: var(--helix-space-lg);
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.verticalRow:first-of-type {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+.verticalRow:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
+.verticalName {
+  font-size: clamp(var(--helix-text-lg), 2.5vw, var(--helix-text-xl));
+  letter-spacing: var(--helix-tracking-tight);
 }
 
 .closing {
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   text-align: center;
 }
 
-.closingLede {
-  max-inline-size: 52ch;
+/* ============================================================ docs ======= */
+
+/* Three columns: what you can go to, what you are reading, and where you are
+   in it. Navigation on the left because that is where a reader looks for it,
+   the rail on the right because it is about this page rather than the site.
+   Both are sticky, so neither scrolls out from under the content it describes.
+
+   The middle track is the only one that grows, and the prose inside it is
+   centred in that track rather than filling it: a reference read at the full
+   width of a desktop is a line nobody can track back from. */
+.docsShell {
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-2xl);
+  grid-template-columns: 15rem minmax(0, 1fr) 13rem;
+  padding-block: var(--helix-space-2xl);
+  padding-inline: var(--site-inset);
 }
+
+.docsMain {
+  margin-inline: auto;
+  max-inline-size: 54rem;
+  min-inline-size: 0;
+}
+
+/* Sticky under the banner, and no taller than what is left of the viewport, so
+   a long list scrolls inside the rail instead of pushing the page. */
+.docsNav,
+.docsRail {
+  block-size: fit-content;
+  inset-block-start: calc(var(--helix-size-header) + var(--helix-space-md));
+  max-block-size: calc(100vh - var(--helix-size-header) - var(--helix-space-xl));
+  overflow-y: auto;
+  position: sticky;
+}
+
+.docsRailTitle {
+  display: block;
+  padding-block-end: var(--helix-space-xs);
+}
+
+/* One rule down the rail, with the current entry marked against it. A border
+   rather than a background: the rail is a margin note, not a panel. */
+.docsRailList {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+.docsRailLink::part(link) {
+  display: block;
+  padding-block: var(--helix-space-2xs);
+  padding-inline-start: var(--helix-space-sm);
+  text-decoration: none;
+}
+
+/* An element's own section, separated by space and a rule rather than by a
+   box, so the page reads as one document instead of a stack of cards. */
+.element {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block-start: var(--helix-space-xl);
+  scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
+}
+
+/* The rail is about this page, so it is the first thing to go when there is no
+   room for a margin note. The navigation survives one step longer, because it
+   is how you leave the page. */
+@media (max-width: 72rem) {
+  .docsShell {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+
+  .docsRail {
+    display: none;
+  }
+}
+
+@media (max-width: 56rem) {
+  .docsShell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docsNav {
+    max-block-size: none;
+    position: static;
+  }
+}
+
+/* ============================================================ footer ===== */
 
 .siteFooter {
-  padding-block: var(--helix-space-xl) var(--helix-space-2xl);
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block: var(--helix-space-xl);
 }
 
-@media (max-width: 48rem) {
-  .band,
-  .hero {
-    padding-block: var(--helix-space-xl);
-  }
+/* ============================================================ chrome ===== */
 
-  .shell {
-    padding-inline: var(--helix-space-md);
-  }
+/* The one place capitals are right: a wordmark is read as a shape, not as
+   letters, and the extra tracking is what stops the caps from crowding. The
+   display face is the brand's, and this is the only text that wears it by
+   default rather than by asking. */
+.wordmark::part(text) {
+  font-family: var(--helix-font-display);
+  letter-spacing: var(--helix-tracking-wide);
+  text-transform: uppercase;
 }
 
 /* The nav drawer's own inset. The drawer places the panel; what goes in it is
@@ -74,37 +261,86 @@
   padding: var(--helix-space-lg);
 }
 
-/* The one place capitals are right: a wordmark is read as a shape, not as
-   letters, and the extra tracking is what stops the caps from crowding. */
-.wordmark::part(text) {
-  letter-spacing: var(--helix-tracking-wide);
-  text-transform: uppercase;
-}
-
-/* Nav links styled as tabs. They stay links, because a tab controls a panel
-   and these navigate; borrowing the role would promise panels that do not
-   exist. `aria-current` is the honest version of "you are here". */
-.navTab::part(link) {
-  border-block-end: var(--helix-border-thick) solid transparent;
-  display: inline-block;
-  padding-block: var(--helix-space-2xs);
-  text-decoration: none;
-}
-
-.navTab[aria-current="true"]::part(link) {
-  border-block-end-color: var(--helix-color-primary);
-  color: var(--helix-color-foreground);
-}
-
-.verticalBody {
-  max-inline-size: 60ch;
-}
-
 .prefsPanel {
   padding: var(--helix-space-lg);
 }
 
-/* A vertical's page is one column of prose and whatever it wants below. */
-.verticalShell {
-  padding-block: var(--helix-space-2xl);
+/* ============================================================ motion ===== */
+
+/* Sections arrive as they are scrolled to, once, and never on the way back up.
+   Driven by a view timeline rather than an observer, so it costs no JavaScript
+   and cannot fight the browser's own scheduling.
+
+   Behind `@supports` because a browser without scroll-driven animations must
+   show the content rather than an element stuck at `opacity: 0`, and behind the
+   motion query because this is decoration. */
+@keyframes site-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--helix-space-lg));
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: site-reveal linear both;
+      animation-range: entry 5% cover 22%;
+      animation-timeline: view();
+    }
+  }
+}
+
+/* Cross-route transitions. The header and its indicator persist while the
+   content beneath cross-fades, so a click reads as moving within one page
+   rather than replacing it.
+
+   Every link on the site is a real anchor, including the ones inside a
+   component's shadow root, so navigation is cross-document. That is what makes
+   this a CSS rule rather than a router integration: the browser runs the
+   transition itself and no JavaScript is involved.
+
+   The header carries its own name so it is lifted out of the cross-fade and
+   stays put, which is the whole effect. Anything not named animates as part of
+   the root snapshot. */
+@view-transition {
+  navigation: auto;
+}
+
+helix-app-header {
+  view-transition-name: site-header;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(site-content) {
+    animation: site-fade-out var(--helix-duration-fast) var(--helix-easing-standard) both;
+  }
+
+  ::view-transition-new(site-content) {
+    animation: site-fade-in var(--helix-duration-normal) var(--helix-easing-decelerate) both;
+  }
+}
+
+@keyframes site-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes site-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--helix-space-sm));
+  }
+}
+
+@media (max-width: 48rem) {
+  .hero {
+    min-block-size: auto;
+  }
 }

@@ -329,81 +329,6 @@ export type HelixBaseAvatarSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseAppHeaderProps = {
-  /** Where the navigation sits in the bar.
-
-`center` puts it in the middle of the banner rather than beside the brand,
-which reads as the site's spine when the nav is the primary thing in the
-header rather than an afterthought next to a logo. */
-  "nav-align"?: HelixBaseAppHeader["navAlign"];
-  /** Where the navigation sits in the bar.
-
-`center` puts it in the middle of the banner rather than beside the brand,
-which reads as the site's spine when the nav is the primary thing in the
-header rather than an afterthought next to a logo. */
-  navAlign?: HelixBaseAppHeader["navAlign"];
-};
-
-export type HelixBaseAppHeaderSolidJsProps = {
-  /** Where the navigation sits in the bar.
-
-`center` puts it in the middle of the banner rather than beside the brand,
-which reads as the site's spine when the nav is the primary thing in the
-header rather than an afterthought next to a logo. */
-  "attr:nav-align"?: HelixBaseAppHeader["navAlign"];
-  /** Where the navigation sits in the bar.
-
-`center` puts it in the middle of the banner rather than beside the brand,
-which reads as the site's spine when the nav is the primary thing in the
-header rather than an afterthought next to a logo. */
-  "prop:navAlign"?: HelixBaseAppHeader["navAlign"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseBreadcrumbsItemProps = {
-  /** Where the step leads. Ignored when the item is the current page. */
-  href?: HelixBaseBreadcrumbsItem["href"];
-  /** Whether this item is the page the reader is on. */
-  current?: HelixBaseBreadcrumbsItem["current"];
-};
-
-export type HelixBaseBreadcrumbsItemSolidJsProps = {
-  /** Where the step leads. Ignored when the item is the current page. */
-  "prop:href"?: HelixBaseBreadcrumbsItem["href"];
-  /** Whether this item is the page the reader is on. */
-  "prop:current"?: HelixBaseBreadcrumbsItem["current"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseBreadcrumbsProps = {
-  /** Accessible name for the landmark.
-
-Named rather than left bare because a page may hold more than one
-navigation, and landmarks are how a screen-reader user chooses between them. */
-  label?: HelixBaseBreadcrumbs["label"];
-};
-
-export type HelixBaseBreadcrumbsSolidJsProps = {
-  /** Accessible name for the landmark.
-
-Named rather than left bare because a page may hold more than one
-navigation, and landmarks are how a screen-reader user chooses between them. */
-  "prop:label"?: HelixBaseBreadcrumbs["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type HelixBaseButtonProps = {
   /** What activating the button does to its form. */
   type?: HelixBaseButton["type"];
@@ -477,6 +402,81 @@ anything a consumer sets. */
   textContent?: string | number;
 };
 
+export type HelixBaseBreadcrumbsItemProps = {
+  /** Where the step leads. Ignored when the item is the current page. */
+  href?: HelixBaseBreadcrumbsItem["href"];
+  /** Whether this item is the page the reader is on. */
+  current?: HelixBaseBreadcrumbsItem["current"];
+};
+
+export type HelixBaseBreadcrumbsItemSolidJsProps = {
+  /** Where the step leads. Ignored when the item is the current page. */
+  "prop:href"?: HelixBaseBreadcrumbsItem["href"];
+  /** Whether this item is the page the reader is on. */
+  "prop:current"?: HelixBaseBreadcrumbsItem["current"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseBreadcrumbsProps = {
+  /** Accessible name for the landmark.
+
+Named rather than left bare because a page may hold more than one
+navigation, and landmarks are how a screen-reader user chooses between them. */
+  label?: HelixBaseBreadcrumbs["label"];
+};
+
+export type HelixBaseBreadcrumbsSolidJsProps = {
+  /** Accessible name for the landmark.
+
+Named rather than left bare because a page may hold more than one
+navigation, and landmarks are how a screen-reader user chooses between them. */
+  "prop:label"?: HelixBaseBreadcrumbs["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseAppHeaderProps = {
+  /** Where the navigation sits in the bar.
+
+`center` puts it in the middle of the banner rather than beside the brand,
+which reads as the site's spine when the nav is the primary thing in the
+header rather than an afterthought next to a logo. */
+  "nav-align"?: HelixBaseAppHeader["navAlign"];
+  /** Where the navigation sits in the bar.
+
+`center` puts it in the middle of the banner rather than beside the brand,
+which reads as the site's spine when the nav is the primary thing in the
+header rather than an afterthought next to a logo. */
+  navAlign?: HelixBaseAppHeader["navAlign"];
+};
+
+export type HelixBaseAppHeaderSolidJsProps = {
+  /** Where the navigation sits in the bar.
+
+`center` puts it in the middle of the banner rather than beside the brand,
+which reads as the site's spine when the nav is the primary thing in the
+header rather than an afterthought next to a logo. */
+  "attr:nav-align"?: HelixBaseAppHeader["navAlign"];
+  /** Where the navigation sits in the bar.
+
+`center` puts it in the middle of the banner rather than beside the brand,
+which reads as the site's spine when the nav is the primary thing in the
+header rather than an afterthought next to a logo. */
+  "prop:navAlign"?: HelixBaseAppHeader["navAlign"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixBaseCalloutProps = {
   /** What kind of attention the passage needs. */
   severity?: HelixBaseCallout["severity"];
@@ -486,15 +486,6 @@ export type HelixBaseCalloutSolidJsProps = {
   /** What kind of attention the passage needs. */
   "prop:severity"?: HelixBaseCallout["severity"];
 
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseCardProps = {};
-
-export type HelixBaseCardSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -516,68 +507,9 @@ export type HelixBaseDividerSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseIconProps = {
-  /** Name of the icon in the Helix set. */
-  name?: HelixBaseIcon["name"];
-  /** Accessible name, for an icon that is not decorative. */
-  label?: HelixBaseIcon["label"];
-};
+export type HelixBaseCardProps = {};
 
-export type HelixBaseIconSolidJsProps = {
-  /** Name of the icon in the Helix set. */
-  "prop:name"?: HelixBaseIcon["name"];
-  /** Accessible name, for an icon that is not decorative. */
-  "prop:label"?: HelixBaseIcon["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseTableCellProps = {
-  /** Whether the cell heads its column. */
-  header?: HelixBaseTableCell["header"];
-};
-
-export type HelixBaseTableCellSolidJsProps = {
-  /** Whether the cell heads its column. */
-  "prop:header"?: HelixBaseTableCell["header"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseTableProps = {
-  /** Column track list, as CSS.
-
-A raw track list rather than a count, because a table's columns are rarely
-equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it. */
-  columns?: HelixBaseTable["columns"];
-  /** Accessible name for the table. */
-  label?: HelixBaseTable["label"];
-};
-
-export type HelixBaseTableSolidJsProps = {
-  /** Column track list, as CSS.
-
-A raw track list rather than a count, because a table's columns are rarely
-equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it. */
-  "prop:columns"?: HelixBaseTable["columns"];
-  /** Accessible name for the table. */
-  "prop:label"?: HelixBaseTable["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseTableRowProps = {};
-
-export type HelixBaseTableRowSolidJsProps = {
+export type HelixBaseCardSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -646,6 +578,93 @@ not, rather than shown or hidden by CSS. */
   "prop:defaultOpen"?: HelixBaseDrawer["defaultOpen"];
   /** Fired when the drawer opens or closes. */
   "on:OpenChange"?: (e: HelixBaseDrawerOpenChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseTableCellProps = {
+  /** Whether the cell heads its column. */
+  header?: HelixBaseTableCell["header"];
+};
+
+export type HelixBaseTableCellSolidJsProps = {
+  /** Whether the cell heads its column. */
+  "prop:header"?: HelixBaseTableCell["header"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseIconProps = {
+  /** Name of the icon in the Helix set. */
+  name?: HelixBaseIcon["name"];
+  /** Accessible name, for an icon that is not decorative. */
+  label?: HelixBaseIcon["label"];
+};
+
+export type HelixBaseIconSolidJsProps = {
+  /** Name of the icon in the Helix set. */
+  "prop:name"?: HelixBaseIcon["name"];
+  /** Accessible name, for an icon that is not decorative. */
+  "prop:label"?: HelixBaseIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseTableRowProps = {};
+
+export type HelixBaseTableRowSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseTableProps = {
+  /** Column track list, as CSS.
+
+A raw track list rather than a count, because a table's columns are rarely
+equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it. */
+  columns?: HelixBaseTable["columns"];
+  /** Accessible name for the table. */
+  label?: HelixBaseTable["label"];
+};
+
+export type HelixBaseTableSolidJsProps = {
+  /** Column track list, as CSS.
+
+A raw track list rather than a count, because a table's columns are rarely
+equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it. */
+  "prop:columns"?: HelixBaseTable["columns"];
+  /** Accessible name for the table. */
+  "prop:label"?: HelixBaseTable["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseTabsPanelProps = {
+  /** Pairs the panel with the tab of the same value. */
+  value?: HelixBaseTabsPanel["value"];
+  /** Whether this panel is the visible one. */
+  selected?: HelixBaseTabsPanel["selected"];
+};
+
+export type HelixBaseTabsPanelSolidJsProps = {
+  /** Pairs the panel with the tab of the same value. */
+  "prop:value"?: HelixBaseTabsPanel["value"];
+  /** Whether this panel is the visible one. */
+  "prop:selected"?: HelixBaseTabsPanel["selected"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -727,25 +746,6 @@ export type HelixBaseTabsTabSolidJsProps = {
   "on:SelectionChange"?: (
     e: HelixBaseTabsTabSelectionChangeElementEvent,
   ) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseTabsPanelProps = {
-  /** Pairs the panel with the tab of the same value. */
-  value?: HelixBaseTabsPanel["value"];
-  /** Whether this panel is the visible one. */
-  selected?: HelixBaseTabsPanel["selected"];
-};
-
-export type HelixBaseTabsPanelSolidJsProps = {
-  /** Pairs the panel with the tab of the same value. */
-  "prop:value"?: HelixBaseTabsPanel["value"];
-  /** Whether this panel is the visible one. */
-  "prop:selected"?: HelixBaseTabsPanel["selected"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -864,6 +864,25 @@ export type HelixBaseToggleGroupItemSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixBaseToolbarProps = {
+  /** Accessible name for the toolbar. */
+  label?: HelixBaseToolbar["label"];
+  /** Which way the arrow keys move. */
+  orientation?: HelixBaseToolbar["orientation"];
+};
+
+export type HelixBaseToolbarSolidJsProps = {
+  /** Accessible name for the toolbar. */
+  "prop:label"?: HelixBaseToolbar["label"];
+  /** Which way the arrow keys move. */
+  "prop:orientation"?: HelixBaseToolbar["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixBaseTreeItem` component event */
 export type HelixBaseTreeItemElementEvent<E = Event> = TypedEvent<
   HelixBaseTreeItem,
@@ -955,25 +974,6 @@ export type HelixBaseToggleGroupSolidJsProps = {
   "on:SelectionChange"?: (
     e: HelixBaseToggleGroupSelectionChangeElementEvent,
   ) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseToolbarProps = {
-  /** Accessible name for the toolbar. */
-  label?: HelixBaseToolbar["label"];
-  /** Which way the arrow keys move. */
-  orientation?: HelixBaseToolbar["orientation"];
-};
-
-export type HelixBaseToolbarSolidJsProps = {
-  /** Accessible name for the toolbar. */
-  "prop:label"?: HelixBaseToolbar["label"];
-  /** Which way the arrow keys move. */
-  "prop:orientation"?: HelixBaseToolbar["orientation"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1150,53 +1150,65 @@ export type CustomElements = {
   >;
 
   /**
-   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
-   * the styled tier can lift the bar off the page without a scroll handler of its
-   * own. Scroll position is the one piece of state the server genuinely cannot
-   * know, so it is read on connect rather than derived: a fresh load starts at
-   * the top, which is what the server rendered, and a reload part-way down
-   * corrects on hydration.
+   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
+   * focus, and the browser's own affordances come from the platform rather than
+   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
+   * serializes into the server's markup, so the button is keyboard reachable
+   * before any JavaScript loads.
    *
-   * The listener is passive and reads `scrollY` only, so it never blocks
-   * scrolling.
-   *
-   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
-   * landmark the navigation needs whether or not anything is in it; the other two
-   * are `display: contents` when unassigned and cost nothing.
-   *
-   * The host is the banner and spans the viewport; the row inside it is what gets
-   * centred. A banner that is itself narrowed leaves its background stopping
-   * short of the window edges, which reads as a floating bar rather than as the
-   * top of the page. That needs one element and one row, not a wrapper as well:
-   * the host carries the material and `content` carries the measure.
+   * Form submission is explicit. A `<button type="submit">` inside a shadow root
+   * submits nothing, because the form is on the other side of the boundary, so
+   * the inner control is always `type="button"` and this element calls
+   * `requestSubmit()` on its form instead. That routes through validation, unlike
+   * `submit()`.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `nav-align`/`navAlign`: Where the navigation sits in the bar.
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `label`: Accessible name, for a button whose content is not text.
    *
-   * `center` puts it in the middle of the banner rather than beside the brand,
-   * which reads as the site's spine when the nav is the primary thing in the
-   * header rather than an afterthought next to a logo.
+   * Lives here rather than only on `IconButton` so the two share one render.
+   * An icon-only button without it is a control a screen reader announces as
+   * "button" and nothing else.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `brand`: Wordmark or logo, at the inline start.
-   * - `(default)`: Primary navigation.
-   * - `actions`: Trailing actions, such as a call to action.
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `content`: The centred row inside the banner.
-   * - `nav`: The navigation region.
+   * - `button`: The inner button or anchor.
    */
-  "helix-base-app-header": Partial<
-    HelixBaseAppHeaderProps & BaseProps<HelixBaseAppHeader> & BaseEvents
+  "helix-base-button": Partial<
+    HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
   >;
 
   /**
@@ -1275,65 +1287,53 @@ export type CustomElements = {
   >;
 
   /**
-   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
-   * focus, and the browser's own affordances come from the platform rather than
-   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
-   * serializes into the server's markup, so the button is keyboard reachable
-   * before any JavaScript loads.
+   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
+   * the styled tier can lift the bar off the page without a scroll handler of its
+   * own. Scroll position is the one piece of state the server genuinely cannot
+   * know, so it is read on connect rather than derived: a fresh load starts at
+   * the top, which is what the server rendered, and a reload part-way down
+   * corrects on hydration.
    *
-   * Form submission is explicit. A `<button type="submit">` inside a shadow root
-   * submits nothing, because the form is on the other side of the boundary, so
-   * the inner control is always `type="button"` and this element calls
-   * `requestSubmit()` on its form instead. That routes through validation, unlike
-   * `submit()`.
+   * The listener is passive and reads `scrollY` only, so it never blocks
+   * scrolling.
+   *
+   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
+   * landmark the navigation needs whether or not anything is in it; the other two
+   * are `display: contents` when unassigned and cost nothing.
+   *
+   * The host is the banner and spans the viewport; the row inside it is what gets
+   * centred. A banner that is itself narrowed leaves its background stopping
+   * short of the window edges, which reads as a floating bar rather than as the
+   * top of the page. That needs one element and one row, not a wrapper as well:
+   * the host carries the material and `content` carries the measure.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `type`: What activating the button does to its form.
-   * - `href`: Navigates to this URL instead of acting on a form.
-   * - `target`: Browsing context for `href`, such as `_blank`.
-   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
-   * - `label`: Accessible name, for a button whose content is not text.
+   * - `nav-align`/`navAlign`: Where the navigation sits in the bar.
    *
-   * Lives here rather than only on `IconButton` so the two share one render.
-   * An icon-only button without it is a control a screen reader announces as
-   * "button" and nothing else.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   * - `focusable`: Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets. (property only)
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
+   * `center` puts it in the middle of the banner rather than beside the brand,
+   * which reads as the site's spine when the nav is the primary thing in the
+   * header rather than an afterthought next to a logo.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
-   * - `end`: Content after the label.
+   * - `brand`: Wordmark or logo, at the inline start.
+   * - `(default)`: Primary navigation.
+   * - `actions`: Trailing actions, such as a call to action.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `content`: The centred row inside the banner.
+   * - `nav`: The navigation region.
    */
-  "helix-base-button": Partial<
-    HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
+  "helix-base-app-header": Partial<
+    HelixBaseAppHeaderProps & BaseProps<HelixBaseAppHeader> & BaseEvents
   >;
 
   /**
@@ -1372,34 +1372,6 @@ export type CustomElements = {
   >;
 
   /**
-   * Regions are slots rather than separate elements, because a header, body, and
-   * footer carry no state, no behavior, and no API of their own. Slotting them
-   * costs one custom element instead of five and lets the consumer bring their
-   * own markup, so a title can be a real `<h2>` rather than an emulated one.
-   *
-   * The host is the surface. A wrapper `<div part="container">` would be a second
-   * box doing nothing the host cannot: the element itself takes the border, the
-   * radius, and the grid, and a consumer styles `helix-card` rather than reaching
-   * through `::part`. One node instead of two, on every card on the page.
-   *
-   * Name the card with `aria-label` or `aria-labelledby`. That is the only
-   * naming that survives server rendering: reading a title out of the light DOM
-   * needs a DOM, and the server has none.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
-   */
-  "helix-base-card": Partial<
-    HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
-  >;
-
-  /**
    * The separator role lives on the rule inside the shadow root rather than on
    * the host. A role does not need to cross the shadow boundary the way an IDREF
    * does, and putting it on the rendered element means the semantics are in the
@@ -1427,121 +1399,31 @@ export type CustomElements = {
   >;
 
   /**
-   * The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is
-   * rendered as its own inner markup rather than as a single path. Most icons are
-   * several elements at once, each with its own stroke and fill, so a one-path
-   * model would draw a fraction of the set and quietly drop the rest.
+   * Regions are slots rather than separate elements, because a header, body, and
+   * footer carry no state, no behavior, and no API of their own. Slotting them
+   * costs one custom element instead of five and lets the consumer bring their
+   * own markup, so a title can be a real `<h2>` rather than an emulated one.
    *
-   * **The markup is trusted by construction.** It is generated at build time from
-   * SVG files in this repository, never from anything a user supplies, which is
-   * what makes `unsafeSVG` the right tool rather than a risk.
+   * The host is the surface. A wrapper `<div part="container">` would be a second
+   * box doing nothing the host cannot: the element itself takes the border, the
+   * radius, and the grid, and a consumer styles `helix-card` rather than reaching
+   * through `::part`. One node instead of two, on every card on the page.
    *
-   * A name with no match renders nothing at all instead of an empty box, so a
-   * typo cannot leave a hole in a layout that looks deliberate.
-   *
-   * An icon is decorative by default and hidden from assistive technology. Give
-   * it a `label` only when the icon is the sole carrier of meaning, such as
-   * inside a button with no text.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `name`: Name of the icon in the Helix set.
-   * - `label`: Accessible name, for an icon that is not decorative.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `svg`: The rendered SVG.
-   */
-  "helix-base-icon": Partial<
-    HelixBaseIconProps & BaseProps<HelixBaseIcon> & BaseEvents
-  >;
-
-  /**
-   * Carries its own role, because a grid of divs is not a table to anything
-   * reading it. `header` makes the cell a `columnheader`, which is what lets a
-   * screen reader announce "Attribute, appearance" rather than just the value.
-   *
-   * The role goes on the host rather than inside the shadow root, because the
-   * cell has to be a child of its row in the flat tree for the table's structure
-   * to hold together.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `header`: Whether the cell heads its column.
+   * Name the card with `aria-label` or `aria-labelledby`. That is the only
+   * naming that survives server rendering: reading a title out of the light DOM
+   * needs a DOM, and the server has none.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The cell's content.
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
    */
-  "helix-base-table-cell": Partial<
-    HelixBaseTableCellProps & BaseProps<HelixBaseTableCell> & BaseEvents
-  >;
-
-  /**
-   * A grid rather than a `<table>`, so every column lines up across rows while
-   * each row stays a real element that can be styled, hidden, or made
-   * interactive. Table layout gives column alignment and takes away almost
-   * everything else; grid gives both.
-   *
-   * The cost is that the roles have to be declared, since a grid of divs is not a
-   * table to anyone reading it. `table`, `row`, `cell`, and `columnheader` are
-   * all set explicitly, and rows are `display: contents` so their cells become
-   * items of the one grid that does the aligning.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `columns`: Column track list, as CSS.
-   *
-   * A raw track list rather than a count, because a table's columns are rarely
-   * equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.
-   * - `label`: Accessible name for the table.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The table's rows.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--table-columns`: Track list for the columns. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `table`: The grid.
-   */
-  "helix-base-table": Partial<
-    HelixBaseTableProps & BaseProps<HelixBaseTable> & BaseEvents
-  >;
-
-  /**
-   * `display: contents` in the styled tier, so the row's cells become items of
-   * the table's own grid and every column lines up across every row. The row
-   * still exists as an element, which is what a `<table>` gives away when its
-   * cells are laid out by the table algorithm.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The row's cells.
-   */
-  "helix-base-table-row": Partial<
-    HelixBaseTableRowProps & BaseProps<HelixBaseTableRow> & BaseEvents
+  "helix-base-card": Partial<
+    HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
   >;
 
   /**
@@ -1609,6 +1491,152 @@ export type CustomElements = {
    */
   "helix-base-drawer": Partial<
     HelixBaseDrawerProps & BaseProps<HelixBaseDrawer> & BaseEvents
+  >;
+
+  /**
+   * Carries its own role, because a grid of divs is not a table to anything
+   * reading it. `header` makes the cell a `columnheader`, which is what lets a
+   * screen reader announce "Attribute, appearance" rather than just the value.
+   *
+   * The role goes on the host rather than inside the shadow root, because the
+   * cell has to be a child of its row in the flat tree for the table's structure
+   * to hold together.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `header`: Whether the cell heads its column.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The cell's content.
+   */
+  "helix-base-table-cell": Partial<
+    HelixBaseTableCellProps & BaseProps<HelixBaseTableCell> & BaseEvents
+  >;
+
+  /**
+   * The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is
+   * rendered as its own inner markup rather than as a single path. Most icons are
+   * several elements at once, each with its own stroke and fill, so a one-path
+   * model would draw a fraction of the set and quietly drop the rest.
+   *
+   * **The markup is trusted by construction.** It is generated at build time from
+   * SVG files in this repository, never from anything a user supplies, which is
+   * what makes `unsafeSVG` the right tool rather than a risk.
+   *
+   * A name with no match renders nothing at all instead of an empty box, so a
+   * typo cannot leave a hole in a layout that looks deliberate.
+   *
+   * An icon is decorative by default and hidden from assistive technology. Give
+   * it a `label` only when the icon is the sole carrier of meaning, such as
+   * inside a button with no text.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `name`: Name of the icon in the Helix set.
+   * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rendered SVG.
+   */
+  "helix-base-icon": Partial<
+    HelixBaseIconProps & BaseProps<HelixBaseIcon> & BaseEvents
+  >;
+
+  /**
+   * `display: contents` in the styled tier, so the row's cells become items of
+   * the table's own grid and every column lines up across every row. The row
+   * still exists as an element, which is what a `<table>` gives away when its
+   * cells are laid out by the table algorithm.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The row's cells.
+   */
+  "helix-base-table-row": Partial<
+    HelixBaseTableRowProps & BaseProps<HelixBaseTableRow> & BaseEvents
+  >;
+
+  /**
+   * A grid rather than a `<table>`, so every column lines up across rows while
+   * each row stays a real element that can be styled, hidden, or made
+   * interactive. Table layout gives column alignment and takes away almost
+   * everything else; grid gives both.
+   *
+   * The cost is that the roles have to be declared, since a grid of divs is not a
+   * table to anyone reading it. `table`, `row`, `cell`, and `columnheader` are
+   * all set explicitly, and rows are `display: contents` so their cells become
+   * items of the one grid that does the aligning.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `columns`: Column track list, as CSS.
+   *
+   * A raw track list rather than a count, because a table's columns are rarely
+   * equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.
+   * - `label`: Accessible name for the table.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The table's rows.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--table-columns`: Track list for the columns. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `table`: The grid.
+   */
+  "helix-base-table": Partial<
+    HelixBaseTableProps & BaseProps<HelixBaseTable> & BaseEvents
+  >;
+
+  /**
+   * Hidden rather than unmounted when inactive, so anything typed into a panel is
+   * still there when the reader comes back to it, and so the content is in the
+   * server's markup for a crawler regardless of which tab is open.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: Pairs the panel with the tab of the same value.
+   * - `selected`: Whether this panel is the visible one.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The panel's content.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `panel`: The panel container.
+   */
+  "helix-base-tabs-panel": Partial<
+    HelixBaseTabsPanelProps & BaseProps<HelixBaseTabsPanel> & BaseEvents
   >;
 
   /**
@@ -1700,34 +1728,6 @@ export type CustomElements = {
    */
   "helix-base-tabs-tab": Partial<
     HelixBaseTabsTabProps & BaseProps<HelixBaseTabsTab> & BaseEvents
-  >;
-
-  /**
-   * Hidden rather than unmounted when inactive, so anything typed into a panel is
-   * still there when the reader comes back to it, and so the content is in the
-   * server's markup for a crawler regardless of which tab is open.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `value`: Pairs the panel with the tab of the same value.
-   * - `selected`: Whether this panel is the visible one.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The panel's content.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `panel`: The panel container.
-   */
-  "helix-base-tabs-panel": Partial<
-    HelixBaseTabsPanelProps & BaseProps<HelixBaseTabsPanel> & BaseEvents
   >;
 
   /**
@@ -1825,6 +1825,40 @@ export type CustomElements = {
     HelixBaseToggleGroupItemProps &
       BaseProps<HelixBaseToggleGroupItem> &
       BaseEvents
+  >;
+
+  /**
+   * Separate from a button group, and the difference is what it holds: a group is
+   * homogeneous, a toolbar is not. A toolbar mixes buttons, toggles, and menus,
+   * which is why it is its own component rather than a variant of something.
+   *
+   * The whole toolbar is one tab stop and the arrows move between controls, so a
+   * page with three toolbars costs three presses of Tab to get past rather than
+   * thirty. Controls are found by asking the browser what is focusable rather
+   * than by matching tag names, so a toolbar works with anything put in it,
+   * including a consumer's own elements.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the toolbar.
+   * - `orientation`: Which way the arrow keys move.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The toolbar's controls.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `toolbar`: The toolbar container.
+   */
+  "helix-base-toolbar": Partial<
+    HelixBaseToolbarProps & BaseProps<HelixBaseToolbar> & BaseEvents
   >;
 
   /**
@@ -1934,40 +1968,6 @@ export type CustomElements = {
    */
   "helix-base-toggle-group": Partial<
     HelixBaseToggleGroupProps & BaseProps<HelixBaseToggleGroup> & BaseEvents
-  >;
-
-  /**
-   * Separate from a button group, and the difference is what it holds: a group is
-   * homogeneous, a toolbar is not. A toolbar mixes buttons, toggles, and menus,
-   * which is why it is its own component rather than a variant of something.
-   *
-   * The whole toolbar is one tab stop and the arrows move between controls, so a
-   * page with three toolbars costs three presses of Tab to get past rather than
-   * thirty. Controls are found by asking the browser what is focusable rather
-   * than by matching tag names, so a toolbar works with anything put in it,
-   * including a consumer's own elements.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `label`: Accessible name for the toolbar.
-   * - `orientation`: Which way the arrow keys move.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The toolbar's controls.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `toolbar`: The toolbar container.
-   */
-  "helix-base-toolbar": Partial<
-    HelixBaseToolbarProps & BaseProps<HelixBaseToolbar> & BaseEvents
   >;
 
   /**
@@ -2157,55 +2157,67 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
-   * the styled tier can lift the bar off the page without a scroll handler of its
-   * own. Scroll position is the one piece of state the server genuinely cannot
-   * know, so it is read on connect rather than derived: a fresh load starts at
-   * the top, which is what the server rendered, and a reload part-way down
-   * corrects on hydration.
+   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
+   * focus, and the browser's own affordances come from the platform rather than
+   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
+   * serializes into the server's markup, so the button is keyboard reachable
+   * before any JavaScript loads.
    *
-   * The listener is passive and reads `scrollY` only, so it never blocks
-   * scrolling.
-   *
-   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
-   * landmark the navigation needs whether or not anything is in it; the other two
-   * are `display: contents` when unassigned and cost nothing.
-   *
-   * The host is the banner and spans the viewport; the row inside it is what gets
-   * centred. A banner that is itself narrowed leaves its background stopping
-   * short of the window edges, which reads as a floating bar rather than as the
-   * top of the page. That needs one element and one row, not a wrapper as well:
-   * the host carries the material and `content` carries the measure.
+   * Form submission is explicit. A `<button type="submit">` inside a shadow root
+   * submits nothing, because the form is on the other side of the boundary, so
+   * the inner control is always `type="button"` and this element calls
+   * `requestSubmit()` on its form instead. That routes through validation, unlike
+   * `submit()`.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `nav-align`/`navAlign`: Where the navigation sits in the bar.
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `label`: Accessible name, for a button whose content is not text.
    *
-   * `center` puts it in the middle of the banner rather than beside the brand,
-   * which reads as the site's spine when the nav is the primary thing in the
-   * header rather than an afterthought next to a logo.
+   * Lives here rather than only on `IconButton` so the two share one render.
+   * An icon-only button without it is a control a screen reader announces as
+   * "button" and nothing else.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `brand`: Wordmark or logo, at the inline start.
-   * - `(default)`: Primary navigation.
-   * - `actions`: Trailing actions, such as a call to action.
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `content`: The centred row inside the banner.
-   * - `nav`: The navigation region.
+   * - `button`: The inner button or anchor.
    */
-  "helix-base-app-header": Partial<
-    HelixBaseAppHeaderProps &
-      HelixBaseAppHeaderSolidJsProps &
-      BaseProps<HelixBaseAppHeader> &
+  "helix-base-button": Partial<
+    HelixBaseButtonProps &
+      HelixBaseButtonSolidJsProps &
+      BaseProps<HelixBaseButton> &
       BaseEvents
   >;
 
@@ -2289,67 +2301,55 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
-   * focus, and the browser's own affordances come from the platform rather than
-   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
-   * serializes into the server's markup, so the button is keyboard reachable
-   * before any JavaScript loads.
+   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
+   * the styled tier can lift the bar off the page without a scroll handler of its
+   * own. Scroll position is the one piece of state the server genuinely cannot
+   * know, so it is read on connect rather than derived: a fresh load starts at
+   * the top, which is what the server rendered, and a reload part-way down
+   * corrects on hydration.
    *
-   * Form submission is explicit. A `<button type="submit">` inside a shadow root
-   * submits nothing, because the form is on the other side of the boundary, so
-   * the inner control is always `type="button"` and this element calls
-   * `requestSubmit()` on its form instead. That routes through validation, unlike
-   * `submit()`.
+   * The listener is passive and reads `scrollY` only, so it never blocks
+   * scrolling.
+   *
+   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
+   * landmark the navigation needs whether or not anything is in it; the other two
+   * are `display: contents` when unassigned and cost nothing.
+   *
+   * The host is the banner and spans the viewport; the row inside it is what gets
+   * centred. A banner that is itself narrowed leaves its background stopping
+   * short of the window edges, which reads as a floating bar rather than as the
+   * top of the page. That needs one element and one row, not a wrapper as well:
+   * the host carries the material and `content` carries the measure.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `type`: What activating the button does to its form.
-   * - `href`: Navigates to this URL instead of acting on a form.
-   * - `target`: Browsing context for `href`, such as `_blank`.
-   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
-   * - `label`: Accessible name, for a button whose content is not text.
+   * - `nav-align`/`navAlign`: Where the navigation sits in the bar.
    *
-   * Lives here rather than only on `IconButton` so the two share one render.
-   * An icon-only button without it is a control a screen reader announces as
-   * "button" and nothing else.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   * - `focusable`: Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets. (property only)
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
+   * `center` puts it in the middle of the banner rather than beside the brand,
+   * which reads as the site's spine when the nav is the primary thing in the
+   * header rather than an afterthought next to a logo.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
-   * - `end`: Content after the label.
+   * - `brand`: Wordmark or logo, at the inline start.
+   * - `(default)`: Primary navigation.
+   * - `actions`: Trailing actions, such as a call to action.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `content`: The centred row inside the banner.
+   * - `nav`: The navigation region.
    */
-  "helix-base-button": Partial<
-    HelixBaseButtonProps &
-      HelixBaseButtonSolidJsProps &
-      BaseProps<HelixBaseButton> &
+  "helix-base-app-header": Partial<
+    HelixBaseAppHeaderProps &
+      HelixBaseAppHeaderSolidJsProps &
+      BaseProps<HelixBaseAppHeader> &
       BaseEvents
   >;
 
@@ -2392,37 +2392,6 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Regions are slots rather than separate elements, because a header, body, and
-   * footer carry no state, no behavior, and no API of their own. Slotting them
-   * costs one custom element instead of five and lets the consumer bring their
-   * own markup, so a title can be a real `<h2>` rather than an emulated one.
-   *
-   * The host is the surface. A wrapper `<div part="container">` would be a second
-   * box doing nothing the host cannot: the element itself takes the border, the
-   * radius, and the grid, and a consumer styles `helix-card` rather than reaching
-   * through `::part`. One node instead of two, on every card on the page.
-   *
-   * Name the card with `aria-label` or `aria-labelledby`. That is the only
-   * naming that survives server rendering: reading a title out of the light DOM
-   * needs a DOM, and the server has none.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
-   */
-  "helix-base-card": Partial<
-    HelixBaseCardProps &
-      HelixBaseCardSolidJsProps &
-      BaseProps<HelixBaseCard> &
-      BaseEvents
-  >;
-
-  /**
    * The separator role lives on the rule inside the shadow root rather than on
    * the host. A role does not need to cross the shadow boundary the way an IDREF
    * does, and putting it on the rendered element means the semantics are in the
@@ -2453,132 +2422,33 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is
-   * rendered as its own inner markup rather than as a single path. Most icons are
-   * several elements at once, each with its own stroke and fill, so a one-path
-   * model would draw a fraction of the set and quietly drop the rest.
+   * Regions are slots rather than separate elements, because a header, body, and
+   * footer carry no state, no behavior, and no API of their own. Slotting them
+   * costs one custom element instead of five and lets the consumer bring their
+   * own markup, so a title can be a real `<h2>` rather than an emulated one.
    *
-   * **The markup is trusted by construction.** It is generated at build time from
-   * SVG files in this repository, never from anything a user supplies, which is
-   * what makes `unsafeSVG` the right tool rather than a risk.
+   * The host is the surface. A wrapper `<div part="container">` would be a second
+   * box doing nothing the host cannot: the element itself takes the border, the
+   * radius, and the grid, and a consumer styles `helix-card` rather than reaching
+   * through `::part`. One node instead of two, on every card on the page.
    *
-   * A name with no match renders nothing at all instead of an empty box, so a
-   * typo cannot leave a hole in a layout that looks deliberate.
-   *
-   * An icon is decorative by default and hidden from assistive technology. Give
-   * it a `label` only when the icon is the sole carrier of meaning, such as
-   * inside a button with no text.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `name`: Name of the icon in the Helix set.
-   * - `label`: Accessible name, for an icon that is not decorative.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `svg`: The rendered SVG.
-   */
-  "helix-base-icon": Partial<
-    HelixBaseIconProps &
-      HelixBaseIconSolidJsProps &
-      BaseProps<HelixBaseIcon> &
-      BaseEvents
-  >;
-
-  /**
-   * Carries its own role, because a grid of divs is not a table to anything
-   * reading it. `header` makes the cell a `columnheader`, which is what lets a
-   * screen reader announce "Attribute, appearance" rather than just the value.
-   *
-   * The role goes on the host rather than inside the shadow root, because the
-   * cell has to be a child of its row in the flat tree for the table's structure
-   * to hold together.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `header`: Whether the cell heads its column.
+   * Name the card with `aria-label` or `aria-labelledby`. That is the only
+   * naming that survives server rendering: reading a title out of the light DOM
+   * needs a DOM, and the server has none.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The cell's content.
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
    */
-  "helix-base-table-cell": Partial<
-    HelixBaseTableCellProps &
-      HelixBaseTableCellSolidJsProps &
-      BaseProps<HelixBaseTableCell> &
-      BaseEvents
-  >;
-
-  /**
-   * A grid rather than a `<table>`, so every column lines up across rows while
-   * each row stays a real element that can be styled, hidden, or made
-   * interactive. Table layout gives column alignment and takes away almost
-   * everything else; grid gives both.
-   *
-   * The cost is that the roles have to be declared, since a grid of divs is not a
-   * table to anyone reading it. `table`, `row`, `cell`, and `columnheader` are
-   * all set explicitly, and rows are `display: contents` so their cells become
-   * items of the one grid that does the aligning.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `columns`: Column track list, as CSS.
-   *
-   * A raw track list rather than a count, because a table's columns are rarely
-   * equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.
-   * - `label`: Accessible name for the table.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The table's rows.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--table-columns`: Track list for the columns. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `table`: The grid.
-   */
-  "helix-base-table": Partial<
-    HelixBaseTableProps &
-      HelixBaseTableSolidJsProps &
-      BaseProps<HelixBaseTable> &
-      BaseEvents
-  >;
-
-  /**
-   * `display: contents` in the styled tier, so the row's cells become items of
-   * the table's own grid and every column lines up across every row. The row
-   * still exists as an element, which is what a `<table>` gives away when its
-   * cells are laid out by the table algorithm.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The row's cells.
-   */
-  "helix-base-table-row": Partial<
-    HelixBaseTableRowProps &
-      HelixBaseTableRowSolidJsProps &
-      BaseProps<HelixBaseTableRow> &
+  "helix-base-card": Partial<
+    HelixBaseCardProps &
+      HelixBaseCardSolidJsProps &
+      BaseProps<HelixBaseCard> &
       BaseEvents
   >;
 
@@ -2649,6 +2519,167 @@ export type CustomElementsSolidJs = {
     HelixBaseDrawerProps &
       HelixBaseDrawerSolidJsProps &
       BaseProps<HelixBaseDrawer> &
+      BaseEvents
+  >;
+
+  /**
+   * Carries its own role, because a grid of divs is not a table to anything
+   * reading it. `header` makes the cell a `columnheader`, which is what lets a
+   * screen reader announce "Attribute, appearance" rather than just the value.
+   *
+   * The role goes on the host rather than inside the shadow root, because the
+   * cell has to be a child of its row in the flat tree for the table's structure
+   * to hold together.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `header`: Whether the cell heads its column.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The cell's content.
+   */
+  "helix-base-table-cell": Partial<
+    HelixBaseTableCellProps &
+      HelixBaseTableCellSolidJsProps &
+      BaseProps<HelixBaseTableCell> &
+      BaseEvents
+  >;
+
+  /**
+   * The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is
+   * rendered as its own inner markup rather than as a single path. Most icons are
+   * several elements at once, each with its own stroke and fill, so a one-path
+   * model would draw a fraction of the set and quietly drop the rest.
+   *
+   * **The markup is trusted by construction.** It is generated at build time from
+   * SVG files in this repository, never from anything a user supplies, which is
+   * what makes `unsafeSVG` the right tool rather than a risk.
+   *
+   * A name with no match renders nothing at all instead of an empty box, so a
+   * typo cannot leave a hole in a layout that looks deliberate.
+   *
+   * An icon is decorative by default and hidden from assistive technology. Give
+   * it a `label` only when the icon is the sole carrier of meaning, such as
+   * inside a button with no text.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `name`: Name of the icon in the Helix set.
+   * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rendered SVG.
+   */
+  "helix-base-icon": Partial<
+    HelixBaseIconProps &
+      HelixBaseIconSolidJsProps &
+      BaseProps<HelixBaseIcon> &
+      BaseEvents
+  >;
+
+  /**
+   * `display: contents` in the styled tier, so the row's cells become items of
+   * the table's own grid and every column lines up across every row. The row
+   * still exists as an element, which is what a `<table>` gives away when its
+   * cells are laid out by the table algorithm.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The row's cells.
+   */
+  "helix-base-table-row": Partial<
+    HelixBaseTableRowProps &
+      HelixBaseTableRowSolidJsProps &
+      BaseProps<HelixBaseTableRow> &
+      BaseEvents
+  >;
+
+  /**
+   * A grid rather than a `<table>`, so every column lines up across rows while
+   * each row stays a real element that can be styled, hidden, or made
+   * interactive. Table layout gives column alignment and takes away almost
+   * everything else; grid gives both.
+   *
+   * The cost is that the roles have to be declared, since a grid of divs is not a
+   * table to anyone reading it. `table`, `row`, `cell`, and `columnheader` are
+   * all set explicitly, and rows are `display: contents` so their cells become
+   * items of the one grid that does the aligning.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `columns`: Column track list, as CSS.
+   *
+   * A raw track list rather than a count, because a table's columns are rarely
+   * equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.
+   * - `label`: Accessible name for the table.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The table's rows.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--table-columns`: Track list for the columns. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `table`: The grid.
+   */
+  "helix-base-table": Partial<
+    HelixBaseTableProps &
+      HelixBaseTableSolidJsProps &
+      BaseProps<HelixBaseTable> &
+      BaseEvents
+  >;
+
+  /**
+   * Hidden rather than unmounted when inactive, so anything typed into a panel is
+   * still there when the reader comes back to it, and so the content is in the
+   * server's markup for a crawler regardless of which tab is open.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: Pairs the panel with the tab of the same value.
+   * - `selected`: Whether this panel is the visible one.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The panel's content.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `panel`: The panel container.
+   */
+  "helix-base-tabs-panel": Partial<
+    HelixBaseTabsPanelProps &
+      HelixBaseTabsPanelSolidJsProps &
+      BaseProps<HelixBaseTabsPanel> &
       BaseEvents
   >;
 
@@ -2750,37 +2781,6 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Hidden rather than unmounted when inactive, so anything typed into a panel is
-   * still there when the reader comes back to it, and so the content is in the
-   * server's markup for a crawler regardless of which tab is open.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `value`: Pairs the panel with the tab of the same value.
-   * - `selected`: Whether this panel is the visible one.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The panel's content.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `panel`: The panel container.
-   */
-  "helix-base-tabs-panel": Partial<
-    HelixBaseTabsPanelProps &
-      HelixBaseTabsPanelSolidJsProps &
-      BaseProps<HelixBaseTabsPanel> &
-      BaseEvents
-  >;
-
-  /**
    * A tag is a label, and optionally a label the reader can take off. `removable`
    * is what separates it from a badge: a badge reports a state the reader cannot
    * change, a tag names something they can.
@@ -2878,6 +2878,43 @@ export type CustomElementsSolidJs = {
     HelixBaseToggleGroupItemProps &
       HelixBaseToggleGroupItemSolidJsProps &
       BaseProps<HelixBaseToggleGroupItem> &
+      BaseEvents
+  >;
+
+  /**
+   * Separate from a button group, and the difference is what it holds: a group is
+   * homogeneous, a toolbar is not. A toolbar mixes buttons, toggles, and menus,
+   * which is why it is its own component rather than a variant of something.
+   *
+   * The whole toolbar is one tab stop and the arrows move between controls, so a
+   * page with three toolbars costs three presses of Tab to get past rather than
+   * thirty. Controls are found by asking the browser what is focusable rather
+   * than by matching tag names, so a toolbar works with anything put in it,
+   * including a consumer's own elements.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the toolbar.
+   * - `orientation`: Which way the arrow keys move.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The toolbar's controls.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `toolbar`: The toolbar container.
+   */
+  "helix-base-toolbar": Partial<
+    HelixBaseToolbarProps &
+      HelixBaseToolbarSolidJsProps &
+      BaseProps<HelixBaseToolbar> &
       BaseEvents
   >;
 
@@ -2993,43 +3030,6 @@ export type CustomElementsSolidJs = {
     HelixBaseToggleGroupProps &
       HelixBaseToggleGroupSolidJsProps &
       BaseProps<HelixBaseToggleGroup> &
-      BaseEvents
-  >;
-
-  /**
-   * Separate from a button group, and the difference is what it holds: a group is
-   * homogeneous, a toolbar is not. A toolbar mixes buttons, toggles, and menus,
-   * which is why it is its own component rather than a variant of something.
-   *
-   * The whole toolbar is one tab stop and the arrows move between controls, so a
-   * page with three toolbars costs three presses of Tab to get past rather than
-   * thirty. Controls are found by asking the browser what is focusable rather
-   * than by matching tag names, so a toolbar works with anything put in it,
-   * including a consumer's own elements.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `label`: Accessible name for the toolbar.
-   * - `orientation`: Which way the arrow keys move.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The toolbar's controls.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `toolbar`: The toolbar container.
-   */
-  "helix-base-toolbar": Partial<
-    HelixBaseToolbarProps &
-      HelixBaseToolbarSolidJsProps &
-      BaseProps<HelixBaseToolbar> &
       BaseEvents
   >;
 
