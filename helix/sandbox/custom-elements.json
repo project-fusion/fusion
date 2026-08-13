@@ -53,16 +53,6 @@
               "attribute": "source"
             },
             {
-              "kind": "field",
-              "name": "stage",
-              "type": {
-                "text": "HTMLElement | null"
-              },
-              "privacy": "private",
-              "description": "Where the previewed markup goes. Present from the first render.",
-              "readonly": true
-            },
-            {
               "kind": "method",
               "name": "applyStyles",
               "privacy": "private",
