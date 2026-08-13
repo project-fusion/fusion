@@ -22,7 +22,9 @@
     "dist"
   ],
   "customElements": "custom-elements.json",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/**/*.js"
+  ],
   "scripts": {
     "analyze": "cem analyze --config custom-elements-manifest.config.mjs",
     "build": "tsc -p tsconfig.json",

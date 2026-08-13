@@ -28,6 +28,7 @@
   "scripts": {
     "analyze": "cem analyze --config custom-elements-manifest.config.mjs",
     "build": "tsc -p tsconfig.json",
+    "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -38,7 +39,9 @@
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@helix-io/cem": "workspace:*",
-    "lit": "^3.2.1"
+    "lit": "^3.2.1",
+    "@types/bun": "^1.3.0",
+    "@happy-dom/global-registrator": "^20.0.0"
   },
   "peerDependencies": {
     "lit": "^3.2.1"

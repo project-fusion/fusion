@@ -1,1 +1,1 @@
-export * from './disclosure-base.js'
+export * from './disclosure.js'

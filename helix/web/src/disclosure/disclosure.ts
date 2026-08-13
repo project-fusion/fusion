@@ -1,4 +1,4 @@
-import { HelixDisclosureBase } from '@helix-io/headless'
+import { HelixBaseDisclosure } from '@helix-io/headless'
 import { type CSSResultGroup, css } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 
@@ -15,7 +15,7 @@ import { customElement, property } from 'lit/decorators.js'
  * @cssproperty --disclosure-padding - Inner padding of trigger and content.
  */
 @customElement('helix-disclosure')
-export class HelixDisclosure extends HelixDisclosureBase {
+export class HelixDisclosure extends HelixBaseDisclosure {
   /**
    * Visual weight of the disclosure.
    */

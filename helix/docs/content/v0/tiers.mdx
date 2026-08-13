@@ -36,7 +36,7 @@ here.
 
 ```ts
 // headless: no CSS, no tokens
-export class HelixDisclosureBase extends WithOpen(HelixElement) {
+export class HelixBaseDisclosure extends WithOpen(HelixElement) {
   protected override render() {
     return html`
       <div part="container">
@@ -50,7 +50,7 @@ export class HelixDisclosureBase extends WithOpen(HelixElement) {
 
 // styled: extends the base, adds presentation only
 @customElement('helix-disclosure')
-export class HelixDisclosure extends HelixDisclosureBase {
+export class HelixDisclosure extends HelixBaseDisclosure {
   @property({ reflect: true })
   appearance: 'outlined' | 'plain' = 'outlined'
 

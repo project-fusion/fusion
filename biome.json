@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
   "assist": {
     "actions": {
       "source": {
@@ -10,7 +10,14 @@
     "enabled": true
   },
   "files": {
-    "includes": ["**", "!**/dist", "!**/target", "!**/.turbo", "!**/node_modules"]
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/target",
+      "!**/.turbo",
+      "!**/node_modules",
+      "!**/custom-elements.json"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -28,7 +35,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "useBlockStatements": "error"
       }

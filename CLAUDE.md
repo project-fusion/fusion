@@ -249,6 +249,17 @@ src/card/card-header.ts  ->  Card.Header
 src/scroll-area/…        ->  ScrollArea.Root
 ```
 
+The headless tier is a **parallel family**, `BaseCard.Root` alongside
+`Card.Root`, not a `CardBase` suffix. It is a supported entry point for
+consumers bringing their own styling, not an implementation detail, and the
+prefix keeps the two adjacent in autocomplete. Both tiers register elements
+(`helix-base-card` and `helix-card`) because an unregistered element can only be
+subclassed, which is not what "independently consumable" means.
+
+**Both tiers ship the same file name.** `helix/headless/src/card/card.ts` and
+`helix/web/src/card/card.ts`. The package says which tier; the file name is the
+part. A `-base` suffix would make the part `Base` instead of `Root`.
+
 Deriving groups from tag names instead is ambiguous exactly where it matters:
 `helix-scroll-area` is one component and `helix-card-header` is part of another,
 and nothing in either name says which.
@@ -260,6 +271,13 @@ Two things the generator must keep doing, both learned the hard way:
   consumers an API that fails at runtime.
 - **Name components with their part.** The namespace object owns the bare group
   name, so the root component is `DisclosureRoot`, not `Disclosure`.
+- **Format its own output.** The generator runs Biome over `src/generated`
+  before finishing. Without it, every build rewrites those files unformatted and
+  `biome ci` fails on a tree `bun run check` had just cleaned, so generate and
+  check permanently disagree.
+- **Leave key order to the formatter.** Namespace key order carries no meaning
+  and `useSortedKeys` alphabetizes it, so the generator sorts alphabetically
+  rather than putting `Root` first and losing to the formatter every run.
 
 ## Theming is derivation, not override
 

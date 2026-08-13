@@ -48,9 +48,15 @@ export const composition = (): Plugin => ({
       const isRoot = file === directory || file === 'index'
       const suffix = file.startsWith(`${directory}-`) ? file.slice(directory.length + 1) : file
 
+      // The headless tier is a parallel family, not a variant of the styled
+      // one, so it namespaces as `BaseCard.Root` alongside `Card.Root`. A
+      // `CardBase` suffix would sort the two apart and read as an
+      // implementation detail rather than a supported entry point.
+      const prefix = declaration.helix?.tier === 'headless' ? 'Base' : ''
+
       declaration.helix = {
         ...declaration.helix,
-        group: pascal(directory),
+        group: `${prefix}${pascal(directory)}`,
         part: isRoot ? 'Root' : pascal(suffix),
       }
     }

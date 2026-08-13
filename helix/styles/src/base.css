@@ -78,7 +78,11 @@ body {
   overflow-x: auto;
 }
 
+/* The only place !important is correct: a user asking the OS to reduce motion
+   is overriding author intent, so it has to beat author specificity, including
+   a component's own transition. */
 @media (prefers-reduced-motion: reduce) {
+  /* biome-ignore-start lint/complexity/noImportantStyles: user preference must win over author styles */
   *,
   *::before,
   *::after {
@@ -87,4 +91,5 @@ body {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+  /* biome-ignore-end lint/complexity/noImportantStyles: user preference must win over author styles */
 }

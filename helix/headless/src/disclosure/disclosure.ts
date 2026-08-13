@@ -1,5 +1,6 @@
 import { HelixElement, WithOpen } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
+import { customElement } from 'lit/decorators.js'
 
 /** Shadow-DOM id linking the trigger's aria-controls to the content region. */
 const CONTENT_ID = 'content'
@@ -42,7 +43,8 @@ const TRIGGER_ID = 'trigger'
  * `{ open: boolean }`. In controlled mode this is the only signal; the element
  * does not update itself.
  */
-export class HelixDisclosureBase extends WithOpen(HelixElement) {
+@customElement('helix-base-disclosure')
+export class HelixBaseDisclosure extends WithOpen(HelixElement) {
   protected handleToggle = (): void => {
     this.setOpen(!this.isOpen)
   }
@@ -74,5 +76,11 @@ export class HelixDisclosureBase extends WithOpen(HelixElement) {
         </div>
       </div>
     `
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'helix-base-disclosure': HelixBaseDisclosure
   }
 }

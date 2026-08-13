@@ -15,13 +15,17 @@
  * One family per module, so a consumer importing `Disclosure` never pulls
  * `Table` into the bundle.
  */
+import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const PACKAGE = join(HERE, '..')
-const MANIFEST = join(PACKAGE, '..', 'web', 'custom-elements.json')
+const MANIFESTS = [
+  join(PACKAGE, '..', 'web', 'custom-elements.json'),
+  join(PACKAGE, '..', 'headless', 'custom-elements.json'),
+]
 const OUT = join(PACKAGE, 'src', 'generated')
 
 const kebabToCamel = (value) => value.replace(/-([a-z])/g, (_, c) => c.toUpperCase())
@@ -66,15 +70,18 @@ const propType = (member) => {
   return text.replace(/\s*\|\s*undefined/g, '')
 }
 
-const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'))
-
 /** group -> [{ declaration, part }] */
 const groups = new Map()
 
-for (const module of manifest.modules ?? []) {
+const modules = MANIFESTS.flatMap((path) => JSON.parse(readFileSync(path, 'utf8')).modules ?? [])
+
+for (const module of modules) {
   for (const declaration of module.declarations ?? []) {
     const helix = declaration.helix ?? {}
-    if (declaration.kind !== 'class' || helix.tier !== 'styled' || !declaration.tagName) {
+    // Both tiers are wrapped. The headless tier is a supported entry point
+    // for consumers bringing their own styling, and it groups as `BaseCard`.
+    const wrappable = helix.tier === 'styled' || helix.tier === 'headless'
+    if (declaration.kind !== 'class' || !wrappable || !declaration.tagName) {
       continue
     }
     const group = helix.group ?? declaration.name.replace(/^Helix/, '')
@@ -87,7 +94,7 @@ for (const module of manifest.modules ?? []) {
 }
 
 if (groups.size === 0) {
-  console.error('generate: manifest contained no styled components. Run `bun run analyze` first.')
+  console.error('generate: manifests contained no components. Run `bun run analyze` first.')
   process.exit(1)
 }
 
@@ -182,5 +189,13 @@ writeFileSync(
     )
     .join('\n')}\n`,
 )
+
+// Format the output with the same tool that checks it. Without this, every
+// build rewrites these files unformatted and `biome ci` fails on a tree that
+// `bun run check` had just cleaned, so generate and check permanently disagree.
+execFileSync('bunx', ['biome', 'check', '--write', '--no-errors-on-unmatched', OUT], {
+  cwd: join(PACKAGE, '..', '..'),
+  stdio: 'ignore',
+})
 
 console.log(`generated ${files.length} component families: ${files.map((f) => f.group).join(', ')}`)
