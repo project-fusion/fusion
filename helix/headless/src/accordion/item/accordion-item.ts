@@ -1,7 +1,8 @@
 import { customElement, HelixElement, WithOpen } from '@helix-io/core'
-import { chevronDown } from '@helix-io/icons'
+import { caretDown } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /** Shadow-DOM id linking the trigger's aria-controls to the content region. */
 const CONTENT_ID = 'content'
@@ -66,16 +67,8 @@ export class HelixBaseAccordionItem extends WithOpen(HelixElement) {
     if (this.chevronPlacement === 'none') {
       return nothing
     }
-    return html`<svg
-      part="chevron"
-      viewBox=${chevronDown.viewBox}
-      fill="none"
-      stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d=${chevronDown.path}></path>
+    return html`<svg part="chevron" viewBox=${caretDown.viewBox} aria-hidden="true">
+      ${unsafeSVG(caretDown.content)}
     </svg>`
   }
 

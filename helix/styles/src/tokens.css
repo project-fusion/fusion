@@ -82,6 +82,9 @@
   /* ======================================================== type ======== */
   --helix-font-sans: var(--_helix-family-sans);
   --helix-font-mono: var(--_helix-family-mono);
+  /* Falls back to the sans stack, so a product that never sets a display face
+     still renders rather than dropping to a serif default. */
+  --helix-font-display: var(--_helix-family-display, var(--_helix-family-sans));
 
   --helix-text-xs: var(--_helix-size-12);
   --helix-text-sm: var(--_helix-size-14);

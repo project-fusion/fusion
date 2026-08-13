@@ -18,7 +18,8 @@
       "!**/node_modules",
       "!**/custom-elements.json",
       "!**/*.css.ts",
-      "!**/jsx.d.ts"
+      "!**/jsx.d.ts",
+      "!helix/icons/raw"
     ]
   },
   "formatter": {

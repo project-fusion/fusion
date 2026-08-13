@@ -14,6 +14,8 @@ flat against the hero and lifts it off the content afterwards.
  * Renders `<helix-app-header>`.
  */
 export interface AppHeaderProps extends BaseProps {
+  /** Whether the banner is flat or a pane of material. Flat by default. Material is translucency plus blur, and a filter makes the header a containing block for `position: fixed` descendants, so any overlay rendered inside it is positioned against the header rather than the viewport. Opt in knowing that. */
+  appearance?: 'flat' | 'material'
   /** Where the navigation sits in the bar. `center` puts it in the middle of the banner rather than beside the brand, which reads as the site's spine when the nav is the primary thing in the header rather than an afterthought next to a logo. */
   navAlign?: 'start' | 'center'
   /** Whether the banner sticks to the top of the viewport. */

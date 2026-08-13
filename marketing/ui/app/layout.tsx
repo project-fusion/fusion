@@ -5,6 +5,7 @@ import '@helix-io/web/elements.css'
 import './site.css'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import { fusionDisplay, fusionMono, fusionSans } from './fonts'
 import { FusionLogo } from './fusion-logo'
 import { HelixElements } from './helix-elements'
 import { SiteNav } from './site-nav'
@@ -17,7 +18,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html
+      className={`${fusionSans.variable} ${fusionMono.variable} ${fusionDisplay.variable}`}
+      lang="en"
+    >
       <body>
         <HelixElements />
 

@@ -6,10 +6,17 @@ import '@helix-io/headless/icon'
 import type { HelixBaseIcon } from '@helix-io/headless'
 
 /**
- * Icons are data rather than components, so the set is a plain record of path
-strings and this element is the only thing that knows how to draw one. A name
-with no match renders nothing at all instead of an empty box, so a typo
-cannot leave a hole in a layout that looks deliberate.
+ * The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is
+rendered as its own inner markup rather than as a single path. Most icons are
+several elements at once, each with its own stroke and fill, so a one-path
+model would draw a fraction of the set and quietly drop the rest.
+
+**The markup is trusted by construction.** It is generated at build time from
+SVG files in this repository, never from anything a user supplies, which is
+what makes `unsafeSVG` the right tool rather than a risk.
+
+A name with no match renders nothing at all instead of an empty box, so a
+typo cannot leave a hole in a layout that looks deliberate.
 
 An icon is decorative by default and hidden from assistive technology. Give
 it a `label` only when the icon is the sole carrier of meaning, such as

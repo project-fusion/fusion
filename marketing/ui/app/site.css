@@ -1,3 +1,12 @@
+/* The brand faces, mapped onto the design system's tokens. Helix reads its own
+   tokens and knows nothing about how they were loaded, which is what lets the
+   same components run under a different loader or none at all. */
+:root {
+  --_helix-family-sans: var(--fusion-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --_helix-family-mono: var(--fusion-font-mono), ui-monospace, monospace;
+  --_helix-family-display: var(--fusion-font-display), var(--fusion-font-sans), sans-serif;
+}
+
 /* Fusion marketing site.
  *
  * App layout only. Every component reads its own tokens, so what is left here

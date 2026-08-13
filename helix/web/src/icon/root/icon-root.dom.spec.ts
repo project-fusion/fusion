@@ -9,10 +9,13 @@ beforeAll(async () => {
 const svg = (host: HTMLElement): Element | null => part(host, 'svg')
 
 describe('icon rendering', () => {
-  test('draws the named path from the set', async () => {
+  test('draws the named glyph from the set', async () => {
+    // The markup is the icon's own, several elements at once rather than one
+    // path, which is why the data is inner content instead of a `d` string.
     const icon = await mount('<helix-icon name="check"></helix-icon>')
     expect(svg(icon)).not.toBeNull()
-    expect(svg(icon)?.querySelector('path')?.getAttribute('d')).toBe('M20 6L9 17l-5-5')
+    expect(svg(icon)?.getAttribute('viewBox')).toBe('0 0 256 256')
+    expect(svg(icon)?.querySelector('polyline, path, circle, line')).not.toBeNull()
   })
 
   test('an unknown name renders nothing rather than an empty box', async () => {
@@ -22,20 +25,22 @@ describe('icon rendering', () => {
   })
 
   test('is decoration by default, and hidden from assistive technology', async () => {
-    const icon = await mount('<helix-icon name="close"></helix-icon>')
+    const icon = await mount('<helix-icon name="x"></helix-icon>')
     expect(svg(icon)?.getAttribute('aria-hidden')).toBe('true')
     expect(svg(icon)?.hasAttribute('role')).toBe(false)
   })
 
   test('a labelled icon becomes content with a name', async () => {
-    const icon = await mount('<helix-icon name="close" label="Dismiss"></helix-icon>')
+    const icon = await mount('<helix-icon name="x" label="Dismiss"></helix-icon>')
     expect(svg(icon)?.getAttribute('role')).toBe('img')
     expect(svg(icon)?.getAttribute('aria-label')).toBe('Dismiss')
     expect(svg(icon)?.hasAttribute('aria-hidden')).toBe(false)
   })
 
   test('takes its color from the text around it', async () => {
+    // On the glyph rather than on the wrapping svg, since each element in the
+    // set carries its own paint.
     const icon = await mount('<helix-icon name="check"></helix-icon>')
-    expect(svg(icon)?.getAttribute('stroke')).toBe('currentColor')
+    expect(svg(icon)?.innerHTML).toContain('currentColor')
   })
 })

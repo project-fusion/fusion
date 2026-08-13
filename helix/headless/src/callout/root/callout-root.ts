@@ -1,13 +1,14 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { check, danger, type HelixIcon, info, warning } from '@helix-io/icons'
+import { checkCircle, type HelixIcon, info, warning, xCircleFill } from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /** Icon and accessible name for each severity. */
 const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
-  danger: { icon: danger, label: 'Error' },
+  danger: { icon: xCircleFill, label: 'Error' },
   info: { icon: info, label: 'Information' },
-  success: { icon: check, label: 'Success' },
+  success: { icon: checkCircle, label: 'Success' },
   warning: { icon: warning, label: 'Warning' },
 }
 
@@ -54,16 +55,8 @@ export class HelixBaseCallout extends HelixElement {
 
     return html`<span part="icon">
         <slot name="icon">
-          <svg
-            viewBox=${icon.viewBox}
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            role="img"
-            aria-label=${label}
-          >
-            <path d=${icon.path}></path>
+          <svg viewBox=${icon.viewBox} role="img" aria-label=${label}>
+            ${unsafeSVG(icon.content)}
           </svg>
         </slot>
       </span>

@@ -38,10 +38,11 @@
   flex: 0 0 auto;
 }
 
+/* Size only. Stroke width belongs to the glyph: the set is drawn on a 256 box
+   at width 16, and a value tuned for a 24 box would make it hairline. */
 [part="icon"] svg {
   block-size: var(--helix-size-icon);
   inline-size: var(--helix-size-icon);
-  stroke-width: 1.5;
 }
 
 /* A slotted replacement icon is sized the same way as the default, so swapping

@@ -1,7 +1,8 @@
 import { customElement, HelixElement, HelixSelectionChangeEvent } from '@helix-io/core'
-import { chevronDown } from '@helix-io/icons'
+import { caretDown } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary One node in a tree.
@@ -102,14 +103,8 @@ export class HelixBaseTreeItem extends HelixElement {
         <div part="row" @click=${this.handleRowClick}>
           ${
             this.branch
-              ? html`<svg
-                part="toggle"
-                viewBox=${chevronDown.viewBox}
-                fill="none"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path d=${chevronDown.path}></path>
+              ? html`<svg part="toggle" viewBox=${caretDown.viewBox} aria-hidden="true">
+                ${unsafeSVG(caretDown.content)}
               </svg>`
               : nothing
           }

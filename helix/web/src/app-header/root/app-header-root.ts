@@ -25,13 +25,24 @@ import { styles } from './app-header-root.css.js'
  * @csspart content - The centred row inside the banner.
  * @csspart nav - The navigation region.
  *
- * @cssproperty --app-header-background - Material behind the banner.
+ * @cssproperty --app-header-background - Fill behind the banner.
  * @cssproperty --app-header-height - Height of the banner.
  * @cssproperty --app-header-inset - Inline padding of the banner.
  * @cssproperty --app-header-max-inline-size - Width the content is centered in.
  */
 @customElement('helix-app-header')
 export class HelixAppHeader extends HelixBaseAppHeader {
+  /**
+   * Whether the banner is flat or a pane of material.
+   *
+   * Flat by default. Material is translucency plus blur, and a filter makes the
+   * header a containing block for `position: fixed` descendants, so any overlay
+   * rendered inside it is positioned against the header rather than the
+   * viewport. Opt in knowing that.
+   */
+  @property({ reflect: true })
+  appearance: 'flat' | 'material' = 'flat'
+
   /** Whether the banner sticks to the top of the viewport. */
   @property({ reflect: true, type: Boolean })
   sticky = true

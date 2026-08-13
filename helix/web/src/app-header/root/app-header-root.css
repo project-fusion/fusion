@@ -1,16 +1,23 @@
-/* The host is the banner: it carries the material and spans the window, and
-   `content` carries the measure. */
+/* Flat by default: an ordinary surface and a hairline, no translucency and no
+   blur. Material is opt-in through `appearance="material"`, because a filter
+   makes the header a containing block for `position: fixed` descendants, which
+   traps any overlay rendered inside it. Flat is both the quieter look and the
+   one that does not surprise. */
 :host {
-  background-color: var(--app-header-background, var(--helix-material-translucent));
-  /* The blur is what makes the bar read as a pane of material over the page
-     rather than a band of flat color sitting on it. */
-  backdrop-filter: blur(var(--helix-material-blur-md));
+  background-color: var(--app-header-background, var(--helix-color-background));
   border-block-end: var(--helix-border-thin) solid transparent;
   display: block;
   inline-size: 100%;
-  transition:
-    border-color var(--helix-duration-normal) var(--helix-easing-standard),
-    box-shadow var(--helix-duration-normal) var(--helix-easing-standard);
+  transition: border-color var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+:host([appearance="material"]) {
+  background-color: var(--app-header-background, var(--helix-material-translucent));
+  backdrop-filter: blur(var(--helix-material-blur-md));
+}
+
+:host([data-scrolled]) {
+  border-block-end-color: var(--helix-color-border);
 }
 
 :host([sticky]) {
@@ -34,9 +41,8 @@
 /* Flat against the hero, lifted once content runs underneath. `data-scrolled`
    is absent in the server's markup, which matches a fresh load at the top, so
    the bar does not start lifted and settle. */
-:host([data-scrolled]) {
+:host([appearance="material"][data-scrolled]) {
   border-block-end-color: var(--helix-material-border);
-  box-shadow: var(--helix-shadow-sm);
 }
 
 /* Brand and actions are bare slots, so an omitted one generates no flex item

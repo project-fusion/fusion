@@ -1,7 +1,8 @@
 import { customElement, HelixElement, HelixRemoveRequestEvent } from '@helix-io/core'
-import { close } from '@helix-io/icons'
+import { x } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary Labels content with a short piece of metadata.
@@ -62,9 +63,7 @@ export class HelixBaseTag extends HelixElement {
             aria-label=${this.removeLabel}
             @click=${this.handleRemove}
           >
-            <svg viewBox=${close.viewBox} fill="none" stroke="currentColor" aria-hidden="true">
-              <path d=${close.path}></path>
-            </svg>
+            <svg viewBox=${x.viewBox} aria-hidden="true">${unsafeSVG(x.content)}</svg>
           </button>`
           : nothing
       }
