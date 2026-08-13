@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, ssr } from '@fusion-io/testing/ssr'
+import { hostTag, ssr } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -21,7 +21,9 @@ describe('card server output', () => {
   })
 
   test('every region is present in the shadow root', () => {
-    expect(hasPart(markup, 'container')).toBe(true)
+    // The host is the surface, so there is no container part to find: the
+    // shadow root is slots and nothing else.
+    expect(hostTag(markup, 'helix-card')).toContain('role="group"')
     for (const name of ['media', 'header', 'footer']) {
       expect(markup, name).toContain(`<slot name="${name}">`)
     }

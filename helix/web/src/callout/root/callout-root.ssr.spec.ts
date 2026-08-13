@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -13,8 +13,10 @@ describe('callout server output', () => {
   })
 
   test('the note role is rendered, not applied on connect', () => {
-    expect(hasPart(ssr(html`<helix-callout>x</helix-callout>`), 'callout')).toBe(true)
-    expect(withoutStyles(ssr(html`<helix-callout>x</helix-callout>`))).toContain('role="note"')
+    // On the host, written in `willUpdate`, which the server does call.
+    expect(hostTag(ssr(html`<helix-callout>x</helix-callout>`), 'helix-callout')).toContain(
+      'role="note"',
+    )
   })
 
   test('the default icon ships as slot fallback, so a replacement needs no JavaScript', () => {

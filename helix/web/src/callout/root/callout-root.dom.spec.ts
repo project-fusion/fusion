@@ -37,7 +37,7 @@ describe('callout severity', () => {
 
   test('is announced as a note', async () => {
     const callout = await mount('<helix-callout>x</helix-callout>')
-    expect(part(callout, 'callout')?.getAttribute('role')).toBe('note')
+    expect(callout.getAttribute('role')).toBe('note')
   })
 })
 

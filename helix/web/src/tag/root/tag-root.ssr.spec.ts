@@ -6,7 +6,6 @@ import '../index.js'
 describe('tag server output', () => {
   test('the label is in the served markup', () => {
     const markup = ssr(html`<helix-tag>Draft</helix-tag>`)
-    expect(hasPart(markup, 'tag')).toBe(true)
     expect(withoutStyles(markup)).toContain('Draft')
   })
 
