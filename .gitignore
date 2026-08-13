@@ -28,3 +28,6 @@ out/
 *.log
 npm-debug.log*
 bun-debug.log*
+
+# Generated light-DOM stylesheet, built from the element sources.
+helix/*/elements.css

@@ -1,6 +1,11 @@
 import type {
+  Helix,
+  HelixAppHeader,
+  HelixButton,
   HelixCard,
   HelixDisclosure,
+  HelixDivider,
+  HelixIcon,
   HelixOpenChangeEvent,
 } from '@helix-io/web';
 
@@ -195,6 +200,125 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
+export type HelixAppHeaderProps = {
+  /** Whether the banner sticks to the top of the viewport. */
+  sticky?: HelixAppHeader["sticky"];
+};
+
+export type HelixAppHeaderSolidJsProps = {
+  /** Whether the banner sticks to the top of the viewport. */
+  "prop:sticky"?: HelixAppHeader["sticky"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixButtonProps = {
+  /** How much visual weight the button carries. */
+  appearance?: HelixButton["appearance"];
+  /** Height and inset of the control. */
+  size?: HelixButton["size"];
+  /** What activating the button does to its form. */
+  type?: HelixButton["type"];
+  /** Navigates to this URL instead of acting on a form. */
+  href?: HelixButton["href"];
+  /** Browsing context for `href`, such as `_blank`. */
+  target?: HelixButton["target"];
+  /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
+  rel?: HelixButton["rel"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixButton["disabled"];
+};
+
+export type HelixButtonSolidJsProps = {
+  /** How much visual weight the button carries. */
+  "prop:appearance"?: HelixButton["appearance"];
+  /** Height and inset of the control. */
+  "prop:size"?: HelixButton["size"];
+  /** What activating the button does to its form. */
+  "prop:type"?: HelixButton["type"];
+  /** Navigates to this URL instead of acting on a form. */
+  "prop:href"?: HelixButton["href"];
+  /** Browsing context for `href`, such as `_blank`. */
+  "prop:target"?: HelixButton["target"];
+  /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
+  "prop:rel"?: HelixButton["rel"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixButton["disabled"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixCardProps = {
+  /** How the card separates itself from the page. */
+  appearance?: HelixCard["appearance"];
+  /** Tightens the inset for dense layouts. */
+  dense?: HelixCard["dense"];
+  /** Whether media sits above the content stack or beside it. */
+  orientation?: HelixCard["orientation"];
+};
+
+export type HelixCardSolidJsProps = {
+  /** How the card separates itself from the page. */
+  "prop:appearance"?: HelixCard["appearance"];
+  /** Tightens the inset for dense layouts. */
+  "prop:dense"?: HelixCard["dense"];
+  /** Whether media sits above the content stack or beside it. */
+  "prop:orientation"?: HelixCard["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixDividerProps = {
+  /** Which way the rule runs. */
+  orientation?: HelixDivider["orientation"];
+};
+
+export type HelixDividerSolidJsProps = {
+  /** Which way the rule runs. */
+  "prop:orientation"?: HelixDivider["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixIconProps = {
+  /** Name of the icon in the Helix set. */
+  name?: HelixIcon["name"];
+  /** Accessible name, for an icon that is not decorative. */
+  label?: HelixIcon["label"];
+};
+
+export type HelixIconSolidJsProps = {
+  /** Name of the icon in the Helix set. */
+  "prop:name"?: HelixIcon["name"];
+  /** Accessible name, for an icon that is not decorative. */
+  "prop:label"?: HelixIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixDisclosure` component event */
 export type HelixDisclosureElementEvent<E = Event> = TypedEvent<
   HelixDisclosure,
@@ -240,26 +364,202 @@ export type HelixDisclosureSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixCardProps = {
-  /** How the card separates itself from the page. */
-  appearance?: HelixCard["appearance"];
-  /** Tightens the inset for dense layouts. */
-  dense?: HelixCard["dense"];
-};
-
-export type HelixCardSolidJsProps = {
-  /** How the card separates itself from the page. */
-  "prop:appearance"?: HelixCard["appearance"];
-  /** Tightens the inset for dense layouts. */
-  "prop:dense"?: HelixCard["dense"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type CustomElements = {
+  /**
+   * Sticky and translucent, drawn on the material tokens so the page content
+   * blurs behind it rather than being hidden by an opaque bar. The separating
+   * rule and shadow appear only once the page has scrolled, which keeps the bar
+   * flat against the hero and lifts it off the content afterwards.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `sticky`: Whether the banner sticks to the top of the viewport.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `brand`: Wordmark or logo, at the inline start.
+   * - `(default)`: Primary navigation.
+   * - `actions`: Trailing actions, such as a call to action.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--app-header-background`: Material behind the banner. (default: `undefined`)
+   * - `--app-header-height`: Height of the banner. (default: `undefined`)
+   * - `--app-header-inset`: Inline padding of the banner. (default: `undefined`)
+   * - `--app-header-max-inline-size`: Width the content is centered in. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bar`: The banner itself.
+   * - `nav`: The navigation region.
+   */
+  "helix-app-header": Partial<
+    HelixAppHeaderProps & BaseProps<HelixAppHeader> & BaseEvents
+  >;
+
+  /**
+   * Four appearances and three sizes, all drawn on one control so a link styled
+   * as a button and a real button are indistinguishable to a reader. The focus
+   * ring is declared here rather than inherited, because the base layer's
+   * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How much visual weight the button carries.
+   * - `size`: Height and inset of the control.
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--button-background-color`: Fill behind the button. (default: `undefined`)
+   * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
+   * - `--button-radii`: Corner radius of the control. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-button": Partial<
+    HelixButtonProps & BaseProps<HelixButton> & BaseEvents
+  >;
+
+  /**
+   * Regions are slots: `media`, `header`, the default slot for content, and
+   * `footer`. An omitted region takes no space, so a card with only content needs
+   * no wrapper markup at all.
+   *
+   * `media` runs edge to edge and clips to the card's corners, so an image needs
+   * no inset correction. Set `orientation="horizontal"` to move it alongside the
+   * header, content, and footer stack rather than above it.
+   *
+   * Regions are bare slots with no wrapper element, so an omitted one occupies no
+   * space without the card having to detect that it is missing. Style slotted
+   * content directly rather than reaching for a part: a header is whatever
+   * element you slotted, not a wrapper we put around it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How the card separates itself from the page.
+   * - `dense`: Tightens the inset for dense layouts.
+   * - `orientation`: Whether media sits above the content stack or beside it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--card-background-color`: Surface behind the card. (default: `undefined`)
+   * - `--card-border-color`: Border color of the surface. (default: `undefined`)
+   * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
+   * - `--card-padding`: Inset applied to each region. (default: `undefined`)
+   * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The card surface.
+   */
+  "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents>;
+
+  /**
+   * A one-pixel rule in the border color, running the full inline size by
+   * default. A vertical divider stretches to its flex parent instead of setting
+   * its own height, so it matches whatever it sits beside without being told how
+   * tall that is.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way the rule runs.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
+   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `line`: The rule itself.
+   */
+  "helix-divider": Partial<
+    HelixDividerProps & BaseProps<HelixDivider> & BaseEvents
+  >;
+
+  /**
+   * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
+   * color of the text it sits in and a container can resize it without reaching
+   * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
+   * proportion as the button's own size changes.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `name`: Name of the icon in the Helix set.
+   * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--icon-size`: Edge length of the icon's box. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rendered SVG.
+   */
+  "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents>;
+
   /**
    * The content region animates between collapsed and expanded by transitioning a
    * grid row, which is the only technique that reaches the content's intrinsic
@@ -315,11 +615,118 @@ export type CustomElements = {
   "helix-disclosure": Partial<
     HelixDisclosureProps & BaseProps<HelixDisclosure> & BaseEvents
   >;
+};
+
+export type CustomElementsSolidJs = {
+  /**
+   * Sticky and translucent, drawn on the material tokens so the page content
+   * blurs behind it rather than being hidden by an opaque bar. The separating
+   * rule and shadow appear only once the page has scrolled, which keeps the bar
+   * flat against the hero and lifts it off the content afterwards.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `sticky`: Whether the banner sticks to the top of the viewport.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `brand`: Wordmark or logo, at the inline start.
+   * - `(default)`: Primary navigation.
+   * - `actions`: Trailing actions, such as a call to action.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--app-header-background`: Material behind the banner. (default: `undefined`)
+   * - `--app-header-height`: Height of the banner. (default: `undefined`)
+   * - `--app-header-inset`: Inline padding of the banner. (default: `undefined`)
+   * - `--app-header-max-inline-size`: Width the content is centered in. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bar`: The banner itself.
+   * - `nav`: The navigation region.
+   */
+  "helix-app-header": Partial<
+    HelixAppHeaderProps &
+      HelixAppHeaderSolidJsProps &
+      BaseProps<HelixAppHeader> &
+      BaseEvents
+  >;
 
   /**
-   * Regions are slots: `header`, the default slot for content, and `footer`. An
-   * omitted region takes no space, so a card with only content needs no wrapper
-   * markup at all.
+   * Four appearances and three sizes, all drawn on one control so a link styled
+   * as a button and a real button are indistinguishable to a reader. The focus
+   * ring is declared here rather than inherited, because the base layer's
+   * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How much visual weight the button carries.
+   * - `size`: Height and inset of the control.
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--button-background-color`: Fill behind the button. (default: `undefined`)
+   * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
+   * - `--button-radii`: Corner radius of the control. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-button": Partial<
+    HelixButtonProps &
+      HelixButtonSolidJsProps &
+      BaseProps<HelixButton> &
+      BaseEvents
+  >;
+
+  /**
+   * Regions are slots: `media`, `header`, the default slot for content, and
+   * `footer`. An omitted region takes no space, so a card with only content needs
+   * no wrapper markup at all.
+   *
+   * `media` runs edge to edge and clips to the card's corners, so an image needs
+   * no inset correction. Set `orientation="horizontal"` to move it alongside the
+   * header, content, and footer stack rather than above it.
+   *
+   * Regions are bare slots with no wrapper element, so an omitted one occupies no
+   * space without the card having to detect that it is missing. Style slotted
+   * content directly rather than reaching for a part: a header is whatever
+   * element you slotted, not a wrapper we put around it.
    *
    * ## Attributes & Properties
    *
@@ -327,11 +734,13 @@ export type CustomElements = {
    *
    * - `appearance`: How the card separates itself from the page.
    * - `dense`: Tightens the inset for dense layouts.
+   * - `orientation`: Whether media sits above the content stack or beside it.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
+   * - `media`: Image or video that runs edge to edge, outside the inset.
    * - `header`: Title and any actions for the whole card.
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
@@ -342,6 +751,7 @@ export type CustomElements = {
    *
    * - `--card-background-color`: Surface behind the card. (default: `undefined`)
    * - `--card-border-color`: Border color of the surface. (default: `undefined`)
+   * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
    * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
    *
@@ -350,14 +760,72 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `container`: The card surface.
-   * - `header`: The header region.
-   * - `body`: The content region.
-   * - `footer`: The footer region.
    */
-  "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents>;
-};
+  "helix-card": Partial<
+    HelixCardProps & HelixCardSolidJsProps & BaseProps<HelixCard> & BaseEvents
+  >;
 
-export type CustomElementsSolidJs = {
+  /**
+   * A one-pixel rule in the border color, running the full inline size by
+   * default. A vertical divider stretches to its flex parent instead of setting
+   * its own height, so it matches whatever it sits beside without being told how
+   * tall that is.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way the rule runs.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
+   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `line`: The rule itself.
+   */
+  "helix-divider": Partial<
+    HelixDividerProps &
+      HelixDividerSolidJsProps &
+      BaseProps<HelixDivider> &
+      BaseEvents
+  >;
+
+  /**
+   * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
+   * color of the text it sits in and a container can resize it without reaching
+   * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
+   * proportion as the button's own size changes.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `name`: Name of the icon in the Helix set.
+   * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--icon-size`: Edge length of the icon's box. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rendered SVG.
+   */
+  "helix-icon": Partial<
+    HelixIconProps & HelixIconSolidJsProps & BaseProps<HelixIcon> & BaseEvents
+  >;
+
   /**
    * The content region animates between collapsed and expanded by transitioning a
    * grid row, which is the only technique that reaches the content's intrinsic
@@ -416,65 +884,45 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixDisclosure> &
       BaseEvents
   >;
-
-  /**
-   * Regions are slots: `header`, the default slot for content, and `footer`. An
-   * omitted region takes no space, so a card with only content needs no wrapper
-   * markup at all.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `appearance`: How the card separates itself from the page.
-   * - `dense`: Tightens the inset for dense layouts.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--card-background-color`: Surface behind the card. (default: `undefined`)
-   * - `--card-border-color`: Border color of the surface. (default: `undefined`)
-   * - `--card-padding`: Inset applied to each region. (default: `undefined`)
-   * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The card surface.
-   * - `header`: The header region.
-   * - `body`: The content region.
-   * - `footer`: The footer region.
-   */
-  "helix-card": Partial<
-    HelixCardProps & HelixCardSolidJsProps & BaseProps<HelixCard> & BaseEvents
-  >;
 };
 
 export type CustomCssProperties = {
+  /** Material behind the banner. */
+  "--app-header-background"?: string;
+  /** Height of the banner. */
+  "--app-header-height"?: string;
+  /** Inline padding of the banner. */
+  "--app-header-inset"?: string;
+  /** Width the content is centered in. */
+  "--app-header-max-inline-size"?: string;
+  /** Fill behind the button. */
+  "--button-background-color"?: string;
+  /** Label and icon color. */
+  "--button-foreground-color"?: string;
+  /** Corner radius of the control. */
+  "--button-radii"?: string;
+  /** Surface behind the card. */
+  "--card-background-color"?: string;
+  /** Border color of the surface. */
+  "--card-border-color"?: string;
+  /** Width of the media column when horizontal. */
+  "--card-media-size"?: string;
+  /** Inset applied to each region. */
+  "--card-padding"?: string;
+  /** Corner radius of the surface. */
+  "--card-radii"?: string;
+  /** Color of the rule. */
+  "--divider-color"?: string;
+  /** Thickness of the rule. */
+  "--divider-thickness"?: string;
+  /** Edge length of the icon's box. */
+  "--icon-size"?: string;
   /** Surface behind the disclosure. */
   "--disclosure-background-color"?: string;
   /** Border color of the container. */
   "--disclosure-border-color"?: string;
   /** Inner padding of trigger and content. */
   "--disclosure-padding"?: string;
-  /** Surface behind the card. */
-  "--card-background-color"?: string;
-  /** Border color of the surface. */
-  "--card-border-color"?: string;
-  /** Inset applied to each region. */
-  "--card-padding"?: string;
-  /** Corner radius of the surface. */
-  "--card-radii"?: string;
 };
 
 declare module "react" {

@@ -1,28 +1,10 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { GlobalRegistrator } from '@happy-dom/global-registrator'
+import { mount, part, registerDom, slotted } from '../../testing/dom.js'
 
 beforeAll(async () => {
-  GlobalRegistrator.register()
+  registerDom()
   await import('../index.js')
 })
-
-type Updatable = HTMLElement & { updateComplete?: Promise<unknown> }
-
-const mount = async (html: string): Promise<HTMLElement> => {
-  document.body.innerHTML = html
-  const root = document.body.firstElementChild as Updatable
-  await root.updateComplete
-  return root
-}
-
-const part = (host: HTMLElement, name: string): Element | null =>
-  host.shadowRoot?.querySelector(`[part='${name}']`) ?? null
-
-const slotted = (host: HTMLElement, name?: string): Element[] => {
-  const selector = name ? `slot[name='${name}']` : 'slot:not([name])'
-  const slot = host.shadowRoot?.querySelector(selector) as HTMLSlotElement | null
-  return (slot?.assignedElements?.() ?? []) as Element[]
-}
 
 describe('card regions', () => {
   test('renders one element, not five', async () => {
@@ -33,24 +15,53 @@ describe('card regions', () => {
         <button slot="footer">Act</button>
       </helix-card>
     `)
-    // The regions are parts of one shadow root, not separate custom elements.
-    expect(card.querySelectorAll('helix-card-header, helix-card-body').length).toBe(0)
-    expect(part(card, 'header')).not.toBeNull()
-    expect(part(card, 'body')).not.toBeNull()
-    expect(part(card, 'footer')).not.toBeNull()
+    // The regions are slots in one shadow root, not separate custom elements
+    // and not wrapper divs either.
+    expect(card.querySelectorAll('helix-card-header, helix-card-content').length).toBe(0)
+    expect(part(card, 'container')).not.toBeNull()
+    expect(card.shadowRoot?.querySelectorAll('div').length).toBe(1)
   })
 
   test('routes content to the right region', async () => {
     const card = await mount(`
       <helix-card>
+        <img slot="media" src="/cover.avif" alt="" />
         <h2 slot="header">Title</h2>
         <p>Body</p>
         <button slot="footer">Act</button>
       </helix-card>
     `)
+    expect(slotted(card, 'media')[0]?.tagName).toBe('IMG')
     expect(slotted(card, 'header')[0]?.tagName).toBe('H2')
     expect(slotted(card)[0]?.tagName).toBe('P')
     expect(slotted(card, 'footer')[0]?.tagName).toBe('BUTTON')
+  })
+
+  test('an omitted region leaves no element behind to take up space', async () => {
+    // A bare slot is `display: contents`, so nothing is rendered for a region
+    // the consumer did not fill. This is what replaced hiding empty wrappers:
+    // `:host(:has(...))` is invalid CSS and the server cannot inspect children.
+    const card = await mount('<helix-card>Body</helix-card>')
+    const slots = [...(card.shadowRoot?.querySelectorAll('slot') ?? [])]
+    for (const slot of slots) {
+      const name = slot.getAttribute('name')
+      if (name) {
+        expect(slot.assignedNodes().length, name).toBe(0)
+      }
+    }
+  })
+
+  test('media is a region of the one element, not a wrapper around it', async () => {
+    // Media sits in the same grid as the content stack, so `orientation` moves
+    // it without any change to the markup a consumer wrote.
+    const card = await mount(`
+      <helix-card orientation="horizontal">
+        <img slot="media" src="/cover.avif" alt="" />
+        Body
+      </helix-card>
+    `)
+    expect(slotted(card, 'media')[0]?.tagName).toBe('IMG')
+    expect(card.getAttribute('orientation')).toBe('horizontal')
   })
 
   test('a consumer heading stays a real heading', async () => {

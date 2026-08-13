@@ -1,0 +1,13 @@
+:host {
+  block-size: var(--icon-size, var(--helix-size-icon));
+  /* `inline-flex` rather than `inline-block`, so the SVG has no descender gap
+     under it and sits on the text baseline of whatever it accompanies. */
+  display: inline-flex;
+  flex: 0 0 auto;
+  inline-size: var(--icon-size, var(--helix-size-icon));
+}
+
+[part="svg"] {
+  block-size: 100%;
+  inline-size: 100%;
+}

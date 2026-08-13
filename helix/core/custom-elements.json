@@ -113,6 +113,126 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/form-element.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "This has to be a class rather than a mixin or controller, and that is not a\nstyle preference: the browser reads `formAssociated` off the constructor\nduring element upgrade, and `attachInternals()` can only be called once from\nthe instance. Neither can be delegated to a composed object.\n\nDeliberately small. It carries what every form participant needs and nothing\nmore; `value`, validity, and the reset and restore callbacks land when the\nfirst input does, rather than being designed against components that do not\nexist yet.",
+          "name": "HelixFormElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's form-facing API.\n\nAvailable during server rendering too: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard."
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "module": "/src/helix-element.js"
+          },
+          "summary": "Base for every element that participates in a form.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/core/form-element",
+            "tier": "core"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixFormElement",
+          "declaration": {
+            "name": "HelixFormElement",
+            "module": "src/form-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/helix-element.ts",
       "declarations": [
         {
@@ -202,6 +322,14 @@
           "declaration": {
             "name": "OpenChangeDetail",
             "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixFormElement",
+          "declaration": {
+            "name": "HelixFormElement",
+            "module": "./form-element.js"
           }
         },
         {

@@ -6,9 +6,18 @@ import '@helix-io/web/card'
 import type { HelixCard } from '@helix-io/web'
 
 /**
- * Regions are slots: `header`, the default slot for content, and `footer`. An
-omitted region takes no space, so a card with only content needs no wrapper
-markup at all.
+ * Regions are slots: `media`, `header`, the default slot for content, and
+`footer`. An omitted region takes no space, so a card with only content needs
+no wrapper markup at all.
+
+`media` runs edge to edge and clips to the card's corners, so an image needs
+no inset correction. Set `orientation="horizontal"` to move it alongside the
+header, content, and footer stack rather than above it.
+
+Regions are bare slots with no wrapper element, so an omitted one occupies no
+space without the card having to detect that it is missing. Style slotted
+content directly rather than reaching for a part: a header is whatever
+element you slotted, not a wrapper we put around it.
  *
  * Renders `<helix-card>`.
  */
@@ -17,6 +26,8 @@ export interface CardProps extends BaseProps {
   appearance?: 'outlined' | 'elevated' | 'plain'
   /** Tightens the inset for dense layouts. */
   dense?: boolean
+  /** Whether media sits above the content stack or beside it. */
+  orientation?: 'vertical' | 'horizontal'
 }
 
 export const CardRoot = createComponent<HelixCard, CardProps>({

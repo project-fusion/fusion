@@ -56,6 +56,16 @@ const RAW_COLOR = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab|lab|lch)\s*\
 /** A bare length or number where a token belongs. */
 const RAW_LENGTH = /(?:^|[\s:(,])-?\d*\.?\d+(?:px|rem|em|ms|s)?(?=[\s;,)]|$)/
 
+/**
+ * Operands of a `calc()` multiplication or division.
+ *
+ * `calc(var(--_card-inset) * -1)` scales a token; the `-1` is a factor, not a
+ * length, and flagging it would push authors toward a second token that exists
+ * only to hold the number minus one. Addition and subtraction are left alone,
+ * because `calc(var(--x) + 4px)` really is a raw length.
+ */
+const CALC_FACTOR = /[*/]\s*-?\d*\.?\d+|-?\d*\.?\d+\s*[*/]/g
+
 /** Values that are structural rather than design decisions. */
 const ALLOWED_VALUES = new Set([
   '0',
@@ -184,7 +194,8 @@ for (const file of walk(root)) {
           continue
         }
 
-        const raw = RAW_COLOR.test(value) || RAW_LENGTH.test(value)
+        const scalar = value.replace(CALC_FACTOR, '')
+        const raw = RAW_COLOR.test(scalar) || RAW_LENGTH.test(scalar)
         if (raw) {
           violations.push({
             at,

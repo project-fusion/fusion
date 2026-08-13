@@ -1,3 +1,7 @@
 export { HelixOpenChangeEvent, type OpenChangeDetail } from '@helix-io/core'
+export * from './app-header/index.js'
+export * from './button/index.js'
 export * from './card/index.js'
 export * from './disclosure/index.js'
+export * from './divider/index.js'
+export * from './icon/index.js'

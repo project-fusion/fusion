@@ -1,10 +1,7 @@
 import { describe, expect, test } from 'bun:test'
-import { render } from '@lit-labs/ssr'
-import { collectResultSync } from '@lit-labs/ssr/lib/render-result.js'
 import { html } from 'lit'
+import { ssr } from '../../testing/ssr.js'
 import '../index.js'
-
-const ssr = (template: ReturnType<typeof html>): string => collectResultSync(render(template))
 
 /**
  * Uncontrolled open state is the case that regressed.

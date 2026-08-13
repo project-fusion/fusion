@@ -39,6 +39,35 @@ body {
   margin: 0;
 }
 
+/* The type scale lives here rather than in a `Text` component, so a heading is
+   a real heading. A component would have to take the level as a prop and would
+   tempt `size` to be set independently of it, which is how a page ends up with
+   an <h4> that looks like a title. This also reaches prose the design system
+   never renders, such as anything coming out of a CMS or a markdown file. */
+:where(h1) {
+  font-size: var(--helix-text-3xl);
+}
+
+:where(h2) {
+  font-size: var(--helix-text-2xl);
+}
+
+:where(h3) {
+  font-size: var(--helix-text-xl);
+}
+
+:where(h4) {
+  font-size: var(--helix-text-lg);
+}
+
+:where(h5) {
+  font-size: var(--helix-text-md);
+}
+
+:where(h6) {
+  font-size: var(--helix-text-sm);
+}
+
 :where(p, figure, blockquote, dl, dd) {
   margin: 0;
 }
@@ -57,8 +86,26 @@ body {
   font: inherit;
 }
 
+/* Anchors are styled here rather than wrapped in a `Link` component. An <a>
+   already carries everything a link needs, so a wrapper would add a shadow
+   boundary and no behavior; styling the element instead also covers links the
+   design system never renders. */
 :where(a) {
   color: var(--helix-color-primary);
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.15em;
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:where(a):hover {
+  color: var(--helix-color-primary-hover);
+}
+
+/* A link opening a new context says so, rather than surprising the reader. */
+:where(a[target="_blank"])::after {
+  content: "↗";
+  font-size: 0.85em;
+  margin-inline-start: 0.15em;
 }
 
 :where(code, kbd, samp, pre) {
