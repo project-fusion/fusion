@@ -87,9 +87,30 @@ export class HelixRemoveRequestEvent extends CustomEvent<RemoveRequestDetail> {
   }
 }
 
+/** Detail carried by `SourceChange`. */
+export interface SourceChangeDetail {
+  /** The full source after the edit. */
+  value: string
+}
+
+/** Fired when editable source is changed by the reader. */
+export class HelixSourceChangeEvent extends CustomEvent<SourceChangeDetail> {
+  static readonly eventName = 'SourceChange'
+
+  constructor(detail: SourceChangeDetail) {
+    super(HelixSourceChangeEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 declare global {
   interface HTMLElementEventMap {
     OpenChange: HelixOpenChangeEvent
     RemoveRequest: HelixRemoveRequestEvent
+    SourceChange: HelixSourceChangeEvent
   }
 }

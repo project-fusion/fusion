@@ -5,6 +5,7 @@ import { type ConventionLintOptions, conventionLint } from './plugins/convention
 import { declaredEvents } from './plugins/declared-events.js'
 import { helixTier } from './plugins/helix-tier.js'
 import { jsxImports } from './plugins/jsx-imports.js'
+import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { metadata } from './plugins/metadata.js'
 import { reactEvents } from './plugins/react-events.js'
 import type { HelixMetadata, Plugin } from './types.js'
@@ -75,6 +76,9 @@ export const createHelixCemConfig = ({
           // Must follow the generator: it references event types it does not
           // import, and an unresolved name degrades to `any` under skipLibCheck.
           ...(packageName ? [jsxImports({ packageName })] : []),
+          // Also after the generator: its `ref` type is framework-agnostic and
+          // rejects the `useRef` every React consumer reaches for.
+          jsxReactRef(),
         ]
       : []),
     ...plugins,

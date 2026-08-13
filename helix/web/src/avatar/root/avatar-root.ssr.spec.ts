@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
-import { partTag, ssr, withoutStyles } from '../../testing/ssr.js'
 import '../index.js'
 
 describe('avatar server output', () => {

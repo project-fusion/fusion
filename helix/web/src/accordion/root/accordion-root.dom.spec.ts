@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '../../testing/dom.js'
+import { mount, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()

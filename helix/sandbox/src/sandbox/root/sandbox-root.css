@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+[part="container"] {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  display: grid;
+  min-block-size: var(--sandbox-min-block-size, 20rem);
+  overflow: hidden;
+}
+
+:host([orientation="horizontal"]) [part="container"] {
+  grid-template-columns: var(--_sandbox-split) auto minmax(0, 1fr);
+}
+
+:host([orientation="vertical"]) [part="container"] {
+  grid-template-rows: var(--_sandbox-split) auto minmax(0, 1fr);
+}
+
+/* Both panes must be allowed to shrink below their content, or a wide preview
+   pushes the split open and the divider stops matching where the panes are. */
+[part="pane"] {
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: auto;
+}
+
+[part="separator"] {
+  background-color: var(--sandbox-separator-color, var(--helix-color-border));
+  border: none;
+  padding: var(--helix-space-none);
+  touch-action: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host([orientation="horizontal"]) [part="separator"] {
+  cursor: col-resize;
+  inline-size: var(--helix-border-thick);
+}
+
+:host([orientation="vertical"]) [part="separator"] {
+  block-size: var(--helix-border-thick);
+  cursor: row-resize;
+}
+
+[part="separator"]:hover,
+[part="container"][data-dragging] [part="separator"] {
+  background-color: var(--helix-color-border-accent);
+}
+
+/* Inset, because the divider runs to the container edge and an outset ring
+   would be clipped by `overflow: hidden`. */
+[part="separator"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* A drag that crosses the preview must not start selecting its text. */
+[part="container"][data-dragging] {
+  user-select: none;
+}
+
+::slotted(helix-sandbox-preview) {
+  display: block;
+  padding: var(--helix-space-md);
+}

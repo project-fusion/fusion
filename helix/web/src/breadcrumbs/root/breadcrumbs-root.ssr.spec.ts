@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { hostTag, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
-import { hostTag, partTag, ssr, withoutStyles } from '../../testing/ssr.js'
 import '../index.js'
 
 const trail = html`<helix-breadcrumbs>

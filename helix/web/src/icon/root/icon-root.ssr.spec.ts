@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { ssr } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
-import { ssr } from '../../testing/ssr.js'
 import '../index.js'
 
 describe('icon server output', () => {

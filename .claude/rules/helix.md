@@ -303,26 +303,46 @@ wrappers drift from the element API the first time someone adds a property.
 
 ## The sandbox
 
-`sandbox/ui` builds one self-contained HTML file from the manifests plus
-colocated examples. No server, no framework, no network requests.
+`@helix-io/sandbox` ships the sandbox elements; `sandbox/ui` is the Next site
+that renders them. Both dev and production work the same way as the marketing
+site, with element registration in one client component.
 
-- **Examples are `.examples/*.html` colocated with the component**, read off
-  disk at build time. `default.html` is the headline preview; every other slug
-  is a named variant. A map in the sandbox package would be one more thing to
-  forget, and forgetting it looks exactly like a component with no examples.
-- **Nothing else is written down.** Components, properties, slots, parts,
-  events, and CSS custom properties come from the manifest, so a literal union
-  becomes a select holding exactly the values that compile.
-- **The markup is the single source of truth.** Property controls rewrite the
-  example text and typing in it re-renders the preview. A read-only snippet
-  beside an editable preview is two versions of one thing, one of them wrong.
-- **The sandbox is not a Helix component.** The previous one was: the design
-  system exported `HelixSandboxEditorBase`, `HelixSandboxTerminalBase`,
-  `HelixSandboxResizeHandleBase`, and seven more from its public barrel, which
-  put 119 kB of 1.22 MB, roughly a tenth of the library, into every consumer's
-  install as tooling for one internal site. A code editor is an app component.
+- **A separate package, never the component library.** The previous Helix
+  exported `HelixSandboxEditorBase`, `HelixSandboxTerminalBase`,
+  `HelixSandboxResizeHandleBase`, and seven more from `helix/web`'s public
+  barrel: 119 kB of 1.22 MB, roughly a tenth of the library, shipped to every
+  consumer as tooling for one internal site. Single tier, because the headless
+  and styled split exists so a consumer can bring their own presentation, and
+  nobody reskins a dev tool.
+- **The preview renders into the light DOM.** `createRenderRoot()` returns
+  `this`. A shadow root would cut the preview off from the base layer, so a
+  heading would come out at the browser's default size and a link in the wrong
+  colour, and the preview would be a worse likeness the more the design system
+  does.
+- **Source and preview never speak directly.** The source pane dispatches
+  `SourceChange` and the root hands the value to whatever preview is slotted
+  into it, the same event-not-registration shape the accordion uses.
+- **The divider is a real `role="separator"`** with `aria-valuenow`, moved by
+  arrow keys as well as by pointer. A divider only a mouse can move is unusable
+  without one.
 
-## Tree-shaking
+### The site
+
+Two page kinds, kept apart on purpose:
+
+- **`/components/<family>` is the API**, read from the manifest and nothing
+  else. No examples: it answers what a component can do, and a reference page
+  that starts collecting pictures stops being complete.
+- **`/components/<family>/<example>` is the sandbox**, one example, editable.
+
+Examples are `.examples/*.html` beside the component. `default.html` is the
+headline preview and reads as "Preview"; every other slug is a named variant.
+
+**Names drop the product.** `helix-app-header` displays as "App Header":
+repeating "Helix" on every row inside the Helix site is noise. The tag keeps its
+prefix, because that is a real identifier a consumer types.
+
+## Tree-shaking## Tree-shaking
 
 One family per module, subpath exports (`@helix-io/react/disclosure`) so
 consumers need not import the barrel, and `sideEffects` declared honestly: `web`

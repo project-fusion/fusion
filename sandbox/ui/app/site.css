@@ -1,0 +1,264 @@
+/* Site chrome. Reads Helix tokens like any other consumer, which makes this
+   site a standing test of whether the token layer is usable from outside. */
+
+.shell {
+  display: grid;
+  grid-template-columns: 16rem minmax(0, 1fr);
+  min-block-size: 100vh;
+}
+
+.sidebar {
+  background-color: var(--helix-color-surface-sunken);
+  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
+  block-size: 100vh;
+  inset-block-start: 0;
+  overflow-y: auto;
+  padding: var(--helix-space-md);
+  position: sticky;
+}
+
+.brand {
+  align-items: baseline;
+  color: var(--helix-color-foreground);
+  display: flex;
+  gap: var(--helix-space-xs);
+  margin-block-end: var(--helix-space-md);
+  text-decoration: none;
+}
+
+.brand strong {
+  font-size: var(--helix-text-lg);
+  letter-spacing: var(--helix-tracking-tight);
+}
+
+.brand span {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+}
+
+.navGroup {
+  margin-block-end: var(--helix-space-xs);
+}
+
+.navFamily {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  display: block;
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  text-decoration: none;
+}
+
+.navFamily:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
+/* Examples are indented under their family with a rule rather than a bullet,
+   so the nesting reads at a glance without adding list semantics the sidebar
+   does not otherwise have. */
+.navExamples {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  flex-direction: column;
+  margin-inline-start: var(--helix-space-sm);
+  padding-inline-start: var(--helix-space-xs);
+}
+
+.navExample {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  text-decoration: none;
+}
+
+.navExample:hover {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+main {
+  min-inline-size: 0;
+  padding: var(--helix-space-xl);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-lg);
+  max-inline-size: 64rem;
+}
+
+.pageHead h1 {
+  font-size: var(--helix-text-2xl);
+}
+
+.crumb {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+  margin-block-end: var(--helix-space-2xs);
+}
+
+.lede {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-lg);
+  margin-block-start: var(--helix-space-sm);
+  max-inline-size: 60ch;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs);
+  margin-block-start: var(--helix-space-xs);
+}
+
+.chip {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  padding: 0 var(--helix-space-xs);
+}
+
+/* Stage labels are honest here too: experimental is stated, never softened. */
+.chip-experimental {
+  border-color: var(--helix-color-warning);
+  color: var(--helix-color-warning);
+}
+
+.chip-stable {
+  border-color: var(--helix-color-success);
+  color: var(--helix-color-success);
+}
+
+.aliases {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  margin-block-start: var(--helix-space-xs);
+}
+
+.cardGrid {
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.cardHead {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+}
+
+.cardHead h2 {
+  font-size: var(--helix-text-lg);
+}
+
+.exampleTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xs);
+}
+
+.exampleTabs a {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+  text-decoration: none;
+}
+
+.exampleTabs a[aria-current="page"] {
+  background-color: var(--helix-color-primary-subtle);
+  border-color: var(--helix-color-border-accent);
+  color: var(--helix-color-primary);
+}
+
+.element {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block-start: var(--helix-space-lg);
+}
+
+.element h2 {
+  align-items: center;
+  display: flex;
+  font-size: var(--helix-text-xl);
+  gap: var(--helix-space-sm);
+}
+
+.tierChip {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-regular);
+  padding: 0 var(--helix-space-xs);
+}
+
+.tagName {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+}
+
+.description {
+  color: var(--helix-color-foreground-muted);
+  margin-block-start: var(--helix-space-sm);
+  max-inline-size: 70ch;
+  white-space: pre-line;
+}
+
+.apiSection {
+  margin-block-start: var(--helix-space-lg);
+}
+
+.apiSection h3 {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-wide);
+  margin-block-end: var(--helix-space-sm);
+  text-transform: uppercase;
+}
+
+.apiSection table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+.apiSection td {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  font-size: var(--helix-text-sm);
+  padding: var(--helix-space-xs) var(--helix-space-sm) var(--helix-space-xs) 0;
+  vertical-align: top;
+}
+
+.apiSection td:first-child {
+  inline-size: 18rem;
+}
+
+.apiSection code {
+  color: var(--helix-color-primary);
+  font-size: var(--helix-text-xs);
+}
+
+.apiType {
+  color: var(--helix-color-foreground-subtle);
+  display: block;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  margin-block-start: var(--helix-space-2xs);
+}
+
+@media (max-width: 60rem) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    block-size: auto;
+    position: static;
+  }
+}
