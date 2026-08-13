@@ -236,6 +236,115 @@ helix-app-header {
   }
 }
 
+/* ============================================================ sandbox ==== */
+
+/* The tool owns the viewport. One header, then everything else fills what is
+   left, and nothing on this screen scrolls the page: the panes scroll inside
+   themselves so the chrome never moves. */
+.sandboxShell {
+  block-size: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workbenchHeader {
+  background-color: var(--helix-color-background);
+  block-size: var(--helix-size-header);
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  flex: 0 0 auto;
+  padding-inline: var(--helix-space-md);
+}
+
+/* The breadcrumb takes the slack, so the actions sit against the right edge
+   rather than trailing the title. */
+.workbenchTitle {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+/* Editor and preview take what is left; the examples keep a fixed rail on the
+   right, which is where they were asked for and where a list you scan while
+   working belongs. */
+.workbenchBody {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1fr) 17rem;
+  min-block-size: 0;
+}
+
+.workbenchBody helix-sandbox {
+  block-size: 100%;
+  min-inline-size: 0;
+}
+
+.examplesRail {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  min-block-size: 0;
+  overflow-y: auto;
+  padding: var(--helix-space-sm);
+}
+
+/* The file tabs and the editor under them are one column that fills the pane,
+   so the text area grows with the window instead of sitting in a fixed box.
+
+   Flex the whole way down rather than a chain of percentage heights. A
+   percentage resolves against a definite containing block, and each link in
+   that chain has to be definite for the next to be: the editor stopped at its
+   own 12rem floor because somewhere up the chain it was not. `flex: 1 1 auto`
+   with `min-block-size: 0` says the same thing without the precondition, and
+   the zeroed floor is what lets it shrink as well as grow. */
+.sourceTabs {
+  block-size: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
+
+  --sandbox-source-min-block-size: 0;
+}
+
+/* `minmax(0, 1fr)` rather than `1fr`, because a `1fr` track has an automatic
+   minimum and refuses to shrink below its content: the editor would push the
+   pane taller instead of scrolling inside it. */
+.sourceTabs::part(panels) {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+/* Every panel is placed in the same cell rather than left to auto-placement.
+   Panels stay mounted so switching files does not discard what was typed, and
+   it is the panel's *inner* element that carries `hidden`, not the host: the
+   hosts all generate boxes, so auto-placement gave each one its own row and the
+   editor got a fraction of the pane. Stacked, the one that renders fills it. */
+.sourceTabs helix-tabs-panel {
+  display: grid;
+  grid-area: 1 / 1;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+/* Sizing only, and deliberately no `display`. A `::part` rule from this
+   document outranks the component's own, so setting `display` here would beat
+   the `[part="panel"][hidden] { display: none }` that hides the inactive file
+   and both would render at once. */
+.sourceTabs helix-tabs-panel::part(panel) {
+  block-size: 100%;
+  padding-block-start: 0;
+}
+
+.sourceTabs helix-sandbox-source {
+  min-block-size: 0;
+}
+
+/* Below the rail's width the examples move into a drawer, so the editor keeps
+   the whole screen rather than sharing it with a list. */
+@media (max-width: 60rem) {
+  .workbenchBody {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* ============================================================ footer ===== */
 
 .siteFooter {
