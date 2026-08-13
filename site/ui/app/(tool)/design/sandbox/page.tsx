@@ -1,4 +1,4 @@
-import { families } from '../../../lib/catalog'
+import { families } from '../../../../lib/catalog'
 import { SandboxWorkbench } from './workbench'
 
 /**

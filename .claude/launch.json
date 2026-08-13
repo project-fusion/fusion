@@ -1,15 +1,9 @@
 {
   "configurations": [
     {
-      "name": "marketing",
+      "name": "fusion",
       "port": 3000,
-      "runtimeArgs": ["run", "--cwd", "marketing/ui", "dev"],
-      "runtimeExecutable": "bun"
-    },
-    {
-      "name": "marketing-prod",
-      "port": 3100,
-      "runtimeArgs": ["run", "--cwd", "marketing/ui", "next", "start", "--port", "3100"],
+      "runtimeArgs": ["run", "--cwd", "site/ui", "next", "dev", "--port", "3000"],
       "runtimeExecutable": "bun"
     }
   ],

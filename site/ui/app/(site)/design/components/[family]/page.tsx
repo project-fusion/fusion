@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { type ApiMember, families, findFamily } from '../../../../lib/catalog'
+import { type ApiMember, families, findFamily } from '../../../../../lib/catalog'
 
 /**
  * API reference for one family, read from the manifest and nothing else.
@@ -64,7 +64,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
       <helix-tree class="docsNav" label="Components" value={family.slug}>
         {families.map((entry) => (
           <helix-tree-item key={entry.slug} value={entry.slug}>
-            <helix-link appearance="quiet" href={`/components/${entry.slug}`}>
+            <helix-link appearance="quiet" href={`/design/components/${entry.slug}`}>
               {entry.label}
             </helix-link>
           </helix-tree-item>
@@ -100,7 +100,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             <helix-flex>
               <helix-button
                 appearance="subtle"
-                href={`/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
+                href={`/design/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
                 size="sm"
               >
                 Open in the sandbox

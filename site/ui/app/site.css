@@ -103,3 +103,8 @@
 .prefsPanel {
   padding: var(--helix-space-lg);
 }
+
+/* A vertical's page is one column of prose and whatever it wants below. */
+.verticalShell {
+  padding-block: var(--helix-space-2xl);
+}

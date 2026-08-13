@@ -1,6 +1,6 @@
 {
-  "name": "@fusion-io/marketing-ui",
-  "description": "fusion.dev. The company site.",
+  "name": "@fusion-io/site-ui",
+  "description": "fusion.dev: the landing page, the verticals, and the tools under them.",
   "version": "0.0.1",
   "private": true,
   "license": "UNLICENSED",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@helix-io/react": "workspace:*",
+    "@helix-io/sandbox": "workspace:*",
     "@helix-io/styles": "workspace:*",
     "@helix-io/web": "workspace:*",
     "next": "^15.5.0",
