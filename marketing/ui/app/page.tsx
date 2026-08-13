@@ -88,13 +88,13 @@ export default function Home() {
     <>
       <section className="hero">
         <helix-flex class="shell" direction="column" gap="lg">
-          <helix-text mono size="xs" tone="subtle" weight="medium">
+          <helix-text appearance="code" tone="subtle">
             Fusion Development Group
           </helix-text>
-          <helix-text class="heroTitle" level={1}>
+          <helix-text class="heroTitle" as="h1">
             Developing for humanity
           </helix-text>
-          <helix-text block class="heroLede" size="lg" tone="muted">
+          <helix-text as="p" class="heroLede" tone="muted">
             Intelligence and energy are collapsing in cost at the same moment. We build the stack
             that makes sovereignty practical, starting with the two substrates everything else
             needs.
@@ -114,7 +114,7 @@ export default function Home() {
         <helix-flex class="shell" direction="column">
           <helix-callout severity="info">
             <helix-flex direction="column" gap="2xs">
-              <helix-text weight="semibold">The Sovereignty Constraint</helix-text>
+              <helix-text appearance="body-strong">The Sovereignty Constraint</helix-text>
               <helix-text tone="muted">
                 No Fusion product may create a dependency its user cannot exit. The user holds their
                 own keys, data, and hardware. Fusion may operate a control plane, never a
@@ -128,8 +128,8 @@ export default function Home() {
       <section className="band" id="substrates">
         <helix-flex class="shell" direction="column" gap="lg">
           <helix-flex direction="column" gap="2xs">
-            <helix-text level={2}>Two substrates</helix-text>
-            <helix-text block size="lg" tone="muted">
+            <helix-text as="h2">Two substrates</helix-text>
+            <helix-text as="p" tone="muted">
               Not products. The layers products are built on.
             </helix-text>
           </helix-flex>
@@ -138,7 +138,7 @@ export default function Home() {
             {substrates.map((substrate) => (
               <helix-card appearance="outlined" aria-label={substrate.name} key={substrate.name}>
                 <helix-flex align="center" gap="sm" justify="between" slot="header">
-                  <helix-text level={3} size="lg">
+                  <helix-text as="h3" appearance="title">
                     {substrate.name}
                   </helix-text>
                   <helix-tag appearance={stageAppearance(substrate.stage)} size="sm">
@@ -146,7 +146,7 @@ export default function Home() {
                   </helix-tag>
                 </helix-flex>
                 <helix-text tone="muted">{substrate.summary}</helix-text>
-                <helix-text size="xs" slot="footer" tone="subtle">
+                <helix-text appearance="label" slot="footer" tone="subtle">
                   {substrate.vertical}
                 </helix-text>
               </helix-card>
@@ -158,8 +158,8 @@ export default function Home() {
       <section className="band" id="verticals">
         <helix-flex class="shell" direction="column" gap="lg">
           <helix-flex direction="column" gap="2xs">
-            <helix-text level={2}>Verticals</helix-text>
-            <helix-text block size="lg" tone="muted">
+            <helix-text as="h2">Verticals</helix-text>
+            <helix-text as="p" tone="muted">
               Stage labels are honest. Building means real work with nothing shipped.
             </helix-text>
           </helix-flex>
@@ -168,14 +168,12 @@ export default function Home() {
             {verticals.map((vertical) => (
               <helix-flex direction="column" gap="sm" id={vertical.id} key={vertical.id}>
                 <helix-flex align="center" gap="sm" wrap>
-                  <helix-text level={3} size="xl">
-                    {vertical.name}
-                  </helix-text>
+                  <helix-text as="h3">{vertical.name}</helix-text>
                   <helix-tag appearance={stageAppearance(vertical.stage)} size="sm">
                     {vertical.stage}
                   </helix-tag>
                 </helix-flex>
-                <helix-text block class="verticalBody" tone="muted">
+                <helix-text as="p" class="verticalBody" tone="muted">
                   {vertical.body}
                 </helix-text>
               </helix-flex>
@@ -186,11 +184,11 @@ export default function Home() {
 
       <section className="band" id="questions">
         <helix-flex class="shell" direction="column" gap="lg">
-          <helix-text level={2}>Questions</helix-text>
+          <helix-text as="h2">Questions</helix-text>
           <helix-accordion>
             {questions.map((entry) => (
               <helix-accordion-item key={entry.question}>
-                <helix-text slot="summary" weight="medium">
+                <helix-text appearance="body-strong" slot="summary">
                   {entry.question}
                 </helix-text>
                 <helix-text tone="muted">{entry.answer}</helix-text>
@@ -202,10 +200,8 @@ export default function Home() {
 
       <section className="band closing">
         <helix-flex align="center" class="shell" direction="column" gap="md">
-          <helix-text level={2} size="2xl">
-            Solo, and shipping
-          </helix-text>
-          <helix-text block class="closingLede" size="lg" tone="muted">
+          <helix-text as="h2">Solo, and shipping</helix-text>
+          <helix-text as="p" class="closingLede" tone="muted">
             We take on interface and intelligence work the substrates make faster to do well. If
             that is what you need, say so plainly and we will tell you whether we are the right
             people.

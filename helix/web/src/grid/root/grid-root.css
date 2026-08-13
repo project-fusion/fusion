@@ -1,6 +1,25 @@
 :host {
   display: grid;
   gap: var(--helix-space-md);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* A fixed count is plain CSS, so it is right in server-rendered markup with no
+   JavaScript. Only `min` needs measuring, and it is applied on upgrade. */
+:host([columns="2"]) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+:host([columns="3"]) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+:host([columns="4"]) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+:host([columns="5"]) {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+:host([columns="6"]) {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 :host([gap="none"]) {

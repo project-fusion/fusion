@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -20,10 +20,11 @@ import { property } from 'lit/decorators.js'
  * landmark the navigation needs whether or not anything is in it; the other two
  * are `display: contents` when unassigned and cost nothing.
  *
- * The banner spans the viewport and the row inside it is what gets centred. A
- * banner that is itself narrowed leaves its own background stopping short of
- * the window edges, which reads as a floating bar rather than as the top of the
- * page. That is a second element, not a max-width on the first.
+ * The host is the banner and spans the viewport; the row inside it is what gets
+ * centred. A banner that is itself narrowed leaves its background stopping
+ * short of the window edges, which reads as a floating bar rather than as the
+ * top of the page. That needs one element and one row, not a wrapper as well:
+ * the host carries the material and `content` carries the measure.
  *
  * @since 0.1.0
  * @status experimental
@@ -34,8 +35,7 @@ import { property } from 'lit/decorators.js'
  * @slot - Primary navigation.
  * @slot actions - Trailing actions, such as a call to action.
  *
- * @csspart bar - The full-width banner.
- * @csspart content - The centred row inside it.
+ * @csspart content - The centred row inside the banner.
  * @csspart nav - The navigation region.
  */
 @customElement('helix-base-app-header')
@@ -54,6 +54,12 @@ export class HelixBaseAppHeader extends HelixElement {
     this.toggleAttribute('data-scrolled', window.scrollY > 0)
   }
 
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    // On the host, since the host is the banner.
+    this.setAttribute('role', 'banner')
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     // Never reached on the server, which is correct: there is no scroll
@@ -70,13 +76,11 @@ export class HelixBaseAppHeader extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`
-      <header part="bar" role="banner">
-        <div part="content">
-          <slot name="brand"></slot>
-          <nav part="nav"><slot></slot></nav>
-          <slot name="actions"></slot>
-        </div>
-      </header>
+      <div part="content">
+        <slot name="brand"></slot>
+        <nav part="nav"><slot></slot></nav>
+        <slot name="actions"></slot>
+      </div>
     `
   }
 }

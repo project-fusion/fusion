@@ -12,7 +12,9 @@ describe('sandbox server output', () => {
   test('renders without reading children it cannot see', () => {
     // The coordination listener is attached on connect, which the server never
     // calls, so rendering at all proves nothing walks the tree.
-    expect(hasPart(markup, 'container')).toBe(true)
+    // The host is the split, so there is no container part: the shadow root
+    // holds two panes and the divider between them.
+    expect(hasPart(markup, 'pane')).toBe(true)
     expect(hasPart(markup, 'separator')).toBe(true)
   })
 
@@ -29,7 +31,10 @@ describe('sandbox server output', () => {
     expect(withoutStyles(markup)).toContain('<textarea')
   })
 
-  test('the split is applied as a style, so no layout shift on hydration', () => {
-    expect(partTag(markup, 'container')).toContain('45%')
+  test('the served split matches the property default, so nothing shifts', () => {
+    // The split cannot be an inline style on the server: the element shim has
+    // no `style`, and Lit rejects expressions inside a `<style>` element. The
+    // stylesheet therefore carries the same 45% the property defaults to.
+    expect(markup).toContain('--_sandbox-split: 45%')
   })
 })

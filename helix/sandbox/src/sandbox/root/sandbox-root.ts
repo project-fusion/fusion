@@ -1,5 +1,5 @@
 import { customElement, HelixElement, type HelixSourceChangeEvent } from '@helix-io/core'
-import type { CSSResultGroup, TemplateResult } from 'lit'
+import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixSandboxPreview } from '../preview/sandbox-preview.js'
@@ -37,7 +37,6 @@ const MAX = 85
  * @slot source - The editable source pane.
  * @slot preview - The live preview.
  *
- * @csspart container - The split layout.
  * @csspart pane - Either pane.
  * @csspart separator - The draggable divider.
  *
@@ -138,13 +137,37 @@ export class HelixSandbox extends HelixElement {
     this.removeEventListener('SourceChange', this.handleSourceChange)
   }
 
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleAttribute('data-dragging', this.dragging)
+  }
+
+  /**
+   * Writes the split to the host.
+   *
+   * Guarded, because the server's element shim has no `style`, and a `<style>`
+   * element cannot carry it either: Lit rejects expressions inside one. The
+   * server therefore renders the stylesheet's default split, which is the same
+   * 45% this property defaults to.
+   */
+  private applySplit(): void {
+    this.style?.setProperty('--_sandbox-split', `${this.split}%`)
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.applySplit()
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('split')) {
+      this.applySplit()
+    }
+  }
+
   protected override render(): TemplateResult {
-    return html`<div
-      part="container"
-      style=${`--_sandbox-split: ${this.split}%`}
-      ?data-dragging=${this.dragging}
-    >
-      <div part="pane"><slot name="source"></slot></div>
+    return html`<div part="pane"><slot name="source"></slot></div>
       <div
         part="separator"
         role="separator"
@@ -159,8 +182,7 @@ export class HelixSandbox extends HelixElement {
         @pointermove=${this.handlePointerMove}
         @pointerup=${this.handlePointerUp}
       ></div>
-      <div part="pane"><slot name="preview"></slot></div>
-    </div>`
+      <div part="pane"><slot name="preview"></slot></div>`
   }
 
   static override styles: CSSResultGroup = styles

@@ -1,0 +1,61 @@
+:host {
+  display: inline-flex;
+  position: relative;
+
+  --_toggle-height: var(--helix-size-control-dense);
+}
+
+:host([size="sm"]) {
+  --_toggle-height: calc(var(--helix-size-control-dense) - var(--helix-space-xs));
+}
+
+:host([appearance="filled"]) {
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  padding: var(--helix-space-2xs);
+}
+
+:host([nav]) nav {
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
+
+/* One marker that travels. Its geometry is measured from the selected item and
+   written to the host, because labels differ in length and no fraction of the
+   group is right for all of them. */
+[part="indicator"] {
+  background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
+  block-size: var(--_toggle-height);
+  border-radius: var(--helix-radii-sm);
+  inline-size: var(--_indicator-w, 0);
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  opacity: 0;
+  position: absolute;
+  translate: var(--_indicator-x, 0) -50%;
+  /* Width is a layout property and the rule is transform and opacity only. The
+     indicator is out of flow, so animating it reflows nothing else, and scaling
+     instead would distort the corner radius. */
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  z-index: var(--helix-layer-base);
+}
+
+/* Hidden until it has somewhere to be, so it fades in rather than sliding from
+   a wrong place on first paint. */
+:host([data-placed]) [part="indicator"] {
+  opacity: 1;
+}
+
+:host([nav]) [part="indicator"] {
+  background-color: var(--toggle-group-indicator-color, var(--helix-color-primary-subtle));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="indicator"] {
+    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  }
+}

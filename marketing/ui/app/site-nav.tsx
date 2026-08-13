@@ -3,6 +3,7 @@
 import type { HelixOpenChangeEvent } from '@helix-io/web'
 import { useEffect, useState } from 'react'
 import { FusionLogo } from './fusion-logo'
+import { Preferences } from './preferences'
 
 /** The verticals, in the order the company is organised. Design leads. */
 const VERTICALS = [
@@ -15,13 +16,12 @@ const VERTICALS = [
 /**
  * Site navigation: the verticals, centred in the banner.
  *
- * Rendered as links rather than as `helix-tabs`, and the difference is not
- * cosmetic. A tab controls a panel and announces itself with `role="tab"`
- * inside a `tablist`; these navigate to sections of the page. Borrowing the
- * role would tell a screen-reader user there are panels to switch between and
- * leave `aria-controls` pointing at content that is not a tabpanel. The links
- * are styled as tabs and carry `aria-current`, which is the honest version of
- * the same thing.
+ * A toggle group in `nav` mode: the items are real links inside a navigation
+ * landmark, and the selection is marked by an indicator that travels between
+ * them. Not tabs, and the difference is not cosmetic: a tab controls a panel
+ * and announces itself inside a `tablist`, so borrowing the role would promise
+ * panels that do not exist. The moving marker is the part that was wanted, and
+ * it does not require the wrong semantics to get.
  *
  * **The header and the drawer are siblings, and have to be.** `backdrop-filter`
  * on the header's material makes it a containing block for `position: fixed`
@@ -71,24 +71,23 @@ export function SiteNav() {
         <helix-link appearance="quiet" href="/" slot="brand">
           <helix-flex align="center" gap="xs" inline>
             <FusionLogo size="1.5rem" />
-            <helix-text class="wordmark" weight="semibold">
+            <helix-text class="wordmark" appearance="body-strong">
               Fusion
             </helix-text>
           </helix-flex>
         </helix-link>
 
-        {!narrow &&
-          VERTICALS.map((entry) => (
-            <helix-link
-              aria-current={current === entry.href ? 'true' : undefined}
-              appearance="quiet"
-              class="navTab"
-              href={entry.href}
-              key={entry.href}
-            >
-              {entry.label}
-            </helix-link>
-          ))}
+        {!narrow && (
+          <helix-toggle-group appearance="plain" label="Verticals" nav value={current}>
+            {VERTICALS.map((entry) => (
+              <helix-toggle-group-item href={entry.href} key={entry.href} value={entry.href}>
+                {entry.label}
+              </helix-toggle-group-item>
+            ))}
+          </helix-toggle-group>
+        )}
+
+        <Preferences />
 
         {narrow ? (
           <helix-button appearance="subtle" onClick={() => setOpen(true)} size="sm" slot="actions">

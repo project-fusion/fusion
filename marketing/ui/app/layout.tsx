@@ -31,11 +31,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <helix-flex align="center" gap="md" justify="between" wrap>
               <helix-flex align="center" gap="xs">
                 <FusionLogo size="1.25rem" />
-                <helix-text size="sm" tone="muted">
+                <helix-text appearance="caption" tone="muted">
                   Fusion Development Group
                 </helix-text>
               </helix-flex>
-              <helix-text size="xs" tone="subtle">
+              <helix-text appearance="label" tone="subtle">
                 Developing for humanity.
               </helix-text>
             </helix-flex>

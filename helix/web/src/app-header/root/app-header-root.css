@@ -1,26 +1,22 @@
+/* The host is the banner: it carries the material and spans the window, and
+   `content` carries the measure. */
 :host {
+  background-color: var(--app-header-background, var(--helix-material-translucent));
+  /* The blur is what makes the bar read as a pane of material over the page
+     rather than a band of flat color sitting on it. */
+  backdrop-filter: blur(var(--helix-material-blur-md));
+  border-block-end: var(--helix-border-thin) solid transparent;
   display: block;
+  inline-size: 100%;
+  transition:
+    border-color var(--helix-duration-normal) var(--helix-easing-standard),
+    box-shadow var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
 :host([sticky]) {
   inset-block-start: 0;
   position: sticky;
   z-index: var(--helix-layer-sticky);
-}
-
-/* The banner spans the window. Narrowing it instead leaves its background
-   stopping short of the edges, which reads as a floating bar rather than as
-   the top of the page. */
-[part="bar"] {
-  background-color: var(--app-header-background, var(--helix-material-translucent));
-  /* The blur is what makes the bar read as a pane of material over the page
-     rather than a band of flat color sitting on it. */
-  backdrop-filter: blur(var(--helix-material-blur-md));
-  border-block-end: var(--helix-border-thin) solid transparent;
-  inline-size: 100%;
-  transition:
-    border-color var(--helix-duration-normal) var(--helix-easing-standard),
-    box-shadow var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
 /* The row is what gets centred, so the content lines up with the page while
@@ -38,7 +34,7 @@
 /* Flat against the hero, lifted once content runs underneath. `data-scrolled`
    is absent in the server's markup, which matches a fresh load at the top, so
    the bar does not start lifted and settle. */
-:host([data-scrolled]) [part="bar"] {
+:host([data-scrolled]) {
   border-block-end-color: var(--helix-material-border);
   box-shadow: var(--helix-shadow-sm);
 }

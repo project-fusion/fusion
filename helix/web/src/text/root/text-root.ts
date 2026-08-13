@@ -1,35 +1,67 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { literal, type StaticValue, html as staticHtml } from 'lit/static-html.js'
 import { styles } from './text-root.css.js'
 
-/** Tags this can render, indexed by level. Static values, so they can be a tag. */
-const TAGS: Record<number, StaticValue> = {
-  1: literal`h1`,
-  2: literal`h2`,
-  3: literal`h3`,
-  4: literal`h4`,
-  5: literal`h5`,
-  6: literal`h6`,
+/** Tags this may render. Static values, so they can be interpolated as a tag. */
+const TAGS: Record<string, StaticValue> = {
+  code: literal`code`,
+  em: literal`em`,
+  h1: literal`h1`,
+  h2: literal`h2`,
+  h3: literal`h3`,
+  h4: literal`h4`,
+  h5: literal`h5`,
+  h6: literal`h6`,
+  label: literal`label`,
+  p: literal`p`,
+  span: literal`span`,
+  strong: literal`strong`,
 }
 
 /**
- * @summary Text at a chosen size, tone, and weight, optionally a heading.
+ * Appearance each element defaults to.
+ *
+ * The point of the pairing: `as="h2"` is already styled as a heading, so the
+ * common case needs one property. `appearance` is then only ever set to break
+ * the pairing deliberately, which is rare and visible when it happens.
+ */
+const DEFAULT_APPEARANCE: Record<string, string> = {
+  code: 'code',
+  h1: 'display',
+  h2: 'heading',
+  h3: 'subheading',
+  h4: 'title',
+  h5: 'body-strong',
+  h6: 'body-strong',
+  label: 'label',
+  strong: 'body-strong',
+}
+
+/**
+ * @summary Text: what element it is, and what it looks like.
  *
  * @description
- * One component rather than two. A separate `Heading` differed from this only
- * in which tag it rendered and what its size defaulted to, and both are
- * expressible as a property. Two components meant two places to add a tone and
- * two contracts to keep aligned.
+ * Two properties, and they answer different questions. `as` is the element,
+ * which decides the document outline and what a screen reader announces.
+ * `appearance` is the treatment, which decides size, weight, leading, and
+ * tracking together.
  *
- * `level` renders a real `<h1>` through `<h6>` and nothing else does. Without
- * it this is a `<span>`, so text is never accidentally structural: a heading is
- * something you ask for.
+ * They are separate because they genuinely come apart: a section's second
+ * heading sometimes has to look smaller without lying about the outline, and a
+ * `<p>` sometimes has to read as a caption. They default to matching, so the
+ * common case is `as="h2"` and nothing else.
  *
- * Size follows `level` unless overridden, so a heading is correct by doing
- * nothing. Setting both is the deliberate exception, for the case where a
- * section's second heading must look smaller without lying about the outline.
+ * **Size, weight, and leading are not properties.** Exposing them separately
+ * offers a few hundred combinations of which a handful are right, and every
+ * caller then picks one. An appearance is a decision the system already made:
+ * the ramp is named, and a page built from it is consistent because there was
+ * nothing else to choose.
+ *
+ * `tone` stays separate, because colour carries state rather than typography.
+ * Folding it in would mean `caption-danger` and `label-primary` and the rest of
+ * the cross product, which is the explosion `appearance` exists to prevent.
  *
  * @since 0.1.0
  * @status experimental
@@ -38,36 +70,48 @@ const TAGS: Record<number, StaticValue> = {
  *
  * @slot - The text.
  *
- * @csspart text - The text element.
+ * @csspart text - The rendered element.
  */
 @customElement('helix-text')
 export class HelixText extends HelixElement {
-  /** Outline level. Renders a real heading tag; omit for ordinary text. */
-  @property({ reflect: true, type: Number })
-  level: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0
-
-  /** Size on the type scale. Defaults to the one matching `level`. */
+  /** Which element to render. Decides the outline and the semantics. */
   @property({ reflect: true })
-  size: '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' = ''
+  as: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label' =
+    'span'
 
-  /** Colour role for the text. */
+  /** Type treatment. Defaults to the one that matches `as`. */
+  @property({ reflect: true })
+  appearance:
+    | ''
+    | 'display'
+    | 'heading'
+    | 'subheading'
+    | 'title'
+    | 'body'
+    | 'body-strong'
+    | 'caption'
+    | 'label'
+    | 'code' = ''
+
+  /** Colour role. Separate from `appearance`, because colour carries state. */
   @property({ reflect: true })
   tone: 'default' | 'muted' | 'subtle' | 'primary' | 'danger' = 'default'
 
-  /** Weight on the weight scale. Headings default to semibold. */
-  @property({ reflect: true })
-  weight: '' | 'regular' | 'medium' | 'semibold' = ''
-
-  /** Renders as a block, for a paragraph rather than an inline run. */
-  @property({ reflect: true, type: Boolean })
-  block = false
-
-  /** Uses the monospace family, for code and identifiers. */
-  @property({ reflect: true, type: Boolean })
-  mono = false
+  /**
+   * Writes the appearance in force onto the host.
+   *
+   * A computed value rather than a reflected property, because it is derived
+   * from two others and Lit reflects on assignment. Set in `willUpdate`, which
+   * the server calls, so the served markup is styled without waiting for
+   * hydration.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.setAttribute('data-appearance', this.appearance || DEFAULT_APPEARANCE[this.as] || 'body')
+  }
 
   protected override render(): unknown {
-    const tag = TAGS[this.level] ?? literal`span`
+    const tag = TAGS[this.as] ?? literal`span`
     return staticHtml`<${tag} part="text"><slot></slot></${tag}>`
   }
 

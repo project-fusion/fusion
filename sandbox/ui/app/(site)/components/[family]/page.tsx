@@ -23,24 +23,24 @@ function ApiTable({ caption, rows }: { caption: string; rows: ApiMember[] }) {
   }
   return (
     <helix-flex direction="column" gap="sm">
-      <helix-text size="xs" tone="subtle" weight="semibold">
+      <helix-text appearance="label" tone="subtle">
         {caption}
       </helix-text>
       <helix-table columns="minmax(10rem, 18rem) minmax(0, 1fr)" label={caption}>
         {rows.map((row) => (
           <helix-table-row key={row.name}>
             <helix-table-cell>
-              <helix-text mono size="xs" tone="primary">
+              <helix-text appearance="code" tone="primary">
                 {row.name || '(default)'}
               </helix-text>
               {row.type && (
-                <helix-text block mono size="xs" tone="subtle">
+                <helix-text as="p" appearance="code" tone="subtle">
                   {row.type}
                 </helix-text>
               )}
             </helix-table-cell>
             <helix-table-cell>
-              <helix-text size="sm" tone="muted">
+              <helix-text appearance="caption" tone="muted">
                 {row.description.split('\n\n')[0]}
               </helix-text>
             </helix-table-cell>
@@ -73,7 +73,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
 
       <helix-flex direction="column" gap="xl">
         <helix-flex direction="column" gap="sm">
-          <helix-text level={1} size="2xl">
+          <helix-text as="h1" appearance="heading">
             {family.label}
           </helix-text>
           <helix-flex align="center" gap="xs" wrap>
@@ -83,17 +83,17 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
               </helix-tag>
             )}
             {family.since && (
-              <helix-text size="xs" tone="subtle">
+              <helix-text appearance="label" tone="subtle">
                 since {family.since}
               </helix-text>
             )}
             {family.aliases.length > 0 && (
-              <helix-text size="xs" tone="subtle">
+              <helix-text appearance="label" tone="subtle">
                 Also known as {family.aliases.join(', ')}
               </helix-text>
             )}
           </helix-flex>
-          <helix-text block size="lg" tone="muted">
+          <helix-text as="p" tone="muted">
             {family.summary}
           </helix-text>
           {family.examples.length > 0 && (
@@ -113,18 +113,18 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
           <helix-flex class="element" direction="column" gap="lg" key={element.tagName}>
             <helix-flex direction="column" gap="2xs">
               <helix-flex align="center" gap="sm">
-                <helix-text level={2} size="xl">
+                <helix-text as="h2" appearance="subheading">
                   {element.label}
                 </helix-text>
                 <helix-tag size="sm">{element.tier}</helix-tag>
               </helix-flex>
-              <helix-text mono size="sm" tone="subtle">
+              <helix-text appearance="code" tone="subtle">
                 &lt;{element.tagName}&gt;
               </helix-text>
             </helix-flex>
 
             {element.description && (
-              <helix-text block class="description" size="sm" tone="muted">
+              <helix-text as="p" class="description" appearance="caption" tone="muted">
                 {element.description}
               </helix-text>
             )}

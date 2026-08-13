@@ -88,7 +88,7 @@ export function SandboxWorkbench({ families }: Props) {
 
   if (!example) {
     return (
-      <helix-text block tone="subtle">
+      <helix-text as="p" tone="subtle">
         No examples are shipped yet.
       </helix-text>
     )
@@ -120,19 +120,19 @@ export function SandboxWorkbench({ families }: Props) {
       <helix-flex align="center" class="workbenchHeader" gap="md">
         <helix-link appearance="quiet" href="/">
           <helix-flex align="baseline" gap="2xs" inline>
-            <helix-text weight="semibold">Helix</helix-text>
-            <helix-text size="xs" tone="subtle">
+            <helix-text appearance="body-strong">Helix</helix-text>
+            <helix-text appearance="label" tone="subtle">
               sandbox
             </helix-text>
           </helix-flex>
         </helix-link>
 
         <helix-flex align="baseline" class="workbenchTitle" gap="2xs">
-          <helix-text size="sm">{family.label}</helix-text>
-          <helix-text size="sm" tone="subtle">
+          <helix-text appearance="caption">{family.label}</helix-text>
+          <helix-text appearance="caption" tone="subtle">
             /
           </helix-text>
-          <helix-text size="sm" tone="muted">
+          <helix-text appearance="caption" tone="muted">
             {example.label}
           </helix-text>
         </helix-flex>

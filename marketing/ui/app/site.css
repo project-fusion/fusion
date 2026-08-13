@@ -90,3 +90,7 @@
 .verticalBody {
   max-inline-size: 60ch;
 }
+
+.prefsPanel {
+  padding: var(--helix-space-lg);
+}

@@ -1,0 +1,44 @@
+:host {
+  display: inline-flex;
+  /* Above the indicator, which sits behind every item. */
+  position: relative;
+  z-index: var(--helix-layer-raised);
+}
+
+/* No background here on purpose: the selected look is the group's indicator
+   behind this item, which is what lets the marker travel. */
+[part="item"] {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  justify-content: center;
+  padding-inline: var(--helix-space-sm);
+  text-decoration: none;
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+  white-space: nowrap;
+}
+
+[part="item"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+:host([selected]) [part="item"] {
+  color: var(--helix-color-foreground);
+}
+
+[part="item"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[part="item"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
