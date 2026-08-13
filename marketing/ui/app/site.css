@@ -64,3 +64,29 @@
 .navDrawer {
   padding: var(--helix-space-lg);
 }
+
+/* The one place capitals are right: a wordmark is read as a shape, not as
+   letters, and the extra tracking is what stops the caps from crowding. */
+.wordmark::part(text) {
+  letter-spacing: var(--helix-tracking-wide);
+  text-transform: uppercase;
+}
+
+/* Nav links styled as tabs. They stay links, because a tab controls a panel
+   and these navigate; borrowing the role would promise panels that do not
+   exist. `aria-current` is the honest version of "you are here". */
+.navTab::part(link) {
+  border-block-end: var(--helix-border-thick) solid transparent;
+  display: inline-block;
+  padding-block: var(--helix-space-2xs);
+  text-decoration: none;
+}
+
+.navTab[aria-current="true"]::part(link) {
+  border-block-end-color: var(--helix-color-primary);
+  color: var(--helix-color-foreground);
+}
+
+.verticalBody {
+  max-inline-size: 60ch;
+}

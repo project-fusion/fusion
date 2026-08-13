@@ -24,7 +24,7 @@ function ApiTable({ caption, rows }: { caption: string; rows: ApiMember[] }) {
   return (
     <helix-flex direction="column" gap="sm">
       <helix-text size="xs" tone="subtle" weight="semibold">
-        {caption.toUpperCase()}
+        {caption}
       </helix-text>
       <helix-table columns="minmax(10rem, 18rem) minmax(0, 1fr)" label={caption}>
         {rows.map((row) => (
@@ -73,9 +73,9 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
 
       <helix-flex direction="column" gap="xl">
         <helix-flex direction="column" gap="sm">
-          <helix-heading level={1} size="2xl">
+          <helix-text level={1} size="2xl">
             {family.label}
-          </helix-heading>
+          </helix-text>
           <helix-flex align="center" gap="xs" wrap>
             {family.status && (
               <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'} size="sm">
@@ -113,9 +113,9 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
           <helix-flex class="element" direction="column" gap="lg" key={element.tagName}>
             <helix-flex direction="column" gap="2xs">
               <helix-flex align="center" gap="sm">
-                <helix-heading level={2} size="xl">
+                <helix-text level={2} size="xl">
                   {element.label}
-                </helix-heading>
+                </helix-text>
                 <helix-tag size="sm">{element.tier}</helix-tag>
               </helix-flex>
               <helix-text mono size="sm" tone="subtle">

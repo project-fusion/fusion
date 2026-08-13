@@ -230,6 +230,24 @@ export type HelixBaseAccordionItemOpenChangeElementEvent =
   HelixBaseAccordionItemElementEvent<HelixOpenChangeEvent>;
 
 export type HelixBaseAccordionItemProps = {
+  /** Where the open indicator sits, or whether there is one.
+
+`auto` resolves to `end`, which is where a reader scanning a list of
+summaries expects it: the label starts at the same x on every row, and the
+indicator is found once at the edge rather than shifting with the text.
+`start` is for a tree-like reading, where the indicator leads the label.
+`none` is for a row that carries its own affordance and would otherwise
+have two. */
+  "chevron-placement"?: HelixBaseAccordionItem["chevronPlacement"];
+  /** Where the open indicator sits, or whether there is one.
+
+`auto` resolves to `end`, which is where a reader scanning a list of
+summaries expects it: the label starts at the same x on every row, and the
+indicator is found once at the edge rather than shifting with the text.
+`start` is for a tree-like reading, where the indicator leads the label.
+`none` is for a row that carries its own affordance and would otherwise
+have two. */
+  chevronPlacement?: HelixBaseAccordionItem["chevronPlacement"];
   /** Whether the element is open. Setting this enters controlled mode. */
   open?: HelixBaseAccordionItem["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is set. */
@@ -242,6 +260,24 @@ export type HelixBaseAccordionItemProps = {
 };
 
 export type HelixBaseAccordionItemSolidJsProps = {
+  /** Where the open indicator sits, or whether there is one.
+
+`auto` resolves to `end`, which is where a reader scanning a list of
+summaries expects it: the label starts at the same x on every row, and the
+indicator is found once at the edge rather than shifting with the text.
+`start` is for a tree-like reading, where the indicator leads the label.
+`none` is for a row that carries its own affordance and would otherwise
+have two. */
+  "attr:chevron-placement"?: HelixBaseAccordionItem["chevronPlacement"];
+  /** Where the open indicator sits, or whether there is one.
+
+`auto` resolves to `end`, which is where a reader scanning a list of
+summaries expects it: the label starts at the same x on every row, and the
+indicator is found once at the edge rather than shifting with the text.
+`start` is for a tree-like reading, where the indicator leads the label.
+`none` is for a row that carries its own affordance and would otherwise
+have two. */
+  "prop:chevronPlacement"?: HelixBaseAccordionItem["chevronPlacement"];
   /** Whether the element is open. Setting this enters controlled mode. */
   "prop:open"?: HelixBaseAccordionItem["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is set. */
@@ -272,9 +308,94 @@ export type HelixBaseAccordionSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseAppHeaderProps = {};
+export type HelixBaseAppHeaderProps = {
+  /** Where the navigation sits in the bar.
+
+`center` puts it in the middle of the banner rather than beside the brand,
+which reads as the site's spine when the nav is the primary thing in the
+header rather than an afterthought next to a logo. */
+  "nav-align"?: HelixBaseAppHeader["navAlign"];
+  /** Where the navigation sits in the bar.
+
+`center` puts it in the middle of the banner rather than beside the brand,
+which reads as the site's spine when the nav is the primary thing in the
+header rather than an afterthought next to a logo. */
+  navAlign?: HelixBaseAppHeader["navAlign"];
+};
 
 export type HelixBaseAppHeaderSolidJsProps = {
+  /** Where the navigation sits in the bar.
+
+`center` puts it in the middle of the banner rather than beside the brand,
+which reads as the site's spine when the nav is the primary thing in the
+header rather than an afterthought next to a logo. */
+  "attr:nav-align"?: HelixBaseAppHeader["navAlign"];
+  /** Where the navigation sits in the bar.
+
+`center` puts it in the middle of the banner rather than beside the brand,
+which reads as the site's spine when the nav is the primary thing in the
+header rather than an afterthought next to a logo. */
+  "prop:navAlign"?: HelixBaseAppHeader["navAlign"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseAvatarProps = {
+  /** Image to show. Falls back to initials if it fails to load. */
+  src?: HelixBaseAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  name?: HelixBaseAvatar["name"];
+};
+
+export type HelixBaseAvatarSolidJsProps = {
+  /** Image to show. Falls back to initials if it fails to load. */
+  "prop:src"?: HelixBaseAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  "prop:name"?: HelixBaseAvatar["name"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseBreadcrumbsItemProps = {
+  /** Where the step leads. Ignored when the item is the current page. */
+  href?: HelixBaseBreadcrumbsItem["href"];
+  /** Whether this item is the page the reader is on. */
+  current?: HelixBaseBreadcrumbsItem["current"];
+};
+
+export type HelixBaseBreadcrumbsItemSolidJsProps = {
+  /** Where the step leads. Ignored when the item is the current page. */
+  "prop:href"?: HelixBaseBreadcrumbsItem["href"];
+  /** Whether this item is the page the reader is on. */
+  "prop:current"?: HelixBaseBreadcrumbsItem["current"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseBreadcrumbsProps = {
+  /** Accessible name for the landmark.
+
+Named rather than left bare because a page may hold more than one
+navigation, and landmarks are how a screen-reader user chooses between them. */
+  label?: HelixBaseBreadcrumbs["label"];
+};
+
+export type HelixBaseBreadcrumbsSolidJsProps = {
+  /** Accessible name for the landmark.
+
+Named rather than left bare because a page may hold more than one
+navigation, and landmarks are how a screen-reader user chooses between them. */
+  "prop:label"?: HelixBaseBreadcrumbs["label"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -332,46 +453,6 @@ tree, so a screen reader can still announce that the control exists. */
   textContent?: string | number;
 };
 
-export type HelixBaseBreadcrumbsItemProps = {
-  /** Where the step leads. Ignored when the item is the current page. */
-  href?: HelixBaseBreadcrumbsItem["href"];
-  /** Whether this item is the page the reader is on. */
-  current?: HelixBaseBreadcrumbsItem["current"];
-};
-
-export type HelixBaseBreadcrumbsItemSolidJsProps = {
-  /** Where the step leads. Ignored when the item is the current page. */
-  "prop:href"?: HelixBaseBreadcrumbsItem["href"];
-  /** Whether this item is the page the reader is on. */
-  "prop:current"?: HelixBaseBreadcrumbsItem["current"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseBreadcrumbsProps = {
-  /** Accessible name for the landmark.
-
-Named rather than left bare because a page may hold more than one
-navigation, and landmarks are how a screen-reader user chooses between them. */
-  label?: HelixBaseBreadcrumbs["label"];
-};
-
-export type HelixBaseBreadcrumbsSolidJsProps = {
-  /** Accessible name for the landmark.
-
-Named rather than left bare because a page may hold more than one
-navigation, and landmarks are how a screen-reader user chooses between them. */
-  "prop:label"?: HelixBaseBreadcrumbs["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type HelixBaseCalloutProps = {
   /** What kind of attention the passage needs. */
   severity?: HelixBaseCallout["severity"];
@@ -387,19 +468,9 @@ export type HelixBaseCalloutSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseAvatarProps = {
-  /** Image to show. Falls back to initials if it fails to load. */
-  src?: HelixBaseAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
-  name?: HelixBaseAvatar["name"];
-};
+export type HelixBaseCardProps = {};
 
-export type HelixBaseAvatarSolidJsProps = {
-  /** Image to show. Falls back to initials if it fails to load. */
-  "prop:src"?: HelixBaseAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
-  "prop:name"?: HelixBaseAvatar["name"];
-
+export type HelixBaseCardSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -465,9 +536,15 @@ behind the cover. */
   textContent?: string | number;
 };
 
-export type HelixBaseCardProps = {};
+export type HelixBaseDividerProps = {
+  /** Which way the rule runs. */
+  orientation?: HelixBaseDivider["orientation"];
+};
 
-export type HelixBaseCardSolidJsProps = {
+export type HelixBaseDividerSolidJsProps = {
+  /** Which way the rule runs. */
+  "prop:orientation"?: HelixBaseDivider["orientation"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -486,21 +563,6 @@ export type HelixBaseIconSolidJsProps = {
   "prop:name"?: HelixBaseIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixBaseIcon["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseDividerProps = {
-  /** Which way the rule runs. */
-  orientation?: HelixBaseDivider["orientation"];
-};
-
-export type HelixBaseDividerSolidJsProps = {
-  /** Which way the rule runs. */
-  "prop:orientation"?: HelixBaseDivider["orientation"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -742,6 +804,36 @@ export type HelixBaseToolbarSolidJsProps = {
   textContent?: string | number;
 };
 
+/** `HelixBaseTree` component event */
+export type HelixBaseTreeElementEvent<E = Event> = TypedEvent<HelixBaseTree, E>;
+/** `SelectionChange` event type */
+export type HelixBaseTreeSelectionChangeElementEvent =
+  HelixBaseTreeElementEvent<HelixSelectionChangeEvent>;
+
+export type HelixBaseTreeProps = {
+  /** Accessible name for the tree. */
+  label?: HelixBaseTree["label"];
+  /** Value of the selected item, kept in step with the items themselves. */
+  value?: HelixBaseTree["value"];
+
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  onSelectionChange?: (e: HelixBaseTreeSelectionChangeElementEvent) => void;
+};
+
+export type HelixBaseTreeSolidJsProps = {
+  /** Accessible name for the tree. */
+  "prop:label"?: HelixBaseTree["label"];
+  /** Value of the selected item, kept in step with the items themselves. */
+  "prop:value"?: HelixBaseTree["value"];
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  "on:SelectionChange"?: (e: HelixBaseTreeSelectionChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixBaseTreeItem` component event */
 export type HelixBaseTreeItemElementEvent<E = Event> = TypedEvent<
   HelixBaseTreeItem,
@@ -789,36 +881,6 @@ export type HelixBaseTreeItemSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseTree` component event */
-export type HelixBaseTreeElementEvent<E = Event> = TypedEvent<HelixBaseTree, E>;
-/** `SelectionChange` event type */
-export type HelixBaseTreeSelectionChangeElementEvent =
-  HelixBaseTreeElementEvent<HelixSelectionChangeEvent>;
-
-export type HelixBaseTreeProps = {
-  /** Accessible name for the tree. */
-  label?: HelixBaseTree["label"];
-  /** Value of the selected item, kept in step with the items themselves. */
-  value?: HelixBaseTree["value"];
-
-  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
-  onSelectionChange?: (e: HelixBaseTreeSelectionChangeElementEvent) => void;
-};
-
-export type HelixBaseTreeSolidJsProps = {
-  /** Accessible name for the tree. */
-  "prop:label"?: HelixBaseTree["label"];
-  /** Value of the selected item, kept in step with the items themselves. */
-  "prop:value"?: HelixBaseTree["value"];
-  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
-  "on:SelectionChange"?: (e: HelixBaseTreeSelectionChangeElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type CustomElements = {
   /**
    * Carries its own open state, which is why it is an element rather than a slot.
@@ -835,6 +897,14 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `chevron-placement`/`chevronPlacement`: Where the open indicator sits, or whether there is one.
+   *
+   * `auto` resolves to `end`, which is where a reader scanning a list of
+   * summaries expects it: the label starts at the same x on every row, and the
+   * indicator is found once at the edge rather than shifting with the text.
+   * `start` is for a tree-like reading, where the indicator leads the label.
+   * `none` is for a row that carries its own affordance and would otherwise
+   * have two.
    * - `open`: Whether the element is open. Setting this enters controlled mode.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
    * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
@@ -870,6 +940,7 @@ export type CustomElements = {
    *
    * - `container`: The outer wrapper.
    * - `trigger`: The clickable summary row.
+   * - `chevron`: The open and close indicator.
    * - `content`: The revealed region.
    * - `content-inner`: Padding wrapper inside the animated region.
    */
@@ -932,6 +1003,16 @@ export type CustomElements = {
    * the window edges, which reads as a floating bar rather than as the top of the
    * page. That is a second element, not a max-width on the first.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `nav-align`/`navAlign`: Where the navigation sits in the bar.
+   *
+   * `center` puts it in the middle of the banner rather than beside the brand,
+   * which reads as the site's spine when the nav is the primary thing in the
+   * header rather than an afterthought next to a logo.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -953,55 +1034,39 @@ export type CustomElements = {
   >;
 
   /**
-   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
-   * focus, and the browser's own affordances come from the platform rather than
-   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
-   * serializes into the server's markup, so the button is keyboard reachable
-   * before any JavaScript loads.
+   * The fallback is the reason this is an element. An image that fails to load
+   * leaves a broken icon and no name, so the avatar listens for the error and
+   * falls back to initials derived from `name`.
    *
-   * Form submission is explicit. A `<button type="submit">` inside a shadow root
-   * submits nothing, because the form is on the other side of the boundary, so
-   * the inner control is always `type="button"` and this element calls
-   * `requestSubmit()` on its form instead. That routes through validation, unlike
-   * `submit()`.
+   * `name` is required for the accessible name whether or not there is an image,
+   * because an avatar with no name tells a screen-reader user nothing. Initials
+   * are hidden from assistive technology: they are a visual shorthand for the
+   * name that is already announced, and would otherwise be read out letter by
+   * letter after it.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `type`: What activating the button does to its form.
-   * - `href`: Navigates to this URL instead of acting on a form.
-   * - `target`: Browsing context for `href`, such as `_blank`.
-   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
-   * - `label`: Accessible name, for a button whose content is not text.
-   *
-   * Lives here rather than only on `IconButton` so the two share one render.
-   * An icon-only button without it is a control a screen reader announces as
-   * "button" and nothing else.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
-   * - `end`: Content after the label.
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
    */
-  "helix-base-button": Partial<
-    HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
+  "helix-base-avatar": Partial<
+    HelixBaseAvatarProps & BaseProps<HelixBaseAvatar> & BaseEvents
   >;
 
   /**
@@ -1080,6 +1145,58 @@ export type CustomElements = {
   >;
 
   /**
+   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
+   * focus, and the browser's own affordances come from the platform rather than
+   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
+   * serializes into the server's markup, so the button is keyboard reachable
+   * before any JavaScript loads.
+   *
+   * Form submission is explicit. A `<button type="submit">` inside a shadow root
+   * submits nothing, because the form is on the other side of the boundary, so
+   * the inner control is always `type="button"` and this element calls
+   * `requestSubmit()` on its form instead. That routes through validation, unlike
+   * `submit()`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `label`: Accessible name, for a button whose content is not text.
+   *
+   * Lives here rather than only on `IconButton` so the two share one render.
+   * An icon-only button without it is a control a screen reader announces as
+   * "button" and nothing else.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-base-button": Partial<
+    HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
+  >;
+
+  /**
    * `severity` lives on the headless tier rather than being an `appearance` on the
    * styled one, because it is meaning and not decoration. It picks the icon and
    * that icon's accessible name, so a reader who cannot see that the box is red
@@ -1107,7 +1224,6 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `callout`: The callout body.
    * - `icon`: The icon region.
    * - `content`: The content region.
    */
@@ -1116,39 +1232,31 @@ export type CustomElements = {
   >;
 
   /**
-   * The fallback is the reason this is an element. An image that fails to load
-   * leaves a broken icon and no name, so the avatar listens for the error and
-   * falls back to initials derived from `name`.
+   * Regions are slots rather than separate elements, because a header, body, and
+   * footer carry no state, no behavior, and no API of their own. Slotting them
+   * costs one custom element instead of five and lets the consumer bring their
+   * own markup, so a title can be a real `<h2>` rather than an emulated one.
    *
-   * `name` is required for the accessible name whether or not there is an image,
-   * because an avatar with no name tells a screen-reader user nothing. Initials
-   * are hidden from assistive technology: they are a visual shorthand for the
-   * name that is already announced, and would otherwise be read out letter by
-   * letter after it.
+   * The host is the surface. A wrapper `<div part="container">` would be a second
+   * box doing nothing the host cannot: the element itself takes the border, the
+   * radius, and the grid, and a consumer styles `helix-card` rather than reaching
+   * through `::part`. One node instead of two, on every card on the page.
    *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `src`: Image to show. Falls back to initials if it fails to load.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
+   * Name the card with `aria-label` or `aria-labelledby`. That is the only
+   * naming that survives server rendering: reading a title out of the light DOM
+   * needs a DOM, and the server has none.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Replaces the image and initials entirely, for an icon.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `avatar`: The avatar body.
-   * - `image`: The image, when one is loading or loaded.
-   * - `initials`: The initials shown when there is no usable image.
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
    */
-  "helix-base-avatar": Partial<
-    HelixBaseAvatarProps & BaseProps<HelixBaseAvatar> & BaseEvents
+  "helix-base-card": Partial<
+    HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
   >;
 
   /**
@@ -1214,32 +1322,30 @@ export type CustomElements = {
   >;
 
   /**
-   * Regions are slots rather than separate elements, because a header, body, and
-   * footer carry no state, no behavior, and no API of their own. Slotting them
-   * costs one custom element instead of five and lets the consumer bring their
-   * own markup, so a title can be a real `<h2>` rather than an emulated one.
+   * The separator role lives on the rule inside the shadow root rather than on
+   * the host. A role does not need to cross the shadow boundary the way an IDREF
+   * does, and putting it on the rendered element means the semantics are in the
+   * server's markup with no attribute written during a lifecycle the server never
+   * runs.
    *
-   * Name the card with `aria-label` or `aria-labelledby`. That is the only
-   * naming that survives server rendering: reading a title out of the light DOM
-   * needs a DOM, and the server has none.
+   * Use `orientation="vertical"` between items on one line, such as inside a
+   * toolbar. A vertical divider stretches to its flex parent rather than setting
+   * a height of its own.
    *
-   * ## Slots
+   * ## Attributes & Properties
    *
-   * Areas where markup can be added to the component.
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
+   * - `orientation`: Which way the rule runs.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `container`: The card surface.
+   * - `line`: The rule itself.
    */
-  "helix-base-card": Partial<
-    HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
+  "helix-base-divider": Partial<
+    HelixBaseDividerProps & BaseProps<HelixBaseDivider> & BaseEvents
   >;
 
   /**
@@ -1267,33 +1373,6 @@ export type CustomElements = {
    */
   "helix-base-icon": Partial<
     HelixBaseIconProps & BaseProps<HelixBaseIcon> & BaseEvents
-  >;
-
-  /**
-   * The separator role lives on the rule inside the shadow root rather than on
-   * the host. A role does not need to cross the shadow boundary the way an IDREF
-   * does, and putting it on the rendered element means the semantics are in the
-   * server's markup with no attribute written during a lifecycle the server never
-   * runs.
-   *
-   * Use `orientation="vertical"` between items on one line, such as inside a
-   * toolbar. A vertical divider stretches to its flex parent rather than setting
-   * a height of its own.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `orientation`: Which way the rule runs.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `line`: The rule itself.
-   */
-  "helix-base-divider": Partial<
-    HelixBaseDividerProps & BaseProps<HelixBaseDivider> & BaseEvents
   >;
 
   /**
@@ -1540,7 +1619,6 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `tag`: The tag body.
    * - `remove`: The remove button, when `removable`.
    */
   "helix-base-tag": Partial<
@@ -1579,6 +1657,44 @@ export type CustomElements = {
    */
   "helix-base-toolbar": Partial<
     HelixBaseToolbarProps & BaseProps<HelixBaseToolbar> & BaseEvents
+  >;
+
+  /**
+   * Focus is a single tab stop, moved with the arrow keys, which is what the tree
+   * pattern requires: a sidebar of forty items should not be forty presses of Tab
+   * to get past. The tree owns which item is the tab stop and moves it as focus
+   * moves, so the browser's own focus order is never fought with.
+   *
+   * Items are found with `instanceof`, never by tag name, so the headless tier
+   * does not learn about the styled one.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the tree.
+   * - `value`: Value of the selected item, kept in step with the items themselves.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tree's items.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tree`: The tree container.
+   */
+  "helix-base-tree": Partial<
+    HelixBaseTreeProps & BaseProps<HelixBaseTree> & BaseEvents
   >;
 
   /**
@@ -1635,44 +1751,6 @@ export type CustomElements = {
   "helix-base-tree-item": Partial<
     HelixBaseTreeItemProps & BaseProps<HelixBaseTreeItem> & BaseEvents
   >;
-
-  /**
-   * Focus is a single tab stop, moved with the arrow keys, which is what the tree
-   * pattern requires: a sidebar of forty items should not be forty presses of Tab
-   * to get past. The tree owns which item is the tab stop and moves it as focus
-   * moves, so the browser's own focus order is never fought with.
-   *
-   * Items are found with `instanceof`, never by tag name, so the headless tier
-   * does not learn about the styled one.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `label`: Accessible name for the tree.
-   * - `value`: Value of the selected item, kept in step with the items themselves.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `SelectionChange`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The tree's items.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `tree`: The tree container.
-   */
-  "helix-base-tree": Partial<
-    HelixBaseTreeProps & BaseProps<HelixBaseTree> & BaseEvents
-  >;
 };
 
 export type CustomElementsSolidJs = {
@@ -1691,6 +1769,14 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `chevron-placement`/`chevronPlacement`: Where the open indicator sits, or whether there is one.
+   *
+   * `auto` resolves to `end`, which is where a reader scanning a list of
+   * summaries expects it: the label starts at the same x on every row, and the
+   * indicator is found once at the edge rather than shifting with the text.
+   * `start` is for a tree-like reading, where the indicator leads the label.
+   * `none` is for a row that carries its own affordance and would otherwise
+   * have two.
    * - `open`: Whether the element is open. Setting this enters controlled mode.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
    * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
@@ -1726,6 +1812,7 @@ export type CustomElementsSolidJs = {
    *
    * - `container`: The outer wrapper.
    * - `trigger`: The clickable summary row.
+   * - `chevron`: The open and close indicator.
    * - `content`: The revealed region.
    * - `content-inner`: Padding wrapper inside the animated region.
    */
@@ -1794,6 +1881,16 @@ export type CustomElementsSolidJs = {
    * the window edges, which reads as a floating bar rather than as the top of the
    * page. That is a second element, not a max-width on the first.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `nav-align`/`navAlign`: Where the navigation sits in the bar.
+   *
+   * `center` puts it in the middle of the banner rather than beside the brand,
+   * which reads as the site's spine when the nav is the primary thing in the
+   * header rather than an afterthought next to a logo.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -1818,57 +1915,41 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
-   * focus, and the browser's own affordances come from the platform rather than
-   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
-   * serializes into the server's markup, so the button is keyboard reachable
-   * before any JavaScript loads.
+   * The fallback is the reason this is an element. An image that fails to load
+   * leaves a broken icon and no name, so the avatar listens for the error and
+   * falls back to initials derived from `name`.
    *
-   * Form submission is explicit. A `<button type="submit">` inside a shadow root
-   * submits nothing, because the form is on the other side of the boundary, so
-   * the inner control is always `type="button"` and this element calls
-   * `requestSubmit()` on its form instead. That routes through validation, unlike
-   * `submit()`.
+   * `name` is required for the accessible name whether or not there is an image,
+   * because an avatar with no name tells a screen-reader user nothing. Initials
+   * are hidden from assistive technology: they are a visual shorthand for the
+   * name that is already announced, and would otherwise be read out letter by
+   * letter after it.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `type`: What activating the button does to its form.
-   * - `href`: Navigates to this URL instead of acting on a form.
-   * - `target`: Browsing context for `href`, such as `_blank`.
-   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
-   * - `label`: Accessible name, for a button whose content is not text.
-   *
-   * Lives here rather than only on `IconButton` so the two share one render.
-   * An icon-only button without it is a control a screen reader announces as
-   * "button" and nothing else.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
-   * - `end`: Content after the label.
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
    */
-  "helix-base-button": Partial<
-    HelixBaseButtonProps &
-      HelixBaseButtonSolidJsProps &
-      BaseProps<HelixBaseButton> &
+  "helix-base-avatar": Partial<
+    HelixBaseAvatarProps &
+      HelixBaseAvatarSolidJsProps &
+      BaseProps<HelixBaseAvatar> &
       BaseEvents
   >;
 
@@ -1952,6 +2033,61 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
+   * focus, and the browser's own affordances come from the platform rather than
+   * from key handlers. `delegatesFocus` puts focus on that inner control, and it
+   * serializes into the server's markup, so the button is keyboard reachable
+   * before any JavaScript loads.
+   *
+   * Form submission is explicit. A `<button type="submit">` inside a shadow root
+   * submits nothing, because the form is on the other side of the boundary, so
+   * the inner control is always `type="button"` and this element calls
+   * `requestSubmit()` on its form instead. That routes through validation, unlike
+   * `submit()`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `label`: Accessible name, for a button whose content is not text.
+   *
+   * Lives here rather than only on `IconButton` so the two share one render.
+   * An icon-only button without it is a control a screen reader announces as
+   * "button" and nothing else.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-base-button": Partial<
+    HelixBaseButtonProps &
+      HelixBaseButtonSolidJsProps &
+      BaseProps<HelixBaseButton> &
+      BaseEvents
+  >;
+
+  /**
    * `severity` lives on the headless tier rather than being an `appearance` on the
    * styled one, because it is meaning and not decoration. It picks the icon and
    * that icon's accessible name, so a reader who cannot see that the box is red
@@ -1979,7 +2115,6 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `callout`: The callout body.
    * - `icon`: The icon region.
    * - `content`: The content region.
    */
@@ -1991,41 +2126,33 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * The fallback is the reason this is an element. An image that fails to load
-   * leaves a broken icon and no name, so the avatar listens for the error and
-   * falls back to initials derived from `name`.
+   * Regions are slots rather than separate elements, because a header, body, and
+   * footer carry no state, no behavior, and no API of their own. Slotting them
+   * costs one custom element instead of five and lets the consumer bring their
+   * own markup, so a title can be a real `<h2>` rather than an emulated one.
    *
-   * `name` is required for the accessible name whether or not there is an image,
-   * because an avatar with no name tells a screen-reader user nothing. Initials
-   * are hidden from assistive technology: they are a visual shorthand for the
-   * name that is already announced, and would otherwise be read out letter by
-   * letter after it.
+   * The host is the surface. A wrapper `<div part="container">` would be a second
+   * box doing nothing the host cannot: the element itself takes the border, the
+   * radius, and the grid, and a consumer styles `helix-card` rather than reaching
+   * through `::part`. One node instead of two, on every card on the page.
    *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `src`: Image to show. Falls back to initials if it fails to load.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
+   * Name the card with `aria-label` or `aria-labelledby`. That is the only
+   * naming that survives server rendering: reading a title out of the light DOM
+   * needs a DOM, and the server has none.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Replaces the image and initials entirely, for an icon.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `avatar`: The avatar body.
-   * - `image`: The image, when one is loading or loaded.
-   * - `initials`: The initials shown when there is no usable image.
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
    */
-  "helix-base-avatar": Partial<
-    HelixBaseAvatarProps &
-      HelixBaseAvatarSolidJsProps &
-      BaseProps<HelixBaseAvatar> &
+  "helix-base-card": Partial<
+    HelixBaseCardProps &
+      HelixBaseCardSolidJsProps &
+      BaseProps<HelixBaseCard> &
       BaseEvents
   >;
 
@@ -2095,34 +2222,32 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Regions are slots rather than separate elements, because a header, body, and
-   * footer carry no state, no behavior, and no API of their own. Slotting them
-   * costs one custom element instead of five and lets the consumer bring their
-   * own markup, so a title can be a real `<h2>` rather than an emulated one.
+   * The separator role lives on the rule inside the shadow root rather than on
+   * the host. A role does not need to cross the shadow boundary the way an IDREF
+   * does, and putting it on the rendered element means the semantics are in the
+   * server's markup with no attribute written during a lifecycle the server never
+   * runs.
    *
-   * Name the card with `aria-label` or `aria-labelledby`. That is the only
-   * naming that survives server rendering: reading a title out of the light DOM
-   * needs a DOM, and the server has none.
+   * Use `orientation="vertical"` between items on one line, such as inside a
+   * toolbar. A vertical divider stretches to its flex parent rather than setting
+   * a height of its own.
    *
-   * ## Slots
+   * ## Attributes & Properties
    *
-   * Areas where markup can be added to the component.
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
+   * - `orientation`: Which way the rule runs.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `container`: The card surface.
+   * - `line`: The rule itself.
    */
-  "helix-base-card": Partial<
-    HelixBaseCardProps &
-      HelixBaseCardSolidJsProps &
-      BaseProps<HelixBaseCard> &
+  "helix-base-divider": Partial<
+    HelixBaseDividerProps &
+      HelixBaseDividerSolidJsProps &
+      BaseProps<HelixBaseDivider> &
       BaseEvents
   >;
 
@@ -2153,36 +2278,6 @@ export type CustomElementsSolidJs = {
     HelixBaseIconProps &
       HelixBaseIconSolidJsProps &
       BaseProps<HelixBaseIcon> &
-      BaseEvents
-  >;
-
-  /**
-   * The separator role lives on the rule inside the shadow root rather than on
-   * the host. A role does not need to cross the shadow boundary the way an IDREF
-   * does, and putting it on the rendered element means the semantics are in the
-   * server's markup with no attribute written during a lifecycle the server never
-   * runs.
-   *
-   * Use `orientation="vertical"` between items on one line, such as inside a
-   * toolbar. A vertical divider stretches to its flex parent rather than setting
-   * a height of its own.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `orientation`: Which way the rule runs.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `line`: The rule itself.
-   */
-  "helix-base-divider": Partial<
-    HelixBaseDividerProps &
-      HelixBaseDividerSolidJsProps &
-      BaseProps<HelixBaseDivider> &
       BaseEvents
   >;
 
@@ -2448,7 +2543,6 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `tag`: The tag body.
    * - `remove`: The remove button, when `removable`.
    */
   "helix-base-tag": Partial<
@@ -2492,6 +2586,47 @@ export type CustomElementsSolidJs = {
     HelixBaseToolbarProps &
       HelixBaseToolbarSolidJsProps &
       BaseProps<HelixBaseToolbar> &
+      BaseEvents
+  >;
+
+  /**
+   * Focus is a single tab stop, moved with the arrow keys, which is what the tree
+   * pattern requires: a sidebar of forty items should not be forty presses of Tab
+   * to get past. The tree owns which item is the tab stop and moves it as focus
+   * moves, so the browser's own focus order is never fought with.
+   *
+   * Items are found with `instanceof`, never by tag name, so the headless tier
+   * does not learn about the styled one.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the tree.
+   * - `value`: Value of the selected item, kept in step with the items themselves.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tree's items.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tree`: The tree container.
+   */
+  "helix-base-tree": Partial<
+    HelixBaseTreeProps &
+      HelixBaseTreeSolidJsProps &
+      BaseProps<HelixBaseTree> &
       BaseEvents
   >;
 
@@ -2550,47 +2685,6 @@ export type CustomElementsSolidJs = {
     HelixBaseTreeItemProps &
       HelixBaseTreeItemSolidJsProps &
       BaseProps<HelixBaseTreeItem> &
-      BaseEvents
-  >;
-
-  /**
-   * Focus is a single tab stop, moved with the arrow keys, which is what the tree
-   * pattern requires: a sidebar of forty items should not be forty presses of Tab
-   * to get past. The tree owns which item is the tab stop and moves it as focus
-   * moves, so the browser's own focus order is never fought with.
-   *
-   * Items are found with `instanceof`, never by tag name, so the headless tier
-   * does not learn about the styled one.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `label`: Accessible name for the tree.
-   * - `value`: Value of the selected item, kept in step with the items themselves.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `SelectionChange`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The tree's items.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `tree`: The tree container.
-   */
-  "helix-base-tree": Partial<
-    HelixBaseTreeProps &
-      HelixBaseTreeSolidJsProps &
-      BaseProps<HelixBaseTree> &
       BaseEvents
   >;
 };

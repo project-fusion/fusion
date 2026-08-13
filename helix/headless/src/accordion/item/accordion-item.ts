@@ -1,5 +1,7 @@
 import { customElement, HelixElement, WithOpen } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { chevronDown } from '@helix-io/icons'
+import { html, nothing, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 
 /** Shadow-DOM id linking the trigger's aria-controls to the content region. */
 const CONTENT_ID = 'content'
@@ -38,6 +40,7 @@ const TRIGGER_ID = 'trigger'
  *
  * @csspart container - The outer wrapper.
  * @csspart trigger - The clickable summary row.
+ * @csspart chevron - The open and close indicator.
  * @csspart content - The revealed region.
  * @csspart content-inner - Padding wrapper inside the animated region.
  *
@@ -45,6 +48,37 @@ const TRIGGER_ID = 'trigger'
  */
 @customElement('helix-base-accordion-item')
 export class HelixBaseAccordionItem extends WithOpen(HelixElement) {
+  /**
+   * Where the open indicator sits, or whether there is one.
+   *
+   * `auto` resolves to `end`, which is where a reader scanning a list of
+   * summaries expects it: the label starts at the same x on every row, and the
+   * indicator is found once at the edge rather than shifting with the text.
+   * `start` is for a tree-like reading, where the indicator leads the label.
+   * `none` is for a row that carries its own affordance and would otherwise
+   * have two.
+   */
+  @property({ attribute: 'chevron-placement', reflect: true })
+  chevronPlacement: 'auto' | 'start' | 'end' | 'none' = 'auto'
+
+  /** The chevron, or nothing when suppressed. */
+  private renderChevron(): TemplateResult | typeof nothing {
+    if (this.chevronPlacement === 'none') {
+      return nothing
+    }
+    return html`<svg
+      part="chevron"
+      viewBox=${chevronDown.viewBox}
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d=${chevronDown.path}></path>
+    </svg>`
+  }
+
   protected handleToggle = (): void => {
     this.setOpen(!this.isOpen)
   }
@@ -72,7 +106,9 @@ export class HelixBaseAccordionItem extends WithOpen(HelixElement) {
           type="button"
           @click=${this.handleToggle}
         >
+          ${this.chevronPlacement === 'start' ? this.renderChevron() : nothing}
           <slot name="summary"></slot>
+          ${this.chevronPlacement === 'start' ? nothing : this.renderChevron()}
         </button>
         <div
           id=${CONTENT_ID}

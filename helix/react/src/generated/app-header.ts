@@ -14,6 +14,8 @@ flat against the hero and lifts it off the content afterwards.
  * Renders `<helix-app-header>`.
  */
 export interface AppHeaderProps extends BaseProps {
+  /** Where the navigation sits in the bar. `center` puts it in the middle of the banner rather than beside the brand, which reads as the site's spine when the nav is the primary thing in the header rather than an afterthought next to a logo. */
+  navAlign?: 'start' | 'center'
   /** Whether the banner sticks to the top of the viewport. */
   sticky?: boolean
 }

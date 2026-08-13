@@ -23,7 +23,6 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The tag's label.
  *
- * @csspart tag - The tag body.
  * @csspart remove - The remove button, when `removable`.
  *
  * @event {HelixRemoveRequestEvent} RemoveRequest - Fired when the reader asks to remove the tag.
@@ -54,8 +53,7 @@ export class HelixBaseTag extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<span part="tag">
-      <slot></slot>
+    return html`<slot></slot>
       ${
         this.removable
           ? html`<button

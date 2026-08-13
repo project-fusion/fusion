@@ -1,5 +1,21 @@
+/* The host is the box, and the leading corners are square.
+   A rounded corner with a thick border on one side draws a crescent: the border
+   follows the radius and thins to nothing at each end, which reads as a
+   rendering mistake rather than as a bar. Square on the accent edge, rounded on
+   the other three, so the bar is a bar. */
 :host {
-  display: block;
+  background-color: var(
+    --callout-background-color,
+    color-mix(in oklab, var(--_callout-color) 10%, transparent)
+  );
+  border-inline-start: var(--helix-border-thick) solid var(--_callout-color);
+  border-radius: var(--callout-radii, var(--helix-radii-md));
+  border-start-start-radius: var(--helix-radii-none);
+  border-end-start-radius: var(--helix-radii-none);
+  color: var(--helix-color-foreground);
+  display: flex;
+  gap: var(--helix-space-sm);
+  padding: var(--helix-space-md);
 
   --_callout-color: var(--helix-color-info);
 }
@@ -14,22 +30,6 @@
 
 :host([severity="danger"]) {
   --_callout-color: var(--helix-color-danger);
-}
-
-[part="callout"] {
-  background-color: var(
-    --callout-background-color,
-    color-mix(in oklab, var(--_callout-color) 10%, transparent)
-  );
-  border-radius: var(--callout-radii, var(--helix-radii-md));
-  /* The bar is the severity in a form that survives greyscale, a monochrome
-     display, and a reader who does not separate the hues. Color alone would be
-     the only signal otherwise. */
-  border-inline-start: var(--helix-border-thick) solid var(--_callout-color);
-  color: var(--helix-color-foreground);
-  display: flex;
-  gap: var(--helix-space-sm);
-  padding: var(--helix-space-md);
 }
 
 [part="icon"] {

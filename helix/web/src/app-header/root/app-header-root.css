@@ -27,7 +27,7 @@
    the banner behind it runs edge to edge. */
 [part="content"] {
   align-items: center;
-  block-size: var(--app-header-height, var(--helix-size-control-large));
+  block-size: var(--app-header-height, var(--helix-size-header));
   display: flex;
   gap: var(--helix-space-lg);
   margin-inline: auto;
@@ -67,4 +67,11 @@ slot[name="actions"]::slotted(*) {
   /* Long navigation scrolls inside the bar instead of widening the page. */
   min-inline-size: 0;
   overflow-x: auto;
+}
+
+/* Centred navigation puts the sections in the middle of the banner rather than
+   trailing the wordmark, which reads as the site's spine when the nav is the
+   primary thing in the header rather than an afterthought beside a logo. */
+:host([nav-align="center"]) [part="nav"] {
+  justify-content: center;
 }
