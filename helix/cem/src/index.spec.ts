@@ -64,7 +64,7 @@ const subject = (pkg: HelixManifest): HelixDeclaration =>
 
 describe('toReactProp', () => {
   test('converts kebab-case to an on-prefixed camel prop', () => {
-    expect(toReactProp('open-change')).toBe('onOpenChange')
+    expect(toReactProp('helix-open-change')).toBe('onHelixOpenChange')
     expect(toReactProp('value-change-complete')).toBe('onValueChangeComplete')
   })
 
@@ -91,9 +91,11 @@ describe('helixTier', () => {
 
 describe('reactEvents', () => {
   test('annotates each event with its generated React prop', () => {
-    const pkg = manifest({ events: [{ description: 'Fired on change.', name: 'open-change' }] })
+    const pkg = manifest({
+      events: [{ description: 'Fired on change.', name: 'helix-open-change' }],
+    })
     run(reactEvents(), pkg)
-    expect(subject(pkg).events?.[0]?.reactProp).toBe('onOpenChange')
+    expect(subject(pkg).events?.[0]?.reactProp).toBe('onHelixOpenChange')
   })
 })
 
@@ -129,7 +131,7 @@ describe('conventionLint', () => {
     expect(
       lintOf({
         cssParts: [{ description: 'The wrapper.', name: 'container' }],
-        events: [{ description: 'Fired on change.', name: 'open-change' }],
+        events: [{ description: 'Fired on change.', name: 'helix-open-change' }],
         members: [{ description: 'Whether it is open.', kind: 'field', name: 'open' }],
       }),
     ).not.toThrow()
@@ -146,7 +148,7 @@ describe('conventionLint', () => {
   })
 
   test('rejects an undocumented event', () => {
-    expect(lintOf({ events: [{ name: 'open-change' }] })).toThrow(/documented-event/)
+    expect(lintOf({ events: [{ name: 'helix-open-change' }] })).toThrow(/documented-event/)
   })
 
   test('rejects a non-kebab event name', () => {

@@ -28,7 +28,7 @@ import { styles } from './disclosure-root.css.js'
  * @cssproperty --disclosure-border-color - Border color of the container.
  * @cssproperty --disclosure-padding - Inner padding of trigger and content.
  *
- * @event {HelixOpenChangeEvent} open-change - Fired when the disclosure opens or closes.
+ * @event {HelixOpenChangeEvent} helix-open-change - Fired when the disclosure opens or closes.
  */
 @customElement('helix-disclosure')
 export class HelixDisclosure extends HelixBaseDisclosure {

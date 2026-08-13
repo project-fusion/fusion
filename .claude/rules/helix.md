@@ -112,11 +112,19 @@ Only `@summary` is native CEM; the rest reach the manifest through
 `helix-metadata`. A `@status experimental` that lives only in a comment cannot
 badge a docs page or warn a consumer.
 
-Events are declared, never inferred:
+Events are declared, never inferred, and **every name is prefixed `helix-`**:
 
 ```ts
-@event {HelixOpenChangeEvent} open-change - Fired when the disclosure opens.
+@event {HelixOpenChangeEvent} helix-open-change - Fired when it opens.
 ```
+
+The prefix is not cosmetic. Events dispatched inside a shadow root are
+retargeted to look like they came from the host, so an unprefixed name is
+indistinguishable from a native event escaping a component's internals: a
+`<helix-input>` wrapping an `<input>` would emit an `input` event that is not
+ours. The React prop keeps the prefix for a second reason: React binds its own
+synthetic listener for any `on*` name it recognizes, so `onInput` would attach
+React's handler while `onHelixInput` cannot.
 
 The type in braces is what lets the React generator emit
 `(event: HelixOpenChangeEvent) => void` instead of `(detail: unknown)`. Each
@@ -142,6 +150,10 @@ wrappers drift from the element API the first time someone adds a property.
   object owns the bare group name.
 - **The generator formats its own output**, or every build dirties files `check`
   just cleaned.
+- **`ref` is typed to the element class**, not `HTMLElement`, or a component's
+  imperative methods are unreachable through it.
+- **`BaseProps` extends React's `HTMLAttributes`**, so `onClick`, `className`,
+  `style`, ARIA, and `data-*` work and typecheck alongside the generated props.
 
 ## Tree-shaking
 

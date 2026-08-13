@@ -1095,8 +1095,8 @@
                 "text": "HelixOpenChangeEvent"
               },
               "description": "Fired when the disclosure opens or closes.",
-              "name": "open-change",
-              "reactProp": "onOpenChange",
+              "name": "helix-open-change",
+              "reactProp": "onHelixOpenChange",
               "inheritedFrom": {
                 "name": "HelixBaseDisclosure",
                 "module": "src/disclosure/root/disclosure-root.ts"

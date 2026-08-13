@@ -1,10 +1,13 @@
 import { describe, expect, test } from 'bun:test'
+import type { HelixCard } from '@helix-io/web'
+import { createRef, type RefObject } from 'react'
 import {
   BaseCard,
   Card,
   type CardProps,
   type CardTitleProps,
   Disclosure,
+  type DisclosureProps,
 } from './generated/index.js'
 
 const tagOf = (component: unknown): string | undefined =>
@@ -80,5 +83,46 @@ describe('generated prop types', () => {
     // @ts-expect-error `dense` belongs to Card.Root, not Card.Title.
     const title: CardTitleProps = { dense: true }
     expect(title).toBeDefined()
+  })
+})
+
+describe('wrapper prop surface', () => {
+  // Compile-time assertions: this file failing to typecheck is the test.
+  test('native React handlers and attributes pass through', () => {
+    const props: CardProps = {
+      className: 'surface',
+      id: 'card-1',
+      onClick: (event) => event.preventDefault(),
+      onFocus: () => undefined,
+      style: { margin: 0 },
+      tabIndex: 0,
+    }
+    expect(props.id).toBe('card-1')
+  })
+
+  test('a ref is typed as the element, not a bare HTMLElement', () => {
+    const ref: RefObject<HelixCard | null> = createRef<HelixCard>()
+    // `appearance` exists on HelixCard and on no plain HTMLElement, so this
+    // line is what proves the ref carries the component's own type.
+    const read = (): string | undefined => ref.current?.appearance
+    expect(read()).toBeUndefined()
+  })
+
+  test('an event callback receives the typed detail', () => {
+    const props: DisclosureProps = {
+      onHelixOpenChange: (event) => {
+        const open: boolean = event.detail.open
+        return open
+      },
+    }
+    expect(props.onHelixOpenChange).toBeDefined()
+  })
+
+  test('rejects a handler that assumes the wrong detail shape', () => {
+    const props: DisclosureProps = {
+      // @ts-expect-error `detail` carries `open`, not `expanded`.
+      onHelixOpenChange: (event) => event.detail.expanded,
+    }
+    expect(props).toBeDefined()
   })
 })

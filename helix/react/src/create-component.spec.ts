@@ -26,7 +26,7 @@ describe('generated props', () => {
       appearance: 'outlined',
       defaultOpen: true,
       dense: false,
-      onOpenChange: (event) => event.detail.open,
+      onHelixOpenChange: (event) => event.detail.open,
       open: true,
     }
     expect(props.appearance).toBe('outlined')
