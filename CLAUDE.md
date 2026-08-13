@@ -232,6 +232,68 @@ consumer regardless of tooling.
 bun, which resolves TypeScript natively, so the config gets type-checked against
 `Config` instead of failing at runtime on a typo.
 
+## SSR and Declarative Shadow DOM
+
+Helix ships into a Next.js App Router site, so **every component renders on the
+server before any JavaScript runs.** DSD is how that works: Lit SSR emits
+`<template shadowrootmode="open">` with the component's styles inlined, so
+markup arrives styled at parse time. All three engines have shipped DSD since
+early 2024. `@lit-labs/nextjs` wires it into App Router.
+
+That means the flash risk is **not styling. It is state.** Four rules, each
+learned from a real defect:
+
+### 1. Never initialize state in `connectedCallback`
+
+**Lit SSR does not call it.** Anything seeded there does not exist on the
+server, so the element renders in its default state and snaps to the real one at
+hydration. A `default-open` disclosure rendered `aria-expanded="false"` with its
+content `inert`, then popped open.
+
+Derive state from properties instead, or seed it in `willUpdate`, which SSR does
+call. Prefer deriving: `internalOpen` starting `undefined` and falling back to
+`defaultOpen` needs no lifecycle hook at all.
+
+### 2. Semantics on the host, presentation in the shadow root
+
+**IDREFs do not cross shadow boundaries.** An `aria-labelledby` on an element
+inside the shadow root cannot resolve to an id in the light DOM, so the
+reference is silently dead. Card's accessible name never worked for exactly
+this reason, in every browser, SSR or not.
+
+Put `role` and ARIA relationships on the **host**, which shares a tree with the
+light-DOM children they reference. The shadow root holds presentation.
+`ElementInternals.ariaLabelledByElements` avoids ids entirely and is the better
+answer once engine support is even.
+
+### 3. Guard generated ids
+
+```ts
+if (!this.id) {
+  this.id = `helix-card-title-${next()}`
+}
+```
+
+The guard is what makes hydration safe: the server writes the id into the HTML,
+the client sees it already present and skips generation, so the two agree
+regardless of what a module-level counter is doing in either environment.
+
+### 4. Every component needs an SSR spec
+
+`*.ssr.spec.ts` renders the component through `@lit-labs/ssr` and asserts the
+**server** output carries the right state. A DOM spec cannot catch any of the
+above: it runs after hydration, when everything is already correct.
+
+Assert the state a user would see before JavaScript loads, not just that the
+markup exists.
+
+### Unupgraded elements
+
+DSD largely solves this: the shadow root is parser-attached, so `:host` rules
+apply before the element upgrades. The gap is client-only rendered components,
+where the host is an unknown inline element until JS arrives. Reserve layout
+with `:not(:defined)` rather than letting content reflow.
+
 ## Tokens: primitives are private, semantics are the API
 
 Two layers in `@helix-io/styles`, and components see only the second.

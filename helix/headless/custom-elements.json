@@ -192,109 +192,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/footer/card-footer.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Footers hold actions that conclude a card, such as confirm and cancel.\n\nA separate element rather than a slot on the root, so it can be styled,\nomitted, and reordered independently.",
-          "name": "HelixBaseCardFooter",
-          "slots": [
-            {
-              "description": "Actions, typically buttons.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "emit",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "detail",
-                  "optional": true,
-                  "type": {
-                    "text": "T"
-                  }
-                }
-              ],
-              "description": "Dispatches a composed, bubbling CustomEvent. Kebab-case names map to React\n`onFooBar` props through the wrapper generator, so event names are part of\nthe public API and should be treated as such.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "tagName": "helix-base-card-footer",
-          "customElement": true,
-          "helix": {
-            "tier": "headless",
-            "group": "BaseCard",
-            "part": "Footer"
-          }
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseCardFooter",
-          "declaration": {
-            "name": "HelixBaseCardFooter",
-            "module": "src/card/footer/card-footer.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-card-footer",
-          "declaration": {
-            "name": "HelixBaseCardFooter",
-            "module": "src/card/footer/card-footer.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/card/header/card-header.ts",
       "declarations": [
         {
@@ -392,6 +289,109 @@
           "declaration": {
             "name": "HelixBaseCardHeader",
             "module": "src/card/header/card-header.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/footer/card-footer.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Footers hold actions that conclude a card, such as confirm and cancel.\n\nA separate element rather than a slot on the root, so it can be styled,\nomitted, and reordered independently.",
+          "name": "HelixBaseCardFooter",
+          "slots": [
+            {
+              "description": "Actions, typically buttons.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "emit",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "detail",
+                  "optional": true,
+                  "type": {
+                    "text": "T"
+                  }
+                }
+              ],
+              "description": "Dispatches a composed, bubbling CustomEvent. Kebab-case names map to React\n`onFooBar` props through the wrapper generator, so event names are part of\nthe public API and should be treated as such.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "tagName": "helix-base-card-footer",
+          "customElement": true,
+          "helix": {
+            "tier": "headless",
+            "group": "BaseCard",
+            "part": "Footer"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseCardFooter",
+          "declaration": {
+            "name": "HelixBaseCardFooter",
+            "module": "src/card/footer/card-footer.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-card-footer",
+          "declaration": {
+            "name": "HelixBaseCardFooter",
+            "module": "src/card/footer/card-footer.ts"
           }
         }
       ]
