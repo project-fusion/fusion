@@ -1,8 +1,12 @@
 export {
   HelixOpenChangeEvent,
   HelixRemoveRequestEvent,
+  HelixSelectionChangeEvent,
+  HelixSourceChangeEvent,
   type OpenChangeDetail,
   type RemoveRequestDetail,
+  type SelectionChangeDetail,
+  type SourceChangeDetail,
 } from '@helix-io/core'
 export * from './accordion/index.js'
 export * from './app-header/index.js'
@@ -12,5 +16,11 @@ export * from './button/index.js'
 export * from './callout/index.js'
 export * from './card/index.js'
 export * from './divider/index.js'
+export * from './flex/index.js'
+export * from './grid/index.js'
+export * from './heading/index.js'
 export * from './icon/index.js'
+export * from './link/index.js'
 export * from './tag/index.js'
+export * from './text/index.js'
+export * from './tree/index.js'

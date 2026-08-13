@@ -115,10 +115,36 @@ export class HelixSourceChangeEvent extends CustomEvent<SourceChangeDetail> {
   }
 }
 
+/** Detail carried by `SelectionChange`. */
+export interface SelectionChangeDetail {
+  /** Value of the item the reader chose. */
+  value: string
+}
+
+/**
+ * Fired when the reader selects an item in a set.
+ *
+ * A notification, not a request: selection within a tree or a list is the
+ * component's own state, unlike removal, where the consumer owns the list.
+ */
+export class HelixSelectionChangeEvent extends CustomEvent<SelectionChangeDetail> {
+  static readonly eventName = 'SelectionChange'
+
+  constructor(detail: SelectionChangeDetail) {
+    super(HelixSelectionChangeEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 declare global {
   interface HTMLElementEventMap {
     OpenChange: HelixOpenChangeEvent
     RemoveRequest: HelixRemoveRequestEvent
+    SelectionChange: HelixSelectionChangeEvent
     SourceChange: HelixSourceChangeEvent
   }
 }

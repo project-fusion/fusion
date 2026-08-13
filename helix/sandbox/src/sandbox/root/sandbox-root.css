@@ -4,6 +4,9 @@
 
 [part="container"] {
   background-color: var(--helix-color-surface);
+  /* Fills the host, so a consumer sizing the element gets a sandbox that
+     stretches rather than one stuck at its own minimum. */
+  block-size: 100%;
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-md);
   display: grid;

@@ -1,40 +1,54 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { type ApiMember, families, findFamily } from '../../../../lib/catalog'
 
 /**
  * API reference for one family, read from the manifest and nothing else.
  *
- * Deliberately holds no examples. This page answers what a component can do;
- * the sandbox answers what it looks like. A reference that starts collecting
+ * Holds no examples on purpose. This page answers what a component can do; the
+ * sandbox answers what it looks like. A reference that starts collecting
  * pictures stops being the place you can trust to be complete.
+ *
+ * The tables are still native `<table>`. A Table family is next; until it
+ * exists, a real table beats a grid of divs pretending to be one.
  */
 
 export function generateStaticParams() {
   return families.map((family) => ({ family: family.slug }))
 }
 
-function Table({ caption, rows }: { caption: string; rows: ApiMember[] }) {
+function ApiTable({ caption, rows }: { caption: string; rows: ApiMember[] }) {
   if (rows.length === 0) {
     return null
   }
   return (
-    <section className="apiSection">
-      <h3>{caption}</h3>
-      <table>
+    <helix-flex direction="column" gap="sm">
+      <helix-text size="xs" tone="subtle" weight="semibold">
+        {caption.toUpperCase()}
+      </helix-text>
+      <table className="apiTable">
         <tbody>
           {rows.map((row) => (
             <tr key={row.name}>
               <td>
-                <code>{row.name || '(default)'}</code>
-                {row.type && <span className="apiType">{row.type}</span>}
+                <helix-text mono size="xs" tone="primary">
+                  {row.name || '(default)'}
+                </helix-text>
+                {row.type && (
+                  <helix-text block mono size="xs" tone="subtle">
+                    {row.type}
+                  </helix-text>
+                )}
               </td>
-              <td>{row.description.split('\n\n')[0]}</td>
+              <td>
+                <helix-text size="sm" tone="muted">
+                  {row.description.split('\n\n')[0]}
+                </helix-text>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </section>
+    </helix-flex>
   )
 }
 
@@ -46,74 +60,91 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
 
   return (
     <div className="docsShell">
-      {/* Families only. The examples belong to the sandbox, and listing them
-          here is what made the two surfaces one confusing thing. */}
-      <nav aria-label="Components" className="docsNav">
+      {/* Families only. Examples belong to the sandbox, and listing them here
+          is what made the two surfaces one confusing thing. */}
+      <helix-tree class="docsNav" label="Components" value={family.slug}>
         {families.map((entry) => (
-          <Link
-            aria-current={entry.slug === family.slug ? 'page' : undefined}
-            href={`/components/${entry.slug}`}
-            key={entry.slug}
-          >
-            {entry.label}
-          </Link>
+          <helix-tree-item key={entry.slug} value={entry.slug}>
+            <helix-link appearance="quiet" href={`/components/${entry.slug}`}>
+              {entry.label}
+            </helix-link>
+          </helix-tree-item>
         ))}
-      </nav>
+      </helix-tree>
 
-      <div className="page">
-        <header className="pageHead">
-          <h1>{family.label}</h1>
-          <div className="chips">
-            {family.status && <span className={`chip chip-${family.status}`}>{family.status}</span>}
-            {family.since && <span className="chip">since {family.since}</span>}
-          </div>
-          {family.aliases.length > 0 && (
-            <p className="aliases">Also known as {family.aliases.join(', ')}</p>
-          )}
-          <p className="lede">{family.summary}</p>
+      <helix-flex direction="column" gap="xl">
+        <helix-flex direction="column" gap="sm">
+          <helix-heading level={1} size="2xl">
+            {family.label}
+          </helix-heading>
+          <helix-flex align="center" gap="xs" wrap>
+            {family.status && (
+              <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'} size="sm">
+                {family.status}
+              </helix-tag>
+            )}
+            {family.since && (
+              <helix-text size="xs" tone="subtle">
+                since {family.since}
+              </helix-text>
+            )}
+            {family.aliases.length > 0 && (
+              <helix-text size="xs" tone="subtle">
+                Also known as {family.aliases.join(', ')}
+              </helix-text>
+            )}
+          </helix-flex>
+          <helix-text block size="lg" tone="muted">
+            {family.summary}
+          </helix-text>
           {family.examples.length > 0 && (
-            <p>
-              <Link href={`/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}>
+            <helix-flex>
+              <helix-button
+                appearance="subtle"
+                href={`/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
+                size="sm"
+              >
                 Open in the sandbox
-              </Link>
-            </p>
+              </helix-button>
+            </helix-flex>
           )}
-        </header>
+        </helix-flex>
 
         {family.elements.map((element) => (
-          <article className="element" key={element.tagName}>
-            <h2>
-              {element.label} <span className="tierChip">{element.tier}</span>
-            </h2>
-            <code className="tagName">&lt;{element.tagName}&gt;</code>
-            {element.description && <p className="description">{element.description}</p>}
+          <helix-flex class="element" direction="column" gap="lg" key={element.tagName}>
+            <helix-flex direction="column" gap="2xs">
+              <helix-flex align="center" gap="sm">
+                <helix-heading level={2} size="xl">
+                  {element.label}
+                </helix-heading>
+                <helix-tag size="sm">{element.tier}</helix-tag>
+              </helix-flex>
+              <helix-text mono size="sm" tone="subtle">
+                &lt;{element.tagName}&gt;
+              </helix-text>
+            </helix-flex>
 
-            <Table caption="Attributes" rows={element.attributes} />
-            <Table caption="Slots" rows={element.slots} />
-            <Table caption="Parts" rows={element.cssParts} />
-            <Table caption="CSS properties" rows={element.cssProperties} />
-
-            {element.events.length > 0 && (
-              <section className="apiSection">
-                <h3>Events</h3>
-                <table>
-                  <tbody>
-                    {element.events.map((event) => (
-                      <tr key={event.name}>
-                        <td>
-                          <code>{event.name}</code>
-                          <span className="apiType">{event.reactProp}</span>
-                        </td>
-                        <td>{event.description}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </section>
+            {element.description && (
+              <helix-text block class="description" size="sm" tone="muted">
+                {element.description}
+              </helix-text>
             )}
-          </article>
+
+            <ApiTable caption="Attributes" rows={element.attributes} />
+            <ApiTable caption="Slots" rows={element.slots} />
+            <ApiTable caption="Parts" rows={element.cssParts} />
+            <ApiTable caption="CSS properties" rows={element.cssProperties} />
+            <ApiTable
+              caption="Events"
+              rows={element.events.map((event) => ({
+                description: event.description,
+                name: event.name,
+                type: event.reactProp,
+              }))}
+            />
+          </helix-flex>
         ))}
-      </div>
+      </helix-flex>
     </div>
   )
 }

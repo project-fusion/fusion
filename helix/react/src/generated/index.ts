@@ -31,6 +31,13 @@ export { BaseDivider, type BaseDividerProps, BaseDividerRoot } from './base-divi
 export { BaseIcon, type BaseIconProps, BaseIconRoot } from './base-icon.js'
 export { BaseTag, type BaseTagProps, BaseTagRoot } from './base-tag.js'
 export {
+  BaseTree,
+  BaseTreeItem,
+  type BaseTreeItemProps,
+  type BaseTreeProps,
+  BaseTreeRoot,
+} from './base-tree.js'
+export {
   Breadcrumbs,
   BreadcrumbsItem,
   type BreadcrumbsItemProps,
@@ -41,5 +48,11 @@ export { Button, type ButtonProps, ButtonRoot } from './button.js'
 export { Callout, type CalloutProps, CalloutRoot } from './callout.js'
 export { Card, type CardProps, CardRoot } from './card.js'
 export { Divider, type DividerProps, DividerRoot } from './divider.js'
+export { Flex, type FlexProps, FlexRoot } from './flex.js'
+export { Grid, type GridProps, GridRoot } from './grid.js'
+export { Heading, type HeadingProps, HeadingRoot } from './heading.js'
 export { Icon, type IconProps, IconRoot } from './icon.js'
+export { Link, type LinkProps, LinkRoot } from './link.js'
 export { Tag, type TagProps, TagRoot } from './tag.js'
+export { Text, type TextProps, TextRoot } from './text.js'
+export { Tree, TreeItem, type TreeItemProps, type TreeProps, TreeRoot } from './tree.js'

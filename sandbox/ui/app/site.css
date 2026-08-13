@@ -10,219 +10,51 @@
   padding: var(--helix-space-xl) var(--helix-space-lg) var(--helix-space-3xl);
 }
 
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-lg);
-  min-inline-size: 0;
-}
-
 .hero {
   padding-block: var(--helix-space-2xl);
 }
 
-.hero h1 {
-  font-size: var(--helix-text-3xl);
-}
-
 .lede {
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-lg);
-  margin-block-start: var(--helix-space-md);
   max-inline-size: 55ch;
-}
-
-.heroActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-sm);
-  margin-block-start: var(--helix-space-xl);
-}
-
-.stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-2xl);
-}
-
-.stats div {
-  display: flex;
-  flex-direction: column;
-}
-
-.stats strong {
-  font-size: var(--helix-text-2xl);
-  letter-spacing: var(--helix-tracking-tight);
-}
-
-.stats span {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-sm);
-}
-
-.cardGrid {
-  display: grid;
-  gap: var(--helix-space-md);
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  margin-block-start: var(--helix-space-lg);
-}
-
-.cardHead {
-  align-items: center;
-  display: flex;
-  gap: var(--helix-space-sm);
-  justify-content: space-between;
-}
-
-.cardHead h3 {
-  font-size: var(--helix-text-lg);
 }
 
 /* ─────────────────────────────────────────────────────────── docs */
 
 .docsShell {
   display: grid;
-  gap: var(--helix-space-xl);
+  gap: var(--helix-space-2xl);
   grid-template-columns: 12rem minmax(0, 1fr);
 }
 
 .docsNav {
   align-self: start;
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
   inset-block-start: var(--helix-space-lg);
   position: sticky;
 }
 
-.docsNav a {
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-sm);
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
-  text-decoration: none;
-}
-
-.docsNav a:hover {
-  background-color: var(--helix-color-surface-raised);
-  color: var(--helix-color-foreground);
-}
-
-.docsNav a[aria-current="page"] {
-  background-color: var(--helix-color-primary-subtle);
-  color: var(--helix-color-primary);
-  font-weight: var(--helix-weight-medium);
-}
-
-.pageHead h1 {
-  font-size: var(--helix-text-2xl);
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-xs);
-  margin-block-start: var(--helix-space-xs);
-}
-
-.chip {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
-  padding: 0 var(--helix-space-xs);
-}
-
-/* Stage labels are honest here too: experimental is stated, never softened. */
-.chip-experimental {
-  border-color: var(--helix-color-warning);
-  color: var(--helix-color-warning);
-}
-
-.chip-stable {
-  border-color: var(--helix-color-success);
-  color: var(--helix-color-success);
-}
-
-.aliases {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
-  margin-block-start: var(--helix-space-xs);
-}
-
 .element {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
-  padding-block-start: var(--helix-space-lg);
-}
-
-.element h2 {
-  align-items: center;
-  display: flex;
-  font-size: var(--helix-text-xl);
-  gap: var(--helix-space-sm);
-}
-
-.tierChip {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-regular);
-  padding: 0 var(--helix-space-xs);
-}
-
-.tagName {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-sm);
+  padding-block-start: var(--helix-space-xl);
 }
 
 .description {
-  color: var(--helix-color-foreground-muted);
-  margin-block-start: var(--helix-space-sm);
   max-inline-size: 70ch;
   white-space: pre-line;
 }
 
-.apiSection {
-  margin-block-start: var(--helix-space-lg);
-}
-
-.apiSection h3 {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-wide);
-  margin-block-end: var(--helix-space-sm);
-  text-transform: uppercase;
-}
-
-.apiSection table {
+.apiTable {
   border-collapse: collapse;
   inline-size: 100%;
 }
 
-.apiSection td {
+.apiTable td {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  font-size: var(--helix-text-sm);
-  padding: var(--helix-space-xs) var(--helix-space-sm) var(--helix-space-xs) 0;
+  padding: var(--helix-space-xs) var(--helix-space-md) var(--helix-space-xs) 0;
   vertical-align: top;
 }
 
-.apiSection td:first-child {
-  inline-size: 18rem;
-}
-
-.apiSection code {
-  color: var(--helix-color-primary);
-  font-size: var(--helix-text-xs);
-}
-
-.apiType {
-  color: var(--helix-color-foreground-subtle);
-  display: block;
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
-  margin-block-start: var(--helix-space-2xs);
+.apiTable td:first-child {
+  inline-size: 16rem;
 }
 
 /* ─────────────────────────────────────────────────────── sandbox */
@@ -236,98 +68,42 @@
 }
 
 .workbenchHeader {
-  align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  display: flex;
   flex: 0 0 auto;
-  gap: var(--helix-space-lg);
-  padding: var(--helix-space-sm) var(--helix-space-md);
-}
-
-.brand {
-  align-items: baseline;
-  color: var(--helix-color-foreground);
-  display: flex;
-  gap: var(--helix-space-xs);
-  text-decoration: none;
-}
-
-.brand strong {
-  letter-spacing: var(--helix-tracking-tight);
-}
-
-.brand span {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-xs) var(--helix-space-md);
 }
 
 .workbenchTitle {
-  color: var(--helix-color-foreground-muted);
   flex: 1 1 auto;
-  font-size: var(--helix-text-sm);
   min-inline-size: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.workbenchTitle span {
-  color: var(--helix-color-foreground-subtle);
-  padding-inline: var(--helix-space-2xs);
-}
-
-.workbenchActions {
-  align-items: center;
-  display: flex;
-  flex: 0 0 auto;
-  gap: var(--helix-space-xs);
-}
-
-.workbenchActions button,
-.workbenchActions a {
-  background: none;
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  cursor: pointer;
-  font: inherit;
-  font-size: var(--helix-text-xs);
-  padding: var(--helix-space-2xs) var(--helix-space-sm);
-  text-decoration: none;
-}
-
-.workbenchActions button:hover,
-.workbenchActions a:hover {
-  border-color: var(--helix-color-border-strong);
-  color: var(--helix-color-foreground);
-}
-
-/* Sandbox on the left, examples on the right. The rail is last in the DOM as
-   well as on screen, so tab order reaches the thing being edited first. */
+/* Sandbox left, examples right. The rail is last in the DOM as well as on
+   screen, so tab order reaches what is being edited first. */
 .workbenchBody {
   display: grid;
+  flex: 1 1 auto;
   grid-template-columns: minmax(0, 1fr) 15rem;
   min-block-size: 0;
-  flex: 1 1 auto;
 }
 
 .workbenchBody helix-sandbox {
   --sandbox-min-block-size: 0;
 
+  block-size: 100%;
   min-block-size: 0;
   overflow: hidden;
 }
 
 .sourcePane {
   block-size: 100%;
-  display: flex;
-  flex-direction: column;
   min-block-size: 0;
 }
 
 .paneTabs {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  display: flex;
   flex: 0 0 auto;
 }
 
@@ -340,6 +116,7 @@
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   padding: var(--helix-space-xs) var(--helix-space-sm);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 .paneTabs button[aria-selected="true"] {
@@ -354,54 +131,14 @@
 
 .examplesRail {
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-xs);
   min-block-size: 0;
   overflow-y: auto;
   padding: var(--helix-space-sm);
 }
 
-.railGroup {
-  display: flex;
-  flex-direction: column;
-}
-
-.railFamily {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-wide);
-  padding: var(--helix-space-xs) var(--helix-space-xs) var(--helix-space-2xs);
-  text-transform: uppercase;
-}
-
-.examplesRail button {
-  background: none;
-  border: none;
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  cursor: pointer;
-  font: inherit;
-  font-size: var(--helix-text-sm);
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
-  text-align: start;
-}
-
-.examplesRail button:hover {
-  background-color: var(--helix-color-surface-raised);
-  color: var(--helix-color-foreground);
-}
-
-.examplesRail button[aria-current="true"] {
-  background-color: var(--helix-color-primary-subtle);
-  color: var(--helix-color-primary);
-  font-weight: var(--helix-weight-medium);
-}
-
-.empty {
-  color: var(--helix-color-foreground-subtle);
-  padding: var(--helix-space-xl);
+/* Only a control at narrow widths, where the rail becomes a drawer. */
+.railToggle {
+  display: none;
 }
 
 @media (max-width: 60rem) {
@@ -409,15 +146,52 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* The rail moves under the sandbox rather than squeezing it. */
+  .docsNav {
+    position: static;
+  }
+
+  .railToggle {
+    display: inline-flex;
+  }
+
+  /* The header has to fit a phone. The path is the first thing to go: it
+     repeats what the tree already shows, and the actions are the only part
+     that cannot be recovered from elsewhere. */
+  .workbenchTitle {
+    display: none;
+  }
+
+  .workbenchHeader {
+    padding-inline: var(--helix-space-sm);
+  }
+
+  /* One column, and the rail slides over the sandbox rather than taking width
+     from it. A 15rem rail on a 375px screen leaves nothing to preview in. */
   .workbenchBody {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    position: relative;
   }
 
   .examplesRail {
-    border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
-    border-inline-start: none;
-    max-block-size: 40vh;
+    background-color: var(--helix-color-surface);
+    border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+    inline-size: min(18rem, 80vw);
+    inset-block: 0;
+    inset-inline-end: 0;
+    position: absolute;
+    transform: translateX(100%);
+    transition: transform var(--helix-duration-normal) var(--helix-easing-decelerate);
+    z-index: var(--helix-layer-overlay);
+  }
+
+  [data-rail-open="true"] .examplesRail {
+    box-shadow: var(--helix-shadow-lg);
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .examplesRail {
+    transition: none;
   }
 }

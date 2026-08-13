@@ -1,0 +1,84 @@
+:host {
+  display: block;
+}
+
+[part="item"] {
+  border-radius: var(--helix-radii-sm);
+  outline: none;
+}
+
+/* Indent is the level times one hook, so a node moved to another depth
+   re-indents with no nested selector. Depth-nested rules stop working at
+   whatever depth nobody wrote a rule for. */
+[part="row"] {
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-2xs);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+  padding-inline-start: calc(
+    var(--helix-space-xs) +
+    (var(--_tree-level, 1) - 1) *
+    var(--tree-indent, var(--helix-space-md))
+  );
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+  user-select: none;
+}
+
+:host([level="2"]) [part="row"] {
+  --_tree-level: 2;
+}
+:host([level="3"]) [part="row"] {
+  --_tree-level: 3;
+}
+:host([level="4"]) [part="row"] {
+  --_tree-level: 4;
+}
+:host([level="5"]) [part="row"] {
+  --_tree-level: 5;
+}
+
+[part="row"]:hover {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+:host([selected]) [part="row"] {
+  background-color: var(--helix-color-primary-subtle);
+  color: var(--helix-color-primary);
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="item"]:focus-visible [part="row"] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* Rotation rather than a swapped glyph: opening a branch is a short movement,
+   not a substitution. The surface stays flat; the motion carries the change. */
+[part="toggle"] {
+  block-size: 1em;
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+  inline-size: 1em;
+  transform: rotate(-90deg);
+  transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host([expanded]) [part="toggle"] {
+  transform: rotate(0deg);
+}
+
+[part="label"] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[part="group"][hidden] {
+  display: none;
+}

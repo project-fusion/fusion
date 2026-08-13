@@ -1,0 +1,52 @@
+:host {
+  display: inline;
+}
+
+:host([block]) {
+  display: block;
+}
+
+[part="text"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-regular);
+  line-height: var(--helix-leading-normal);
+}
+
+:host([mono]) [part="text"] {
+  font-family: var(--helix-font-mono);
+}
+
+:host([size="xs"]) [part="text"] {
+  font-size: var(--helix-text-xs);
+}
+:host([size="sm"]) [part="text"] {
+  font-size: var(--helix-text-sm);
+}
+:host([size="lg"]) [part="text"] {
+  font-size: var(--helix-text-lg);
+}
+:host([size="xl"]) [part="text"] {
+  font-size: var(--helix-text-xl);
+}
+
+:host([tone="muted"]) [part="text"] {
+  color: var(--helix-color-foreground-muted);
+}
+:host([tone="subtle"]) [part="text"] {
+  color: var(--helix-color-foreground-subtle);
+}
+:host([tone="primary"]) [part="text"] {
+  color: var(--helix-color-primary);
+}
+:host([tone="danger"]) [part="text"] {
+  color: var(--helix-color-danger);
+}
+
+:host([weight="medium"]) [part="text"] {
+  font-weight: var(--helix-weight-medium);
+}
+:host([weight="semibold"]) [part="text"] {
+  font-weight: var(--helix-weight-semibold);
+}

@@ -5,47 +5,51 @@ export default function Home() {
   const elements = families.reduce((total, family) => total + family.elements.length, 0)
 
   return (
-    <div className="page">
-      <section className="hero">
-        <h1>Helix</h1>
-        <p className="lede">
+    <helix-flex direction="column" gap="2xl">
+      <helix-flex class="hero" direction="column" gap="lg">
+        <helix-heading level={1}>Helix</helix-heading>
+        <helix-text block class="lede" size="lg" tone="muted">
           The design system Fusion products are built on. Web components, so the framework stays
           swappable, and a token layer that themes them.
-        </p>
-        <div className="heroActions">
+        </helix-text>
+        <helix-flex gap="sm" wrap>
           <helix-button appearance="primary" href="/sandbox" size="lg">
             Open the sandbox
           </helix-button>
           <helix-button href="/components/button" size="lg">
             Read the API
           </helix-button>
-        </div>
-      </section>
+        </helix-flex>
+      </helix-flex>
 
       <helix-divider></helix-divider>
 
-      <section className="stats">
-        <div>
-          <strong>{families.length}</strong>
-          <span>families</span>
-        </div>
-        <div>
-          <strong>{elements}</strong>
-          <span>elements</span>
-        </div>
-        <div>
-          <strong>{examples}</strong>
-          <span>examples</span>
-        </div>
-      </section>
+      <helix-flex gap="2xl" wrap>
+        {[
+          { label: 'families', value: families.length },
+          { label: 'elements', value: elements },
+          { label: 'examples', value: examples },
+        ].map((stat) => (
+          <helix-flex direction="column" key={stat.label}>
+            <helix-heading level={3} size="2xl">
+              {stat.value}
+            </helix-heading>
+            <helix-text size="sm" tone="subtle">
+              {stat.label}
+            </helix-text>
+          </helix-flex>
+        ))}
+      </helix-flex>
 
-      <section aria-labelledby="components">
-        <h2 id="components">Components</h2>
-        <div className="cardGrid">
+      <helix-flex direction="column" gap="lg">
+        <helix-heading level={2}>Components</helix-heading>
+        <helix-grid gap="md" min="17rem">
           {families.map((family) => (
-            <helix-card appearance="outlined" aria-labelledby={family.slug} key={family.slug}>
-              <div className="cardHead" slot="header">
-                <h3 id={family.slug}>{family.label}</h3>
+            <helix-card appearance="outlined" aria-label={family.label} key={family.slug}>
+              <helix-flex align="center" gap="sm" justify="between" slot="header">
+                <helix-heading level={3} size="lg">
+                  {family.label}
+                </helix-heading>
                 {family.status && (
                   <helix-tag
                     appearance={family.status === 'stable' ? 'success' : 'warning'}
@@ -54,20 +58,28 @@ export default function Home() {
                     {family.status}
                   </helix-tag>
                 )}
-              </div>
-              {family.summary}
-              <helix-button
-                appearance="subtle"
-                href={`/components/${family.slug}`}
-                size="sm"
-                slot="footer"
-              >
-                API
-              </helix-button>
+              </helix-flex>
+              <helix-text size="sm" tone="muted">
+                {family.summary}
+              </helix-text>
+              <helix-flex gap="2xs" slot="footer">
+                {family.examples.length > 0 && (
+                  <helix-button
+                    appearance="subtle"
+                    href={`/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
+                    size="sm"
+                  >
+                    Sandbox
+                  </helix-button>
+                )}
+                <helix-button appearance="subtle" href={`/components/${family.slug}`} size="sm">
+                  API
+                </helix-button>
+              </helix-flex>
             </helix-card>
           ))}
-        </div>
-      </section>
-    </div>
+        </helix-grid>
+      </helix-flex>
+    </helix-flex>
   )
 }
