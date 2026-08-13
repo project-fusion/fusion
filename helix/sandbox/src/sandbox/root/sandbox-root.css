@@ -1,24 +1,23 @@
+/* The host is the split. A wrapper would be a second box with the same border
+   and the same grid on it. */
 :host {
-  display: block;
-}
-
-[part="container"] {
   background-color: var(--helix-color-surface);
-  /* Fills the host, so a consumer sizing the element gets a sandbox that
-     stretches rather than one stuck at its own minimum. */
-  block-size: 100%;
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-md);
   display: grid;
   min-block-size: var(--sandbox-min-block-size, 20rem);
   overflow: hidden;
+
+  /* Matches the property's own default, so server-rendered markup and the
+     upgraded element agree until a consumer changes it. */
+  --_sandbox-split: 45%;
 }
 
-:host([orientation="horizontal"]) [part="container"] {
+:host([orientation="horizontal"]) {
   grid-template-columns: var(--_sandbox-split) auto minmax(0, 1fr);
 }
 
-:host([orientation="vertical"]) [part="container"] {
+:host([orientation="vertical"]) {
   grid-template-rows: var(--_sandbox-split) auto minmax(0, 1fr);
 }
 
@@ -49,7 +48,7 @@
 }
 
 [part="separator"]:hover,
-[part="container"][data-dragging] [part="separator"] {
+:host([data-dragging]) [part="separator"] {
   background-color: var(--helix-color-border-accent);
 }
 
@@ -61,7 +60,7 @@
 }
 
 /* A drag that crosses the preview must not start selecting its text. */
-[part="container"][data-dragging] {
+:host([data-dragging]) {
   user-select: none;
 }
 

@@ -419,7 +419,6 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `container`: The split layout.
    * - `pane`: Either pane.
    * - `separator`: The draggable divider.
    */
@@ -547,7 +546,6 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `container`: The split layout.
    * - `pane`: Either pane.
    * - `separator`: The draggable divider.
    */

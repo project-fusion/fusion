@@ -7,8 +7,8 @@ export default function Home() {
   return (
     <helix-flex direction="column" gap="2xl">
       <helix-flex class="hero" direction="column" gap="lg">
-        <helix-text level={1}>Helix</helix-text>
-        <helix-text block class="lede" size="lg" tone="muted">
+        <helix-text as="h1">Helix</helix-text>
+        <helix-text as="p" class="lede" tone="muted">
           The design system Fusion products are built on. Web components, so the framework stays
           swappable, and a token layer that themes them.
         </helix-text>
@@ -31,10 +31,10 @@ export default function Home() {
           { label: 'examples', value: examples },
         ].map((stat) => (
           <helix-flex direction="column" key={stat.label}>
-            <helix-text level={3} size="2xl">
+            <helix-text as="h3" appearance="heading">
               {stat.value}
             </helix-text>
-            <helix-text size="sm" tone="subtle">
+            <helix-text appearance="caption" tone="subtle">
               {stat.label}
             </helix-text>
           </helix-flex>
@@ -42,12 +42,12 @@ export default function Home() {
       </helix-flex>
 
       <helix-flex direction="column" gap="lg">
-        <helix-text level={2}>Components</helix-text>
+        <helix-text as="h2">Components</helix-text>
         <helix-grid gap="md" min="17rem">
           {families.map((family) => (
             <helix-card appearance="outlined" aria-label={family.label} key={family.slug}>
               <helix-flex align="center" gap="sm" justify="between" slot="header">
-                <helix-text level={3} size="lg">
+                <helix-text as="h3" appearance="title">
                   {family.label}
                 </helix-text>
                 {family.status && (
@@ -59,7 +59,7 @@ export default function Home() {
                   </helix-tag>
                 )}
               </helix-flex>
-              <helix-text size="sm" tone="muted">
+              <helix-text appearance="caption" tone="muted">
                 {family.summary}
               </helix-text>
               <helix-flex gap="2xs" slot="footer">

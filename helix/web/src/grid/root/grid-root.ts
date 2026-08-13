@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import type { CSSResultGroup, TemplateResult } from 'lit'
+import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './grid-root.css.js'
@@ -47,18 +47,45 @@ export class HelixGrid extends HelixElement {
   @property({ reflect: true })
   align: 'start' | 'center' | 'end' | 'stretch' = 'stretch'
 
+  /**
+   * Writes the track list to the host.
+   *
+   * Set on `this.style` rather than rendered into a `<style>` element, because
+   * Lit refuses expressions inside `<style>`: it is an invalid binding location
+   * and throws while rendering rather than at build time. The guard is for the
+   * server, whose element shim has no `style` at all.
+   *
+   * The consequence is that a server-rendered grid falls back to the
+   * stylesheet's single column until it upgrades. That is why `columns` is also
+   * expressed as plain CSS below: the fixed-count case, which can be enumerated,
+   * needs no JavaScript at all, and only `min` depends on this.
+   */
+  private applyTemplate(): void {
+    if (!this.style) {
+      return
+    }
+    const template = this.min ? `repeat(auto-fit, minmax(min(${this.min}, 100%), 1fr))` : ''
+    if (template) {
+      this.style.setProperty('grid-template-columns', template)
+    } else {
+      this.style.removeProperty('grid-template-columns')
+    }
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('min')) {
+      this.applyTemplate()
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.applyTemplate()
+  }
+
   protected override render(): TemplateResult {
-    // Inline style rather than a class, because the value is a length or a
-    // count the consumer chose and no fixed set of rules can enumerate it.
-    const template = this.min
-      ? `repeat(auto-fit, minmax(min(${this.min}, 100%), 1fr))`
-      : this.columns > 0
-        ? `repeat(${this.columns}, minmax(0, 1fr))`
-        : 'minmax(0, 1fr)'
-    return html`<style>
-        :host { grid-template-columns: ${template}; }
-      </style>
-      <slot></slot>`
+    return html`<slot></slot>`
   }
 
   static override styles: CSSResultGroup = styles

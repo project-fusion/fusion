@@ -6,39 +6,50 @@ import '@helix-io/web/text'
 import type { HelixText } from '@helix-io/web'
 
 /**
- * One component rather than two. A separate `Heading` differed from this only
-in which tag it rendered and what its size defaulted to, and both are
-expressible as a property. Two components meant two places to add a tone and
-two contracts to keep aligned.
+ * Two properties, and they answer different questions. `as` is the element,
+which decides the document outline and what a screen reader announces.
+`appearance` is the treatment, which decides size, weight, leading, and
+tracking together.
 
-`level` renders a real `<h1>` through `<h6>` and nothing else does. Without
-it this is a `<span>`, so text is never accidentally structural: a heading is
-something you ask for.
+They are separate because they genuinely come apart: a section's second
+heading sometimes has to look smaller without lying about the outline, and a
+`<p>` sometimes has to read as a caption. They default to matching, so the
+common case is `as="h2"` and nothing else.
 
-Size follows `level` unless overridden, so a heading is correct by doing
-nothing. Setting both is the deliberate exception, for the case where a
-section's second heading must look smaller without lying about the outline.
+**Size, weight, and leading are not properties.** Exposing them separately
+offers a few hundred combinations of which a handful are right, and every
+caller then picks one. An appearance is a decision the system already made:
+the ramp is named, and a page built from it is consistent because there was
+nothing else to choose.
+
+`tone` stays separate, because colour carries state rather than typography.
+Folding it in would mean `caption-danger` and `label-primary` and the rest of
+the cross product, which is the explosion `appearance` exists to prevent.
  *
  * Renders `<helix-text>`.
  */
 export interface TextProps extends BaseProps {
-  /** Renders as a block, for a paragraph rather than an inline run. */
-  block?: boolean
-  /** Outline level. Renders a real heading tag; omit for ordinary text. */
-  level?: 0 | 1 | 2 | 3 | 4 | 5 | 6
-  /** Uses the monospace family, for code and identifiers. */
-  mono?: boolean
-  /** Size on the type scale. Defaults to the one matching `level`. */
-  size?: '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
-  /** Colour role for the text. */
+  /** Type treatment. Defaults to the one that matches `as`. */
+  appearance?:
+    | ''
+    | 'display'
+    | 'heading'
+    | 'subheading'
+    | 'title'
+    | 'body'
+    | 'body-strong'
+    | 'caption'
+    | 'label'
+    | 'code'
+  /** Which element to render. Decides the outline and the semantics. */
+  as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
+  /** Colour role. Separate from `appearance`, because colour carries state. */
   tone?: 'default' | 'muted' | 'subtle' | 'primary' | 'danger'
-  /** Weight on the weight scale. Headings default to semibold. */
-  weight?: '' | 'regular' | 'medium' | 'semibold'
 }
 
 export const TextRoot = createComponent<HelixText, TextProps>({
   events: {},
-  properties: ['block', 'mono'],
+  properties: [],
   tagName: 'helix-text',
 })
 

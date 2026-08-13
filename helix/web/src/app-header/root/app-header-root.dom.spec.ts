@@ -15,7 +15,9 @@ describe('app header', () => {
         <helix-button slot="actions">Contact</helix-button>
       </helix-app-header>
     `)
-    expect(part(header, 'bar')?.getAttribute('role')).toBe('banner')
+    // On the host, since the host is the banner: it carries the material and
+    // spans the window, and `content` carries the measure.
+    expect(header.getAttribute('role')).toBe('banner')
     // `<nav>` keeps a wrapper because it is a landmark; brand and actions are
     // bare slots, so an omitted one renders nothing at all.
     expect(part(header, 'nav')?.tagName).toBe('NAV')
