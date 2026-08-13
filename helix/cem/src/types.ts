@@ -43,6 +43,17 @@ export interface HelixEvent extends Documented {
  */
 export interface HelixMetadata {
   /**
+   * Composition family this component belongs to, from its directory.
+   * `Card.Root` and `Card.Header` share the group `Card`.
+   */
+  group?: string
+
+  /**
+   * Role within the group. `Root` for the family's primary element.
+   */
+  part?: string
+
+  /**
    * Which layer of the design system the declaration belongs to. The React
    * wrapper generator wraps only `styled`. `core` holds element primitives and
    * mixins, which are not components but must be analyzed so dependents can

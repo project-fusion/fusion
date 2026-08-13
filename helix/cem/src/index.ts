@@ -1,4 +1,5 @@
 import type { Config } from '@custom-elements-manifest/analyzer'
+import { composition } from './plugins/composition.js'
 import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
 import { declaredEvents } from './plugins/declared-events.js'
 import { helixTier } from './plugins/helix-tier.js'
@@ -31,6 +32,7 @@ export const createHelixCemConfig = ({
 }: HelixCemOptions): Config => {
   const helixPlugins: Plugin[] = [
     helixTier(tier),
+    composition(),
     // Must precede the linter: it validates declared events, not inferred ones.
     declaredEvents(),
     reactEvents(),
@@ -78,4 +80,4 @@ export {
   isCustomElement,
 } from './types.js'
 export type { ConventionLintOptions }
-export { conventionLint, declaredEvents, helixTier, reactEvents }
+export { composition, conventionLint, declaredEvents, helixTier, reactEvents }

@@ -6,7 +6,8 @@
   "scripts": {
     "analyze": "turbo run analyze",
     "build": "turbo run build",
-    "check": "bun run order && biome check --write .",
+    "check": "bun run order && biome check --write . && bun run check:tokens",
+    "check:tokens": "node tooling/scripts/check-tokens.mjs",
     "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
     "dev": "turbo run dev",
     "format": "biome format --write .",
@@ -18,13 +19,15 @@
     "rs:test": "cargo test --workspace",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && bun run typecheck && bun run analyze && bun run test && bun run rs:check && bun run rs:test"
+    "verify": "biome ci . && bun run check:tokens && bun run typecheck && bun run analyze && bun run test && bun run rs:check && bun run rs:test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@types/bun": "^1.3.14",
     "@types/node": "^22.10.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "turbo": "^2.3.0",
     "typescript": "^5.7.2"
   },

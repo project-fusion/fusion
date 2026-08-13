@@ -11,6 +11,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*/index.d.ts",
+      "default": "./dist/*/index.js"
     }
   },
   "files": [
@@ -18,7 +22,7 @@
     "dist"
   ],
   "customElements": "custom-elements.json",
-  "sideEffects": true,
+  "sideEffects": false,
   "scripts": {
     "analyze": "cem analyze --config custom-elements-manifest.config.mjs",
     "build": "tsc -p tsconfig.json",

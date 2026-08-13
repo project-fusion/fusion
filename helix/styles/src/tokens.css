@@ -1,145 +1,232 @@
 /**
- * Helix design tokens.
+ * Helix semantic tokens. The public surface.
  *
- * These values are the OUTPUT SHAPE of theme derivation, not a hand-picked
- * palette. `@helix-io/theme` computes a complete set from a small number of
- * intent inputs, guaranteeing contrast across every derived foreground and
- * background pair. What ships here is the default theme it produces.
+ * Every token here answers "what is this for", never "what value is it".
+ * Components reference these and nothing else: not primitives, not raw hex,
+ * not bare pixel values. `bun run check:tokens` enforces it.
  *
- * Colors are authored in OKLCH deliberately. Equal numeric steps in sRGB hex
- * are not equal perceptual steps, which makes both scale generation and
- * contrast math unreliable. OKLCH is what makes derivation possible at all.
+ * Categories, all of them prefixed `--helix-<category>-`:
  *
- * Do not hand-edit derived values. Change the seeds and regenerate.
+ *   color     surfaces, text, borders, status
+ *   space     spacing and gaps
+ *   radii     corner radius
+ *   font      families
+ *   text      font sizes
+ *   weight    font weights
+ *   leading   line heights
+ *   tracking  letter spacing
+ *   border    border widths
+ *   shadow    elevation
+ *   material  translucency and blur
+ *   duration  motion durations
+ *   easing    motion curves
+ *   size      control sizing
+ *   layer     stacking order
+ *
+ * Values resolve to primitives from `primitives.css`, which is internal.
  */
 
 :root {
   color-scheme: light dark;
 
-  /* ---------------------------------------------------------------- seeds */
-  /* The intent inputs. Everything below is computed from these. */
-  --helix-seed-brand: oklch(0.58 0.19 258);
-  --helix-seed-neutral-chroma: 0.008;
-  --helix-seed-neutral-hue: 258;
-  --helix-seed-contrast: 1; /* 1 = WCAG AA, 1.15 = AAA-leaning */
-  --helix-seed-density: 1; /* scales spacing and control heights */
-  --helix-seed-radius: 0.5rem;
+  /* ======================================================== color ======= */
+  /* Surfaces, from furthest back to nearest front. */
+  --helix-color-background: var(--_helix-neutral-50);
+  --helix-color-surface: var(--_helix-neutral-0);
+  --helix-color-surface-raised: var(--_helix-neutral-0);
+  --helix-color-surface-sunken: var(--_helix-neutral-100);
+  --helix-color-overlay: color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent);
 
-  /* --------------------------------------------------------------- neutral */
-  --helix-neutral-50: oklch(0.985 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-100: oklch(0.96 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-200: oklch(0.91 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-300: oklch(0.84 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-400: oklch(0.71 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-500: oklch(0.6 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-600: oklch(0.5 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-700: oklch(0.4 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-800: oklch(0.29 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-900: oklch(0.21 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
-  --helix-neutral-950: oklch(0.15 var(--helix-seed-neutral-chroma) var(--helix-seed-neutral-hue));
+  /* Text and icons, by prominence. */
+  --helix-color-foreground: var(--_helix-neutral-900);
+  --helix-color-foreground-muted: var(--_helix-neutral-600);
+  --helix-color-foreground-subtle: var(--_helix-neutral-500);
+  --helix-color-foreground-on-accent: var(--_helix-neutral-0);
 
-  /* --------------------------------------------------------------- surface */
-  --helix-color-background: var(--helix-neutral-50);
-  --helix-color-surface: oklch(1 0 0);
-  --helix-color-surface-raised: oklch(1 0 0);
-  --helix-color-border: var(--helix-neutral-200);
-  --helix-color-border-strong: var(--helix-neutral-300);
+  /* Lines. */
+  --helix-color-border: var(--_helix-neutral-200);
+  --helix-color-border-strong: var(--_helix-neutral-300);
+  --helix-color-border-accent: var(--_helix-brand-500);
 
-  /* ------------------------------------------------------------------ text */
-  --helix-color-foreground: var(--helix-neutral-900);
-  --helix-color-foreground-muted: var(--helix-neutral-600);
-  --helix-color-foreground-subtle: var(--helix-neutral-500);
+  /* Interaction. */
+  --helix-color-primary: var(--_helix-brand-500);
+  --helix-color-primary-hover: var(--_helix-brand-600);
+  --helix-color-primary-active: var(--_helix-brand-700);
+  --helix-color-primary-subtle: var(--_helix-brand-50);
+  --helix-color-focus-ring: var(--_helix-brand-500);
 
-  /* ----------------------------------------------------------------- brand */
-  --helix-color-primary: var(--helix-seed-brand);
-  --helix-color-primary-hover: oklch(from var(--helix-seed-brand) calc(l - 0.05) c h);
-  --helix-color-primary-active: oklch(from var(--helix-seed-brand) calc(l - 0.1) c h);
-  --helix-color-primary-foreground: oklch(0.99 0 0);
-  --helix-color-primary-subtle: oklch(from var(--helix-seed-brand) 0.95 calc(c * 0.25) h);
+  /* Status. */
+  --helix-color-info: var(--_helix-info-500);
+  --helix-color-success: var(--_helix-success-500);
+  --helix-color-warning: var(--_helix-warning-500);
+  --helix-color-danger: var(--_helix-danger-500);
 
-  /* ------------------------------------------------------------------ tone */
-  --helix-color-info: oklch(0.58 0.16 245);
-  --helix-color-success: oklch(0.58 0.15 155);
-  --helix-color-warning: oklch(0.72 0.16 75);
-  --helix-color-danger: oklch(0.57 0.21 27);
+  /* ======================================================== space ======= */
+  --helix-space-none: var(--_helix-scale-0);
+  --helix-space-2xs: var(--_helix-scale-1);
+  --helix-space-xs: var(--_helix-scale-2);
+  --helix-space-sm: var(--_helix-scale-3);
+  --helix-space-md: var(--_helix-scale-4);
+  --helix-space-lg: var(--_helix-scale-6);
+  --helix-space-xl: var(--_helix-scale-8);
+  --helix-space-2xl: var(--_helix-scale-12);
+  --helix-space-3xl: var(--_helix-scale-16);
 
-  /* -------------------------------------------------------------- typography */
-  --helix-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --helix-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  /* ======================================================== radii ======= */
+  --helix-radii-none: 0;
+  --helix-radii-sm: calc(var(--_helix-seed-radii) * 0.5);
+  --helix-radii-md: var(--_helix-seed-radii);
+  --helix-radii-lg: calc(var(--_helix-seed-radii) * 1.5);
+  --helix-radii-full: 9999px;
 
-  --helix-text-xs: 0.75rem;
-  --helix-text-sm: 0.875rem;
-  --helix-text-md: 0.9375rem;
-  --helix-text-lg: 1.125rem;
-  --helix-text-xl: 1.5rem;
-  --helix-text-2xl: 2rem;
-  --helix-text-3xl: 2.75rem;
+  /* ======================================================== type ======== */
+  --helix-font-sans: var(--_helix-family-sans);
+  --helix-font-mono: var(--_helix-family-mono);
+
+  --helix-text-xs: var(--_helix-size-12);
+  --helix-text-sm: var(--_helix-size-14);
+  --helix-text-md: var(--_helix-size-15);
+  --helix-text-lg: var(--_helix-size-18);
+  --helix-text-xl: var(--_helix-size-24);
+  --helix-text-2xl: var(--_helix-size-32);
+  --helix-text-3xl: var(--_helix-size-44);
+
+  --helix-weight-regular: 400;
+  --helix-weight-medium: 500;
+  --helix-weight-semibold: 600;
 
   --helix-leading-tight: 1.2;
   --helix-leading-normal: 1.5;
   --helix-leading-loose: 1.7;
 
-  /* ----------------------------------------------------------------- space */
-  --helix-space-1: calc(0.25rem * var(--helix-seed-density));
-  --helix-space-2: calc(0.5rem * var(--helix-seed-density));
-  --helix-space-3: calc(0.75rem * var(--helix-seed-density));
-  --helix-space-4: calc(1rem * var(--helix-seed-density));
-  --helix-space-6: calc(1.5rem * var(--helix-seed-density));
-  --helix-space-8: calc(2rem * var(--helix-seed-density));
-  --helix-space-12: calc(3rem * var(--helix-seed-density));
+  --helix-tracking-tight: -0.01em;
+  --helix-tracking-normal: 0;
+  --helix-tracking-wide: 0.02em;
 
-  /* ---------------------------------------------------------------- radius */
-  --helix-radius-sm: calc(var(--helix-seed-radius) * 0.5);
-  --helix-radius-md: var(--helix-seed-radius);
-  --helix-radius-lg: calc(var(--helix-seed-radius) * 1.5);
-  --helix-radius-full: 9999px;
+  /* ======================================================== border ====== */
+  --helix-border-thin: 1px;
+  --helix-border-thick: 2px;
 
-  /* ---------------------------------------------------------------- motion */
-  --helix-duration-fast: 120ms;
-  --helix-duration-normal: 200ms;
-  --helix-duration-slow: 320ms;
-  --helix-ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --helix-ease-emphasized: cubic-bezier(0.3, 0, 0, 1.2);
+  /* ======================================================== shadow ====== */
+  /* Used sparingly. Depth is a hairline border first; shadow is reserved for
+     surfaces that genuinely float above the page. */
+  --helix-shadow-none: none;
+  --helix-shadow-sm: 0 1px 2px color-mix(in oklab, var(--_helix-neutral-950) 8%, transparent);
+  --helix-shadow-md: 0 4px 12px color-mix(in oklab, var(--_helix-neutral-950) 10%, transparent);
+  --helix-shadow-lg: 0 12px 32px color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent);
 
-  /* ----------------------------------------------------------- form control */
-  --helix-control-height: calc(2.5rem * var(--helix-seed-density));
-  --helix-control-height-dense: calc(2rem * var(--helix-seed-density));
+  /* ======================================================== material ==== */
+  /* Translucency and blur, for surfaces that sit above content and should
+     acknowledge what is behind them: headers, popovers, sheets, command
+     palettes. Never for flat page content, where it reads as decoration. */
+  --helix-material-blur-sm: 8px;
+  --helix-material-blur-md: 16px;
+  --helix-material-blur-lg: 32px;
+  --helix-material-translucent: color-mix(in oklab, var(--_helix-neutral-0) 72%, transparent);
+  --helix-material-translucent-strong: color-mix(
+    in oklab,
+    var(--_helix-neutral-0) 88%,
+    transparent
+  );
+  --helix-material-border: color-mix(in oklab, var(--_helix-neutral-0) 40%, transparent);
 
-  /* ----------------------------------------------------------------- focus */
-  --helix-focus-ring-width: 2px;
-  --helix-focus-ring-offset: 2px;
-  --helix-focus-ring-color: var(--helix-color-primary);
+  /* ======================================================== motion ====== */
+  --helix-duration-instant: 0ms;
+  --helix-duration-fast: var(--_helix-ms-120);
+  --helix-duration-normal: var(--_helix-ms-200);
+  --helix-duration-slow: var(--_helix-ms-320);
+
+  /* `standard` for most state changes, `emphasized` for things entering the
+     screen, `decelerate` for things arriving and settling, `spring` for the
+     one or two places a gesture should feel physical. */
+  --helix-easing-standard: var(--_helix-curve-standard);
+  --helix-easing-emphasized: var(--_helix-curve-emphasized);
+  --helix-easing-decelerate: cubic-bezier(0, 0, 0, 1);
+  --helix-easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --helix-easing-spring: linear(
+    0,
+    0.006,
+    0.025,
+    0.101,
+    0.539,
+    0.826,
+    0.976,
+    1.037,
+    1.043,
+    1.026,
+    1.006,
+    0.997,
+    1
+  );
+
+  /* ======================================================== size ======== */
+  --helix-size-control: calc(2.5rem * var(--_helix-seed-density));
+  --helix-size-control-dense: calc(2rem * var(--_helix-seed-density));
+  --helix-size-icon: 1.25rem;
+  --helix-size-focus-ring: var(--helix-border-thick);
+  --helix-size-focus-offset: 2px;
+
+  /* ======================================================== layer ======= */
+  --helix-layer-base: 0;
+  --helix-layer-raised: 10;
+  --helix-layer-sticky: 100;
+  --helix-layer-overlay: 1000;
+  --helix-layer-popover: 1100;
+  --helix-layer-toast: 1200;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --helix-color-background: var(--helix-neutral-950);
-    --helix-color-surface: var(--helix-neutral-900);
-    --helix-color-surface-raised: var(--helix-neutral-800);
-    --helix-color-border: var(--helix-neutral-800);
-    --helix-color-border-strong: var(--helix-neutral-700);
+    --helix-color-background: var(--_helix-neutral-950);
+    --helix-color-surface: var(--_helix-neutral-900);
+    --helix-color-surface-raised: var(--_helix-neutral-800);
+    --helix-color-surface-sunken: var(--_helix-neutral-950);
+    --helix-color-overlay: color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent);
 
-    --helix-color-foreground: var(--helix-neutral-100);
-    --helix-color-foreground-muted: var(--helix-neutral-400);
-    --helix-color-foreground-subtle: var(--helix-neutral-500);
+    --helix-color-foreground: var(--_helix-neutral-100);
+    --helix-color-foreground-muted: var(--_helix-neutral-400);
+    --helix-color-foreground-subtle: var(--_helix-neutral-500);
 
-    --helix-color-primary: oklch(from var(--helix-seed-brand) calc(l + 0.12) c h);
-    --helix-color-primary-subtle: oklch(from var(--helix-seed-brand) 0.28 calc(c * 0.5) h);
+    --helix-color-border: var(--_helix-neutral-800);
+    --helix-color-border-strong: var(--_helix-neutral-700);
+
+    --helix-color-primary: var(--_helix-brand-400);
+    --helix-color-primary-subtle: var(--_helix-brand-900);
+
+    --helix-material-translucent: color-mix(in oklab, var(--_helix-neutral-900) 72%, transparent);
+    --helix-material-translucent-strong: color-mix(
+      in oklab,
+      var(--_helix-neutral-900) 88%,
+      transparent
+    );
+    --helix-material-border: color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent);
   }
 }
 
 /* The theme toggle stamps data-theme on the root and must win over the media
    query in both directions. */
 :root[data-theme="light"] {
-  --helix-color-background: var(--helix-neutral-50);
-  --helix-color-surface: oklch(1 0 0);
-  --helix-color-foreground: var(--helix-neutral-900);
-  --helix-color-border: var(--helix-neutral-200);
+  --helix-color-background: var(--_helix-neutral-50);
+  --helix-color-surface: var(--_helix-neutral-0);
+  --helix-color-surface-raised: var(--_helix-neutral-0);
+  --helix-color-foreground: var(--_helix-neutral-900);
+  --helix-color-foreground-muted: var(--_helix-neutral-600);
+  --helix-color-border: var(--_helix-neutral-200);
+  --helix-color-border-strong: var(--_helix-neutral-300);
+  --helix-color-primary: var(--_helix-brand-500);
+  --helix-color-primary-subtle: var(--_helix-brand-50);
+  --helix-material-translucent: color-mix(in oklab, var(--_helix-neutral-0) 72%, transparent);
 }
 
 :root[data-theme="dark"] {
-  --helix-color-background: var(--helix-neutral-950);
-  --helix-color-surface: var(--helix-neutral-900);
-  --helix-color-foreground: var(--helix-neutral-100);
-  --helix-color-border: var(--helix-neutral-800);
+  --helix-color-background: var(--_helix-neutral-950);
+  --helix-color-surface: var(--_helix-neutral-900);
+  --helix-color-surface-raised: var(--_helix-neutral-800);
+  --helix-color-foreground: var(--_helix-neutral-100);
+  --helix-color-foreground-muted: var(--_helix-neutral-400);
+  --helix-color-border: var(--_helix-neutral-800);
+  --helix-color-border-strong: var(--_helix-neutral-700);
+  --helix-color-primary: var(--_helix-brand-400);
+  --helix-color-primary-subtle: var(--_helix-brand-900);
+  --helix-material-translucent: color-mix(in oklab, var(--_helix-neutral-900) 72%, transparent);
 }

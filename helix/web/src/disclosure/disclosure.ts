@@ -36,7 +36,7 @@ export class HelixDisclosure extends HelixDisclosureBase {
     [part='container'] {
       background-color: var(--disclosure-background-color, var(--helix-color-surface));
       border: 1px solid var(--disclosure-border-color, var(--helix-color-border));
-      border-radius: var(--helix-radius-md);
+      border-radius: var(--helix-radii-md);
       overflow: hidden;
     }
 
@@ -54,13 +54,13 @@ export class HelixDisclosure extends HelixDisclosureBase {
       font-size: var(--helix-text-md);
       inline-size: 100%;
       justify-content: space-between;
-      min-block-size: var(--helix-control-height);
-      padding: var(--disclosure-padding, var(--helix-space-3) var(--helix-space-4));
-      transition: background-color var(--helix-duration-fast) var(--helix-ease-standard);
+      min-block-size: var(--helix-size-control);
+      padding: var(--disclosure-padding, var(--helix-space-sm) var(--helix-space-md));
+      transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
     }
 
     :host([dense]) [part='trigger'] {
-      min-block-size: var(--helix-control-height-dense);
+      min-block-size: var(--helix-size-control-dense);
     }
 
     [part='trigger']:hover {
@@ -68,8 +68,8 @@ export class HelixDisclosure extends HelixDisclosureBase {
     }
 
     [part='trigger']:focus-visible {
-      outline: var(--helix-focus-ring-width) solid var(--helix-focus-ring-color);
-      outline-offset: calc(var(--helix-focus-ring-offset) * -1);
+      outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+      outline-offset: calc(var(--helix-size-focus-offset) * -1);
     }
 
     /* Content stays in the box tree when closed so it can animate. A grid
@@ -78,7 +78,7 @@ export class HelixDisclosure extends HelixDisclosureBase {
     [part='content'] {
       display: grid;
       grid-template-rows: 0fr;
-      transition: grid-template-rows var(--helix-duration-normal) var(--helix-ease-standard);
+      transition: grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard);
     }
 
     :host([data-open]) [part='content'] {
@@ -95,7 +95,7 @@ export class HelixDisclosure extends HelixDisclosureBase {
     :host([data-open]) [part='content-inner'] {
       border-block-start: 1px solid var(--disclosure-border-color, var(--helix-color-border));
       color: var(--helix-color-foreground-muted);
-      padding: var(--disclosure-padding, var(--helix-space-3) var(--helix-space-4));
+      padding: var(--disclosure-padding, var(--helix-space-sm) var(--helix-space-md));
     }
 
     @media (prefers-reduced-motion: reduce) {

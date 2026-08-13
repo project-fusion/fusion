@@ -1,0 +1,106 @@
+/**
+ * Helix primitive tokens. INTERNAL.
+ *
+ * Raw values with no meaning attached: a colour ramp, a spacing scale, a set of
+ * durations. They answer "what values exist", never "what is this for".
+ *
+ * The leading underscore marks them private. **Components must never reference
+ * a primitive.** They reference semantic tokens from `tokens.css`, which are the
+ * only supported surface. That indirection is what lets a theme change what
+ * `--helix-color-primary` resolves to without every component knowing which
+ * step of which ramp it happened to be.
+ *
+ * `bun run check:tokens` fails the build on any component reaching past this
+ * line.
+ *
+ * Colours are authored in OKLCH: equal numeric steps in sRGB are not equal
+ * perceptual steps, which makes both ramp generation and contrast math
+ * unreliable. See `@helix-io/theme`.
+ */
+
+:root {
+  /* ------------------------------------------------------- seed -------- */
+  /* The intent inputs. `@helix-io/theme` derives everything below from
+     these, guaranteeing contrast by construction rather than by audit. */
+  --_helix-seed-brand: oklch(0.58 0.19 258);
+  --_helix-seed-neutral-chroma: 0.008;
+  --_helix-seed-neutral-hue: 258;
+  --_helix-seed-density: 1;
+  --_helix-seed-radii: 0.5rem;
+
+  /* ------------------------------------------------------- neutral ----- */
+  --_helix-neutral-0: oklch(1 0 0);
+  --_helix-neutral-50: oklch(
+    0.985 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
+  --_helix-neutral-100: oklch(
+    0.96 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
+  --_helix-neutral-200: oklch(
+    0.91 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
+  --_helix-neutral-300: oklch(
+    0.84 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
+  --_helix-neutral-400: oklch(
+    0.71 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
+  --_helix-neutral-500: oklch(0.6 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue));
+  --_helix-neutral-600: oklch(0.5 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue));
+  --_helix-neutral-700: oklch(0.4 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue));
+  --_helix-neutral-800: oklch(
+    0.29 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
+  --_helix-neutral-900: oklch(
+    0.21 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
+  --_helix-neutral-950: oklch(
+    0.15 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
+
+  /* ------------------------------------------------------- brand ------- */
+  --_helix-brand-500: var(--_helix-seed-brand);
+  --_helix-brand-600: oklch(from var(--_helix-seed-brand) calc(l - 0.05) c h);
+  --_helix-brand-700: oklch(from var(--_helix-seed-brand) calc(l - 0.1) c h);
+  --_helix-brand-400: oklch(from var(--_helix-seed-brand) calc(l + 0.12) c h);
+  --_helix-brand-50: oklch(from var(--_helix-seed-brand) 0.95 calc(c * 0.25) h);
+  --_helix-brand-900: oklch(from var(--_helix-seed-brand) 0.28 calc(c * 0.5) h);
+
+  /* ------------------------------------------------------- status ------ */
+  --_helix-info-500: oklch(0.58 0.16 245);
+  --_helix-success-500: oklch(0.58 0.15 155);
+  --_helix-warning-500: oklch(0.72 0.16 75);
+  --_helix-danger-500: oklch(0.57 0.21 27);
+
+  /* ------------------------------------------------------- scale ------- */
+  --_helix-scale-0: 0rem;
+  --_helix-scale-1: calc(0.25rem * var(--_helix-seed-density));
+  --_helix-scale-2: calc(0.5rem * var(--_helix-seed-density));
+  --_helix-scale-3: calc(0.75rem * var(--_helix-seed-density));
+  --_helix-scale-4: calc(1rem * var(--_helix-seed-density));
+  --_helix-scale-5: calc(1.25rem * var(--_helix-seed-density));
+  --_helix-scale-6: calc(1.5rem * var(--_helix-seed-density));
+  --_helix-scale-8: calc(2rem * var(--_helix-seed-density));
+  --_helix-scale-10: calc(2.5rem * var(--_helix-seed-density));
+  --_helix-scale-12: calc(3rem * var(--_helix-seed-density));
+  --_helix-scale-16: calc(4rem * var(--_helix-seed-density));
+
+  /* ------------------------------------------------------- type -------- */
+  --_helix-family-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --_helix-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --_helix-size-12: 0.75rem;
+  --_helix-size-14: 0.875rem;
+  --_helix-size-15: 0.9375rem;
+  --_helix-size-18: 1.125rem;
+  --_helix-size-24: 1.5rem;
+  --_helix-size-32: 2rem;
+  --_helix-size-44: 2.75rem;
+
+  /* ------------------------------------------------------- motion ------ */
+  --_helix-ms-120: 120ms;
+  --_helix-ms-200: 200ms;
+  --_helix-ms-320: 320ms;
+  --_helix-curve-standard: cubic-bezier(0.2, 0, 0, 1);
+  --_helix-curve-emphasized: cubic-bezier(0.3, 0, 0, 1.2);
+}

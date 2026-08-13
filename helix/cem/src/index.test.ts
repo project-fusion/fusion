@@ -226,6 +226,7 @@ describe('createHelixCemConfig', () => {
     expect(config.dependencies).toBe(true)
     expect(names).toEqual([
       'helix-tier',
+      'helix-composition',
       'helix-declared-events',
       'helix-react-events',
       'helix-convention-lint',

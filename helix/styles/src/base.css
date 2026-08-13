@@ -1,7 +1,9 @@
 /**
  * Helix base layer. Light-DOM reset and document defaults.
  *
- * Shadow DOM gets `box-sizing: border-box` from HelixElement.finalizeStyles,
+ * Import after `tokens.css`, which this depends on.
+ *
+ * Shadow DOM gets `box-sizing: border-box` from `HelixElement.finalizeStyles`,
  * so component CSS can rely on border-box on both sides of the boundary.
  */
 
@@ -21,6 +23,8 @@ body {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-normal);
   margin: 0;
   /* Wide content scrolls inside its own container. The page never scrolls
@@ -28,7 +32,14 @@ body {
   overflow-x: clip;
 }
 
-:where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) {
+:where(h1, h2, h3, h4, h5, h6) {
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  margin: 0;
+}
+
+:where(p, figure, blockquote, dl, dd) {
   margin: 0;
 }
 
@@ -52,6 +63,11 @@ body {
 
 :where(code, kbd, samp, pre) {
   font-family: var(--helix-font-mono);
+}
+
+:where(:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
 }
 
 /* A flex or grid descendant defaults to min-width: auto, which propagates the

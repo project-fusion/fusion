@@ -7,8 +7,8 @@
       "outputs": ["custom-elements.json"]
     },
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "tsconfig.json", "package.json"],
+      "dependsOn": ["^build", "^analyze"],
+      "inputs": ["src/**", "scripts/**", "tsconfig.json", "package.json"],
       "outputs": ["dist/**"]
     },
     "dev": {

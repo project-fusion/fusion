@@ -177,6 +177,90 @@ with consumer restraint, hierarchy from type and space rather than color,
 borders over shadows, motion as feedback only. The current tokens are a working
 default, not that direction.
 
+## Tokens: primitives are private, semantics are the API
+
+Two layers in `@helix-io/styles`, and components see only the second.
+
+| Layer | File | Shape | Who may reference it |
+|---|---|---|---|
+| **Primitive** | `primitives.css` | `--_helix-neutral-500`, `--_helix-scale-4` | `@helix-io/styles` only |
+| **Semantic** | `tokens.css` | `--helix-color-primary`, `--helix-space-md` | everything |
+
+A primitive answers *what value exists*. A semantic token answers *what it is
+for*. The indirection is the point: a theme changes what
+`--helix-color-primary` resolves to without every component knowing which step
+of which ramp it happened to be.
+
+**Fifteen categories**, and every token belongs to exactly one:
+
+`color` `space` `radii` `font` `text` `weight` `leading` `tracking` `border`
+`shadow` `material` `duration` `easing` `size` `layer`
+
+`--helix-<category>-<role>`. No exceptions, no uncategorized tokens.
+
+### `bun run check:tokens` enforces three rules
+
+1. **No raw values** where a token exists. A `#f5f5f5` in one component is
+   invisible in review and then invisible in every theme that component appears
+   in. The theme changes, that value does not, and it surfaces months later as
+   "the disclosure looks wrong in dark mode".
+2. **No primitive access** from outside the styles package.
+3. **No references to tokens that do not exist.** This is the rule that earns
+   its keep: a renamed token resolves to nothing and the property silently falls
+   back to the browser default, so the code looks correct and the component is
+   quietly unstyled. Renaming the radius scale broke twelve references and none
+   of them would have thrown.
+
+Per-component hooks (`--disclosure-padding`) are not Helix tokens and are
+exempt. They should default to a semantic token.
+
+## Tree-shaking
+
+Three things, together:
+
+- **One family per module**, with subpath exports (`@helix-io/react/disclosure`,
+  `@helix-io/web/disclosure`). Importing from the barrel pulls everything;
+  subpaths exist so consumers do not have to.
+- **`sideEffects` declared honestly.** `@helix-io/web` is
+  `["./dist/**/*.js"]` because `@customElement()` registers on import and
+  dropping that import breaks the element. `@helix-io/headless` and
+  `@helix-io/react` are `false`: headless registers nothing, which is what makes
+  it headless, and the React wrappers are pure.
+- **Generated wrappers import only their own element**, so an app using
+  `Disclosure` never pulls `Table` into the bundle.
+
+Getting `sideEffects` wrong is silent in both directions: too broad and nothing
+shakes, too narrow and a bundler drops a registration and the element renders as
+an unknown tag with no error.
+
+## React wrappers are generated, never written
+
+`bun run generate` in `helix/react` reads `@helix-io/web`'s manifest and emits
+the wrappers. Hand-writing them means the React API drifts from the element API
+the first time someone adds a property and forgets the wrapper.
+
+**Composition namespaces use dot notation**: `Disclosure.Root`, `Card.Header`.
+Groups come from the file layout via the `helix-composition` plugin, where the
+directory is the group and the file is the part:
+
+```
+src/card/card.ts         ->  Card.Root
+src/card/card-header.ts  ->  Card.Header
+src/scroll-area/…        ->  ScrollArea.Root
+```
+
+Deriving groups from tag names instead is ambiguous exactly where it matters:
+`helix-scroll-area` is one component and `helix-card-header` is part of another,
+and nothing in either name says which.
+
+Two things the generator must keep doing, both learned the hard way:
+
+- **Skip `readonly` members.** A getter like `isOpen` reads as a plain boolean
+  field in the manifest, but assigning to it throws. Emitting it as a prop hands
+  consumers an API that fails at runtime.
+- **Name components with their part.** The namespace object owns the bare group
+  name, so the root component is `DisclosureRoot`, not `Disclosure`.
+
 ## Theming is derivation, not override
 
 **Tokens are a function, not a table.** `@helix-io/theme` computes a complete
