@@ -10,10 +10,18 @@ import type {
   HelixCallout,
   HelixCard,
   HelixDivider,
+  HelixFlex,
+  HelixGrid,
+  HelixHeading,
   HelixIcon,
+  HelixLink,
   HelixOpenChangeEvent,
   HelixRemoveRequestEvent,
+  HelixSelectionChangeEvent,
   HelixTag,
+  HelixText,
+  HelixTree,
+  HelixTreeItem,
 } from '@helix-io/web';
 
 /**
@@ -310,46 +318,6 @@ export type HelixAvatarSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBreadcrumbsItemProps = {
-  /** Where the step leads. Ignored when the item is the current page. */
-  href?: HelixBreadcrumbsItem["href"];
-  /** Whether this item is the page the reader is on. */
-  current?: HelixBreadcrumbsItem["current"];
-};
-
-export type HelixBreadcrumbsItemSolidJsProps = {
-  /** Where the step leads. Ignored when the item is the current page. */
-  "prop:href"?: HelixBreadcrumbsItem["href"];
-  /** Whether this item is the page the reader is on. */
-  "prop:current"?: HelixBreadcrumbsItem["current"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBreadcrumbsProps = {
-  /** Accessible name for the landmark.
-
-Named rather than left bare because a page may hold more than one
-navigation, and landmarks are how a screen-reader user chooses between them. */
-  label?: HelixBreadcrumbs["label"];
-};
-
-export type HelixBreadcrumbsSolidJsProps = {
-  /** Accessible name for the landmark.
-
-Named rather than left bare because a page may hold more than one
-navigation, and landmarks are how a screen-reader user chooses between them. */
-  "prop:label"?: HelixBreadcrumbs["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type HelixButtonProps = {
   /** How much visual weight the button carries. */
   appearance?: HelixButton["appearance"];
@@ -397,6 +365,21 @@ tree, so a screen reader can still announce that the control exists. */
   textContent?: string | number;
 };
 
+export type HelixCalloutProps = {
+  /** What kind of attention the passage needs. */
+  severity?: HelixCallout["severity"];
+};
+
+export type HelixCalloutSolidJsProps = {
+  /** What kind of attention the passage needs. */
+  "prop:severity"?: HelixCallout["severity"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixCardProps = {
   /** How the card separates itself from the page. */
   appearance?: HelixCard["appearance"];
@@ -420,14 +403,145 @@ export type HelixCardSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixCalloutProps = {
-  /** What kind of attention the passage needs. */
-  severity?: HelixCallout["severity"];
+export type HelixBreadcrumbsItemProps = {
+  /** Where the step leads. Ignored when the item is the current page. */
+  href?: HelixBreadcrumbsItem["href"];
+  /** Whether this item is the page the reader is on. */
+  current?: HelixBreadcrumbsItem["current"];
 };
 
-export type HelixCalloutSolidJsProps = {
-  /** What kind of attention the passage needs. */
-  "prop:severity"?: HelixCallout["severity"];
+export type HelixBreadcrumbsItemSolidJsProps = {
+  /** Where the step leads. Ignored when the item is the current page. */
+  "prop:href"?: HelixBreadcrumbsItem["href"];
+  /** Whether this item is the page the reader is on. */
+  "prop:current"?: HelixBreadcrumbsItem["current"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBreadcrumbsProps = {
+  /** Accessible name for the landmark.
+
+Named rather than left bare because a page may hold more than one
+navigation, and landmarks are how a screen-reader user chooses between them. */
+  label?: HelixBreadcrumbs["label"];
+};
+
+export type HelixBreadcrumbsSolidJsProps = {
+  /** Accessible name for the landmark.
+
+Named rather than left bare because a page may hold more than one
+navigation, and landmarks are how a screen-reader user chooses between them. */
+  "prop:label"?: HelixBreadcrumbs["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixDividerProps = {
+  /** Which way the rule runs. */
+  orientation?: HelixDivider["orientation"];
+};
+
+export type HelixDividerSolidJsProps = {
+  /** Which way the rule runs. */
+  "prop:orientation"?: HelixDivider["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixFlexProps = {
+  /** Whether items run across or down. */
+  direction?: HelixFlex["direction"];
+  /** Space between items, named on the space scale. */
+  gap?: HelixFlex["gap"];
+  /** Alignment across the direction. */
+  align?: HelixFlex["align"];
+  /** Distribution along the direction. */
+  justify?: HelixFlex["justify"];
+  /** Whether items wrap onto more lines. */
+  wrap?: HelixFlex["wrap"];
+  /** Flows with surrounding text instead of taking the full width. */
+  inline?: HelixFlex["inline"];
+};
+
+export type HelixFlexSolidJsProps = {
+  /** Whether items run across or down. */
+  "prop:direction"?: HelixFlex["direction"];
+  /** Space between items, named on the space scale. */
+  "prop:gap"?: HelixFlex["gap"];
+  /** Alignment across the direction. */
+  "prop:align"?: HelixFlex["align"];
+  /** Distribution along the direction. */
+  "prop:justify"?: HelixFlex["justify"];
+  /** Whether items wrap onto more lines. */
+  "prop:wrap"?: HelixFlex["wrap"];
+  /** Flows with surrounding text instead of taking the full width. */
+  "prop:inline"?: HelixFlex["inline"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixGridProps = {
+  /** Fixed number of equal columns. */
+  columns?: HelixGrid["columns"];
+  /** Minimum column width, filling as many as fit.
+
+Takes precedence over `columns`: a grid that both fixes a count and reflows
+is two intentions in one element. */
+  min?: HelixGrid["min"];
+  /** Space between cells, named on the space scale. */
+  gap?: HelixGrid["gap"];
+  /** Alignment of each cell within its row. */
+  align?: HelixGrid["align"];
+};
+
+export type HelixGridSolidJsProps = {
+  /** Fixed number of equal columns. */
+  "prop:columns"?: HelixGrid["columns"];
+  /** Minimum column width, filling as many as fit.
+
+Takes precedence over `columns`: a grid that both fixes a count and reflows
+is two intentions in one element. */
+  "prop:min"?: HelixGrid["min"];
+  /** Space between cells, named on the space scale. */
+  "prop:gap"?: HelixGrid["gap"];
+  /** Alignment of each cell within its row. */
+  "prop:align"?: HelixGrid["align"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixHeadingProps = {
+  /** Outline level, one through six. */
+  level?: HelixHeading["level"];
+  /** Visual size, defaulting to the one that matches `level`. */
+  size?: HelixHeading["size"];
+  /** Colour role for the heading. */
+  tone?: HelixHeading["tone"];
+};
+
+export type HelixHeadingSolidJsProps = {
+  /** Outline level, one through six. */
+  "prop:level"?: HelixHeading["level"];
+  /** Visual size, defaulting to the one that matches `level`. */
+  "prop:size"?: HelixHeading["size"];
+  /** Colour role for the heading. */
+  "prop:tone"?: HelixHeading["tone"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -454,14 +568,38 @@ export type HelixIconSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixDividerProps = {
-  /** Which way the rule runs. */
-  orientation?: HelixDivider["orientation"];
+export type HelixLinkProps = {
+  /** Where the link goes. */
+  href?: HelixLink["href"];
+  /** Browsing context, such as `_blank`. */
+  target?: HelixLink["target"];
+  /** Relationship of the linked URL, defaulted when opening a new tab. */
+  rel?: HelixLink["rel"];
+  /** Size on the type scale. */
+  size?: HelixLink["size"];
+  /** How much the link announces itself. */
+  appearance?: HelixLink["appearance"];
+  /** Whether the underline waits for hover. */
+  "underline-on-hover"?: HelixLink["underlineOnHover"];
+  /** Whether the underline waits for hover. */
+  underlineOnHover?: HelixLink["underlineOnHover"];
 };
 
-export type HelixDividerSolidJsProps = {
-  /** Which way the rule runs. */
-  "prop:orientation"?: HelixDivider["orientation"];
+export type HelixLinkSolidJsProps = {
+  /** Where the link goes. */
+  "prop:href"?: HelixLink["href"];
+  /** Browsing context, such as `_blank`. */
+  "prop:target"?: HelixLink["target"];
+  /** Relationship of the linked URL, defaulted when opening a new tab. */
+  "prop:rel"?: HelixLink["rel"];
+  /** Size on the type scale. */
+  "prop:size"?: HelixLink["size"];
+  /** How much the link announces itself. */
+  "prop:appearance"?: HelixLink["appearance"];
+  /** Whether the underline waits for hover. */
+  "bool:underline-on-hover"?: HelixLink["underlineOnHover"];
+  /** Whether the underline waits for hover. */
+  "prop:underlineOnHover"?: HelixLink["underlineOnHover"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -536,6 +674,109 @@ only as `removelabel`, which nobody would guess and no linter would catch. */
   "prop:removeLabel"?: HelixTag["removeLabel"];
   /** Fired when the reader asks to remove the tag. */
   "on:RemoveRequest"?: (e: HelixTagRemoveRequestElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixTextProps = {
+  /** Size on the type scale. */
+  size?: HelixText["size"];
+  /** Colour role for the text. */
+  tone?: HelixText["tone"];
+  /** Weight on the weight scale. */
+  weight?: HelixText["weight"];
+  /** Renders as a block, for a paragraph rather than an inline run. */
+  block?: HelixText["block"];
+  /** Uses the monospace family, for code and identifiers. */
+  mono?: HelixText["mono"];
+};
+
+export type HelixTextSolidJsProps = {
+  /** Size on the type scale. */
+  "prop:size"?: HelixText["size"];
+  /** Colour role for the text. */
+  "prop:tone"?: HelixText["tone"];
+  /** Weight on the weight scale. */
+  "prop:weight"?: HelixText["weight"];
+  /** Renders as a block, for a paragraph rather than an inline run. */
+  "prop:block"?: HelixText["block"];
+  /** Uses the monospace family, for code and identifiers. */
+  "prop:mono"?: HelixText["mono"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixTreeItem` component event */
+export type HelixTreeItemElementEvent<E = Event> = TypedEvent<HelixTreeItem, E>;
+/** `SelectionChange` event type */
+export type HelixTreeItemSelectionChangeElementEvent =
+  HelixTreeItemElementEvent<HelixSelectionChangeEvent>;
+
+export type HelixTreeItemProps = {
+  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  value?: HelixTreeItem["value"];
+  /** Whether this item is the current one. */
+  selected?: HelixTreeItem["selected"];
+  /** Whether a branch is showing its children. */
+  expanded?: HelixTreeItem["expanded"];
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting. */
+  level?: HelixTreeItem["level"];
+  /** Whether this item holds the tree's single tab stop. */
+  focusable?: HelixTreeItem["focusable"];
+
+  /** Fired when the item is chosen. */
+  onSelectionChange?: (e: HelixTreeItemSelectionChangeElementEvent) => void;
+};
+
+export type HelixTreeItemSolidJsProps = {
+  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  "prop:value"?: HelixTreeItem["value"];
+  /** Whether this item is the current one. */
+  "prop:selected"?: HelixTreeItem["selected"];
+  /** Whether a branch is showing its children. */
+  "prop:expanded"?: HelixTreeItem["expanded"];
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting. */
+  "prop:level"?: HelixTreeItem["level"];
+  /** Whether this item holds the tree's single tab stop. */
+  "prop:focusable"?: HelixTreeItem["focusable"];
+  /** Fired when the item is chosen. */
+  "on:SelectionChange"?: (e: HelixTreeItemSelectionChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixTree` component event */
+export type HelixTreeElementEvent<E = Event> = TypedEvent<HelixTree, E>;
+/** `SelectionChange` event type */
+export type HelixTreeSelectionChangeElementEvent =
+  HelixTreeElementEvent<HelixSelectionChangeEvent>;
+
+export type HelixTreeProps = {
+  /** Accessible name for the tree. */
+  label?: HelixTree["label"];
+  /** Value of the selected item, kept in step with the items themselves. */
+  value?: HelixTree["value"];
+
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  onSelectionChange?: (e: HelixTreeSelectionChangeElementEvent) => void;
+};
+
+export type HelixTreeSolidJsProps = {
+  /** Accessible name for the tree. */
+  "prop:label"?: HelixTree["label"];
+  /** Value of the selected item, kept in step with the items themselves. */
+  "prop:value"?: HelixTree["value"];
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  "on:SelectionChange"?: (e: HelixTreeSelectionChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -721,6 +962,145 @@ export type CustomElements = {
   >;
 
   /**
+   * Four appearances and three sizes, all drawn on one control so a link styled
+   * as a button and a real button are indistinguishable to a reader. The focus
+   * ring is declared here rather than inherited, because the base layer's
+   * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How much visual weight the button carries.
+   * - `size`: Height and inset of the control.
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--button-background-color`: Fill behind the button. (default: `undefined`)
+   * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
+   * - `--button-radii`: Corner radius of the control. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-button": Partial<
+    HelixButtonProps & BaseProps<HelixButton> & BaseEvents
+  >;
+
+  /**
+   * Tinted from the severity's status color with `color-mix`, and marked with a
+   * bar on the inline start so the severity survives being read in greyscale or
+   * by anyone who does not distinguish the hues.
+   *
+   * There is no `appearance` here. `severity` carries the meaning and lives on
+   * the headless tier; this tier only decides what that meaning looks like.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the passage needs.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The callout's content.
+   * - `icon`: Replaces the icon chosen by `severity`.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--callout-background-color`: Fill behind the callout. (default: `undefined`)
+   * - `--callout-radii`: Corner radius of the callout. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `callout`: The callout body.
+   * - `icon`: The icon region.
+   * - `content`: The content region.
+   */
+  "helix-callout": Partial<
+    HelixCalloutProps & BaseProps<HelixCallout> & BaseEvents
+  >;
+
+  /**
+   * Regions are slots: `media`, `header`, the default slot for content, and
+   * `footer`. An omitted region takes no space, so a card with only content needs
+   * no wrapper markup at all.
+   *
+   * `media` runs edge to edge and clips to the card's corners, so an image needs
+   * no inset correction. Set `orientation="horizontal"` to move it alongside the
+   * header, content, and footer stack rather than above it.
+   *
+   * Regions are bare slots with no wrapper element, so an omitted one occupies no
+   * space without the card having to detect that it is missing. Style slotted
+   * content directly rather than reaching for a part: a header is whatever
+   * element you slotted, not a wrapper we put around it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How the card separates itself from the page.
+   * - `dense`: Tightens the inset for dense layouts.
+   * - `orientation`: Whether media sits above the content stack or beside it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--card-background-color`: Surface behind the card. (default: `undefined`)
+   * - `--card-border-color`: Border color of the surface. (default: `undefined`)
+   * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
+   * - `--card-padding`: Inset applied to each region. (default: `undefined`)
+   * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The card surface.
+   */
+  "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents>;
+
+  /**
    * The separator is hidden on the first item with `:host(:first-child)`, so no
    * item needs to know its own index and the parent needs no coordination.
    *
@@ -792,142 +1172,136 @@ export type CustomElements = {
   >;
 
   /**
-   * Four appearances and three sizes, all drawn on one control so a link styled
-   * as a button and a real button are indistinguishable to a reader. The focus
-   * ring is declared here rather than inherited, because the base layer's
-   * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+   * A one-pixel rule in the border color, running the full inline size by
+   * default. A vertical divider stretches to its flex parent instead of setting
+   * its own height, so it matches whatever it sits beside without being told how
+   * tall that is.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How much visual weight the button carries.
-   * - `size`: Height and inset of the control.
-   * - `type`: What activating the button does to its form.
-   * - `href`: Navigates to this URL instead of acting on a form.
-   * - `target`: Browsing context for `href`, such as `_blank`.
-   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
-   * - `end`: Content after the label.
+   * - `orientation`: Which way the rule runs.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--button-background-color`: Fill behind the button. (default: `undefined`)
-   * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
-   * - `--button-radii`: Corner radius of the control. (default: `undefined`)
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
+   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `line`: The rule itself.
    */
-  "helix-button": Partial<
-    HelixButtonProps & BaseProps<HelixButton> & BaseEvents
+  "helix-divider": Partial<
+    HelixDividerProps & BaseProps<HelixDivider> & BaseEvents
   >;
 
   /**
-   * Regions are slots: `media`, `header`, the default slot for content, and
-   * `footer`. An omitted region takes no space, so a card with only content needs
-   * no wrapper markup at all.
+   * The host is the flex container itself and the only child is a slot, so the
+   * element adds no box of its own: `<helix-flex>` costs exactly the `<div>` it
+   * replaces.
    *
-   * `media` runs edge to edge and clips to the card's corners, so an image needs
-   * no inset correction. Set `orientation="horizontal"` to move it alongside the
-   * header, content, and footer stack rather than above it.
+   * There is no separate Stack. A stack is this with `direction="column"`, and a
+   * second element whose whole definition is one default of the first is a name
+   * to learn rather than a capability to gain.
    *
-   * Regions are bare slots with no wrapper element, so an omitted one occupies no
-   * space without the card having to detect that it is missing. Style slotted
-   * content directly rather than reaching for a part: a header is whatever
-   * element you slotted, not a wrapper we put around it.
+   * Gap takes a space token name rather than a length, so spacing stays on the
+   * scale. A layout that can say `gap="13px"` is one that will.
+   *
+   * Presentation only, so there is no headless tier: the split exists to keep
+   * behavior separate from styling, and this is entirely styling.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the card separates itself from the page.
-   * - `dense`: Tightens the inset for dense layouts.
-   * - `orientation`: Whether media sits above the content stack or beside it.
+   * - `direction`: Whether items run across or down.
+   * - `gap`: Space between items, named on the space scale.
+   * - `align`: Alignment across the direction.
+   * - `justify`: Distribution along the direction.
+   * - `wrap`: Whether items wrap onto more lines.
+   * - `inline`: Flows with surrounding text instead of taking the full width.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--card-background-color`: Surface behind the card. (default: `undefined`)
-   * - `--card-border-color`: Border color of the surface. (default: `undefined`)
-   * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
-   * - `--card-padding`: Inset applied to each region. (default: `undefined`)
-   * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The card surface.
+   * - `(default)`: The items to lay out.
    */
-  "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents>;
+  "helix-flex": Partial<HelixFlexProps & BaseProps<HelixFlex> & BaseEvents>;
 
   /**
-   * Tinted from the severity's status color with `color-mix`, and marked with a
-   * bar on the inline start so the severity survives being read in greyscale or
-   * by anyone who does not distinguish the hues.
+   * Two ways to declare columns, and only two. `columns` is a fixed count;
+   * `min` fills as many equal columns as fit above that width, which is a
+   * responsive layout with no breakpoint to maintain. Setting `min` wins, because
+   * a fixed count that also reflows is two intentions in one element.
    *
-   * There is no `appearance` here. `severity` carries the meaning and lives on
-   * the headless tier; this tier only decides what that meaning looks like.
+   * Presentation only, so there is no headless tier.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `severity`: What kind of attention the passage needs.
+   * - `columns`: Fixed number of equal columns.
+   * - `min`: Minimum column width, filling as many as fit.
+   *
+   * Takes precedence over `columns`: a grid that both fixes a count and reflows
+   * is two intentions in one element.
+   * - `gap`: Space between cells, named on the space scale.
+   * - `align`: Alignment of each cell within its row.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The callout's content.
-   * - `icon`: Replaces the icon chosen by `severity`.
+   * - `(default)`: The items to lay out.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--callout-background-color`: Fill behind the callout. (default: `undefined`)
-   * - `--callout-radii`: Corner radius of the callout. (default: `undefined`)
+   * - `--grid-min`: Column width floor when `min` is set. (default: `undefined`)
+   */
+  "helix-grid": Partial<HelixGridProps & BaseProps<HelixGrid> & BaseEvents>;
+
+  /**
+   * Renders a real `<h1>` through `<h6>` using Lit's static templates, never a
+   * `<div role="heading">`. A real heading is what a screen reader's heading
+   * navigation lists, and emulation has to be kept correct by hand forever.
+   *
+   * **`level` and `size` are separate on purpose, and that is the risk.** Level
+   * is document structure and belongs to the outline; size is appearance. They
+   * default to matching, so a heading is correct by doing nothing, and `size`
+   * exists for the case where a section's second heading has to look smaller
+   * without lying about the outline. Reach for it rarely: two headings at the
+   * same level looking different is usually a sign the outline is wrong.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `level`: Outline level, one through six.
+   * - `size`: Visual size, defaulting to the one that matches `level`.
+   * - `tone`: Colour role for the heading.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The heading text.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `callout`: The callout body.
-   * - `icon`: The icon region.
-   * - `content`: The content region.
+   * - `heading`: The heading element.
    */
-  "helix-callout": Partial<
-    HelixCalloutProps & BaseProps<HelixCallout> & BaseEvents
+  "helix-heading": Partial<
+    HelixHeadingProps & BaseProps<HelixHeading> & BaseEvents
   >;
 
   /**
@@ -958,33 +1332,38 @@ export type CustomElements = {
   "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents>;
 
   /**
-   * A one-pixel rule in the border color, running the full inline size by
-   * default. A vertical divider stretches to its flex parent instead of setting
-   * its own height, so it matches whatever it sits beside without being told how
-   * tall that is.
+   * Renders a real `<a>`, so middle-click, copy-link-address, and the browser's
+   * own status bar all work without anything being reimplemented.
+   *
+   * A new browsing context gets `rel="noreferrer noopener"` unless told
+   * otherwise, because without it the opened page can reach back through
+   * `window.opener`, and it is marked with an indicator so the reader knows
+   * before they click rather than after.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Which way the rule runs.
+   * - `href`: Where the link goes.
+   * - `target`: Browsing context, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when opening a new tab.
+   * - `size`: Size on the type scale.
+   * - `appearance`: How much the link announces itself.
+   * - `underline-on-hover`/`underlineOnHover`: Whether the underline waits for hover.
    *
-   * ## CSS Custom Properties
+   * ## Slots
    *
-   * CSS variables available for styling the component.
+   * Areas where markup can be added to the component.
    *
-   * - `--divider-color`: Color of the rule. (default: `undefined`)
-   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
+   * - `(default)`: The link text.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `line`: The rule itself.
+   * - `link`: The anchor.
    */
-  "helix-divider": Partial<
-    HelixDividerProps & BaseProps<HelixDivider> & BaseEvents
-  >;
+  "helix-link": Partial<HelixLinkProps & BaseProps<HelixLink> & BaseEvents>;
 
   /**
    * Five appearances, drawn as a tinted fill derived from the status color with
@@ -1037,6 +1416,137 @@ export type CustomElements = {
    * - `remove`: The remove button, when `removable`.
    */
   "helix-tag": Partial<HelixTagProps & BaseProps<HelixTag> & BaseEvents>;
+
+  /**
+   * For text that is not a heading. Headings have their own element, because a
+   * heading carries an outline level and this does not; asking one element to do
+   * both is what leads to a page whose outline is a styling accident.
+   *
+   * `block` makes it a paragraph rather than an inline run. It stays inline by
+   * default because most text sits inside something else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `size`: Size on the type scale.
+   * - `tone`: Colour role for the text.
+   * - `weight`: Weight on the weight scale.
+   * - `block`: Renders as a block, for a paragraph rather than an inline run.
+   * - `mono`: Uses the monospace family, for code and identifiers.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The text.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `text`: The text container.
+   */
+  "helix-text": Partial<HelixTextProps & BaseProps<HelixText> & BaseEvents>;
+
+  /**
+   * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
+   * node moved to another depth re-indents without any nested selector. Nesting
+   * selectors by depth is the usual approach and stops working at whatever depth
+   * nobody wrote a rule for.
+   *
+   * The twisty rotates rather than swapping glyphs, so opening a branch is a
+   * short movement instead of a substitution. Motion carries the state change;
+   * the row itself stays flat.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
+   * - `selected`: Whether this item is the current one.
+   * - `expanded`: Whether a branch is showing its children.
+   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
+   * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
+   * - `isBranch`: Whether this node has children. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when the item is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The item's label.
+   * - `children`: Nested items, which make this a branch.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus to this node.
+   * - `select() => void`: Selects this node and announces it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The node, and the focus target.
+   * - `row`: The clickable label row.
+   * - `toggle`: The expand and collapse control.
+   * - `label`: The label text.
+   * - `group`: The container for nested items.
+   */
+  "helix-tree-item": Partial<
+    HelixTreeItemProps & BaseProps<HelixTreeItem> & BaseEvents
+  >;
+
+  /**
+   * Quiet by default: no rules between rows and no fill except on the selected
+   * item. A navigation tree is read by scanning, and every line of chrome added
+   * to it is one more thing between the reader and the label.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the tree.
+   * - `value`: Value of the selected item, kept in step with the items themselves.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tree's items.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tree`: The tree container.
+   */
+  "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents>;
 };
 
 export type CustomElementsSolidJs = {
@@ -1229,6 +1739,153 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Four appearances and three sizes, all drawn on one control so a link styled
+   * as a button and a real button are indistinguishable to a reader. The focus
+   * ring is declared here rather than inherited, because the base layer's
+   * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How much visual weight the button carries.
+   * - `size`: Height and inset of the control.
+   * - `type`: What activating the button does to its form.
+   * - `href`: Navigates to this URL instead of acting on a form.
+   * - `target`: Browsing context for `href`, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The button's label.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--button-background-color`: Fill behind the button. (default: `undefined`)
+   * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
+   * - `--button-radii`: Corner radius of the control. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-button": Partial<
+    HelixButtonProps &
+      HelixButtonSolidJsProps &
+      BaseProps<HelixButton> &
+      BaseEvents
+  >;
+
+  /**
+   * Tinted from the severity's status color with `color-mix`, and marked with a
+   * bar on the inline start so the severity survives being read in greyscale or
+   * by anyone who does not distinguish the hues.
+   *
+   * There is no `appearance` here. `severity` carries the meaning and lives on
+   * the headless tier; this tier only decides what that meaning looks like.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the passage needs.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The callout's content.
+   * - `icon`: Replaces the icon chosen by `severity`.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--callout-background-color`: Fill behind the callout. (default: `undefined`)
+   * - `--callout-radii`: Corner radius of the callout. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `callout`: The callout body.
+   * - `icon`: The icon region.
+   * - `content`: The content region.
+   */
+  "helix-callout": Partial<
+    HelixCalloutProps &
+      HelixCalloutSolidJsProps &
+      BaseProps<HelixCallout> &
+      BaseEvents
+  >;
+
+  /**
+   * Regions are slots: `media`, `header`, the default slot for content, and
+   * `footer`. An omitted region takes no space, so a card with only content needs
+   * no wrapper markup at all.
+   *
+   * `media` runs edge to edge and clips to the card's corners, so an image needs
+   * no inset correction. Set `orientation="horizontal"` to move it alongside the
+   * header, content, and footer stack rather than above it.
+   *
+   * Regions are bare slots with no wrapper element, so an omitted one occupies no
+   * space without the card having to detect that it is missing. Style slotted
+   * content directly rather than reaching for a part: a header is whatever
+   * element you slotted, not a wrapper we put around it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How the card separates itself from the page.
+   * - `dense`: Tightens the inset for dense layouts.
+   * - `orientation`: Whether media sits above the content stack or beside it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--card-background-color`: Surface behind the card. (default: `undefined`)
+   * - `--card-border-color`: Border color of the surface. (default: `undefined`)
+   * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
+   * - `--card-padding`: Inset applied to each region. (default: `undefined`)
+   * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The card surface.
+   */
+  "helix-card": Partial<
+    HelixCardProps & HelixCardSolidJsProps & BaseProps<HelixCard> & BaseEvents
+  >;
+
+  /**
    * The separator is hidden on the first item with `:host(:first-child)`, so no
    * item needs to know its own index and the parent needs no coordination.
    *
@@ -1306,149 +1963,145 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Four appearances and three sizes, all drawn on one control so a link styled
-   * as a button and a real button are indistinguishable to a reader. The focus
-   * ring is declared here rather than inherited, because the base layer's
-   * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+   * A one-pixel rule in the border color, running the full inline size by
+   * default. A vertical divider stretches to its flex parent instead of setting
+   * its own height, so it matches whatever it sits beside without being told how
+   * tall that is.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How much visual weight the button carries.
-   * - `size`: Height and inset of the control.
-   * - `type`: What activating the button does to its form.
-   * - `href`: Navigates to this URL instead of acting on a form.
-   * - `target`: Browsing context for `href`, such as `_blank`.
-   * - `rel`: Relationship of the linked URL, defaulted when `target` opens a new tab.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
-   * - `end`: Content after the label.
+   * - `orientation`: Which way the rule runs.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--button-background-color`: Fill behind the button. (default: `undefined`)
-   * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
-   * - `--button-radii`: Corner radius of the control. (default: `undefined`)
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
+   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `line`: The rule itself.
    */
-  "helix-button": Partial<
-    HelixButtonProps &
-      HelixButtonSolidJsProps &
-      BaseProps<HelixButton> &
+  "helix-divider": Partial<
+    HelixDividerProps &
+      HelixDividerSolidJsProps &
+      BaseProps<HelixDivider> &
       BaseEvents
   >;
 
   /**
-   * Regions are slots: `media`, `header`, the default slot for content, and
-   * `footer`. An omitted region takes no space, so a card with only content needs
-   * no wrapper markup at all.
+   * The host is the flex container itself and the only child is a slot, so the
+   * element adds no box of its own: `<helix-flex>` costs exactly the `<div>` it
+   * replaces.
    *
-   * `media` runs edge to edge and clips to the card's corners, so an image needs
-   * no inset correction. Set `orientation="horizontal"` to move it alongside the
-   * header, content, and footer stack rather than above it.
+   * There is no separate Stack. A stack is this with `direction="column"`, and a
+   * second element whose whole definition is one default of the first is a name
+   * to learn rather than a capability to gain.
    *
-   * Regions are bare slots with no wrapper element, so an omitted one occupies no
-   * space without the card having to detect that it is missing. Style slotted
-   * content directly rather than reaching for a part: a header is whatever
-   * element you slotted, not a wrapper we put around it.
+   * Gap takes a space token name rather than a length, so spacing stays on the
+   * scale. A layout that can say `gap="13px"` is one that will.
+   *
+   * Presentation only, so there is no headless tier: the split exists to keep
+   * behavior separate from styling, and this is entirely styling.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the card separates itself from the page.
-   * - `dense`: Tightens the inset for dense layouts.
-   * - `orientation`: Whether media sits above the content stack or beside it.
+   * - `direction`: Whether items run across or down.
+   * - `gap`: Space between items, named on the space scale.
+   * - `align`: Alignment across the direction.
+   * - `justify`: Distribution along the direction.
+   * - `wrap`: Whether items wrap onto more lines.
+   * - `inline`: Flows with surrounding text instead of taking the full width.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--card-background-color`: Surface behind the card. (default: `undefined`)
-   * - `--card-border-color`: Border color of the surface. (default: `undefined`)
-   * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
-   * - `--card-padding`: Inset applied to each region. (default: `undefined`)
-   * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The card surface.
+   * - `(default)`: The items to lay out.
    */
-  "helix-card": Partial<
-    HelixCardProps & HelixCardSolidJsProps & BaseProps<HelixCard> & BaseEvents
+  "helix-flex": Partial<
+    HelixFlexProps & HelixFlexSolidJsProps & BaseProps<HelixFlex> & BaseEvents
   >;
 
   /**
-   * Tinted from the severity's status color with `color-mix`, and marked with a
-   * bar on the inline start so the severity survives being read in greyscale or
-   * by anyone who does not distinguish the hues.
+   * Two ways to declare columns, and only two. `columns` is a fixed count;
+   * `min` fills as many equal columns as fit above that width, which is a
+   * responsive layout with no breakpoint to maintain. Setting `min` wins, because
+   * a fixed count that also reflows is two intentions in one element.
    *
-   * There is no `appearance` here. `severity` carries the meaning and lives on
-   * the headless tier; this tier only decides what that meaning looks like.
+   * Presentation only, so there is no headless tier.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `severity`: What kind of attention the passage needs.
+   * - `columns`: Fixed number of equal columns.
+   * - `min`: Minimum column width, filling as many as fit.
+   *
+   * Takes precedence over `columns`: a grid that both fixes a count and reflows
+   * is two intentions in one element.
+   * - `gap`: Space between cells, named on the space scale.
+   * - `align`: Alignment of each cell within its row.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The callout's content.
-   * - `icon`: Replaces the icon chosen by `severity`.
+   * - `(default)`: The items to lay out.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--callout-background-color`: Fill behind the callout. (default: `undefined`)
-   * - `--callout-radii`: Corner radius of the callout. (default: `undefined`)
+   * - `--grid-min`: Column width floor when `min` is set. (default: `undefined`)
+   */
+  "helix-grid": Partial<
+    HelixGridProps & HelixGridSolidJsProps & BaseProps<HelixGrid> & BaseEvents
+  >;
+
+  /**
+   * Renders a real `<h1>` through `<h6>` using Lit's static templates, never a
+   * `<div role="heading">`. A real heading is what a screen reader's heading
+   * navigation lists, and emulation has to be kept correct by hand forever.
+   *
+   * **`level` and `size` are separate on purpose, and that is the risk.** Level
+   * is document structure and belongs to the outline; size is appearance. They
+   * default to matching, so a heading is correct by doing nothing, and `size`
+   * exists for the case where a section's second heading has to look smaller
+   * without lying about the outline. Reach for it rarely: two headings at the
+   * same level looking different is usually a sign the outline is wrong.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `level`: Outline level, one through six.
+   * - `size`: Visual size, defaulting to the one that matches `level`.
+   * - `tone`: Colour role for the heading.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The heading text.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `callout`: The callout body.
-   * - `icon`: The icon region.
-   * - `content`: The content region.
+   * - `heading`: The heading element.
    */
-  "helix-callout": Partial<
-    HelixCalloutProps &
-      HelixCalloutSolidJsProps &
-      BaseProps<HelixCallout> &
+  "helix-heading": Partial<
+    HelixHeadingProps &
+      HelixHeadingSolidJsProps &
+      BaseProps<HelixHeading> &
       BaseEvents
   >;
 
@@ -1482,35 +2135,39 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * A one-pixel rule in the border color, running the full inline size by
-   * default. A vertical divider stretches to its flex parent instead of setting
-   * its own height, so it matches whatever it sits beside without being told how
-   * tall that is.
+   * Renders a real `<a>`, so middle-click, copy-link-address, and the browser's
+   * own status bar all work without anything being reimplemented.
+   *
+   * A new browsing context gets `rel="noreferrer noopener"` unless told
+   * otherwise, because without it the opened page can reach back through
+   * `window.opener`, and it is marked with an indicator so the reader knows
+   * before they click rather than after.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Which way the rule runs.
+   * - `href`: Where the link goes.
+   * - `target`: Browsing context, such as `_blank`.
+   * - `rel`: Relationship of the linked URL, defaulted when opening a new tab.
+   * - `size`: Size on the type scale.
+   * - `appearance`: How much the link announces itself.
+   * - `underline-on-hover`/`underlineOnHover`: Whether the underline waits for hover.
    *
-   * ## CSS Custom Properties
+   * ## Slots
    *
-   * CSS variables available for styling the component.
+   * Areas where markup can be added to the component.
    *
-   * - `--divider-color`: Color of the rule. (default: `undefined`)
-   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
+   * - `(default)`: The link text.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `line`: The rule itself.
+   * - `link`: The anchor.
    */
-  "helix-divider": Partial<
-    HelixDividerProps &
-      HelixDividerSolidJsProps &
-      BaseProps<HelixDivider> &
-      BaseEvents
+  "helix-link": Partial<
+    HelixLinkProps & HelixLinkSolidJsProps & BaseProps<HelixLink> & BaseEvents
   >;
 
   /**
@@ -1566,6 +2223,144 @@ export type CustomElementsSolidJs = {
   "helix-tag": Partial<
     HelixTagProps & HelixTagSolidJsProps & BaseProps<HelixTag> & BaseEvents
   >;
+
+  /**
+   * For text that is not a heading. Headings have their own element, because a
+   * heading carries an outline level and this does not; asking one element to do
+   * both is what leads to a page whose outline is a styling accident.
+   *
+   * `block` makes it a paragraph rather than an inline run. It stays inline by
+   * default because most text sits inside something else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `size`: Size on the type scale.
+   * - `tone`: Colour role for the text.
+   * - `weight`: Weight on the weight scale.
+   * - `block`: Renders as a block, for a paragraph rather than an inline run.
+   * - `mono`: Uses the monospace family, for code and identifiers.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The text.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `text`: The text container.
+   */
+  "helix-text": Partial<
+    HelixTextProps & HelixTextSolidJsProps & BaseProps<HelixText> & BaseEvents
+  >;
+
+  /**
+   * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
+   * node moved to another depth re-indents without any nested selector. Nesting
+   * selectors by depth is the usual approach and stops working at whatever depth
+   * nobody wrote a rule for.
+   *
+   * The twisty rotates rather than swapping glyphs, so opening a branch is a
+   * short movement instead of a substitution. Motion carries the state change;
+   * the row itself stays flat.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
+   * - `selected`: Whether this item is the current one.
+   * - `expanded`: Whether a branch is showing its children.
+   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
+   * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
+   * - `isBranch`: Whether this node has children. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when the item is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The item's label.
+   * - `children`: Nested items, which make this a branch.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus to this node.
+   * - `select() => void`: Selects this node and announces it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The node, and the focus target.
+   * - `row`: The clickable label row.
+   * - `toggle`: The expand and collapse control.
+   * - `label`: The label text.
+   * - `group`: The container for nested items.
+   */
+  "helix-tree-item": Partial<
+    HelixTreeItemProps &
+      HelixTreeItemSolidJsProps &
+      BaseProps<HelixTreeItem> &
+      BaseEvents
+  >;
+
+  /**
+   * Quiet by default: no rules between rows and no fill except on the selected
+   * item. A navigation tree is read by scanning, and every line of chrome added
+   * to it is one more thing between the reader and the label.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the tree.
+   * - `value`: Value of the selected item, kept in step with the items themselves.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tree's items.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tree`: The tree container.
+   */
+  "helix-tree": Partial<
+    HelixTreeProps & HelixTreeSolidJsProps & BaseProps<HelixTree> & BaseEvents
+  >;
 };
 
 export type CustomCssProperties = {
@@ -1587,16 +2382,16 @@ export type CustomCssProperties = {
   "--avatar-background-color"?: string;
   /** Edge length of the avatar. */
   "--avatar-size"?: string;
-  /** Color of the separator. */
-  "--breadcrumbs-separator-color"?: string;
-  /** Space between items and separators. */
-  "--breadcrumbs-gap"?: string;
   /** Fill behind the button. */
   "--button-background-color"?: string;
   /** Label and icon color. */
   "--button-foreground-color"?: string;
   /** Corner radius of the control. */
   "--button-radii"?: string;
+  /** Fill behind the callout. */
+  "--callout-background-color"?: string;
+  /** Corner radius of the callout. */
+  "--callout-radii"?: string;
   /** Surface behind the card. */
   "--card-background-color"?: string;
   /** Border color of the surface. */
@@ -1607,22 +2402,26 @@ export type CustomCssProperties = {
   "--card-padding"?: string;
   /** Corner radius of the surface. */
   "--card-radii"?: string;
-  /** Fill behind the callout. */
-  "--callout-background-color"?: string;
-  /** Corner radius of the callout. */
-  "--callout-radii"?: string;
-  /** Edge length of the icon's box. */
-  "--icon-size"?: string;
+  /** Color of the separator. */
+  "--breadcrumbs-separator-color"?: string;
+  /** Space between items and separators. */
+  "--breadcrumbs-gap"?: string;
   /** Color of the rule. */
   "--divider-color"?: string;
   /** Thickness of the rule. */
   "--divider-thickness"?: string;
+  /** Column width floor when `min` is set. */
+  "--grid-min"?: string;
+  /** Edge length of the icon's box. */
+  "--icon-size"?: string;
   /** Fill behind the tag. */
   "--tag-background-color"?: string;
   /** Label color. */
   "--tag-foreground-color"?: string;
   /** Corner radius of the tag. */
   "--tag-radii"?: string;
+  /** Indent added per level. */
+  "--tree-indent"?: string;
 };
 
 declare module "react" {

@@ -1,30 +1,28 @@
 'use client'
 
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
-import Link from 'next/link'
+import type { HelixSelectionChangeEvent } from '@helix-io/web'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../lib/catalog'
 
 /**
- * The sandbox workbench: source panes, a live preview, and the example browser.
+ * The sandbox workbench: source panes, a live preview, and the example tree.
  *
- * Everything that identifies what you are looking at lives in the URL, so the
- * address bar is the share format and no server state is involved. Everything
- * about how you are looking at it, the split and the preview theme, is local to
- * the session.
+ * What you are looking at lives in the URL, so the address bar is the share
+ * format. How you are looking at it, the split and the preview theme, is local
+ * to the session.
  */
 
 interface Props {
   families: Family[]
 }
 
-/** Reads the example named by the URL, falling back to the first one shipped. */
 const resolve = (families: Family[], familySlug: string | null, exampleSlug: string | null) => {
   const withExamples = families.filter((entry) => entry.examples.length > 0)
   const family =
     withExamples.find((entry) => entry.slug === familySlug) ?? (withExamples[0] as Family)
   const example = family.examples.find((entry) => entry.slug === exampleSlug) ?? family.examples[0]
-  return { example, family }
+  return { example, family, withExamples }
 }
 
 export function SandboxWorkbench({ families }: Props) {
@@ -34,10 +32,12 @@ export function SandboxWorkbench({ families }: Props) {
   const [pane, setPane] = useState<'html' | 'css'>('html')
   const [previewTheme, setPreviewTheme] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
+  const [railOpen, setRailOpen] = useState(false)
+  const [narrow, setNarrow] = useState(false)
 
-  // Read the URL after mount rather than during render: the page is static, so
-  // the server has no query string and reading one during render would make the
-  // first paint disagree with the URL.
+  // Read the URL after mount, not during render: the page is static, so the
+  // server has no query string and reading one would make the first paint
+  // disagree with the address bar.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     setFamilySlug(params.get('family'))
@@ -45,20 +45,34 @@ export function SandboxWorkbench({ families }: Props) {
     setPreviewTheme(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark')
   }, [])
 
-  const { example, family } = resolve(families, familySlug, exampleSlug)
-
-  const select = useCallback((nextFamily: string, nextExample: string) => {
-    setFamilySlug(nextFamily)
-    setExampleSlug(nextExample)
-    const url = `${window.location.pathname}?family=${nextFamily}&example=${nextExample}`
-    // Replace, so browsing the tree does not bury the way back under one entry
-    // per example looked at.
-    window.history.replaceState(null, '', url)
+  // Side by side is unusable on a phone: at 375px a 45/55 split leaves two
+  // slivers. Orientation is a property rather than a stylesheet override,
+  // because the component lays the panes out and only it knows how.
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 60rem)')
+    const sync = () => setNarrow(query.matches)
+    sync()
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
   }, [])
 
-  // Seed the preview whenever the example changes. The source pane carries the
-  // markup as a property, but nothing has been edited, so the SourceChange
-  // handshake that normally feeds the preview has not fired.
+  const { example, family, withExamples } = resolve(families, familySlug, exampleSlug)
+
+  const select = useCallback((value: string) => {
+    const [nextFamily, nextExample] = value.split('/')
+    if (!nextFamily || !nextExample) {
+      return
+    }
+    setFamilySlug(nextFamily)
+    setExampleSlug(nextExample)
+    setRailOpen(false)
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}?family=${nextFamily}&example=${nextExample}`,
+    )
+  }, [])
+
   useEffect(() => {
     if (preview.current && example) {
       preview.current.source = example.html
@@ -73,40 +87,67 @@ export function SandboxWorkbench({ families }: Props) {
   }
 
   if (!example) {
-    return <p className="empty">No examples are shipped yet.</p>
+    return (
+      <helix-text block tone="subtle">
+        No examples are shipped yet.
+      </helix-text>
+    )
   }
+
+  const activeValue = `${family.slug}/${example.slug}`
 
   return (
     <>
-      <header className="workbenchHeader">
-        <Link className="brand" href="/">
-          <strong>Helix</strong>
-          <span>sandbox</span>
-        </Link>
+      <helix-flex align="center" class="workbenchHeader" gap="md">
+        <helix-link appearance="quiet" href="/">
+          <helix-flex align="baseline" gap="2xs" inline>
+            <helix-text weight="semibold">Helix</helix-text>
+            <helix-text size="xs" tone="subtle">
+              sandbox
+            </helix-text>
+          </helix-flex>
+        </helix-link>
 
-        <div className="workbenchTitle">
-          {family.label} <span>/</span> {example.label}
-        </div>
+        <helix-flex align="baseline" class="workbenchTitle" gap="2xs">
+          <helix-text size="sm">{family.label}</helix-text>
+          <helix-text size="sm" tone="subtle">
+            /
+          </helix-text>
+          <helix-text size="sm" tone="muted">
+            {example.label}
+          </helix-text>
+        </helix-flex>
 
-        <div className="workbenchActions">
-          <button
-            aria-pressed={previewTheme === 'light'}
+        <helix-flex align="center" gap="2xs">
+          <helix-button
+            appearance="subtle"
             onClick={() => setPreviewTheme(previewTheme === 'light' ? 'dark' : 'light')}
-            type="button"
+            size="sm"
           >
-            {previewTheme === 'light' ? 'Light preview' : 'Dark preview'}
-          </button>
-          <button onClick={share} type="button">
+            {previewTheme === 'light' ? 'Light' : 'Dark'}
+          </helix-button>
+          <helix-button appearance="subtle" onClick={share} size="sm">
             {copied ? 'Copied' : 'Share'}
-          </button>
-          <Link href={`/components/${family.slug}`}>API</Link>
-        </div>
-      </header>
+          </helix-button>
+          <helix-button appearance="subtle" href={`/components/${family.slug}`} size="sm">
+            API
+          </helix-button>
+          {/* Only reachable at narrow widths, where the rail is a drawer. */}
+          <helix-button
+            appearance="subtle"
+            class="railToggle"
+            onClick={() => setRailOpen(!railOpen)}
+            size="sm"
+          >
+            Examples
+          </helix-button>
+        </helix-flex>
+      </helix-flex>
 
-      <div className="workbenchBody">
-        <helix-sandbox orientation="horizontal" split={45}>
-          <div className="sourcePane" slot="source">
-            <div className="paneTabs" role="tablist">
+      <div className="workbenchBody" data-rail-open={railOpen ? 'true' : 'false'}>
+        <helix-sandbox orientation={narrow ? 'vertical' : 'horizontal'} split={narrow ? 50 : 45}>
+          <helix-flex class="sourcePane" direction="column" slot="source">
+            <helix-flex class="paneTabs" gap="none" role="tablist">
               {(['html', 'css'] as const).map((name) => (
                 <button
                   aria-selected={pane === name}
@@ -118,27 +159,25 @@ export function SandboxWorkbench({ families }: Props) {
                   {name === 'html' ? 'index.html' : 'styles.css'}
                 </button>
               ))}
-            </div>
+            </helix-flex>
             {/* Both panes stay mounted and one is hidden, so switching tabs
                 does not discard what was typed in the other. */}
             <helix-sandbox-source
               field-label="Example markup"
               hidden={pane !== 'html'}
-              key={`${family.slug}-${example.slug}-html`}
+              key={`${activeValue}-html`}
               name="html"
               value={example.html}
             ></helix-sandbox-source>
             <helix-sandbox-source
               field-label="Example stylesheet"
               hidden={pane !== 'css'}
-              key={`${family.slug}-${example.slug}-css`}
+              key={`${activeValue}-css`}
               name="css"
               value=""
             ></helix-sandbox-source>
-          </div>
+          </helix-flex>
 
-          {/* The preview carries its own theme attribute, so it can be read in
-              light while the tool around it stays dark. */}
           <helix-sandbox-preview
             data-theme={previewTheme}
             ref={preview}
@@ -146,27 +185,32 @@ export function SandboxWorkbench({ families }: Props) {
           ></helix-sandbox-preview>
         </helix-sandbox>
 
-        <nav aria-label="Examples" className="examplesRail">
-          {families
-            .filter((entry) => entry.examples.length > 0)
-            .map((entry) => (
-              <div className="railGroup" key={entry.slug}>
-                <span className="railFamily">{entry.label}</span>
+        <aside className="examplesRail">
+          <helix-tree
+            label="Examples"
+            onSelectionChange={(event: HelixSelectionChangeEvent) => select(event.detail.value)}
+            value={activeValue}
+          >
+            {withExamples.map((entry) => (
+              <helix-tree-item
+                expanded={entry.slug === family.slug}
+                key={entry.slug}
+                value={entry.slug}
+              >
+                {entry.label}
                 {entry.examples.map((item) => (
-                  <button
-                    aria-current={
-                      entry.slug === family.slug && item.slug === example.slug ? 'true' : undefined
-                    }
+                  <helix-tree-item
                     key={item.slug}
-                    onClick={() => select(entry.slug, item.slug)}
-                    type="button"
+                    slot="children"
+                    value={`${entry.slug}/${item.slug}`}
                   >
                     {item.label}
-                  </button>
+                  </helix-tree-item>
                 ))}
-              </div>
+              </helix-tree-item>
             ))}
-        </nav>
+          </helix-tree>
+        </aside>
       </div>
     </>
   )

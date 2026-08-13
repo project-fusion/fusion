@@ -3,9 +3,11 @@ export { customElement } from './custom-element.js'
 export {
   HelixOpenChangeEvent,
   HelixRemoveRequestEvent,
+  HelixSelectionChangeEvent,
   HelixSourceChangeEvent,
   type OpenChangeDetail,
   type RemoveRequestDetail,
+  type SelectionChangeDetail,
   type SourceChangeDetail,
 } from './events.js'
 export { HelixFormElement } from './form-element.js'

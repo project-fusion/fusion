@@ -139,16 +139,24 @@ looks correct and the component is quietly unstyled.
 Per-component hooks (`--card-padding`) are not Helix tokens and are exempt. They
 should default to a semantic token.
 
-**Typography and links are the base layer, not components.** The type scale
-lives on `h1`–`h6` in `base.css`, and anchor treatment on `:where(a)`. A `Text`
-component would take the heading level as a prop, which lets `size` be set
-independently of it, and that is how a page gets an `<h4>` styled like a title.
-A `Link` component would add a shadow boundary around an element that already
-carries everything a link needs. Styling the elements also reaches prose the
-design system never renders: markdown, a CMS, anything with an `<a>` in it.
+**Apps use components, not native elements.** *Reversed 13 Aug 2026.* The base
+layer still styles `h1`–`h6` and `:where(a)`, because prose the design system
+never renders (markdown, a CMS) has to look right too. But an app written
+against Helix reaches for `Heading`, `Text`, `Link`, `Flex`, and `Grid` rather
+than raw tags, so dropping a component in works without the app knowing which
+token to apply.
 
-A component gets built when it has behavior. Presentation of native elements is
-a stylesheet.
+The earlier rule said a component is only built when it has behavior. That was
+right about what *earns* an element and wrong about what an app should *write*:
+`Flex` has no behavior and still removes every hand-rolled layout div.
+
+`Heading` keeps `level` and `size` separate, which is the risk that killed the
+first `Text`. They default to matching, so a heading is correct by doing
+nothing, and `size` is only ever a deliberate exception.
+
+Layout components are presentation with no structure or a11y of their own, so
+they ship in `helix/web` with **no headless tier**. The tier split exists to
+keep behavior separate from styling, and there is no behavior to separate.
 
 Styles are authored in sibling `.css` files. `bun run styles` compiles each into
 a generated `.css.ts` calling `createSheet`. Generated files are gitignored;

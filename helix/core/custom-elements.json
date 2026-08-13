@@ -142,6 +142,28 @@
             "module": "src/events.ts"
           },
           "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "Fired when the reader selects an item in a set.\n\nA notification, not a request: selection within a tree or a list is the\ncomponent's own state, unlike removal, where the consumer owns the list.",
+          "name": "HelixSelectionChangeEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'SelectionChange'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events.ts"
+          },
+          "helix": {}
         }
       ],
       "exports": [
@@ -166,6 +188,14 @@
           "name": "HelixSourceChangeEvent",
           "declaration": {
             "name": "HelixSourceChangeEvent",
+            "module": "src/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSelectionChangeEvent",
+          "declaration": {
+            "name": "HelixSelectionChangeEvent",
             "module": "src/events.ts"
           }
         }
@@ -386,6 +416,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixSelectionChangeEvent",
+          "declaration": {
+            "name": "HelixSelectionChangeEvent",
+            "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixSourceChangeEvent",
           "declaration": {
             "name": "HelixSourceChangeEvent",
@@ -405,6 +443,14 @@
           "name": "RemoveRequestDetail",
           "declaration": {
             "name": "RemoveRequestDetail",
+            "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SelectionChangeDetail",
+          "declaration": {
+            "name": "SelectionChangeDetail",
             "module": "./events.js"
           }
         },

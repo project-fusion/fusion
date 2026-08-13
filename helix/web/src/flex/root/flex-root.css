@@ -1,0 +1,67 @@
+/* The host is the container. No wrapper part, so the element adds no box of its
+   own and costs exactly the div it replaces. */
+:host {
+  display: flex;
+  flex-direction: row;
+  gap: var(--helix-space-none);
+}
+
+:host([inline]) {
+  display: inline-flex;
+}
+
+:host([direction="column"]) {
+  flex-direction: column;
+}
+
+:host([wrap]) {
+  flex-wrap: wrap;
+}
+
+:host([gap="2xs"]) {
+  gap: var(--helix-space-2xs);
+}
+:host([gap="xs"]) {
+  gap: var(--helix-space-xs);
+}
+:host([gap="sm"]) {
+  gap: var(--helix-space-sm);
+}
+:host([gap="md"]) {
+  gap: var(--helix-space-md);
+}
+:host([gap="lg"]) {
+  gap: var(--helix-space-lg);
+}
+:host([gap="xl"]) {
+  gap: var(--helix-space-xl);
+}
+:host([gap="2xl"]) {
+  gap: var(--helix-space-2xl);
+}
+
+:host([align="start"]) {
+  align-items: flex-start;
+}
+:host([align="center"]) {
+  align-items: center;
+}
+:host([align="end"]) {
+  align-items: flex-end;
+}
+:host([align="baseline"]) {
+  align-items: baseline;
+}
+
+:host([justify="center"]) {
+  justify-content: center;
+}
+:host([justify="end"]) {
+  justify-content: flex-end;
+}
+:host([justify="between"]) {
+  justify-content: space-between;
+}
+:host([justify="around"]) {
+  justify-content: space-around;
+}

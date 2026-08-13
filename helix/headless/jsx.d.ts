@@ -12,8 +12,11 @@ import type {
   HelixBaseDivider,
   HelixBaseIcon,
   HelixBaseTag,
+  HelixBaseTree,
+  HelixBaseTreeItem,
   HelixOpenChangeEvent,
   HelixRemoveRequestEvent,
+  HelixSelectionChangeEvent,
   initialsOf,
 } from '@helix-io/headless';
 
@@ -209,34 +212,6 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
-export type HelixBaseAppHeaderProps = {};
-
-export type HelixBaseAppHeaderSolidJsProps = {
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseAvatarProps = {
-  /** Image to show. Falls back to initials if it fails to load. */
-  src?: HelixBaseAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
-  name?: HelixBaseAvatar["name"];
-};
-
-export type HelixBaseAvatarSolidJsProps = {
-  /** Image to show. Falls back to initials if it fails to load. */
-  "prop:src"?: HelixBaseAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
-  "prop:name"?: HelixBaseAvatar["name"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 /** `HelixBaseAccordionItem` component event */
 export type HelixBaseAccordionItemElementEvent<E = Event> = TypedEvent<
   HelixBaseAccordionItem,
@@ -282,6 +257,34 @@ export type HelixBaseAccordionProps = {
 export type HelixBaseAccordionSolidJsProps = {
   /** Whether more than one item may be open at once. */
   "prop:multiple"?: HelixBaseAccordion["multiple"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseAppHeaderProps = {};
+
+export type HelixBaseAppHeaderSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseAvatarProps = {
+  /** Image to show. Falls back to initials if it fails to load. */
+  src?: HelixBaseAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  name?: HelixBaseAvatar["name"];
+};
+
+export type HelixBaseAvatarSolidJsProps = {
+  /** Image to show. Falls back to initials if it fails to load. */
+  "prop:src"?: HelixBaseAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  "prop:name"?: HelixBaseAvatar["name"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -492,77 +495,84 @@ only as `removelabel`, which nobody would guess and no linter would catch. */
   textContent?: string | number;
 };
 
+/** `HelixBaseTreeItem` component event */
+export type HelixBaseTreeItemElementEvent<E = Event> = TypedEvent<
+  HelixBaseTreeItem,
+  E
+>;
+/** `SelectionChange` event type */
+export type HelixBaseTreeItemSelectionChangeElementEvent =
+  HelixBaseTreeItemElementEvent<HelixSelectionChangeEvent>;
+
+export type HelixBaseTreeItemProps = {
+  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  value?: HelixBaseTreeItem["value"];
+  /** Whether this item is the current one. */
+  selected?: HelixBaseTreeItem["selected"];
+  /** Whether a branch is showing its children. */
+  expanded?: HelixBaseTreeItem["expanded"];
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting. */
+  level?: HelixBaseTreeItem["level"];
+  /** Whether this item holds the tree's single tab stop. */
+  focusable?: HelixBaseTreeItem["focusable"];
+
+  /** Fired when the item is chosen. */
+  onSelectionChange?: (e: HelixBaseTreeItemSelectionChangeElementEvent) => void;
+};
+
+export type HelixBaseTreeItemSolidJsProps = {
+  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  "prop:value"?: HelixBaseTreeItem["value"];
+  /** Whether this item is the current one. */
+  "prop:selected"?: HelixBaseTreeItem["selected"];
+  /** Whether a branch is showing its children. */
+  "prop:expanded"?: HelixBaseTreeItem["expanded"];
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting. */
+  "prop:level"?: HelixBaseTreeItem["level"];
+  /** Whether this item holds the tree's single tab stop. */
+  "prop:focusable"?: HelixBaseTreeItem["focusable"];
+  /** Fired when the item is chosen. */
+  "on:SelectionChange"?: (
+    e: HelixBaseTreeItemSelectionChangeElementEvent,
+  ) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseTree` component event */
+export type HelixBaseTreeElementEvent<E = Event> = TypedEvent<HelixBaseTree, E>;
+/** `SelectionChange` event type */
+export type HelixBaseTreeSelectionChangeElementEvent =
+  HelixBaseTreeElementEvent<HelixSelectionChangeEvent>;
+
+export type HelixBaseTreeProps = {
+  /** Accessible name for the tree. */
+  label?: HelixBaseTree["label"];
+  /** Value of the selected item, kept in step with the items themselves. */
+  value?: HelixBaseTree["value"];
+
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  onSelectionChange?: (e: HelixBaseTreeSelectionChangeElementEvent) => void;
+};
+
+export type HelixBaseTreeSolidJsProps = {
+  /** Accessible name for the tree. */
+  "prop:label"?: HelixBaseTree["label"];
+  /** Value of the selected item, kept in step with the items themselves. */
+  "prop:value"?: HelixBaseTree["value"];
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  "on:SelectionChange"?: (e: HelixBaseTreeSelectionChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type CustomElements = {
-  /**
-   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
-   * the styled tier can lift the bar off the page without a scroll handler of its
-   * own. Scroll position is the one piece of state the server genuinely cannot
-   * know, so it is read on connect rather than derived: a fresh load starts at
-   * the top, which is what the server rendered, and a reload part-way down
-   * corrects on hydration.
-   *
-   * The listener is passive and reads `scrollY` only, so it never blocks
-   * scrolling.
-   *
-   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
-   * landmark the navigation needs whether or not anything is in it; the other two
-   * are `display: contents` when unassigned and cost nothing.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `brand`: Wordmark or logo, at the inline start.
-   * - `(default)`: Primary navigation.
-   * - `actions`: Trailing actions, such as a call to action.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `bar`: The banner itself.
-   * - `nav`: The navigation region.
-   */
-  "helix-base-app-header": Partial<
-    HelixBaseAppHeaderProps & BaseProps<HelixBaseAppHeader> & BaseEvents
-  >;
-
-  /**
-   * The fallback is the reason this is an element. An image that fails to load
-   * leaves a broken icon and no name, so the avatar listens for the error and
-   * falls back to initials derived from `name`.
-   *
-   * `name` is required for the accessible name whether or not there is an image,
-   * because an avatar with no name tells a screen-reader user nothing. Initials
-   * are hidden from assistive technology: they are a visual shorthand for the
-   * name that is already announced, and would otherwise be read out letter by
-   * letter after it.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `src`: Image to show. Falls back to initials if it fails to load.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: Replaces the image and initials entirely, for an icon.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `avatar`: The avatar body.
-   * - `image`: The image, when one is loading or loaded.
-   * - `initials`: The initials shown when there is no usable image.
-   */
-  "helix-base-avatar": Partial<
-    HelixBaseAvatarProps & BaseProps<HelixBaseAvatar> & BaseEvents
-  >;
-
   /**
    * Carries its own open state, which is why it is an element rather than a slot.
    * Used alone it is a disclosure, and that is deliberate: shipping a separate
@@ -653,6 +663,76 @@ export type CustomElements = {
    */
   "helix-base-accordion": Partial<
     HelixBaseAccordionProps & BaseProps<HelixBaseAccordion> & BaseEvents
+  >;
+
+  /**
+   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
+   * the styled tier can lift the bar off the page without a scroll handler of its
+   * own. Scroll position is the one piece of state the server genuinely cannot
+   * know, so it is read on connect rather than derived: a fresh load starts at
+   * the top, which is what the server rendered, and a reload part-way down
+   * corrects on hydration.
+   *
+   * The listener is passive and reads `scrollY` only, so it never blocks
+   * scrolling.
+   *
+   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
+   * landmark the navigation needs whether or not anything is in it; the other two
+   * are `display: contents` when unassigned and cost nothing.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `brand`: Wordmark or logo, at the inline start.
+   * - `(default)`: Primary navigation.
+   * - `actions`: Trailing actions, such as a call to action.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bar`: The banner itself.
+   * - `nav`: The navigation region.
+   */
+  "helix-base-app-header": Partial<
+    HelixBaseAppHeaderProps & BaseProps<HelixBaseAppHeader> & BaseEvents
+  >;
+
+  /**
+   * The fallback is the reason this is an element. An image that fails to load
+   * leaves a broken icon and no name, so the avatar listens for the error and
+   * falls back to initials derived from `name`.
+   *
+   * `name` is required for the accessible name whether or not there is an image,
+   * because an avatar with no name tells a screen-reader user nothing. Initials
+   * are hidden from assistive technology: they are a visual shorthand for the
+   * name that is already announced, and would otherwise be read out letter by
+   * letter after it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
+   */
+  "helix-base-avatar": Partial<
+    HelixBaseAvatarProps & BaseProps<HelixBaseAvatar> & BaseEvents
   >;
 
   /**
@@ -943,85 +1023,102 @@ export type CustomElements = {
   "helix-base-tag": Partial<
     HelixBaseTagProps & BaseProps<HelixBaseTag> & BaseEvents
   >;
-};
-
-export type CustomElementsSolidJs = {
-  /**
-   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
-   * the styled tier can lift the bar off the page without a scroll handler of its
-   * own. Scroll position is the one piece of state the server genuinely cannot
-   * know, so it is read on connect rather than derived: a fresh load starts at
-   * the top, which is what the server rendered, and a reload part-way down
-   * corrects on hydration.
-   *
-   * The listener is passive and reads `scrollY` only, so it never blocks
-   * scrolling.
-   *
-   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
-   * landmark the navigation needs whether or not anything is in it; the other two
-   * are `display: contents` when unassigned and cost nothing.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `brand`: Wordmark or logo, at the inline start.
-   * - `(default)`: Primary navigation.
-   * - `actions`: Trailing actions, such as a call to action.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `bar`: The banner itself.
-   * - `nav`: The navigation region.
-   */
-  "helix-base-app-header": Partial<
-    HelixBaseAppHeaderProps &
-      HelixBaseAppHeaderSolidJsProps &
-      BaseProps<HelixBaseAppHeader> &
-      BaseEvents
-  >;
 
   /**
-   * The fallback is the reason this is an element. An image that fails to load
-   * leaves a broken icon and no name, so the avatar listens for the error and
-   * falls back to initials derived from `name`.
+   * An element rather than a slot because it owns state: whether it is expanded,
+   * whether it is selected, and whether it is the one holding focus.
    *
-   * `name` is required for the accessible name whether or not there is an image,
-   * because an avatar with no name tells a screen-reader user nothing. Initials
-   * are hidden from assistive technology: they are a visual shorthand for the
-   * name that is already announced, and would otherwise be read out letter by
-   * letter after it.
+   * A branch is any item with something slotted into `children`, detected in
+   * `firstUpdated` rather than declared by the consumer. That is a client-side
+   * enhancement by necessity, since the server cannot inspect children, so the
+   * server renders the node as a leaf and the twisty appears on hydration. It
+   * appears rather than disappearing, which is the harmless direction.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `src`: Image to show. Falls back to initials if it fails to load.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
+   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
+   * - `selected`: Whether this item is the current one.
+   * - `expanded`: Whether a branch is showing its children.
+   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
+   * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
+   * - `isBranch`: Whether this node has children. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when the item is chosen.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   * - `(default)`: The item's label.
+   * - `children`: Nested items, which make this a branch.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus to this node.
+   * - `select() => void`: Selects this node and announces it.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `avatar`: The avatar body.
-   * - `image`: The image, when one is loading or loaded.
-   * - `initials`: The initials shown when there is no usable image.
+   * - `item`: The node, and the focus target.
+   * - `row`: The clickable label row.
+   * - `toggle`: The expand and collapse control.
+   * - `label`: The label text.
+   * - `group`: The container for nested items.
    */
-  "helix-base-avatar": Partial<
-    HelixBaseAvatarProps &
-      HelixBaseAvatarSolidJsProps &
-      BaseProps<HelixBaseAvatar> &
-      BaseEvents
+  "helix-base-tree-item": Partial<
+    HelixBaseTreeItemProps & BaseProps<HelixBaseTreeItem> & BaseEvents
   >;
 
+  /**
+   * Focus is a single tab stop, moved with the arrow keys, which is what the tree
+   * pattern requires: a sidebar of forty items should not be forty presses of Tab
+   * to get past. The tree owns which item is the tab stop and moves it as focus
+   * moves, so the browser's own focus order is never fought with.
+   *
+   * Items are found with `instanceof`, never by tag name, so the headless tier
+   * does not learn about the styled one.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the tree.
+   * - `value`: Value of the selected item, kept in step with the items themselves.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tree's items.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tree`: The tree container.
+   */
+  "helix-base-tree": Partial<
+    HelixBaseTreeProps & BaseProps<HelixBaseTree> & BaseEvents
+  >;
+};
+
+export type CustomElementsSolidJs = {
   /**
    * Carries its own open state, which is why it is an element rather than a slot.
    * Used alone it is a disclosure, and that is deliberate: shipping a separate
@@ -1117,6 +1214,82 @@ export type CustomElementsSolidJs = {
     HelixBaseAccordionProps &
       HelixBaseAccordionSolidJsProps &
       BaseProps<HelixBaseAccordion> &
+      BaseEvents
+  >;
+
+  /**
+   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
+   * the styled tier can lift the bar off the page without a scroll handler of its
+   * own. Scroll position is the one piece of state the server genuinely cannot
+   * know, so it is read on connect rather than derived: a fresh load starts at
+   * the top, which is what the server rendered, and a reload part-way down
+   * corrects on hydration.
+   *
+   * The listener is passive and reads `scrollY` only, so it never blocks
+   * scrolling.
+   *
+   * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
+   * landmark the navigation needs whether or not anything is in it; the other two
+   * are `display: contents` when unassigned and cost nothing.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `brand`: Wordmark or logo, at the inline start.
+   * - `(default)`: Primary navigation.
+   * - `actions`: Trailing actions, such as a call to action.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bar`: The banner itself.
+   * - `nav`: The navigation region.
+   */
+  "helix-base-app-header": Partial<
+    HelixBaseAppHeaderProps &
+      HelixBaseAppHeaderSolidJsProps &
+      BaseProps<HelixBaseAppHeader> &
+      BaseEvents
+  >;
+
+  /**
+   * The fallback is the reason this is an element. An image that fails to load
+   * leaves a broken icon and no name, so the avatar listens for the error and
+   * falls back to initials derived from `name`.
+   *
+   * `name` is required for the accessible name whether or not there is an image,
+   * because an avatar with no name tells a screen-reader user nothing. Initials
+   * are hidden from assistive technology: they are a visual shorthand for the
+   * name that is already announced, and would otherwise be read out letter by
+   * letter after it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
+   */
+  "helix-base-avatar": Partial<
+    HelixBaseAvatarProps &
+      HelixBaseAvatarSolidJsProps &
+      BaseProps<HelixBaseAvatar> &
       BaseEvents
   >;
 
@@ -1428,6 +1601,105 @@ export type CustomElementsSolidJs = {
     HelixBaseTagProps &
       HelixBaseTagSolidJsProps &
       BaseProps<HelixBaseTag> &
+      BaseEvents
+  >;
+
+  /**
+   * An element rather than a slot because it owns state: whether it is expanded,
+   * whether it is selected, and whether it is the one holding focus.
+   *
+   * A branch is any item with something slotted into `children`, detected in
+   * `firstUpdated` rather than declared by the consumer. That is a client-side
+   * enhancement by necessity, since the server cannot inspect children, so the
+   * server renders the node as a leaf and the twisty appears on hydration. It
+   * appears rather than disappearing, which is the harmless direction.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
+   * - `selected`: Whether this item is the current one.
+   * - `expanded`: Whether a branch is showing its children.
+   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
+   * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
+   * - `isBranch`: Whether this node has children. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when the item is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The item's label.
+   * - `children`: Nested items, which make this a branch.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus to this node.
+   * - `select() => void`: Selects this node and announces it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The node, and the focus target.
+   * - `row`: The clickable label row.
+   * - `toggle`: The expand and collapse control.
+   * - `label`: The label text.
+   * - `group`: The container for nested items.
+   */
+  "helix-base-tree-item": Partial<
+    HelixBaseTreeItemProps &
+      HelixBaseTreeItemSolidJsProps &
+      BaseProps<HelixBaseTreeItem> &
+      BaseEvents
+  >;
+
+  /**
+   * Focus is a single tab stop, moved with the arrow keys, which is what the tree
+   * pattern requires: a sidebar of forty items should not be forty presses of Tab
+   * to get past. The tree owns which item is the tab stop and moves it as focus
+   * moves, so the browser's own focus order is never fought with.
+   *
+   * Items are found with `instanceof`, never by tag name, so the headless tier
+   * does not learn about the styled one.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the tree.
+   * - `value`: Value of the selected item, kept in step with the items themselves.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SelectionChange`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tree's items.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tree`: The tree container.
+   */
+  "helix-base-tree": Partial<
+    HelixBaseTreeProps &
+      HelixBaseTreeSolidJsProps &
+      BaseProps<HelixBaseTree> &
       BaseEvents
   >;
 };

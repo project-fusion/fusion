@@ -25,6 +25,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixSelectionChangeEvent",
+          "declaration": {
+            "name": "HelixSelectionChangeEvent",
+            "package": "@helix-io/core"
+          }
+        },
+        {
+          "kind": "js",
           "name": "OpenChangeDetail",
           "declaration": {
             "name": "OpenChangeDetail",
@@ -36,6 +44,14 @@
           "name": "RemoveRequestDetail",
           "declaration": {
             "name": "RemoveRequestDetail",
+            "package": "@helix-io/core"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SelectionChangeDetail",
+          "declaration": {
+            "name": "SelectionChangeDetail",
             "package": "@helix-io/core"
           }
         },
@@ -118,6 +134,37 @@
             "name": "*",
             "module": "src/tag/index.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tree/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/accordion/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/accordion/item/accordion-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/accordion/root/accordion-root.js"
+          }
         }
       ]
     },
@@ -147,29 +194,6 @@
           "declaration": {
             "name": "*",
             "module": "src/avatar/root/avatar-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/accordion/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/accordion/item/accordion-item.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/accordion/root/accordion-root.js"
           }
         }
       ]
@@ -289,287 +313,23 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/app-header/root/app-header-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Tracks whether the page has scrolled and reflects it as `data-scrolled`, so\nthe styled tier can lift the bar off the page without a scroll handler of its\nown. Scroll position is the one piece of state the server genuinely cannot\nknow, so it is read on connect rather than derived: a fresh load starts at\nthe top, which is what the server rendered, and a reload part-way down\ncorrects on hydration.\n\nThe listener is passive and reads `scrollY` only, so it never blocks\nscrolling.\n\nBrand and actions are bare slots. `<nav>` keeps its wrapper because it is a\nlandmark the navigation needs whether or not anything is in it; the other two\nare `display: contents` when unassigned and cost nothing.",
-          "name": "HelixBaseAppHeader",
-          "cssParts": [
-            {
-              "description": "The banner itself.",
-              "name": "bar"
-            },
-            {
-              "description": "The navigation region.",
-              "name": "nav"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Wordmark or logo, at the inline start.",
-              "name": "brand"
-            },
-            {
-              "description": "Primary navigation.",
-              "name": ""
-            },
-            {
-              "description": "Trailing actions, such as a call to action.",
-              "name": "actions"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "handleScroll",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Page-level banner holding brand, navigation, and actions.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/app-header",
-            "aliases": [
-              "Masthead",
-              "Navbar",
-              "TopBar"
-            ],
-            "tier": "headless",
-            "group": "BaseAppHeader",
-            "part": "Root"
-          },
-          "tagName": "helix-base-app-header",
-          "customElement": true,
-          "modulePath": "src/app-header/root/app-header-root.ts",
-          "definitionPath": "src/app-header/root/app-header-root.ts"
-        }
-      ],
+      "path": "src/tree/index.ts",
+      "declarations": [],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseAppHeader",
+          "name": "*",
           "declaration": {
-            "name": "HelixBaseAppHeader",
-            "module": "src/app-header/root/app-header-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-app-header",
-          "declaration": {
-            "name": "HelixBaseAppHeader",
-            "module": "src/app-header/root/app-header-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/avatar/root/avatar-root.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "initialsOf",
-          "return": {
-            "type": {
-              "text": "string"
-            }
-          },
-          "parameters": [
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Initials for a name: first letter of the first and last words.\n\nA pure function of the name, so the server and the client agree without\neither of them measuring anything."
-        },
-        {
-          "kind": "class",
-          "description": "The fallback is the reason this is an element. An image that fails to load\nleaves a broken icon and no name, so the avatar listens for the error and\nfalls back to initials derived from `name`.\n\n`name` is required for the accessible name whether or not there is an image,\nbecause an avatar with no name tells a screen-reader user nothing. Initials\nare hidden from assistive technology: they are a visual shorthand for the\nname that is already announced, and would otherwise be read out letter by\nletter after it.",
-          "name": "HelixBaseAvatar",
-          "cssParts": [
-            {
-              "description": "The avatar body.",
-              "name": "avatar"
-            },
-            {
-              "description": "The image, when one is loading or loaded.",
-              "name": "image"
-            },
-            {
-              "description": "The initials shown when there is no usable image.",
-              "name": "initials"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Replaces the image and initials entirely, for an icon.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "src",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Image to show. Falls back to initials if it fails to load.",
-              "attribute": "src"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name of the person or entity. Used for the label and the initials.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "failed",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false",
-              "description": "Whether the image failed.\n\nState rather than a property: it is the element's own observation, not\nsomething a consumer sets, and it starts false on the server because the\nserver cannot know whether an image will load."
-            },
-            {
-              "kind": "field",
-              "name": "handleError",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "src",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Image to show. Falls back to initials if it fails to load.",
-              "fieldName": "src"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name of the person or entity. Used for the label and the initials.",
-              "fieldName": "name"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Represents a person or entity with an image or their initials.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/avatar",
-            "aliases": [
-              "Profile picture",
-              "Gravatar"
-            ],
-            "tier": "headless",
-            "group": "BaseAvatar",
-            "part": "Root"
-          },
-          "tagName": "helix-base-avatar",
-          "customElement": true,
-          "modulePath": "src/avatar/root/avatar-root.ts",
-          "definitionPath": "src/avatar/root/avatar-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "initialsOf",
-          "declaration": {
-            "name": "initialsOf",
-            "module": "src/avatar/root/avatar-root.ts"
+            "name": "*",
+            "module": "src/tree/item/tree-item.js"
           }
         },
         {
           "kind": "js",
-          "name": "HelixBaseAvatar",
+          "name": "*",
           "declaration": {
-            "name": "HelixBaseAvatar",
-            "module": "src/avatar/root/avatar-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-avatar",
-          "declaration": {
-            "name": "HelixBaseAvatar",
-            "module": "src/avatar/root/avatar-root.ts"
+            "name": "*",
+            "module": "src/tree/root/tree-root.js"
           }
         }
       ]
@@ -965,6 +725,293 @@
           "declaration": {
             "name": "HelixBaseAccordion",
             "module": "src/accordion/root/accordion-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/app-header/root/app-header-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Tracks whether the page has scrolled and reflects it as `data-scrolled`, so\nthe styled tier can lift the bar off the page without a scroll handler of its\nown. Scroll position is the one piece of state the server genuinely cannot\nknow, so it is read on connect rather than derived: a fresh load starts at\nthe top, which is what the server rendered, and a reload part-way down\ncorrects on hydration.\n\nThe listener is passive and reads `scrollY` only, so it never blocks\nscrolling.\n\nBrand and actions are bare slots. `<nav>` keeps its wrapper because it is a\nlandmark the navigation needs whether or not anything is in it; the other two\nare `display: contents` when unassigned and cost nothing.",
+          "name": "HelixBaseAppHeader",
+          "cssParts": [
+            {
+              "description": "The banner itself.",
+              "name": "bar"
+            },
+            {
+              "description": "The navigation region.",
+              "name": "nav"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Wordmark or logo, at the inline start.",
+              "name": "brand"
+            },
+            {
+              "description": "Primary navigation.",
+              "name": ""
+            },
+            {
+              "description": "Trailing actions, such as a call to action.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Page-level banner holding brand, navigation, and actions.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/app-header",
+            "aliases": [
+              "Masthead",
+              "Navbar",
+              "TopBar"
+            ],
+            "tier": "headless",
+            "group": "BaseAppHeader",
+            "part": "Root"
+          },
+          "tagName": "helix-base-app-header",
+          "customElement": true,
+          "modulePath": "src/app-header/root/app-header-root.ts",
+          "definitionPath": "src/app-header/root/app-header-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseAppHeader",
+          "declaration": {
+            "name": "HelixBaseAppHeader",
+            "module": "src/app-header/root/app-header-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-app-header",
+          "declaration": {
+            "name": "HelixBaseAppHeader",
+            "module": "src/app-header/root/app-header-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/avatar/root/avatar-root.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "initialsOf",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Initials for a name: first letter of the first and last words.\n\nA pure function of the name, so the server and the client agree without\neither of them measuring anything."
+        },
+        {
+          "kind": "class",
+          "description": "The fallback is the reason this is an element. An image that fails to load\nleaves a broken icon and no name, so the avatar listens for the error and\nfalls back to initials derived from `name`.\n\n`name` is required for the accessible name whether or not there is an image,\nbecause an avatar with no name tells a screen-reader user nothing. Initials\nare hidden from assistive technology: they are a visual shorthand for the\nname that is already announced, and would otherwise be read out letter by\nletter after it.",
+          "name": "HelixBaseAvatar",
+          "cssParts": [
+            {
+              "description": "The avatar body.",
+              "name": "avatar"
+            },
+            {
+              "description": "The image, when one is loading or loaded.",
+              "name": "image"
+            },
+            {
+              "description": "The initials shown when there is no usable image.",
+              "name": "initials"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Replaces the image and initials entirely, for an icon.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Image to show. Falls back to initials if it fails to load.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name of the person or entity. Used for the label and the initials.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "failed",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the image failed.\n\nState rather than a property: it is the element's own observation, not\nsomething a consumer sets, and it starts false on the server because the\nserver cannot know whether an image will load."
+            },
+            {
+              "kind": "field",
+              "name": "handleError",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Image to show. Falls back to initials if it fails to load.",
+              "fieldName": "src"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name of the person or entity. Used for the label and the initials.",
+              "fieldName": "name"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Represents a person or entity with an image or their initials.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/avatar",
+            "aliases": [
+              "Profile picture",
+              "Gravatar"
+            ],
+            "tier": "headless",
+            "group": "BaseAvatar",
+            "part": "Root"
+          },
+          "tagName": "helix-base-avatar",
+          "customElement": true,
+          "modulePath": "src/avatar/root/avatar-root.ts",
+          "definitionPath": "src/avatar/root/avatar-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "initialsOf",
+          "declaration": {
+            "name": "initialsOf",
+            "module": "src/avatar/root/avatar-root.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBaseAvatar",
+          "declaration": {
+            "name": "HelixBaseAvatar",
+            "module": "src/avatar/root/avatar-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-avatar",
+          "declaration": {
+            "name": "HelixBaseAvatar",
+            "module": "src/avatar/root/avatar-root.ts"
           }
         }
       ]
@@ -2103,6 +2150,493 @@
           "declaration": {
             "name": "HelixBaseTag",
             "module": "src/tag/root/tag-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tree/item/tree-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An element rather than a slot because it owns state: whether it is expanded,\nwhether it is selected, and whether it is the one holding focus.\n\nA branch is any item with something slotted into `children`, detected in\n`firstUpdated` rather than declared by the consumer. That is a client-side\nenhancement by necessity, since the server cannot inspect children, so the\nserver renders the node as a leaf and the twisty appears on hydration. It\nappears rather than disappearing, which is the harmless direction.",
+          "name": "HelixBaseTreeItem",
+          "cssParts": [
+            {
+              "description": "The node, and the focus target.",
+              "name": "item"
+            },
+            {
+              "description": "The clickable label row.",
+              "name": "row"
+            },
+            {
+              "description": "The expand and collapse control.",
+              "name": "toggle"
+            },
+            {
+              "description": "The label text.",
+              "name": "label"
+            },
+            {
+              "description": "The container for nested items.",
+              "name": "group"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The item's label.",
+              "name": ""
+            },
+            {
+              "description": "Nested items, which make this a branch.",
+              "name": "children"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies the item to the consumer, carried in `SelectionChange`.",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item is the current one.",
+              "attribute": "selected",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "expanded",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a branch is showing its children.",
+              "attribute": "expanded",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "level",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Depth from the root, set by the tree so indentation needs no CSS nesting.",
+              "attribute": "level",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "focusable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item holds the tree's single tab stop."
+            },
+            {
+              "kind": "field",
+              "name": "branch",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether anything is slotted into `children`. Read after first render."
+            },
+            {
+              "kind": "field",
+              "name": "isBranch",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether this node has children.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "focusItem",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Moves focus to this node.",
+              "type": {
+                "text": "focusItem() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Selects this node and announces it.",
+              "type": {
+                "text": "select() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleRowClick",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectionChangeEvent"
+              },
+              "description": "Fired when the item is chosen.",
+              "name": "SelectionChange",
+              "reactProp": "onSelectionChange"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies the item to the consumer, carried in `SelectionChange`.",
+              "fieldName": "value"
+            },
+            {
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item is the current one.",
+              "fieldName": "selected"
+            },
+            {
+              "name": "expanded",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a branch is showing its children.",
+              "fieldName": "expanded"
+            },
+            {
+              "name": "level",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Depth from the root, set by the tree so indentation needs no CSS nesting.",
+              "fieldName": "level"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One node in a tree.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tree",
+            "aliases": [
+              "TreeNode",
+              "Branch",
+              "Leaf"
+            ],
+            "tier": "headless",
+            "group": "BaseTree",
+            "part": "Item"
+          },
+          "tagName": "helix-base-tree-item",
+          "customElement": true,
+          "modulePath": "src/tree/item/tree-item.ts",
+          "definitionPath": "src/tree/item/tree-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTreeItem",
+          "declaration": {
+            "name": "HelixBaseTreeItem",
+            "module": "src/tree/item/tree-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-tree-item",
+          "declaration": {
+            "name": "HelixBaseTreeItem",
+            "module": "src/tree/item/tree-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tree/root/tree-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Focus is a single tab stop, moved with the arrow keys, which is what the tree\npattern requires: a sidebar of forty items should not be forty presses of Tab\nto get past. The tree owns which item is the tab stop and moves it as focus\nmoves, so the browser's own focus order is never fought with.\n\nItems are found with `instanceof`, never by tag name, so the headless tier\ndoes not learn about the styled one.",
+          "name": "HelixBaseTree",
+          "cssParts": [
+            {
+              "description": "The tree container.",
+              "name": "tree"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The tree's items.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Tree'",
+              "description": "Accessible name for the tree.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Value of the selected item, kept in step with the items themselves.",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "HelixBaseTreeItem[]"
+              },
+              "privacy": "private",
+              "description": "Every item, in the order a reader moving down would meet them.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "visibleItems",
+              "type": {
+                "text": "HelixBaseTreeItem[]"
+              },
+              "privacy": "private",
+              "description": "Items a reader can actually reach: not inside a collapsed branch.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleSelection",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "syncItems",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Pushes tree-owned state down: which item is selected, which holds the tab\nstop, and how deep each one sits.\n\nDepth is computed here rather than by each item counting its own ancestors,\nso an item moved in the tree gets the right indent without knowing it moved."
+            },
+            {
+              "kind": "method",
+              "name": "move",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "from",
+                  "type": {
+                    "text": "HelixBaseTreeItem"
+                  }
+                },
+                {
+                  "name": "delta",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "focusOn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "HelixBaseTreeItem | undefined"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectionChangeEvent"
+              },
+              "description": "Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.",
+              "name": "SelectionChange",
+              "reactProp": "onSelectionChange"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Tree'",
+              "description": "Accessible name for the tree.",
+              "fieldName": "label"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Value of the selected item, kept in step with the items themselves.",
+              "fieldName": "value"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A tree of items, navigable entirely from the keyboard.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tree",
+            "aliases": [
+              "FileTree",
+              "Navigation tree"
+            ],
+            "tier": "headless",
+            "group": "BaseTree",
+            "part": "Root"
+          },
+          "tagName": "helix-base-tree",
+          "customElement": true,
+          "modulePath": "src/tree/root/tree-root.ts",
+          "definitionPath": "src/tree/root/tree-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTree",
+          "declaration": {
+            "name": "HelixBaseTree",
+            "module": "src/tree/root/tree-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-tree",
+          "declaration": {
+            "name": "HelixBaseTree",
+            "module": "src/tree/root/tree-root.ts"
           }
         }
       ]
