@@ -1,0 +1,72 @@
+---
+title: Trace
+description: 'The provenance spine: why(), replay, and cascading deletion.'
+---
+
+# Trace
+
+Every memory, context assembly, tool call, and output is a node with edges to
+whatever produced it. Provenance is the spine of Cortex rather than a module
+beside it, and three capabilities fall out of that which cannot be retrofitted.
+
+## why()
+
+The query the product rests on.
+
+```rust
+use cortex_trace::{Graph, Node, NodeKind};
+
+let mut graph = Graph::new();
+let source = graph.insert(Node::new(NodeKind::Source, vec![]));
+let memory = graph.insert(Node::new(NodeKind::Memory, vec![source]));
+let context = graph.insert(Node::new(NodeKind::Context, vec![memory]));
+let output = graph.insert(Node::new(NodeKind::Output, vec![context]));
+
+// The full derivation: which memories, which context decisions, which model.
+let trace = graph.why(output);
+assert_eq!(trace.len(), 4);
+```
+
+`why()` walks the derivation transitively and terminates on cycles, which a
+buggy writer can produce.
+
+## Replay
+
+Given a trace, re-run it against a different model or prompt version and diff
+the result. This is how you regression-test a system whose outputs are not
+deterministic: you hold the inputs fixed and compare, rather than asserting on
+text.
+
+## Cascading deletion
+
+Deleting a memory must also remove the summaries, embeddings, and outputs
+computed from it, or "delete" is a promise the system cannot keep.
+
+```rust
+let removed = graph.delete_cascade(memory);
+
+assert_eq!(removed.len(), 3);          // memory, context, and output
+assert!(graph.get(output).is_none());  // derived output does not survive
+assert!(graph.get(source).is_some());  // ancestors are untouched
+```
+
+A reverse index is maintained on insert, so cascading deletion does not require
+a full scan, and dangling parent references are dropped afterwards so the graph
+stays consistent.
+
+This is the Sovereignty Constraint made mechanical. A user's right to delete is
+only real if the system can find everything that was derived from what they
+deleted, and provenance is what makes that tractable.
+
+## Node kinds
+
+| Kind | Represents |
+| --- | --- |
+| `Source` | Raw input from outside the system |
+| `Memory` | A stored memory, episodic or semantic |
+| `Context` | A context window assembled for a task |
+| `ToolCall` | A tool invocation and its result |
+| `Output` | Model output |
+
+Each node carries `metadata` for kind-specific detail: model id, prompt
+version, tool name, relevance scores.

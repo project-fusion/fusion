@@ -1,6 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
+    "analyze": {
+      "dependsOn": ["^build", "build"],
+      "inputs": ["src/**", "custom-elements-manifest.config.mjs"],
+      "outputs": ["custom-elements.json"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "tsconfig.json", "package.json"],

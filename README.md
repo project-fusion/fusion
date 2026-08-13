@@ -44,9 +44,25 @@ on purpose and are not softened as the company matures.
 | Doc | Contents |
 |---|---|
 
+## Packages
+
+| Domain | Packages |
+|---|---|
+| **Helix** (`@helix-io/*`) | `styles` `core` `headless` `web` `react` `icons` `theme` `cem` `docs` |
+| **Cortex** (crates, `@cortex-io/*`) | `cortex-core` `cortex-trace` `cortex-engram` `docs` |
+
+Versions are **lockstep within a domain**, independent across domains. See
+[`CLAUDE.md`](CLAUDE.md).
+
 ## Stack
 
 Rust for the backend and substrate cores. TypeScript for the frontend.
+Cargo workspace for Rust, bun and Turborepo for TypeScript, Biome for both
+linting and formatting.
+
+```bash
+bun install && bun run verify
+```
 
 ## Conventions
 

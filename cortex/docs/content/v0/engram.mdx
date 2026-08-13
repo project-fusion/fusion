@@ -1,0 +1,73 @@
+---
+title: Engram
+description: Episodic and semantic memory, consolidation, and decay.
+---
+
+# Engram
+
+**Storage is not memory.** A table of everything that ever happened is the raw
+material memory operates on. Memory implies selection, consolidation, and
+forgetting.
+
+## Two kinds, for now
+
+| Kind | Holds | Example |
+| --- | --- | --- |
+| **Episodic** | What happened. Timestamped, raw, append-only | "At 09:14 the user asked about tariff windows" |
+| **Semantic** | What is true. Distilled, deduplicated, confidence-scored | "The user's utility bills on a time-of-use plan" |
+
+Procedural memory (distilling repeated successful action sequences into
+reusable procedure) is deferred to v1. It is a research problem, and the first
+two already differentiate.
+
+```rust
+use cortex_core::Id;
+use cortex_engram::{Episode, Fact, Memory};
+
+let mut memory = Memory::new();
+let trace = Id::new();
+
+let episode = memory.record(Episode::new("bills on a time-of-use plan", trace));
+memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), None);
+```
+
+## Consolidation
+
+Episodes accumulate; a background pass distills them into semantic facts.
+`unconsolidated()` returns the episodes not yet folded into any fact, which is
+the input to that pass.
+
+```rust
+let pending = memory.unconsolidated();
+```
+
+Consolidation runs as a background job rather than inline. Running it on the
+request path is what makes a memory system slow enough that people turn it off.
+
+## Superseding, not overwriting
+
+When a newer fact contradicts an older one, the old fact is marked superseded
+and **retained**. Provenance needs it to explain outputs that were produced
+while it was current.
+
+```rust
+let old = memory.assert_fact(Fact::new("on a flat rate plan", vec![episode], 0.6), None);
+let new = memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), Some(old));
+
+assert_eq!(memory.current_facts().len(), 1); // only the newer one is current
+```
+
+## Forgetting is an operation
+
+A memory system that never lowers its confidence in stale claims is a memory
+system that confidently tells you things that stopped being true.
+
+```rust
+let fact = Fact::new("x", vec![], 1.0);
+
+assert_eq!(fact.decayed_confidence(30.0, 30.0), 0.5);  // one half-life
+assert!(fact.decayed_confidence(300.0, 30.0) < 0.01);  // ten half-lives
+```
+
+Decay is exponential with a configurable half-life, and confidence is reinforced
+when new episodes support the same claim.

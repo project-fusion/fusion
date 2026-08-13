@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixDisclosure",
+          "declaration": {
+            "name": "HelixDisclosure",
+            "module": "./disclosure/disclosure.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/disclosure/disclosure.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Disclosures let users show and hide a section of related content.",
+          "name": "HelixDisclosure",
+          "cssProperties": [
+            {
+              "description": "Surface behind the disclosure.",
+              "name": "--disclosure-background-color"
+            },
+            {
+              "description": "Border color of the container.",
+              "name": "--disclosure-border-color"
+            },
+            {
+              "description": "Inner padding of trigger and content.",
+              "name": "--disclosure-padding"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "The clickable summary row.",
+              "name": "trigger"
+            },
+            {
+              "description": "The revealed region.",
+              "name": "content"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'outlined' | 'plain'"
+              },
+              "default": "'outlined'",
+              "description": "Visual weight of the disclosure.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "dense",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Reduces the vertical padding for dense layouts.",
+              "attribute": "dense",
+              "reflects": true
+            }
+          ],
+          "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'outlined' | 'plain'"
+              },
+              "default": "'outlined'",
+              "description": "Visual weight of the disclosure.",
+              "fieldName": "appearance"
+            },
+            {
+              "name": "dense",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Reduces the vertical padding for dense layouts.",
+              "fieldName": "dense"
+            }
+          ],
+          "superclass": {
+            "name": "HelixDisclosureBase",
+            "package": "@helix-io/headless"
+          },
+          "tagName": "helix-disclosure",
+          "customElement": true,
+          "helix": {
+            "tier": "styled"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixDisclosure",
+          "declaration": {
+            "name": "HelixDisclosure",
+            "module": "src/disclosure/disclosure.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-disclosure",
+          "declaration": {
+            "name": "HelixDisclosure",
+            "module": "src/disclosure/disclosure.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

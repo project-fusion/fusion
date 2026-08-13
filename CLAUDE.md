@@ -50,12 +50,47 @@ Domain folders at the repo root, packages flat inside them. A new product gets a
 new top-level folder.
 
 ```
-helix/     styles core headless web react icons theme
-cortex/    core trace engram
-docs/      strategy, tracked
+helix/     styles core headless web react icons theme cem docs
+cortex/    core trace engram docs
+docs/      company strategy, tracked
 .local/    per-machine scratch, gitignored
 tooling/   shared CI and script infrastructure
 ```
+
+`<domain>/docs` is a **content package**, not a site: versioned MDX plus a typed
+registry. The site that renders it is a separate app and depends on this. That
+seam is what lets one site serve several documentation versions, and what makes
+docs versionable at all.
+
+## Versioning: lockstep per domain
+
+**Every package within a domain shares one version. Domains move
+independently.**
+
+| Domain | Version | Covers |
+|---|---|---|
+| Helix | one | `@helix-io/*`, including `docs` |
+| Cortex | one | `cortex-*` crates, `@cortex-io/*` |
+
+Full-repo lockstep is the obvious alternative and it is wrong here for one
+concrete reason: docs packages carry the version of the thing they document. If
+every package moved together, publishing a Cortex fix would bump the Helix docs
+to a version in which nothing about Helix changed, and `helix.fusion.dev/v0.4`
+would document a release that never happened.
+
+Per-domain lockstep keeps the property that actually matters, which is that
+`@helix-io/react@x` is always known to work with `@helix-io/web@x`. There is no
+compatibility matrix inside a domain, and no meaningless version churn across
+them.
+
+Today the Rust workspace contains only Cortex crates, so
+`[workspace.package] version` *is* the Cortex version. **When Helix gains a Rust
+crate, that inherited version has to be split** into per-crate versions, or
+Helix and Cortex are silently back in full lockstep.
+
+Nothing is published yet: every npm package is `private: true` and every crate
+is `publish = false`. Changing this policy is free right now and expensive
+later.
 
 **The folder drops the domain prefix; the package name keeps it.** `helix/web`
 is the package `@helix-io/web`; `cortex/core` is the crate `cortex-core`. Cargo
@@ -137,6 +172,43 @@ unreliable. Two rules that fall out of it and are easy to get wrong:
 
 Both are covered by regression tests in `helix/theme/src/derive.test.ts`. Do not
 weaken them.
+
+## The custom elements manifest
+
+`@helix-io/cem` owns the analyzer config and every Helix plugin. Component
+packages do not configure the analyzer themselves; they call
+`createHelixCemConfig({ tier })` so a new plugin is added once rather than
+copied into each package and left to drift.
+
+```js
+// helix/web/custom-elements-manifest.config.mjs
+import { createHelixCemConfig } from '@helix-io/cem'
+
+export default createHelixCemConfig({ tier: 'styled' })
+```
+
+Three plugins ship today. `helix-tier` stamps each component with its tier,
+because the React wrapper generator wraps only the styled tier and cannot infer
+that. `helix-react-events` records the generated prop name on each event
+(`open-change` becomes `onOpenChange`) so the React API is inspectable from the
+manifest rather than implicit in the generator. `helix-convention-lint` enforces
+the conventions in this file and **fails the build** by default.
+
+Two things to know when writing a plugin:
+
+- **Plugins are objects, not factories.** The analyzer's `Config` type says
+  `Array<() => unknown>`, but its runtime destructures hooks straight off each
+  element. The type is wrong; `createHelixCemConfig` casts at that one boundary.
+- **Do not import `custom-elements-manifest/schema`.** The analyzer bundles its
+  own copy, and two copies produce nominally distinct types that
+  `exactOptionalPropertyTypes` refuses to unify. `@helix-io/cem` declares the
+  manifest structurally in `types.ts` instead.
+
+**The analyzer cannot follow a mixin into another package.** `open` and
+`defaultOpen` come from `WithOpen` in `@helix-io/core`, so anything a component
+exposes through a mixin has to be documented on the component itself with
+`@fires`, `@property`, or similar. Undocumented mixin API is invisible to IDE
+tooltips, the wrapper generator, and any agent reading the manifest.
 
 ## Where does a fix live?
 

@@ -1,0 +1,94 @@
+---
+title: Tiers
+description: Why the headless and styled tiers are separate packages.
+---
+
+# Tiers
+
+Helix ships as five packages. Each has one job, and the dependency direction
+never reverses.
+
+| Package | Owns | Depends on |
+| --- | --- | --- |
+| `@helix-io/styles` | Tokens and the base layer. Pure CSS | nothing |
+| `@helix-io/core` | Element base class, mixins, decorators | Lit |
+| `@helix-io/headless` | Structure, accessibility, state, form participation | `core` |
+| `@helix-io/web` | Presentation: tokens, parts, `appearance` and `tone` | `headless`, `styles` |
+| `@helix-io/react` | Generated React wrappers | `web` |
+
+## The rule that makes the split worth it
+
+**`headless` must never depend on `styles`.**
+
+That single constraint is what makes the headless tier independently
+consumable, and therefore separately valuable. Consume it and bring your own
+styling entirely; nothing about how Helix looks comes with it. If styling leaks
+downward, the five packages are one package in five files.
+
+## What belongs where
+
+The base tier owns what a component **is and does**: markup structure, ARIA
+wiring, slots, events, internal state, form participation. It ships no CSS, no
+token references, and no `appearance` or `tone` properties.
+
+The styled tier extends it and adds only presentation. Token references live
+here.
+
+```ts
+// headless: no CSS, no tokens
+export class HelixDisclosureBase extends WithOpen(HelixElement) {
+  protected override render() {
+    return html`
+      <div part="container">
+        <button aria-expanded=${this.isOpen} part="trigger" @click=${this.toggle}>
+          <slot name="summary"></slot>
+        </button>
+      </div>
+    `
+  }
+}
+
+// styled: extends the base, adds presentation only
+@customElement('helix-disclosure')
+export class HelixDisclosure extends HelixDisclosureBase {
+  @property({ reflect: true })
+  appearance: 'outlined' | 'plain' = 'outlined'
+
+  static override styles = css`
+    [part='trigger'] {
+      min-block-size: var(--helix-control-height);
+      padding: var(--disclosure-padding, var(--helix-space-3));
+    }
+  `
+}
+```
+
+## Styling from the outside
+
+Shadow DOM markup uses CSS Shadow Parts, not class names. Every structural
+element carries a `part`, which doubles as the public override API:
+
+```css
+helix-disclosure::part(trigger) {
+  font-weight: 600;
+}
+```
+
+For single-knob changes, prefer the per-component custom property. It defaults
+to a system token, so overriding it restyles one component without touching
+`--helix-*` and affecting everything else:
+
+```css
+helix-disclosure {
+  --disclosure-padding: 1rem 1.5rem;
+}
+```
+
+## Mixins and tooling
+
+`open` and `defaultOpen` come from the `WithOpen` mixin in `@helix-io/core`.
+The manifest analyzer cannot follow a mixin into another package, so any
+mixin-provided API a component exposes has to be documented on the component
+itself with `@fires`, `@property`, or similar. Undocumented mixin API is
+invisible to IDE tooltips, the React wrapper generator, and any agent reading
+the manifest.

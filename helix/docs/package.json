@@ -1,0 +1,30 @@
+{
+  "description": "Versioned documentation content and registry for Helix.",
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./content/*": "./content/*"
+  },
+  "files": [
+    "content",
+    "dist"
+  ],
+  "license": "UNLICENSED",
+  "main": "./dist/index.js",
+  "name": "@helix-io/docs",
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "bun test src",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "version": "0.0.1"
+}

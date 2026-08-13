@@ -1,0 +1,61 @@
+---
+title: Introduction
+description: 'What Cortex is: memory and provenance, not a model wrapper.'
+---
+
+# Cortex
+
+Cortex is Fusion's cognitive substrate. Rust, local-first, storage-agnostic.
+
+**Most AI systems are amnesiac and unaccountable. Cortex is neither.**
+
+Two properties turn a model call into cognition:
+
+- **Memory** that persists, consolidates, and forgets. Not a log of everything
+  that ever happened, which is the raw material memory operates on rather than
+  memory itself.
+- **Provenance** that makes every output traceable to its inputs. Almost no AI
+  stack can answer *"why did it say that?"* Cortex answers it by construction,
+  because provenance is the spine rather than a module.
+
+## Why local-first
+
+An AI that remembers you, but whose memory lives on someone else's server, is
+not cognitive sovereignty. It relocates the dependency instead of removing it.
+
+Cortex defaults to a single SQLite file on your machine. The hosted tier is
+convenience, never a chokepoint. The `Provider` trait carries an `is_local`
+flag so a product can tell the user whether their data left the device:
+
+```rust
+use cortex_core::provider::{MockProvider, Provider};
+
+let provider = MockProvider { reply: "hello".into() };
+assert!(provider.is_local());
+```
+
+## Primitives
+
+| Module | Crate | Owns |
+| --- | --- | --- |
+| **Engram** | `cortex-engram` | Memory: episodic, semantic, later procedural |
+| **Trace** | `cortex-trace` | Provenance: `why()`, replay, cascading deletion |
+| **Recall** | `cortex-recall` | Context assembly. Not yet built |
+| Core | `cortex-core` | Identifiers, provider abstraction, shared errors |
+
+Three modules carry the differentiated ideas and earn names of their own.
+Everything else stays descriptive.
+
+## Identifiers
+
+Ids are UUIDv7 rather than v4. The timestamp prefix makes them sort in creation
+order, which turns index locality and time-range scans over episodic memory
+into a property of the key rather than a separate column.
+
+```rust
+use cortex_core::Id;
+
+let first = Id::new();
+let second = Id::new();
+assert!(first <= second);
+```

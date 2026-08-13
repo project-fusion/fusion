@@ -1,9 +1,12 @@
 {
+  "customElements": "custom-elements.json",
   "dependencies": {
     "@helix-io/core": "workspace:*"
   },
   "description": "Headless component tier. Structure, accessibility, state, and form participation. No styling.",
   "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@helix-io/cem": "workspace:*",
     "lit": "^3.2.1"
   },
   "exports": {
@@ -13,6 +16,7 @@
     }
   },
   "files": [
+    "custom-elements.json",
     "dist"
   ],
   "license": "UNLICENSED",
@@ -26,6 +30,7 @@
     "access": "public"
   },
   "scripts": {
+    "analyze": "cem analyze --config custom-elements-manifest.config.mjs",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

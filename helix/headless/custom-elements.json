@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixDisclosureBase",
+          "declaration": {
+            "name": "HelixDisclosureBase",
+            "module": "./disclosure/disclosure-base.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/disclosure/disclosure-base.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Disclosures let users show and hide a section of related content.\n\nThe headless tier owns structure, accessibility wiring, and state. It ships\nno CSS and references no tokens: styling is the styled tier's job. Consumers\nwho want to bring their own styling entirely can use this tier directly.\n\n`open` and `defaultOpen` come from the `WithOpen` mixin, and the analyzer\ncannot follow a mixin into another package, so the event it emits is declared\nhere. Any mixin-provided API a component exposes has to be documented on the\ncomponent or it is invisible to tooling.",
+          "name": "HelixDisclosureBase",
+          "slots": [
+            {
+              "description": "The always-visible trigger content.",
+              "name": "summary"
+            },
+            {
+              "description": "The content revealed when open.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "handleToggle",
+              "privacy": "protected"
+            }
+          ],
+          "events": [
+            {
+              "description": "Fired when the disclosure is opened or closed. Carries `{ open: boolean }`. In controlled mode this is the only signal; the element does not update itself.",
+              "name": "open-change",
+              "reactProp": "onOpenChange"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "WithOpen",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "helix": {
+            "tier": "headless"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixDisclosureBase",
+          "declaration": {
+            "name": "HelixDisclosureBase",
+            "module": "src/disclosure/disclosure-base.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

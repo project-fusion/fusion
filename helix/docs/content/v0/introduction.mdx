@@ -1,0 +1,68 @@
+---
+title: Introduction
+description: What Helix is, and the five tiers it ships as.
+---
+
+# Helix
+
+Helix is Fusion's design system: the DNA every Fusion product is built from.
+Tokens, element primitives, a headless component tier, a styled tier, and
+generated React wrappers.
+
+Two things make it different from a component library.
+
+**Theming is derivation, not override.** You supply a handful of intent inputs
+and the system computes a complete token set whose every foreground and
+background pair meets its contrast target by construction. See
+[Theming](./theming).
+
+**AI is a first-class consumer.** Components are described by a custom elements
+manifest with typed enums, documented parts, and generated React prop names. An
+agent can write correct Helix code by reading types alone. That is why
+conventions like inline literal unions and documented CSS parts are enforced at
+analysis time rather than left to review.
+
+## Install
+
+```sh
+bun add @helix-io/web @helix-io/styles
+```
+
+Import the tokens once at your app root, then use the components:
+
+```ts
+import '@helix-io/styles/tokens.css'
+import '@helix-io/styles/base.css'
+import '@helix-io/web'
+```
+
+```html
+<helix-disclosure appearance="outlined">
+  <span slot="summary">What is Helix?</span>
+  <p>A design system that derives its own accessible palette.</p>
+</helix-disclosure>
+```
+
+In React, use the wrappers instead of the custom elements directly:
+
+```tsx
+import { Disclosure } from '@helix-io/react'
+
+<Disclosure appearance="outlined" onOpenChange={({ open }) => track(open)}>
+  <span slot="summary">What is Helix?</span>
+  <p>A design system that derives its own accessible palette.</p>
+</Disclosure>
+```
+
+## Packages
+
+| Package | Use when |
+| --- | --- |
+| `@helix-io/styles` | Always. Tokens and the base layer |
+| `@helix-io/web` | You want Helix components as-is |
+| `@helix-io/react` | Same, in a React app |
+| `@helix-io/headless` | You want the behavior and none of the styling |
+| `@helix-io/theme` | You are generating or validating a theme |
+| `@helix-io/core` | You are building a new Helix component |
+
+See [Tiers](./tiers) for how they relate and which one to reach for.

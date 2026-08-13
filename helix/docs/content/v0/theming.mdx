@@ -1,0 +1,73 @@
+---
+title: Theming
+description: Deriving an accessible token set from intent inputs.
+---
+
+# Theming
+
+**Tokens are a function, not a table.**
+
+A design system that ships two hundred hand-picked hex values can only offer
+override. You change one, break contrast somewhere three components away, and
+never find out. That is a config file, not a theming system.
+
+`@helix-io/theme` computes a complete token set from a handful of intent
+inputs, and every foreground and background pair meets its contrast target **by
+construction** rather than by audit.
+
+```ts
+import { deriveTheme, toCss } from '@helix-io/theme'
+
+const theme = deriveTheme({
+  brand: { chroma: 0.19, hue: 258, lightness: 0.58 },
+  contrastTarget: 4.5, // 4.5 is WCAG AA, 7 is AAA
+  scheme: 'light',
+})
+
+if (theme.violations.length > 0) {
+  throw new Error(theme.violations.join('\n'))
+}
+
+console.log(toCss(theme))
+```
+
+## Why OKLCH
+
+Equal numeric steps in sRGB are not equal perceptual steps, which makes both
+scale generation and contrast math unreliable. OKLCH is what makes derivation
+possible at all. Colors are authored in it and converted at the edge.
+
+The brand color keeps its hue and chroma; only lightness moves to meet the
+target. That is what preserves brand identity while guaranteeing contrast.
+
+## Two failure modes it protects against
+
+Both of these produce a palette that passes review and fails in production.
+Both are covered by regression tests.
+
+**Solving against colors that cannot be rendered.** A near-white surface
+carrying brand tint falls outside the sRGB gamut and gets truncated on the way
+to hex, breaking both the intended hue and the contrast just solved for. Every
+color is gamut-fitted before it is solved against, and a token reports
+`chromaReduced` when fitting changed it rather than clipping silently.
+
+**Verifying against only one surface.** Text lands on `surface` as often as on
+`background`: cards, dialogs, menus. In a dark theme `surface` is *lighter*
+than `background`, so light text loses contrast inside every card while the
+page itself passes. Foregrounds are solved against the hardest surface they
+land on, not just the page background.
+
+## Inspecting a theme
+
+Every derived token carries the check that produced it:
+
+```ts
+const theme = deriveTheme({ brand })
+
+for (const token of theme.tokens) {
+  console.log(token.name, token.hex, token.contrast, token.chromaReduced)
+}
+```
+
+`violations` is empty when the theme passes. Anything that could not reach its
+target at the requested chroma is reported there rather than shipped.
