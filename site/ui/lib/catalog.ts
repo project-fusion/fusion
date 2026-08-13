@@ -78,11 +78,29 @@ interface RawDeclaration {
   tagName?: string
 }
 
+/**
+ * Drops `undefined` from a union.
+ *
+ * Every reflected property is optional, because the default state of a Helix
+ * component is the absent attribute: a reflected default would put an attribute
+ * on the host that a React consumer's server markup never had. That makes the
+ * declared type `'primary' | 'neutral' | undefined`, and the `undefined` is an
+ * implementation detail of how the default is expressed rather than a value
+ * anyone sets. The table reads better without it, and the attribute being
+ * omissible is already what "attribute" means.
+ */
+const withoutUndefined = (text: string): string =>
+  text
+    .split('|')
+    .map((part) => part.trim())
+    .filter((part) => part !== 'undefined')
+    .join(' | ')
+
 const members = (rows: RawNamed[] | undefined): ApiMember[] =>
   (rows ?? []).map((row) => ({
     description: row.description ?? '',
     name: row.name ?? '',
-    type: row.type?.text ?? '',
+    type: withoutUndefined(row.type?.text ?? ''),
   }))
 
 const readManifest = (path: string): RawDeclaration[] => {

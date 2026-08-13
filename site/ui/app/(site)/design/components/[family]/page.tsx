@@ -71,7 +71,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
         ))}
       </helix-tree>
 
-      <helix-flex direction="column" gap="xl">
+      <helix-flex class="docsMain" direction="column" gap="xl">
         <helix-flex direction="column" gap="sm">
           <helix-text as="h1" appearance="heading">
             {family.label}
@@ -110,7 +110,13 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
         </helix-flex>
 
         {family.elements.map((element) => (
-          <helix-flex class="element" direction="column" gap="lg" key={element.tagName}>
+          <helix-flex
+            class="element"
+            direction="column"
+            gap="lg"
+            id={element.tagName}
+            key={element.tagName}
+          >
             <helix-flex direction="column" gap="2xs">
               <helix-flex align="center" gap="sm">
                 <helix-text as="h2" appearance="subheading">
@@ -143,6 +149,28 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             />
           </helix-flex>
         ))}
+      </helix-flex>
+
+      {/* On this page. A plain list of the elements documented below, which is
+          what a table of contents for a reference page is. When the Table of
+          Contents component lands it drops into this rail unchanged. */}
+      <helix-flex class="docsRail" direction="column" gap="2xs">
+        <helix-text appearance="label" class="docsRailTitle" tone="subtle">
+          On this page
+        </helix-text>
+        <helix-flex class="docsRailList" direction="column">
+          {family.elements.map((element) => (
+            <helix-link
+              appearance="quiet"
+              class="docsRailLink"
+              href={`#${element.tagName}`}
+              key={element.tagName}
+              size="sm"
+            >
+              {element.label} · {element.tier}
+            </helix-link>
+          ))}
+        </helix-flex>
       </helix-flex>
     </div>
   )

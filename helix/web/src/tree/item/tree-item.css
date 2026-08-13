@@ -36,9 +36,12 @@
   color: var(--helix-color-foreground);
 }
 
+/* A surface, not the accent. The selected node says where you are, and the
+   accent colour is reserved for state; using it here made the current page the
+   loudest thing on the screen. */
 :host([selected]) [part="row"] {
-  background-color: var(--helix-color-primary-subtle);
-  color: var(--helix-color-primary);
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-medium);
 }
 

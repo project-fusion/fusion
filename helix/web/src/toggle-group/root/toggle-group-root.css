@@ -23,12 +23,15 @@
 }
 
 /* One marker that travels. Its geometry is measured from the selected item and
-   written to the host, because labels differ in length and no fraction of the
-   group is right for all of them. */
+   written onto this element, because labels differ in length and no fraction of
+   the group is right for all of them.
+
+   Its radius matches an item's rather than the wrapper's, so the marker sits
+   concentrically inside the group instead of reading as a second shape. */
 [part="indicator"] {
   background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
   block-size: var(--_toggle-height);
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-sm);
   inline-size: var(--_indicator-w, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;
