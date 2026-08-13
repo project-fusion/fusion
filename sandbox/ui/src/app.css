@@ -182,10 +182,6 @@ main {
   inline-size: 100%;
 }
 
-#stage[data-wrapper="inline"] {
-  justify-content: center;
-}
-
 .panels {
   display: grid;
   gap: var(--helix-space-lg);
@@ -311,4 +307,67 @@ main {
     block-size: auto;
     position: static;
   }
+}
+
+/* The markup is the single source of truth: property controls rewrite it, and
+   typing in it re-renders the preview. A read-only snippet beside an editable
+   preview would be two versions of the same thing, one of them wrong. */
+#source {
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  inline-size: 100%;
+  line-height: var(--helix-leading-normal);
+  min-block-size: 8rem;
+  padding: var(--helix-space-sm);
+  resize: vertical;
+}
+
+#source:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+#examples-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xs);
+}
+
+#examples-bar:empty {
+  display: none;
+}
+
+.exampleTab {
+  background: none;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+  text-transform: capitalize;
+}
+
+.exampleTab.active {
+  background-color: var(--helix-color-primary-subtle);
+  border-color: var(--helix-color-border-accent);
+  color: var(--helix-color-primary);
+}
+
+#stage[data-wrapper="auto"] {
+  justify-content: center;
+}
+
+.srOnly {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }

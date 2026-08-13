@@ -1,5 +1,3 @@
-import { type Example, exampleFor } from './examples.js'
-
 /**
  * The sandbox, driven entirely by the custom elements manifest.
  *
@@ -31,6 +29,11 @@ interface EventDoc extends Named {
   type?: Typed
 }
 
+interface Example {
+  html: string
+  slug: string
+}
+
 interface Component {
   aliases: string[]
   attributes: Attribute[]
@@ -42,6 +45,8 @@ interface Component {
   name: string
   since: string | undefined
   slots: Named[]
+  /** `src/<family>/...`, which is where the component's examples live. */
+  family: string
   status: string | undefined
   summary: string | undefined
   tagName: string
@@ -58,9 +63,17 @@ interface HelixMeta {
   status?: string
 }
 
-const manifestData = JSON.parse(
-  document.querySelector('#manifest')?.textContent ?? '{"modules":[]}',
-) as { modules: Array<{ declarations?: Array<Record<string, unknown>> }> }
+const readJson = <T>(id: string, fallback: T): T => {
+  const raw = document.querySelector(`#${id}`)?.textContent
+  return raw ? (JSON.parse(raw) as T) : fallback
+}
+
+const manifestData = readJson('manifest', { modules: [] } as {
+  modules: Array<{ declarations?: Array<Record<string, unknown>> }>
+})
+
+/** Colocated `.examples/*.html`, keyed by family folder. */
+const examplesByFamily = readJson('examples', {} as Record<string, Example[]>)
 
 /** Every component with a tag name, styled tier first, then the headless tier. */
 const components: Component[] = manifestData.modules
@@ -76,6 +89,7 @@ const components: Component[] = manifestData.modules
       description: declaration.description as string | undefined,
       documentation: helix.documentation,
       events: (declaration.events as EventDoc[] | undefined) ?? [],
+      family: /^src\/([^/]+)\//.exec((declaration.modulePath as string) ?? '')?.[1] ?? '',
       name: declaration.name as string,
       since: helix.since,
       slots: (declaration.slots as Named[] | undefined) ?? [],
@@ -130,7 +144,8 @@ let current: Component = components[0] as Component
 const stage = document.querySelector('#stage') as HTMLElement
 const controls = document.querySelector('#controls') as HTMLElement
 const meta = document.querySelector('#meta') as HTMLElement
-const snippet = document.querySelector('#snippet') as HTMLElement
+const source = document.querySelector('#source') as HTMLTextAreaElement
+const examplesBar = document.querySelector('#examples-bar') as HTMLElement
 const reference = document.querySelector('#reference') as HTMLElement
 const log = document.querySelector('#log') as HTMLElement
 const nav = document.querySelector('#nav') as HTMLElement
@@ -142,58 +157,102 @@ const changed = (): Attribute[] =>
     return value !== undefined && value !== defaultOf(attribute) && value !== ''
   })
 
-const renderSnippet = (): void => {
-  const attrs = changed()
-    .map((attribute) =>
-      isBoolean(attribute)
-        ? ` ${attribute.name}`
-        : ` ${attribute.name}="${state.get(attribute.name)}"`,
-    )
-    .join('')
-  const example = exampleFor(current.tagName)
-  const lines = example.content
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-  snippet.textContent =
-    lines.length > 0
-      ? `<${current.tagName}${attrs}>\n${lines.map((line) => `  ${line}`).join('\n')}\n</${current.tagName}>`
-      : `<${current.tagName}${attrs}></${current.tagName}>`
+/** Examples for the current component's family, or a bare tag if it has none. */
+const examplesFor = (component: Component): Example[] => {
+  const found = examplesByFamily[component.family]
+  if (found && found.length > 0) {
+    return found
+  }
+  return [{ html: `<${component.tagName}></${component.tagName}>`, slug: 'default' }]
 }
 
+let exampleIndex = 0
+
+/**
+ * Rewrites one attribute on the first occurrence of the component's tag.
+ *
+ * Operates on the markup text rather than on a parsed tree, because the text is
+ * what the reader is editing and reserializing a parse would reformat their
+ * work. The examples are ours and well-formed, which is what makes matching the
+ * opening tag safe here.
+ */
+const writeAttribute = (markup: string, name: string, value: string | boolean): string => {
+  const open = new RegExp(`<${current.tagName}\\b[^>]*>`)
+  const tag = open.exec(markup)?.[0]
+  if (!tag) {
+    return markup
+  }
+
+  const stripped = tag
+    .replace(new RegExp(`\\s${name}="[^"]*"`), '')
+    .replace(new RegExp(`\\s${name}(?=[\\s/>])`), '')
+
+  const insert =
+    value === false || value === '' ? '' : value === true ? ` ${name}` : ` ${name}="${value}"`
+  return markup.replace(tag, stripped.replace(/(\s*\/?)>$/, `${insert}$1>`))
+}
+
+/** Renders whatever markup is in the editor, and rebinds the event log. */
 const renderPreview = (): void => {
   stage.textContent = ''
-  const example: Example = exampleFor(current.tagName)
-  const node = document.createElement(current.tagName)
-  node.innerHTML = example.content
+  const holder = document.createElement('div')
+  holder.innerHTML = source.value
+  const nodes = [...holder.children]
 
-  for (const attribute of current.attributes) {
-    const value = state.get(attribute.name)
-    if (value === undefined || value === '') {
-      continue
+  for (const node of nodes) {
+    for (const event of current.events) {
+      node.addEventListener(event.name, (fired) => {
+        const detail = (fired as CustomEvent).detail
+        log.prepend(
+          el('div', { className: 'logLine' }, [
+            el('code', { textContent: event.name }),
+            el('span', {
+              className: 'logDetail',
+              textContent: detail ? JSON.stringify(detail) : '',
+            }),
+          ]),
+        )
+      })
     }
-    // Set the property, not the attribute: it is the API a consumer uses, it
-    // covers camelCase names without mapping, and it is what the element's own
-    // types describe.
-    ;(node as unknown as Record<string, unknown>)[attribute.fieldName ?? attribute.name] = value
   }
 
-  for (const event of current.events) {
-    node.addEventListener(event.name, (fired) => {
-      const detail = (fired as CustomEvent).detail
-      log.prepend(
-        el('div', { className: 'logLine' }, [
-          el('code', { textContent: event.name }),
-          el('span', { className: 'logDetail', textContent: detail ? JSON.stringify(detail) : '' }),
-        ]),
-      )
-    })
-  }
-
-  stage.dataset.wrapper = example.wrapper ?? 'block'
-  stage.append(node)
-  renderSnippet()
+  stage.dataset.wrapper = nodes.length === 1 && current.family !== '' ? 'auto' : 'block'
+  stage.append(...nodes)
 }
+
+const loadExample = (index: number): void => {
+  exampleIndex = index
+  const list = examplesFor(current)
+  source.value = (list[index] ?? list[0])?.html ?? ''
+  // Re-apply any non-default control values on top of the example.
+  for (const attribute of changed()) {
+    source.value = writeAttribute(source.value, attribute.name, state.get(attribute.name) as string)
+  }
+  renderPreview()
+}
+
+const renderExamplesBar = (): void => {
+  examplesBar.textContent = ''
+  const list = examplesFor(current)
+  if (list.length < 2) {
+    return
+  }
+  for (const [index, example] of list.entries()) {
+    const button = el('button', {
+      className: index === exampleIndex ? 'exampleTab active' : 'exampleTab',
+      textContent: example.slug === 'default' ? 'Preview' : example.slug.replace(/-/g, ' '),
+      type: 'button',
+    })
+    button.addEventListener('click', () => {
+      loadExample(index)
+      renderExamplesBar()
+      writeUrl()
+    })
+    examplesBar.append(button)
+  }
+}
+
+source.addEventListener('input', renderPreview)
 
 const renderControls = (): void => {
   controls.textContent = ''
@@ -213,6 +272,7 @@ const renderControls = (): void => {
       const box = el('input', { checked: state.get(attribute.name) === true, id, type: 'checkbox' })
       box.addEventListener('change', () => {
         state.set(attribute.name, box.checked)
+        source.value = writeAttribute(source.value, attribute.name, box.checked)
         renderPreview()
         writeUrl()
       })
@@ -230,6 +290,7 @@ const renderControls = (): void => {
       }
       select.addEventListener('change', () => {
         state.set(attribute.name, select.value)
+        source.value = writeAttribute(source.value, attribute.name, select.value)
         renderPreview()
         writeUrl()
       })
@@ -242,6 +303,7 @@ const renderControls = (): void => {
       })
       field.addEventListener('input', () => {
         state.set(attribute.name, field.value)
+        source.value = writeAttribute(source.value, attribute.name, field.value)
         renderPreview()
         writeUrl()
       })
@@ -356,12 +418,14 @@ const select = (component: Component, params?: URLSearchParams): void => {
     }
   }
   log.textContent = ''
+  exampleIndex = 0
   for (const link of nav.querySelectorAll('a')) {
     link.classList.toggle('active', link.dataset.tag === component.tagName)
   }
   renderMeta()
   renderControls()
-  renderPreview()
+  renderExamplesBar()
+  loadExample(0)
   renderReference()
   writeUrl()
 }

@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
@@ -11,6 +11,10 @@ import { join } from 'node:path'
  *
  * The component list is not written anywhere. It comes from the manifests, so
  * adding a component adds a sandbox page with its full API and no edit here.
+ * Examples are the same: they are `.examples/*.html` files colocated with the
+ * component, read off disk at build time. A map in this package would be one
+ * more thing to forget, and forgetting it looks exactly like a component with
+ * no examples.
  */
 
 const root = join(import.meta.dir, '..')
@@ -23,6 +27,36 @@ const manifests = ['helix/web/custom-elements.json', 'helix/headless/custom-elem
   (path) => JSON.parse(read(path)) as { modules: unknown[] },
 )
 const manifest = { modules: manifests.flatMap((entry) => entry.modules) }
+
+/**
+ * Examples per family folder, read from `src/<family>/.examples/*.html`.
+ *
+ * Keyed by folder rather than by tag, because a family's examples belong to the
+ * family: `accordion/.examples/` covers both `helix-accordion` and
+ * `helix-accordion-item`, and the component resolves its folder from the
+ * `modulePath` the manifest already records.
+ */
+const examples: Record<string, Array<{ html: string; slug: string }>> = {}
+const componentRoot = join(repo, 'helix/web/src')
+
+for (const family of readdirSync(componentRoot)) {
+  const dir = join(componentRoot, family, '.examples')
+  if (!existsSync(dir)) {
+    continue
+  }
+  const files = readdirSync(dir)
+    .filter((file) => file.endsWith('.html'))
+    // `default` first, then alphabetical: it is the headline preview, and the
+    // rest are named variants.
+    .sort((a, b) => (a === 'default.html' ? -1 : b === 'default.html' ? 1 : a.localeCompare(b)))
+
+  examples[family] = files.map((file) => ({
+    html: readFileSync(join(dir, file), 'utf8').trim(),
+    slug: file.replace(/\.html$/, ''),
+  }))
+}
+
+const exampleCount = Object.values(examples).reduce((total, list) => total + list.length, 0)
 
 const bundle = await Bun.build({
   entrypoints: [join(root, 'src/main.ts')],
@@ -57,8 +91,10 @@ const page = `<style>${css}</style>
 <main>
   <div id="topbar"><button id="theme" type="button">Light</button></div>
   <div id="meta"></div>
+  <div id="examples-bar"></div>
   <div id="stage"></div>
-  <code id="snippet"></code>
+  <label class="srOnly" for="source">Example markup</label>
+  <textarea id="source" spellcheck="false"></textarea>
   <div class="panels">
     <section class="panel"><h3>Properties</h3><div id="controls"></div></section>
     <section class="panel"><h3>Events</h3><div id="log"></div></section>
@@ -66,6 +102,7 @@ const page = `<style>${css}</style>
   <div id="reference"></div>
 </main>
 <script type="application/json" id="manifest">${JSON.stringify(manifest).replace(/</g, '\\u003c')}</script>
+<script type="application/json" id="examples">${JSON.stringify(examples).replace(/</g, '\\u003c')}</script>
 <script>${script}</script>
 `
 
@@ -91,5 +128,5 @@ writeFileSync(join(root, 'dist/artifact.html'), `<title>Helix Sandbox</title>\n$
 
 const kb = (value: number): string => `${Math.round(value / 1024)} kB`
 console.log(
-  `sandbox: ${manifest.modules.length} modules, script ${kb(script.length)}, page ${kb(html.length)}`,
+  `sandbox: ${manifest.modules.length} modules, ${exampleCount} examples, script ${kb(script.length)}, page ${kb(html.length)}`,
 )
