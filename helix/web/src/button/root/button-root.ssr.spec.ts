@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostTag, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  hostTag,
+  partTag,
+  ssr,
+  withoutStyles,
+} from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -39,15 +46,12 @@ describe('button server output', () => {
     expect(anchor).not.toContain('href')
   })
 
-  test('unset properties leave no empty attributes on the host', () => {
+  test('the host carries nothing the consumer did not write', () => {
     // `target` and `rel` reflected until they were told not to, so every button
-    // ever rendered carried a bare `target rel` pair. Reflection is for values
-    // CSS selects on, and no rule selects on either.
-    const host = hostTag(ssr(html`<helix-button>Go</helix-button>`), 'helix-button')
-    expect(host).toContain('appearance="neutral"')
-    expect(host).not.toContain('target')
-    expect(host).not.toContain('rel')
-    expect(host).not.toContain('href')
+    // ever rendered carried a bare `target rel` pair. `appearance` and `size`
+    // then reflected their defaults, which is the same bug with a value: the
+    // host ends up holding an attribute the consumer's markup never had.
+    expect(hostAttributes(ssr(html`<helix-button>Go</helix-button>`), 'helix-button')).toEqual([])
   })
 
   test('declarative shadow DOM carries the styles', () => {

@@ -207,7 +207,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "This has to be a class rather than a mixin or controller, and that is not a\nstyle preference: the browser reads `formAssociated` off the constructor\nduring element upgrade, and `attachInternals()` can only be called once from\nthe instance. Neither can be delegated to a composed object.\n\nDeliberately small. It carries what every form participant needs and nothing\nmore; `value`, validity, and the reset and restore callbacks land when the\nfirst input does, rather than being designed against components that do not\nexist yet.",
+          "description": "This has to be a class rather than a mixin or controller, and that is not a\nstyle preference: the browser reads `formAssociated` off the constructor\nduring element upgrade, which cannot be delegated to a composed object.\n\n`internals` comes from `HelixElement`, which attaches it for every component.\n`attachInternals()` throws on a second call, so there is exactly one owner.\n\nDeliberately small. It carries what every form participant needs and nothing\nmore; `value`, validity, and the reset and restore callbacks land when the\nfirst input does, rather than being designed against components that do not\nexist yet.",
           "name": "HelixFormElement",
           "members": [
             {
@@ -220,16 +220,6 @@
               "readonly": true,
               "default": "true",
               "description": "Opts the element into form ownership, labels, and submission."
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's form-facing API.\n\nAvailable during server rendering too: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard."
             },
             {
               "kind": "field",
@@ -259,6 +249,20 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
             },
             {
               "kind": "method",
@@ -330,6 +334,16 @@
           "description": "Owns only what is universal: normalizing `box-sizing` inside the shadow root,\nso component CSS can rely on border-box on both sides of the boundary.\n\nThere is deliberately no `emit(name, detail)` helper. A dispatch through a\ngeneric helper cannot be named by the manifest analyzer, which recorded the\nparameter identifier and produced a phantom event on every element that\ninherited it. Components dispatch concrete event classes from `events.ts`,\nwhich the analyzer and TypeScript can both see.",
           "name": "HelixElement",
           "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard."
+            },
             {
               "kind": "method",
               "name": "finalizeStyles",

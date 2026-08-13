@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostTag, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hostAttributes, hostTag, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -15,10 +15,10 @@ describe('breadcrumbs server output', () => {
     expect(partTag(markup, 'list')).toContain('role="list"')
   })
 
-  test('the list-item role is on the host, written before hydration', () => {
+  test('the list-item role is on internals, so the host stays as written', () => {
     // Set in `willUpdate`, which the server does call, unlike
     // `connectedCallback`. Without it the list would have no items.
-    expect(hostTag(ssr(trail), 'helix-breadcrumbs-item')).toContain('role="listitem"')
+    expect(hostAttributes(ssr(trail), 'helix-breadcrumbs-item')).toEqual(['href'])
   })
 
   test('links are crawlable and the current page is not a link', () => {

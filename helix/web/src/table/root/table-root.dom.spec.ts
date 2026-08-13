@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -26,11 +26,11 @@ describe('table structure', () => {
     const table = await mount(markup)
     expect(part(table, 'table')?.getAttribute('role')).toBe('table')
     for (const row of table.querySelectorAll('helix-table-row')) {
-      expect(row.getAttribute('role')).toBe('row')
+      expect(role(row)).toBe('row')
     }
     const cells = [...table.querySelectorAll('helix-table-cell')]
-    expect(cells[0]?.getAttribute('role')).toBe('columnheader')
-    expect(cells[2]?.getAttribute('role')).toBe('cell')
+    expect(role(cells[0] as HTMLElement)).toBe('columnheader')
+    expect(role(cells[2] as HTMLElement)).toBe('cell')
   })
 
   test('the table is named', async () => {

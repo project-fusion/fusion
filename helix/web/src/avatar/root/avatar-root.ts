@@ -31,11 +31,11 @@ import { styles } from './avatar-root.css.js'
 export class HelixAvatar extends HelixBaseAvatar {
   /** Whether the avatar is a circle or a rounded square. */
   @property({ reflect: true })
-  shape: 'circle' | 'square' = 'circle'
+  shape?: 'circle' | 'square'
 
   /** Edge length of the avatar. */
   @property({ reflect: true })
-  size: 'sm' | 'md' | 'lg' = 'md'
+  size?: 'sm' | 'md' | 'lg'
 
   static override styles: CSSResultGroup = styles
 }

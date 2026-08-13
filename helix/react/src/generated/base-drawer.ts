@@ -25,7 +25,7 @@ export interface BaseDrawerProps extends BaseProps {
   defaultOpen?: boolean
   /** Accessible name for the panel. */
   label?: string
-  /** Whether the drawer blocks the page behind it. Turning this off removes the focus trap and the scrim together, because they are one decision: a panel that traps focus without covering the page strands the reader, and one that covers without trapping lets them tab behind the cover. */
+  /** Whether the drawer blocks the page behind it. Turning this off removes the focus trap and the scrim together, because they are one decision: a panel that traps focus without covering the page strands the reader, and one that covers without trapping lets them tab behind the cover. Not reflected. It stays `true` by default, since a drawer that silently lost its focus trap because a consumer forgot a word would be worse than an attribute on the host, and nothing selects on it: the scrim is rendered or not, rather than shown or hidden by CSS. */
   modal?: boolean
   /** Whether the element is open. Setting this enters controlled mode. */
   open?: boolean

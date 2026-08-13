@@ -35,7 +35,7 @@ export class HelixBaseCard extends HelixElement {
     super.willUpdate(changed)
     // On the host, since the host is the box. Set here rather than in
     // `connectedCallback`, which the server never calls.
-    this.setAttribute('role', 'group')
+    this.internals.role = 'group'
   }
 
   protected override render(): TemplateResult {

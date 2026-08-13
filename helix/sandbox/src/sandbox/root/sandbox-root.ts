@@ -47,7 +47,7 @@ const MAX = 85
 export class HelixSandbox extends HelixElement {
   /** Whether the panes sit side by side or stacked. */
   @property({ reflect: true })
-  orientation: 'horizontal' | 'vertical' = 'horizontal'
+  orientation?: 'horizontal' | 'vertical'
 
   /** Percentage of the sandbox given to the source pane. */
   @property({ attribute: 'split', type: Number })
@@ -82,9 +82,19 @@ export class HelixSandbox extends HelixElement {
     return Math.min(MAX, Math.max(MIN, next))
   }
 
+  /**
+   * The orientation in force.
+   *
+   * Unset is horizontal, and stays unset: the default is the absent attribute,
+   * so a reflected default cannot appear on the host after hydration.
+   */
+  private get axis(): 'horizontal' | 'vertical' {
+    return this.orientation ?? 'horizontal'
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    const back = this.orientation === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'
-    const forward = this.orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown'
+    const back = this.axis === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'
+    const forward = this.axis === 'horizontal' ? 'ArrowRight' : 'ArrowDown'
 
     let next = this.split
     if (event.key === back) {
@@ -116,7 +126,7 @@ export class HelixSandbox extends HelixElement {
     }
     const box = this.getBoundingClientRect()
     const ratio =
-      this.orientation === 'horizontal'
+      this.axis === 'horizontal'
         ? ((event.clientX - box.left) / box.width) * 100
         : ((event.clientY - box.top) / box.height) * 100
     this.split = this.clamp(ratio)
@@ -143,15 +153,24 @@ export class HelixSandbox extends HelixElement {
   }
 
   /**
-   * Writes the split to the host.
+   * Writes the split into the shadow root's own stylesheet.
    *
-   * Guarded, because the server's element shim has no `style`, and a `<style>`
-   * element cannot carry it either: Lit rejects expressions inside one. The
-   * server therefore renders the stylesheet's default split, which is the same
-   * 45% this property defaults to.
+   * Into a `<style>` rather than onto `this.style`, because an inline style on
+   * the host is an attribute the element gives itself once it upgrades, and a
+   * React consumer's server markup does not have it: hydration reports the
+   * mismatch and does not patch it up. The shadow root is not part of the tree
+   * React hydrates.
+   *
+   * Filled imperatively because Lit rejects expressions inside `<style>`, which
+   * is why the template carries a static empty one. The server renders the
+   * stylesheet's default split, which is the same 45% this property defaults
+   * to.
    */
   private applySplit(): void {
-    this.style?.setProperty('--_sandbox-split', `${this.split}%`)
+    const sheet = this.renderRoot.querySelector<HTMLStyleElement>('#split')
+    if (sheet) {
+      sheet.textContent = `:host { --_sandbox-split: ${this.split}%; }`
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -167,13 +186,14 @@ export class HelixSandbox extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="pane"><slot name="source"></slot></div>
+    return html`<style id="split"></style>
+      <div part="pane"><slot name="source"></slot></div>
       <div
         part="separator"
         role="separator"
         tabindex="0"
         aria-label=${this.separatorLabel}
-        aria-orientation=${this.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
+        aria-orientation=${this.axis === 'horizontal' ? 'vertical' : 'horizontal'}
         aria-valuemax=${MAX}
         aria-valuemin=${MIN}
         aria-valuenow=${Math.round(this.split)}

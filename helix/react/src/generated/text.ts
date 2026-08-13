@@ -16,6 +16,13 @@ heading sometimes has to look smaller without lying about the outline, and a
 `<p>` sometimes has to read as a caption. They default to matching, so the
 common case is `as="h2"` and nothing else.
 
+The pairing is resolved in CSS rather than by computing an attribute, so the
+element writes nothing to its own host: `as="h2"` picks up the heading ramp
+through a selector, and setting `appearance` takes the pairing rule out of
+play. Deriving it in `willUpdate` worked, but it put an attribute on the host
+that the server's markup did not have, which is a hydration mismatch in every
+React consumer.
+
 **Size, weight, and leading are not properties.** Exposing them separately
 offers a few hundred combinations of which a handful are right, and every
 caller then picks one. An appearance is a decision the system already made:
@@ -31,7 +38,6 @@ the cross product, which is the explosion `appearance` exists to prevent.
 export interface TextProps extends BaseProps {
   /** Type treatment. Defaults to the one that matches `as`. */
   appearance?:
-    | ''
     | 'display'
     | 'heading'
     | 'subheading'

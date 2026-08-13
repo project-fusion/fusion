@@ -22,7 +22,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-base-tabs-panel')
 export class HelixBaseTabsPanel extends HelixElement {
   /** Pairs the panel with the tab of the same value. */
-  @property({ reflect: true })
+  @property()
   value = ''
 
   /** Whether this panel is the visible one. */

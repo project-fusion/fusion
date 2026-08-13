@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -37,7 +37,7 @@ describe('breadcrumbs', () => {
     const items = [...crumbs.querySelectorAll('helix-breadcrumbs-item')]
     expect(items).toHaveLength(3)
     for (const item of items) {
-      expect(item.getAttribute('role')).toBe('listitem')
+      expect(role(item)).toBe('listitem')
     }
   })
 })

@@ -27,8 +27,12 @@ export const registerDom = (): void => {
  * runtime check there would make production code defensive about a browser
  * capability every browser has, and would swallow a real failure.
  *
- * Only `form` is modelled with real behavior, because it is the only part the
- * components currently rely on. It resolves the nearest ancestor form, which is
+ * `role` and `ariaLabel` are plain slots rather than behavior: components set
+ * their semantics through internals so nothing lands on the host as an
+ * attribute, and a spec reads them back through the `role` helper below.
+ *
+ * Only `form` is modelled with real behavior, because it is the only other part
+ * the components currently rely on. It resolves the nearest ancestor form, which is
  * what the platform does in the absence of a `form` attribute; the attribute
  * form of ownership is not covered. Everything else is inert, so a test that
  * starts depending on validity or form values will read as obviously empty
@@ -48,6 +52,7 @@ const shimElementInternals = (): void => {
   proto.attachInternals = function attachInternals(this: HTMLElement): ElementInternals {
     const host = this
     return {
+      ariaLabel: null,
       checkValidity: () => true,
       get form(): HTMLFormElement | null {
         // The platform grants form ownership only to form-associated elements,
@@ -60,6 +65,7 @@ const shimElementInternals = (): void => {
         return document.querySelectorAll(host.id ? `label[for="${host.id}"]` : 'nothing-matches')
       },
       reportValidity: () => true,
+      role: null,
       setFormValue: () => undefined,
       setValidity: () => undefined,
     } as unknown as ElementInternals
@@ -76,6 +82,19 @@ export const mount = async (markup: string): Promise<HTMLElement> => {
   await root.updateComplete
   return root
 }
+
+/**
+ * The role a screen reader sees on the host.
+ *
+ * Components set their semantics through `ElementInternals`, which writes no
+ * attribute at all, so `getAttribute('role')` reports nothing on a banner. An
+ * author's `role` attribute still wins, which is the platform's own precedence
+ * and the reason this checks the attribute first.
+ */
+export const role = (host: HTMLElement): string | null =>
+  host.getAttribute('role') ??
+  (host as unknown as { internals?: ElementInternals }).internals?.role ??
+  null
 
 /** Finds a shadow part by name. */
 export const part = (host: HTMLElement, name: string): Element | null =>

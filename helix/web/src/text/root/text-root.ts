@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import type { CSSResultGroup, PropertyValues } from 'lit'
+import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { literal, type StaticValue, html as staticHtml } from 'lit/static-html.js'
 import { styles } from './text-root.css.js'
@@ -21,25 +21,6 @@ const TAGS: Record<string, StaticValue> = {
 }
 
 /**
- * Appearance each element defaults to.
- *
- * The point of the pairing: `as="h2"` is already styled as a heading, so the
- * common case needs one property. `appearance` is then only ever set to break
- * the pairing deliberately, which is rare and visible when it happens.
- */
-const DEFAULT_APPEARANCE: Record<string, string> = {
-  code: 'code',
-  h1: 'display',
-  h2: 'heading',
-  h3: 'subheading',
-  h4: 'title',
-  h5: 'body-strong',
-  h6: 'body-strong',
-  label: 'label',
-  strong: 'body-strong',
-}
-
-/**
  * @summary Text: what element it is, and what it looks like.
  *
  * @description
@@ -52,6 +33,13 @@ const DEFAULT_APPEARANCE: Record<string, string> = {
  * heading sometimes has to look smaller without lying about the outline, and a
  * `<p>` sometimes has to read as a caption. They default to matching, so the
  * common case is `as="h2"` and nothing else.
+ *
+ * The pairing is resolved in CSS rather than by computing an attribute, so the
+ * element writes nothing to its own host: `as="h2"` picks up the heading ramp
+ * through a selector, and setting `appearance` takes the pairing rule out of
+ * play. Deriving it in `willUpdate` worked, but it put an attribute on the host
+ * that the server's markup did not have, which is a hydration mismatch in every
+ * React consumer.
  *
  * **Size, weight, and leading are not properties.** Exposing them separately
  * offers a few hundred combinations of which a handful are right, and every
@@ -76,13 +64,11 @@ const DEFAULT_APPEARANCE: Record<string, string> = {
 export class HelixText extends HelixElement {
   /** Which element to render. Decides the outline and the semantics. */
   @property({ reflect: true })
-  as: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label' =
-    'span'
+  as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
 
   /** Type treatment. Defaults to the one that matches `as`. */
   @property({ reflect: true })
-  appearance:
-    | ''
+  appearance?:
     | 'display'
     | 'heading'
     | 'subheading'
@@ -91,27 +77,14 @@ export class HelixText extends HelixElement {
     | 'body-strong'
     | 'caption'
     | 'label'
-    | 'code' = ''
+    | 'code'
 
   /** Colour role. Separate from `appearance`, because colour carries state. */
   @property({ reflect: true })
-  tone: 'default' | 'muted' | 'subtle' | 'primary' | 'danger' = 'default'
-
-  /**
-   * Writes the appearance in force onto the host.
-   *
-   * A computed value rather than a reflected property, because it is derived
-   * from two others and Lit reflects on assignment. Set in `willUpdate`, which
-   * the server calls, so the served markup is styled without waiting for
-   * hydration.
-   */
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    this.setAttribute('data-appearance', this.appearance || DEFAULT_APPEARANCE[this.as] || 'body')
-  }
+  tone?: 'default' | 'muted' | 'subtle' | 'primary' | 'danger'
 
   protected override render(): unknown {
-    const tag = TAGS[this.as] ?? literal`span`
+    const tag = (this.as ? TAGS[this.as] : undefined) ?? literal`span`
     return staticHtml`<${tag} part="text"><slot></slot></${tag}>`
   }
 

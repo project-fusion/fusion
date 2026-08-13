@@ -49,7 +49,7 @@ export function SiteNav() {
 
   return (
     <>
-      <helix-app-header>
+      <helix-app-header sticky>
         <helix-link appearance="quiet" href="/" slot="brand">
           <helix-flex align="center" gap="xs" inline>
             <FusionLogo size="1.5rem" />

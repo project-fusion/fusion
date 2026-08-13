@@ -34,11 +34,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-base-icon')
 export class HelixBaseIcon extends HelixElement {
   /** Name of the icon in the Helix set. */
-  @property({ reflect: true })
+  @property()
   name = ''
 
   /** Accessible name, for an icon that is not decorative. */
-  @property({ reflect: true })
+  @property()
   label = ''
 
   protected override render(): TemplateResult | typeof nothing {

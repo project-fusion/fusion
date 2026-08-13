@@ -33,19 +33,19 @@ import { styles } from './flex-root.css.js'
 export class HelixFlex extends HelixElement {
   /** Whether items run across or down. */
   @property({ reflect: true })
-  direction: 'row' | 'column' = 'row'
+  direction?: 'row' | 'column'
 
   /** Space between items, named on the space scale. */
   @property({ reflect: true })
-  gap: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'none'
+  gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
   /** Alignment across the direction. */
   @property({ reflect: true })
-  align: 'start' | 'center' | 'end' | 'stretch' | 'baseline' = 'stretch'
+  align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
 
   /** Distribution along the direction. */
   @property({ reflect: true })
-  justify: 'start' | 'center' | 'end' | 'between' | 'around' = 'start'
+  justify?: 'start' | 'center' | 'end' | 'between' | 'around'
 
   /** Whether items wrap onto more lines. */
   @property({ reflect: true, type: Boolean })

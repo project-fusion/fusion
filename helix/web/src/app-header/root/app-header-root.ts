@@ -41,11 +41,16 @@ export class HelixAppHeader extends HelixBaseAppHeader {
    * viewport. Opt in knowing that.
    */
   @property({ reflect: true })
-  appearance: 'flat' | 'material' = 'flat'
+  appearance?: 'flat' | 'material'
 
-  /** Whether the banner sticks to the top of the viewport. */
+  /**
+   * Whether the banner sticks to the top of the viewport.
+   *
+   * Opt in, because a reflected `true` writes an attribute the server's markup
+   * does not have. Every default here is the absent attribute.
+   */
   @property({ reflect: true, type: Boolean })
-  sticky = true
+  sticky = false
 
   static override styles: CSSResultGroup = styles
 }

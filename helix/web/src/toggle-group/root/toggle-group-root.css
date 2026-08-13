@@ -9,6 +9,7 @@
   --_toggle-height: calc(var(--helix-size-control-dense) - var(--helix-space-xs));
 }
 
+:host(:not([appearance])),
 :host([appearance="filled"]) {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
@@ -46,7 +47,7 @@
 
 /* Hidden until it has somewhere to be, so it fades in rather than sliding from
    a wrong place on first paint. */
-:host([data-placed]) [part="indicator"] {
+[part="indicator"][data-placed] {
   opacity: 1;
 }
 

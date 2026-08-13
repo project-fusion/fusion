@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -17,7 +17,7 @@ describe('app header', () => {
     `)
     // On the host, since the host is the banner: it carries the material and
     // spans the window, and `content` carries the measure.
-    expect(header.getAttribute('role')).toBe('banner')
+    expect(role(header)).toBe('banner')
     // `<nav>` keeps a wrapper because it is a landmark; brand and actions are
     // bare slots, so an omitted one renders nothing at all.
     expect(part(header, 'nav')?.tagName).toBe('NAV')

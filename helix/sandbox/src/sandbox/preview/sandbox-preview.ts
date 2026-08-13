@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { nothing, type PropertyValues } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -49,19 +49,31 @@ export class HelixSandboxPreview extends HelixElement {
   }
 
   /**
-   * Nothing, because the children are set by hand below.
+   * A stage for the previewed markup, which is set by hand below.
    *
    * The source is a string of markup rather than a template, and Lit's own
    * `unsafeHTML` would leave part markers among the previewed elements.
+   *
+   * It goes inside a stage rather than straight into this element because Lit
+   * keeps its part markers among this element's children: replacing them
+   * wholesale ejects the markers, and the next update throws rather than
+   * rendering. `display: contents` keeps the stage out of layout, so the
+   * preview is laid out exactly as if the markup were a direct child.
    */
-  protected override render(): typeof nothing {
-    return nothing
+  protected override render(): TemplateResult {
+    return html`<div id="stage" style="display: contents"></div>`
+  }
+
+  /** Where the previewed markup goes. Present from the first render. */
+  private get stage(): HTMLElement | null {
+    return this.querySelector<HTMLElement>('#stage')
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('source')) {
-      this.innerHTML = this.source
+    const stage = this.stage
+    if (stage && changed.has('source')) {
+      stage.innerHTML = this.source
     }
     if (changed.has('source') || changed.has('styles')) {
       this.applyStyles()
@@ -80,7 +92,7 @@ export class HelixSandboxPreview extends HelixElement {
     }
     const sheet = document.createElement('style')
     sheet.textContent = this.styles
-    this.append(sheet)
+    this.stage?.append(sheet)
   }
 }
 

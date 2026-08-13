@@ -70,11 +70,13 @@
   background-color: var(--helix-color-primary-active);
 }
 
+:host(:not([appearance])) [part="button"],
 :host([appearance="neutral"]) [part="button"] {
   background-color: var(--button-background-color, var(--helix-color-surface));
   border-color: var(--helix-color-border);
 }
 
+:host(:not([appearance])) [part="button"]:hover,
 :host([appearance="neutral"]) [part="button"]:hover {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-border-strong);
@@ -106,6 +108,7 @@
   background-color: var(--button-background-color, var(--helix-color-primary));
 }
 
+:host([disabled]:not([appearance])) [part="button"]:hover,
 :host([disabled][appearance="neutral"]) [part="button"]:hover {
   background-color: var(--button-background-color, var(--helix-color-surface));
   border-color: var(--helix-color-border);

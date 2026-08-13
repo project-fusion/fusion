@@ -106,8 +106,24 @@ export class HelixBaseButton extends HelixFormElement {
     }
   }
 
+  /**
+   * Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets.
+   */
+  @property({ attribute: false })
+  focusable = true
+
   protected override render(): TemplateResult {
     const label = html`<slot name="start"></slot><slot></slot><slot name="end"></slot>`
+    const stop = this.focusable ? nothing : '-1'
 
     if (this.href) {
       return html`<a
@@ -118,7 +134,7 @@ export class HelixBaseButton extends HelixFormElement {
         rel=${this.resolvedRel || nothing}
         role=${this.disabled ? 'link' : nothing}
         aria-disabled=${this.disabled ? 'true' : nothing}
-        tabindex=${this.disabled ? '-1' : nothing}
+        tabindex=${this.disabled ? '-1' : stop}
         @click=${this.handleClick}
         >${label}</a
       >`
@@ -128,6 +144,7 @@ export class HelixBaseButton extends HelixFormElement {
       part="button"
       type="button"
       aria-label=${this.label || nothing}
+      tabindex=${stop}
       ?disabled=${this.disabled}
       @click=${this.handleClick}
     >

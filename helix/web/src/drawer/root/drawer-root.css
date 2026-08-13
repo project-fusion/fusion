@@ -35,6 +35,7 @@
   background-color: transparent;
 }
 
+:host(:not([placement])) [part="panel"],
 :host([placement="end"]) [part="panel"] {
   block-size: 100%;
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);

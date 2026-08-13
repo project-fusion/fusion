@@ -28,7 +28,7 @@ import { styles } from './grid-root.css.js'
 export class HelixGrid extends HelixElement {
   /** Fixed number of equal columns. */
   @property({ reflect: true, type: Number })
-  columns = 0
+  columns?: number
 
   /**
    * Minimum column width, filling as many as fit.
@@ -36,24 +36,30 @@ export class HelixGrid extends HelixElement {
    * Takes precedence over `columns`: a grid that both fixes a count and reflows
    * is two intentions in one element.
    */
-  @property({ reflect: true })
+  @property()
   min = ''
 
   /** Space between cells, named on the space scale. */
   @property({ reflect: true })
-  gap: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'md'
+  gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
   /** Alignment of each cell within its row. */
   @property({ reflect: true })
-  align: 'start' | 'center' | 'end' | 'stretch' = 'stretch'
+  align?: 'start' | 'center' | 'end' | 'stretch'
 
   /**
-   * Writes the track list to the host.
+   * Writes the track list into the shadow root's own stylesheet.
    *
-   * Set on `this.style` rather than rendered into a `<style>` element, because
-   * Lit refuses expressions inside `<style>`: it is an invalid binding location
-   * and throws while rendering rather than at build time. The guard is for the
-   * server, whose element shim has no `style` at all.
+   * Into a `<style>` rather than onto `this.style`, and the difference is
+   * hydration. An inline style on the host is an attribute the element gives
+   * itself once it upgrades, so a React consumer's server markup does not have
+   * it and hydration reports a mismatch it will not patch up. The shadow root
+   * is not part of the tree React hydrates, so a rule written there is free.
+   *
+   * The element is filled imperatively because Lit refuses expressions inside
+   * `<style>`: it is an invalid binding location and throws while rendering
+   * rather than at build time. Hence a static, empty element in the template
+   * and its `textContent` set here.
    *
    * The consequence is that a server-rendered grid falls back to the
    * stylesheet's single column until it upgrades. That is why `columns` is also
@@ -61,15 +67,13 @@ export class HelixGrid extends HelixElement {
    * needs no JavaScript at all, and only `min` depends on this.
    */
   private applyTemplate(): void {
-    if (!this.style) {
+    const sheet = this.renderRoot.querySelector<HTMLStyleElement>('#template')
+    if (!sheet) {
       return
     }
-    const template = this.min ? `repeat(auto-fit, minmax(min(${this.min}, 100%), 1fr))` : ''
-    if (template) {
-      this.style.setProperty('grid-template-columns', template)
-    } else {
-      this.style.removeProperty('grid-template-columns')
-    }
+    sheet.textContent = this.min
+      ? `:host { grid-template-columns: repeat(auto-fit, minmax(min(${this.min}, 100%), 1fr)); }`
+      : ''
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -85,7 +89,8 @@ export class HelixGrid extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<slot></slot>`
+    return html`<style id="template"></style>
+      <slot></slot>`
   }
 
   static override styles: CSSResultGroup = styles

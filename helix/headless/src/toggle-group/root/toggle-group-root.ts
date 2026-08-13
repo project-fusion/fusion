@@ -1,6 +1,6 @@
 import { customElement, HelixElement } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { HelixBaseToggleGroupItem } from '../item/toggle-group-item.js'
 
 /** Keys the group handles, per the APG radio-group pattern. */
@@ -16,9 +16,9 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  * moves is a single object the eye follows, and it says where the selection
  * came from as well as where it went.
  *
- * Its position and width are measured from the selected item and written to the
- * host as custom properties, because labels are different lengths and no
- * proportion of the group is the right answer. Measurement is client-side by
+ * Its position and width are measured from the selected item and written onto
+ * the indicator as custom properties, because labels are different lengths and
+ * no proportion of the group is the right answer. Measurement is client-side by
  * necessity, so the server renders the indicator hidden and it fades in once it
  * has somewhere to be, which is the harmless direction: it appears rather than
  * jumping from a wrong place.
@@ -46,16 +46,12 @@ export class HelixBaseToggleGroup extends HelixElement {
   label = 'Options'
 
   /** Value of the selected item. */
-  @property({ reflect: true })
+  @property()
   value = ''
 
   /** Renders items as links in a navigation landmark rather than as radios. */
   @property({ reflect: true, type: Boolean })
   nav = false
-
-  /** Whether the indicator has somewhere to be yet. */
-  @state()
-  private placed = false
 
   private observer: ResizeObserver | undefined
 
@@ -70,7 +66,7 @@ export class HelixBaseToggleGroup extends HelixElement {
   }
 
   /**
-   * Measures the selected item and writes the indicator's geometry to the host.
+   * Measures the selected item and writes the geometry onto the indicator.
    *
    * Offsets rather than a proportion of the group: labels have different
    * lengths, so no fraction is the right answer for all of them.
@@ -89,9 +85,18 @@ export class HelixBaseToggleGroup extends HelixElement {
     if (box.width === 0) {
       return
     }
-    this.style.setProperty('--_indicator-x', `${box.left - own.left}px`)
-    this.style.setProperty('--_indicator-w', `${box.width}px`)
-    this.placed = true
+
+    // On the indicator rather than the host. The geometry is only readable
+    // after layout, so it is written after the element upgrades, and anything
+    // written to the host at that point is an attribute a React consumer's
+    // server markup never had. The shadow root is invisible to hydration.
+    const indicator = this.renderRoot.querySelector<HTMLElement>('[part="indicator"]')
+    if (!indicator) {
+      return
+    }
+    indicator.style.setProperty('--_indicator-x', `${box.left - own.left}px`)
+    indicator.style.setProperty('--_indicator-w', `${box.width}px`)
+    indicator.toggleAttribute('data-placed', true)
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -148,20 +153,20 @@ export class HelixBaseToggleGroup extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('value')) {
+    // `nav` swaps the template branch, which builds a fresh indicator with no
+    // geometry on it, so it has to be measured again.
+    if (changed.has('value') || changed.has('nav')) {
       this.place()
     }
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.toggleAttribute('data-placed', this.placed)
-    if (!this.nav) {
-      this.setAttribute('role', 'radiogroup')
-      this.setAttribute('aria-label', this.label)
-    } else {
-      this.removeAttribute('role')
-    }
+    // Through internals, so nothing lands on the host as an attribute. A nav
+    // renders a real `<nav>` in the shadow root and takes its semantics from
+    // that, so the host stays neutral.
+    this.internals.role = this.nav ? null : 'radiogroup'
+    this.internals.ariaLabel = this.nav ? null : this.label
   }
 
   protected override render(): TemplateResult {

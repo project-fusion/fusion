@@ -42,16 +42,16 @@ export class HelixBaseCallout extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the box.
-    this.setAttribute('role', 'note')
+    this.internals.role = 'note'
   }
 
   /** What kind of attention the passage needs. */
   @property({ reflect: true })
-  severity: 'info' | 'success' | 'warning' | 'danger' = 'info'
+  severity?: 'info' | 'success' | 'warning' | 'danger'
 
   protected override render(): TemplateResult {
     const { icon, label } =
-      SEVERITIES[this.severity] ?? (SEVERITIES.info as { icon: HelixIcon; label: string })
+      SEVERITIES[this.severity ?? 'info'] ?? (SEVERITIES.info as { icon: HelixIcon; label: string })
 
     return html`<span part="icon">
         <slot name="icon">

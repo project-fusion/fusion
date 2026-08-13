@@ -31,11 +31,11 @@ import { styles } from './button-root.css.js'
 export class HelixButton extends HelixBaseButton {
   /** How much visual weight the button carries. */
   @property({ reflect: true })
-  appearance: 'primary' | 'neutral' | 'subtle' | 'danger' = 'neutral'
+  appearance?: 'primary' | 'neutral' | 'subtle' | 'danger'
 
   /** Height and inset of the control. */
   @property({ reflect: true })
-  size: 'sm' | 'md' | 'lg' = 'md'
+  size?: 'sm' | 'md' | 'lg'
 
   static override styles: CSSResultGroup = styles
 }

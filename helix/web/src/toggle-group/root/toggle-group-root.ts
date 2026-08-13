@@ -33,11 +33,11 @@ import { styles } from './toggle-group-root.css.js'
 export class HelixToggleGroup extends HelixBaseToggleGroup {
   /** How much chrome the group carries around its items. */
   @property({ reflect: true })
-  appearance: 'filled' | 'plain' = 'filled'
+  appearance?: 'filled' | 'plain'
 
   /** Height and inset of the items. */
   @property({ reflect: true })
-  size: 'sm' | 'md' = 'md'
+  size?: 'sm' | 'md'
 
   static override styles: CSSResultGroup = styles
 }

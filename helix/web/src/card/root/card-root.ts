@@ -41,7 +41,7 @@ import { styles } from './card-root.css.js'
 export class HelixCard extends HelixBaseCard {
   /** How the card separates itself from the page. */
   @property({ reflect: true })
-  appearance: 'outlined' | 'elevated' | 'plain' = 'outlined'
+  appearance?: 'outlined' | 'elevated' | 'plain'
 
   /** Tightens the inset for dense layouts. */
   @property({ reflect: true, type: Boolean })
@@ -49,7 +49,7 @@ export class HelixCard extends HelixBaseCard {
 
   /** Whether media sits above the content stack or beside it. */
   @property({ reflect: true })
-  orientation: 'vertical' | 'horizontal' = 'vertical'
+  orientation?: 'vertical' | 'horizontal'
 
   static override styles: CSSResultGroup = styles
 }

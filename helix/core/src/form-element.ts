@@ -7,8 +7,10 @@ import { HelixElement } from './helix-element.js'
  * @description
  * This has to be a class rather than a mixin or controller, and that is not a
  * style preference: the browser reads `formAssociated` off the constructor
- * during element upgrade, and `attachInternals()` can only be called once from
- * the instance. Neither can be delegated to a composed object.
+ * during element upgrade, which cannot be delegated to a composed object.
+ *
+ * `internals` comes from `HelixElement`, which attaches it for every component.
+ * `attachInternals()` throws on a second call, so there is exactly one owner.
  *
  * Deliberately small. It carries what every form participant needs and nothing
  * more; `value`, validity, and the reset and restore callbacks land when the
@@ -22,19 +24,6 @@ import { HelixElement } from './helix-element.js'
 export class HelixFormElement extends HelixElement {
   /** Opts the element into form ownership, labels, and submission. */
   static readonly formAssociated = true
-
-  /**
-   * The element's form-facing API.
-   *
-   * Available during server rendering too: Lit's shim implements
-   * `attachInternals`, verified, so nothing here needs a guard.
-   */
-  protected readonly internals: ElementInternals
-
-  constructor() {
-    super()
-    this.internals = this.attachInternals()
-  }
 
   /**
    * Whether the control is non-interactive.

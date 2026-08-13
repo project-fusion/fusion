@@ -48,7 +48,7 @@ export class HelixBaseAppHeader extends HelixElement {
    * header rather than an afterthought next to a logo.
    */
   @property({ attribute: 'nav-align', reflect: true })
-  navAlign: 'start' | 'center' = 'start'
+  navAlign?: 'start' | 'center'
 
   private readonly handleScroll = (): void => {
     this.toggleAttribute('data-scrolled', window.scrollY > 0)
@@ -57,7 +57,7 @@ export class HelixBaseAppHeader extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the banner.
-    this.setAttribute('role', 'banner')
+    this.internals.role = 'banner'
   }
 
   override connectedCallback(): void {

@@ -43,7 +43,7 @@ import { property } from 'lit/decorators.js'
 export class HelixBaseDrawer extends WithOpen(HelixElement) {
   /** Which edge the drawer comes from. */
   @property({ reflect: true })
-  placement: 'start' | 'end' | 'top' | 'bottom' = 'end'
+  placement?: 'start' | 'end' | 'top' | 'bottom'
 
   /** Accessible name for the panel. */
   @property()
@@ -56,8 +56,13 @@ export class HelixBaseDrawer extends WithOpen(HelixElement) {
    * they are one decision: a panel that traps focus without covering the page
    * strands the reader, and one that covers without trapping lets them tab
    * behind the cover.
+   *
+   * Not reflected. It stays `true` by default, since a drawer that silently
+   * lost its focus trap because a consumer forgot a word would be worse than an
+   * attribute on the host, and nothing selects on it: the scrim is rendered or
+   * not, rather than shown or hidden by CSS.
    */
-  @property({ reflect: true, type: Boolean })
+  @property({ type: Boolean })
   modal = true
 
   private readonly trap = new FocusTrapController(this)

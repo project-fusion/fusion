@@ -41,11 +41,11 @@ export class HelixLink extends HelixElement {
 
   /** Size on the type scale. */
   @property({ reflect: true })
-  size: 'xs' | 'sm' | 'md' | 'lg' = 'md'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
 
   /** How much the link announces itself. */
   @property({ reflect: true })
-  appearance: 'default' | 'subtle' | 'quiet' = 'default'
+  appearance?: 'default' | 'subtle' | 'quiet'
 
   /** Whether the underline waits for hover. */
   @property({ attribute: 'underline-on-hover', reflect: true, type: Boolean })

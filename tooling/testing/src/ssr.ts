@@ -32,6 +32,24 @@ export const hostTag = (markup: string, tagName: string): string =>
   new RegExp(`<${tagName}[^>]*>`).exec(withoutStyles(markup))?.[0] ?? ''
 
 /**
+ * Every attribute name on the host's opening tag, sorted.
+ *
+ * This is the hydration contract in one assertion. A React consumer's server
+ * markup contains exactly the attributes they wrote in JSX, so any attribute a
+ * component adds to its own host, whether by reflecting a default or by writing
+ * `role` in `willUpdate`, is a mismatch the moment the element upgrades. React
+ * reports it and does not patch it up.
+ *
+ * So the rule is that the host carries nothing the consumer did not write:
+ * defaults are the absent attribute, semantics go through `ElementInternals`,
+ * and measured geometry is written inside the shadow root.
+ */
+export const hostAttributes = (markup: string, tagName: string): string[] =>
+  [...hostTag(markup, tagName).matchAll(/\s([a-z-]+[a-z0-9-]*)(?==|[\s>/])/g)]
+    .map(([, name]) => name as string)
+    .sort()
+
+/**
  * Whether the shadow root contains an element rendered with the given part.
  *
  * Matches the tag rather than the bare `part="…"` string, so a selector in the

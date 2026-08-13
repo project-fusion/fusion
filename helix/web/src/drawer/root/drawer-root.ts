@@ -33,7 +33,7 @@ import { styles } from './drawer-root.css.js'
 export class HelixDrawer extends HelixBaseDrawer {
   /** Removes the panel's own surface, for a drawer inside another surface. */
   @property({ reflect: true })
-  appearance: 'surface' | 'plain' = 'surface'
+  appearance?: 'surface' | 'plain'
 
   static override styles: CSSResultGroup = styles
 }

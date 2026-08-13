@@ -45,7 +45,7 @@ export class HelixBaseTree extends HelixElement {
   label = 'Tree'
 
   /** Value of the selected item, kept in step with the items themselves. */
-  @property({ reflect: true })
+  @property()
   value = ''
 
   /** Every item, in the order a reader moving down would meet them. */

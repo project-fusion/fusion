@@ -18,7 +18,7 @@ export interface AppHeaderProps extends BaseProps {
   appearance?: 'flat' | 'material'
   /** Where the navigation sits in the bar. `center` puts it in the middle of the banner rather than beside the brand, which reads as the site's spine when the nav is the primary thing in the header rather than an afterthought next to a logo. */
   navAlign?: 'start' | 'center'
-  /** Whether the banner sticks to the top of the viewport. */
+  /** Whether the banner sticks to the top of the viewport. Opt in, because a reflected `true` writes an attribute the server's markup does not have. Every default here is the absent attribute. */
   sticky?: boolean
 }
 
