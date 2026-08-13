@@ -31,9 +31,18 @@ import { styles } from './sandbox-source.css.js'
  */
 @customElement('helix-sandbox-source')
 export class HelixSandboxSource extends HelixElement {
-  /** The markup being edited. */
+  /** The source being edited. */
   @property()
   value = ''
+
+  /**
+   * Which source this pane holds, echoed in every `SourceChange`.
+   *
+   * `html` and `css` are what the sandbox root routes on; any other name is
+   * passed through untouched for a consumer wiring their own panes.
+   */
+  @property({ reflect: true })
+  name = 'html'
 
   /** Accessible name for the editable region. */
   @property({ attribute: 'field-label' })
@@ -48,7 +57,7 @@ export class HelixSandboxSource extends HelixElement {
 
   private readonly handleInput = (event: Event): void => {
     this.value = (event.target as HTMLTextAreaElement).value
-    this.dispatchEvent(new HelixSourceChangeEvent({ value: this.value }))
+    this.dispatchEvent(new HelixSourceChangeEvent({ name: this.name, value: this.value }))
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -69,7 +78,7 @@ export class HelixSandboxSource extends HelixElement {
     field.selectionStart = selectionStart + 2
     field.selectionEnd = field.selectionStart
     this.value = field.value
-    this.dispatchEvent(new HelixSourceChangeEvent({ value: this.value }))
+    this.dispatchEvent(new HelixSourceChangeEvent({ name: this.name, value: this.value }))
   }
 
   protected override render(): TemplateResult {

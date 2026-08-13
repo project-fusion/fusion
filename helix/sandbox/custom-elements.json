@@ -54,6 +54,17 @@
             },
             {
               "kind": "method",
+              "name": "applyStyles",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the stylesheet inside the preview, after the markup.\n\nRe-created whenever the markup is, because setting `innerHTML` removes it\nalong with everything else."
+            },
+            {
+              "kind": "method",
               "name": "finalizeStyles",
               "privacy": "protected",
               "static": true,
@@ -87,6 +98,15 @@
               "default": "''",
               "description": "Markup to render.",
               "fieldName": "source"
+            },
+            {
+              "name": "styles",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Stylesheet applied to the preview.\n\nScoped by being written into the preview's own subtree rather than the\ndocument, so an example that restyles `helix-card` restyles the one being\npreviewed and not the sandbox around it.",
+              "fieldName": "styles"
             }
           ],
           "superclass": {
@@ -157,7 +177,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Coordination is by event, the same way the accordion does it: the source pane\ndispatches `SourceChange`, which bubbles, and the sandbox hands the new value\nto whatever preview is slotted into it. Neither child knows the other exists,\nso either can be replaced or used alone.\n\nThe split is a real `role=\"separator\"` with `aria-valuenow`, movable by\npointer and by arrow keys, because a divider that only responds to dragging\nis unusable without a mouse. Home and End jump to the bounds.",
+          "description": "Coordination is by event, the same way the accordion does it: a source pane\ndispatches `SourceChange`, which bubbles, and the sandbox hands the value to\nwhatever preview is slotted into it. Neither child knows the other exists, so\neither can be replaced or used alone.\n\nThe event carries the pane's `name`, which is what lets one sandbox hold a\nmarkup pane and a stylesheet pane without the root identifying senders by\nreference. `css` becomes the preview's stylesheet; anything else is markup.\n\nThe split is a real `role=\"separator\"` with `aria-valuenow`, movable by\npointer and by arrow keys, because a divider that only responds to dragging\nis unusable without a mouse. Home and End jump to the bounds.",
           "name": "HelixSandbox",
           "cssProperties": [
             {
@@ -442,8 +462,19 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The markup being edited.",
+              "description": "The source being edited.",
               "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "'html'",
+              "description": "Which source this pane holds, echoed in every `SourceChange`.\n\n`html` and `css` are what the sandbox root routes on; any other name is\npassed through untouched for a consumer wiring their own panes.",
+              "attribute": "name",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -531,8 +562,17 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The markup being edited.",
+              "description": "The source being edited.",
               "fieldName": "value"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "'html'",
+              "description": "Which source this pane holds, echoed in every `SourceChange`.\n\n`html` and `css` are what the sandbox root routes on; any other name is\npassed through untouched for a consumer wiring their own panes.",
+              "fieldName": "name"
             },
             {
               "name": "field-label",
