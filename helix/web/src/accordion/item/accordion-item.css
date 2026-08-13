@@ -2,18 +2,6 @@
   display: block;
 }
 
-[part="container"] {
-  background-color: var(--disclosure-background-color, var(--helix-color-surface));
-  border: 1px solid var(--disclosure-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-md);
-  overflow: hidden;
-}
-
-:host([appearance="plain"]) [part="container"] {
-  background-color: transparent;
-  border-color: transparent;
-}
-
 [part="trigger"] {
   all: unset;
   align-items: center;
@@ -21,10 +9,11 @@
   cursor: pointer;
   display: flex;
   font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-medium);
   inline-size: 100%;
   justify-content: space-between;
   min-block-size: var(--helix-size-control);
-  padding: var(--disclosure-padding, var(--helix-space-sm) var(--helix-space-md));
+  padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -36,6 +25,8 @@
   background-color: var(--helix-color-primary-subtle);
 }
 
+/* Inset, because the trigger runs to the item's edge and an outset ring would
+   be clipped by the accordion's `overflow: hidden`. */
 [part="trigger"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
@@ -62,9 +53,10 @@
 }
 
 :host([data-open]) [part="content-inner"] {
-  border-block-start: 1px solid var(--disclosure-border-color, var(--helix-color-border));
   color: var(--helix-color-foreground-muted);
-  padding: var(--disclosure-padding, var(--helix-space-sm) var(--helix-space-md));
+  line-height: var(--helix-leading-normal);
+  padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
+  padding-block-start: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

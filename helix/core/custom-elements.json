@@ -98,6 +98,28 @@
             "module": "src/events.ts"
           },
           "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "Fired when an element asks to be removed.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the list it is in and removing the DOM node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\n`RemoveRequest` rather than `Remove` because event names are always compound.\nThe name also happens to say the right thing.",
+          "name": "HelixRemoveRequestEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'RemoveRequest'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events.ts"
+          },
+          "helix": {}
         }
       ],
       "exports": [
@@ -106,6 +128,14 @@
           "name": "HelixOpenChangeEvent",
           "declaration": {
             "name": "HelixOpenChangeEvent",
+            "module": "src/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixRemoveRequestEvent",
+          "declaration": {
+            "name": "HelixRemoveRequestEvent",
             "module": "src/events.ts"
           }
         }
@@ -318,9 +348,25 @@
         },
         {
           "kind": "js",
+          "name": "HelixRemoveRequestEvent",
+          "declaration": {
+            "name": "HelixRemoveRequestEvent",
+            "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "OpenChangeDetail",
           "declaration": {
             "name": "OpenChangeDetail",
+            "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "RemoveRequestDetail",
+          "declaration": {
+            "name": "RemoveRequestDetail",
             "module": "./events.js"
           }
         },

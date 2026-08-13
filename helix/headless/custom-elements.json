@@ -17,10 +17,34 @@
         },
         {
           "kind": "js",
+          "name": "HelixRemoveRequestEvent",
+          "declaration": {
+            "name": "HelixRemoveRequestEvent",
+            "package": "@helix-io/core"
+          }
+        },
+        {
+          "kind": "js",
           "name": "OpenChangeDetail",
           "declaration": {
             "name": "OpenChangeDetail",
             "package": "@helix-io/core"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "RemoveRequestDetail",
+          "declaration": {
+            "name": "RemoveRequestDetail",
+            "package": "@helix-io/core"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/accordion/index.js"
           }
         },
         {
@@ -44,7 +68,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/card/index.js"
+            "module": "src/callout/index.js"
           }
         },
         {
@@ -52,7 +76,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/disclosure/index.js"
+            "module": "src/card/index.js"
           }
         },
         {
@@ -69,6 +93,14 @@
           "declaration": {
             "name": "*",
             "module": "src/icon/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tag/index.js"
           }
         }
       ]
@@ -105,6 +137,44 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/accordion/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/accordion/item/accordion-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/accordion/root/accordion-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/callout/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/callout/root/callout-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/card/index.ts",
       "declarations": [],
       "exports": [
@@ -114,21 +184,6 @@
           "declaration": {
             "name": "*",
             "module": "src/card/root/card-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/disclosure/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/disclosure/root/disclosure-root.js"
           }
         }
       ]
@@ -159,6 +214,21 @@
           "declaration": {
             "name": "*",
             "module": "src/divider/root/divider-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tag/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tag/root/tag-root.js"
           }
         }
       ]
@@ -553,113 +623,12 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/root/card-root.ts",
+      "path": "src/accordion/item/accordion-item.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Regions are slots rather than separate elements, because a header, body, and\nfooter carry no state, no behavior, and no API of their own. Slotting them\ncosts one custom element instead of five and lets the consumer bring their\nown markup, so a title can be a real `<h2>` rather than an emulated one.\n\nName the card with `aria-label` or `aria-labelledby`. That is the only\nnaming that survives server rendering: reading a title out of the light DOM\nneeds a DOM, and the server has none.",
-          "name": "HelixBaseCard",
-          "cssParts": [
-            {
-              "description": "The card surface.",
-              "name": "container"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Image or video that runs edge to edge, outside the inset.",
-              "name": "media"
-            },
-            {
-              "description": "Title and any actions for the whole card.",
-              "name": "header"
-            },
-            {
-              "description": "The card's main content.",
-              "name": ""
-            },
-            {
-              "description": "Actions that conclude the card.",
-              "name": "footer"
-            }
-          ],
-          "members": [
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Groups related content and actions into a single surface.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/card",
-            "aliases": [
-              "Panel",
-              "Surface"
-            ],
-            "tier": "headless",
-            "group": "BaseCard",
-            "part": "Root"
-          },
-          "tagName": "helix-base-card",
-          "customElement": true,
-          "modulePath": "src/card/root/card-root.ts",
-          "definitionPath": "src/card/root/card-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseCard",
-          "declaration": {
-            "name": "HelixBaseCard",
-            "module": "src/card/root/card-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-card",
-          "declaration": {
-            "name": "HelixBaseCard",
-            "module": "src/card/root/card-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/disclosure/root/disclosure-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Content stays mounted when closed and is hidden by the styled tier's CSS, so\nan open and close transition is possible and the text is present in\nserver-rendered HTML. Closed content is `inert`, keeping it out of the tab\norder and the accessibility tree without removing it from the box tree.\n\nSlated to become `Accordion.Item`: a disclosure is an accordion with one\nsection, and shipping both means two implementations of one behavior.",
-          "name": "HelixBaseDisclosure",
+          "description": "Carries its own open state, which is why it is an element rather than a slot.\nUsed alone it is a disclosure, and that is deliberate: shipping a separate\n`Disclosure` meant two implementations of one behavior, which is what this\nreplaced.\n\nContent stays mounted when closed and is hidden by the styled tier's CSS, so\nit can animate and so the text is present in server-rendered HTML. Closed\ncontent is `inert`, keeping it out of the tab order and the accessibility\ntree without removing it from the box tree.",
+          "name": "HelixBaseAccordionItem",
           "cssParts": [
             {
               "description": "The outer wrapper.",
@@ -693,6 +662,19 @@
               "kind": "field",
               "name": "handleToggle",
               "privacy": "protected"
+            },
+            {
+              "kind": "method",
+              "name": "focusTrigger",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Moves focus to this item's trigger.\n\nThe parent accordion drives arrow-key navigation and cannot reach the\ntrigger itself, because it is inside this item's shadow root. Exposing the\nintent as a method keeps the parent out of the child's internals.",
+              "type": {
+                "text": "focusTrigger() => void"
+              }
             },
             {
               "kind": "field",
@@ -819,7 +801,7 @@
               "type": {
                 "text": "HelixOpenChangeEvent"
               },
-              "description": "Fired when the disclosure opens or closes.",
+              "description": "Fired when the item opens or closes.",
               "name": "OpenChange",
               "reactProp": "onOpenChange"
             }
@@ -834,20 +816,21 @@
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "Shows and hides a section of related content.",
+          "summary": "One collapsible section of an accordion.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/disclosure",
+            "documentation": "https://helix.fusion.dev/components/accordion",
             "aliases": [
               "Collapsible",
-              "Expander"
+              "Expander",
+              "Disclosure"
             ],
             "tier": "headless",
-            "group": "BaseDisclosure",
-            "part": "Root"
+            "group": "BaseAccordion",
+            "part": "Item"
           },
-          "tagName": "helix-base-disclosure",
+          "tagName": "helix-base-accordion-item",
           "customElement": true,
           "attributes": [
             {
@@ -877,25 +860,384 @@
               }
             }
           ],
-          "modulePath": "src/disclosure/root/disclosure-root.ts",
-          "definitionPath": "src/disclosure/root/disclosure-root.ts"
+          "modulePath": "src/accordion/item/accordion-item.ts",
+          "definitionPath": "src/accordion/item/accordion-item.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseDisclosure",
+          "name": "HelixBaseAccordionItem",
           "declaration": {
-            "name": "HelixBaseDisclosure",
-            "module": "src/disclosure/root/disclosure-root.ts"
+            "name": "HelixBaseAccordionItem",
+            "module": "src/accordion/item/accordion-item.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-disclosure",
+          "name": "helix-base-accordion-item",
           "declaration": {
-            "name": "HelixBaseDisclosure",
-            "module": "src/disclosure/root/disclosure-root.ts"
+            "name": "HelixBaseAccordionItem",
+            "module": "src/accordion/item/accordion-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/accordion/root/accordion-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Coordination is by event rather than by registration. Items dispatch\n`OpenChange`, which bubbles and is composed, so the accordion learns that one\nopened by listening to itself. No ready handshake, no child registry, and\nnothing to keep in step when items are added or removed.\n\nItems are matched with `instanceof HelixBaseAccordionItem`, never by tag\nname. A headless component that looked for `helix-accordion-item` would only\nwork with the styled tier, which is the tier it is not allowed to know about.\n\nEvery listener is attached on connect, so none of it runs on the server,\nwhere there is no tree to walk and no events to hear.",
+          "name": "HelixBaseAccordion",
+          "cssParts": [
+            {
+              "description": "The stack of items.",
+              "name": "container"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The accordion's items.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "multiple",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether more than one item may be open at once.",
+              "attribute": "multiple",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "HelixBaseAccordionItem[]"
+              },
+              "privacy": "private",
+              "description": "Items in light-DOM order. Client only: the server has no children to read.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleOpenChange",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "multiple",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether more than one item may be open at once.",
+              "fieldName": "multiple"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Groups collapsible sections, one open at a time by default.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/accordion",
+            "aliases": [
+              "Collapse",
+              "Expander group"
+            ],
+            "tier": "headless",
+            "group": "BaseAccordion",
+            "part": "Root"
+          },
+          "tagName": "helix-base-accordion",
+          "customElement": true,
+          "modulePath": "src/accordion/root/accordion-root.ts",
+          "definitionPath": "src/accordion/root/accordion-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseAccordion",
+          "declaration": {
+            "name": "HelixBaseAccordion",
+            "module": "src/accordion/root/accordion-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-accordion",
+          "declaration": {
+            "name": "HelixBaseAccordion",
+            "module": "src/accordion/root/accordion-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/callout/root/callout-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "`severity` lives on the headless tier rather than being an `appearance` on the\nstyled one, because it is meaning and not decoration. It picks the icon and\nthat icon's accessible name, so a reader who cannot see that the box is red\nstill hears \"Error\". A callout whose severity existed only as a color would\nsay nothing to them at all.\n\nThe icon is the fallback content of a slot, so a consumer replaces it by\nslotting their own and the default disappears with no emptiness check. That\nis what slot fallback is for.",
+          "name": "HelixBaseCallout",
+          "cssParts": [
+            {
+              "description": "The callout body.",
+              "name": "callout"
+            },
+            {
+              "description": "The icon region.",
+              "name": "icon"
+            },
+            {
+              "description": "The content region.",
+              "name": "content"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The callout's content.",
+              "name": ""
+            },
+            {
+              "description": "Replaces the icon chosen by `severity`.",
+              "name": "icon"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger'"
+              },
+              "default": "'info'",
+              "description": "What kind of attention the passage needs.",
+              "attribute": "severity",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger'"
+              },
+              "default": "'info'",
+              "description": "What kind of attention the passage needs.",
+              "fieldName": "severity"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Sets a passage apart as information, a warning, or an error.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/callout",
+            "aliases": [
+              "Alert",
+              "Banner",
+              "Admonition",
+              "Notice"
+            ],
+            "tier": "headless",
+            "group": "BaseCallout",
+            "part": "Root"
+          },
+          "tagName": "helix-base-callout",
+          "customElement": true,
+          "modulePath": "src/callout/root/callout-root.ts",
+          "definitionPath": "src/callout/root/callout-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseCallout",
+          "declaration": {
+            "name": "HelixBaseCallout",
+            "module": "src/callout/root/callout-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-callout",
+          "declaration": {
+            "name": "HelixBaseCallout",
+            "module": "src/callout/root/callout-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/root/card-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Regions are slots rather than separate elements, because a header, body, and\nfooter carry no state, no behavior, and no API of their own. Slotting them\ncosts one custom element instead of five and lets the consumer bring their\nown markup, so a title can be a real `<h2>` rather than an emulated one.\n\nName the card with `aria-label` or `aria-labelledby`. That is the only\nnaming that survives server rendering: reading a title out of the light DOM\nneeds a DOM, and the server has none.",
+          "name": "HelixBaseCard",
+          "cssParts": [
+            {
+              "description": "The card surface.",
+              "name": "container"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Image or video that runs edge to edge, outside the inset.",
+              "name": "media"
+            },
+            {
+              "description": "Title and any actions for the whole card.",
+              "name": "header"
+            },
+            {
+              "description": "The card's main content.",
+              "name": ""
+            },
+            {
+              "description": "Actions that conclude the card.",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Groups related content and actions into a single surface.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/card",
+            "aliases": [
+              "Panel",
+              "Surface"
+            ],
+            "tier": "headless",
+            "group": "BaseCard",
+            "part": "Root"
+          },
+          "tagName": "helix-base-card",
+          "customElement": true,
+          "modulePath": "src/card/root/card-root.ts",
+          "definitionPath": "src/card/root/card-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseCard",
+          "declaration": {
+            "name": "HelixBaseCard",
+            "module": "src/card/root/card-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-card",
+          "declaration": {
+            "name": "HelixBaseCard",
+            "module": "src/card/root/card-root.ts"
           }
         }
       ]
@@ -1126,6 +1468,157 @@
           "declaration": {
             "name": "HelixBaseDivider",
             "module": "src/divider/root/divider-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tag/root/tag-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A tag is a label, and optionally a label the reader can take off. `removable`\nis what separates it from a badge: a badge reports a state the reader cannot\nchange, a tag names something they can.\n\nRemoving is a request, not an action. The tag dispatches `RemoveRequest` and\ndoes nothing else, because the consumer owns the list it sits in; taking the\nnode out from under them would put their state and the document out of step.\nThe event is cancelable, so `preventDefault()` is a refusal.",
+          "name": "HelixBaseTag",
+          "cssParts": [
+            {
+              "description": "The tag body.",
+              "name": "tag"
+            },
+            {
+              "description": "The remove button, when `removable`.",
+              "name": "remove"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The tag's label.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "removable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tag offers a control to remove itself.",
+              "attribute": "removable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "removeLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Remove'",
+              "description": "Accessible name for the remove control.\n\nA property rather than text read from the tag, because naming the button\n\"Remove Draft\" would mean reading `textContent` and the server has no tree\nto read it from.\n\nThe attribute is named explicitly. Lit lowercases a property name to get an\nattribute rather than dash-casing it, so this would otherwise be reachable\nonly as `removelabel`, which nobody would guess and no linter would catch.",
+              "attribute": "remove-label"
+            },
+            {
+              "kind": "field",
+              "name": "handleRemove",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixRemoveRequestEvent"
+              },
+              "description": "Fired when the reader asks to remove the tag.",
+              "name": "RemoveRequest",
+              "reactProp": "onRemoveRequest"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "removable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tag offers a control to remove itself.",
+              "fieldName": "removable"
+            },
+            {
+              "name": "remove-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Remove'",
+              "description": "Accessible name for the remove control.\n\nA property rather than text read from the tag, because naming the button\n\"Remove Draft\" would mean reading `textContent` and the server has no tree\nto read it from.\n\nThe attribute is named explicitly. Lit lowercases a property name to get an\nattribute rather than dash-casing it, so this would otherwise be reachable\nonly as `removelabel`, which nobody would guess and no linter would catch.",
+              "fieldName": "removeLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Labels content with a short piece of metadata.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tag",
+            "aliases": [
+              "Chip",
+              "Pill",
+              "Label"
+            ],
+            "tier": "headless",
+            "group": "BaseTag",
+            "part": "Root"
+          },
+          "tagName": "helix-base-tag",
+          "customElement": true,
+          "modulePath": "src/tag/root/tag-root.ts",
+          "definitionPath": "src/tag/root/tag-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTag",
+          "declaration": {
+            "name": "HelixBaseTag",
+            "module": "src/tag/root/tag-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-tag",
+          "declaration": {
+            "name": "HelixBaseTag",
+            "module": "src/tag/root/tag-root.ts"
           }
         }
       ]

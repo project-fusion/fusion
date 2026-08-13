@@ -1,0 +1,41 @@
+import { customElement } from '@helix-io/core'
+import { HelixBaseCallout } from '@helix-io/headless'
+import type { CSSResultGroup } from 'lit'
+import { styles } from './callout-root.css.js'
+
+/**
+ * @summary Sets a passage apart as information, a warning, or an error.
+ *
+ * @description
+ * Tinted from the severity's status color with `color-mix`, and marked with a
+ * bar on the inline start so the severity survives being read in greyscale or
+ * by anyone who does not distinguish the hues.
+ *
+ * There is no `appearance` here. `severity` carries the meaning and lives on
+ * the headless tier; this tier only decides what that meaning looks like.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @aliases Alert, Banner, Admonition, Notice
+ * @documentation https://helix.fusion.dev/components/callout
+ *
+ * @slot - The callout's content.
+ * @slot icon - Replaces the icon chosen by `severity`.
+ *
+ * @csspart callout - The callout body.
+ * @csspart icon - The icon region.
+ * @csspart content - The content region.
+ *
+ * @cssproperty --callout-background-color - Fill behind the callout.
+ * @cssproperty --callout-radii - Corner radius of the callout.
+ */
+@customElement('helix-callout')
+export class HelixCallout extends HelixBaseCallout {
+  static override styles: CSSResultGroup = styles
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'helix-callout': HelixCallout
+  }
+}

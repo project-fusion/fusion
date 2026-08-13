@@ -43,3 +43,17 @@
   gap: var(--helix-space-md);
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
 }
+
+/* A card header holding a title and a status side by side. The card places the
+   region; laying out two things inside it is the consumer's job, which is why
+   there is no wrapper element inside the component to do it. */
+.cardTitle {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+}
+
+.section helix-callout {
+  margin-block-end: var(--helix-space-xl);
+}

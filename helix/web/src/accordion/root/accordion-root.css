@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+[part="container"] {
+  border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
+  border-radius: var(--accordion-radii, var(--helix-radii-md));
+  /* Clips each item's square corners to the stack's radius, so no item needs
+     to know whether it is first or last. */
+  overflow: hidden;
+}
+
+:host([appearance="plain"]) [part="container"] {
+  border-color: transparent;
+  border-radius: var(--helix-radii-none);
+}
+
+/* One rule between neighbours rather than one per item, so the seam is a single
+   pixel. `+` reaches slotted siblings because they are siblings in the light
+   DOM, which is the tree the selector runs against. */
+::slotted(* + *) {
+  border-block-start: var(--helix-border-thin) solid
+    var(--accordion-border-color, var(--helix-color-border));
+}

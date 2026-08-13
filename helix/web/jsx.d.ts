@@ -1,12 +1,16 @@
 import type {
   Helix,
+  HelixAccordion,
+  HelixAccordionItem,
   HelixAppHeader,
   HelixButton,
+  HelixCallout,
   HelixCard,
-  HelixDisclosure,
   HelixDivider,
   HelixIcon,
   HelixOpenChangeEvent,
+  HelixRemoveRequestEvent,
+  HelixTag,
 } from '@helix-io/web';
 
 /**
@@ -200,6 +204,66 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
+/** `HelixAccordionItem` component event */
+export type HelixAccordionItemElementEvent<E = Event> = TypedEvent<
+  HelixAccordionItem,
+  E
+>;
+/** `OpenChange` event type */
+export type HelixAccordionItemOpenChangeElementEvent =
+  HelixAccordionItemElementEvent<HelixOpenChangeEvent>;
+
+export type HelixAccordionItemProps = {
+  /** Tightens the trigger for dense layouts. */
+  dense?: HelixAccordionItem["dense"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixAccordionItem["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixAccordionItem["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixAccordionItem["defaultOpen"];
+
+  /** Fired when the item opens or closes. */
+  onOpenChange?: (e: HelixAccordionItemOpenChangeElementEvent) => void;
+};
+
+export type HelixAccordionItemSolidJsProps = {
+  /** Tightens the trigger for dense layouts. */
+  "prop:dense"?: HelixAccordionItem["dense"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixAccordionItem["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixAccordionItem["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixAccordionItem["defaultOpen"];
+  /** Fired when the item opens or closes. */
+  "on:OpenChange"?: (e: HelixAccordionItemOpenChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixAccordionProps = {
+  /** Removes the surrounding surface, leaving only the separating rules. */
+  appearance?: HelixAccordion["appearance"];
+  /** Whether more than one item may be open at once. */
+  multiple?: HelixAccordion["multiple"];
+};
+
+export type HelixAccordionSolidJsProps = {
+  /** Removes the surrounding surface, leaving only the separating rules. */
+  "prop:appearance"?: HelixAccordion["appearance"];
+  /** Whether more than one item may be open at once. */
+  "prop:multiple"?: HelixAccordion["multiple"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixAppHeaderProps = {
   /** Whether the banner sticks to the top of the viewport. */
   sticky?: HelixAppHeader["sticky"];
@@ -300,6 +364,21 @@ export type HelixDividerSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixCalloutProps = {
+  /** What kind of attention the passage needs. */
+  severity?: HelixCallout["severity"];
+};
+
+export type HelixCalloutSolidJsProps = {
+  /** What kind of attention the passage needs. */
+  "prop:severity"?: HelixCallout["severity"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixIconProps = {
   /** Name of the icon in the Helix set. */
   name?: HelixIcon["name"];
@@ -319,44 +398,73 @@ export type HelixIconSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixDisclosure` component event */
-export type HelixDisclosureElementEvent<E = Event> = TypedEvent<
-  HelixDisclosure,
-  E
->;
-/** `OpenChange` event type */
-export type HelixDisclosureOpenChangeElementEvent =
-  HelixDisclosureElementEvent<HelixOpenChangeEvent>;
+/** `HelixTag` component event */
+export type HelixTagElementEvent<E = Event> = TypedEvent<HelixTag, E>;
+/** `RemoveRequest` event type */
+export type HelixTagRemoveRequestElementEvent =
+  HelixTagElementEvent<HelixRemoveRequestEvent>;
 
-export type HelixDisclosureProps = {
-  /** Visual weight of the disclosure. */
-  appearance?: HelixDisclosure["appearance"];
-  /** Reduces the vertical padding for dense layouts. */
-  dense?: HelixDisclosure["dense"];
-  /** Whether the element is open. Setting this enters controlled mode. */
-  open?: HelixDisclosure["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
-  "default-open"?: HelixDisclosure["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
-  defaultOpen?: HelixDisclosure["defaultOpen"];
+export type HelixTagProps = {
+  /** Which status the tag reports. */
+  appearance?: HelixTag["appearance"];
+  /** Height and inset of the tag. */
+  size?: HelixTag["size"];
+  /** Whether the tag offers a control to remove itself. */
+  removable?: HelixTag["removable"];
+  /** Accessible name for the remove control.
 
-  /** Fired when the disclosure opens or closes. */
-  onOpenChange?: (e: HelixDisclosureOpenChangeElementEvent) => void;
+A property rather than text read from the tag, because naming the button
+"Remove Draft" would mean reading `textContent` and the server has no tree
+to read it from.
+
+The attribute is named explicitly. Lit lowercases a property name to get an
+attribute rather than dash-casing it, so this would otherwise be reachable
+only as `removelabel`, which nobody would guess and no linter would catch. */
+  "remove-label"?: HelixTag["removeLabel"];
+  /** Accessible name for the remove control.
+
+A property rather than text read from the tag, because naming the button
+"Remove Draft" would mean reading `textContent` and the server has no tree
+to read it from.
+
+The attribute is named explicitly. Lit lowercases a property name to get an
+attribute rather than dash-casing it, so this would otherwise be reachable
+only as `removelabel`, which nobody would guess and no linter would catch. */
+  removeLabel?: HelixTag["removeLabel"];
+
+  /** Fired when the reader asks to remove the tag. */
+  onRemoveRequest?: (e: HelixTagRemoveRequestElementEvent) => void;
 };
 
-export type HelixDisclosureSolidJsProps = {
-  /** Visual weight of the disclosure. */
-  "prop:appearance"?: HelixDisclosure["appearance"];
-  /** Reduces the vertical padding for dense layouts. */
-  "prop:dense"?: HelixDisclosure["dense"];
-  /** Whether the element is open. Setting this enters controlled mode. */
-  "prop:open"?: HelixDisclosure["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
-  "bool:default-open"?: HelixDisclosure["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
-  "prop:defaultOpen"?: HelixDisclosure["defaultOpen"];
-  /** Fired when the disclosure opens or closes. */
-  "on:OpenChange"?: (e: HelixDisclosureOpenChangeElementEvent) => void;
+export type HelixTagSolidJsProps = {
+  /** Which status the tag reports. */
+  "prop:appearance"?: HelixTag["appearance"];
+  /** Height and inset of the tag. */
+  "prop:size"?: HelixTag["size"];
+  /** Whether the tag offers a control to remove itself. */
+  "prop:removable"?: HelixTag["removable"];
+  /** Accessible name for the remove control.
+
+A property rather than text read from the tag, because naming the button
+"Remove Draft" would mean reading `textContent` and the server has no tree
+to read it from.
+
+The attribute is named explicitly. Lit lowercases a property name to get an
+attribute rather than dash-casing it, so this would otherwise be reachable
+only as `removelabel`, which nobody would guess and no linter would catch. */
+  "attr:remove-label"?: HelixTag["removeLabel"];
+  /** Accessible name for the remove control.
+
+A property rather than text read from the tag, because naming the button
+"Remove Draft" would mean reading `textContent` and the server has no tree
+to read it from.
+
+The attribute is named explicitly. Lit lowercases a property name to get an
+attribute rather than dash-casing it, so this would otherwise be reachable
+only as `removelabel`, which nobody would guess and no linter would catch. */
+  "prop:removeLabel"?: HelixTag["removeLabel"];
+  /** Fired when the reader asks to remove the tag. */
+  "on:RemoveRequest"?: (e: HelixTagRemoveRequestElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -365,6 +473,102 @@ export type HelixDisclosureSolidJsProps = {
 };
 
 export type CustomElements = {
+  /**
+   * The open and close transition animates `grid-template-rows` from `0fr` to
+   * `1fr`, which is the only technique that reaches the content's intrinsic
+   * height without measuring it in JavaScript. It is disabled under
+   * `prefers-reduced-motion`.
+   *
+   * Usable on its own as a disclosure, with no accordion around it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `dense`: Tightens the trigger for dense layouts.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `OpenChange`: Fired when the item opens or closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `summary`: The always-visible trigger content.
+   * - `(default)`: The content revealed when open.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `setOpen(next: boolean) => void`: Requests an open-state change. In uncontrolled mode the element updates
+   * itself; in controlled mode it only notifies and waits for the consumer.
+   * - `focusTrigger() => void`: Moves focus to this item's trigger.
+   *
+   * The parent accordion drives arrow-key navigation and cannot reach the
+   * trigger itself, because it is inside this item's shadow root. Exposing the
+   * intent as a method keeps the parent out of the child's internals.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--accordion-item-padding`: Inset of the trigger and content. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The outer wrapper.
+   * - `trigger`: The clickable summary row.
+   * - `content`: The revealed region.
+   * - `content-inner`: Padding wrapper inside the animated region.
+   */
+  "helix-accordion-item": Partial<
+    HelixAccordionItemProps & BaseProps<HelixAccordionItem> & BaseEvents
+  >;
+
+  /**
+   * Items sit in a single bordered stack, sharing one rule between neighbours
+   * rather than each drawing its own, so the seam between two items is one pixel
+   * and not two.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: Removes the surrounding surface, leaving only the separating rules.
+   * - `multiple`: Whether more than one item may be open at once.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The accordion's items.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--accordion-border-color`: Color of the surrounding rule. (default: `undefined`)
+   * - `--accordion-radii`: Corner radius of the stack. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The stack of items.
+   */
+  "helix-accordion": Partial<
+    HelixAccordionProps & BaseProps<HelixAccordion> & BaseEvents
+  >;
+
   /**
    * Sticky and translucent, drawn on the material tokens so the page content
    * blurs behind it rather than being hidden by an opaque bar. The separating
@@ -534,6 +738,46 @@ export type CustomElements = {
   >;
 
   /**
+   * Tinted from the severity's status color with `color-mix`, and marked with a
+   * bar on the inline start so the severity survives being read in greyscale or
+   * by anyone who does not distinguish the hues.
+   *
+   * There is no `appearance` here. `severity` carries the meaning and lives on
+   * the headless tier; this tier only decides what that meaning looks like.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the passage needs.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The callout's content.
+   * - `icon`: Replaces the icon chosen by `severity`.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--callout-background-color`: Fill behind the callout. (default: `undefined`)
+   * - `--callout-radii`: Corner radius of the callout. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `callout`: The callout body.
+   * - `icon`: The icon region.
+   * - `content`: The content region.
+   */
+  "helix-callout": Partial<
+    HelixCalloutProps & BaseProps<HelixCallout> & BaseEvents
+  >;
+
+  /**
    * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
    * color of the text it sits in and a container can resize it without reaching
    * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
@@ -561,16 +805,72 @@ export type CustomElements = {
   "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents>;
 
   /**
-   * The content region animates between collapsed and expanded by transitioning a
-   * grid row, which is the only technique that reaches the content's intrinsic
-   * height without measuring it in JavaScript.
+   * Five appearances, drawn as a tinted fill derived from the status color with
+   * `color-mix` rather than from a token per status. The alternative was eight
+   * new tokens whose only job was to be a lighter version of one that already
+   * existed, and they would have had to be re-derived by every theme.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Visual weight of the disclosure.
-   * - `dense`: Reduces the vertical padding for dense layouts.
+   * - `appearance`: Which status the tag reports.
+   * - `size`: Height and inset of the tag.
+   * - `removable`: Whether the tag offers a control to remove itself.
+   * - `remove-label`/`removeLabel`: Accessible name for the remove control.
+   *
+   * A property rather than text read from the tag, because naming the button
+   * "Remove Draft" would mean reading `textContent` and the server has no tree
+   * to read it from.
+   *
+   * The attribute is named explicitly. Lit lowercases a property name to get an
+   * attribute rather than dash-casing it, so this would otherwise be reachable
+   * only as `removelabel`, which nobody would guess and no linter would catch.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `RemoveRequest`: Fired when the reader asks to remove the tag.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tag's label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
+   * - `--tag-foreground-color`: Label color. (default: `undefined`)
+   * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tag`: The tag body.
+   * - `remove`: The remove button, when `removable`.
+   */
+  "helix-tag": Partial<HelixTagProps & BaseProps<HelixTag> & BaseEvents>;
+};
+
+export type CustomElementsSolidJs = {
+  /**
+   * The open and close transition animates `grid-template-rows` from `0fr` to
+   * `1fr`, which is the only technique that reaches the content's intrinsic
+   * height without measuring it in JavaScript. It is disabled under
+   * `prefers-reduced-motion`.
+   *
+   * Usable on its own as a disclosure, with no accordion around it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `dense`: Tightens the trigger for dense layouts.
    * - `open`: Whether the element is open. Setting this enters controlled mode.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
    * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
@@ -579,7 +879,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `OpenChange`: Fired when the disclosure opens or closes.
+   * - `OpenChange`: Fired when the item opens or closes.
    *
    * ## Slots
    *
@@ -594,14 +894,17 @@ export type CustomElements = {
    *
    * - `setOpen(next: boolean) => void`: Requests an open-state change. In uncontrolled mode the element updates
    * itself; in controlled mode it only notifies and waits for the consumer.
+   * - `focusTrigger() => void`: Moves focus to this item's trigger.
+   *
+   * The parent accordion drives arrow-key navigation and cannot reach the
+   * trigger itself, because it is inside this item's shadow root. Exposing the
+   * intent as a method keeps the parent out of the child's internals.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--disclosure-background-color`: Surface behind the disclosure. (default: `undefined`)
-   * - `--disclosure-border-color`: Border color of the container. (default: `undefined`)
-   * - `--disclosure-padding`: Inner padding of trigger and content. (default: `undefined`)
+   * - `--accordion-item-padding`: Inset of the trigger and content. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -609,15 +912,54 @@ export type CustomElements = {
    *
    * - `container`: The outer wrapper.
    * - `trigger`: The clickable summary row.
-   * - `content`: The revealed region. Animates open and closed.
+   * - `content`: The revealed region.
    * - `content-inner`: Padding wrapper inside the animated region.
    */
-  "helix-disclosure": Partial<
-    HelixDisclosureProps & BaseProps<HelixDisclosure> & BaseEvents
+  "helix-accordion-item": Partial<
+    HelixAccordionItemProps &
+      HelixAccordionItemSolidJsProps &
+      BaseProps<HelixAccordionItem> &
+      BaseEvents
   >;
-};
 
-export type CustomElementsSolidJs = {
+  /**
+   * Items sit in a single bordered stack, sharing one rule between neighbours
+   * rather than each drawing its own, so the seam between two items is one pixel
+   * and not two.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: Removes the surrounding surface, leaving only the separating rules.
+   * - `multiple`: Whether more than one item may be open at once.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The accordion's items.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--accordion-border-color`: Color of the surrounding rule. (default: `undefined`)
+   * - `--accordion-radii`: Corner radius of the stack. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The stack of items.
+   */
+  "helix-accordion": Partial<
+    HelixAccordionProps &
+      HelixAccordionSolidJsProps &
+      BaseProps<HelixAccordion> &
+      BaseEvents
+  >;
+
   /**
    * Sticky and translucent, drawn on the material tokens so the page content
    * blurs behind it rather than being hidden by an opaque bar. The separating
@@ -798,6 +1140,49 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Tinted from the severity's status color with `color-mix`, and marked with a
+   * bar on the inline start so the severity survives being read in greyscale or
+   * by anyone who does not distinguish the hues.
+   *
+   * There is no `appearance` here. `severity` carries the meaning and lives on
+   * the headless tier; this tier only decides what that meaning looks like.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the passage needs.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The callout's content.
+   * - `icon`: Replaces the icon chosen by `severity`.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--callout-background-color`: Fill behind the callout. (default: `undefined`)
+   * - `--callout-radii`: Corner radius of the callout. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `callout`: The callout body.
+   * - `icon`: The icon region.
+   * - `content`: The content region.
+   */
+  "helix-callout": Partial<
+    HelixCalloutProps &
+      HelixCalloutSolidJsProps &
+      BaseProps<HelixCallout> &
+      BaseEvents
+  >;
+
+  /**
    * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
    * color of the text it sits in and a container can resize it without reaching
    * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
@@ -827,66 +1212,67 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * The content region animates between collapsed and expanded by transitioning a
-   * grid row, which is the only technique that reaches the content's intrinsic
-   * height without measuring it in JavaScript.
+   * Five appearances, drawn as a tinted fill derived from the status color with
+   * `color-mix` rather than from a token per status. The alternative was eight
+   * new tokens whose only job was to be a lighter version of one that already
+   * existed, and they would have had to be re-derived by every theme.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Visual weight of the disclosure.
-   * - `dense`: Reduces the vertical padding for dense layouts.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `appearance`: Which status the tag reports.
+   * - `size`: Height and inset of the tag.
+   * - `removable`: Whether the tag offers a control to remove itself.
+   * - `remove-label`/`removeLabel`: Accessible name for the remove control.
+   *
+   * A property rather than text read from the tag, because naming the button
+   * "Remove Draft" would mean reading `textContent` and the server has no tree
+   * to read it from.
+   *
+   * The attribute is named explicitly. Lit lowercases a property name to get an
+   * attribute rather than dash-casing it, so this would otherwise be reachable
+   * only as `removelabel`, which nobody would guess and no linter would catch.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `OpenChange`: Fired when the disclosure opens or closes.
+   * - `RemoveRequest`: Fired when the reader asks to remove the tag.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `summary`: The always-visible trigger content.
-   * - `(default)`: The content revealed when open.
-   *
-   * ## Methods
-   *
-   * Methods that can be called to access component functionality.
-   *
-   * - `setOpen(next: boolean) => void`: Requests an open-state change. In uncontrolled mode the element updates
-   * itself; in controlled mode it only notifies and waits for the consumer.
+   * - `(default)`: The tag's label.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--disclosure-background-color`: Surface behind the disclosure. (default: `undefined`)
-   * - `--disclosure-border-color`: Border color of the container. (default: `undefined`)
-   * - `--disclosure-padding`: Inner padding of trigger and content. (default: `undefined`)
+   * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
+   * - `--tag-foreground-color`: Label color. (default: `undefined`)
+   * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `container`: The outer wrapper.
-   * - `trigger`: The clickable summary row.
-   * - `content`: The revealed region. Animates open and closed.
-   * - `content-inner`: Padding wrapper inside the animated region.
+   * - `tag`: The tag body.
+   * - `remove`: The remove button, when `removable`.
    */
-  "helix-disclosure": Partial<
-    HelixDisclosureProps &
-      HelixDisclosureSolidJsProps &
-      BaseProps<HelixDisclosure> &
-      BaseEvents
+  "helix-tag": Partial<
+    HelixTagProps & HelixTagSolidJsProps & BaseProps<HelixTag> & BaseEvents
   >;
 };
 
 export type CustomCssProperties = {
+  /** Inset of the trigger and content. */
+  "--accordion-item-padding"?: string;
+  /** Color of the surrounding rule. */
+  "--accordion-border-color"?: string;
+  /** Corner radius of the stack. */
+  "--accordion-radii"?: string;
   /** Material behind the banner. */
   "--app-header-background"?: string;
   /** Height of the banner. */
@@ -915,14 +1301,18 @@ export type CustomCssProperties = {
   "--divider-color"?: string;
   /** Thickness of the rule. */
   "--divider-thickness"?: string;
+  /** Fill behind the callout. */
+  "--callout-background-color"?: string;
+  /** Corner radius of the callout. */
+  "--callout-radii"?: string;
   /** Edge length of the icon's box. */
   "--icon-size"?: string;
-  /** Surface behind the disclosure. */
-  "--disclosure-background-color"?: string;
-  /** Border color of the container. */
-  "--disclosure-border-color"?: string;
-  /** Inner padding of trigger and content. */
-  "--disclosure-padding"?: string;
+  /** Fill behind the tag. */
+  "--tag-background-color"?: string;
+  /** Label color. */
+  "--tag-foreground-color"?: string;
+  /** Corner radius of the tag. */
+  "--tag-radii"?: string;
 };
 
 declare module "react" {

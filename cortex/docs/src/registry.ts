@@ -1,84 +1,64 @@
 /**
  * Documentation registry for Cortex.
  *
- * Docs are a package rather than a folder inside a site so that a version of
- * the docs is pinned to the version of the code it describes. A site renders
- * this registry; it does not own it. That seam is what lets one site serve
- * several doc versions, and what lets the docs be versioned at all.
+ * Docs are a package rather than a folder inside a site so that the docs are
+ * pinned to the version of the code they describe. A site renders this
+ * registry; it does not own it.
+ *
+ * **There is no version axis in here.** The package version is the version:
+ * `@cortex-io/docs@0.2.0` documents Cortex 0.2.0, because every package in a
+ * domain moves in lockstep. A `versions` array beside that would be a second
+ * source of truth with nothing keeping the two in step, and the first time they
+ * disagreed the registry would win over the package that shipped it.
+ *
+ * A site serving several versions installs several versions, which is the
+ * mechanism npm already provides and the only one that cannot drift.
  */
-
-/** Where a version sits in its lifecycle. */
-export type VersionStatus = 'archived' | 'current' | 'next'
 
 export interface DocPage {
   /** One-line summary, used for nav tooltips and search results. */
   description: string
   /** Position within its section. */
   order: number
-  /** Path segment, unique within a version. */
+  /** Path segment, unique across the package. */
   slug: string
   /** Top-level grouping in the sidebar. */
   section: string
   title: string
 }
 
-export interface DocVersion {
-  /** Directory under `content/` holding this version's MDX. */
-  dir: string
-  /** Human label, e.g. "0.0.x". */
-  label: string
-  pages: DocPage[]
-  status: VersionStatus
-  /** Semver range this documentation describes. */
-  version: string
-}
+/** Every page this package documents. */
+export const pages: DocPage[] = [
+  {
+    description: 'What Cortex is: memory and provenance, not a model wrapper.',
+    order: 1,
+    section: 'Overview',
+    slug: 'introduction',
+    title: 'Introduction',
+  },
+  {
+    description: 'Episodic and semantic memory, consolidation, and decay.',
+    order: 1,
+    section: 'Primitives',
+    slug: 'engram',
+    title: 'Engram',
+  },
+  {
+    description: 'The provenance spine: why(), replay, and cascading deletion.',
+    order: 2,
+    section: 'Primitives',
+    slug: 'trace',
+    title: 'Trace',
+  },
+]
 
-const v0: DocVersion = {
-  dir: 'v0',
-  label: '0.0.x',
-  pages: [
-    {
-      description: 'What Cortex is: memory and provenance, not a model wrapper.',
-      order: 1,
-      section: 'Overview',
-      slug: 'introduction',
-      title: 'Introduction',
-    },
-    {
-      description: 'Episodic and semantic memory, consolidation, and decay.',
-      order: 1,
-      section: 'Primitives',
-      slug: 'engram',
-      title: 'Engram',
-    },
-    {
-      description: 'The provenance spine: why(), replay, and cascading deletion.',
-      order: 2,
-      section: 'Primitives',
-      slug: 'trace',
-      title: 'Trace',
-    },
-  ],
-  status: 'current',
-  version: '0.0.1',
-}
-
-/** Every published version, newest first. */
-export const versions: DocVersion[] = [v0]
-
-/** The version served at the unversioned docs root. */
-export const currentVersion: DocVersion = v0
-
-export const findVersion = (version: string): DocVersion | undefined =>
-  versions.find((v) => v.version === version || v.label === version)
-
-export const findPage = (version: DocVersion, slug: string): DocPage | undefined =>
-  version.pages.find((p) => p.slug === slug)
+export const findPage = (slug: string): DocPage | undefined =>
+  pages.find((page) => page.slug === slug)
 
 /** Pages grouped by section, each section's pages ordered. */
-export const sections = (version: DocVersion): Array<{ pages: DocPage[]; section: string }> => {
+export const sections = (): Array<{ pages: DocPage[]; section: string }> => {
   const grouped = new Map<string, DocPage[]>()
-  for (const page of version.pages) {
+  for (const page of pages) {
     const existing = grouped.get(page.section)
     if (existing) {
       existing.push(page)
@@ -86,12 +66,11 @@ export const sections = (version: DocVersion): Array<{ pages: DocPage[]; section
       grouped.set(page.section, [page])
     }
   }
-  return [...grouped.entries()].map(([section, pages]) => ({
-    pages: [...pages].sort((a, b) => a.order - b.order),
+  return [...grouped.entries()].map(([section, entries]) => ({
+    pages: [...entries].sort((a, b) => a.order - b.order),
     section,
   }))
 }
 
 /** Path to a page's MDX, relative to the package root. */
-export const contentPath = (version: DocVersion, page: DocPage): string =>
-  `content/${version.dir}/${page.slug}.mdx`
+export const contentPath = (page: DocPage): string => `content/${page.slug}.mdx`

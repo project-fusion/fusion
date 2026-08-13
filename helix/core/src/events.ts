@@ -57,8 +57,39 @@ export class HelixOpenChangeEvent extends CustomEvent<OpenChangeDetail> {
   }
 }
 
+/** Detail carried by `RemoveRequest`. */
+export interface RemoveRequestDetail {
+  /** Text content of the element asking to be removed, for identifying it. */
+  label: string
+}
+
+/**
+ * Fired when an element asks to be removed.
+ *
+ * A request rather than a notification: the element does not remove itself,
+ * because the consumer owns the list it is in and removing the DOM node under
+ * them would put their state and the document out of step. Cancelable, so
+ * `preventDefault()` is a refusal.
+ *
+ * `RemoveRequest` rather than `Remove` because event names are always compound.
+ * The name also happens to say the right thing.
+ */
+export class HelixRemoveRequestEvent extends CustomEvent<RemoveRequestDetail> {
+  static readonly eventName = 'RemoveRequest'
+
+  constructor(detail: RemoveRequestDetail) {
+    super(HelixRemoveRequestEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 declare global {
   interface HTMLElementEventMap {
     OpenChange: HelixOpenChangeEvent
+    RemoveRequest: HelixRemoveRequestEvent
   }
 }
