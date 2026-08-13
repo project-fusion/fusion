@@ -3,7 +3,7 @@
 import type { HelixOpenChangeEvent } from '@helix-io/web'
 import { useEffect, useState } from 'react'
 import { FusionLogo } from './fusion-logo'
-import { Preferences } from './preferences'
+import { PreferencesDrawer } from './preferences'
 
 /** The verticals, in the order the company is organised. Design leads. */
 const VERTICALS = [
@@ -33,6 +33,7 @@ const VERTICALS = [
 export function SiteNav() {
   const [narrow, setNarrow] = useState(false)
   const [open, setOpen] = useState(false)
+  const [prefsOpen, setPrefsOpen] = useState(false)
   const [current, setCurrent] = useState('')
 
   useEffect(() => {
@@ -87,7 +88,14 @@ export function SiteNav() {
           </helix-toggle-group>
         )}
 
-        <Preferences />
+        <helix-icon-button
+          label="Preferences"
+          onClick={() => setPrefsOpen(true)}
+          size="sm"
+          slot="actions"
+        >
+          <helix-icon name="gear"></helix-icon>
+        </helix-icon-button>
 
         {narrow ? (
           <helix-button appearance="subtle" onClick={() => setOpen(true)} size="sm" slot="actions">
@@ -104,6 +112,8 @@ export function SiteNav() {
           </helix-button>
         )}
       </helix-app-header>
+
+      <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
       <helix-drawer
         label="Site navigation"

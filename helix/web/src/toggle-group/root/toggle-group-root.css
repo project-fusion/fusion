@@ -27,7 +27,7 @@
 [part="indicator"] {
   background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
   block-size: var(--_toggle-height);
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--helix-radii-md);
   inline-size: var(--_indicator-w, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;
@@ -50,8 +50,11 @@
   opacity: 1;
 }
 
+/* A surface, not an accent. The indicator says which item is current; the
+   accent colour is reserved for state, and using it here would make navigation
+   the loudest thing on the page. */
 :host([nav]) [part="indicator"] {
-  background-color: var(--toggle-group-indicator-color, var(--helix-color-primary-subtle));
+  background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
 }
 
 @media (prefers-reduced-motion: reduce) {

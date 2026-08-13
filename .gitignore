@@ -36,3 +36,6 @@ helix/*/elements.css
 sandbox/ui/dist/
 .vercel
 .env*
+
+# Generated icon set, built from raw/.
+helix/icons/src/generated.ts

@@ -24,6 +24,7 @@
    Exposing them separately would offer a few hundred combinations of which a
    handful are right; this is the handful. */
 :host([data-appearance="display"]) [part="text"] {
+  font-family: var(--helix-font-display);
   font-size: var(--helix-text-3xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);

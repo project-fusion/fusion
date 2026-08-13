@@ -7,13 +7,17 @@
       "outputs": ["custom-elements.json"]
     },
     "build": {
-      "dependsOn": ["^build", "^analyze", "styles"],
+      "dependsOn": ["^build", "^analyze", "icons", "styles"],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "icons": {
+      "inputs": ["raw/**"],
+      "outputs": ["src/generated.ts"]
     },
     "styles": {
       "inputs": ["src/**/*.css"],

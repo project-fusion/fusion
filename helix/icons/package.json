@@ -14,11 +14,13 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "raw"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "bun run icons && tsc -p tsconfig.json",
+    "icons": "node ../../tooling/scripts/build-icons.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "publishConfig": {
