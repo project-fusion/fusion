@@ -8,108 +8,67 @@ beforeAll(async () => {
 
 type Updatable = HTMLElement & { updateComplete?: Promise<unknown> }
 
-/**
- * Waits for the element to settle.
- *
- * A card names itself from a title in its light DOM, which it cannot see until
- * `slotchange` fires. That is one microtask after insertion, and the resulting
- * update is another, so a single `updateComplete` observes the card before it
- * has found its title.
- */
-const settle = async (root: Updatable): Promise<void> => {
-  await root.updateComplete
-  await new Promise((resolve) => setTimeout(resolve, 0))
-  await root.updateComplete
-}
-
 const mount = async (html: string): Promise<HTMLElement> => {
   document.body.innerHTML = html
   const root = document.body.firstElementChild as Updatable
-  await settle(root)
+  await root.updateComplete
   return root
 }
 
-/**
- * Resolves an ARIA reference the way a browser does: within the tree scope of
- * the element carrying the attribute.
- *
- * This is the check the original specs were missing. They asserted that
- * `aria-labelledby` equalled the title's id, which was true while the reference
- * pointed from inside the shadow root at a light-DOM element and could never
- * resolve. An ARIA test that does not resolve proves nothing.
- */
-const accessibleNameSource = (element: Element): Element | null => {
-  const id = element.getAttribute('aria-labelledby')
-  if (!id) {
-    return null
-  }
-  const scope = element.getRootNode() as Document | ShadowRoot
-  return scope.getElementById?.(id) ?? null
+const part = (host: HTMLElement, name: string): Element | null =>
+  host.shadowRoot?.querySelector(`[part='${name}']`) ?? null
+
+const slotted = (host: HTMLElement, name?: string): Element[] => {
+  const selector = name ? `slot[name='${name}']` : 'slot:not([name])'
+  const slot = host.shadowRoot?.querySelector(selector) as HTMLSlotElement | null
+  return (slot?.assignedElements?.() ?? []) as Element[]
 }
 
-describe('card naming', () => {
-  test('the name resolves to a nested title', async () => {
+describe('card regions', () => {
+  test('renders one element, not five', async () => {
     const card = await mount(`
       <helix-card>
-        <helix-card-header>
-          <helix-card-title>Quarterly report</helix-card-title>
-        </helix-card-header>
-        <helix-card-body>Body</helix-card-body>
+        <h2 slot="header">Title</h2>
+        Body
+        <button slot="footer">Act</button>
       </helix-card>
     `)
-
-    const title = card.querySelector('helix-card-title')
-    expect(accessibleNameSource(card)).toBe(title)
+    // The regions are parts of one shadow root, not separate custom elements.
+    expect(card.querySelectorAll('helix-card-header, helix-card-body').length).toBe(0)
+    expect(part(card, 'header')).not.toBeNull()
+    expect(part(card, 'body')).not.toBeNull()
+    expect(part(card, 'footer')).not.toBeNull()
   })
 
-  test('the reference lives on the host, where it can resolve', async () => {
-    const card = await mount('<helix-card><helix-card-title>T</helix-card-title></helix-card>')
-
-    // Not on the shadow container: IDREFs do not cross shadow boundaries.
-    expect(card.shadowRoot?.querySelector('[aria-labelledby]')).toBeNull()
-    expect(card.getAttribute('role')).toBe('group')
-    expect(accessibleNameSource(card)).not.toBeNull()
+  test('routes content to the right region', async () => {
+    const card = await mount(`
+      <helix-card>
+        <h2 slot="header">Title</h2>
+        <p>Body</p>
+        <button slot="footer">Act</button>
+      </helix-card>
+    `)
+    expect(slotted(card, 'header')[0]?.tagName).toBe('H2')
+    expect(slotted(card)[0]?.tagName).toBe('P')
+    expect(slotted(card, 'footer')[0]?.tagName).toBe('BUTTON')
   })
 
-  test('a consumer-supplied id is left alone and still resolves', async () => {
-    const card = await mount(
-      '<helix-card><helix-card-title id="mine">T</helix-card-title></helix-card>',
-    )
-
-    expect(card.querySelector('helix-card-title')?.id).toBe('mine')
-    expect(accessibleNameSource(card)?.id).toBe('mine')
+  test('a consumer heading stays a real heading', async () => {
+    // The reason a title is a slot rather than an element: an <h2> beats a
+    // <div role="heading"> and needs no `level` prop to say so.
+    const card = await mount('<helix-card><h2 slot="header">T</h2>Body</helix-card>')
+    const heading = slotted(card, 'header')[0]
+    expect(heading?.tagName).toBe('H2')
+    expect(heading?.getAttribute('role')).toBeNull()
   })
 
-  test('a card without a title carries no dangling reference', async () => {
-    const card = await mount('<helix-card><helix-card-body>No title</helix-card-body></helix-card>')
-    expect(card.hasAttribute('aria-labelledby')).toBe(false)
+  test('carries the group role', async () => {
+    const card = await mount('<helix-card>Body</helix-card>')
+    expect(part(card, 'container')?.getAttribute('role')).toBe('group')
   })
 
-  test('ids are unique across cards on one page', async () => {
-    document.body.innerHTML = `
-      <helix-card><helix-card-title>One</helix-card-title></helix-card>
-      <helix-card><helix-card-title>Two</helix-card-title></helix-card>
-    `
-    const titles = [...document.querySelectorAll('helix-card-title')] as Updatable[]
-    // Ids are assigned in `willUpdate`, so they do not exist synchronously.
-    await Promise.all(titles.map(settle))
-
-    const ids = titles.map((t) => t.id)
-    expect(ids.every(Boolean)).toBe(true)
-    expect(new Set(ids).size).toBe(ids.length)
-  })
-})
-
-describe('card title', () => {
-  test('renders as a heading at the requested level', async () => {
-    const card = await mount(
-      '<helix-card><helix-card-title level="2">H</helix-card-title></helix-card>',
-    )
-    const title = card.querySelector('helix-card-title') as Updatable
-    await settle(title)
-
-    const heading = title.shadowRoot?.querySelector("[part='heading']")
-    expect(heading?.getAttribute('role')).toBe('heading')
-    expect(heading?.getAttribute('aria-level')).toBe('2')
+  test('a consumer-supplied name is left alone', async () => {
+    const card = await mount('<helix-card aria-label="Report">Body</helix-card>')
+    expect(card.getAttribute('aria-label')).toBe('Report')
   })
 })

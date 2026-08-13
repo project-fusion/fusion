@@ -1,12 +1,4 @@
-import type {
-  HelixBaseCard,
-  HelixBaseCardBody,
-  HelixBaseCardFooter,
-  HelixBaseCardHeader,
-  HelixBaseCardTitle,
-  HelixBaseDisclosure,
-  HelixOpenChangeEvent,
-} from '@helix-io/headless'
+import type { HelixBaseCard, HelixBaseDisclosure, HelixOpenChangeEvent } from '@helix-io/headless'
 
 /**
  * This type can be used to create scoped tags for your components.
@@ -194,48 +186,6 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void
 }
 
-export type HelixBaseCardFooterProps = {}
-
-export type HelixBaseCardFooterSolidJsProps = {
-  /** Set the innerHTML of the element */
-  innerHTML?: string
-  /** Set the textContent of the element */
-  textContent?: string | number
-}
-
-export type HelixBaseCardBodyProps = {}
-
-export type HelixBaseCardBodySolidJsProps = {
-  /** Set the innerHTML of the element */
-  innerHTML?: string
-  /** Set the textContent of the element */
-  textContent?: string | number
-}
-
-export type HelixBaseCardHeaderProps = {}
-
-export type HelixBaseCardHeaderSolidJsProps = {
-  /** Set the innerHTML of the element */
-  innerHTML?: string
-  /** Set the textContent of the element */
-  textContent?: string | number
-}
-
-export type HelixBaseCardTitleProps = {
-  /** Heading level, 1 through 6. */
-  level?: HelixBaseCardTitle['level']
-}
-
-export type HelixBaseCardTitleSolidJsProps = {
-  /** Heading level, 1 through 6. */
-  'prop:level'?: HelixBaseCardTitle['level']
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string
-  /** Set the textContent of the element */
-  textContent?: string | number
-}
-
 export type HelixBaseCardProps = {}
 
 export type HelixBaseCardSolidJsProps = {
@@ -281,108 +231,31 @@ export type HelixBaseDisclosureSolidJsProps = {
 
 export type CustomElements = {
   /**
-   * Aligns its content to the end, so buttons sit where a user expects to finish.
+   * Regions are slots rather than separate elements, because a header, body, and
+   * footer carry no state, no behavior, and no API of their own. Slotting them
+   * costs one custom element instead of five and lets the consumer bring their
+   * own markup, so a title can be a real `<h2>` rather than an emulated one.
+   *
+   * Name the card with `aria-label` or `aria-labelledby`. That is the only
+   * naming that survives server rendering: reading a title out of the light DOM
+   * needs a DOM, and the server has none.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Actions, typically buttons.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The region.
-   */
-  'helix-base-card-footer': Partial<
-    HelixBaseCardFooterProps & BaseProps<HelixBaseCardFooter> & BaseEvents
-  >
-
-  /**
-   * Carries the card's inset and muted foreground so content does not need to restate either.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The card's content.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The region.
-   */
-  'helix-base-card-body': Partial<
-    HelixBaseCardBodyProps & BaseProps<HelixBaseCardBody> & BaseEvents
-  >
-
-  /**
-   * Sits above the body, separated by a rule. Omit it entirely for a card that needs no heading.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: Title and actions.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The region.
-   */
-  'helix-base-card-header': Partial<
-    HelixBaseCardHeaderProps & BaseProps<HelixBaseCardHeader> & BaseEvents
-  >
-
-  /**
-   * Ensures it has an id, because `Card.Root` names itself by pointing
-   * `aria-labelledby` at this element and cannot reference one without an id. A
-   * consumer-supplied id is left alone.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `level`: Heading level, 1 through 6.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The title text.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `heading`: The heading element.
-   */
-  'helix-base-card-title': Partial<
-    HelixBaseCardTitleProps & BaseProps<HelixBaseCardTitle> & BaseEvents
-  >
-
-  /**
-   * Composed of regions rather than slots on one element, so a header, body, or
-   * footer can be styled, omitted, and reordered independently.
-   *
-   * Set `aria-labelledby` or `aria-label` for a name present in server-rendered
-   * HTML. Otherwise the card adopts the first `Card.Title` beneath it once in a
-   * browser, however deeply nested.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: Card regions, typically Header, Body, and Footer.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `container`: The card surface.
+   * - `header`: The header region.
+   * - `body`: The content region.
+   * - `footer`: The footer region.
    */
   'helix-base-card': Partial<HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents>
 
@@ -439,120 +312,31 @@ export type CustomElements = {
 
 export type CustomElementsSolidJs = {
   /**
-   * Aligns its content to the end, so buttons sit where a user expects to finish.
+   * Regions are slots rather than separate elements, because a header, body, and
+   * footer carry no state, no behavior, and no API of their own. Slotting them
+   * costs one custom element instead of five and lets the consumer bring their
+   * own markup, so a title can be a real `<h2>` rather than an emulated one.
+   *
+   * Name the card with `aria-label` or `aria-labelledby`. That is the only
+   * naming that survives server rendering: reading a title out of the light DOM
+   * needs a DOM, and the server has none.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Actions, typically buttons.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The region.
-   */
-  'helix-base-card-footer': Partial<
-    HelixBaseCardFooterProps &
-      HelixBaseCardFooterSolidJsProps &
-      BaseProps<HelixBaseCardFooter> &
-      BaseEvents
-  >
-
-  /**
-   * Carries the card's inset and muted foreground so content does not need to restate either.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The card's content.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The region.
-   */
-  'helix-base-card-body': Partial<
-    HelixBaseCardBodyProps &
-      HelixBaseCardBodySolidJsProps &
-      BaseProps<HelixBaseCardBody> &
-      BaseEvents
-  >
-
-  /**
-   * Sits above the body, separated by a rule. Omit it entirely for a card that needs no heading.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: Title and actions.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The region.
-   */
-  'helix-base-card-header': Partial<
-    HelixBaseCardHeaderProps &
-      HelixBaseCardHeaderSolidJsProps &
-      BaseProps<HelixBaseCardHeader> &
-      BaseEvents
-  >
-
-  /**
-   * Ensures it has an id, because `Card.Root` names itself by pointing
-   * `aria-labelledby` at this element and cannot reference one without an id. A
-   * consumer-supplied id is left alone.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `level`: Heading level, 1 through 6.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The title text.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `heading`: The heading element.
-   */
-  'helix-base-card-title': Partial<
-    HelixBaseCardTitleProps &
-      HelixBaseCardTitleSolidJsProps &
-      BaseProps<HelixBaseCardTitle> &
-      BaseEvents
-  >
-
-  /**
-   * Composed of regions rather than slots on one element, so a header, body, or
-   * footer can be styled, omitted, and reordered independently.
-   *
-   * Set `aria-labelledby` or `aria-label` for a name present in server-rendered
-   * HTML. Otherwise the card adopts the first `Card.Title` beneath it once in a
-   * browser, however deeply nested.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: Card regions, typically Header, Body, and Footer.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `container`: The card surface.
+   * - `header`: The header region.
+   * - `body`: The content region.
+   * - `footer`: The footer region.
    */
   'helix-base-card': Partial<
     HelixBaseCardProps & HelixBaseCardSolidJsProps & BaseProps<HelixBaseCard> & BaseEvents

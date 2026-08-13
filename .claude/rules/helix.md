@@ -33,6 +33,14 @@ shipped one package in five files.
   controller.
 - **One folder per part**: `card/root/card-root.{ts,css,dom.spec.ts}`. The
   folder is what the composition plugin reads.
+- **A region becomes an element only when it has behavior, state, or API.**
+  Otherwise it is a slot. Card's header, body, and footer carried none of the
+  three, so five elements became one and a title became a real `<h2>` the
+  consumer writes. `Tabs.Tab`, `Select.Option`, and `Accordion.Item` do carry
+  state, so they stay elements.
+- **Hide an omitted region with `:host(:has([slot='footer']))`**, which reaches
+  the host's light-DOM children in pure CSS and is therefore correct in
+  server-rendered markup, where the component cannot inspect its children.
 
 ## SSR and Declarative Shadow DOM
 

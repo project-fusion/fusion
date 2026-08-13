@@ -8,18 +8,23 @@ import { styles } from './card-root.css.js'
  * @summary Groups related content and actions into a single surface.
  *
  * @description
- * Set `aria-labelledby` or `aria-label` for a name present in server-rendered
- * HTML; otherwise the card adopts the first `Card.Title` beneath it once in a
- * browser.
+ * Regions are slots: `header`, the default slot for content, and `footer`. An
+ * omitted region takes no space, so a card with only content needs no wrapper
+ * markup at all.
  *
  * @since 0.1.0
  * @status experimental
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
  *
- * @slot - Card regions, typically Header, Body, and Footer.
+ * @slot header - Title and any actions for the whole card.
+ * @slot - The card's main content.
+ * @slot footer - Actions that conclude the card.
  *
  * @csspart container - The card surface.
+ * @csspart header - The header region.
+ * @csspart body - The content region.
+ * @csspart footer - The footer region.
  *
  * @cssproperty --card-background-color - Surface behind the card.
  * @cssproperty --card-border-color - Border color of the surface.
@@ -28,19 +33,11 @@ import { styles } from './card-root.css.js'
  */
 @customElement('helix-card')
 export class HelixCard extends HelixBaseCard {
-  /**
-   * How the card separates itself from the page.
-   *
-   * `outlined` is the default because a hairline is denser than a shadow,
-   * scales better, and needs no tuning per color scheme. `elevated` is for a
-   * card that genuinely floats above the content behind it.
-   */
+  /** How the card separates itself from the page. */
   @property({ reflect: true })
   appearance: 'outlined' | 'elevated' | 'plain' = 'outlined'
 
-  /**
-   * Tightens the inset for dense layouts.
-   */
+  /** Tightens the inset for dense layouts. */
   @property({ reflect: true, type: Boolean })
   dense = false
 

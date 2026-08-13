@@ -1,9 +1,0 @@
-:host {
-  display: block;
-}
-
-[part="container"] {
-  padding: var(--_card-inset, var(--helix-space-md));
-  color: var(--helix-color-foreground-muted);
-  line-height: var(--helix-leading-normal);
-}

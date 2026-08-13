@@ -1,5 +1,12 @@
 :host {
   display: block;
+
+  /* One inset for every region, so dense narrows them together. */
+  --_card-inset: var(--card-padding, var(--helix-space-md));
+}
+
+:host([dense]) {
+  --_card-inset: var(--card-padding, var(--helix-space-sm));
 }
 
 [part="container"] {
@@ -9,8 +16,6 @@
   color: var(--helix-color-foreground);
   display: flex;
   flex-direction: column;
-  /* Regions own their own padding so any one of them can be omitted
-     without leaving a gap the container already reserved. */
   overflow: hidden;
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -27,12 +32,39 @@
   border-color: transparent;
 }
 
-/* The inset every region inherits. Dense narrows it in one place rather
-   than in each region's own stylesheet. */
-:host {
-  --_card-inset: var(--card-padding, var(--helix-space-md));
+[part="header"],
+[part="body"],
+[part="footer"] {
+  padding: var(--_card-inset);
 }
 
-:host([dense]) {
-  --_card-inset: var(--card-padding, var(--helix-space-sm));
+/* An omitted region would still paint its inset and rule, leaving a stray band.
+   `:host(:has(...))` reaches the host's light-DOM children, so the region is
+   hidden unless the consumer actually slotted something. This is pure CSS, so
+   it is correct in server-rendered markup too, where the component cannot
+   inspect its own children. */
+[part="header"],
+[part="footer"] {
+  display: none;
+}
+
+:host(:has([slot="header"])) [part="header"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+}
+
+[part="body"] {
+  color: var(--helix-color-foreground-muted);
+  line-height: var(--helix-leading-normal);
+}
+
+:host(:has([slot="footer"])) [part="footer"] {
+  align-items: center;
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-xs);
+  justify-content: flex-end;
 }

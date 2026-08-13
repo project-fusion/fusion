@@ -1,5 +1,1 @@
-export * from './body/card-body.js'
-export * from './footer/card-footer.js'
-export * from './header/card-header.js'
 export * from './root/card-root.js'
-export * from './title/card-title.js'

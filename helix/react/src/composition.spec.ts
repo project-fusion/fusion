@@ -5,7 +5,6 @@ import {
   BaseCard,
   Card,
   type CardProps,
-  type CardTitleProps,
   Disclosure,
   type DisclosureProps,
 } from './generated/index.js'
@@ -14,8 +13,11 @@ const tagOf = (component: unknown): string | undefined =>
   (component as { displayName?: string }).displayName
 
 describe('composition namespaces', () => {
-  test('a multi-part family exposes every part', () => {
-    expect(Object.keys(Card).sort()).toEqual(['Body', 'Footer', 'Header', 'Root', 'Title'])
+  // Card is one element with slotted regions, so its namespace has one member.
+  // A family gets separate part elements only where a part carries behavior or
+  // API of its own, which a header, body, and footer do not.
+  test('a slot-based family exposes only its root', () => {
+    expect(Object.keys(Card)).toEqual(['Root'])
   })
 
   // Alphabetical rather than Root-first: namespace key order carries no
@@ -24,12 +26,8 @@ describe('composition namespaces', () => {
     expect(Object.keys(Card)).toEqual([...Object.keys(Card)].sort())
   })
 
-  test('each part renders its own element', () => {
+  test('the root renders its element', () => {
     expect(tagOf(Card.Root)).toBe('helix-card')
-    expect(tagOf(Card.Header)).toBe('helix-card-header')
-    expect(tagOf(Card.Title)).toBe('helix-card-title')
-    expect(tagOf(Card.Body)).toBe('helix-card-body')
-    expect(tagOf(Card.Footer)).toBe('helix-card-footer')
   })
 
   test('a single-part family still uses Root', () => {
@@ -45,9 +43,8 @@ describe('the headless tier is its own family', () => {
     expect(Object.keys(BaseCard).sort()).toEqual(Object.keys(Card).sort())
   })
 
-  test('renders the base elements, not the styled ones', () => {
+  test('renders the base element, not the styled one', () => {
     expect(tagOf(BaseCard.Root)).toBe('helix-base-card')
-    expect(tagOf(BaseCard.Title)).toBe('helix-base-card-title')
   })
 
   test('is a distinct namespace from the styled family', () => {
@@ -61,11 +58,6 @@ describe('generated prop types', () => {
     expect(props.appearance).toBe('elevated')
   })
 
-  test('a part carries only its own props', () => {
-    const title: CardTitleProps = { level: 2 }
-    expect(title.level).toBe(2)
-  })
-
   test('rejects an appearance outside the union', () => {
     // @ts-expect-error 'glass' is not a card appearance. Material is for
     // surfaces that layer over content, which a card is not.
@@ -73,16 +65,10 @@ describe('generated prop types', () => {
     expect(props).toBeDefined()
   })
 
-  test('rejects an out-of-range heading level', () => {
-    // @ts-expect-error there is no h7.
-    const title: CardTitleProps = { level: 7 }
-    expect(title).toBeDefined()
-  })
-
-  test("a part does not accept the root's props", () => {
-    // @ts-expect-error `dense` belongs to Card.Root, not Card.Title.
-    const title: CardTitleProps = { dense: true }
-    expect(title).toBeDefined()
+  test('rejects a prop the element does not have', () => {
+    // @ts-expect-error there is no `level` on a card.
+    const props: CardProps = { level: 2 }
+    expect(props).toBeDefined()
   })
 })
 
