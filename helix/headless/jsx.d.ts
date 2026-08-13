@@ -270,6 +270,25 @@ export type HelixBaseAppHeaderSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixBaseAvatarProps = {
+  /** Image to show. Falls back to initials if it fails to load. */
+  src?: HelixBaseAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  name?: HelixBaseAvatar["name"];
+};
+
+export type HelixBaseAvatarSolidJsProps = {
+  /** Image to show. Falls back to initials if it fails to load. */
+  "prop:src"?: HelixBaseAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  "prop:name"?: HelixBaseAvatar["name"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixBaseButtonProps = {
   /** What activating the button does to its form. */
   type?: HelixBaseButton["type"];
@@ -309,19 +328,24 @@ tree, so a screen reader can still announce that the control exists. */
   textContent?: string | number;
 };
 
-export type HelixBaseAvatarProps = {
-  /** Image to show. Falls back to initials if it fails to load. */
-  src?: HelixBaseAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
-  name?: HelixBaseAvatar["name"];
+export type HelixBaseCalloutProps = {
+  /** What kind of attention the passage needs. */
+  severity?: HelixBaseCallout["severity"];
 };
 
-export type HelixBaseAvatarSolidJsProps = {
-  /** Image to show. Falls back to initials if it fails to load. */
-  "prop:src"?: HelixBaseAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
-  "prop:name"?: HelixBaseAvatar["name"];
+export type HelixBaseCalloutSolidJsProps = {
+  /** What kind of attention the passage needs. */
+  "prop:severity"?: HelixBaseCallout["severity"];
 
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseCardProps = {};
+
+export type HelixBaseCardSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -361,30 +385,6 @@ export type HelixBaseBreadcrumbsSolidJsProps = {
 Named rather than left bare because a page may hold more than one
 navigation, and landmarks are how a screen-reader user chooses between them. */
   "prop:label"?: HelixBaseBreadcrumbs["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseCardProps = {};
-
-export type HelixBaseCardSolidJsProps = {
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseCalloutProps = {
-  /** What kind of attention the passage needs. */
-  severity?: HelixBaseCallout["severity"];
-};
-
-export type HelixBaseCalloutSolidJsProps = {
-  /** What kind of attention the passage needs. */
-  "prop:severity"?: HelixBaseCallout["severity"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -620,6 +620,42 @@ export type CustomElements = {
   >;
 
   /**
+   * The fallback is the reason this is an element. An image that fails to load
+   * leaves a broken icon and no name, so the avatar listens for the error and
+   * falls back to initials derived from `name`.
+   *
+   * `name` is required for the accessible name whether or not there is an image,
+   * because an avatar with no name tells a screen-reader user nothing. Initials
+   * are hidden from assistive technology: they are a visual shorthand for the
+   * name that is already announced, and would otherwise be read out letter by
+   * letter after it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
+   */
+  "helix-base-avatar": Partial<
+    HelixBaseAvatarProps & BaseProps<HelixBaseAvatar> & BaseEvents
+  >;
+
+  /**
    * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
    * focus, and the browser's own affordances come from the platform rather than
    * from key handlers. `delegatesFocus` puts focus on that inner control, and it
@@ -667,39 +703,68 @@ export type CustomElements = {
   >;
 
   /**
-   * The fallback is the reason this is an element. An image that fails to load
-   * leaves a broken icon and no name, so the avatar listens for the error and
-   * falls back to initials derived from `name`.
+   * `severity` lives on the headless tier rather than being an `appearance` on the
+   * styled one, because it is meaning and not decoration. It picks the icon and
+   * that icon's accessible name, so a reader who cannot see that the box is red
+   * still hears "Error". A callout whose severity existed only as a color would
+   * say nothing to them at all.
    *
-   * `name` is required for the accessible name whether or not there is an image,
-   * because an avatar with no name tells a screen-reader user nothing. Initials
-   * are hidden from assistive technology: they are a visual shorthand for the
-   * name that is already announced, and would otherwise be read out letter by
-   * letter after it.
+   * The icon is the fallback content of a slot, so a consumer replaces it by
+   * slotting their own and the default disappears with no emptiness check. That
+   * is what slot fallback is for.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `src`: Image to show. Falls back to initials if it fails to load.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
+   * - `severity`: What kind of attention the passage needs.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   * - `(default)`: The callout's content.
+   * - `icon`: Replaces the icon chosen by `severity`.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `avatar`: The avatar body.
-   * - `image`: The image, when one is loading or loaded.
-   * - `initials`: The initials shown when there is no usable image.
+   * - `callout`: The callout body.
+   * - `icon`: The icon region.
+   * - `content`: The content region.
    */
-  "helix-base-avatar": Partial<
-    HelixBaseAvatarProps & BaseProps<HelixBaseAvatar> & BaseEvents
+  "helix-base-callout": Partial<
+    HelixBaseCalloutProps & BaseProps<HelixBaseCallout> & BaseEvents
+  >;
+
+  /**
+   * Regions are slots rather than separate elements, because a header, body, and
+   * footer carry no state, no behavior, and no API of their own. Slotting them
+   * costs one custom element instead of five and lets the consumer bring their
+   * own markup, so a title can be a real `<h2>` rather than an emulated one.
+   *
+   * Name the card with `aria-label` or `aria-labelledby`. That is the only
+   * naming that survives server rendering: reading a title out of the light DOM
+   * needs a DOM, and the server has none.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The card surface.
+   */
+  "helix-base-card": Partial<
+    HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
   >;
 
   /**
@@ -775,71 +840,6 @@ export type CustomElements = {
    */
   "helix-base-breadcrumbs": Partial<
     HelixBaseBreadcrumbsProps & BaseProps<HelixBaseBreadcrumbs> & BaseEvents
-  >;
-
-  /**
-   * Regions are slots rather than separate elements, because a header, body, and
-   * footer carry no state, no behavior, and no API of their own. Slotting them
-   * costs one custom element instead of five and lets the consumer bring their
-   * own markup, so a title can be a real `<h2>` rather than an emulated one.
-   *
-   * Name the card with `aria-label` or `aria-labelledby`. That is the only
-   * naming that survives server rendering: reading a title out of the light DOM
-   * needs a DOM, and the server has none.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The card surface.
-   */
-  "helix-base-card": Partial<
-    HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
-  >;
-
-  /**
-   * `severity` lives on the headless tier rather than being an `appearance` on the
-   * styled one, because it is meaning and not decoration. It picks the icon and
-   * that icon's accessible name, so a reader who cannot see that the box is red
-   * still hears "Error". A callout whose severity existed only as a color would
-   * say nothing to them at all.
-   *
-   * The icon is the fallback content of a slot, so a consumer replaces it by
-   * slotting their own and the default disappears with no emptiness check. That
-   * is what slot fallback is for.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `severity`: What kind of attention the passage needs.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The callout's content.
-   * - `icon`: Replaces the icon chosen by `severity`.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `callout`: The callout body.
-   * - `icon`: The icon region.
-   * - `content`: The content region.
-   */
-  "helix-base-callout": Partial<
-    HelixBaseCalloutProps & BaseProps<HelixBaseCallout> & BaseEvents
   >;
 
   /**
@@ -1082,6 +1082,45 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The fallback is the reason this is an element. An image that fails to load
+   * leaves a broken icon and no name, so the avatar listens for the error and
+   * falls back to initials derived from `name`.
+   *
+   * `name` is required for the accessible name whether or not there is an image,
+   * because an avatar with no name tells a screen-reader user nothing. Initials
+   * are hidden from assistive technology: they are a visual shorthand for the
+   * name that is already announced, and would otherwise be read out letter by
+   * letter after it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
+   */
+  "helix-base-avatar": Partial<
+    HelixBaseAvatarProps &
+      HelixBaseAvatarSolidJsProps &
+      BaseProps<HelixBaseAvatar> &
+      BaseEvents
+  >;
+
+  /**
    * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
    * focus, and the browser's own affordances come from the platform rather than
    * from key handlers. `delegatesFocus` puts focus on that inner control, and it
@@ -1132,41 +1171,73 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * The fallback is the reason this is an element. An image that fails to load
-   * leaves a broken icon and no name, so the avatar listens for the error and
-   * falls back to initials derived from `name`.
+   * `severity` lives on the headless tier rather than being an `appearance` on the
+   * styled one, because it is meaning and not decoration. It picks the icon and
+   * that icon's accessible name, so a reader who cannot see that the box is red
+   * still hears "Error". A callout whose severity existed only as a color would
+   * say nothing to them at all.
    *
-   * `name` is required for the accessible name whether or not there is an image,
-   * because an avatar with no name tells a screen-reader user nothing. Initials
-   * are hidden from assistive technology: they are a visual shorthand for the
-   * name that is already announced, and would otherwise be read out letter by
-   * letter after it.
+   * The icon is the fallback content of a slot, so a consumer replaces it by
+   * slotting their own and the default disappears with no emptiness check. That
+   * is what slot fallback is for.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `src`: Image to show. Falls back to initials if it fails to load.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
+   * - `severity`: What kind of attention the passage needs.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   * - `(default)`: The callout's content.
+   * - `icon`: Replaces the icon chosen by `severity`.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `avatar`: The avatar body.
-   * - `image`: The image, when one is loading or loaded.
-   * - `initials`: The initials shown when there is no usable image.
+   * - `callout`: The callout body.
+   * - `icon`: The icon region.
+   * - `content`: The content region.
    */
-  "helix-base-avatar": Partial<
-    HelixBaseAvatarProps &
-      HelixBaseAvatarSolidJsProps &
-      BaseProps<HelixBaseAvatar> &
+  "helix-base-callout": Partial<
+    HelixBaseCalloutProps &
+      HelixBaseCalloutSolidJsProps &
+      BaseProps<HelixBaseCallout> &
+      BaseEvents
+  >;
+
+  /**
+   * Regions are slots rather than separate elements, because a header, body, and
+   * footer carry no state, no behavior, and no API of their own. Slotting them
+   * costs one custom element instead of five and lets the consumer bring their
+   * own markup, so a title can be a real `<h2>` rather than an emulated one.
+   *
+   * Name the card with `aria-label` or `aria-labelledby`. That is the only
+   * naming that survives server rendering: reading a title out of the light DOM
+   * needs a DOM, and the server has none.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `header`: Title and any actions for the whole card.
+   * - `(default)`: The card's main content.
+   * - `footer`: Actions that conclude the card.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `container`: The card surface.
+   */
+  "helix-base-card": Partial<
+    HelixBaseCardProps &
+      HelixBaseCardSolidJsProps &
+      BaseProps<HelixBaseCard> &
       BaseEvents
   >;
 
@@ -1246,77 +1317,6 @@ export type CustomElementsSolidJs = {
     HelixBaseBreadcrumbsProps &
       HelixBaseBreadcrumbsSolidJsProps &
       BaseProps<HelixBaseBreadcrumbs> &
-      BaseEvents
-  >;
-
-  /**
-   * Regions are slots rather than separate elements, because a header, body, and
-   * footer carry no state, no behavior, and no API of their own. Slotting them
-   * costs one custom element instead of five and lets the consumer bring their
-   * own markup, so a title can be a real `<h2>` rather than an emulated one.
-   *
-   * Name the card with `aria-label` or `aria-labelledby`. That is the only
-   * naming that survives server rendering: reading a title out of the light DOM
-   * needs a DOM, and the server has none.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
-   * - `(default)`: The card's main content.
-   * - `footer`: Actions that conclude the card.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The card surface.
-   */
-  "helix-base-card": Partial<
-    HelixBaseCardProps &
-      HelixBaseCardSolidJsProps &
-      BaseProps<HelixBaseCard> &
-      BaseEvents
-  >;
-
-  /**
-   * `severity` lives on the headless tier rather than being an `appearance` on the
-   * styled one, because it is meaning and not decoration. It picks the icon and
-   * that icon's accessible name, so a reader who cannot see that the box is red
-   * still hears "Error". A callout whose severity existed only as a color would
-   * say nothing to them at all.
-   *
-   * The icon is the fallback content of a slot, so a consumer replaces it by
-   * slotting their own and the default disappears with no emptiness check. That
-   * is what slot fallback is for.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `severity`: What kind of attention the passage needs.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The callout's content.
-   * - `icon`: Replaces the icon chosen by `severity`.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `callout`: The callout body.
-   * - `icon`: The icon region.
-   * - `content`: The content region.
-   */
-  "helix-base-callout": Partial<
-    HelixBaseCalloutProps &
-      HelixBaseCalloutSolidJsProps &
-      BaseProps<HelixBaseCallout> &
       BaseEvents
   >;
 
