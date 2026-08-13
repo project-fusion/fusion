@@ -7,6 +7,7 @@ export {
   AccordionRoot,
 } from './accordion.js'
 export { AppHeader, type AppHeaderProps, AppHeaderRoot } from './app-header.js'
+export { Avatar, type AvatarProps, AvatarRoot } from './avatar.js'
 export {
   BaseAccordion,
   BaseAccordionItem,
@@ -15,12 +16,27 @@ export {
   BaseAccordionRoot,
 } from './base-accordion.js'
 export { BaseAppHeader, type BaseAppHeaderProps, BaseAppHeaderRoot } from './base-app-header.js'
+export { BaseAvatar, type BaseAvatarProps, BaseAvatarRoot } from './base-avatar.js'
+export {
+  BaseBreadcrumbs,
+  BaseBreadcrumbsItem,
+  type BaseBreadcrumbsItemProps,
+  type BaseBreadcrumbsProps,
+  BaseBreadcrumbsRoot,
+} from './base-breadcrumbs.js'
 export { BaseButton, type BaseButtonProps, BaseButtonRoot } from './base-button.js'
 export { BaseCallout, type BaseCalloutProps, BaseCalloutRoot } from './base-callout.js'
 export { BaseCard, type BaseCardProps, BaseCardRoot } from './base-card.js'
 export { BaseDivider, type BaseDividerProps, BaseDividerRoot } from './base-divider.js'
 export { BaseIcon, type BaseIconProps, BaseIconRoot } from './base-icon.js'
 export { BaseTag, type BaseTagProps, BaseTagRoot } from './base-tag.js'
+export {
+  Breadcrumbs,
+  BreadcrumbsItem,
+  type BreadcrumbsItemProps,
+  type BreadcrumbsProps,
+  BreadcrumbsRoot,
+} from './breadcrumbs.js'
 export { Button, type ButtonProps, ButtonRoot } from './button.js'
 export { Callout, type CalloutProps, CalloutRoot } from './callout.js'
 export { Card, type CardProps, CardRoot } from './card.js'

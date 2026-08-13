@@ -1,0 +1,26 @@
+import { describe, expect, test } from 'bun:test'
+import { html } from 'lit'
+import { partTag, ssr, withoutStyles } from '../../testing/ssr.js'
+import '../index.js'
+
+describe('avatar server output', () => {
+  test('initials are computed on the server, not after hydration', () => {
+    // A pure function of the name, so both sides agree without measuring.
+    const markup = withoutStyles(ssr(html`<helix-avatar name="Ross Sheppard"></helix-avatar>`))
+    expect(markup).toContain('RS')
+  })
+
+  test('the accessible name ships with it', () => {
+    const markup = ssr(html`<helix-avatar name="Ross Sheppard"></helix-avatar>`)
+    expect(partTag(markup, 'avatar')).toContain('aria-label="Ross Sheppard"')
+    expect(partTag(markup, 'avatar')).toContain('role="img"')
+  })
+
+  test('an image renders as an image, with the fallback held back', () => {
+    // The server cannot know whether an image will load, so it renders the
+    // optimistic case and the client corrects on error.
+    const markup = ssr(html`<helix-avatar name="Ross" src="/me.avif"></helix-avatar>`)
+    expect(partTag(markup, 'image')).toContain('src="/me.avif"')
+    expect(partTag(markup, 'initials')).toBe('')
+  })
+})

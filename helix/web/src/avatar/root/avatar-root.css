@@ -1,0 +1,46 @@
+:host {
+  --_avatar-size: var(--avatar-size, var(--helix-size-control));
+
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+:host([size="sm"]) {
+  --_avatar-size: var(--avatar-size, var(--helix-size-control-dense));
+}
+
+:host([size="lg"]) {
+  --_avatar-size: var(--avatar-size, var(--helix-size-control-large));
+}
+
+[part="avatar"] {
+  align-items: center;
+  background-color: var(--avatar-background-color, var(--helix-color-primary-subtle));
+  block-size: var(--_avatar-size);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground);
+  display: inline-flex;
+  inline-size: var(--_avatar-size);
+  justify-content: center;
+  overflow: hidden;
+}
+
+:host([shape="square"]) [part="avatar"] {
+  border-radius: var(--helix-radii-md);
+}
+
+[part="image"] {
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+/* Sized against the avatar rather than per size, so one rule covers every size
+   including a custom `--avatar-size`. */
+[part="initials"] {
+  font-size: calc(var(--_avatar-size) * 0.4);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-wide);
+  line-height: 1;
+  user-select: none;
+}
