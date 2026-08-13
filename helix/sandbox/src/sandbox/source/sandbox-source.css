@@ -1,0 +1,27 @@
+:host {
+  display: block;
+  block-size: 100%;
+}
+
+[part="source"] {
+  background-color: var(--sandbox-source-background, var(--helix-color-surface-sunken));
+  block-size: 100%;
+  border: none;
+  color: var(--helix-color-foreground-muted);
+  display: block;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  inline-size: 100%;
+  line-height: var(--helix-leading-normal);
+  min-block-size: var(--sandbox-source-min-block-size, 12rem);
+  padding: var(--helix-space-sm);
+  resize: none;
+  tab-size: 2;
+}
+
+/* Inset for the same reason the separator's is: the field fills its pane and an
+   outset ring would be clipped. */
+[part="source"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}

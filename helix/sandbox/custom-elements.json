@@ -1,0 +1,599 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/sandbox/preview/sandbox-preview.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/sandbox/root/sandbox-root.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/sandbox/source/sandbox-source.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/preview/sandbox-preview.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders into the light DOM rather than a shadow root, which is the whole\nreason this is an element and not a `<div>` someone sets `innerHTML` on.\nContent inside a shadow root is cut off from the base layer, so a heading\nwould come out at the browser's default size and a link in the wrong colour,\nand the preview would be a worse likeness the more the design system does.\nIn the light DOM it is styled exactly as it would be on a real page.\n\n**The source is trusted.** It is markup a developer typed into their own\nsandbox, and it is rendered as markup. Never point this at input from anyone\nelse.",
+          "name": "HelixSandboxPreview",
+          "members": [
+            {
+              "kind": "field",
+              "name": "source",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Markup to render.",
+              "attribute": "source"
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "source",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Markup to render.",
+              "fieldName": "source"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Renders sandbox source as live markup.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/sandbox/preview",
+            "aliases": [
+              "Result",
+              "Output"
+            ],
+            "tier": "styled",
+            "group": "Sandbox",
+            "part": "Preview"
+          },
+          "tagName": "helix-sandbox-preview",
+          "customElement": true,
+          "modulePath": "src/sandbox/preview/sandbox-preview.ts",
+          "definitionPath": "src/sandbox/preview/sandbox-preview.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSandboxPreview",
+          "declaration": {
+            "name": "HelixSandboxPreview",
+            "module": "src/sandbox/preview/sandbox-preview.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-sandbox-preview",
+          "declaration": {
+            "name": "HelixSandboxPreview",
+            "module": "src/sandbox/preview/sandbox-preview.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/root/sandbox-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/sandbox/root/sandbox-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/root/sandbox-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Coordination is by event, the same way the accordion does it: the source pane\ndispatches `SourceChange`, which bubbles, and the sandbox hands the new value\nto whatever preview is slotted into it. Neither child knows the other exists,\nso either can be replaced or used alone.\n\nThe split is a real `role=\"separator\"` with `aria-valuenow`, movable by\npointer and by arrow keys, because a divider that only responds to dragging\nis unusable without a mouse. Home and End jump to the bounds.",
+          "name": "HelixSandbox",
+          "cssProperties": [
+            {
+              "description": "Minimum height of the sandbox.",
+              "name": "--sandbox-min-block-size"
+            },
+            {
+              "description": "Colour of the divider.",
+              "name": "--sandbox-separator-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The split layout.",
+              "name": "container"
+            },
+            {
+              "description": "Either pane.",
+              "name": "pane"
+            },
+            {
+              "description": "The draggable divider.",
+              "name": "separator"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The editable source pane.",
+              "name": "source"
+            },
+            {
+              "description": "The live preview.",
+              "name": "preview"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Whether the panes sit side by side or stacked.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "split",
+              "type": {
+                "text": "number"
+              },
+              "default": "45",
+              "description": "Percentage of the sandbox given to the source pane.",
+              "attribute": "split"
+            },
+            {
+              "kind": "field",
+              "name": "separatorLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize source pane'",
+              "description": "Accessible name for the divider.",
+              "attribute": "separator-label"
+            },
+            {
+              "kind": "field",
+              "name": "dragging",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "handleSourceChange",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "previews",
+              "type": {
+                "text": "HelixSandboxPreview[]"
+              },
+              "privacy": "private",
+              "description": "Slotted previews. Client only: the server has no children to read.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "clamp",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerDown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerMove",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerUp",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Whether the panes sit side by side or stacked.",
+              "fieldName": "orientation"
+            },
+            {
+              "name": "split",
+              "type": {
+                "text": "number"
+              },
+              "default": "45",
+              "description": "Percentage of the sandbox given to the source pane.",
+              "fieldName": "split"
+            },
+            {
+              "name": "separator-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize source pane'",
+              "description": "Accessible name for the divider.",
+              "fieldName": "separatorLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Pairs an editable source pane with a live preview.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/sandbox",
+            "aliases": [
+              "Playground",
+              "REPL",
+              "Editor"
+            ],
+            "tier": "styled",
+            "group": "Sandbox",
+            "part": "Root"
+          },
+          "tagName": "helix-sandbox",
+          "customElement": true,
+          "modulePath": "src/sandbox/root/sandbox-root.ts",
+          "definitionPath": "src/sandbox/root/sandbox-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSandbox",
+          "declaration": {
+            "name": "HelixSandbox",
+            "module": "src/sandbox/root/sandbox-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-sandbox",
+          "declaration": {
+            "name": "HelixSandbox",
+            "module": "src/sandbox/root/sandbox-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/source/sandbox-source.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/sandbox/source/sandbox-source.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/source/sandbox-source.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A real `<textarea>`, not a contenteditable div with a syntax highlighter over\nit. Undo, selection, spellcheck suppression, mobile keyboards, and screen\nreader support all come from the platform, and every one of them is\nexpensive to rebuild and easy to get subtly wrong.\n\nTab inserts two spaces rather than leaving the field, because a code pane\nthat cannot indent is not one. Escape then Tab still moves focus out, which\nis the documented escape hatch for exactly this trade.",
+          "name": "HelixSandboxSource",
+          "cssProperties": [
+            {
+              "description": "Fill behind the source.",
+              "name": "--sandbox-source-background"
+            },
+            {
+              "description": "Minimum height of the pane.",
+              "name": "--sandbox-source-min-block-size"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The editable region.",
+              "name": "source"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The markup being edited.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "fieldLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Example source'",
+              "description": "Accessible name for the editable region.",
+              "attribute": "field-label"
+            },
+            {
+              "kind": "field",
+              "name": "tabIndents",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether Tab indents rather than moving focus.",
+              "attribute": "tab-indents",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "escaped",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Set by Escape, so the next Tab leaves the field."
+            },
+            {
+              "kind": "field",
+              "name": "handleInput",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSourceChangeEvent"
+              },
+              "description": "Fired when the source is edited.",
+              "name": "SourceChange",
+              "reactProp": "onSourceChange"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The markup being edited.",
+              "fieldName": "value"
+            },
+            {
+              "name": "field-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Example source'",
+              "description": "Accessible name for the editable region.",
+              "fieldName": "fieldLabel"
+            },
+            {
+              "name": "tab-indents",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether Tab indents rather than moving focus.",
+              "fieldName": "tabIndents"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Editable source for a sandbox preview.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/sandbox/source",
+            "aliases": [
+              "Editor",
+              "Code pane"
+            ],
+            "tier": "styled",
+            "group": "Sandbox",
+            "part": "Source"
+          },
+          "tagName": "helix-sandbox-source",
+          "customElement": true,
+          "modulePath": "src/sandbox/source/sandbox-source.ts",
+          "definitionPath": "src/sandbox/source/sandbox-source.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSandboxSource",
+          "declaration": {
+            "name": "HelixSandboxSource",
+            "module": "src/sandbox/source/sandbox-source.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-sandbox-source",
+          "declaration": {
+            "name": "HelixSandboxSource",
+            "module": "src/sandbox/source/sandbox-source.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

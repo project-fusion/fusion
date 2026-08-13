@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { hasPart, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
-import { hasPart, ssr, withoutStyles } from '../../testing/ssr.js'
 import '../index.js'
 
 describe('callout server output', () => {

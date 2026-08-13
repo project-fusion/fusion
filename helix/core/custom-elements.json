@@ -120,6 +120,28 @@
             "module": "src/events.ts"
           },
           "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "Fired when editable source is changed by the reader.",
+          "name": "HelixSourceChangeEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'SourceChange'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events.ts"
+          },
+          "helix": {}
         }
       ],
       "exports": [
@@ -136,6 +158,14 @@
           "name": "HelixRemoveRequestEvent",
           "declaration": {
             "name": "HelixRemoveRequestEvent",
+            "module": "src/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSourceChangeEvent",
+          "declaration": {
+            "name": "HelixSourceChangeEvent",
             "module": "src/events.ts"
           }
         }
@@ -356,6 +386,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixSourceChangeEvent",
+          "declaration": {
+            "name": "HelixSourceChangeEvent",
+            "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "OpenChangeDetail",
           "declaration": {
             "name": "OpenChangeDetail",
@@ -367,6 +405,14 @@
           "name": "RemoveRequestDetail",
           "declaration": {
             "name": "RemoveRequestDetail",
+            "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SourceChangeDetail",
+          "declaration": {
+            "name": "SourceChangeDetail",
             "module": "./events.js"
           }
         },

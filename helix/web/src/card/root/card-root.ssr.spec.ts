@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { hasPart, ssr } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
-import { hasPart, ssr } from '../../testing/ssr.js'
 import '../index.js'
 
 describe('card server output', () => {

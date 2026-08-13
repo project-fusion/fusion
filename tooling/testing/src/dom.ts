@@ -38,7 +38,10 @@ const shimElementInternals = (): void => {
   const proto = HTMLElement.prototype as HTMLElement & {
     attachInternals?: () => ElementInternals
   }
-  if (proto.attachInternals) {
+  // Read through an index rather than testing the member directly. The DOM lib
+  // types `attachInternals` as always present, so TypeScript narrows the guard
+  // away entirely; happy-dom is the environment where it genuinely is not.
+  if (typeof (proto as unknown as Record<string, unknown>).attachInternals === 'function') {
     return
   }
 

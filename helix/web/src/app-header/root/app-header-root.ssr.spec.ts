@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
-import { hostTag, ssr, withoutStyles } from '../../testing/ssr.js'
 import '../index.js'
 
 describe('app header server output', () => {
