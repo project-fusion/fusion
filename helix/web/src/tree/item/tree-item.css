@@ -71,11 +71,14 @@ slot[name="children"]::slotted(*) {
 
 /* A surface, not the accent. The selected node says where you are, and the
    accent color is reserved for state; using it here made the current page the
-   loudest thing on the screen. */
+   loudest thing on the screen.
+
+   No change of weight with it, for the reason the toggle group does not either:
+   a heavier label is a wider one, and a row that resizes as it is chosen is a
+   list that twitches. The surface says it. */
 :host([selected]) [part="row"] {
   background-color: var(--helix-color-surface-raised);
   color: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-medium);
 }
 
 [part="item"]:focus-visible [part="row"] {
@@ -102,6 +105,28 @@ slot[name="children"]::slotted(*) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The label takes the room, so a mark at either side keeps its size and the
+   name is what gives way when the rail is narrow. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  flex: 0 0 auto;
+}
+
+/* Whatever is at the end goes to the far side of the row. On the slot rather
+   than on what was slotted, so it applies once however many marks there are. */
+slot[name="end"] {
+  display: flex;
+  align-items: center;
+  gap: var(--helix-space-2xs);
+  margin-inline-start: auto;
+}
+
+/* A mark beside the name reads as being about the name, so it takes the muted
+   colour the row has rather than full strength. */
+slot[name="start"]::slotted(*) {
+  color: var(--helix-color-foreground-subtle);
 }
 
 [part="group"][hidden] {

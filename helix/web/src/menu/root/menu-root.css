@@ -5,6 +5,10 @@
 }
 
 [part="menu"] {
+  /* Compact by nature, and it says so once, so a control slotted into a row is
+     the size the rows are rather than the size a page is. */
+  --helix-size-control: var(--helix-size-control-sm);
+
   background-color: var(--menu-background-color, var(--helix-color-surface-raised));
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-md);
@@ -69,7 +73,7 @@
 
 [part="title"] {
   color: var(--helix-color-foreground);
-  font-size: var(--helix-text-sm);
+  font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
 }
 

@@ -8,7 +8,11 @@
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: grid;
-  font-size: var(--helix-text-sm);
+  /* Chrome, at the size the rest of the chrome is. A menu is a compact surface
+     by nature, the way a toolbar and a status bar are, and 14px next to a
+     toolbar whose buttons read at 12 made the menu the one thing not following
+     the room it was opened from. */
+  font-size: var(--helix-text-xs);
   gap: var(--helix-space-xs);
   /* The label, then one trailing column for the mark. A row is never both a
      choice and a way into a page, so one column serves both and the marks line

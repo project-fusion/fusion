@@ -24,6 +24,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.
+ * @slot start - Before the label, after the chevron. A mark about the item.
+ * @slot end - After the label, at the row's far side. A count, or a state.
  *
  * @csspart item - The node, and the focus target.
  * @csspart row - The clickable label row.
@@ -119,7 +121,9 @@ export class HelixBaseTreeItem extends HelixElement {
               </svg>`
               : nothing
           }
+          <slot name="start"></slot>
           <span part="label"><slot></slot></span>
+          <slot name="end"></slot>
         </div>
       </div>
       <div part="group" role="group" ?hidden=${!this.expanded}>

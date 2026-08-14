@@ -12,10 +12,10 @@ import {
 } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type { HelixDrawer, HelixMenu, HelixTabs, HelixToggleGroup, HelixTree } from '@helix-io/web'
-import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
 import { useHelixEvent } from '../../../../lib/use-helix-event'
+import { PreferencesDrawer } from '../../../preferences'
 
 /**
  * The sandbox workbench: source files, a live preview, and the example tree.
@@ -104,6 +104,7 @@ export function SandboxWorkbench({ families }: Props) {
   const settings = useRef<HelixMenu>(null)
   const [layout, setLayout] = useState<'padded' | 'centered' | 'fullscreen'>('padded')
   const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
+  const [showEditor, setShowEditor] = useState(true)
   const [showPanel, setShowPanel] = useState(true)
   const [showStatus, setShowStatus] = useState(true)
   const terminal = useRef<HelixSandboxTerminal>(null)
@@ -113,9 +114,14 @@ export function SandboxWorkbench({ families }: Props) {
   const [pane, setPane] = useState<Pane>('source')
   const [syntax, setSyntax] = useState<Syntax>('html')
   const [markup, setMarkup] = useState('')
-  const [previewTheme, setPreviewTheme] = useState<'dark' | 'light'>('dark')
+  // Unset means the preview follows the page. A reader who has chosen a mode
+  // for the site has said how they want to look at things, and a preview that
+  // ignored it would be the one part of the page that did.
+  const [previewTheme, setPreviewTheme] = useState<'dark' | 'light' | null>(null)
+  const [siteTheme, setSiteTheme] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
   const [railOpen, setRailOpen] = useState(false)
+  const [prefsOpen, setPrefsOpen] = useState(false)
   const [narrow, setNarrow] = useState(false)
 
   // Read the URL after mount, not during render: the page is static, so the
@@ -126,7 +132,7 @@ export function SandboxWorkbench({ families }: Props) {
     const params = new URLSearchParams(window.location.search)
     setFamilySlug(params.get('family'))
     setExampleSlug(params.get('example'))
-    setPreviewTheme(document.documentElement.dataset.colorMode === 'light' ? 'light' : 'dark')
+    setSiteTheme(document.documentElement.dataset.colorMode === 'light' ? 'light' : 'dark')
 
     const stored = readArrangement()
     if (stored.syntax) {
@@ -157,6 +163,18 @@ export function SandboxWorkbench({ families }: Props) {
       JSON.stringify({ panelSize: element.panelSize, split: element.split, syntax }),
     )
   })
+
+  // Watched, not read once: the preferences drawer is on this page now, so the
+  // site's mode can change while the sandbox is open and a preview following it
+  // has to notice.
+  useEffect(() => {
+    const root = document.documentElement
+    const sync = () => setSiteTheme(root.dataset.colorMode === 'light' ? 'light' : 'dark')
+    sync()
+    const watch = new MutationObserver(sync)
+    watch.observe(root, { attributeFilter: ['data-color-mode'], attributes: true })
+    return () => watch.disconnect()
+  }, [])
 
   // Side by side is unusable on a phone: at 375px a 45/55 split leaves two
   // slivers. Orientation is a property rather than a stylesheet override,
@@ -222,6 +240,10 @@ export function SandboxWorkbench({ families }: Props) {
       setLayout(option as 'padded' | 'centered' | 'fullscreen')
     } else if (setting === 'direction' && option) {
       setDirection(option as 'ltr' | 'rtl')
+    } else if (setting === 'colour' && option) {
+      setPreviewTheme(option === 'site' ? null : (option as 'dark' | 'light'))
+    } else if (setting === 'editor') {
+      setShowEditor((was) => !was)
     } else if (setting === 'panel') {
       setShowPanel((was) => !was)
     } else if (setting === 'status') {
@@ -299,6 +321,14 @@ export function SandboxWorkbench({ families }: Props) {
     <helix-tree label="Examples" ref={treeRef} value={activeValue}>
       {withExamples.map((entry) => (
         <helix-tree-item expanded={entry.slug === family.slug} key={entry.slug} value={entry.slug}>
+          {/* Everything here is experimental, and saying so on each row is the
+              honest form of that: a badge on the page a reader has already
+              opened tells them after they chose it. */}
+          {entry.status === 'experimental' && (
+            <helix-tooltip content="Experimental. The API can change." slot="end">
+              <helix-icon label="Experimental" name="flask"></helix-icon>
+            </helix-tooltip>
+          )}
           {entry.label}
           {entry.examples.map((item) => (
             <helix-tree-item key={item.slug} slot="children" value={`${entry.slug}/${item.slug}`}>
@@ -332,21 +362,29 @@ export function SandboxWorkbench({ families }: Props) {
           </helix-text>
         </helix-flex>
 
-        {/* The sandbox's own actions live in its toolbar now. What stays here
-            is the one control that is about the page rather than the sandbox. */}
-        {narrow && (
-          <helix-button appearance="subtle" onClick={() => setRailOpen(true)}>
-            Examples
-          </helix-button>
-        )}
+        {/* What is about the site rather than the sandbox: how the whole thing
+            looks, and on a phone, the way to the examples. The sandbox's own
+            settings are in its toolbar. */}
+        <helix-flex align="center" class="workbenchHeaderEnd" gap="2xs">
+          {narrow && (
+            <helix-button appearance="subtle" onClick={() => setRailOpen(true)}>
+              Examples
+            </helix-button>
+          )}
+          <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
+            <helix-icon name="gear"></helix-icon>
+          </helix-icon-button>
+        </helix-flex>
       </helix-flex>
+
+      <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
       <div className="workbenchBody">
         <helix-sandbox
           orientation={narrow ? 'vertical' : 'horizontal'}
           panel-collapsed-size={panelClosed}
           ref={sandbox}
-          split={narrow ? 50 : 45}
+          split={showEditor ? undefined : 0}
         >
           {/* One declaration for the region, rather than `size="sm"` on each
               control in it. Nothing inside can be missed, and adding a control
@@ -363,25 +401,19 @@ export function SandboxWorkbench({ families }: Props) {
             </helix-toggle-group>
 
             <helix-toolbar label="Sandbox actions" slot="end">
-              <helix-button
-                appearance="subtle"
-                onClick={() => setPreviewTheme(previewTheme === 'light' ? 'dark' : 'light')}
+              <helix-icon-button
+                label={copied ? 'Link copied' : 'Copy a link to this example'}
+                onClick={share}
               >
-                {previewTheme === 'light' ? 'Light' : 'Dark'}
-              </helix-button>
-              <helix-button appearance="subtle" onClick={share}>
-                {copied ? 'Copied' : 'Share'}
-              </helix-button>
-              <Link data-button="subtle" href={`/design/components/${family.slug}`}>
-                API
-              </Link>
+                <helix-icon name={copied ? 'check' : 'share-network'}></helix-icon>
+              </helix-icon-button>
 
               {/* Layout and Direction drill down; the last three tick. The menu
                   reads its state from here rather than holding its own, so what
                   is ticked is what is showing. */}
               <helix-menu label="Environment" ref={settings}>
-                <helix-icon-button label="Environment" slot="trigger">
-                  <helix-icon name="gear"></helix-icon>
+                <helix-icon-button label="Sandbox settings" slot="trigger">
+                  <helix-icon name="sliders-horizontal"></helix-icon>
                 </helix-icon-button>
 
                 <helix-menu-item value="syntax">
@@ -414,6 +446,34 @@ export function SandboxWorkbench({ families }: Props) {
                   ))}
                 </helix-menu-item>
 
+                <helix-menu-item value="colour">
+                  Color mode
+                  <helix-menu-item
+                    checkable
+                    checked={previewTheme === null ? true : undefined}
+                    slot="submenu"
+                    value="colour:site"
+                  >
+                    Follow the site
+                  </helix-menu-item>
+                  <helix-menu-item
+                    checkable
+                    checked={previewTheme === 'light' ? true : undefined}
+                    slot="submenu"
+                    value="colour:light"
+                  >
+                    Light
+                  </helix-menu-item>
+                  <helix-menu-item
+                    checkable
+                    checked={previewTheme === 'dark' ? true : undefined}
+                    slot="submenu"
+                    value="colour:dark"
+                  >
+                    Dark
+                  </helix-menu-item>
+                </helix-menu-item>
+
                 <helix-menu-item value="direction">
                   Direction
                   {DIRECTIONS.map((option) => (
@@ -431,6 +491,9 @@ export function SandboxWorkbench({ families }: Props) {
 
                 <helix-divider announced></helix-divider>
 
+                <helix-menu-item checkable checked={showEditor ? true : undefined} value="editor">
+                  Editor
+                </helix-menu-item>
                 <helix-menu-item checkable checked={showPanel ? true : undefined} value="panel">
                   Panel
                 </helix-menu-item>
@@ -477,7 +540,7 @@ export function SandboxWorkbench({ families }: Props) {
           </div>
 
           <helix-sandbox-preview
-            data-color-mode={previewTheme}
+            data-color-mode={previewTheme ?? siteTheme}
             direction={direction === 'rtl' ? 'rtl' : undefined}
             layout={layout === 'padded' ? undefined : layout}
             ref={preview}

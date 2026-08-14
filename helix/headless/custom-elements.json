@@ -10850,6 +10850,14 @@
             {
               "description": "Nested items, which make this a branch.",
               "name": "children"
+            },
+            {
+              "description": "Before the label, after the chevron. A mark about the item.",
+              "name": "start"
+            },
+            {
+              "description": "After the label, at the row's far side. A count, or a state.",
+              "name": "end"
             }
           ],
           "members": [

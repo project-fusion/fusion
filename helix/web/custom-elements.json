@@ -15378,6 +15378,22 @@
                 "name": "HelixBaseTreeItem",
                 "module": "src/tree/item/tree-item.ts"
               }
+            },
+            {
+              "description": "Before the label, after the chevron. A mark about the item.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "description": "After the label, at the row's far side. A count, or a state.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
             }
           ],
           "members": [

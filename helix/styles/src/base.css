@@ -535,13 +535,15 @@ helix-toggle::part(item):hover {
   color: var(--helix-color-foreground);
 }
 
-/* The travelling thumb is behind this item, so the label goes to full strength
-   and gains weight. Weight rather than color: color is reserved for state. */
+/* The travelling thumb is behind this item, so the label goes to full strength.
+   Colour only, and no change of weight: a heavier label is a wider one, and the
+   thumb measures the item it marks. Measured, the same text came out 94.2px
+   selected against 92.34 unselected, so choosing a file nudged the row it was
+   in. The thumb is the emphasis, and it does not need help. */
 helix-toggle[link][selected] > *,
 helix-toggle[selected]::part(item) {
   background-color: transparent;
   color: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-semibold);
 }
 
 helix-toggle[disabled][link] > *,

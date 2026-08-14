@@ -4239,6 +4239,8 @@ export type CustomElements = {
    *
    * - `(default)`: The item's label.
    * - `children`: Nested items, which make this a branch.
+   * - `start`: Before the label, after the chevron. A mark about the item.
+   * - `end`: After the label, at the row's far side. A count, or a state.
    *
    * ## Methods
    *
@@ -6539,6 +6541,8 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The item's label.
    * - `children`: Nested items, which make this a branch.
+   * - `start`: Before the label, after the chevron. A mark about the item.
+   * - `end`: After the label, at the row's far side. A count, or a state.
    *
    * ## Methods
    *
