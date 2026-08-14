@@ -3,20 +3,25 @@
   display: inline-flex;
   flex-shrink: 0;
   vertical-align: middle;
+
+  /* Tokens, so a spinner is the same size wherever it is placed. Set
+     `--spinner-size: 1em` for one that should match the text beside it, which
+     is the case inside a button. */
+  --_spinner-size: var(--helix-size-spinner);
 }
 
 :host([size="sm"]) {
-  --_spinner-size: 1em;
+  --_spinner-size: var(--helix-size-spinner-dense);
 }
 
 :host([size="lg"]) {
-  --_spinner-size: 2.5em;
+  --_spinner-size: var(--helix-size-spinner-large);
 }
 
 [part="svg"] {
   animation: helix-spinner-turn 0.8s linear infinite;
-  block-size: var(--spinner-size, var(--_spinner-size, 1.5em));
-  inline-size: var(--spinner-size, var(--_spinner-size, 1.5em));
+  block-size: var(--spinner-size, var(--_spinner-size));
+  inline-size: var(--spinner-size, var(--_spinner-size));
 }
 
 [part="track"] {
