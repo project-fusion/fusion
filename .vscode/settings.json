@@ -5,6 +5,8 @@
     "**/.git": true,
     "**/.hg": true,
     "**/.local": true,
+    "**/.next": true,
+    "**/.next-dev": true,
     "**/.svn": true,
     "**/.turbo": true,
     "**/.vercel": true,
@@ -16,6 +18,7 @@
     "**/node_modules": true,
     "**/out": true,
     "**/target": true,
-    "**/tmp": true
+    "**/tmp": true,
+    "**/tsconfig.tsbuildinfo": true
   }
 }

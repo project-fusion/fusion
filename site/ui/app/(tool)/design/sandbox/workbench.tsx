@@ -1,5 +1,8 @@
 'use client'
 
+// The editor is on its own path: it carries CodeMirror, and the site's
+// element registration runs on every page.
+import '@helix-io/sandbox/editor'
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
 import type { HelixSelectEvent } from '@helix-io/web'
 import Link from 'next/link'
@@ -180,20 +183,22 @@ export function SandboxWorkbench({ families }: Props) {
             <helix-tabs-tab value="html">index.html</helix-tabs-tab>
             <helix-tabs-tab value="css">styles.css</helix-tabs-tab>
             <helix-tabs-panel slot="panels" value="html">
-              <helix-sandbox-source
+              <helix-sandbox-editor
                 field-label="Example markup"
                 key={`${activeValue}-html`}
+                language="html"
                 name="html"
                 value={example.html}
-              ></helix-sandbox-source>
+              ></helix-sandbox-editor>
             </helix-tabs-panel>
             <helix-tabs-panel slot="panels" value="css">
-              <helix-sandbox-source
+              <helix-sandbox-editor
                 field-label="Example stylesheet"
                 key={`${activeValue}-css`}
+                language="css"
                 name="css"
                 value=""
-              ></helix-sandbox-source>
+              ></helix-sandbox-editor>
             </helix-tabs-panel>
           </helix-tabs>
 

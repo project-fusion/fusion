@@ -3,7 +3,6 @@ import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixSandboxPreview } from '../preview/sandbox-preview.js'
-import { HelixSandboxSource } from '../source/sandbox-source.js'
 import { styles } from './sandbox-root.css.js'
 
 /** How far one arrow press moves the split, in percent. */
@@ -62,15 +61,34 @@ export class HelixSandbox extends HelixElement {
   private dragging = false
 
   /**
+   * Whether a change came from inside this sandbox's source region.
+   *
+   * Structural rather than a type check. It was `instanceof
+   * HelixSandboxSource`, which was right until there was a second kind of
+   * pane: the editor is `@helix-io/sandbox/editor`, on its own path because it
+   * carries CodeMirror, and naming its class here would pull that back into
+   * this module for every consumer. Where the event came from is a question
+   * about the tree, and the tree can answer it.
+   */
+  private fromSource(target: EventTarget | null): boolean {
+    if (!(target instanceof Node)) {
+      return false
+    }
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
+    return (slot?.assignedElements({ flatten: true }) ?? []).some(
+      (pane) => pane === target || pane.contains(target),
+    )
+  }
+
+  /**
    * Takes a change from one of this sandbox's own source panes.
    *
-   * The target is checked, and has to be. `helix-change` bubbles and composes,
-   * so every form control rendered *inside* a preview sends one up here too: a
-   * checkbox group in an example replaced the example's own markup with its
-   * selected values. A sandbox hears a great deal that is not its source.
+   * The origin is checked, and has to be. `helix-change` bubbles and composes,
+   * so anything a consumer slots into a sandbox sends one up here too. A
+   * sandbox hears a great deal that is not its source.
    */
   private readonly handleSourceChange = (event: Event): void => {
-    if (!(event.target instanceof HelixSandboxSource)) {
+    if (!this.fromSource(event.target)) {
       return
     }
     const { name, value } = (event as HelixChangeEvent).detail

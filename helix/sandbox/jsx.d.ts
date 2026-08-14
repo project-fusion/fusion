@@ -2,6 +2,7 @@ import type {
   HelixChangeEvent,
   HelixConsoleEvent,
   HelixSandbox,
+  HelixSandboxEditor,
   HelixSandboxPreview,
   HelixSandboxSource,
 } from '@helix-io/sandbox';
@@ -198,6 +199,55 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
+/** `HelixSandboxEditor` component event */
+export type HelixSandboxEditorElementEvent<E = Event> = TypedEvent<
+  HelixSandboxEditor,
+  E
+>;
+/** `helix-change` event type */
+export type HelixSandboxEditorHelixChangeElementEvent =
+  HelixSandboxEditorElementEvent<HelixChangeEvent>;
+
+export type HelixSandboxEditorProps = {
+  /** The source being edited. */
+  value?: HelixSandboxEditor["value"];
+  /** Which source this pane holds, echoed in every change. */
+  name?: HelixSandboxEditor["name"];
+  /** How to highlight it. */
+  language?: HelixSandboxEditor["language"];
+  /** Accessible name for the editable region. */
+  "field-label"?: HelixSandboxEditor["fieldLabel"];
+  /** Accessible name for the editable region. */
+  fieldLabel?: HelixSandboxEditor["fieldLabel"];
+
+  /** Fired when the cursor moves, with its line and column. */
+  "onhelix-caret"?: (e: HelixSandboxEditorElementEvent) => void;
+  /** Fired when the source is edited. */
+  "onhelix-change"?: (e: HelixSandboxEditorHelixChangeElementEvent) => void;
+};
+
+export type HelixSandboxEditorSolidJsProps = {
+  /** The source being edited. */
+  "prop:value"?: HelixSandboxEditor["value"];
+  /** Which source this pane holds, echoed in every change. */
+  "prop:name"?: HelixSandboxEditor["name"];
+  /** How to highlight it. */
+  "prop:language"?: HelixSandboxEditor["language"];
+  /** Accessible name for the editable region. */
+  "attr:field-label"?: HelixSandboxEditor["fieldLabel"];
+  /** Accessible name for the editable region. */
+  "prop:fieldLabel"?: HelixSandboxEditor["fieldLabel"];
+  /** Fired when the cursor moves, with its line and column. */
+  "on:helix-caret"?: (e: HelixSandboxEditorElementEvent) => void;
+  /** Fired when the source is edited. */
+  "on:helix-change"?: (e: HelixSandboxEditorHelixChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixSandboxPreview` component event */
 export type HelixSandboxPreviewElementEvent<E = Event> = TypedEvent<
   HelixSandboxPreview,
@@ -334,6 +384,50 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
 };
 
 export type CustomElements = {
+  /**
+   * CodeMirror, not a `<textarea>`. The textarea it replaces was the right call
+   * while a sandbox only had to hold text: undo, selection, spellcheck
+   * suppression, mobile keyboards, and screen-reader support all came from the
+   * platform. What it could not do is highlight what it holds, number its lines,
+   * or say where the cursor is, and a status bar reading line and column has to
+   * ask something.
+   *
+   * **On its own path.** This is `@helix-io/sandbox/editor` rather than part of
+   * the barrel, because CodeMirror is around 110 KB over the wire where the rest
+   * of this package is a few. A sandbox with no editable pane should not pay for
+   * one, and neither should a site that registers its elements once.
+   *
+   * The view is built once and reconfigured, not rebuilt. Replacing it on every
+   * change would throw away the undo history, the scroll position, and the
+   * selection, which is most of what an editor is.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every change.
+   * - `language`: How to highlight it.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `caret`: Where the cursor is, counted from one, as an editor reports it. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-caret`: Fired when the cursor moves, with its line and column.
+   * - `helix-change`: Fired when the source is edited.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `editor`: The element CodeMirror is mounted into.
+   */
+  "helix-sandbox-editor": Partial<
+    HelixSandboxEditorProps & BaseProps<HelixSandboxEditor> & BaseEvents
+  >;
+
   /**
    * A same-origin `<iframe>` pointed at `src`, which is a document the consumer
    * provides. That document imports whatever the examples need, listens for a
@@ -477,6 +571,53 @@ export type CustomElements = {
 };
 
 export type CustomElementsSolidJs = {
+  /**
+   * CodeMirror, not a `<textarea>`. The textarea it replaces was the right call
+   * while a sandbox only had to hold text: undo, selection, spellcheck
+   * suppression, mobile keyboards, and screen-reader support all came from the
+   * platform. What it could not do is highlight what it holds, number its lines,
+   * or say where the cursor is, and a status bar reading line and column has to
+   * ask something.
+   *
+   * **On its own path.** This is `@helix-io/sandbox/editor` rather than part of
+   * the barrel, because CodeMirror is around 110 KB over the wire where the rest
+   * of this package is a few. A sandbox with no editable pane should not pay for
+   * one, and neither should a site that registers its elements once.
+   *
+   * The view is built once and reconfigured, not rebuilt. Replacing it on every
+   * change would throw away the undo history, the scroll position, and the
+   * selection, which is most of what an editor is.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every change.
+   * - `language`: How to highlight it.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `caret`: Where the cursor is, counted from one, as an editor reports it. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-caret`: Fired when the cursor moves, with its line and column.
+   * - `helix-change`: Fired when the source is edited.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `editor`: The element CodeMirror is mounted into.
+   */
+  "helix-sandbox-editor": Partial<
+    HelixSandboxEditorProps &
+      HelixSandboxEditorSolidJsProps &
+      BaseProps<HelixSandboxEditor> &
+      BaseEvents
+  >;
+
   /**
    * A same-origin `<iframe>` pointed at `src`, which is a document the consumer
    * provides. That document imports whatever the examples need, listens for a

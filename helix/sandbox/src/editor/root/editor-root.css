@@ -1,0 +1,50 @@
+:host {
+  display: block;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+[part="editor"] {
+  block-size: 100%;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+}
+
+/* CodeMirror's own structure. Named here rather than left to its theme,
+   because the sandbox's colours are tokens and its theme's are not. */
+[part="editor"] .cm-editor {
+  block-size: 100%;
+}
+
+[part="editor"] .cm-scroller {
+  font-family: inherit;
+  line-height: var(--helix-leading-normal);
+}
+
+[part="editor"] .cm-gutters {
+  background-color: transparent;
+  border: none;
+  color: var(--helix-color-foreground-subtle);
+}
+
+[part="editor"] .cm-activeLineGutter,
+[part="editor"] .cm-activeLine {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+[part="editor"] .cm-content {
+  caret-color: var(--helix-color-primary);
+}
+
+[part="editor"] .cm-cursor {
+  border-left-color: var(--helix-color-primary);
+}
+
+[part="editor"] .cm-selectionBackground,
+[part="editor"] .cm-editor.cm-focused .cm-selectionBackground {
+  background-color: var(--helix-color-primary-subtle);
+}
+
+[part="editor"] .cm-editor.cm-focused {
+  outline: none;
+}
