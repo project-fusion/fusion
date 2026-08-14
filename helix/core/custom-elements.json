@@ -235,7 +235,7 @@
         },
         {
           "kind": "class",
-          "description": "Fired when an element asks to be taken away.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the markup it is in and removing the node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\nOne verb for both shapes. A tag leaving a list and a banner closing itself\nare the same act from the element's side, and splitting them into `remove`\nand `dismiss` would have meant two names for one thing that a consumer has to\nlearn separately.",
+          "description": "Fired when an element asks to be taken away.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the markup it is in and removing the node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\nOne verb for both shapes. A tag leaving a list and a banner closing itself\nare the same act from the element's side.",
           "name": "HelixDismissEvent",
           "members": [
             {
@@ -360,7 +360,7 @@
               },
               "privacy": "protected",
               "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard."
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard."
             },
             {
               "kind": "method",
@@ -493,7 +493,7 @@
               },
               "privacy": "protected",
               "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
@@ -782,6 +782,40 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/utils/create-sheet/create-sheet.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSheet",
+          "return": {
+            "type": {
+              "text": "CSSResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createSheet",
+          "declaration": {
+            "name": "createSheet",
+            "module": "src/utils/create-sheet/create-sheet.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/utils/custom-element/custom-element.ts",
       "declarations": [
         {
@@ -813,74 +847,6 @@
           "declaration": {
             "name": "target",
             "module": "src/utils/custom-element/custom-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/request-controlled-change/request-controlled-change.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "requestControlledChange",
-          "return": {
-            "type": {
-              "text": "boolean"
-            }
-          },
-          "parameters": [
-            {
-              "name": "{\n  apply,\n  event,\n  host,\n  notify,\n  next,\n}",
-              "type": {
-                "text": "ControlledChangeOptions<T>"
-              }
-            }
-          ],
-          "description": "Announces a change, then applies it if nobody refused.\n\nOne audited path for every stateful change in the system. The order is the\nwhole point: the event goes first and carries the state being *proposed*, so\na listener calling `preventDefault()` stops it before anything moves. A\ncomponent that mutated itself and then announced it would leave a consumer\nreacting to a decision already made.\n\nReturns whether the change was applied, so a caller that needs to know\n(a key handler deciding whether to also move focus) can ask.\n\nA throwing `notify` is caught and logged rather than rethrown. A consumer's\nbroken callback must not corrupt the element's state or abort the rest of a\ncoordinated update, and there is nothing useful this can do about it besides\nmake it visible."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "requestControlledChange",
-          "declaration": {
-            "name": "requestControlledChange",
-            "module": "src/utils/request-controlled-change/request-controlled-change.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/create-sheet/create-sheet.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "createSheet",
-          "return": {
-            "type": {
-              "text": "CSSResult"
-            }
-          },
-          "parameters": [
-            {
-              "name": "cssText",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "createSheet",
-          "declaration": {
-            "name": "createSheet",
-            "module": "src/utils/create-sheet/create-sheet.ts"
           }
         }
       ]
@@ -1147,6 +1113,40 @@
           "declaration": {
             "name": "MixinControllerOpen",
             "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/request-controlled-change/request-controlled-change.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "requestControlledChange",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "{\n  apply,\n  event,\n  host,\n  notify,\n  next,\n}",
+              "type": {
+                "text": "ControlledChangeOptions<T>"
+              }
+            }
+          ],
+          "description": "Announces a change, then applies it if nobody refused.\n\nOne audited path for every stateful change in the system. The order is the\nwhole point: the event goes first and carries the state being *proposed*, so\na listener calling `preventDefault()` stops it before anything moves. A\ncomponent that mutated itself and then announced it would leave a consumer\nreacting to a decision already made.\n\nReturns whether the change was applied, so a caller that needs to know\n(a key handler deciding whether to also move focus) can ask.\n\nA throwing `notify` is caught and logged rather than rethrown. A consumer's\nbroken callback must not corrupt the element's state or abort the rest of a\ncoordinated update, and there is nothing useful this can do about it besides\nmake it visible."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "requestControlledChange",
+          "declaration": {
+            "name": "requestControlledChange",
+            "module": "src/utils/request-controlled-change/request-controlled-change.ts"
           }
         }
       ]

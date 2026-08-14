@@ -41,8 +41,8 @@ describe('card regions', () => {
 
   test('an omitted region leaves no element behind to take up space', async () => {
     // A bare slot is `display: contents`, so nothing is rendered for a region
-    // the consumer did not fill. This is what replaced hiding empty wrappers:
-    // `:host(:has(...))` is invalid CSS and the server cannot inspect children.
+    // the consumer did not fill. It has to be layout: `:host(:has(...))` is
+    // invalid CSS, and the server cannot inspect children to do it in JS.
     const card = await mount('<helix-card>Body</helix-card>')
     const slots = [...(card.shadowRoot?.querySelectorAll('slot') ?? [])]
     for (const slot of slots) {

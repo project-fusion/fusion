@@ -129,7 +129,7 @@ const searchDirection = (
 
     if (contrastRatio(fitToGamut(candidate), background) >= target) {
       best = candidate
-      // Contrast grows as we move away from the background, so pull back toward
+      // Contrast grows with distance from the background, so pull back toward
       // it to find the least extreme lightness that still passes.
       if (darker) {
         low = mid

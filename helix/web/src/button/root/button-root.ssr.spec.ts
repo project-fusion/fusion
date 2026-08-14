@@ -28,10 +28,9 @@ describe('button server output', () => {
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    // `target` and `rel` reflected until they were told not to, so every button
-    // ever rendered carried a bare `target rel` pair. `appearance` and `size`
-    // then reflected their defaults, which is the same bug with a value: the
-    // host ends up holding an attribute the consumer's markup never had.
+    // A reflected property with a default writes its attribute on upgrade, and
+    // the host then holds an attribute the consumer's markup never had. React
+    // reports that as a hydration mismatch, so the host has to start bare.
     expect(hostAttributes(ssr(html`<helix-button>Go</helix-button>`), 'helix-button')).toEqual([])
   })
 

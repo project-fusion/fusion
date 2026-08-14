@@ -8,10 +8,9 @@ import { styles } from './tag-root.css.js'
  * @summary Labels content with a short piece of metadata.
  *
  * @description
- * Five appearances, drawn as a tinted fill derived from the status color with
- * `color-mix` rather than from a token per status. The alternative was eight
- * new tokens whose only job was to be a lighter version of one that already
- * existed, and they would have had to be re-derived by every theme.
+ * Five appearances. The fill is a tint of the status color, mixed with
+ * `color-mix` rather than held as a token per status, so a theme that changes
+ * the status colors gets the tints with them.
  *
  * @since 0.1.0
  * @status experimental

@@ -10,9 +10,8 @@ import { property } from 'lit/decorators.js'
  * whether it is the current page, and the separator that precedes it.
  *
  * Each item renders its own separator and hides it with `:host(:first-child)`,
- * so the trail needs no index and no coordination from the parent. Structural
- * pseudo-classes are allowed inside `:host()`, unlike `:has()`, and this was
- * verified in a browser before being relied on.
+ * so the trail needs no index and no coordination from the parent. `:host()`
+ * takes a structural pseudo-class, unlike `:has()`, which it rejects.
  *
  * The current page is a `<span>`, not a link. Linking a page to itself is a
  * known screen-reader annoyance, and `aria-current="page"` is what actually
@@ -42,8 +41,8 @@ export class HelixBaseBreadcrumbsItem extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, because the item is an `<ol>` child in the flat tree and the
-    // role has to be there for the list to have items. Set here rather than in
-    // `connectedCallback`, which the server never calls; verified to serialize.
+    // role has to be there for the list to have items. In `willUpdate` rather
+    // than `connectedCallback`, which the server never calls.
     this.internals.role = 'listitem'
   }
 

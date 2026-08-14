@@ -14,18 +14,16 @@ const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
  * coordinates: it walks up to the nearest accordion, reads the mode off it, and
  * closes its peers itself.
  *
- * That is structural rather than a subscription, and it has to be. `helix-open`
- * does not bubble and is not composed, because overlays nest and an inner one's
- * lifecycle must never read as the outer one's. So an accordion cannot learn
- * that a child opened by listening, and asking it to would mean a second,
- * bubbling event whose only purpose was to say the same thing again.
+ * Coordination is structural, not a subscription. `helix-open` does not bubble
+ * and is not composed, because overlays nest and an inner one's lifecycle must
+ * never read as the outer one's, so an accordion cannot learn that a child
+ * opened by listening for it.
  *
- * Resolving on demand also means there is no registry to keep in step: an item
- * added a second after render coordinates on its first click, with no handshake.
+ * Membership resolves on demand, so there is no registry to keep in step: an
+ * item added a second after render coordinates on its first click.
  *
  * Items are matched with `instanceof HelixBaseAccordionItem`, never by tag
- * name. A headless component that looked for `helix-accordion-item` would only
- * work with the styled tier, which is the tier it is not allowed to know about.
+ * name. Matching `helix-accordion-item` would tie this tier to the styled one.
  *
  * Every listener is attached on connect, so none of it runs on the server,
  * where there is no tree to walk and no events to hear.
@@ -46,9 +44,8 @@ export class HelixBaseAccordion extends HelixElement {
    * no attribute on the host. `single` keeps exactly one open and refuses to
    * close the last; `single-collapsible` keeps at most one and lets it close.
    *
-   * One property rather than a mode plus a `collapsible` boolean, because
-   * `collapsible` alongside `multiple` is a combination that means nothing and
-   * a union can simply not offer it.
+   * A union rather than a mode plus a `collapsible` boolean, which would make
+   * `collapsible` alongside `multiple` expressible and meaningless.
    */
   @property({ reflect: true })
   mode?: 'single' | 'single-collapsible'

@@ -23,9 +23,7 @@ const TRIGGER_ID = 'trigger'
  *
  * @description
  * Carries its own open state, which is why it is an element rather than a slot.
- * Used alone it is a disclosure, and that is deliberate: shipping a separate
- * `Disclosure` meant two implementations of one behavior, which is what this
- * replaced.
+ * Used alone, outside an accordion, it is a disclosure.
  *
  * Content stays mounted when closed and is hidden by the styled tier's CSS, so
  * it can animate and so the text is present in server-rendered HTML. Closed

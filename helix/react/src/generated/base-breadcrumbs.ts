@@ -32,9 +32,8 @@ export const BaseBreadcrumbsRoot = createComponent<HelixBaseBreadcrumbs, BaseBre
 whether it is the current page, and the separator that precedes it.
 
 Each item renders its own separator and hides it with `:host(:first-child)`,
-so the trail needs no index and no coordination from the parent. Structural
-pseudo-classes are allowed inside `:host()`, unlike `:has()`, and this was
-verified in a browser before being relied on.
+so the trail needs no index and no coordination from the parent. `:host()`
+takes a structural pseudo-class, unlike `:has()`, which it rejects.
 
 The current page is a `<span>`, not a link. Linking a page to itself is a
 known screen-reader annoyance, and `aria-current="page"` is what actually

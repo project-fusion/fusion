@@ -1,7 +1,7 @@
 import type { HelixContext, HelixManifest, Plugin } from '../types.js'
 import { eachComponent } from '../types.js'
 /**
- * Drops events the analyzer inferred rather than ones we declared.
+ * Keeps the events a component declares with `@event`, and drops the rest.
  *
  * The analyzer records an event for every `dispatchEvent` call it can see. When
  * the call sits inside a generic helper, the name it records is the *parameter

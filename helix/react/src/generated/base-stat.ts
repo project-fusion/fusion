@@ -10,11 +10,9 @@ import type { HelixBaseStat, HelixBaseStatGroup } from '@helix-io/headless'
 order a figure wants: the number is what the eye lands on and the label is
 what tells it what it landed on.
 
-Both are bare slots rather than elements. The reference implementation ships
-a `stat-label` and a `stat-value` whose entire job is to assign themselves a
-slot on connect, which is a component for something the consumer can write,
-and it writes an attribute onto its own host after upgrading, which a React
-consumer's markup never had.
+Both are bare slots. An element whose only job is to assign itself a slot on
+connect gives its own host an attribute after upgrade, which a React
+consumer's server markup never had.
  *
  * Renders `<helix-base-stat>`.
  */

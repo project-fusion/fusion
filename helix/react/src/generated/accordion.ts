@@ -15,7 +15,7 @@ and not two.
 export interface AccordionProps extends BaseProps {
   /** Removes the surrounding surface, leaving only the separating rules. */
   appearance?: 'outlined' | 'plain'
-  /** How many sections may be open at once. Absent is `multiple`, so nothing closes unexpectedly and the default costs no attribute on the host. `single` keeps exactly one open and refuses to close the last; `single-collapsible` keeps at most one and lets it close. One property rather than a mode plus a `collapsible` boolean, because `collapsible` alongside `multiple` is a combination that means nothing and a union can simply not offer it. */
+  /** How many sections may be open at once. Absent is `multiple`, so nothing closes unexpectedly and the default costs no attribute on the host. `single` keeps exactly one open and refuses to close the last; `single-collapsible` keeps at most one and lets it close. A union rather than a mode plus a `collapsible` boolean, which would make `collapsible` alongside `multiple` expressible and meaningless. */
   mode?: 'single' | 'single-collapsible'
 }
 

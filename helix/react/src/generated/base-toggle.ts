@@ -8,11 +8,9 @@ import type { HelixBaseToggle, HelixBaseToggleGroup, HelixSelectEvent } from '@h
 /**
  * Renders a `<button role="radio">`. This is a form control and nothing else.
 
-It used to serve navigation too, behind a `nav` attribute on the group, and
-that was two components wearing one name. Navigation is links marked with
-`aria-current`, styled by the `data-nav-item` recipe in the base layer; it
-only ever borrowed this component's *look*. Borrowing radio semantics for it
-would have announced a set of destinations as a set of choices.
+Navigation is not this. It is links marked with `aria-current` and styled by
+the `data-nav-item` recipe in the base layer, which carries the same look
+without radio semantics announcing destinations as choices.
  *
  * Renders `<helix-base-toggle>`.
  */
@@ -47,12 +45,9 @@ necessity, so the server renders the indicator hidden and it fades in once it
 has somewhere to be, which is the harmless direction: it appears rather than
 jumping from a wrong place.
 
-A radio group, and only that. It carried a `nav` mode once, which made the
-same element a navigation landmark of links, and that was two components
-sharing a name: navigation borrowed the look and would have had to borrow
-radio semantics with it, announcing a set of destinations as a set of
-choices. Navigation is the `data-nav-item` recipe now. A tab was never the
-answer either, in that direction: a tab controls a panel.
+A radio group, and only that. Navigation is links marked with `aria-current`
+and styled by the `data-nav-item` recipe: radio semantics would announce a
+set of destinations as a set of choices. A tab controls a panel.
  *
  * Renders `<helix-base-toggle-group>`.
  */

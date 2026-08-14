@@ -23,12 +23,9 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  * has somewhere to be, which is the harmless direction: it appears rather than
  * jumping from a wrong place.
  *
- * A radio group, and only that. It carried a `nav` mode once, which made the
- * same element a navigation landmark of links, and that was two components
- * sharing a name: navigation borrowed the look and would have had to borrow
- * radio semantics with it, announcing a set of destinations as a set of
- * choices. Navigation is the `data-nav-item` recipe now. A tab was never the
- * answer either, in that direction: a tab controls a panel.
+ * A radio group, and only that. Navigation is links marked with `aria-current`
+ * and styled by the `data-nav-item` recipe: radio semantics would announce a
+ * set of destinations as a set of choices. A tab controls a panel.
  *
  * @since 0.1.0
  * @status experimental

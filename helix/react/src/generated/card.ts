@@ -17,7 +17,7 @@ header, content, and footer stack rather than above it.
 Regions are bare slots with no wrapper element, so an omitted one occupies no
 space without the card having to detect that it is missing. Style slotted
 content directly rather than reaching for a part: a header is whatever
-element you slotted, not a wrapper we put around it.
+element you slotted, not a wrapper around it.
  *
  * Renders `<helix-card>`.
  */

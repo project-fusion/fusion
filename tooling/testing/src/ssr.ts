@@ -15,8 +15,7 @@ export const ssr = (template: TemplateResult): string => collectResultSync(rende
  * 'data-scrolled')` passes on a `:host([data-scrolled])` rule, and both say
  * nothing whatever about what rendered.
  *
- * This has produced a false pass twice. Strip the styles first and the
- * assertion can only see markup.
+ * Strip the styles first and the assertion can only see markup.
  */
 export const withoutStyles = (markup: string): string =>
   markup.replace(/<style>[\s\S]*?<\/style>/g, '')
