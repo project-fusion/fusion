@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--list-gap, var(--helix-space-none));
+}
+
+/* Between rows rather than around them, so the first and last edges stay open
+   and the list reads as one object. */
+:host([divided]) ::slotted(*:not(:first-child)) {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+}
