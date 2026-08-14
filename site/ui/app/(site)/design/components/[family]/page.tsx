@@ -64,9 +64,9 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
       <helix-tree class="docsNav" label="Components" value={family.slug}>
         {families.map((entry) => (
           <helix-tree-item key={entry.slug} value={entry.slug}>
-            <helix-link appearance="quiet" href={`/design/components/${entry.slug}`}>
+            <a data-link="quiet" href={`/design/components/${entry.slug}`}>
               {entry.label}
-            </helix-link>
+            </a>
           </helix-tree-item>
         ))}
       </helix-tree>
@@ -160,15 +160,15 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
         </helix-text>
         <helix-flex class="docsRailList" direction="column">
           {family.elements.map((element) => (
-            <helix-link
-              appearance="quiet"
-              class="docsRailLink"
+            <a
+              className="docsRailLink"
+              data-link="quiet"
+              data-link-size="sm"
               href={`#${element.tagName}`}
               key={element.tagName}
-              size="sm"
             >
               {element.label} · {element.tier}
-            </helix-link>
+            </a>
           ))}
         </helix-flex>
       </helix-flex>

@@ -197,7 +197,7 @@ helix-app-header {
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
-.docsRailLink::part(link) {
+.docsRailLink {
   display: block;
   padding-block: var(--helix-space-2xs);
   padding-inline-start: var(--helix-space-sm);

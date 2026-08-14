@@ -50,14 +50,14 @@ export function SiteNav() {
   return (
     <>
       <helix-app-header sticky>
-        <helix-link appearance="quiet" href="/" slot="brand">
+        <a data-link="quiet" href="/" slot="brand">
           <helix-flex align="center" gap="xs" inline>
             <FusionLogo size="1.5rem" />
             <helix-text appearance="body-strong" class="wordmark">
               Fusion
             </helix-text>
           </helix-flex>
-        </helix-link>
+        </a>
 
         {!narrow && (
           <helix-toggle-group appearance="plain" label="Verticals" nav value={current}>
@@ -108,14 +108,15 @@ export function SiteNav() {
       >
         <helix-flex align="start" class="navDrawer" direction="column" gap="lg">
           {VERTICALS.map((vertical) => (
-            <helix-link
+            <a
+              data-link
+              data-link-size="lg"
               href={vertical.href}
               key={vertical.href}
               onClick={() => setOpen(false)}
-              size="lg"
             >
               {vertical.label}
-            </helix-link>
+            </a>
           ))}
           <helix-button appearance="primary" href="mailto:hello@fusion.dev" size="lg">
             Get in touch
