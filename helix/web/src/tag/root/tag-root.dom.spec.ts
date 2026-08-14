@@ -12,32 +12,32 @@ describe('tag', () => {
     // The host is the box, so the shadow root holds the label slot and, when
     // asked for, the remove control. Nothing else.
     expect(tag.shadowRoot?.querySelector('slot')).not.toBeNull()
-    expect(part(tag, 'remove')).toBeNull()
+    expect(part(tag, 'dismiss')).toBeNull()
   })
 
-  test('offers a named control when removable', async () => {
-    const tag = await mount('<helix-tag removable>Draft</helix-tag>')
-    const remove = part(tag, 'remove')
-    expect(remove?.tagName).toBe('BUTTON')
+  test('offers a named control when dismissible', async () => {
+    const tag = await mount('<helix-tag dismissible>Draft</helix-tag>')
+    const dismiss = part(tag, 'dismiss')
+    expect(dismiss?.tagName).toBe('BUTTON')
     // A real button, so Enter and Space work without a key handler.
-    expect(remove?.getAttribute('type')).toBe('button')
-    expect(remove?.getAttribute('aria-label')).toBe('Remove')
+    expect(dismiss?.getAttribute('type')).toBe('button')
+    expect(dismiss?.getAttribute('aria-label')).toBe('Remove')
   })
 
-  test('the remove control can be named for what it removes', async () => {
-    const tag = await mount('<helix-tag removable remove-label="Remove Draft">Draft</helix-tag>')
-    expect(part(tag, 'remove')?.getAttribute('aria-label')).toBe('Remove Draft')
+  test('the dismiss control can be named for what it removes', async () => {
+    const tag = await mount('<helix-tag dismissible dismiss-label="Remove Draft">Draft</helix-tag>')
+    expect(part(tag, 'dismiss')?.getAttribute('aria-label')).toBe('Remove Draft')
   })
 
-  test('asks to be removed rather than removing itself', async () => {
+  test('asks to be dismissed rather than removing itself', async () => {
     // The consumer owns the list the tag is in. Taking the node out from under
     // them would put their state and the document out of step.
-    const tag = await mount('<helix-tag removable>Draft</helix-tag>')
+    const tag = await mount('<helix-tag dismissible>Draft</helix-tag>')
     let detail: { label: string } | null = null
     tag.addEventListener('helix-dismiss', (event) => {
       detail = (event as CustomEvent<{ label: string }>).detail
     })
-    ;(part(tag, 'remove') as HTMLElement).click()
+    ;(part(tag, 'dismiss') as HTMLElement).click()
 
     expect(detail).not.toBeNull()
     expect((detail as unknown as { label: string }).label).toBe('Draft')
@@ -45,13 +45,13 @@ describe('tag', () => {
   })
 
   test('the request can be refused', async () => {
-    const tag = await mount('<helix-tag removable>Draft</helix-tag>')
+    const tag = await mount('<helix-tag dismissible>Draft</helix-tag>')
     let cancelable = false
     tag.addEventListener('helix-dismiss', (event) => {
       cancelable = event.cancelable
       event.preventDefault()
     })
-    ;(part(tag, 'remove') as HTMLElement).click()
+    ;(part(tag, 'dismiss') as HTMLElement).click()
     expect(cancelable).toBe(true)
     expect(tag.isConnected).toBe(true)
   })

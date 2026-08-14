@@ -35,168 +35,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/sandbox/preview/sandbox-preview.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Renders into the light DOM rather than a shadow root, which is the whole\nreason this is an element and not a `<div>` someone sets `innerHTML` on.\nContent inside a shadow root is cut off from the base layer, so a heading\nwould come out at the browser's default size and a link in the wrong color,\nand the preview would be a worse likeness the more the design system does.\nIn the light DOM it is styled exactly as it would be on a real page.\n\n**The source is trusted.** It is markup a developer typed into their own\nsandbox, and it is rendered as markup. Never point this at input from anyone\nelse.",
-          "name": "HelixSandboxPreview",
-          "members": [
-            {
-              "kind": "field",
-              "name": "source",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Markup to render.",
-              "attribute": "source"
-            },
-            {
-              "kind": "method",
-              "name": "applyStyles",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Puts the stylesheet inside the preview, after the markup.\n\nRe-created whenever the markup is, because setting `innerHTML` removes it\nalong with everything else."
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "source",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Markup to render.",
-              "fieldName": "source"
-            },
-            {
-              "name": "styles",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Stylesheet applied to the preview.\n\nScoped by being written into the preview's own subtree rather than the\ndocument, so an example that restyles `helix-card` restyles the one being\npreviewed and not the sandbox around it.",
-              "fieldName": "styles"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Renders sandbox source as live markup.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/sandbox/preview",
-            "aliases": [
-              "Result",
-              "Output"
-            ],
-            "tier": "styled",
-            "group": "Sandbox",
-            "part": "Preview"
-          },
-          "tagName": "helix-sandbox-preview",
-          "customElement": true,
-          "modulePath": "src/sandbox/preview/sandbox-preview.ts",
-          "definitionPath": "src/sandbox/preview/sandbox-preview.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixSandboxPreview",
-          "declaration": {
-            "name": "HelixSandboxPreview",
-            "module": "src/sandbox/preview/sandbox-preview.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-sandbox-preview",
-          "declaration": {
-            "name": "HelixSandboxPreview",
-            "module": "src/sandbox/preview/sandbox-preview.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/sandbox/root/sandbox-root.css.ts",
       "declarations": [
         {
@@ -776,6 +614,168 @@
           "declaration": {
             "name": "HelixSandboxSource",
             "module": "src/sandbox/source/sandbox-source.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/preview/sandbox-preview.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders into the light DOM rather than a shadow root, which is the whole\nreason this is an element and not a `<div>` someone sets `innerHTML` on.\nContent inside a shadow root is cut off from the base layer, so a heading\nwould come out at the browser's default size and a link in the wrong color,\nand the preview would be a worse likeness the more the design system does.\nIn the light DOM it is styled exactly as it would be on a real page.\n\n**The source is trusted.** It is markup a developer typed into their own\nsandbox, and it is rendered as markup. Never point this at input from anyone\nelse.",
+          "name": "HelixSandboxPreview",
+          "members": [
+            {
+              "kind": "field",
+              "name": "source",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Markup to render.",
+              "attribute": "source"
+            },
+            {
+              "kind": "method",
+              "name": "applyStyles",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the stylesheet inside the preview, after the markup.\n\nRe-created whenever the markup is, because setting `innerHTML` removes it\nalong with everything else."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "source",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Markup to render.",
+              "fieldName": "source"
+            },
+            {
+              "name": "styles",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Stylesheet applied to the preview.\n\nScoped by being written into the preview's own subtree rather than the\ndocument, so an example that restyles `helix-card` restyles the one being\npreviewed and not the sandbox around it.",
+              "fieldName": "styles"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Renders sandbox source as live markup.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/sandbox/preview",
+            "aliases": [
+              "Result",
+              "Output"
+            ],
+            "tier": "styled",
+            "group": "Sandbox",
+            "part": "Preview"
+          },
+          "tagName": "helix-sandbox-preview",
+          "customElement": true,
+          "modulePath": "src/sandbox/preview/sandbox-preview.ts",
+          "definitionPath": "src/sandbox/preview/sandbox-preview.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSandboxPreview",
+          "declaration": {
+            "name": "HelixSandboxPreview",
+            "module": "src/sandbox/preview/sandbox-preview.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-sandbox-preview",
+          "declaration": {
+            "name": "HelixSandboxPreview",
+            "module": "src/sandbox/preview/sandbox-preview.ts"
           }
         }
       ]

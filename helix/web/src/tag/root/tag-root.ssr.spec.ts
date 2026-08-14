@@ -10,11 +10,11 @@ describe('tag server output', () => {
   })
 
   test('a plain tag ships no control', () => {
-    expect(hasPart(ssr(html`<helix-tag>Draft</helix-tag>`), 'remove')).toBe(false)
+    expect(hasPart(ssr(html`<helix-tag>Draft</helix-tag>`), 'dismiss')).toBe(false)
   })
 
-  test('the remove control is named before any JavaScript runs', () => {
-    const markup = ssr(html`<helix-tag removable>Draft</helix-tag>`)
-    expect(partTag(markup, 'remove')).toContain('aria-label="Remove"')
+  test('the dismiss control is named before any JavaScript runs', () => {
+    const markup = ssr(html`<helix-tag dismissible>Draft</helix-tag>`)
+    expect(partTag(markup, 'dismiss')).toContain('aria-label="Remove"')
   })
 })

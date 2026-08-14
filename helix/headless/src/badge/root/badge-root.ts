@@ -59,20 +59,25 @@ export class HelixBaseBadge extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    if (this.blank) {
-      return html`<slot></slot>`
-    }
+    const blank = this.blank
+    const announced = this.label !== '' && !blank
 
     // The indicator holds the text and nothing else, so an absent value leaves
     // it empty and `[part="indicator"]:empty` is what draws the dot. Lit's
     // marker comments do not affect `:empty`, but a whitespace text node does,
     // which is why the tags close the way they do.
+    //
+    // It stays mounted when there is nothing to show, so the styled tier can
+    // transition it out rather than having it vanish between frames. `blank` is
+    // on the shadow content, not the host, so it costs no attribute a consumer's
+    // server markup would have to match.
     return html`<slot></slot>
       <span
         part="indicator"
-        role=${this.label ? 'status' : nothing}
-        aria-label=${this.label || nothing}
-        aria-hidden=${this.label ? nothing : 'true'}
+        data-blank=${blank ? '' : nothing}
+        role=${announced ? 'status' : nothing}
+        aria-label=${announced ? this.label : nothing}
+        aria-hidden=${announced ? nothing : 'true'}
         >${this.text}</span
       >`
   }

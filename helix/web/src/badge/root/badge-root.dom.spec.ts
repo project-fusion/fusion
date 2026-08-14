@@ -19,20 +19,39 @@ describe('badge', () => {
     expect(part(badge, 'indicator')?.textContent?.trim()).toBe('3')
   })
 
-  test('a value that counts nothing renders no mark at all', async () => {
+  test('a value that counts nothing marks the indicator blank, and keeps it', async () => {
+    // Mounted so it can transition out. `data-blank` is on the shadow content,
+    // so the host still carries nothing the consumer did not write.
     const badge = await mount('<helix-badge value="0"><span>x</span></helix-badge>')
-    expect(part(badge, 'indicator')).toBeNull()
+    const indicator = part(badge, 'indicator')
+    expect(indicator?.hasAttribute('data-blank')).toBe(true)
+    expect(indicator?.getAttribute('aria-hidden')).toBe('true')
+    expect(badge.getAttributeNames()).toEqual(['value'])
   })
 
-  test('no value leaves an empty indicator, which is what `:empty` draws as a dot', async () => {
+  test('a blank mark keeps its text, so it never matches the dot rule', async () => {
+    // `:empty` is not asserted here. happy-dom answers it without looking at
+    // text nodes, so it reports true for an indicator reading "0". The text is
+    // what the selector turns on, so the text is what is checked.
+    const badge = await mount('<helix-badge value="0"><span>x</span></helix-badge>')
+    expect(part(badge, 'indicator')?.textContent).toBe('0')
+  })
+
+  test('a blank mark is not announced, even with a label', async () => {
+    const badge = await mount('<helix-badge value="0" label="unread"><span>x</span></helix-badge>')
+    const indicator = part(badge, 'indicator')
+    expect(indicator?.getAttribute('role')).toBeNull()
+    expect(indicator?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  test('no value leaves the indicator with no text, which is what draws it as a dot', async () => {
     // Shape follows content, so the dot is the indicator with nothing in it.
-    // Lit's marker comments do not count against `:empty`, but a whitespace
-    // text node would, so the check is on the text and not just the node.
+    // The text is the assertion, not `:empty`: happy-dom does not consider text
+    // nodes when answering it, so it would pass here whatever the text was.
     const badge = await mount('<helix-badge label="3 unread"><span>x</span></helix-badge>')
     const indicator = part(badge, 'indicator')
     expect(indicator).not.toBeNull()
     expect(indicator?.textContent).toBe('')
-    expect(indicator?.matches(':empty')).toBe(true)
   })
 
   test('a dot with a label announces it, and one without says nothing at all', async () => {

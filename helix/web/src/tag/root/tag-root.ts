@@ -19,7 +19,7 @@ import { styles } from './tag-root.css.js'
  *
  * @slot - The tag's label.
  *
- * @csspart remove - The remove button, when `removable`.
+ * @csspart dismiss - The remove button, when `dismissible`.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  *

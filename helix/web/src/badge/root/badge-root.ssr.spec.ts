@@ -21,8 +21,9 @@ describe('badge server output', () => {
     expect(markup).toMatch(/<span[^>]*part="indicator"[^>]*>(<!--[^>]*-->)*<\/span/)
   })
 
-  test('a value that counts nothing renders no indicator', () => {
+  test('a value that counts nothing ships blank, so there is nothing to transition on load', () => {
     const markup = withoutStyles(ssr(html`<helix-badge value="0">x</helix-badge>`))
-    expect(markup).not.toContain('part="indicator"')
+    expect(markup).toContain('data-blank')
+    expect(hostAttributes(markup, 'helix-badge')).toEqual(['value'])
   })
 })

@@ -181,7 +181,11 @@ Attaches a count or a presence mark to another element, pinned to its corner.
 
 The dot is the indicator with nothing in it, drawn by
 `[part="indicator"]:empty`. An indicator with no `label` is hidden from
-assistive technology.
+assistive technology, as is one whose value counts nothing.
+
+The indicator stays mounted when there is nothing to show, carrying `data-blank`
+on the shadow content, so the styled tier transitions it out instead of having
+it disappear between frames.
 
 #### Slots
 

@@ -16,9 +16,9 @@ export interface TagProps extends Omit<BaseProps, 'onDismiss'> {
   /** Which status the tag reports. */
   appearance?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger'
   /** Whether the tag offers a control to remove itself. */
-  removable?: boolean
-  /** Accessible name for the remove control. A property rather than text read from the tag, because naming the button "Remove Draft" would mean reading `textContent` and the server has no tree to read it from. The attribute is named explicitly. Lit lowercases a property name to get an attribute rather than dash-casing it, so this would otherwise be reachable only as `removelabel`, which nobody would guess and no linter would catch. */
-  removeLabel?: string
+  dismissible?: boolean
+  /** Accessible name for the dismiss control. A property rather than text read from the tag, because naming the button "Remove Draft" would mean reading `textContent` and the server has no tree to read it from. The attribute is named explicitly. Lit lowercases a property name to get an attribute rather than dash-casing it, so this would otherwise be reachable only as `removelabel`, which nobody would guess and no linter would catch. */
+  dismissLabel?: string
   /** Height and inset of the tag. */
   size?: 'sm' | 'md'
   /** Fired when the reader asks to remove the tag. */
@@ -27,7 +27,7 @@ export interface TagProps extends Omit<BaseProps, 'onDismiss'> {
 
 export const TagRoot = createComponent<HelixTag, TagProps>({
   events: { 'helix-dismiss': 'onDismiss' },
-  properties: ['removable'],
+  properties: ['dismissible'],
   tagName: 'helix-tag',
 })
 
