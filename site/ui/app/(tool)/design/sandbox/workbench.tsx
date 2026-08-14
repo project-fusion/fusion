@@ -42,7 +42,7 @@ export function SandboxWorkbench({ families }: Props) {
     const params = new URLSearchParams(window.location.search)
     setFamilySlug(params.get('family'))
     setExampleSlug(params.get('example'))
-    setPreviewTheme(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark')
+    setPreviewTheme(document.documentElement.dataset.colorMode === 'light' ? 'light' : 'dark')
   }, [])
 
   // Side by side is unusable on a phone: at 375px a 45/55 split leaves two
@@ -193,7 +193,7 @@ export function SandboxWorkbench({ families }: Props) {
           </helix-tabs>
 
           <helix-sandbox-preview
-            data-theme={previewTheme}
+            data-color-mode={previewTheme}
             ref={preview}
             slot="preview"
           ></helix-sandbox-preview>

@@ -17,6 +17,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * SVG files in this repository, never from anything a user supplies, which is
  * what makes `unsafeSVG` the right tool rather than a risk.
  *
+ * The `<svg>` carries `fill="currentColor"` because the generator keeps only
+ * the inner markup and discards the source's own root tag, and that tag is
+ * where Phosphor puts its fill. Without it, every solid glyph in the set, 65 of
+ * them, falls back to the SVG default of black and disappears on a dark page.
+ * Shapes that set their own `fill` or `stroke` are unaffected, which is why the
+ * outline icons looked fine and hid this.
+ *
  * A name with no match renders nothing at all instead of an empty box, so a
  * typo cannot leave a hole in a layout that looks deliberate.
  *
@@ -54,6 +61,7 @@ export class HelixBaseIcon extends HelixElement {
     const labelled = this.label.length > 0
     return html`<svg
       part="svg"
+      fill="currentColor"
       viewBox=${icon.viewBox}
       role=${labelled ? 'img' : nothing}
       aria-label=${labelled ? this.label : nothing}

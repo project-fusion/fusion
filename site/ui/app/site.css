@@ -163,6 +163,23 @@ helix-app-header {
   text-align: center;
 }
 
+/* ====================================================== vertical ========= */
+
+/* A vertical's page: a title, a lede, and whatever it wants below. It gets the
+   same band of air above and below as a section of the landing page, so moving
+   between the two does not feel like landing in a different site. */
+.verticalShell {
+  padding-block: var(--site-band);
+}
+
+/* The lede runs slightly wider than body prose and slightly larger, so the
+   opening paragraph reads as the page's summary rather than as its first
+   paragraph. */
+.lede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  max-inline-size: 68ch;
+}
+
 /* ============================================================ docs ======= */
 
 /* Three columns: what you can go to, what you are reading, and where you are
@@ -215,6 +232,13 @@ helix-app-header {
   padding-block: var(--helix-space-2xs);
   padding-inline-start: var(--helix-space-sm);
   text-decoration: none;
+}
+
+/* A component's prose, which comes from its class comment and can run long.
+   Capped so a reference paragraph stays readable in a wide middle column. */
+.description {
+  max-inline-size: 68ch;
+  white-space: pre-line;
 }
 
 /* An element's own section, separated by space and a rule rather than by a
@@ -412,7 +436,11 @@ helix-app-header {
   @media (prefers-reduced-motion: no-preference) {
     .reveal {
       animation: site-reveal linear both;
-      animation-range: entry 5% cover 22%;
+      /* Both ends in `entry`, so the reveal completes as the section finishes
+         entering the viewport. Ending on `cover` made the range a fraction of
+         the element's whole pass across the screen, which on a tall window
+         left a section fully visible and still half faded. */
+      animation-range: entry 10% entry 90%;
       animation-timeline: view();
     }
   }

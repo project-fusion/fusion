@@ -11,7 +11,7 @@
   align-items: center;
   background: none;
   border: none;
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--helix-radii-full);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
@@ -25,18 +25,11 @@
   white-space: nowrap;
 }
 
-/* A fill on hover, not just a colour change. Without it the only rounded thing
-   in the group is the indicator, so an item that is not current reads as bare
-   text rather than as something to press. */
+/* Colour only. The indicator is the one surface in the group, which is what
+   lets it read as a single object travelling between items; a fill on the item
+   as well would mean two things marking the same state. */
 [part="item"]:hover {
-  background-color: var(--helix-color-surface-raised);
   color: var(--helix-color-foreground);
-}
-
-/* The current item already has the indicator behind it, and a second fill on
-   top of it would double the surface. */
-:host([selected]) [part="item"]:hover {
-  background-color: transparent;
 }
 
 :host([selected]) [part="item"] {

@@ -67,7 +67,7 @@ export class HelixBaseAccordionItem extends WithOpen(HelixElement) {
     if (this.chevronPlacement === 'none') {
       return nothing
     }
-    return html`<svg part="chevron" viewBox=${caretDown.viewBox} aria-hidden="true">
+    return html`<svg part="chevron" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
       ${unsafeSVG(caretDown.content)}
     </svg>`
   }

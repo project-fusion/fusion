@@ -16,10 +16,10 @@ const STORAGE_KEY = 'fusion-color-mode'
  */
 const apply = (mode: ColorMode): void => {
   if (mode === 'system') {
-    delete document.documentElement.dataset.theme
+    delete document.documentElement.dataset.colorMode
     return
   }
-  document.documentElement.dataset.theme = mode
+  document.documentElement.dataset.colorMode = mode
 }
 
 interface Props {

@@ -114,7 +114,7 @@ export class HelixBaseTreeItem extends HelixElement {
         >
           ${
             this.branch
-              ? html`<svg part="toggle" viewBox=${caretDown.viewBox} aria-hidden="true">
+              ? html`<svg part="toggle" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
                 ${unsafeSVG(caretDown.content)}
               </svg>`
               : nothing
