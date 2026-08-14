@@ -1,5 +1,5 @@
 import { property } from 'lit/decorators.js'
-import { HelixElement } from './helix-element.js'
+import { HelixElement } from '../helix-element/helix-element.js'
 
 /**
  * @summary Base for every element that participates in a form.

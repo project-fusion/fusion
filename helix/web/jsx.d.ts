@@ -236,33 +236,6 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
-export type HelixAvatarProps = {
-  /** Whether the avatar is a circle or a rounded square. */
-  shape?: HelixAvatar["shape"];
-  /** Edge length of the avatar. */
-  size?: HelixAvatar["size"];
-  /** Image to show. Falls back to initials if it fails to load. */
-  src?: HelixAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
-  name?: HelixAvatar["name"];
-};
-
-export type HelixAvatarSolidJsProps = {
-  /** Whether the avatar is a circle or a rounded square. */
-  "prop:shape"?: HelixAvatar["shape"];
-  /** Edge length of the avatar. */
-  "prop:size"?: HelixAvatar["size"];
-  /** Image to show. Falls back to initials if it fails to load. */
-  "prop:src"?: HelixAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
-  "prop:name"?: HelixAvatar["name"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type HelixAccordionProps = {
   /** Removes the surrounding surface, leaving only the separating rules. */
   appearance?: HelixAccordion["appearance"];
@@ -495,6 +468,48 @@ export type HelixBadgeSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixAvatarProps = {
+  /** Whether the avatar is a circle or a rounded square. */
+  shape?: HelixAvatar["shape"];
+  /** Edge length of the avatar. */
+  size?: HelixAvatar["size"];
+  /** Image to show. Falls back to initials if it fails to load. */
+  src?: HelixAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  name?: HelixAvatar["name"];
+};
+
+export type HelixAvatarSolidJsProps = {
+  /** Whether the avatar is a circle or a rounded square. */
+  "prop:shape"?: HelixAvatar["shape"];
+  /** Edge length of the avatar. */
+  "prop:size"?: HelixAvatar["size"];
+  /** Image to show. Falls back to initials if it fails to load. */
+  "prop:src"?: HelixAvatar["src"];
+  /** Name of the person or entity. Used for the label and the initials. */
+  "prop:name"?: HelixAvatar["name"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBlockquoteProps = {
+  /** URL identifying where the passage came from. */
+  cite?: HelixBlockquote["cite"];
+};
+
+export type HelixBlockquoteSolidJsProps = {
+  /** URL identifying where the passage came from. */
+  "prop:cite"?: HelixBlockquote["cite"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixBreadcrumbsItemProps = {
   /** Where the step leads. Ignored when the item is the current page. */
   href?: HelixBreadcrumbsItem["href"];
@@ -619,6 +634,29 @@ export type HelixCalloutSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixCardProps = {
+  /** How the card separates itself from the page. */
+  appearance?: HelixCard["appearance"];
+  /** Tightens the inset for dense layouts. */
+  dense?: HelixCard["dense"];
+  /** Whether media sits above the content stack or beside it. */
+  orientation?: HelixCard["orientation"];
+};
+
+export type HelixCardSolidJsProps = {
+  /** How the card separates itself from the page. */
+  "prop:appearance"?: HelixCard["appearance"];
+  /** Tightens the inset for dense layouts. */
+  "prop:dense"?: HelixCard["dense"];
+  /** Whether media sits above the content stack or beside it. */
+  "prop:orientation"?: HelixCard["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixDividerProps = {
   /** Which way the rule runs. */
   orientation?: HelixDivider["orientation"];
@@ -655,83 +693,6 @@ quiet default would have been unreachable from HTML and settable only as a
 property. An opt-in has no such problem, and it is absent by default, which
 is what every reflected property here has to be. */
   "prop:announced"?: HelixDivider["announced"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBlockquoteProps = {
-  /** URL identifying where the passage came from. */
-  cite?: HelixBlockquote["cite"];
-};
-
-export type HelixBlockquoteSolidJsProps = {
-  /** URL identifying where the passage came from. */
-  "prop:cite"?: HelixBlockquote["cite"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixCardProps = {
-  /** How the card separates itself from the page. */
-  appearance?: HelixCard["appearance"];
-  /** Tightens the inset for dense layouts. */
-  dense?: HelixCard["dense"];
-  /** Whether media sits above the content stack or beside it. */
-  orientation?: HelixCard["orientation"];
-};
-
-export type HelixCardSolidJsProps = {
-  /** How the card separates itself from the page. */
-  "prop:appearance"?: HelixCard["appearance"];
-  /** Tightens the inset for dense layouts. */
-  "prop:dense"?: HelixCard["dense"];
-  /** Whether media sits above the content stack or beside it. */
-  "prop:orientation"?: HelixCard["orientation"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixEmptyStateProps = {
-  /** Whether the state sits on a surface of its own. */
-  appearance?: HelixEmptyState["appearance"];
-  /** Whether the state is announced when it appears.
-
-On by default: an empty state almost always replaces something that was
-loading. Turn it off for one that was on the page from the start, which
-has nothing to announce because nothing changed. */
-  "no-announce"?: HelixEmptyState["noAnnounce"];
-  /** Whether the state is announced when it appears.
-
-On by default: an empty state almost always replaces something that was
-loading. Turn it off for one that was on the page from the start, which
-has nothing to announce because nothing changed. */
-  noAnnounce?: HelixEmptyState["noAnnounce"];
-};
-
-export type HelixEmptyStateSolidJsProps = {
-  /** Whether the state sits on a surface of its own. */
-  "prop:appearance"?: HelixEmptyState["appearance"];
-  /** Whether the state is announced when it appears.
-
-On by default: an empty state almost always replaces something that was
-loading. Turn it off for one that was on the page from the start, which
-has nothing to announce because nothing changed. */
-  "bool:no-announce"?: HelixEmptyState["noAnnounce"];
-  /** Whether the state is announced when it appears.
-
-On by default: an empty state almost always replaces something that was
-loading. Turn it off for one that was on the page from the start, which
-has nothing to announce because nothing changed. */
-  "prop:noAnnounce"?: HelixEmptyState["noAnnounce"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -891,18 +852,38 @@ is two intentions in one element. */
   textContent?: string | number;
 };
 
-export type HelixIconProps = {
-  /** Name of the icon in the Helix set. */
-  name?: HelixIcon["name"];
-  /** Accessible name, for an icon that is not decorative. */
-  label?: HelixIcon["label"];
+export type HelixEmptyStateProps = {
+  /** Whether the state sits on a surface of its own. */
+  appearance?: HelixEmptyState["appearance"];
+  /** Whether the state is announced when it appears.
+
+On by default: an empty state almost always replaces something that was
+loading. Turn it off for one that was on the page from the start, which
+has nothing to announce because nothing changed. */
+  "no-announce"?: HelixEmptyState["noAnnounce"];
+  /** Whether the state is announced when it appears.
+
+On by default: an empty state almost always replaces something that was
+loading. Turn it off for one that was on the page from the start, which
+has nothing to announce because nothing changed. */
+  noAnnounce?: HelixEmptyState["noAnnounce"];
 };
 
-export type HelixIconSolidJsProps = {
-  /** Name of the icon in the Helix set. */
-  "prop:name"?: HelixIcon["name"];
-  /** Accessible name, for an icon that is not decorative. */
-  "prop:label"?: HelixIcon["label"];
+export type HelixEmptyStateSolidJsProps = {
+  /** Whether the state sits on a surface of its own. */
+  "prop:appearance"?: HelixEmptyState["appearance"];
+  /** Whether the state is announced when it appears.
+
+On by default: an empty state almost always replaces something that was
+loading. Turn it off for one that was on the page from the start, which
+has nothing to announce because nothing changed. */
+  "bool:no-announce"?: HelixEmptyState["noAnnounce"];
+  /** Whether the state is announced when it appears.
+
+On by default: an empty state almost always replaces something that was
+loading. Turn it off for one that was on the page from the start, which
+has nothing to announce because nothing changed. */
+  "prop:noAnnounce"?: HelixEmptyState["noAnnounce"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -979,6 +960,34 @@ anything a consumer sets. */
   textContent?: string | number;
 };
 
+export type HelixIconProps = {
+  /** Name of the icon in the Helix set. */
+  name?: HelixIcon["name"];
+  /** Accessible name, for an icon that is not decorative. */
+  label?: HelixIcon["label"];
+};
+
+export type HelixIconSolidJsProps = {
+  /** Name of the icon in the Helix set. */
+  "prop:name"?: HelixIcon["name"];
+  /** Accessible name, for an icon that is not decorative. */
+  "prop:label"?: HelixIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixListItemProps = {};
+
+export type HelixListItemSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixKbdProps = {};
 
 export type HelixKbdSolidJsProps = {
@@ -1000,6 +1009,21 @@ export type HelixListSolidJsProps = {
   "prop:divided"?: HelixList["divided"];
   /** Accessible name for the set. */
   "prop:label"?: HelixList["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixTableCellProps = {
+  /** Whether the cell heads its column. */
+  header?: HelixTableCell["header"];
+};
+
+export type HelixTableCellSolidJsProps = {
+  /** Whether the cell heads its column. */
+  "prop:header"?: HelixTableCell["header"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1041,15 +1065,6 @@ export type HelixQuoteSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixListItemProps = {};
-
-export type HelixListItemSolidJsProps = {
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type HelixSpinnerProps = {
   /** Diameter relative to the surrounding text. */
   size?: HelixSpinner["size"];
@@ -1062,49 +1077,6 @@ export type HelixSpinnerSolidJsProps = {
   "prop:size"?: HelixSpinner["size"];
   /** Accessible name, announced while the work is outstanding. */
   "prop:label"?: HelixSpinner["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixStatProps = {};
-
-export type HelixStatSolidJsProps = {
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixStatGroupProps = {
-  /** Whether the figures are separated by a rule as well as by space. */
-  divided?: HelixStatGroup["divided"];
-  /** Accessible name for the set. */
-  label?: HelixStatGroup["label"];
-};
-
-export type HelixStatGroupSolidJsProps = {
-  /** Whether the figures are separated by a rule as well as by space. */
-  "prop:divided"?: HelixStatGroup["divided"];
-  /** Accessible name for the set. */
-  "prop:label"?: HelixStatGroup["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixTableCellProps = {
-  /** Whether the cell heads its column. */
-  header?: HelixTableCell["header"];
-};
-
-export type HelixTableCellSolidJsProps = {
-  /** Whether the cell heads its column. */
-  "prop:header"?: HelixTableCell["header"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1140,6 +1112,152 @@ equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it. */
 export type HelixTableRowProps = {};
 
 export type HelixTableRowSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixStatGroupProps = {
+  /** Whether the figures are separated by a rule as well as by space. */
+  divided?: HelixStatGroup["divided"];
+  /** Accessible name for the set. */
+  label?: HelixStatGroup["label"];
+};
+
+export type HelixStatGroupSolidJsProps = {
+  /** Whether the figures are separated by a rule as well as by space. */
+  "prop:divided"?: HelixStatGroup["divided"];
+  /** Accessible name for the set. */
+  "prop:label"?: HelixStatGroup["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixStatProps = {};
+
+export type HelixStatSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixTabsPanelProps = {
+  /** Pairs the panel with the tab of the same value. */
+  value?: HelixTabsPanel["value"];
+  /** Whether this panel is the visible one. */
+  selected?: HelixTabsPanel["selected"];
+};
+
+export type HelixTabsPanelSolidJsProps = {
+  /** Pairs the panel with the tab of the same value. */
+  "prop:value"?: HelixTabsPanel["value"];
+  /** Whether this panel is the visible one. */
+  "prop:selected"?: HelixTabsPanel["selected"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixTabs` component event */
+export type HelixTabsElementEvent<E = Event> = TypedEvent<HelixTabs, E>;
+/** `helix-select` event type */
+export type HelixTabsHelixSelectElementEvent =
+  HelixTabsElementEvent<HelixSelectEvent>;
+
+export type HelixTabsProps = {
+  /** Accessible name for the tab list. */
+  label?: HelixTabs["label"];
+  /** Value of the selected tab. */
+  value?: HelixTabs["value"];
+  /** Whether arrowing to a tab also selects it.
+
+Automatic is the default because showing a panel is usually cheap. Set this
+where it is not, so a reader arrowing past four tabs does not load four
+panels on the way. */
+  manual?: HelixTabs["manual"];
+
+  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
+  "onhelix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
+};
+
+export type HelixTabsSolidJsProps = {
+  /** Accessible name for the tab list. */
+  "prop:label"?: HelixTabs["label"];
+  /** Value of the selected tab. */
+  "prop:value"?: HelixTabs["value"];
+  /** Whether arrowing to a tab also selects it.
+
+Automatic is the default because showing a panel is usually cheap. Set this
+where it is not, so a reader arrowing past four tabs does not load four
+panels on the way. */
+  "prop:manual"?: HelixTabs["manual"];
+  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
+  "on:helix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixTextProps = {
+  /** Which element to render. Decides the outline and the semantics. */
+  as?: HelixText["as"];
+  /** Type treatment. Defaults to the one that matches `as`. */
+  appearance?: HelixText["appearance"];
+  /** Color role. Separate from `appearance`, because color carries state. */
+  tone?: HelixText["tone"];
+};
+
+export type HelixTextSolidJsProps = {
+  /** Which element to render. Decides the outline and the semantics. */
+  "prop:as"?: HelixText["as"];
+  /** Type treatment. Defaults to the one that matches `as`. */
+  "prop:appearance"?: HelixText["appearance"];
+  /** Color role. Separate from `appearance`, because color carries state. */
+  "prop:tone"?: HelixText["tone"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixTabsTab` component event */
+export type HelixTabsTabElementEvent<E = Event> = TypedEvent<HelixTabsTab, E>;
+/** `helix-select` event type */
+export type HelixTabsTabHelixSelectElementEvent =
+  HelixTabsTabElementEvent<HelixSelectEvent>;
+
+export type HelixTabsTabProps = {
+  /** Identifies the tab, and pairs it with the panel of the same value. */
+  value?: HelixTabsTab["value"];
+  /** Whether this tab is the current one. */
+  selected?: HelixTabsTab["selected"];
+  /** Whether the tab can be chosen. */
+  disabled?: HelixTabsTab["disabled"];
+
+  /** Fired when the tab is chosen. */
+  "onhelix-select"?: (e: HelixTabsTabHelixSelectElementEvent) => void;
+};
+
+export type HelixTabsTabSolidJsProps = {
+  /** Identifies the tab, and pairs it with the panel of the same value. */
+  "prop:value"?: HelixTabsTab["value"];
+  /** Whether this tab is the current one. */
+  "prop:selected"?: HelixTabsTab["selected"];
+  /** Whether the tab can be chosen. */
+  "prop:disabled"?: HelixTabsTab["disabled"];
+  /** Fired when the tab is chosen. */
+  "on:helix-select"?: (e: HelixTabsTabHelixSelectElementEvent) => void;
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -1220,195 +1338,6 @@ only as `removelabel`, which nobody would guess and no linter would catch. */
   textContent?: string | number;
 };
 
-export type HelixTabsPanelProps = {
-  /** Pairs the panel with the tab of the same value. */
-  value?: HelixTabsPanel["value"];
-  /** Whether this panel is the visible one. */
-  selected?: HelixTabsPanel["selected"];
-};
-
-export type HelixTabsPanelSolidJsProps = {
-  /** Pairs the panel with the tab of the same value. */
-  "prop:value"?: HelixTabsPanel["value"];
-  /** Whether this panel is the visible one. */
-  "prop:selected"?: HelixTabsPanel["selected"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-/** `HelixTabsTab` component event */
-export type HelixTabsTabElementEvent<E = Event> = TypedEvent<HelixTabsTab, E>;
-/** `helix-select` event type */
-export type HelixTabsTabHelixSelectElementEvent =
-  HelixTabsTabElementEvent<HelixSelectEvent>;
-
-export type HelixTabsTabProps = {
-  /** Identifies the tab, and pairs it with the panel of the same value. */
-  value?: HelixTabsTab["value"];
-  /** Whether this tab is the current one. */
-  selected?: HelixTabsTab["selected"];
-  /** Whether the tab can be chosen. */
-  disabled?: HelixTabsTab["disabled"];
-
-  /** Fired when the tab is chosen. */
-  "onhelix-select"?: (e: HelixTabsTabHelixSelectElementEvent) => void;
-};
-
-export type HelixTabsTabSolidJsProps = {
-  /** Identifies the tab, and pairs it with the panel of the same value. */
-  "prop:value"?: HelixTabsTab["value"];
-  /** Whether this tab is the current one. */
-  "prop:selected"?: HelixTabsTab["selected"];
-  /** Whether the tab can be chosen. */
-  "prop:disabled"?: HelixTabsTab["disabled"];
-  /** Fired when the tab is chosen. */
-  "on:helix-select"?: (e: HelixTabsTabHelixSelectElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixTextProps = {
-  /** Which element to render. Decides the outline and the semantics. */
-  as?: HelixText["as"];
-  /** Type treatment. Defaults to the one that matches `as`. */
-  appearance?: HelixText["appearance"];
-  /** Color role. Separate from `appearance`, because color carries state. */
-  tone?: HelixText["tone"];
-};
-
-export type HelixTextSolidJsProps = {
-  /** Which element to render. Decides the outline and the semantics. */
-  "prop:as"?: HelixText["as"];
-  /** Type treatment. Defaults to the one that matches `as`. */
-  "prop:appearance"?: HelixText["appearance"];
-  /** Color role. Separate from `appearance`, because color carries state. */
-  "prop:tone"?: HelixText["tone"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixToolbarProps = {
-  /** Accessible name for the toolbar. */
-  label?: HelixToolbar["label"];
-  /** Which way the arrow keys move. */
-  orientation?: HelixToolbar["orientation"];
-};
-
-export type HelixToolbarSolidJsProps = {
-  /** Accessible name for the toolbar. */
-  "prop:label"?: HelixToolbar["label"];
-  /** Which way the arrow keys move. */
-  "prop:orientation"?: HelixToolbar["orientation"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-/** `HelixTabs` component event */
-export type HelixTabsElementEvent<E = Event> = TypedEvent<HelixTabs, E>;
-/** `helix-select` event type */
-export type HelixTabsHelixSelectElementEvent =
-  HelixTabsElementEvent<HelixSelectEvent>;
-
-export type HelixTabsProps = {
-  /** Accessible name for the tab list. */
-  label?: HelixTabs["label"];
-  /** Value of the selected tab. */
-  value?: HelixTabs["value"];
-  /** Whether arrowing to a tab also selects it.
-
-Automatic is the default because showing a panel is usually cheap. Set this
-where it is not, so a reader arrowing past four tabs does not load four
-panels on the way. */
-  manual?: HelixTabs["manual"];
-
-  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
-  "onhelix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
-};
-
-export type HelixTabsSolidJsProps = {
-  /** Accessible name for the tab list. */
-  "prop:label"?: HelixTabs["label"];
-  /** Value of the selected tab. */
-  "prop:value"?: HelixTabs["value"];
-  /** Whether arrowing to a tab also selects it.
-
-Automatic is the default because showing a panel is usually cheap. Set this
-where it is not, so a reader arrowing past four tabs does not load four
-panels on the way. */
-  "prop:manual"?: HelixTabs["manual"];
-  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
-  "on:helix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-/** `HelixTreeItem` component event */
-export type HelixTreeItemElementEvent<E = Event> = TypedEvent<HelixTreeItem, E>;
-/** `helix-select` event type */
-export type HelixTreeItemHelixSelectElementEvent =
-  HelixTreeItemElementEvent<HelixSelectEvent>;
-
-export type HelixTreeItemProps = {
-  /** Identifies the item to the consumer, carried in `SelectionChange`. */
-  value?: HelixTreeItem["value"];
-  /** Whether this item is the current one. */
-  selected?: HelixTreeItem["selected"];
-  /** Whether a branch is showing its children. */
-  expanded?: HelixTreeItem["expanded"];
-  /** Depth from the root, set by the tree so indentation needs no CSS nesting.
-
-Not reflected. The tree assigns this after it upgrades, so an attribute
-here would be a change to markup the consumer rendered and hydration would
-report it. The indent it drives is written onto the row instead, inside the
-shadow root, which is not part of the tree React hydrates. */
-  level?: HelixTreeItem["level"];
-  /** Whether this item holds the tree's single tab stop. */
-  focusable?: HelixTreeItem["focusable"];
-
-  /** Fired when the item is chosen. */
-  "onhelix-select"?: (e: HelixTreeItemHelixSelectElementEvent) => void;
-};
-
-export type HelixTreeItemSolidJsProps = {
-  /** Identifies the item to the consumer, carried in `SelectionChange`. */
-  "prop:value"?: HelixTreeItem["value"];
-  /** Whether this item is the current one. */
-  "prop:selected"?: HelixTreeItem["selected"];
-  /** Whether a branch is showing its children. */
-  "prop:expanded"?: HelixTreeItem["expanded"];
-  /** Depth from the root, set by the tree so indentation needs no CSS nesting.
-
-Not reflected. The tree assigns this after it upgrades, so an attribute
-here would be a change to markup the consumer rendered and hydration would
-report it. The indent it drives is written onto the row instead, inside the
-shadow root, which is not part of the tree React hydrates. */
-  "prop:level"?: HelixTreeItem["level"];
-  /** Whether this item holds the tree's single tab stop. */
-  "prop:focusable"?: HelixTreeItem["focusable"];
-  /** Fired when the item is chosen. */
-  "on:helix-select"?: (e: HelixTreeItemHelixSelectElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 /** `HelixToggleGroup` component event */
 export type HelixToggleGroupElementEvent<E = Event> = TypedEvent<
   HelixToggleGroup,
@@ -1480,6 +1409,77 @@ export type HelixTreeSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixToolbarProps = {
+  /** Accessible name for the toolbar. */
+  label?: HelixToolbar["label"];
+  /** Which way the arrow keys move. */
+  orientation?: HelixToolbar["orientation"];
+};
+
+export type HelixToolbarSolidJsProps = {
+  /** Accessible name for the toolbar. */
+  "prop:label"?: HelixToolbar["label"];
+  /** Which way the arrow keys move. */
+  "prop:orientation"?: HelixToolbar["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixTreeItem` component event */
+export type HelixTreeItemElementEvent<E = Event> = TypedEvent<HelixTreeItem, E>;
+/** `helix-select` event type */
+export type HelixTreeItemHelixSelectElementEvent =
+  HelixTreeItemElementEvent<HelixSelectEvent>;
+
+export type HelixTreeItemProps = {
+  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  value?: HelixTreeItem["value"];
+  /** Whether this item is the current one. */
+  selected?: HelixTreeItem["selected"];
+  /** Whether a branch is showing its children. */
+  expanded?: HelixTreeItem["expanded"];
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting.
+
+Not reflected. The tree assigns this after it upgrades, so an attribute
+here would be a change to markup the consumer rendered and hydration would
+report it. The indent it drives is written onto the row instead, inside the
+shadow root, which is not part of the tree React hydrates. */
+  level?: HelixTreeItem["level"];
+  /** Whether this item holds the tree's single tab stop. */
+  focusable?: HelixTreeItem["focusable"];
+
+  /** Fired when the item is chosen. */
+  "onhelix-select"?: (e: HelixTreeItemHelixSelectElementEvent) => void;
+};
+
+export type HelixTreeItemSolidJsProps = {
+  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  "prop:value"?: HelixTreeItem["value"];
+  /** Whether this item is the current one. */
+  "prop:selected"?: HelixTreeItem["selected"];
+  /** Whether a branch is showing its children. */
+  "prop:expanded"?: HelixTreeItem["expanded"];
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting.
+
+Not reflected. The tree assigns this after it upgrades, so an attribute
+here would be a change to markup the consumer rendered and hydration would
+report it. The indent it drives is written onto the row instead, inside the
+shadow root, which is not part of the tree React hydrates. */
+  "prop:level"?: HelixTreeItem["level"];
+  /** Whether this item holds the tree's single tab stop. */
+  "prop:focusable"?: HelixTreeItem["focusable"];
+  /** Fired when the item is chosen. */
+  "on:helix-select"?: (e: HelixTreeItemHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixToggle` component event */
 export type HelixToggleElementEvent<E = Event> = TypedEvent<HelixToggle, E>;
 /** `helix-select` event type */
@@ -1515,46 +1515,6 @@ export type HelixToggleSolidJsProps = {
 };
 
 export type CustomElements = {
-  /**
-   * Initials scale with the avatar rather than being sized per size, because the
-   * font size is set in `em` against the avatar's own dimension. One rule covers
-   * every size, including one a consumer sets themselves through
-   * `--avatar-size`.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `shape`: Whether the avatar is a circle or a rounded square.
-   * - `size`: Edge length of the avatar.
-   * - `src`: Image to show. Falls back to initials if it fails to load.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: Replaces the image and initials entirely, for an icon.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--avatar-background-color`: Fill behind the initials. (default: `undefined`)
-   * - `--avatar-size`: Edge length of the avatar. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `avatar`: The avatar body.
-   * - `image`: The image, when one is loading or loaded.
-   * - `initials`: The initials shown when there is no usable image.
-   */
-  "helix-avatar": Partial<
-    HelixAvatarProps & BaseProps<HelixAvatar> & BaseEvents
-  >;
-
   /**
    * Items sit in a single bordered stack, sharing one rule between neighbours
    * rather than each drawing its own, so the seam between two items is one pixel
@@ -1779,6 +1739,82 @@ export type CustomElements = {
   "helix-badge": Partial<HelixBadgeProps & BaseProps<HelixBadge> & BaseEvents>;
 
   /**
+   * Initials scale with the avatar rather than being sized per size, because the
+   * font size is set in `em` against the avatar's own dimension. One rule covers
+   * every size, including one a consumer sets themselves through
+   * `--avatar-size`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `shape`: Whether the avatar is a circle or a rounded square.
+   * - `size`: Edge length of the avatar.
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--avatar-background-color`: Fill behind the initials. (default: `undefined`)
+   * - `--avatar-size`: Edge length of the avatar. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
+   */
+  "helix-avatar": Partial<
+    HelixAvatarProps & BaseProps<HelixAvatar> & BaseEvents
+  >;
+
+  /**
+   * Set larger than body text on the display face, because a pulled quotation is
+   * a change of voice and the type is what says so. No quotation marks are drawn:
+   * the size and the space around it already set the passage apart, and marks on
+   * top of that are the same thing said twice.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `cite`: URL identifying where the passage came from.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The quoted passage.
+   * - `attribution`: Who said it, and where.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--blockquote-size`: Size of the quoted passage. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `blockquote`: The quotation.
+   * - `attribution`: The footer carrying the source.
+   */
+  "helix-blockquote": Partial<
+    HelixBlockquoteProps & BaseProps<HelixBlockquote> & BaseEvents
+  >;
+
+  /**
    * The separator is hidden on the first item with `:host(:first-child)`, so no
    * item needs to know its own index and the parent needs no coordination.
    *
@@ -1951,84 +1987,6 @@ export type CustomElements = {
   >;
 
   /**
-   * A one-pixel rule in the border color, running the full inline size by
-   * default. A vertical divider stretches to its flex parent instead of setting
-   * its own height, so it matches whatever it sits beside without being told how
-   * tall that is.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `orientation`: Which way the rule runs.
-   * - `announced`: Whether the rule is announced as a separator.
-   *
-   * Off by default, and out of the accessibility tree. Most rules on a page
-   * separate nothing: they underline a heading or close a section that space
-   * had already closed, and announcing every one as a separator is noise a
-   * screen-reader user has to walk past.
-   *
-   * Stated this way round rather than as `decorative`, which is how the
-   * reference implementation has it, because a boolean attribute cannot be
-   * turned off: `decorative="false"` is still `true` to the parser, so the
-   * quiet default would have been unreachable from HTML and settable only as a
-   * property. An opt-in has no such problem, and it is absent by default, which
-   * is what every reflected property here has to be.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--divider-color`: Color of the rule. (default: `undefined`)
-   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `line`: The rule itself.
-   */
-  "helix-divider": Partial<
-    HelixDividerProps & BaseProps<HelixDivider> & BaseEvents
-  >;
-
-  /**
-   * Set larger than body text on the display face, because a pulled quotation is
-   * a change of voice and the type is what says so. No quotation marks are drawn:
-   * the size and the space around it already set the passage apart, and marks on
-   * top of that are the same thing said twice.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `cite`: URL identifying where the passage came from.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The quoted passage.
-   * - `attribution`: Who said it, and where.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--blockquote-size`: Size of the quoted passage. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `blockquote`: The quotation.
-   * - `attribution`: The footer carrying the source.
-   */
-  "helix-blockquote": Partial<
-    HelixBlockquoteProps & BaseProps<HelixBlockquote> & BaseEvents
-  >;
-
-  /**
    * Regions are slots: `media`, `header`, the default slot for content, and
    * `footer`. An omitted region takes no space, so a card with only content needs
    * no wrapper markup at all.
@@ -2072,38 +2030,45 @@ export type CustomElements = {
   "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents>;
 
   /**
-   * Centered and given room, because an empty state is the only thing on screen
-   * and crowding it against the top edge makes the region look broken rather than
-   * empty.
+   * A one-pixel rule in the border color, running the full inline size by
+   * default. A vertical divider stretches to its flex parent instead of setting
+   * its own height, so it matches whatever it sits beside without being told how
+   * tall that is.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the state sits on a surface of its own.
-   * - `no-announce`/`noAnnounce`: Whether the state is announced when it appears.
+   * - `orientation`: Which way the rule runs.
+   * - `announced`: Whether the rule is announced as a separator.
    *
-   * On by default: an empty state almost always replaces something that was
-   * loading. Turn it off for one that was on the page from the start, which
-   * has nothing to announce because nothing changed.
+   * Off by default, and out of the accessibility tree. Most rules on a page
+   * separate nothing: they underline a heading or close a section that space
+   * had already closed, and announcing every one as a separator is noise a
+   * screen-reader user has to walk past.
    *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `icon`: A mark above the heading.
-   * - `heading`: What is missing.
-   * - `(default)`: Why, and what to do about it.
-   * - `actions`: The way out.
+   * Stated this way round rather than as `decorative`, which is how the
+   * reference implementation has it, because a boolean attribute cannot be
+   * turned off: `decorative="false"` is still `true` to the parser, so the
+   * quiet default would have been unreachable from HTML and settable only as a
+   * property. An opt-in has no such problem, and it is absent by default, which
+   * is what every reflected property here has to be.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--empty-state-inset`: Space around the whole block. (default: `undefined`)
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
+   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `line`: The rule itself.
    */
-  "helix-empty-state": Partial<
-    HelixEmptyStateProps & BaseProps<HelixEmptyState> & BaseEvents
+  "helix-divider": Partial<
+    HelixDividerProps & BaseProps<HelixDivider> & BaseEvents
   >;
 
   /**
@@ -2253,31 +2218,39 @@ export type CustomElements = {
   "helix-grid": Partial<HelixGridProps & BaseProps<HelixGrid> & BaseEvents>;
 
   /**
-   * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
-   * color of the text it sits in and a container can resize it without reaching
-   * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
-   * proportion as the button's own size changes.
+   * Centered and given room, because an empty state is the only thing on screen
+   * and crowding it against the top edge makes the region look broken rather than
+   * empty.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name of the icon in the Helix set.
-   * - `label`: Accessible name, for an icon that is not decorative.
+   * - `appearance`: Whether the state sits on a surface of its own.
+   * - `no-announce`/`noAnnounce`: Whether the state is announced when it appears.
+   *
+   * On by default: an empty state almost always replaces something that was
+   * loading. Turn it off for one that was on the page from the start, which
+   * has nothing to announce because nothing changed.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `icon`: A mark above the heading.
+   * - `heading`: What is missing.
+   * - `(default)`: Why, and what to do about it.
+   * - `actions`: The way out.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--icon-size`: Edge length of the icon's box. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `svg`: The rendered SVG.
+   * - `--empty-state-inset`: Space around the whole block. (default: `undefined`)
    */
-  "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents>;
+  "helix-empty-state": Partial<
+    HelixEmptyStateProps & BaseProps<HelixEmptyState> & BaseEvents
+  >;
 
   /**
    * Top-level rather than `Button.Icon`, because a namespace means composition:
@@ -2344,6 +2317,57 @@ export type CustomElements = {
   >;
 
   /**
+   * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
+   * color of the text it sits in and a container can resize it without reaching
+   * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
+   * proportion as the button's own size changes.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `name`: Name of the icon in the Helix set.
+   * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--icon-size`: Edge length of the icon's box. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rendered SVG.
+   */
+  "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents>;
+
+  /**
+   * A grid rather than a flex row, so the supporting text lines up under the
+   * label rather than under the leading icon. The leading and trailing regions
+   * hold their own width and the middle takes the rest.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Leading content, usually an icon or an avatar.
+   * - `(default)`: The label.
+   * - `supporting`: Secondary text under the label.
+   * - `end`: Trailing content.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
+   */
+  "helix-list-item": Partial<
+    HelixListItemProps & BaseProps<HelixListItem> & BaseEvents
+  >;
+
+  /**
    * Drawn as a physical key: a hairline, a sunken fill, and one inset shadow
    * along the bottom edge that reads as depth without becoming a picture of a
    * key.
@@ -2398,6 +2422,27 @@ export type CustomElements = {
    * - `--list-gap`: Space between rows. (default: `undefined`)
    */
   "helix-list": Partial<HelixListProps & BaseProps<HelixList> & BaseEvents>;
+
+  /**
+   * Hairline rules between rows and no fill, per the rule that depth comes from a
+   * single border rather than from elevation. A dense table earns its density by
+   * decorating none of it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `header`: Whether the cell heads its column.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The cell's content.
+   */
+  "helix-table-cell": Partial<
+    HelixTableCellProps & BaseProps<HelixTableCell> & BaseEvents
+  >;
 
   /**
    * A sweep rather than a pulse. A block fading in and out reads as something
@@ -2459,30 +2504,6 @@ export type CustomElements = {
   "helix-quote": Partial<HelixQuoteProps & BaseProps<HelixQuote> & BaseEvents>;
 
   /**
-   * A grid rather than a flex row, so the supporting text lines up under the
-   * label rather than under the leading icon. The leading and trailing regions
-   * hold their own width and the middle takes the rest.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `start`: Leading content, usually an icon or an avatar.
-   * - `(default)`: The label.
-   * - `supporting`: Secondary text under the label.
-   * - `end`: Trailing content.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
-   */
-  "helix-list-item": Partial<
-    HelixListItemProps & BaseProps<HelixListItem> & BaseEvents
-  >;
-
-  /**
    * Sized in `em`, so it matches whatever text it sits beside without being told.
    * The color is `currentColor` for the same reason: a spinner inside a primary
    * button is on the accent, and one in body copy is not, and neither should have
@@ -2513,79 +2534,6 @@ export type CustomElements = {
    */
   "helix-spinner": Partial<
     HelixSpinnerProps & BaseProps<HelixSpinner> & BaseEvents
-  >;
-
-  /**
-   * The value is set on the display face at a size the type scale does not reach,
-   * because a figure is the one place on a page where the number is the design.
-   * The label sits above it in the label ramp, quiet and wide-tracked, so the
-   * pair reads as one object rather than as two lines of text.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The value.
-   * - `label`: What the value measures.
-   * - `unit`: The unit, set beside the value.
-   * - `detail`: A change, comparison, or note under the label.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--stat-value-size`: Size of the figure. (default: `undefined`)
-   */
-  "helix-stat": Partial<HelixStatProps & BaseProps<HelixStat> & BaseEvents>;
-
-  /**
-   * Wraps rather than scrolls, and each figure keeps its own width instead of
-   * every one taking an equal share: a set of figures is read by comparing them,
-   * and equal columns make a four-digit number and a two-digit one look like the
-   * same quantity.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `divided`: Whether the figures are separated by a rule as well as by space.
-   * - `label`: Accessible name for the set.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The stats.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--stat-group-gap`: Space between figures. (default: `undefined`)
-   */
-  "helix-stat-group": Partial<
-    HelixStatGroupProps & BaseProps<HelixStatGroup> & BaseEvents
-  >;
-
-  /**
-   * Hairline rules between rows and no fill, per the rule that depth comes from a
-   * single border rather than from elevation. A dense table earns its density by
-   * decorating none of it.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `header`: Whether the cell heads its column.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The cell's content.
-   */
-  "helix-table-cell": Partial<
-    HelixTableCellProps & BaseProps<HelixTableCell> & BaseEvents
   >;
 
   /**
@@ -2639,55 +2587,56 @@ export type CustomElements = {
   >;
 
   /**
-   * Five appearances, drawn as a tinted fill derived from the status color with
-   * `color-mix` rather than from a token per status. The alternative was eight
-   * new tokens whose only job was to be a lighter version of one that already
-   * existed, and they would have had to be re-derived by every theme.
+   * Wraps rather than scrolls, and each figure keeps its own width instead of
+   * every one taking an equal share: a set of figures is read by comparing them,
+   * and equal columns make a four-digit number and a two-digit one look like the
+   * same quantity.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Which status the tag reports.
-   * - `size`: Height and inset of the tag.
-   * - `removable`: Whether the tag offers a control to remove itself.
-   * - `remove-label`/`removeLabel`: Accessible name for the remove control.
-   *
-   * A property rather than text read from the tag, because naming the button
-   * "Remove Draft" would mean reading `textContent` and the server has no tree
-   * to read it from.
-   *
-   * The attribute is named explicitly. Lit lowercases a property name to get an
-   * attribute rather than dash-casing it, so this would otherwise be reachable
-   * only as `removelabel`, which nobody would guess and no linter would catch.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-remove`: Fired when the reader asks to remove the tag.
+   * - `divided`: Whether the figures are separated by a rule as well as by space.
+   * - `label`: Accessible name for the set.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The tag's label.
+   * - `(default)`: The stats.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
-   * - `--tag-foreground-color`: Label color. (default: `undefined`)
-   * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `remove`: The remove button, when `removable`.
+   * - `--stat-group-gap`: Space between figures. (default: `undefined`)
    */
-  "helix-tag": Partial<HelixTagProps & BaseProps<HelixTag> & BaseEvents>;
+  "helix-stat-group": Partial<
+    HelixStatGroupProps & BaseProps<HelixStatGroup> & BaseEvents
+  >;
+
+  /**
+   * The value is set on the display face at a size the type scale does not reach,
+   * because a figure is the one place on a page where the number is the design.
+   * The label sits above it in the label ramp, quiet and wide-tracked, so the
+   * pair reads as one object rather than as two lines of text.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The value.
+   * - `label`: What the value measures.
+   * - `unit`: The unit, set beside the value.
+   * - `detail`: A change, comparison, or note under the label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--stat-value-size`: Size of the figure. (default: `undefined`)
+   */
+  "helix-stat": Partial<HelixStatProps & BaseProps<HelixStat> & BaseEvents>;
 
   /**
    * Selection is marked with a rule under the active tab rather than a filled
@@ -2726,38 +2675,35 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Identifies the tab, and pairs it with the panel of the same value.
-   * - `selected`: Whether this tab is the current one.
-   * - `disabled`: Whether the tab can be chosen.
+   * - `label`: Accessible name for the tab list.
+   * - `value`: Value of the selected tab.
+   * - `manual`: Whether arrowing to a tab also selects it.
+   *
+   * Automatic is the default because showing a panel is usually cheap. Set this
+   * where it is not, so a reader arrowing past four tabs does not load four
+   * panels on the way.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the tab is chosen.
+   * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The tab's label.
-   *
-   * ## Methods
-   *
-   * Methods that can be called to access component functionality.
-   *
-   * - `focusTab() => void`: Moves focus to this tab.
-   * - `select() => void`: Selects this tab and announces it.
+   * - `(default)`: The tabs.
+   * - `panels`: The panels.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `tab`: The tab itself.
+   * - `tabs`: The tab list.
+   * - `panels`: The panel container.
    */
-  "helix-tabs-tab": Partial<
-    HelixTabsTabProps & BaseProps<HelixTabsTab> & BaseEvents
-  >;
+  "helix-tabs": Partial<HelixTabsProps & BaseProps<HelixTabs> & BaseEvents>;
 
   /**
    * Two properties, and they answer different questions. `as` is the element,
@@ -2810,39 +2756,6 @@ export type CustomElements = {
   "helix-text": Partial<HelixTextProps & BaseProps<HelixText> & BaseEvents>;
 
   /**
-   * No chrome of its own: a toolbar is a place controls sit, and a border around
-   * them would be a second frame inside whatever already frames the bar.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `label`: Accessible name for the toolbar.
-   * - `orientation`: Which way the arrow keys move.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The toolbar's controls.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--toolbar-gap`: Space between controls. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `toolbar`: The toolbar container.
-   */
-  "helix-toolbar": Partial<
-    HelixToolbarProps & BaseProps<HelixToolbar> & BaseEvents
-  >;
-
-  /**
    * Selection is marked with a rule under the active tab rather than a filled
    * pill, which keeps the row flat and lets the underline animate between tabs as
    * a movement instead of two separate fills.
@@ -2851,101 +2764,89 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `label`: Accessible name for the tab list.
-   * - `value`: Value of the selected tab.
-   * - `manual`: Whether arrowing to a tab also selects it.
-   *
-   * Automatic is the default because showing a panel is usually cheap. Set this
-   * where it is not, so a reader arrowing past four tabs does not load four
-   * panels on the way.
+   * - `value`: Identifies the tab, and pairs it with the panel of the same value.
+   * - `selected`: Whether this tab is the current one.
+   * - `disabled`: Whether the tab can be chosen.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
+   * - `helix-select`: Fired when the tab is chosen.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The tabs.
-   * - `panels`: The panels.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `tabs`: The tab list.
-   * - `panels`: The panel container.
-   */
-  "helix-tabs": Partial<HelixTabsProps & BaseProps<HelixTabs> & BaseEvents>;
-
-  /**
-   * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
-   * node moved to another depth re-indents without any nested selector. Nesting
-   * selectors by depth is the usual approach and stops working at whatever depth
-   * nobody wrote a rule for.
-   *
-   * The twisty rotates rather than swapping glyphs, so opening a branch is a
-   * short movement instead of a substitution. Motion carries the state change;
-   * the row itself stays flat.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
-   * - `selected`: Whether this item is the current one.
-   * - `expanded`: Whether a branch is showing its children.
-   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
-   *
-   * Not reflected. The tree assigns this after it upgrades, so an attribute
-   * here would be a change to markup the consumer rendered and hydration would
-   * report it. The indent it drives is written onto the row instead, inside the
-   * shadow root, which is not part of the tree React hydrates.
-   * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
-   * - `isBranch`: Whether this node has children. (property only) (readonly)
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-select`: Fired when the item is chosen.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The item's label.
-   * - `children`: Nested items, which make this a branch.
+   * - `(default)`: The tab's label.
    *
    * ## Methods
    *
    * Methods that can be called to access component functionality.
    *
-   * - `focusItem() => void`: Moves focus to this node.
-   * - `select() => void`: Selects this node and announces it.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   * - `focusTab() => void`: Moves focus to this tab.
+   * - `select() => void`: Selects this tab and announces it.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The node, and the focus target.
-   * - `row`: The clickable label row.
-   * - `toggle`: The expand and collapse control.
-   * - `label`: The label text.
-   * - `group`: The container for nested items.
+   * - `tab`: The tab itself.
    */
-  "helix-tree-item": Partial<
-    HelixTreeItemProps & BaseProps<HelixTreeItem> & BaseEvents
+  "helix-tabs-tab": Partial<
+    HelixTabsTabProps & BaseProps<HelixTabsTab> & BaseEvents
   >;
+
+  /**
+   * Five appearances, drawn as a tinted fill derived from the status color with
+   * `color-mix` rather than from a token per status. The alternative was eight
+   * new tokens whose only job was to be a lighter version of one that already
+   * existed, and they would have had to be re-derived by every theme.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: Which status the tag reports.
+   * - `size`: Height and inset of the tag.
+   * - `removable`: Whether the tag offers a control to remove itself.
+   * - `remove-label`/`removeLabel`: Accessible name for the remove control.
+   *
+   * A property rather than text read from the tag, because naming the button
+   * "Remove Draft" would mean reading `textContent` and the server has no tree
+   * to read it from.
+   *
+   * The attribute is named explicitly. Lit lowercases a property name to get an
+   * attribute rather than dash-casing it, so this would otherwise be reachable
+   * only as `removelabel`, which nobody would guess and no linter would catch.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-remove`: Fired when the reader asks to remove the tag.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tag's label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
+   * - `--tag-foreground-color`: Label color. (default: `undefined`)
+   * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `remove`: The remove button, when `removable`.
+   */
+  "helix-tag": Partial<HelixTagProps & BaseProps<HelixTag> & BaseEvents>;
 
   /**
    * The indicator travels between items rather than the fill swapping. A fill
@@ -3034,6 +2935,105 @@ export type CustomElements = {
   "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents>;
 
   /**
+   * No chrome of its own: a toolbar is a place controls sit, and a border around
+   * them would be a second frame inside whatever already frames the bar.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the toolbar.
+   * - `orientation`: Which way the arrow keys move.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The toolbar's controls.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toolbar-gap`: Space between controls. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `toolbar`: The toolbar container.
+   */
+  "helix-toolbar": Partial<
+    HelixToolbarProps & BaseProps<HelixToolbar> & BaseEvents
+  >;
+
+  /**
+   * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
+   * node moved to another depth re-indents without any nested selector. Nesting
+   * selectors by depth is the usual approach and stops working at whatever depth
+   * nobody wrote a rule for.
+   *
+   * The twisty rotates rather than swapping glyphs, so opening a branch is a
+   * short movement instead of a substitution. Motion carries the state change;
+   * the row itself stays flat.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
+   * - `selected`: Whether this item is the current one.
+   * - `expanded`: Whether a branch is showing its children.
+   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
+   *
+   * Not reflected. The tree assigns this after it upgrades, so an attribute
+   * here would be a change to markup the consumer rendered and hydration would
+   * report it. The indent it drives is written onto the row instead, inside the
+   * shadow root, which is not part of the tree React hydrates.
+   * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
+   * - `isBranch`: Whether this node has children. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the item is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The item's label.
+   * - `children`: Nested items, which make this a branch.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus to this node.
+   * - `select() => void`: Selects this node and announces it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The node, and the focus target.
+   * - `row`: The clickable label row.
+   * - `toggle`: The expand and collapse control.
+   * - `label`: The label text.
+   * - `group`: The container for nested items.
+   */
+  "helix-tree-item": Partial<
+    HelixTreeItemProps & BaseProps<HelixTreeItem> & BaseEvents
+  >;
+
+  /**
    * Carries no background of its own. The selected look comes from the group's
    * indicator sitting behind it, which is what lets that marker travel instead of
    * one fill appearing as another disappears.
@@ -3077,49 +3077,6 @@ export type CustomElements = {
 };
 
 export type CustomElementsSolidJs = {
-  /**
-   * Initials scale with the avatar rather than being sized per size, because the
-   * font size is set in `em` against the avatar's own dimension. One rule covers
-   * every size, including one a consumer sets themselves through
-   * `--avatar-size`.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `shape`: Whether the avatar is a circle or a rounded square.
-   * - `size`: Edge length of the avatar.
-   * - `src`: Image to show. Falls back to initials if it fails to load.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: Replaces the image and initials entirely, for an icon.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--avatar-background-color`: Fill behind the initials. (default: `undefined`)
-   * - `--avatar-size`: Edge length of the avatar. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `avatar`: The avatar body.
-   * - `image`: The image, when one is loading or loaded.
-   * - `initials`: The initials shown when there is no usable image.
-   */
-  "helix-avatar": Partial<
-    HelixAvatarProps &
-      HelixAvatarSolidJsProps &
-      BaseProps<HelixAvatar> &
-      BaseEvents
-  >;
-
   /**
    * Items sit in a single bordered stack, sharing one rule between neighbours
    * rather than each drawing its own, so the seam between two items is one pixel
@@ -3358,6 +3315,88 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Initials scale with the avatar rather than being sized per size, because the
+   * font size is set in `em` against the avatar's own dimension. One rule covers
+   * every size, including one a consumer sets themselves through
+   * `--avatar-size`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `shape`: Whether the avatar is a circle or a rounded square.
+   * - `size`: Edge length of the avatar.
+   * - `src`: Image to show. Falls back to initials if it fails to load.
+   * - `name`: Name of the person or entity. Used for the label and the initials.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Replaces the image and initials entirely, for an icon.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--avatar-background-color`: Fill behind the initials. (default: `undefined`)
+   * - `--avatar-size`: Edge length of the avatar. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `avatar`: The avatar body.
+   * - `image`: The image, when one is loading or loaded.
+   * - `initials`: The initials shown when there is no usable image.
+   */
+  "helix-avatar": Partial<
+    HelixAvatarProps &
+      HelixAvatarSolidJsProps &
+      BaseProps<HelixAvatar> &
+      BaseEvents
+  >;
+
+  /**
+   * Set larger than body text on the display face, because a pulled quotation is
+   * a change of voice and the type is what says so. No quotation marks are drawn:
+   * the size and the space around it already set the passage apart, and marks on
+   * top of that are the same thing said twice.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `cite`: URL identifying where the passage came from.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The quoted passage.
+   * - `attribution`: Who said it, and where.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--blockquote-size`: Size of the quoted passage. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `blockquote`: The quotation.
+   * - `attribution`: The footer carrying the source.
+   */
+  "helix-blockquote": Partial<
+    HelixBlockquoteProps &
+      HelixBlockquoteSolidJsProps &
+      BaseProps<HelixBlockquote> &
+      BaseEvents
+  >;
+
+  /**
    * The separator is hidden on the first item with `:host(:first-child)`, so no
    * item needs to know its own index and the parent needs no coordination.
    *
@@ -3542,90 +3581,6 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * A one-pixel rule in the border color, running the full inline size by
-   * default. A vertical divider stretches to its flex parent instead of setting
-   * its own height, so it matches whatever it sits beside without being told how
-   * tall that is.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `orientation`: Which way the rule runs.
-   * - `announced`: Whether the rule is announced as a separator.
-   *
-   * Off by default, and out of the accessibility tree. Most rules on a page
-   * separate nothing: they underline a heading or close a section that space
-   * had already closed, and announcing every one as a separator is noise a
-   * screen-reader user has to walk past.
-   *
-   * Stated this way round rather than as `decorative`, which is how the
-   * reference implementation has it, because a boolean attribute cannot be
-   * turned off: `decorative="false"` is still `true` to the parser, so the
-   * quiet default would have been unreachable from HTML and settable only as a
-   * property. An opt-in has no such problem, and it is absent by default, which
-   * is what every reflected property here has to be.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--divider-color`: Color of the rule. (default: `undefined`)
-   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `line`: The rule itself.
-   */
-  "helix-divider": Partial<
-    HelixDividerProps &
-      HelixDividerSolidJsProps &
-      BaseProps<HelixDivider> &
-      BaseEvents
-  >;
-
-  /**
-   * Set larger than body text on the display face, because a pulled quotation is
-   * a change of voice and the type is what says so. No quotation marks are drawn:
-   * the size and the space around it already set the passage apart, and marks on
-   * top of that are the same thing said twice.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `cite`: URL identifying where the passage came from.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The quoted passage.
-   * - `attribution`: Who said it, and where.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--blockquote-size`: Size of the quoted passage. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `blockquote`: The quotation.
-   * - `attribution`: The footer carrying the source.
-   */
-  "helix-blockquote": Partial<
-    HelixBlockquoteProps &
-      HelixBlockquoteSolidJsProps &
-      BaseProps<HelixBlockquote> &
-      BaseEvents
-  >;
-
-  /**
    * Regions are slots: `media`, `header`, the default slot for content, and
    * `footer`. An omitted region takes no space, so a card with only content needs
    * no wrapper markup at all.
@@ -3671,40 +3626,47 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Centered and given room, because an empty state is the only thing on screen
-   * and crowding it against the top edge makes the region look broken rather than
-   * empty.
+   * A one-pixel rule in the border color, running the full inline size by
+   * default. A vertical divider stretches to its flex parent instead of setting
+   * its own height, so it matches whatever it sits beside without being told how
+   * tall that is.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the state sits on a surface of its own.
-   * - `no-announce`/`noAnnounce`: Whether the state is announced when it appears.
+   * - `orientation`: Which way the rule runs.
+   * - `announced`: Whether the rule is announced as a separator.
    *
-   * On by default: an empty state almost always replaces something that was
-   * loading. Turn it off for one that was on the page from the start, which
-   * has nothing to announce because nothing changed.
+   * Off by default, and out of the accessibility tree. Most rules on a page
+   * separate nothing: they underline a heading or close a section that space
+   * had already closed, and announcing every one as a separator is noise a
+   * screen-reader user has to walk past.
    *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `icon`: A mark above the heading.
-   * - `heading`: What is missing.
-   * - `(default)`: Why, and what to do about it.
-   * - `actions`: The way out.
+   * Stated this way round rather than as `decorative`, which is how the
+   * reference implementation has it, because a boolean attribute cannot be
+   * turned off: `decorative="false"` is still `true` to the parser, so the
+   * quiet default would have been unreachable from HTML and settable only as a
+   * property. An opt-in has no such problem, and it is absent by default, which
+   * is what every reflected property here has to be.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--empty-state-inset`: Space around the whole block. (default: `undefined`)
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
+   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `line`: The rule itself.
    */
-  "helix-empty-state": Partial<
-    HelixEmptyStateProps &
-      HelixEmptyStateSolidJsProps &
-      BaseProps<HelixEmptyState> &
+  "helix-divider": Partial<
+    HelixDividerProps &
+      HelixDividerSolidJsProps &
+      BaseProps<HelixDivider> &
       BaseEvents
   >;
 
@@ -3862,32 +3824,41 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
-   * color of the text it sits in and a container can resize it without reaching
-   * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
-   * proportion as the button's own size changes.
+   * Centered and given room, because an empty state is the only thing on screen
+   * and crowding it against the top edge makes the region look broken rather than
+   * empty.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name of the icon in the Helix set.
-   * - `label`: Accessible name, for an icon that is not decorative.
+   * - `appearance`: Whether the state sits on a surface of its own.
+   * - `no-announce`/`noAnnounce`: Whether the state is announced when it appears.
+   *
+   * On by default: an empty state almost always replaces something that was
+   * loading. Turn it off for one that was on the page from the start, which
+   * has nothing to announce because nothing changed.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `icon`: A mark above the heading.
+   * - `heading`: What is missing.
+   * - `(default)`: Why, and what to do about it.
+   * - `actions`: The way out.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--icon-size`: Edge length of the icon's box. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `svg`: The rendered SVG.
+   * - `--empty-state-inset`: Space around the whole block. (default: `undefined`)
    */
-  "helix-icon": Partial<
-    HelixIconProps & HelixIconSolidJsProps & BaseProps<HelixIcon> & BaseEvents
+  "helix-empty-state": Partial<
+    HelixEmptyStateProps &
+      HelixEmptyStateSolidJsProps &
+      BaseProps<HelixEmptyState> &
+      BaseEvents
   >;
 
   /**
@@ -3958,6 +3929,62 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
+   * color of the text it sits in and a container can resize it without reaching
+   * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
+   * proportion as the button's own size changes.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `name`: Name of the icon in the Helix set.
+   * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--icon-size`: Edge length of the icon's box. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rendered SVG.
+   */
+  "helix-icon": Partial<
+    HelixIconProps & HelixIconSolidJsProps & BaseProps<HelixIcon> & BaseEvents
+  >;
+
+  /**
+   * A grid rather than a flex row, so the supporting text lines up under the
+   * label rather than under the leading icon. The leading and trailing regions
+   * hold their own width and the middle takes the rest.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Leading content, usually an icon or an avatar.
+   * - `(default)`: The label.
+   * - `supporting`: Secondary text under the label.
+   * - `end`: Trailing content.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
+   */
+  "helix-list-item": Partial<
+    HelixListItemProps &
+      HelixListItemSolidJsProps &
+      BaseProps<HelixListItem> &
+      BaseEvents
+  >;
+
+  /**
    * Drawn as a physical key: a hairline, a sunken fill, and one inset shadow
    * along the bottom edge that reads as depth without becoming a picture of a
    * key.
@@ -4015,6 +4042,30 @@ export type CustomElementsSolidJs = {
    */
   "helix-list": Partial<
     HelixListProps & HelixListSolidJsProps & BaseProps<HelixList> & BaseEvents
+  >;
+
+  /**
+   * Hairline rules between rows and no fill, per the rule that depth comes from a
+   * single border rather than from elevation. A dense table earns its density by
+   * decorating none of it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `header`: Whether the cell heads its column.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The cell's content.
+   */
+  "helix-table-cell": Partial<
+    HelixTableCellProps &
+      HelixTableCellSolidJsProps &
+      BaseProps<HelixTableCell> &
+      BaseEvents
   >;
 
   /**
@@ -4085,33 +4136,6 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * A grid rather than a flex row, so the supporting text lines up under the
-   * label rather than under the leading icon. The leading and trailing regions
-   * hold their own width and the middle takes the rest.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `start`: Leading content, usually an icon or an avatar.
-   * - `(default)`: The label.
-   * - `supporting`: Secondary text under the label.
-   * - `end`: Trailing content.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
-   */
-  "helix-list-item": Partial<
-    HelixListItemProps &
-      HelixListItemSolidJsProps &
-      BaseProps<HelixListItem> &
-      BaseEvents
-  >;
-
-  /**
    * Sized in `em`, so it matches whatever text it sits beside without being told.
    * The color is `currentColor` for the same reason: a spinner inside a primary
    * button is on the accent, and one in body copy is not, and neither should have
@@ -4144,87 +4168,6 @@ export type CustomElementsSolidJs = {
     HelixSpinnerProps &
       HelixSpinnerSolidJsProps &
       BaseProps<HelixSpinner> &
-      BaseEvents
-  >;
-
-  /**
-   * The value is set on the display face at a size the type scale does not reach,
-   * because a figure is the one place on a page where the number is the design.
-   * The label sits above it in the label ramp, quiet and wide-tracked, so the
-   * pair reads as one object rather than as two lines of text.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The value.
-   * - `label`: What the value measures.
-   * - `unit`: The unit, set beside the value.
-   * - `detail`: A change, comparison, or note under the label.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--stat-value-size`: Size of the figure. (default: `undefined`)
-   */
-  "helix-stat": Partial<
-    HelixStatProps & HelixStatSolidJsProps & BaseProps<HelixStat> & BaseEvents
-  >;
-
-  /**
-   * Wraps rather than scrolls, and each figure keeps its own width instead of
-   * every one taking an equal share: a set of figures is read by comparing them,
-   * and equal columns make a four-digit number and a two-digit one look like the
-   * same quantity.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `divided`: Whether the figures are separated by a rule as well as by space.
-   * - `label`: Accessible name for the set.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The stats.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--stat-group-gap`: Space between figures. (default: `undefined`)
-   */
-  "helix-stat-group": Partial<
-    HelixStatGroupProps &
-      HelixStatGroupSolidJsProps &
-      BaseProps<HelixStatGroup> &
-      BaseEvents
-  >;
-
-  /**
-   * Hairline rules between rows and no fill, per the rule that depth comes from a
-   * single border rather than from elevation. A dense table earns its density by
-   * decorating none of it.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `header`: Whether the cell heads its column.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The cell's content.
-   */
-  "helix-table-cell": Partial<
-    HelixTableCellProps &
-      HelixTableCellSolidJsProps &
-      BaseProps<HelixTableCell> &
       BaseEvents
   >;
 
@@ -4287,56 +4230,60 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Five appearances, drawn as a tinted fill derived from the status color with
-   * `color-mix` rather than from a token per status. The alternative was eight
-   * new tokens whose only job was to be a lighter version of one that already
-   * existed, and they would have had to be re-derived by every theme.
+   * Wraps rather than scrolls, and each figure keeps its own width instead of
+   * every one taking an equal share: a set of figures is read by comparing them,
+   * and equal columns make a four-digit number and a two-digit one look like the
+   * same quantity.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Which status the tag reports.
-   * - `size`: Height and inset of the tag.
-   * - `removable`: Whether the tag offers a control to remove itself.
-   * - `remove-label`/`removeLabel`: Accessible name for the remove control.
-   *
-   * A property rather than text read from the tag, because naming the button
-   * "Remove Draft" would mean reading `textContent` and the server has no tree
-   * to read it from.
-   *
-   * The attribute is named explicitly. Lit lowercases a property name to get an
-   * attribute rather than dash-casing it, so this would otherwise be reachable
-   * only as `removelabel`, which nobody would guess and no linter would catch.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-remove`: Fired when the reader asks to remove the tag.
+   * - `divided`: Whether the figures are separated by a rule as well as by space.
+   * - `label`: Accessible name for the set.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The tag's label.
+   * - `(default)`: The stats.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
-   * - `--tag-foreground-color`: Label color. (default: `undefined`)
-   * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `remove`: The remove button, when `removable`.
+   * - `--stat-group-gap`: Space between figures. (default: `undefined`)
    */
-  "helix-tag": Partial<
-    HelixTagProps & HelixTagSolidJsProps & BaseProps<HelixTag> & BaseEvents
+  "helix-stat-group": Partial<
+    HelixStatGroupProps &
+      HelixStatGroupSolidJsProps &
+      BaseProps<HelixStatGroup> &
+      BaseEvents
+  >;
+
+  /**
+   * The value is set on the display face at a size the type scale does not reach,
+   * because a figure is the one place on a page where the number is the design.
+   * The label sits above it in the label ramp, quiet and wide-tracked, so the
+   * pair reads as one object rather than as two lines of text.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The value.
+   * - `label`: What the value measures.
+   * - `unit`: The unit, set beside the value.
+   * - `detail`: A change, comparison, or note under the label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--stat-value-size`: Size of the figure. (default: `undefined`)
+   */
+  "helix-stat": Partial<
+    HelixStatProps & HelixStatSolidJsProps & BaseProps<HelixStat> & BaseEvents
   >;
 
   /**
@@ -4379,40 +4326,36 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Identifies the tab, and pairs it with the panel of the same value.
-   * - `selected`: Whether this tab is the current one.
-   * - `disabled`: Whether the tab can be chosen.
+   * - `label`: Accessible name for the tab list.
+   * - `value`: Value of the selected tab.
+   * - `manual`: Whether arrowing to a tab also selects it.
+   *
+   * Automatic is the default because showing a panel is usually cheap. Set this
+   * where it is not, so a reader arrowing past four tabs does not load four
+   * panels on the way.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the tab is chosen.
+   * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The tab's label.
-   *
-   * ## Methods
-   *
-   * Methods that can be called to access component functionality.
-   *
-   * - `focusTab() => void`: Moves focus to this tab.
-   * - `select() => void`: Selects this tab and announces it.
+   * - `(default)`: The tabs.
+   * - `panels`: The panels.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `tab`: The tab itself.
+   * - `tabs`: The tab list.
+   * - `panels`: The panel container.
    */
-  "helix-tabs-tab": Partial<
-    HelixTabsTabProps &
-      HelixTabsTabSolidJsProps &
-      BaseProps<HelixTabsTab> &
-      BaseEvents
+  "helix-tabs": Partial<
+    HelixTabsProps & HelixTabsSolidJsProps & BaseProps<HelixTabs> & BaseEvents
   >;
 
   /**
@@ -4468,42 +4411,6 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * No chrome of its own: a toolbar is a place controls sit, and a border around
-   * them would be a second frame inside whatever already frames the bar.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `label`: Accessible name for the toolbar.
-   * - `orientation`: Which way the arrow keys move.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The toolbar's controls.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--toolbar-gap`: Space between controls. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `toolbar`: The toolbar container.
-   */
-  "helix-toolbar": Partial<
-    HelixToolbarProps &
-      HelixToolbarSolidJsProps &
-      BaseProps<HelixToolbar> &
-      BaseEvents
-  >;
-
-  /**
    * Selection is marked with a rule under the active tab rather than a filled
    * pill, which keeps the row flat and lets the underline animate between tabs as
    * a movement instead of two separate fills.
@@ -4512,105 +4419,93 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `label`: Accessible name for the tab list.
-   * - `value`: Value of the selected tab.
-   * - `manual`: Whether arrowing to a tab also selects it.
-   *
-   * Automatic is the default because showing a panel is usually cheap. Set this
-   * where it is not, so a reader arrowing past four tabs does not load four
-   * panels on the way.
+   * - `value`: Identifies the tab, and pairs it with the panel of the same value.
+   * - `selected`: Whether this tab is the current one.
+   * - `disabled`: Whether the tab can be chosen.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
+   * - `helix-select`: Fired when the tab is chosen.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The tabs.
-   * - `panels`: The panels.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `tabs`: The tab list.
-   * - `panels`: The panel container.
-   */
-  "helix-tabs": Partial<
-    HelixTabsProps & HelixTabsSolidJsProps & BaseProps<HelixTabs> & BaseEvents
-  >;
-
-  /**
-   * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
-   * node moved to another depth re-indents without any nested selector. Nesting
-   * selectors by depth is the usual approach and stops working at whatever depth
-   * nobody wrote a rule for.
-   *
-   * The twisty rotates rather than swapping glyphs, so opening a branch is a
-   * short movement instead of a substitution. Motion carries the state change;
-   * the row itself stays flat.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
-   * - `selected`: Whether this item is the current one.
-   * - `expanded`: Whether a branch is showing its children.
-   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
-   *
-   * Not reflected. The tree assigns this after it upgrades, so an attribute
-   * here would be a change to markup the consumer rendered and hydration would
-   * report it. The indent it drives is written onto the row instead, inside the
-   * shadow root, which is not part of the tree React hydrates.
-   * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
-   * - `isBranch`: Whether this node has children. (property only) (readonly)
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-select`: Fired when the item is chosen.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The item's label.
-   * - `children`: Nested items, which make this a branch.
+   * - `(default)`: The tab's label.
    *
    * ## Methods
    *
    * Methods that can be called to access component functionality.
    *
-   * - `focusItem() => void`: Moves focus to this node.
-   * - `select() => void`: Selects this node and announces it.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   * - `focusTab() => void`: Moves focus to this tab.
+   * - `select() => void`: Selects this tab and announces it.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The node, and the focus target.
-   * - `row`: The clickable label row.
-   * - `toggle`: The expand and collapse control.
-   * - `label`: The label text.
-   * - `group`: The container for nested items.
+   * - `tab`: The tab itself.
    */
-  "helix-tree-item": Partial<
-    HelixTreeItemProps &
-      HelixTreeItemSolidJsProps &
-      BaseProps<HelixTreeItem> &
+  "helix-tabs-tab": Partial<
+    HelixTabsTabProps &
+      HelixTabsTabSolidJsProps &
+      BaseProps<HelixTabsTab> &
       BaseEvents
+  >;
+
+  /**
+   * Five appearances, drawn as a tinted fill derived from the status color with
+   * `color-mix` rather than from a token per status. The alternative was eight
+   * new tokens whose only job was to be a lighter version of one that already
+   * existed, and they would have had to be re-derived by every theme.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: Which status the tag reports.
+   * - `size`: Height and inset of the tag.
+   * - `removable`: Whether the tag offers a control to remove itself.
+   * - `remove-label`/`removeLabel`: Accessible name for the remove control.
+   *
+   * A property rather than text read from the tag, because naming the button
+   * "Remove Draft" would mean reading `textContent` and the server has no tree
+   * to read it from.
+   *
+   * The attribute is named explicitly. Lit lowercases a property name to get an
+   * attribute rather than dash-casing it, so this would otherwise be reachable
+   * only as `removelabel`, which nobody would guess and no linter would catch.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-remove`: Fired when the reader asks to remove the tag.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The tag's label.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
+   * - `--tag-foreground-color`: Label color. (default: `undefined`)
+   * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `remove`: The remove button, when `removable`.
+   */
+  "helix-tag": Partial<
+    HelixTagProps & HelixTagSolidJsProps & BaseProps<HelixTag> & BaseEvents
   >;
 
   /**
@@ -4705,6 +4600,111 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * No chrome of its own: a toolbar is a place controls sit, and a border around
+   * them would be a second frame inside whatever already frames the bar.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the toolbar.
+   * - `orientation`: Which way the arrow keys move.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The toolbar's controls.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toolbar-gap`: Space between controls. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `toolbar`: The toolbar container.
+   */
+  "helix-toolbar": Partial<
+    HelixToolbarProps &
+      HelixToolbarSolidJsProps &
+      BaseProps<HelixToolbar> &
+      BaseEvents
+  >;
+
+  /**
+   * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
+   * node moved to another depth re-indents without any nested selector. Nesting
+   * selectors by depth is the usual approach and stops working at whatever depth
+   * nobody wrote a rule for.
+   *
+   * The twisty rotates rather than swapping glyphs, so opening a branch is a
+   * short movement instead of a substitution. Motion carries the state change;
+   * the row itself stays flat.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
+   * - `selected`: Whether this item is the current one.
+   * - `expanded`: Whether a branch is showing its children.
+   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
+   *
+   * Not reflected. The tree assigns this after it upgrades, so an attribute
+   * here would be a change to markup the consumer rendered and hydration would
+   * report it. The indent it drives is written onto the row instead, inside the
+   * shadow root, which is not part of the tree React hydrates.
+   * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
+   * - `isBranch`: Whether this node has children. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the item is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The item's label.
+   * - `children`: Nested items, which make this a branch.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus to this node.
+   * - `select() => void`: Selects this node and announces it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The node, and the focus target.
+   * - `row`: The clickable label row.
+   * - `toggle`: The expand and collapse control.
+   * - `label`: The label text.
+   * - `group`: The container for nested items.
+   */
+  "helix-tree-item": Partial<
+    HelixTreeItemProps &
+      HelixTreeItemSolidJsProps &
+      BaseProps<HelixTreeItem> &
+      BaseEvents
+  >;
+
+  /**
    * Carries no background of its own. The selected look comes from the group's
    * indicator sitting behind it, which is what lets that marker travel instead of
    * one fill appearing as another disappears.
@@ -4751,10 +4751,6 @@ export type CustomElementsSolidJs = {
 };
 
 export type CustomCssProperties = {
-  /** Fill behind the initials. */
-  "--avatar-background-color"?: string;
-  /** Edge length of the avatar. */
-  "--avatar-size"?: string;
   /** Color of the surrounding rule. */
   "--accordion-border-color"?: string;
   /** Corner radius of the stack. */
@@ -4773,6 +4769,12 @@ export type CustomCssProperties = {
   "--badge-background-color"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
+  /** Fill behind the initials. */
+  "--avatar-background-color"?: string;
+  /** Edge length of the avatar. */
+  "--avatar-size"?: string;
+  /** Size of the quoted passage. */
+  "--blockquote-size"?: string;
   /** Color of the separator. */
   "--breadcrumbs-separator-color"?: string;
   /** Space between items and separators. */
@@ -4787,12 +4789,6 @@ export type CustomCssProperties = {
   "--callout-background-color"?: string;
   /** Corner radius of the callout. */
   "--callout-radii"?: string;
-  /** Color of the rule. */
-  "--divider-color"?: string;
-  /** Thickness of the rule. */
-  "--divider-thickness"?: string;
-  /** Size of the quoted passage. */
-  "--blockquote-size"?: string;
   /** Surface behind the card. */
   "--card-background-color"?: string;
   /** Border color of the surface. */
@@ -4803,16 +4799,22 @@ export type CustomCssProperties = {
   "--card-padding"?: string;
   /** Corner radius of the surface. */
   "--card-radii"?: string;
-  /** Space around the whole block. */
-  "--empty-state-inset"?: string;
+  /** Color of the rule. */
+  "--divider-color"?: string;
+  /** Thickness of the rule. */
+  "--divider-thickness"?: string;
   /** Width or height of the panel. */
   "--drawer-size"?: string;
   /** Column width floor when `min` is set. */
   "--grid-min"?: string;
-  /** Edge length of the icon's box. */
-  "--icon-size"?: string;
+  /** Space around the whole block. */
+  "--empty-state-inset"?: string;
   /** Edge length of the control. */
   "--icon-button-size"?: string;
+  /** Edge length of the icon's box. */
+  "--icon-size"?: string;
+  /** Padding inside the row. */
+  "--list-item-inset"?: string;
   /** Fill of the key. */
   "--kbd-background-color"?: string;
   /** Color of the hairline and the edge. */
@@ -4823,32 +4825,30 @@ export type CustomCssProperties = {
   "--skeleton-size"?: string;
   /** Color of the quoted text. */
   "--quote-color"?: string;
-  /** Padding inside the row. */
-  "--list-item-inset"?: string;
   /** Diameter. Defaults to 1.5em. */
   "--spinner-size"?: string;
   /** Color of the moving arc. */
   "--spinner-color"?: string;
   /** Color of the circle behind it. */
   "--spinner-track-color"?: string;
-  /** Size of the figure. */
-  "--stat-value-size"?: string;
-  /** Space between figures. */
-  "--stat-group-gap"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
+  /** Space between figures. */
+  "--stat-group-gap"?: string;
+  /** Size of the figure. */
+  "--stat-value-size"?: string;
   /** Fill behind the tag. */
   "--tag-background-color"?: string;
   /** Label color. */
   "--tag-foreground-color"?: string;
   /** Corner radius of the tag. */
   "--tag-radii"?: string;
-  /** Space between controls. */
-  "--toolbar-gap"?: string;
-  /** Indent added per level. */
-  "--tree-indent"?: string;
   /** Fill of the moving marker. */
   "--toggle-group-indicator-color"?: string;
+  /** Indent added per level. */
+  "--tree-indent"?: string;
+  /** Space between controls. */
+  "--toolbar-gap"?: string;
 };
 
 declare module "react" {

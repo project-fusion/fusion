@@ -1,4 +1,4 @@
-import { customElement, HelixElement, WithOpen } from '@helix-io/core'
+import { customElement, HelixElement, MixinControllerOpen } from '@helix-io/core'
 import { caretDown } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -49,7 +49,7 @@ const TRIGGER_ID = 'trigger'
  * @event {HelixOpenEvent} helix-open - Fired when the item opens or closes.
  */
 @customElement('helix-base-accordion-item')
-export class HelixBaseAccordionItem extends WithOpen(HelixElement) {
+export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
   /**
    * Where the open indicator sits, or whether there is one.
    *

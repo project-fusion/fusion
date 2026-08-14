@@ -1,20 +1,20 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixCloseEvent, HelixOpenEvent } from '../events.js'
-import type { HelixElement } from '../helix-element.js'
-import { requestControlledChange } from '../request-controlled-change.js'
+import { HelixCloseEvent, HelixOpenEvent } from '../../events/events.js'
+import type { HelixElement } from '../../helix-element/helix-element.js'
+import { requestControlledChange } from '../../utils/request-controlled-change/request-controlled-change.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
 
 /**
- * The public surface `WithOpen` adds.
+ * The public surface `MixinControllerOpen` adds.
  *
  * Declared separately because TypeScript cannot emit declarations for an
  * anonymous class that has private members (TS4094). Casting the mixin's return
  * to this interface keeps the internals private and the build working.
  */
-export declare class WithOpenInterface {
+export declare class MixinControllerOpenInterface {
   /** Initial open state for uncontrolled use. Ignored once `open` is set. */
   defaultOpen: boolean
 
@@ -58,8 +58,8 @@ export declare class WithOpenInterface {
  * Styled tiers select on that rather than `[open]`, which is absent for
  * uncontrolled consumers.
  */
-export const WithOpen = <T extends Constructor<HelixElement>>(Base: T) => {
-  // JSDoc is duplicated from WithOpenInterface deliberately. The interface is
+export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T) => {
+  // JSDoc is duplicated from MixinControllerOpenInterface deliberately. The interface is
   // what TypeScript consumers see; this class is what the manifest analyzer
   // reads when resolving inherited members into dependent packages.
   class OpenElement extends Base {
@@ -149,5 +149,5 @@ export const WithOpen = <T extends Constructor<HelixElement>>(Base: T) => {
     }
   }
 
-  return OpenElement as Constructor<WithOpenInterface> & T
+  return OpenElement as Constructor<MixinControllerOpenInterface> & T
 }

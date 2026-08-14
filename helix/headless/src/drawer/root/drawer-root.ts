@@ -3,7 +3,7 @@ import {
   DismissController,
   FocusTrapController,
   HelixElement,
-  WithOpen,
+  MixinControllerOpen,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -12,7 +12,7 @@ import { property } from 'lit/decorators.js'
  * @summary A panel that slides in from an edge.
  *
  * @description
- * Takes `WithOpen`, so `open`, `defaultOpen`, and `OpenChange` behave exactly
+ * Takes `MixinControllerOpen`, so `open`, `defaultOpen`, and `OpenChange` behave exactly
  * as they do on an accordion item, and a consumer already knows the API.
  *
  * Modal by default, which is three things together and not one: focus is
@@ -40,7 +40,7 @@ import { property } from 'lit/decorators.js'
  * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
  */
 @customElement('helix-base-drawer')
-export class HelixBaseDrawer extends WithOpen(HelixElement) {
+export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
   /** Which edge the drawer comes from. */
   @property({ reflect: true })
   placement?: 'start' | 'end' | 'top' | 'bottom'
