@@ -188,7 +188,7 @@ export function SandboxWorkbench({ families }: Props) {
                 IDREF cannot leave the tab's shadow root to reach it: the
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
-            <helix-toggle-group label="Files" ref={files} value={pane}>
+            <helix-toggle-group appearance="plain" label="Files" ref={files} value={pane}>
               <helix-toggle value="html">index.html</helix-toggle>
               <helix-toggle value="css">styles.css</helix-toggle>
             </helix-toggle-group>
@@ -256,7 +256,7 @@ export function SandboxWorkbench({ families }: Props) {
           {/* The panel's tabs are `helix-tabs`, not a second tab set built
               into the sandbox: tabs are the only behaviour the region has, and
               that behaviour already exists. */}
-          <helix-tabs label="Panel" slot="panel" value="terminal">
+          <helix-tabs appearance="underline" label="Panel" slot="panel" value="terminal">
             <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
             <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
             <helix-tabs-panel slot="panels" value="terminal">

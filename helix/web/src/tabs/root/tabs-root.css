@@ -1,4 +1,19 @@
 :host {
+  /* The default look, and where every variant starts from: a raised pill on
+     the selected tab and nothing at all behind the row.
+
+     A raised surface with a hairline of shadow under it, rather than a fill,
+     because a fill has no colour that works in both modes. `surface-raised` is
+     the same white as `surface` in light and a step lighter in dark, and
+     `surface-sunken` is the reverse, so either one is invisible half the time.
+     What reads in both is the lift. */
+  --_tabs-rule: none;
+  --_tab-padding-block: var(--helix-space-2xs);
+  --_tab-radius: var(--helix-radii-sm);
+  --_tab-selected-rule: transparent;
+  --_tab-selected-shadow: var(--helix-shadow-sm);
+  --_tab-selected-surface: var(--helix-color-surface-raised);
+
   display: grid;
   /* The tab strip takes what it needs, the panels take the rest. `minmax(0,
      1fr)` rather than `1fr`, because a `1fr` track keeps an automatic minimum
@@ -19,23 +34,28 @@
   overflow-x: auto;
 }
 
-/* The segmented look. Everything a tab needs to know about it arrives as an
-   inherited custom property rather than a selector, because the button a tab
-   draws is inside the tab's own shadow root: `::slotted()` reaches the tab and
-   stops there, and an attribute written onto each tab would be an attribute the
+/* Underlined. A rule under the row and a thicker one under the selected tab,
+   and no fill anywhere: the row stays flat and the mark reads as one thing
+   moving rather than two fills swapping.
+
+   Everything a tab needs to know about any of this arrives as an inherited
+   custom property rather than a selector, because the button a tab draws is
+   inside the tab's own shadow root: `::slotted()` reaches the tab and stops
+   there, and an attribute written onto each tab would be an attribute the
    element gave itself. Custom properties cross both boundaries on their own. */
-:host([appearance="toggle"]) {
-  --_tabs-rule: none;
-  --_tab-padding-block: var(--helix-space-2xs);
-  --_tab-radius: var(--helix-radii-sm);
-  --_tab-selected-rule: transparent;
-  --_tab-selected-shadow: var(--helix-shadow-sm);
-  --_tab-selected-surface: var(--helix-color-surface-raised);
+:host([appearance="underline"]) {
+  --_tabs-rule: var(--helix-border-thin) solid var(--helix-color-border);
+  --_tab-padding-block: var(--helix-space-xs);
+  --_tab-radius: var(--helix-radii-none);
+  --_tab-selected-rule: var(--helix-color-primary);
+  --_tab-selected-shadow: none;
+  --_tab-selected-surface: transparent;
 }
 
-/* A framed, sunken track, which is what makes it read as one control rather
-   than as buttons that happen to be adjacent. It hugs its tabs instead of
-   filling the row: a segmented control the width of the window is a menu bar. */
+/* Segmented. The default pill, put in a framed sunken track, which is what
+   makes the row read as one control rather than as buttons that happen to be
+   adjacent. It hugs its tabs instead of filling the row: a segmented control
+   the width of the window is a menu bar. */
 :host([appearance="toggle"]) [part="tabs"] {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);

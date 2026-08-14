@@ -38,15 +38,17 @@ export class HelixBaseTabs extends HelixElement {
   /**
    * How the row reads.
    *
-   * Unset is a row of underlines. `toggle` is a segmented control: a framed,
-   * sunken track with the selected tab raised inside it, which is what a set of
-   * files or modes wants when it sits in a toolbar rather than above a page.
+   * Unset is a raised pill on the selected tab with nothing behind the row,
+   * which is what a set sitting inside other chrome wants. `underline` is a
+   * rule under the row and a thicker one under the selected tab, for a set that
+   * heads a page. `toggle` puts the pill in a framed, sunken track, which reads
+   * as one control rather than as a row.
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
    */
   @property({ reflect: true })
-  appearance?: 'toggle'
+  appearance?: 'toggle' | 'underline'
 
   /** Accessible name for the tab list. */
   @property()

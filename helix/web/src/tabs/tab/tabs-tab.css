@@ -4,8 +4,10 @@
 
 /* A rule under the active tab rather than a filled pill: the row stays flat,
    and the underline reads as one mark moving rather than two fills swapping. */
-/* The defaults here are the underline look. A tab set asking for the segmented
-   one sets these from its host, and they inherit in. */
+/* Every one of these comes from the tab set, which sets them all for its
+   default and overrides what a variant changes. The fallbacks are what a tab
+   would look like with no set around it, which is not an arrangement that
+   ships, so they are the plainest thing rather than a second design. */
 [part="tab"] {
   background-color: var(--_tab-surface, transparent);
   border: none;

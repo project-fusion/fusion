@@ -7968,9 +7968,9 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'toggle' | undefined"
+                "text": "'toggle' | 'underline' | undefined"
               },
-              "description": "How the row reads.\n\nUnset is a row of underlines. `toggle` is a segmented control: a framed,\nsunken track with the selected tab raised inside it, which is what a set of\nfiles or modes wants when it sits in a toolbar rather than above a page.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
+              "description": "How the row reads.\n\nUnset is a raised pill on the selected tab with nothing behind the row,\nwhich is what a set sitting inside other chrome wants. `underline` is a\nrule under the row and a thicker one under the selected tab, for a set that\nheads a page. `toggle` puts the pill in a framed, sunken track, which reads\nas one control rather than as a row.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -8130,9 +8130,9 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'toggle' | undefined"
+                "text": "'toggle' | 'underline' | undefined"
               },
-              "description": "How the row reads.\n\nUnset is a row of underlines. `toggle` is a segmented control: a framed,\nsunken track with the selected tab raised inside it, which is what a set of\nfiles or modes wants when it sits in a toolbar rather than above a page.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
+              "description": "How the row reads.\n\nUnset is a raised pill on the selected tab with nothing behind the row,\nwhich is what a set sitting inside other chrome wants. `underline` is a\nrule under the row and a thicker one under the selected tab, for a set that\nheads a page. `toggle` puts the pill in a framed, sunken track, which reads\nas one control rather than as a row.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
               "fieldName": "appearance"
             },
             {
