@@ -92,7 +92,7 @@ body {
    design system never renders.
 
    The underline moves on hover: it drops away from the text and strengthens in
-   colour. Both of those are the decoration's own properties rather than a box
+   color. Both of those are the decoration's own properties rather than a box
    shadow, because a shadow is drawn on the border box, and an anchor is not
    always an inline box the width of its text. A flex item is blockified, so any
    link inside a `column` flex container stretches, and the shadow ran the full
@@ -165,7 +165,7 @@ body {
 }
 
 /* Quiet is for navigation, where a line under every row would be noise, so it
-   stays underline-free on hover and moves in colour instead. */
+   stays underline-free on hover and moves in color instead. */
 [data-link="quiet"]:hover {
   color: var(--helix-color-foreground);
   text-decoration: none;
@@ -304,7 +304,7 @@ helix-text:not([appearance])[as="code"] {
   line-height: var(--helix-leading-normal);
 }
 
-/* Colour carries state, so it stays a separate axis from the ramp. Folding it
+/* Color carries state, so it stays a separate axis from the ramp. Folding it
    in would mean `caption-danger` and the rest of the cross product. */
 [data-tone="muted"],
 helix-text[tone="muted"] {
@@ -467,7 +467,7 @@ helix-toggle::part(item):hover {
 }
 
 /* The travelling thumb is behind this item, so the label goes to full strength
-   and gains weight. Weight rather than colour: colour is reserved for state. */
+   and gains weight. Weight rather than color: color is reserved for state. */
 helix-toggle[link][selected] > *,
 helix-toggle[selected]::part(item) {
   background-color: transparent;
@@ -522,15 +522,19 @@ helix-toggle[disabled]::part(item) {
 
 /* A raised thumb, the same one the toggle group uses, because it is the same
    idea: this is the one of these you are on. */
+/* No surface of its own. The marker travelling behind it is the one surface,
+   and a fill here as well would mean two things saying the same thing. Weight
+   and full-strength color are what make the current page legible before the
+   marker has been measured, which cannot happen on the server. */
 [data-nav-item][aria-current="page"] {
-  background-color: var(--helix-color-surface-raised);
-  box-shadow: var(--helix-shadow-sm);
   color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-semibold);
-  /* Named, so a view transition morphs the thumb from the old current item to
-     the new one instead of cross-fading two rectangles. Costs nothing where no
-     view transition is running. */
-  view-transition-name: helix-nav-current;
+}
+
+/* Above the marker, which sits behind every item. */
+[data-nav-item] {
+  position: relative;
+  z-index: var(--helix-layer-raised);
 }
 
 :where(code, kbd, samp, pre) {

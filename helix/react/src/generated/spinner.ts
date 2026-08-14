@@ -7,7 +7,7 @@ import type { HelixSpinner } from '@helix-io/web'
 
 /**
  * Sized in `em`, so it matches whatever text it sits beside without being told.
-The colour is `currentColor` for the same reason: a spinner inside a primary
+The color is `currentColor` for the same reason: a spinner inside a primary
 button is on the accent, and one in body copy is not, and neither should have
 to say so.
  *

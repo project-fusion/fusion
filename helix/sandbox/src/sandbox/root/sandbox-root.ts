@@ -41,7 +41,7 @@ const MAX = 85
  * @csspart separator - The draggable divider.
  *
  * @cssproperty --sandbox-min-block-size - Minimum height of the sandbox.
- * @cssproperty --sandbox-separator-color - Colour of the divider.
+ * @cssproperty --sandbox-separator-color - Color of the divider.
  */
 @customElement('helix-sandbox')
 export class HelixSandbox extends HelixElement {

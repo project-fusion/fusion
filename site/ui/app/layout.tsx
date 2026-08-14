@@ -21,7 +21,7 @@ export const metadata: Metadata = {
  * Carries the token layers, the brand faces, and element registration.
  *
  * No chrome. The site and its tools want different frames: pages want a header
- * and a centred column, and a tool wants the whole viewport. Putting either
+ * and a centered column, and a tool wants the whole viewport. Putting either
  * here would force the other to undo it, which is what route groups are for.
  */
 export default function RootLayout({ children }: { children: ReactNode }) {

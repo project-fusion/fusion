@@ -224,6 +224,33 @@ previewed and not the sandbox around it. */
   textContent?: string | number;
 };
 
+export type HelixSandboxProps = {
+  /** Whether the panes sit side by side or stacked. */
+  orientation?: HelixSandbox["orientation"];
+  /** Percentage of the sandbox given to the source pane. */
+  split?: HelixSandbox["split"];
+  /** Accessible name for the divider. */
+  "separator-label"?: HelixSandbox["separatorLabel"];
+  /** Accessible name for the divider. */
+  separatorLabel?: HelixSandbox["separatorLabel"];
+};
+
+export type HelixSandboxSolidJsProps = {
+  /** Whether the panes sit side by side or stacked. */
+  "prop:orientation"?: HelixSandbox["orientation"];
+  /** Percentage of the sandbox given to the source pane. */
+  "prop:split"?: HelixSandbox["split"];
+  /** Accessible name for the divider. */
+  "attr:separator-label"?: HelixSandbox["separatorLabel"];
+  /** Accessible name for the divider. */
+  "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixSandboxSource` component event */
 export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
   HelixSandboxSource,
@@ -283,39 +310,12 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   textContent?: string | number;
 };
 
-export type HelixSandboxProps = {
-  /** Whether the panes sit side by side or stacked. */
-  orientation?: HelixSandbox["orientation"];
-  /** Percentage of the sandbox given to the source pane. */
-  split?: HelixSandbox["split"];
-  /** Accessible name for the divider. */
-  "separator-label"?: HelixSandbox["separatorLabel"];
-  /** Accessible name for the divider. */
-  separatorLabel?: HelixSandbox["separatorLabel"];
-};
-
-export type HelixSandboxSolidJsProps = {
-  /** Whether the panes sit side by side or stacked. */
-  "prop:orientation"?: HelixSandbox["orientation"];
-  /** Percentage of the sandbox given to the source pane. */
-  "prop:split"?: HelixSandbox["split"];
-  /** Accessible name for the divider. */
-  "attr:separator-label"?: HelixSandbox["separatorLabel"];
-  /** Accessible name for the divider. */
-  "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type CustomElements = {
   /**
    * Renders into the light DOM rather than a shadow root, which is the whole
    * reason this is an element and not a `<div>` someone sets `innerHTML` on.
    * Content inside a shadow root is cut off from the base layer, so a heading
-   * would come out at the browser's default size and a link in the wrong colour,
+   * would come out at the browser's default size and a link in the wrong color,
    * and the preview would be a worse likeness the more the design system does.
    * In the light DOM it is styled exactly as it would be on a real page.
    *
@@ -336,6 +336,53 @@ export type CustomElements = {
    */
   "helix-sandbox-preview": Partial<
     HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents
+  >;
+
+  /**
+   * Coordination is by event, the same way the accordion does it: a source pane
+   * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+   * whatever preview is slotted into it. Neither child knows the other exists, so
+   * either can be replaced or used alone.
+   *
+   * The event carries the pane's `name`, which is what lets one sandbox hold a
+   * markup pane and a stylesheet pane without the root identifying senders by
+   * reference. `css` becomes the preview's stylesheet; anything else is markup.
+   *
+   * The split is a real `role="separator"` with `aria-valuenow`, movable by
+   * pointer and by arrow keys, because a divider that only responds to dragging
+   * is unusable without a mouse. Home and End jump to the bounds.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Whether the panes sit side by side or stacked.
+   * - `split`: Percentage of the sandbox given to the source pane.
+   * - `separator-label`/`separatorLabel`: Accessible name for the divider.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `source`: The editable source pane.
+   * - `preview`: The live preview.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sandbox-min-block-size`: Minimum height of the sandbox. (default: `undefined`)
+   * - `--sandbox-separator-color`: Color of the divider. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `pane`: Either pane.
+   * - `separator`: The draggable divider.
+   */
+  "helix-sandbox": Partial<
+    HelixSandboxProps & BaseProps<HelixSandbox> & BaseEvents
   >;
 
   /**
@@ -384,6 +431,38 @@ export type CustomElements = {
   "helix-sandbox-source": Partial<
     HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
   >;
+};
+
+export type CustomElementsSolidJs = {
+  /**
+   * Renders into the light DOM rather than a shadow root, which is the whole
+   * reason this is an element and not a `<div>` someone sets `innerHTML` on.
+   * Content inside a shadow root is cut off from the base layer, so a heading
+   * would come out at the browser's default size and a link in the wrong color,
+   * and the preview would be a worse likeness the more the design system does.
+   * In the light DOM it is styled exactly as it would be on a real page.
+   *
+   * **The source is trusted.** It is markup a developer typed into their own
+   * sandbox, and it is rendered as markup. Never point this at input from anyone
+   * else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `source`: Markup to render.
+   * - `styles`: Stylesheet applied to the preview.
+   *
+   * Scoped by being written into the preview's own subtree rather than the
+   * document, so an example that restyles `helix-card` restyles the one being
+   * previewed and not the sandbox around it.
+   */
+  "helix-sandbox-preview": Partial<
+    HelixSandboxPreviewProps &
+      HelixSandboxPreviewSolidJsProps &
+      BaseProps<HelixSandboxPreview> &
+      BaseEvents
+  >;
 
   /**
    * Coordination is by event, the same way the accordion does it: a source pane
@@ -419,7 +498,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--sandbox-min-block-size`: Minimum height of the sandbox. (default: `undefined`)
-   * - `--sandbox-separator-color`: Colour of the divider. (default: `undefined`)
+   * - `--sandbox-separator-color`: Color of the divider. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -429,38 +508,9 @@ export type CustomElements = {
    * - `separator`: The draggable divider.
    */
   "helix-sandbox": Partial<
-    HelixSandboxProps & BaseProps<HelixSandbox> & BaseEvents
-  >;
-};
-
-export type CustomElementsSolidJs = {
-  /**
-   * Renders into the light DOM rather than a shadow root, which is the whole
-   * reason this is an element and not a `<div>` someone sets `innerHTML` on.
-   * Content inside a shadow root is cut off from the base layer, so a heading
-   * would come out at the browser's default size and a link in the wrong colour,
-   * and the preview would be a worse likeness the more the design system does.
-   * In the light DOM it is styled exactly as it would be on a real page.
-   *
-   * **The source is trusted.** It is markup a developer typed into their own
-   * sandbox, and it is rendered as markup. Never point this at input from anyone
-   * else.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `source`: Markup to render.
-   * - `styles`: Stylesheet applied to the preview.
-   *
-   * Scoped by being written into the preview's own subtree rather than the
-   * document, so an example that restyles `helix-card` restyles the one being
-   * previewed and not the sandbox around it.
-   */
-  "helix-sandbox-preview": Partial<
-    HelixSandboxPreviewProps &
-      HelixSandboxPreviewSolidJsProps &
-      BaseProps<HelixSandboxPreview> &
+    HelixSandboxProps &
+      HelixSandboxSolidJsProps &
+      BaseProps<HelixSandbox> &
       BaseEvents
   >;
 
@@ -513,67 +563,17 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixSandboxSource> &
       BaseEvents
   >;
-
-  /**
-   * Coordination is by event, the same way the accordion does it: a source pane
-   * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
-   * whatever preview is slotted into it. Neither child knows the other exists, so
-   * either can be replaced or used alone.
-   *
-   * The event carries the pane's `name`, which is what lets one sandbox hold a
-   * markup pane and a stylesheet pane without the root identifying senders by
-   * reference. `css` becomes the preview's stylesheet; anything else is markup.
-   *
-   * The split is a real `role="separator"` with `aria-valuenow`, movable by
-   * pointer and by arrow keys, because a divider that only responds to dragging
-   * is unusable without a mouse. Home and End jump to the bounds.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `orientation`: Whether the panes sit side by side or stacked.
-   * - `split`: Percentage of the sandbox given to the source pane.
-   * - `separator-label`/`separatorLabel`: Accessible name for the divider.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `source`: The editable source pane.
-   * - `preview`: The live preview.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--sandbox-min-block-size`: Minimum height of the sandbox. (default: `undefined`)
-   * - `--sandbox-separator-color`: Colour of the divider. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `pane`: Either pane.
-   * - `separator`: The draggable divider.
-   */
-  "helix-sandbox": Partial<
-    HelixSandboxProps &
-      HelixSandboxSolidJsProps &
-      BaseProps<HelixSandbox> &
-      BaseEvents
-  >;
 };
 
 export type CustomCssProperties = {
+  /** Minimum height of the sandbox. */
+  "--sandbox-min-block-size"?: string;
+  /** Color of the divider. */
+  "--sandbox-separator-color"?: string;
   /** Fill behind the source. */
   "--sandbox-source-background"?: string;
   /** Minimum height of the pane. */
   "--sandbox-source-min-block-size"?: string;
-  /** Minimum height of the sandbox. */
-  "--sandbox-min-block-size"?: string;
-  /** Colour of the divider. */
-  "--sandbox-separator-color"?: string;
 };
 
 declare module "react" {

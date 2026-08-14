@@ -50,7 +50,7 @@ const TOKENIZED = [
   { category: 'layer', property: /(?:^|[^-\w])z-index\s*:/ },
 ]
 
-/** Literal colour values. Any of these in a component is a bug. */
+/** Literal color values. Any of these in a component is a bug. */
 const RAW_COLOR = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab|lab|lch)\s*\(/
 
 /** A bare length or number where a token belongs. */

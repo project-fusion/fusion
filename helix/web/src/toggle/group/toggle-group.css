@@ -27,7 +27,7 @@
 
    A raised thumb rather than a flat fill: a lifted surface with a hairline of
    shadow under it is what says "this one", and it does the saying without
-   colour, which stays reserved for state. One step rounder than nothing and one
+   color, which stays reserved for state. One step rounder than nothing and one
    step tighter than the track it sits in, so the two are concentric. */
 [part="indicator"] {
   background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));

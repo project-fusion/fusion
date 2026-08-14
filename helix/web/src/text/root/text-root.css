@@ -20,7 +20,7 @@
    cannot drift apart.
 
    Those rules match the host, and this element takes them by inheritance:
-   font, colour, and tracking all cross a shadow boundary. `font: inherit` is
+   font, color, and tracking all cross a shadow boundary. `font: inherit` is
    what makes that work rather than merely possible, because the UA's own `h2`
    rules are declarations on this element and beat an inherited value. Resetting
    to `inherit` puts the host's computed font back in charge.

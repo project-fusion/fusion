@@ -37,7 +37,7 @@
 }
 
 /* A surface, not the accent. The selected node says where you are, and the
-   accent colour is reserved for state; using it here made the current page the
+   accent color is reserved for state; using it here made the current page the
    loudest thing on the screen. */
 :host([selected]) [part="row"] {
   background-color: var(--helix-color-surface-raised);

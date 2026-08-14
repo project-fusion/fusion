@@ -20,7 +20,7 @@ import { styles } from './kbd-root.css.js'
  * @documentation https://helix.fusion.dev/components/kbd
  *
  * @cssproperty --kbd-background-color - Fill of the key.
- * @cssproperty --kbd-border-color - Colour of the hairline and the edge.
+ * @cssproperty --kbd-border-color - Color of the hairline and the edge.
  */
 @customElement('helix-kbd')
 export class HelixKbd extends HelixBaseKbd {

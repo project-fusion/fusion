@@ -33,7 +33,7 @@
   --site-text-section: clamp(2rem, 4.5vw, 3.25rem);
 }
 
-/* Full width, held off the edges by the inset. Nothing is centred in a measure
+/* Full width, held off the edges by the inset. Nothing is centered in a measure
    any more; text that needs a measure asks for one. */
 .shell {
   inline-size: 100%;
@@ -61,16 +61,11 @@ helix-app-header {
   --app-header-max-inline-size: none;
 }
 
-/* The framed track the nav items sit in. It belongs to the site rather than to
-   the design system: `data-nav-item` styles an item, and where a run of them
-   sits in a groove is this page's decision. */
+/* No groove. The links sit on the page and the header's marker travels between
+   them, which is the whole treatment. */
 helix-app-header::part(nav) {
-  background-color: var(--helix-color-surface-sunken);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
-  block-size: calc(var(--helix-size-control-dense) + var(--helix-space-xs));
+  block-size: var(--helix-size-control-dense);
   gap: var(--helix-space-2xs);
-  padding: var(--helix-space-2xs);
 }
 
 /* ============================================================ hero ======= */
@@ -100,7 +95,7 @@ helix-app-header::part(nav) {
 
 /* ============================================================ sections === */
 
-/* One statement, set large and centred, with nothing else in the band. This is
+/* One statement, set large and centered, with nothing else in the band. This is
    the constraint, and it is the only thing on the site set as a quotation.
 
    Capped in `rem`, not `ch`. A `ch` on this container resolves against the
@@ -200,7 +195,7 @@ helix-app-header::part(nav) {
    Both are sticky, so neither scrolls out from under the content it describes.
 
    The middle track is the only one that grows, and the prose inside it is
-   centred in that track rather than filling it: a reference read at the full
+   centered in that track rather than filling it: a reference read at the full
    width of a desktop is a line nobody can track back from. */
 .docsShell {
   align-items: start;
