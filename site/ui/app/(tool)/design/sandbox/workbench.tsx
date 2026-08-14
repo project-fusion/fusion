@@ -318,7 +318,7 @@ export function SandboxWorkbench({ families }: Props) {
   const activeValue = `${family.slug}/${example.slug}`
 
   const tree = (
-    <helix-tree label="Examples" ref={treeRef} value={activeValue}>
+    <helix-tree chevron="end" label="Examples" ref={treeRef} value={activeValue}>
       {withExamples.map((entry) => (
         <helix-tree-item expanded={entry.slug === family.slug} key={entry.slug} value={entry.slug}>
           {/* Everything here is experimental, and saying so on each row is the

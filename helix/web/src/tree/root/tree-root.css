@@ -6,3 +6,19 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Where the chevron goes, said as the two things an item needs to know: which
+   end to put it at, and how much room a row without one has to leave at the
+   start. Custom properties rather than a selector, because the item draws its
+   own row inside its own shadow root and `::slotted()` stops at the host. */
+:host {
+  --_tree-chevron-order: 0;
+  --_tree-gutter: calc(var(--helix-size-icon) + var(--helix-space-2xs));
+}
+
+/* At the end there is nothing to reserve: every label starts at the row's own
+   inset, and the chevron is what moves. */
+:host([chevron="end"]) {
+  --_tree-chevron-order: 2;
+  --_tree-gutter: 0px;
+}

@@ -479,6 +479,8 @@ helix-app-header {
  * It suits a rail two levels deep. A tree that nests further wants a step back,
  * because with none of it the third level is indistinguishable from the second.
  */
+/* Chrome density, so the marks in a row come down with the type. */
+.examplesRail,
 .examplesRail helix-tree,
 helix-drawer helix-tree {
   /* `0px`, not `0`. The indent is multiplied by the level, and a unitless zero
@@ -487,4 +489,5 @@ helix-drawer helix-tree {
      chevron gutter with it. Measured, every row's padding fell to zero and the
      children sat left of their parents. */
   --tree-indent: 0px;
+  --helix-size-icon: var(--helix-size-icon-sm);
 }

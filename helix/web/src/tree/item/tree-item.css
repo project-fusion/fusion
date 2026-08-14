@@ -54,8 +54,7 @@
     var(--helix-space-xs) +
     (var(--_tree-level, 1) - 1) *
     var(--tree-indent, var(--helix-space-md)) +
-    var(--helix-size-icon) +
-    var(--helix-space-2xs)
+    var(--_tree-gutter, calc(var(--helix-size-icon) + var(--helix-space-2xs)))
   );
 }
 
@@ -100,6 +99,7 @@ slot[name="children"]::slotted(*) {
   color: var(--helix-color-foreground-subtle);
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon);
+  order: var(--_tree-chevron-order, 0);
   transform: rotate(-90deg);
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -124,10 +124,13 @@ slot[name="end"]::slotted(*) {
 /* Whatever is at the end goes to the far side of the row. On the slot rather
    than on what was slotted, so it applies once however many marks there are. */
 slot[name="end"] {
-  display: flex;
   align-items: center;
+  display: flex;
   gap: var(--helix-space-2xs);
+  /* Takes the free space, so it and anything ordered after it sit at the far
+     side. The chevron is ordered after it when the tree puts it there. */
   margin-inline-start: auto;
+  order: 1;
 }
 
 /* A mark beside the name reads as being about the name, so it takes the muted
@@ -136,6 +139,41 @@ slot[name="start"]::slotted(*) {
   color: var(--helix-color-foreground-subtle);
 }
 
+/* Opening a branch is a movement.
+ *
+ * The row that holds the children goes from no height to its own, which
+ * `grid-template-rows` can interpolate where `height: auto` cannot. `display`
+ * transitions with `allow-discrete` so the group is still `display: none` when
+ * shut, which is what keeps its rows out of the tree a reader is walking, and
+ * `@starting-style` gives the opening frame somewhere to come from.
+ */
+[part="group"] {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows var(--helix-duration-fast) var(--helix-easing-standard),
+    display var(--helix-duration-fast) allow-discrete;
+}
+
+[part="group"] > slot {
+  display: block;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
 [part="group"][hidden] {
   display: none;
+  grid-template-rows: 0fr;
+}
+
+@starting-style {
+  [part="group"]:not([hidden]) {
+    grid-template-rows: 0fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="group"] {
+    transition: none;
+  }
 }

@@ -258,7 +258,13 @@
   --helix-size-spinner-sm: calc(1rem * var(--_helix-seed-density));
   --helix-size-spinner-lg: calc(2.5rem * var(--_helix-seed-density));
   --helix-size-header: calc(3.5rem * var(--_helix-seed-density));
-  --helix-size-icon: 1.25rem;
+  /* The current step, which density moves, and the scale it moves along. An
+     icon is chrome: in a dense row it has to come down with the rest of it, or
+     a 20px mark sits beside 12px text and reads as the loudest thing there. */
+  --helix-size-icon: var(--helix-size-icon-md);
+  --helix-size-icon-lg: 1.5rem;
+  --helix-size-icon-md: 1.25rem;
+  --helix-size-icon-sm: 1rem;
   --helix-size-focus-ring: var(--helix-border-thick);
   --helix-size-focus-offset: 2px;
 

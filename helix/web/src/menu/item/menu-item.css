@@ -15,6 +15,10 @@
      toolbar whose buttons read at 12 made the menu the one thing not following
      the room it was opened from. */
   font-size: var(--helix-text-xs);
+  /* A shade heavier than body text. A menu is read by scanning rather than by
+     reading, and at twelve pixels the labels need the extra weight to hold
+     their own against the surface they sit on. */
+  font-weight: var(--helix-weight-medium);
   gap: var(--helix-space-xs);
   /* The label, then one trailing column for the mark. A row is never both a
      choice and a way into a page, so one column serves both and the marks line

@@ -8,11 +8,19 @@
   /* Compact by nature, and it says so once, so a control slotted into a row is
      the size the rows are rather than the size a page is. */
   --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
 
   background-color: var(--menu-background-color, var(--helix-color-surface-raised));
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  /* No border, said rather than left out: the UA stylesheet gives `[popover]`
+     `border: solid`, so dropping the declaration leaves a three-pixel medium
+     border rather than none at all. Measured, that is exactly what happened.
+
+     A surface in the top layer is already off the page, and a rule around it
+     draws a second edge just inside the one the shadow makes. The shadow says
+     it is floating; the border only made it look cut out. */
+  border: none;
   border-radius: var(--helix-radii-md);
-  box-shadow: var(--helix-shadow-md);
+  box-shadow: var(--helix-shadow-lg);
   /* The popover API puts it in the top layer, so the UA's own inset and border
      have to be cleared or it sits in the middle of the window with a frame. */
   inset: auto;

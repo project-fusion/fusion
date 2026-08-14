@@ -2119,6 +2119,16 @@ export type HelixTreeHelixSelectElementEvent =
   HelixTreeElementEvent<HelixSelectEvent>;
 
 export type HelixTreeProps = {
+  /** Which end of a row the chevron sits at.
+
+Unset is the start, which is what a tree of folders looks like. `end` puts
+it at the far side, where it reads as a control belonging to the row rather
+than as part of the name, and it lets every label start at one place
+without a row that has no chevron reserving space for one.
+
+On the tree rather than on each item, because a row whose chevron sat
+somewhere different from its siblings' would be a mistake, not a choice. */
+  chevron?: HelixTree["chevron"];
   /** Accessible name for the tree. */
   label?: HelixTree["label"];
   /** Value of the selected item, kept in step with the items themselves. */
@@ -2129,6 +2139,16 @@ export type HelixTreeProps = {
 };
 
 export type HelixTreeSolidJsProps = {
+  /** Which end of a row the chevron sits at.
+
+Unset is the start, which is what a tree of folders looks like. `end` puts
+it at the far side, where it reads as a control belonging to the row rather
+than as part of the name, and it lets every label start at one place
+without a row that has no chevron reserving space for one.
+
+On the tree rather than on each item, because a row whose chevron sat
+somewhere different from its siblings' would be a mistake, not a choice. */
+  "prop:chevron"?: HelixTree["chevron"];
   /** Accessible name for the tree. */
   "prop:label"?: HelixTree["label"];
   /** Value of the selected item, kept in step with the items themselves. */
@@ -4278,6 +4298,15 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `chevron`: Which end of a row the chevron sits at.
+   *
+   * Unset is the start, which is what a tree of folders looks like. `end` puts
+   * it at the far side, where it reads as a control belonging to the row rather
+   * than as part of the name, and it lets every label start at one place
+   * without a row that has no chevron reserving space for one.
+   *
+   * On the tree rather than on each item, because a row whose chevron sat
+   * somewhere different from its siblings' would be a mistake, not a choice.
    * - `label`: Accessible name for the tree.
    * - `value`: Value of the selected item, kept in step with the items themselves.
    *
@@ -6583,6 +6612,15 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `chevron`: Which end of a row the chevron sits at.
+   *
+   * Unset is the start, which is what a tree of folders looks like. `end` puts
+   * it at the far side, where it reads as a control belonging to the row rather
+   * than as part of the name, and it lets every label start at one place
+   * without a row that has no chevron reserving space for one.
+   *
+   * On the tree rather than on each item, because a row whose chevron sat
+   * somewhere different from its siblings' would be a mistake, not a choice.
    * - `label`: Accessible name for the tree.
    * - `value`: Value of the selected item, kept in step with the items themselves.
    *

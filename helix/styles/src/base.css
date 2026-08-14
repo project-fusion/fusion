@@ -468,18 +468,21 @@ helix-button[disabled]::part(button) {
  */
 [data-density="sm"] {
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
 }
 
 [data-density="md"] {
   --helix-size-checkbox: var(--helix-size-checkbox-md);
+  --helix-size-icon: var(--helix-size-icon-md);
   --helix-size-control: var(--helix-size-control-md);
   --helix-size-tag: var(--helix-size-tag-md);
 }
 
 [data-density="lg"] {
   --helix-size-checkbox: var(--helix-size-checkbox-lg);
+  --helix-size-icon: var(--helix-size-icon-lg);
   --helix-size-control: var(--helix-size-control-lg);
   --helix-size-tag: var(--helix-size-tag-lg);
 }
