@@ -50,12 +50,12 @@ export {
 } from './base-tabs.js'
 export { BaseTag, type BaseTagProps, BaseTagRoot } from './base-tag.js'
 export {
+  BaseToggle,
   BaseToggleGroup,
-  BaseToggleGroupItem,
-  type BaseToggleGroupItemProps,
   type BaseToggleGroupProps,
-  BaseToggleGroupRoot,
-} from './base-toggle-group.js'
+  type BaseToggleProps,
+  BaseToggleRoot,
+} from './base-toggle.js'
 export { BaseToolbar, type BaseToolbarProps, BaseToolbarRoot } from './base-toolbar.js'
 export {
   BaseTree,
@@ -101,11 +101,11 @@ export {
 export { Tag, type TagProps, TagRoot } from './tag.js'
 export { Text, type TextProps, TextRoot } from './text.js'
 export {
+  Toggle,
   ToggleGroup,
-  ToggleGroupItem,
-  type ToggleGroupItemProps,
   type ToggleGroupProps,
-  ToggleGroupRoot,
-} from './toggle-group.js'
+  type ToggleProps,
+  ToggleRoot,
+} from './toggle.js'
 export { Toolbar, type ToolbarProps, ToolbarRoot } from './toolbar.js'
 export { Tree, TreeItem, type TreeItemProps, type TreeProps, TreeRoot } from './tree.js'

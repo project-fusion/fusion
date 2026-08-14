@@ -1,7 +1,7 @@
 import { customElement, HelixElement } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixBaseToggleGroupItem } from '../item/toggle-group-item.js'
+import { HelixBaseToggle } from '../root/toggle-root.js'
 
 /** Keys the group handles, per the APG radio-group pattern. */
 const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'])
@@ -55,9 +55,9 @@ export class HelixBaseToggleGroup extends HelixElement {
 
   private observer: ResizeObserver | undefined
 
-  private get items(): HelixBaseToggleGroupItem[] {
+  private get items(): HelixBaseToggle[] {
     return [...this.children].filter(
-      (child): child is HelixBaseToggleGroupItem => child instanceof HelixBaseToggleGroupItem,
+      (child): child is HelixBaseToggle => child instanceof HelixBaseToggle,
     )
   }
 

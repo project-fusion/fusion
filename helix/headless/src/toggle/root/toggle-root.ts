@@ -26,8 +26,8 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixSelectionChangeEvent} SelectionChange - Fired when the item is chosen.
  */
-@customElement('helix-base-toggle-group-item')
-export class HelixBaseToggleGroupItem extends HelixElement {
+@customElement('helix-base-toggle')
+export class HelixBaseToggle extends HelixElement {
   /** Identifies the item to the group. */
   @property()
   value = ''
@@ -85,6 +85,6 @@ export class HelixBaseToggleGroupItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-toggle-group-item': HelixBaseToggleGroupItem
+    'helix-base-toggle': HelixBaseToggle
   }
 }

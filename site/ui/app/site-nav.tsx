@@ -60,15 +60,11 @@ export function SiteNav() {
         </a>
 
         {!narrow && (
-          <helix-toggle-group appearance="plain" label="Verticals" nav value={current}>
+          <helix-toggle-group label="Verticals" nav value={current}>
             {VERTICALS.map((vertical) => (
-              <helix-toggle-group-item
-                href={vertical.href}
-                key={vertical.href}
-                value={vertical.href}
-              >
+              <helix-toggle href={vertical.href} key={vertical.href} value={vertical.href}>
                 {vertical.label}
-              </helix-toggle-group-item>
+              </helix-toggle>
             ))}
           </helix-toggle-group>
         )}
@@ -82,18 +78,9 @@ export function SiteNav() {
           <helix-icon name="gear"></helix-icon>
         </helix-icon-button>
 
-        {narrow ? (
+        {narrow && (
           <helix-button appearance="subtle" onClick={() => setOpen(true)} size="sm" slot="actions">
             Menu
-          </helix-button>
-        ) : (
-          <helix-button
-            appearance="primary"
-            href="mailto:hello@fusion.dev"
-            size="sm"
-            slot="actions"
-          >
-            Get in touch
           </helix-button>
         )}
       </helix-app-header>

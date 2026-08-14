@@ -11,7 +11,7 @@
   align-items: center;
   background: none;
   border: none;
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
@@ -25,11 +25,21 @@
   white-space: nowrap;
 }
 
-/* Colour only. The indicator is the one surface in the group, which is what
-   lets it read as a single object travelling between items; a fill on the item
-   as well would mean two things marking the same state. */
+/* A wash rather than a surface. The travelling thumb is the group's one real
+   surface; hover only has to say "this is reachable", and mixing a few percent
+   of the foreground into the track does that without competing. */
 [part="item"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);
+}
+
+/* The thumb is behind this item, so the label on top of it goes to full
+   strength and gains weight. Weight rather than colour, again because colour
+   is the one thing reserved for state. */
+:host([selected]) [part="item"] {
+  background-color: transparent;
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
 }
 
 :host([selected]) [part="item"] {
