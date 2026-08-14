@@ -14,7 +14,7 @@ every size, including one a consumer sets themselves through
  * Renders `<helix-avatar>`.
  */
 export interface AvatarProps extends Omit<BaseProps, 'onError' | 'onLoad'> {
-  /** Accessible name, when it should differ from `name`. `name` is what the initials are drawn from, so it has to be a person's name. This is for the cases where what should be announced is not: an avatar standing for a whole team, or one whose label carries a role. */
+  /** Accessible name. Falls back to `name`, which the initials come from. */
   label?: string
   /** Name of the person or entity. Used for the label and the initials. */
   name?: string

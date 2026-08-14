@@ -2,12 +2,7 @@ import { customElement, HelixElement } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
-/**
- * Initials for a name: first letter of the first and last words.
- *
- * A pure function of the name, so the server and the client agree without
- * either of them measuring anything.
- */
+/** Initials for a name: first letter of the first and last words. */
 export const initialsOf = (name: string): string => {
   const words = name.trim().split(/\s+/).filter(Boolean)
   if (words.length === 0) {
@@ -22,30 +17,15 @@ export const initialsOf = (name: string): string => {
  * @summary Represents a person or entity with an image or their initials.
  *
  * @description
- * The fallback is the reason this is an element. An image that fails to load
- * leaves a broken icon and no name, so the avatar listens for the error and
- * falls back: to whatever was slotted, or to initials derived from `name`.
+ * Shows `src` until it fails to load. Without an image, or after a failure,
+ * the default slot is shown; its own fallback is the initials.
  *
- * **One element, not three.** A separate image and fallback would each need to
- * be written for every avatar and would have to coordinate through an event,
- * and the only thing that buys is trying several sources in turn. The fallback
- * carries no behavior at all, which by the rule here makes it a slot; the image
- * does own load state, but the root already owns it.
+ * The host carries the accessible name, so the `<img>` takes an empty `alt` and
+ * the initials are hidden from assistive technology. Announcing either would
+ * repeat the name.
  *
- * `name` is required for the accessible name whether or not there is an image,
- * because an avatar with no name tells a screen-reader user nothing. Initials
- * are hidden from assistive technology: they are a visual shorthand for the
- * name that is already announced, and would otherwise be read out letter by
- * letter after it.
- *
- * The `<img>` keeps an empty `alt` for the same reason. The host carries the
- * accessible name through `ElementInternals`, so a populated `alt` would
- * announce the same person twice.
- *
- * The image's own `load` and `error` are relayed from the host. They are not
- * composed, so they stop at the shadow boundary otherwise, and relaying them
- * under their native names is what lets a consumer wait for an avatar the way
- * they would wait for any image.
+ * `load` and `error` are relayed from the host. They are not composed, so they
+ * stop at the shadow boundary otherwise.
  *
  * @since 0.1.0
  * @status experimental
@@ -70,23 +50,11 @@ export class HelixBaseAvatar extends HelixElement {
   @property()
   name = ''
 
-  /**
-   * Accessible name, when it should differ from `name`.
-   *
-   * `name` is what the initials are drawn from, so it has to be a person's
-   * name. This is for the cases where what should be announced is not: an
-   * avatar standing for a whole team, or one whose label carries a role.
-   */
+  /** Accessible name. Falls back to `name`, which the initials come from. */
   @property()
   label = ''
 
-  /**
-   * Whether the image failed.
-   *
-   * State rather than a property: it is the element's own observation, not
-   * something a consumer sets, and it starts false on the server because the
-   * server cannot know whether an image will load.
-   */
+  /** Whether the image failed. The element's own observation, never set. */
   @state()
   private failed = false
 
@@ -101,8 +69,6 @@ export class HelixBaseAvatar extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // On the host through internals, so the avatar announces itself without
-    // taking an attribute a consumer's server markup never had.
     this.internals.role = 'img'
     this.internals.ariaLabel = this.label || this.name || null
   }
@@ -118,10 +84,6 @@ export class HelixBaseAvatar extends HelixElement {
       />`
     }
 
-    // The slot is the fallback rather than a replacement for everything, so a
-    // consumer can say "this image, and my icon if it fails" rather than having
-    // to choose between an image and their own content. Its own fallback is the
-    // initials, which is what an unfilled slot renders.
     return html`<slot>
       <span part="initials" aria-hidden="true">${initialsOf(this.name)}</span>
     </slot>`
