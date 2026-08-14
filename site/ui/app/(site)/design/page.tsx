@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { families } from '../../../lib/catalog'
+import { getFamilies } from '../../../lib/catalog'
 import { findVertical } from '../../verticals'
 import { VerticalPage } from '../vertical-page'
 
@@ -19,6 +19,7 @@ export default function Page() {
     return null
   }
 
+  const families = getFamilies()
   const elements = families.reduce((total, family) => total + family.elements.length, 0)
   const examples = families.reduce((total, family) => total + family.examples.length, 0)
 

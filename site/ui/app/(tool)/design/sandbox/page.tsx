@@ -1,4 +1,4 @@
-import { families } from '../../../../lib/catalog'
+import { getFamilies } from '../../../../lib/catalog'
 import { SandboxWorkbench } from './workbench'
 
 /**
@@ -10,5 +10,5 @@ import { SandboxWorkbench } from './workbench'
  * share format.
  */
 export default function SandboxPage() {
-  return <SandboxWorkbench families={families} />
+  return <SandboxWorkbench families={getFamilies()} />
 }

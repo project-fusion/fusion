@@ -48,6 +48,13 @@
   padding-inline: var(--helix-space-none);
 }
 
+/* One character, so the mark is a circle. `min-inline-size` alone does not get
+   there: the inline padding pushes a wide glyph past the block size, and a 9
+   renders 1.2px wider than it is tall where a 1 does not. */
+[part="indicator"][data-single] {
+  padding-inline: var(--helix-space-none);
+}
+
 /* Arriving. The mark stays mounted with nothing to show, so this is a state
    change and not an insertion, and both directions transition on their own. */
 [part="indicator"] {

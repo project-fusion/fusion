@@ -60,6 +60,7 @@ export class HelixBaseBadge extends HelixElement {
 
   protected override render(): TemplateResult {
     const blank = this.blank
+    const text = this.text
     const announced = this.label !== '' && !blank
 
     // The indicator holds the text and nothing else, so an absent value leaves
@@ -68,17 +69,22 @@ export class HelixBaseBadge extends HelixElement {
     // which is why the tags close the way they do.
     //
     // It stays mounted when there is nothing to show, so the styled tier can
-    // transition it out rather than having it vanish between frames. `blank` is
-    // on the shadow content, not the host, so it costs no attribute a consumer's
-    // server markup would have to match.
+    // transition it out rather than having it vanish between frames. Both
+    // markers are on the shadow content, not the host, so they cost no
+    // attribute a consumer's server markup would have to match.
+    //
+    // `single` is what lets a one-character mark be a circle. Whether the text
+    // fits inside the square is a fact about the string, and CSS cannot count
+    // characters.
     return html`<slot></slot>
       <span
         part="indicator"
         data-blank=${blank ? '' : nothing}
+        data-single=${text.length <= 1 ? '' : nothing}
         role=${announced ? 'status' : nothing}
         aria-label=${announced ? this.label : nothing}
         aria-hidden=${announced ? nothing : 'true'}
-        >${this.text}</span
+        >${text}</span
       >`
   }
 }

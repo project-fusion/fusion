@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { type ApiMember, families, findFamily } from '../../../../../lib/catalog'
+import { type ApiMember, findFamily, getFamilies } from '../../../../../lib/catalog'
 
 /**
  * API reference for one family, read from the manifest and nothing else.
@@ -15,7 +15,7 @@ import { type ApiMember, families, findFamily } from '../../../../../lib/catalog
  */
 
 export function generateStaticParams() {
-  return families.map((family) => ({ family: family.slug }))
+  return getFamilies().map((family) => ({ family: family.slug }))
 }
 
 function ApiTable({ caption, rows }: { caption: string; rows: ApiMember[] }) {
@@ -63,7 +63,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
       {/* Families only. Examples belong to the sandbox, and listing them here
           is what made the two surfaces one confusing thing. */}
       <helix-tree class="docsNav" label="Components" value={family.slug}>
-        {families.map((entry) => (
+        {getFamilies().map((entry) => (
           <helix-tree-item key={entry.slug} value={entry.slug}>
             <a data-link="quiet" href={`/design/components/${entry.slug}`}>
               {entry.label}
