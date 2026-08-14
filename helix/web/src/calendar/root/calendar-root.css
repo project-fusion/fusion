@@ -20,7 +20,7 @@
   display: flex;
   gap: var(--helix-space-2xs);
   justify-content: space-between;
-  margin-block-end: var(--helix-space-xs);
+  margin-block-end: var(--helix-space-lg);
 }
 
 [part="heading"] {
