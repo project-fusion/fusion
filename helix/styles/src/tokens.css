@@ -61,6 +61,11 @@
   --helix-color-foreground-muted: light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400));
   --helix-color-foreground-subtle: light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500));
   --helix-color-foreground-on-accent: var(--_helix-neutral-0);
+  /* The mode's opposite, for a surface that has to read as separate from the
+     page rather than as part of it: a tooltip, a toast. Both flip together, so
+     the pair stays legible in either mode. */
+  --helix-color-surface-inverse: light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100));
+  --helix-color-foreground-inverse: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
 
   /* Lines. */
   --helix-color-border: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-800));

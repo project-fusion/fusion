@@ -39,6 +39,7 @@ import type {
   HelixBaseToggle,
   HelixBaseToggleGroup,
   HelixBaseToolbar,
+  HelixBaseTooltip,
   HelixBaseTree,
   HelixBaseTreeItem,
   HelixDismissEvent,
@@ -1463,6 +1464,33 @@ export type HelixBaseToolbarSolidJsProps = {
   "prop:label"?: HelixBaseToolbar["label"];
   /** Which way the arrow keys move. */
   "prop:orientation"?: HelixBaseToolbar["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseTooltipProps = {
+  /** The text shown in the bubble. */
+  content?: HelixBaseTooltip["content"];
+  /** Preferred side. It moves if that side does not fit. */
+  placement?: HelixBaseTooltip["placement"];
+  /** Space between the trigger and the bubble, in pixels. */
+  offset?: HelixBaseTooltip["offset"];
+  /** Whether the tooltip never shows. */
+  disabled?: HelixBaseTooltip["disabled"];
+};
+
+export type HelixBaseTooltipSolidJsProps = {
+  /** The text shown in the bubble. */
+  "prop:content"?: HelixBaseTooltip["content"];
+  /** Preferred side. It moves if that side does not fit. */
+  "prop:placement"?: HelixBaseTooltip["placement"];
+  /** Space between the trigger and the bubble, in pixels. */
+  "prop:offset"?: HelixBaseTooltip["offset"];
+  /** Whether the tooltip never shows. */
+  "prop:disabled"?: HelixBaseTooltip["disabled"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3164,6 +3192,56 @@ export type CustomElements = {
    */
   "helix-base-toolbar": Partial<
     HelixBaseToolbarProps & BaseProps<HelixBaseToolbar> & BaseEvents
+  >;
+
+  /**
+   * The trigger is slotted and stays the consumer's own element. The bubble is
+   * rendered here, in the top layer through the popover API, so it clears any
+   * ancestor with `overflow: hidden` without a `z-index` anywhere.
+   *
+   * Position comes from `FloatingController`, which flips to another side when
+   * the preferred one does not fit and slides along it to stay in view.
+   *
+   * **The description is linked by element reference, not by id.** An IDREF
+   * cannot cross a shadow boundary, so `aria-describedby` on a slotted trigger
+   * pointing at a bubble in here resolves to nothing.
+   * `ElementInternals.ariaDescribedByElements` takes the element itself, which
+   * does cross.
+   *
+   * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
+   * A tooltip that answers only the pointer is one a keyboard reader never sees.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `content`: The text shown in the bubble.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `offset`: Space between the trigger and the bubble, in pixels.
+   * - `disabled`: Whether the tooltip never shows.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The trigger.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `show() => void`: Shows the bubble, unless there is nothing to show.
+   * - `hide() => void`: Hides the bubble.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tooltip`: The bubble.
+   * - `arrow`: The point aimed at the trigger.
+   */
+  "helix-base-tooltip": Partial<
+    HelixBaseTooltipProps & BaseProps<HelixBaseTooltip> & BaseEvents
   >;
 
   /**
@@ -4990,6 +5068,59 @@ export type CustomElementsSolidJs = {
     HelixBaseToolbarProps &
       HelixBaseToolbarSolidJsProps &
       BaseProps<HelixBaseToolbar> &
+      BaseEvents
+  >;
+
+  /**
+   * The trigger is slotted and stays the consumer's own element. The bubble is
+   * rendered here, in the top layer through the popover API, so it clears any
+   * ancestor with `overflow: hidden` without a `z-index` anywhere.
+   *
+   * Position comes from `FloatingController`, which flips to another side when
+   * the preferred one does not fit and slides along it to stay in view.
+   *
+   * **The description is linked by element reference, not by id.** An IDREF
+   * cannot cross a shadow boundary, so `aria-describedby` on a slotted trigger
+   * pointing at a bubble in here resolves to nothing.
+   * `ElementInternals.ariaDescribedByElements` takes the element itself, which
+   * does cross.
+   *
+   * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
+   * A tooltip that answers only the pointer is one a keyboard reader never sees.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `content`: The text shown in the bubble.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `offset`: Space between the trigger and the bubble, in pixels.
+   * - `disabled`: Whether the tooltip never shows.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The trigger.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `show() => void`: Shows the bubble, unless there is nothing to show.
+   * - `hide() => void`: Hides the bubble.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tooltip`: The bubble.
+   * - `arrow`: The point aimed at the trigger.
+   */
+  "helix-base-tooltip": Partial<
+    HelixBaseTooltipProps &
+      HelixBaseTooltipSolidJsProps &
+      BaseProps<HelixBaseTooltip> &
       BaseEvents
   >;
 

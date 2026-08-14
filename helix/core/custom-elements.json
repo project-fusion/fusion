@@ -108,6 +108,94 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/floating-controller/floating-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Places one element against another, and keeps it there.\n\nPositioning is `@floating-ui/dom` rather than arithmetic written here. Two\nthings in particular are why. A `position: fixed` element inside an ancestor\ncarrying `transform`, `filter`, `will-change`, or `contain` is positioned\nagainst that ancestor and not the viewport, so viewport coordinates land it\nsomewhere else entirely. And an overlay has to clear its nearest *clipping*\nancestor, not just the window, or it is placed correctly inside a scrolling\npanel and clipped out of sight by it. Both are ordinary here, and both are a\nlong tail of browser behaviour rather than a formula.\n\n`autoUpdate` keeps the position through scrolling on any ancestor, resizes of\neither element, and layout shifts.\n\nThe side the element actually landed on is written back as `data-placement`,\nso a styled tier can animate from it rather than from the side that was\nasked for.",
+          "name": "FloatingController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "FloatingOptions"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "options"
+            },
+            {
+              "kind": "field",
+              "name": "cleanup",
+              "type": {
+                "text": "(() => void) | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "placement",
+              "type": {
+                "text": "Placement"
+              },
+              "default": "'bottom-start'",
+              "description": "The placement in use after the last measurement."
+            },
+            {
+              "kind": "method",
+              "name": "start",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Starts placing, and keeps placing until stopped."
+            },
+            {
+              "kind": "method",
+              "name": "stop",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Stops placing and releases everything it was tracking."
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "Placement",
+          "declaration": {
+            "name": "Placement",
+            "module": "src/controllers/floating-controller/floating-controller.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FloatingController",
+          "declaration": {
+            "name": "FloatingController",
+            "module": "src/controllers/floating-controller/floating-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/controllers/focus-trap-controller/focus-trap-controller.ts",
       "declarations": [
         {
@@ -616,6 +704,30 @@
           "declaration": {
             "name": "DismissOptions",
             "module": "./controllers/dismiss-controller/dismiss-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FloatingController",
+          "declaration": {
+            "name": "FloatingController",
+            "module": "./controllers/floating-controller/floating-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FloatingOptions",
+          "declaration": {
+            "name": "FloatingOptions",
+            "module": "./controllers/floating-controller/floating-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Placement",
+          "declaration": {
+            "name": "Placement",
+            "module": "./controllers/floating-controller/floating-controller.js"
           }
         },
         {

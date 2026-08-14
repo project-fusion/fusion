@@ -90,6 +90,7 @@ export {
   BaseToggleRoot,
 } from './base-toggle.js'
 export { BaseToolbar, type BaseToolbarProps, BaseToolbarRoot } from './base-toolbar.js'
+export { BaseTooltip, type BaseTooltipProps, BaseTooltipRoot } from './base-tooltip.js'
 export {
   BaseTree,
   BaseTreeItem,
@@ -154,4 +155,5 @@ export {
   ToggleRoot,
 } from './toggle.js'
 export { Toolbar, type ToolbarProps, ToolbarRoot } from './toolbar.js'
+export { Tooltip, type TooltipProps, TooltipRoot } from './tooltip.js'
 export { Tree, TreeItem, type TreeItemProps, type TreeProps, TreeRoot } from './tree.js'

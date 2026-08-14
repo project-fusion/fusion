@@ -8039,6 +8039,14 @@
         },
         {
           "kind": "js",
+          "name": "Placement",
+          "declaration": {
+            "name": "Placement",
+            "package": "@helix-io/headless"
+          }
+        },
+        {
+          "kind": "js",
           "name": "*",
           "declaration": {
             "name": "*",
@@ -8307,6 +8315,14 @@
           "declaration": {
             "name": "*",
             "module": "src/toolbar/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tooltip/index.js"
           }
         },
         {
@@ -13226,6 +13242,407 @@
           "declaration": {
             "name": "HelixToolbar",
             "module": "src/toolbar/root/toolbar-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tooltip/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tooltip/root/tooltip-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tooltip/root/tooltip-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/tooltip/root/tooltip-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tooltip/root/tooltip-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The bubble is in the top layer, so it needs no `z-index` and cannot be\nclipped by whatever it sits inside.\n\nThe arrow is positioned by the same pass that positions the bubble, so it\nstill points at the trigger after the bubble has slid along to stay in view.",
+          "name": "HelixTooltip",
+          "cssProperties": [
+            {
+              "description": "Fill of the bubble.",
+              "name": "--tooltip-background-color"
+            },
+            {
+              "description": "Widest the bubble grows before wrapping.",
+              "name": "--tooltip-max-inline-size"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "content",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The text shown in the bubble.",
+              "attribute": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "placement",
+              "type": {
+                "text": "Placement"
+              },
+              "default": "'top'",
+              "description": "Preferred side. It moves if that side does not fit.",
+              "attribute": "placement",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "offset",
+              "type": {
+                "text": "number"
+              },
+              "default": "8",
+              "description": "Space between the trigger and the bubble, in pixels.",
+              "attribute": "offset",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tooltip never shows.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "showing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the bubble is showing.",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "trigger",
+              "type": {
+                "text": "HTMLElement"
+              },
+              "privacy": "private",
+              "description": "The element the bubble points at.\n\nThe trigger, not the host. The host is `display: contents` so it wraps\nwithout adding a box, and an element that generates no box measures as\nnothing at the document origin: the bubble was placed against the corner\nof the viewport rather than against the button.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "floating",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new FloatingController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), floating: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), offset: () => this.offset, placement: () => this.placement, })",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "bubble",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Shows the bubble, unless there is nothing to show.",
+              "type": {
+                "text": "show() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hide",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Hides the bubble.",
+              "type": {
+                "text": "hide() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTooltip",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A short description that appears beside what it describes.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tooltip",
+            "aliases": [
+              "Hint",
+              "Popup label"
+            ],
+            "tier": "styled",
+            "group": "Tooltip",
+            "part": "Root"
+          },
+          "tagName": "helix-tooltip",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The trigger.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The bubble.",
+              "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "description": "The point aimed at the trigger.",
+              "name": "arrow",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "content",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The text shown in the bubble.",
+              "fieldName": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "name": "placement",
+              "type": {
+                "text": "Placement"
+              },
+              "default": "'top'",
+              "description": "Preferred side. It moves if that side does not fit.",
+              "fieldName": "placement",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "name": "offset",
+              "type": {
+                "text": "number"
+              },
+              "default": "8",
+              "description": "Space between the trigger and the bubble, in pixels.",
+              "fieldName": "offset",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tooltip never shows.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/tooltip/root/tooltip-root.ts",
+          "definitionPath": "src/tooltip/root/tooltip-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTooltip",
+          "declaration": {
+            "name": "HelixTooltip",
+            "module": "src/tooltip/root/tooltip-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-tooltip",
+          "declaration": {
+            "name": "HelixTooltip",
+            "module": "src/tooltip/root/tooltip-root.ts"
           }
         }
       ]
