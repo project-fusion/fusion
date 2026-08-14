@@ -329,31 +329,79 @@ parent.
 
 ### Root
 
-Description
+Triggers an action or submits a form.
+
+Renders a real `<button>`, so activation, focus, and the browser's own
+affordances come from the platform rather than from key handlers.
+`delegatesFocus` puts focus on that inner control and serializes into the
+server's markup, so the button is keyboard reachable before any script loads.
+
+**It never renders an anchor.** A router renders its own `<a>` to intercept a
+click and cannot render one inside this shadow root, so a button that could also
+be a link made every such navigation a full page load. A link that looks like a
+button is styling, so it is a recipe in the base layer:
+
+```html
+<a data-button="primary" href="/pricing">See pricing</a>
+```
+
+Form submission is explicit. A `<button type="submit">` inside a shadow root
+submits nothing, because the form is on the other side of the boundary, so the
+inner control is always `type="button"` and this element calls `requestSubmit()`
+on its form. That routes through validation, where `submit()` would not.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property    | Attribute  | Type                                | Default    | Inherited From     | Description                                          |
+| ----------- | ---------- | ----------------------------------- | ---------- | ------------------ | ---------------------------------------------------- |
+| `disabled`  | `disabled` | `boolean`                           | `false`    | `HelixFormElement` | Whether the control is inert.                        |
+| `focusable` | -          | `boolean`                           | `true`     | -                  | Whether the button holds its group's tab stop.       |
+| `label`     | `label`    | `string`                            | `''`       | -                  | Accessible name, for a button whose content is not text. |
+| `type`      | `type`     | `'button' \| 'submit' \| 'reset'`  | `'button'` | -                  | What activating the button does to its form.         |
+
+`focusable` has no attribute. A toolbar keeps one tab stop across its children,
+and writing `tabindex` on each of them changes markup the consumer rendered,
+which a React consumer's hydration reports and does not patch up. The parent
+sets this property, and the stop lands on the inner control inside the shadow
+root.
+
+`label` is a property rather than `aria-label` on the host, because it names the
+inner `<button>`. An `aria-label` on the host would name the host, which carries
+no role.
+
+#### Getters
+
+| Getter   | Type                      | Inherited From     | Description                          |
+| -------- | ------------------------- | ------------------ | ------------------------------------ |
+| `form`   | `HTMLFormElement \| null` | `HelixFormElement` | The form this control belongs to.    |
+| `labels` | `NodeList`                | `HelixFormElement` | Labels associated with the control.  |
 
 #### Events
 
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+None of its own. `click` is the native event from the inner control and
+retargets to the host, so a consumer listens for it the way they would on any
+button.
 
 #### Slots
 
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
+| Slot        | Description                              |
+| ----------- | ---------------------------------------- |
+| _(default)_ | The button's label.                      |
+| `start`     | Content before the label, usually an icon. |
+| `end`       | Content after the label.                 |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+| Part     | Description        |
+| -------- | ------------------ |
+| `button` | The inner control. |
+
+### Styled
+
+Adds `appearance` (`primary`, `neutral`, `subtle`, `danger`) and `size` (`sm`,
+`md`, `lg`), both reflected and both absent by default. The focus ring is
+declared in the component rather than inherited, because the base layer's
+`:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
 
 ## BaseButtonGroup
 
