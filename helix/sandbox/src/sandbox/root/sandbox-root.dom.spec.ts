@@ -87,6 +87,91 @@ describe('sandbox coordination', () => {
     expect(preview.shadowRoot?.querySelector('iframe')?.getAttribute('title')).toBe('Preview')
   })
 
+  test('a console call in the frame arrives as an event on the host', async () => {
+    // The terminal's whole source. A message from any other window, or from
+    // any other origin, is not this preview's.
+    const sandbox = await mount(wired)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable
+    const frame = preview.shadowRoot?.querySelector('iframe') as HTMLIFrameElement
+    const sender = {}
+    Object.defineProperty(frame, 'contentWindow', { value: sender })
+
+    const heard: string[] = []
+    preview.addEventListener('helix-console', (event) => {
+      const { level, text } = (event as CustomEvent<{ level: string; text: string }>).detail
+      heard.push(`${level}: ${text}`)
+    })
+
+    const post = (source: unknown, origin: string) =>
+      window.dispatchEvent(
+        Object.assign(
+          new MessageEvent('message', {
+            data: { level: 'warn', text: 'from the example', type: 'helix-preview-console' },
+          }),
+          { origin, source },
+        ),
+      )
+
+    post(sender, window.location.origin)
+    post({}, window.location.origin)
+    post(sender, 'https://elsewhere.test')
+
+    expect(heard).toEqual(['warn: from the example'])
+  })
+
+  test('the layout and direction go to the frame, not onto the host', async () => {
+    // Spacing around an example belongs to the document the example is in.
+    // Padding on the host would sit outside the frame, where no layout mode
+    // could reach it.
+    const sandbox = await mount(wired)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
+      direction: string
+      layout: string
+    }
+    const frame = preview.shadowRoot?.querySelector('iframe') as HTMLIFrameElement
+    const sent: Record<string, unknown>[] = []
+    Object.defineProperty(frame, 'contentWindow', {
+      value: { postMessage: (message: Record<string, unknown>) => sent.push(message) },
+    })
+
+    window.dispatchEvent(
+      Object.assign(new MessageEvent('message', { data: { type: 'helix-preview-ready' } }), {
+        origin: window.location.origin,
+        source: frame.contentWindow,
+      }),
+    )
+
+    preview.layout = 'centered'
+    preview.direction = 'rtl'
+    await preview.updateComplete
+
+    const last = sent.at(-1)
+    expect(last?.layout).toBe('centered')
+    expect(last?.direction).toBe('rtl')
+  })
+
+  test('the frame is answered at a named origin, never at a wildcard', async () => {
+    // `'*'` delivers to whatever the frame has navigated to, which need not be
+    // what `src` said.
+    const sandbox = await mount(wired)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable
+    const frame = preview.shadowRoot?.querySelector('iframe') as HTMLIFrameElement
+    const origins: string[] = []
+    Object.defineProperty(frame, 'contentWindow', {
+      value: { postMessage: (_: unknown, origin: string) => origins.push(origin) },
+    })
+
+    window.dispatchEvent(
+      Object.assign(new MessageEvent('message', { data: { type: 'helix-preview-ready' } }), {
+        origin: window.location.origin,
+        source: frame.contentWindow,
+      }),
+    )
+
+    expect(origins).not.toContain('*')
+    expect(origins[0]).toBe(window.location.origin)
+  })
+
   test('nothing is sent until the frame says it is listening', async () => {
     // A document that has not loaded has no listener, so a render posted at it
     // is lost and the preview stays empty until something else moves.

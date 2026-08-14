@@ -159,6 +159,36 @@ export class HelixChangeEvent extends CustomEvent<ChangeDetail> {
   }
 }
 
+/** Detail carried by `helix-console`. */
+export interface ConsoleDetail {
+  /** How the message was logged. */
+  level: 'log' | 'info' | 'warn' | 'error'
+
+  /** The message, already flattened to text. */
+  text: string
+}
+
+/**
+ * Fired when something being previewed writes to the console.
+ *
+ * Carries text rather than the logged values. The preview is a separate
+ * document, so what arrives has crossed `postMessage` and been through
+ * structured clone: a DOM node or a function does not survive that, and half a
+ * value is worse than a string of it.
+ */
+export class HelixConsoleEvent extends CustomEvent<ConsoleDetail> {
+  static readonly eventName = 'helix-console'
+
+  constructor(detail: ConsoleDetail) {
+    super(HelixConsoleEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** Detail carried by `helix-select`. */
 export interface SelectDetail {
   /** Value of the item the reader chose. */

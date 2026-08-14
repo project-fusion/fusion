@@ -145,6 +145,16 @@
               "description": "Takes messages from the frame.\n\nThe source is checked against this frame's own window, because every frame\non the page posts to the same parent and a sandbox is rarely alone."
             },
             {
+              "kind": "field",
+              "name": "origin",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The origin the frame is on, which is what it is answered at.\n\n`postMessage` to `'*'` delivers to whatever the frame has navigated to,\nwhich is not necessarily what `src` said. Naming the origin means a frame\nthat moved gets nothing rather than the sandbox's contents.",
+              "readonly": true
+            },
+            {
               "kind": "method",
               "name": "send",
               "privacy": "private",
@@ -228,7 +238,7 @@
           "events": [
             {
               "type": {
-                "text": "CustomEvent"
+                "text": "HelixConsoleEvent"
               },
               "description": "Relayed from the frame, one per console call.",
               "name": "helix-console",

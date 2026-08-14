@@ -10,9 +10,11 @@ export {
 export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {
   type ChangeDetail,
+  type ConsoleDetail,
   type DismissDetail,
   HelixChangeEvent,
   HelixCloseEvent,
+  HelixConsoleEvent,
   HelixDismissEvent,
   HelixOpenEvent,
   HelixSelectEvent,

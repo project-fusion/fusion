@@ -1,17 +1,33 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixConsoleEvent, HelixElement } from '@helix-io/core'
 import type { CSSResultGroup } from 'lit'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as sheet } from './sandbox-preview.css.js'
 
-/** What the frame is told, and what it says back. */
-export interface PreviewMessage {
-  level?: 'log' | 'info' | 'warn' | 'error'
-  source?: string
-  styles?: string
-  text?: string
-  type: 'helix-preview-ready' | 'helix-preview-render' | 'helix-preview-console'
+/** The frame saying it has a listener, and where to answer it. */
+export interface PreviewReady {
+  type: 'helix-preview-ready'
 }
+
+/** What the frame is asked to render. */
+export interface PreviewRender {
+  direction: 'ltr' | 'rtl'
+  layout: 'padded' | 'centered' | 'fullscreen'
+  /** Where to answer, so the frame need not guess its parent's origin. */
+  origin: string
+  source: string
+  styles: string
+  type: 'helix-preview-render'
+}
+
+/** One console call from inside the frame. */
+export interface PreviewConsole {
+  level: 'log' | 'info' | 'warn' | 'error'
+  text: string
+  type: 'helix-preview-console'
+}
+
+export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender
 
 /**
  * @summary Renders sandbox source in a frame of its own.
@@ -41,7 +57,7 @@ export interface PreviewMessage {
  * @aliases Result, Output
  * @documentation https://helix.fusion.dev/sandbox/preview
  *
- * @event {CustomEvent} helix-console - Relayed from the frame, one per console call.
+ * @event {HelixConsoleEvent} helix-console - Relayed from the frame, one per console call.
  *
  * @csspart frame - The iframe.
  */
@@ -85,7 +101,7 @@ export class HelixSandboxPreview extends HelixElement {
    * on the page posts to the same parent and a sandbox is rarely alone.
    */
   private readonly handleMessage = (event: MessageEvent<PreviewMessage>): void => {
-    if (event.source !== this.frame?.contentWindow) {
+    if (event.source !== this.frame?.contentWindow || event.origin !== this.origin) {
       return
     }
     if (event.data?.type === 'helix-preview-ready') {
@@ -94,13 +110,22 @@ export class HelixSandboxPreview extends HelixElement {
       return
     }
     if (event.data?.type === 'helix-preview-console') {
-      this.dispatchEvent(
-        new CustomEvent('helix-console', {
-          bubbles: true,
-          composed: true,
-          detail: { level: event.data.level ?? 'log', text: event.data.text ?? '' },
-        }),
-      )
+      this.dispatchEvent(new HelixConsoleEvent({ level: event.data.level, text: event.data.text }))
+    }
+  }
+
+  /**
+   * The origin the frame is on, which is what it is answered at.
+   *
+   * `postMessage` to `'*'` delivers to whatever the frame has navigated to,
+   * which is not necessarily what `src` said. Naming the origin means a frame
+   * that moved gets nothing rather than the sandbox's contents.
+   */
+  private get origin(): string {
+    try {
+      return new URL(this.src, window.location.href).origin
+    } catch {
+      return window.location.origin
     }
   }
 
@@ -109,16 +134,15 @@ export class HelixSandboxPreview extends HelixElement {
     if (!this.ready) {
       return
     }
-    this.frame?.contentWindow?.postMessage(
-      {
-        direction: this.direction ?? 'ltr',
-        layout: this.layout ?? 'padded',
-        source: this.source,
-        styles: this.styles,
-        type: 'helix-preview-render',
-      } satisfies PreviewMessage & { direction: string; layout: string },
-      '*',
-    )
+    const message: PreviewRender = {
+      direction: this.direction ?? 'ltr',
+      layout: this.layout ?? 'padded',
+      origin: window.location.origin,
+      source: this.source,
+      styles: this.styles,
+      type: 'helix-preview-render',
+    }
+    this.frame?.contentWindow?.postMessage(message, this.origin)
   }
 
   override connectedCallback(): void {

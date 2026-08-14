@@ -373,6 +373,28 @@
         },
         {
           "kind": "class",
+          "description": "Fired when something being previewed writes to the console.\n\nCarries text rather than the logged values. The preview is a separate\ndocument, so what arrives has crossed `postMessage` and been through\nstructured clone: a DOM node or a function does not survive that, and half a\nvalue is worse than a string of it.",
+          "name": "HelixConsoleEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-console'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Fired when the reader selects an item in a set.\n\nBubbles and is composed, because this is how a set coordinates: a tree, a\ntab list and a toggle group all learn which of their children was chosen by\nhearing it arrive.",
           "name": "HelixSelectEvent",
           "members": [
@@ -424,6 +446,14 @@
           "name": "HelixChangeEvent",
           "declaration": {
             "name": "HelixChangeEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixConsoleEvent",
+          "declaration": {
+            "name": "HelixConsoleEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -748,6 +778,14 @@
         },
         {
           "kind": "js",
+          "name": "ConsoleDetail",
+          "declaration": {
+            "name": "ConsoleDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "DismissDetail",
           "declaration": {
             "name": "DismissDetail",
@@ -767,6 +805,14 @@
           "name": "HelixCloseEvent",
           "declaration": {
             "name": "HelixCloseEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixConsoleEvent",
+          "declaration": {
+            "name": "HelixConsoleEvent",
             "module": "./events/events.js"
           }
         },

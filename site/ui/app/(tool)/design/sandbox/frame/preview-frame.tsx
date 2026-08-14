@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 interface RenderMessage {
   direction?: 'ltr' | 'rtl'
   layout?: 'padded' | 'centered' | 'fullscreen'
+  origin?: string
   source?: string
   styles?: string
   type?: string
@@ -33,7 +34,11 @@ export function PreviewFrame() {
       return
     }
 
-    const post = (message: unknown) => window.parent?.postMessage(message, '*')
+    // Answered at the origin the sandbox names in its render message. The
+    // first `ready` has to go out wide, because until the sandbox has spoken
+    // there is nothing here that knows where its parent is.
+    let parentOrigin = '*'
+    const post = (message: unknown) => window.parent?.postMessage(message, parentOrigin)
 
     const levels = ['log', 'info', 'warn', 'error'] as const
     const original = new Map<string, (...args: unknown[]) => void>()
@@ -55,10 +60,11 @@ export function PreviewFrame() {
     window.addEventListener('error', onError)
 
     const onMessage = (event: MessageEvent<RenderMessage>) => {
-      if (event.data?.type !== 'helix-preview-render') {
+      if (event.data?.type !== 'helix-preview-render' || event.source !== window.parent) {
         return
       }
       const { direction = 'ltr', layout = 'padded', source = '', styles = '' } = event.data
+      parentOrigin = event.data.origin ?? event.origin
       document.documentElement.dir = direction
       host.dataset.layout = layout
       host.innerHTML = source

@@ -1,5 +1,6 @@
 import type {
   HelixChangeEvent,
+  HelixConsoleEvent,
   HelixSandbox,
   HelixSandboxPreview,
   HelixSandboxSource,
@@ -202,6 +203,9 @@ export type HelixSandboxPreviewElementEvent<E = Event> = TypedEvent<
   HelixSandboxPreview,
   E
 >;
+/** `helix-console` event type */
+export type HelixSandboxPreviewHelixConsoleElementEvent =
+  HelixSandboxPreviewElementEvent<HelixConsoleEvent>;
 
 export type HelixSandboxPreviewProps = {
   /** Document the frame loads, which brings the styles and the elements. */
@@ -218,7 +222,7 @@ export type HelixSandboxPreviewProps = {
   layout?: HelixSandboxPreview["layout"];
 
   /** Relayed from the frame, one per console call. */
-  "onhelix-console"?: (e: HelixSandboxPreviewElementEvent) => void;
+  "onhelix-console"?: (e: HelixSandboxPreviewHelixConsoleElementEvent) => void;
 };
 
 export type HelixSandboxPreviewSolidJsProps = {
@@ -235,7 +239,7 @@ export type HelixSandboxPreviewSolidJsProps = {
   /** How the example is placed in the frame. */
   "prop:layout"?: HelixSandboxPreview["layout"];
   /** Relayed from the frame, one per console call. */
-  "on:helix-console"?: (e: HelixSandboxPreviewElementEvent) => void;
+  "on:helix-console"?: (e: HelixSandboxPreviewHelixConsoleElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
