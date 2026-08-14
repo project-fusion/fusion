@@ -10,6 +10,7 @@ import type {
   HelixBaseBreadcrumb,
   HelixBaseBreadcrumbs,
   HelixBaseButton,
+  HelixBaseButtonGroup,
   HelixBaseCallout,
   HelixBaseCard,
   HelixBaseDivider,
@@ -533,6 +534,27 @@ export type HelixBaseBreadcrumbSolidJsProps = {
 export type HelixBaseBreadcrumbsProps = {};
 
 export type HelixBaseBreadcrumbsSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseButtonGroupProps = {
+  /** Accessible name for the group.
+
+On the host through internals, so an author's `aria-label` still overrides
+it and nothing lands on the host that a consumer's markup did not have. */
+  label?: HelixBaseButtonGroup["label"];
+};
+
+export type HelixBaseButtonGroupSolidJsProps = {
+  /** Accessible name for the group.
+
+On the host through internals, so an author's `aria-label` still overrides
+it and nothing lands on the host that a consumer's markup did not have. */
+  "prop:label"?: HelixBaseButtonGroup["label"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -1711,6 +1733,38 @@ export type CustomElements = {
    */
   "helix-base-breadcrumbs": Partial<
     HelixBaseBreadcrumbsProps & BaseProps<HelixBaseBreadcrumbs> & BaseEvents
+  >;
+
+  /**
+   * The host is the group, so `role="group"` sits on it through internals and
+   * `label` names it. A group of buttons with no name is announced as a run of
+   * separate controls, which is what the grouping exists to say it is not.
+   *
+   * It manages no focus. A group is not a toolbar: the APG toolbar pattern asks
+   * for one tab stop with arrow keys inside it, and that is what Toolbar is for.
+   * Here every button keeps its own tab stop, which is what a reader expects from
+   * buttons sitting side by side.
+   *
+   * Buttons are slotted rather than wrapped, so they stay the consumer's own
+   * elements and keep whatever appearance and size they were given.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the group.
+   *
+   * On the host through internals, so an author's `aria-label` still overrides
+   * it and nothing lands on the host that a consumer's markup did not have.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The buttons in the group.
+   */
+  "helix-base-button-group": Partial<
+    HelixBaseButtonGroupProps & BaseProps<HelixBaseButtonGroup> & BaseEvents
   >;
 
   /**
@@ -3192,6 +3246,41 @@ export type CustomElementsSolidJs = {
     HelixBaseBreadcrumbsProps &
       HelixBaseBreadcrumbsSolidJsProps &
       BaseProps<HelixBaseBreadcrumbs> &
+      BaseEvents
+  >;
+
+  /**
+   * The host is the group, so `role="group"` sits on it through internals and
+   * `label` names it. A group of buttons with no name is announced as a run of
+   * separate controls, which is what the grouping exists to say it is not.
+   *
+   * It manages no focus. A group is not a toolbar: the APG toolbar pattern asks
+   * for one tab stop with arrow keys inside it, and that is what Toolbar is for.
+   * Here every button keeps its own tab stop, which is what a reader expects from
+   * buttons sitting side by side.
+   *
+   * Buttons are slotted rather than wrapped, so they stay the consumer's own
+   * elements and keep whatever appearance and size they were given.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the group.
+   *
+   * On the host through internals, so an author's `aria-label` still overrides
+   * it and nothing lands on the host that a consumer's markup did not have.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The buttons in the group.
+   */
+  "helix-base-button-group": Partial<
+    HelixBaseButtonGroupProps &
+      HelixBaseButtonGroupSolidJsProps &
+      BaseProps<HelixBaseButtonGroup> &
       BaseEvents
   >;
 

@@ -1990,6 +1990,169 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/button-group/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/button-group/root/button-group-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/button-group/root/button-group-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The host is the group, so `role=\"group\"` sits on it through internals and\n`label` names it. A group of buttons with no name is announced as a run of\nseparate controls, which is what the grouping exists to say it is not.\n\nIt manages no focus. A group is not a toolbar: the APG toolbar pattern asks\nfor one tab stop with arrow keys inside it, and that is what Toolbar is for.\nHere every button keeps its own tab stop, which is what a reader expects from\nbuttons sitting side by side.\n\nButtons are slotted rather than wrapped, so they stay the consumer's own\nelements and keep whatever appearance and size they were given.",
+          "name": "HelixBaseButtonGroup",
+          "slots": [
+            {
+              "description": "The buttons in the group.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the group.\n\nOn the host through internals, so an author's `aria-label` still overrides\nit and nothing lands on the host that a consumer's markup did not have.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the group.\n\nOn the host through internals, so an author's `aria-label` still overrides\nit and nothing lands on the host that a consumer's markup did not have.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Groups related buttons into one control.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/button-group",
+            "aliases": [
+              "Segmented buttons",
+              "Split button"
+            ],
+            "tier": "headless",
+            "group": "BaseButtonGroup",
+            "part": "Root"
+          },
+          "tagName": "helix-base-button-group",
+          "customElement": true,
+          "modulePath": "src/button-group/root/button-group-root.ts",
+          "definitionPath": "src/button-group/root/button-group-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseButtonGroup",
+          "declaration": {
+            "name": "HelixBaseButtonGroup",
+            "module": "src/button-group/root/button-group-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-button-group",
+          "declaration": {
+            "name": "HelixBaseButtonGroup",
+            "module": "src/button-group/root/button-group-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/button/index.ts",
       "declarations": [],
       "exports": [
@@ -3679,6 +3842,14 @@
           "declaration": {
             "name": "*",
             "module": "src/button/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/button-group/index.js"
           }
         },
         {

@@ -407,31 +407,57 @@ declared in the component rather than inherited, because the base layer's
 
 ### Root
 
-Description
+Groups related buttons into one control.
+
+The host is the group: `role="group"` sits on it through internals and `label`
+names it. A run of buttons with no name is announced as separate controls,
+which is what the grouping exists to say it is not.
+
+**It manages no focus.** A group is not a toolbar. The APG toolbar pattern asks
+for one tab stop with arrow keys inside it, and that is what Toolbar is for.
+Here every button keeps its own tab stop, which is what a reader expects from
+buttons sitting side by side, and is what Shoelace and WebAwesome do for the
+same component.
+
+Buttons are slotted rather than wrapped, so they stay the consumer's own
+elements and keep whatever appearance and size they were given.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type     | Default | Inherited From | Description                    |
+| -------- | --------- | -------- | ------- | -------------- | ------------------------------ |
+| `label`  | `label`   | `string` | `''`    | -              | Accessible name for the group. |
 
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+An author's `aria-label` on the host still overrides `label`, since the
+property sets the implicit name through `ElementInternals`.
 
 #### Slots
 
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
+| Slot        | Description              |
+| ----------- | ------------------------ |
+| _(default)_ | The buttons in the group. |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+None. The host is the box.
+
+### Styled
+
+The buttons are joined into a single shape: outer corners keep their radius,
+inner ones lose it, and adjacent borders collapse onto one line.
+
+That joining lives in the base layer, paired with `data-button` the way the
+button's own box is. The corner belongs to the control inside each button's
+shadow root, and a rule inside the group cannot reach through a second
+boundary, where `::part` from the document can. The same rule therefore joins a
+consumer's own anchor styled as a button:
+
+```html
+<helix-button-group label="History">
+  <helix-button>Back</helix-button>
+  <a data-button href="/next">Forward</a>
+</helix-button-group>
+```
 
 ## BaseCalendar
 
