@@ -1,0 +1,21 @@
+{
+  "files.exclude": {
+    "**/.bzr": true,
+    "**/.claude": true,
+    "**/.git": true,
+    "**/.hg": true,
+    "**/.local": true,
+    "**/.svn": true,
+    "**/.turbo": true,
+    "**/.vercel": true,
+    "**/.vscode": true,
+    "**/build": true,
+    "**/cache": true,
+    "**/dist": true,
+    "**/logs": true,
+    "**/node_modules": true,
+    "**/out": true,
+    "**/target": true,
+    "**/tmp": true
+  }
+}

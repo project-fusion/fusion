@@ -1,0 +1,35 @@
+/* Three columns and two rows: the supporting text sits under the label rather
+   than under the leading icon, which a flex row cannot express without a
+   wrapper around the middle. */
+:host {
+  align-items: center;
+  column-gap: var(--helix-space-sm);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  padding: var(--list-item-inset, var(--helix-space-sm) var(--helix-space-md));
+}
+
+slot[name="start"]::slotted(*) {
+  color: var(--helix-color-foreground-muted);
+  grid-column: 1;
+  grid-row: 1 / -1;
+}
+
+slot:not([name])::slotted(*) {
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  grid-column: 2;
+  margin: var(--helix-space-none);
+}
+
+slot[name="supporting"]::slotted(*) {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  grid-column: 2;
+  margin: var(--helix-space-none);
+}
+
+slot[name="end"]::slotted(*) {
+  grid-column: 3;
+  grid-row: 1 / -1;
+}
