@@ -8,6 +8,7 @@ export {
 } from './accordion.js'
 export { AppHeader, type AppHeaderProps, AppHeaderRoot } from './app-header.js'
 export { Avatar, type AvatarProps, AvatarRoot } from './avatar.js'
+export { Badge, type BadgeProps, BadgeRoot } from './badge.js'
 export {
   BaseAccordion,
   BaseAccordionItem,
@@ -17,6 +18,7 @@ export {
 } from './base-accordion.js'
 export { BaseAppHeader, type BaseAppHeaderProps, BaseAppHeaderRoot } from './base-app-header.js'
 export { BaseAvatar, type BaseAvatarProps, BaseAvatarRoot } from './base-avatar.js'
+export { BaseBadge, type BaseBadgeProps, BaseBadgeRoot } from './base-badge.js'
 export {
   BaseBreadcrumbs,
   BaseBreadcrumbsItem,
@@ -31,8 +33,16 @@ export { BaseDivider, type BaseDividerProps, BaseDividerRoot } from './base-divi
 export { BaseDrawer, type BaseDrawerProps, BaseDrawerRoot } from './base-drawer.js'
 export { BaseIcon, type BaseIconProps, BaseIconRoot } from './base-icon.js'
 export { BaseKbd, type BaseKbdProps, BaseKbdRoot } from './base-kbd.js'
+export { BaseQuote, type BaseQuoteProps, BaseQuoteRoot } from './base-quote.js'
 export { BaseSkeleton, type BaseSkeletonProps, BaseSkeletonRoot } from './base-skeleton.js'
 export { BaseSpinner, type BaseSpinnerProps, BaseSpinnerRoot } from './base-spinner.js'
+export {
+  BaseStat,
+  BaseStatGroup,
+  type BaseStatGroupProps,
+  type BaseStatProps,
+  BaseStatRoot,
+} from './base-stat.js'
 export {
   BaseTable,
   BaseTableCell,
@@ -84,8 +94,10 @@ export { Grid, type GridProps, GridRoot } from './grid.js'
 export { Icon, type IconProps, IconRoot } from './icon.js'
 export { IconButton, type IconButtonProps, IconButtonRoot } from './icon-button.js'
 export { Kbd, type KbdProps, KbdRoot } from './kbd.js'
+export { Quote, type QuoteProps, QuoteRoot } from './quote.js'
 export { Skeleton, type SkeletonProps, SkeletonRoot } from './skeleton.js'
 export { Spinner, type SpinnerProps, SpinnerRoot } from './spinner.js'
+export { Stat, StatGroup, type StatGroupProps, type StatProps, StatRoot } from './stat.js'
 export {
   Table,
   TableCell,

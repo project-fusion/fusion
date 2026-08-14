@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--stat-group-gap, var(--helix-space-2xl));
+}
+
+/* The rule goes on the figure rather than between slots, because a `<slot>` is
+   `display: contents` and generates no box to put a border on. First-child
+   skips the leading edge without needing a selector that counts. */
+:host([divided]) ::slotted(*:not(:first-child)) {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-inline-start: var(--stat-group-gap, var(--helix-space-2xl));
+}

@@ -1,0 +1,39 @@
+/* A grid rather than a stack, so the unit sits on the value's baseline and the
+   label and detail span the full width above and below it. */
+:host {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  grid-template-columns: auto 1fr;
+}
+
+slot[name="label"]::slotted(*) {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  grid-column: 1 / -1;
+  letter-spacing: var(--helix-tracking-wide);
+}
+
+slot:not([name])::slotted(*) {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-display);
+  font-size: var(--stat-value-size, var(--helix-text-3xl));
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+}
+
+/* On the value's baseline rather than centered against it, so the unit reads as
+   part of the figure instead of floating beside it. */
+slot[name="unit"]::slotted(*) {
+  align-self: baseline;
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-medium);
+}
+
+slot[name="detail"]::slotted(*) {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  grid-column: 1 / -1;
+}
