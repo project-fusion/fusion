@@ -196,6 +196,7 @@
   /* Smaller than a control on purpose: a tag is a label, not something to
      press, and matching control height would make a row of them read as a row
      of buttons. */
+  --helix-size-badge: calc(1rem * var(--_helix-seed-density));
   --helix-size-tag: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-tag-dense: calc(1.25rem * var(--_helix-seed-density));
   --helix-size-header: calc(3.5rem * var(--_helix-seed-density));

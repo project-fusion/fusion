@@ -58,10 +58,7 @@ for (const file of walk(root, '.css')) {
     continue
   }
 
-  // `@property` is dropped here and hoisted into `elements.css` instead. A
-  // registration inside a shadow root never takes effect, so shipping one into
-  // every shadow root is bytes that read as though they do something.
-  const css = readFileSync(file, 'utf8').replace(/@property\s+--[a-z0-9-]+\s*\{[^}]*\}\n*/g, '')
+  const css = readFileSync(file, 'utf8')
   const out = `${file}.ts`
   const source = `// Generated from ${rel} by \`bun run styles\`. Do not edit.
 import { createSheet } from '@helix-io/core'

@@ -9,11 +9,6 @@ import { join } from 'node:path'
  * a run of unstyled text and then snaps into a card. `:not(:defined)` covers
  * that window.
  *
- * It also carries every `@property` a component declares. A registration
- * inside a shadow root does not register at all, so a component that writes one
- * beside the property it describes needs it hoisted to a document stylesheet to
- * take effect. This is that stylesheet.
- *
  * The tag list is read from the source rather than from the manifest, because
  * the manifest is written by `analyze`, which runs inside `build`, and this has
  * to be available before it.
@@ -24,37 +19,27 @@ import { join } from 'node:path'
  */
 const TAG = /@customElement\(\s*['"]([a-z][a-z0-9]*(?:-[a-z0-9]+)+)['"]\s*\)/g
 
-/** A component's `@property` registration, hoisted verbatim. */
-const REGISTRATION = /@property\s+--[a-z0-9-]+\s*\{[^}]*\}/g
-
-const walk = (dir, keep) =>
+const walk = (dir) =>
   readdirSync(dir).flatMap((entry) => {
     const path = join(dir, entry)
     if (statSync(path).isDirectory()) {
-      return walk(path, keep)
+      return walk(path)
     }
-    return keep(path) ? [path] : []
+    return path.endsWith('.ts') && !path.endsWith('.spec.ts') ? [path] : []
   })
 
 const root = process.argv[2] ?? '.'
 const tags = new Set()
-const registrations = new Set()
 
-for (const file of walk(join(root, 'src'), (p) => p.endsWith('.ts') && !p.endsWith('.spec.ts'))) {
-  for (const match of readFileSync(file, 'utf8').matchAll(TAG)) {
+for (const file of walk(join(root, 'src'))) {
+  const source = readFileSync(file, 'utf8')
+  for (const match of source.matchAll(TAG)) {
     tags.add(match[1])
-  }
-}
-
-for (const file of walk(join(root, 'src'), (p) => p.endsWith('.css'))) {
-  for (const match of readFileSync(file, 'utf8').matchAll(REGISTRATION)) {
-    registrations.add(match[0])
   }
 }
 
 const sorted = [...tags].sort()
 const selector = sorted.map((tag) => `${tag}:not(:defined)`).join(',\n')
-const hoisted = [...registrations].sort().join('\n\n')
 
 writeFileSync(
   join(root, 'elements.css'),
@@ -72,7 +57,7 @@ writeFileSync(
  * layout and the page does not reflow when it upgrades. The content is in the
  * markup either way, so a crawler reads it regardless.
  */
-${hoisted ? `${hoisted}\n\n` : ''}${selector} {
+${selector} {
   visibility: hidden;
 }
 `,

@@ -18,7 +18,7 @@ import { styles } from './badge-root.css.js'
  * @documentation https://helix.fusion.dev/components/badge
  *
  * @cssproperty --badge-background-color - Fill of the indicator.
- * @cssproperty --badge-offset - Pulls the mark in from the corner, along both axes. Relative to the host, so `0.5em` on a 16px host is 8px.
+ * @cssproperty --badge-offset - Pulls the mark in from the corner, along both axes.
  * @cssproperty --badge-ring-color - The ring separating it from what is behind.
  */
 @customElement('helix-badge')
