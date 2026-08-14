@@ -28,7 +28,10 @@ export const withoutStyles = (markup: string): string =>
  * document fragment.
  */
 export const hostTag = (markup: string, tagName: string): string =>
-  new RegExp(`<${tagName}[^>]*>`).exec(withoutStyles(markup))?.[0] ?? ''
+  // The name has to end where the tag name ends. Tag names nest as prefixes
+  // all over the set, so a bare `<${tagName}` matches `helix-toggle-group`
+  // when asked for `helix-toggle` and reports the wrong element's attributes.
+  new RegExp(`<${tagName}(?=[\\s>/])[^>]*>`).exec(withoutStyles(markup))?.[0] ?? ''
 
 /**
  * Every attribute name on the host's opening tag, sorted.
