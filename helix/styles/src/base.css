@@ -89,15 +89,24 @@ body {
 /* Anchors are styled here rather than wrapped in a `Link` component. An <a>
    already carries everything a link needs, so a wrapper would add a shadow
    boundary and no behavior; styling the element instead also covers links the
-   design system never renders. */
+   design system never renders.
+
+   The underline is a shadow rather than a text decoration, because a decoration
+   cannot move. Thickness, distance and strength are all animatable here, so the
+   line thickens and settles a little further from the text on hover instead of
+   switching on. The cost is that it does not skip descenders the way
+   `text-decoration-skip-ink` does, which is a fair trade at this weight. */
 :where(a) {
+  box-shadow: 0 1px 0 color-mix(in oklab, currentColor 35%, transparent);
   color: var(--helix-color-primary);
-  text-decoration-thickness: from-font;
-  text-underline-offset: 0.15em;
-  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+  text-decoration: none;
+  transition:
+    box-shadow var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 :where(a):hover {
+  box-shadow: 0 3px 0 color-mix(in oklab, currentColor 70%, transparent);
   color: var(--helix-color-primary-hover);
 }
 
@@ -138,19 +147,22 @@ body {
 }
 
 [data-link="quiet"] {
-  text-decoration: none;
+  box-shadow: none;
 }
 
+/* Quiet is for navigation, where a line under every row would be noise, so it
+   stays underline-free on hover and moves in colour instead. */
 [data-link="quiet"]:hover {
+  box-shadow: none;
   color: var(--helix-color-foreground);
 }
 
 [data-link-underline="hover"] {
-  text-decoration: none;
+  box-shadow: none;
 }
 
 [data-link-underline="hover"]:hover {
-  text-decoration: underline;
+  box-shadow: 0 3px 0 color-mix(in oklab, currentColor 70%, transparent);
 }
 
 /* `md` is absent, because it is what the surrounding text already is. */
@@ -164,6 +176,140 @@ body {
 
 [data-link-size="lg"] {
   font-size: var(--helix-text-lg);
+}
+
+/* The type ramps, as recipes.
+ *
+ * One rule per appearance, each setting the five things that move together.
+ * Exposing them separately would offer a few hundred combinations of which a
+ * handful are right; this is the handful, which is why they are named bundles
+ * rather than composable size, weight and leading utilities.
+ *
+ * Each ramp answers to three selectors and they are the same decision written
+ * three ways: `data-text` for any element, `helix-text[appearance]` for the
+ * component, and `helix-text[as]` for the pairing where an element implies its
+ * own treatment. Declared once here so the component and a plain `<h2>` cannot
+ * drift apart.
+ *
+ * `Text` reaches these through inheritance rather than a copy. Typography
+ * inherits across a shadow boundary, so a rule matching the host reaches the
+ * element inside it; `text-root.css` resets that element to `font: inherit` so
+ * the UA's own heading styles do not win against it.
+ *
+ * `body` is listed for completeness and is what `body` already sets, so an
+ * element with no appearance and no pairing needs no rule to look right.
+ */
+
+[data-text="display"],
+helix-text[appearance="display"],
+helix-text:not([appearance])[as="h1"] {
+  font-family: var(--helix-font-display);
+  font-size: var(--helix-text-3xl);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+}
+
+[data-text="heading"],
+helix-text[appearance="heading"],
+helix-text:not([appearance])[as="h2"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-2xl);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+}
+
+[data-text="subheading"],
+helix-text[appearance="subheading"],
+helix-text:not([appearance])[as="h3"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xl);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+}
+
+[data-text="title"],
+helix-text[appearance="title"],
+helix-text:not([appearance])[as="h4"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-tight);
+}
+
+[data-text="body"],
+helix-text[appearance="body"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
+}
+
+[data-text="body-strong"],
+helix-text[appearance="body-strong"],
+helix-text:not([appearance])[as="h5"],
+helix-text:not([appearance])[as="h6"],
+helix-text:not([appearance])[as="strong"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
+}
+
+[data-text="caption"],
+helix-text[appearance="caption"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
+}
+
+[data-text="label"],
+helix-text[appearance="label"],
+helix-text:not([appearance])[as="label"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-wide);
+  line-height: var(--helix-leading-normal);
+}
+
+[data-text="code"],
+helix-text[appearance="code"],
+helix-text:not([appearance])[as="code"] {
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
+}
+
+/* Colour carries state, so it stays a separate axis from the ramp. Folding it
+   in would mean `caption-danger` and the rest of the cross product. */
+[data-tone="muted"],
+helix-text[tone="muted"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[data-tone="subtle"],
+helix-text[tone="subtle"] {
+  color: var(--helix-color-foreground-subtle);
+}
+
+[data-tone="primary"],
+helix-text[tone="primary"] {
+  color: var(--helix-color-primary);
+}
+
+[data-tone="danger"],
+helix-text[tone="danger"] {
+  color: var(--helix-color-danger);
 }
 
 :where(code, kbd, samp, pre) {

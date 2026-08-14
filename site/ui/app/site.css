@@ -89,10 +89,15 @@ helix-app-header {
 /* ============================================================ sections === */
 
 /* One statement, set large and centred, with nothing else in the band. This is
-   the constraint, and it is the only thing on the site set as a quotation. */
+   the constraint, and it is the only thing on the site set as a quotation.
+
+   Capped in `rem`, not `ch`. A `ch` on this container resolves against the
+   container's own font size, which is body text, so `32ch` came out near 250px
+   and broke a one-line claim across four. The measure has to be expressed in
+   the same terms as the type it is holding. */
 .statement {
   margin-inline: auto;
-  max-inline-size: 32ch;
+  max-inline-size: 52rem;
   text-align: center;
 }
 
@@ -126,10 +131,18 @@ helix-app-header {
 }
 
 /* A vertical is a row rather than a card. Four cards make four boxes competing
-   for the same attention; four rules down the page make a list that reads. */
+   for the same attention; four rules down the page make a list that reads.
+
+   The inline padding is pulled back out with a matching negative margin, so the
+   row's hover fill and its rule reach past the text while the text itself still
+   starts on the same line as everything else down the page. Padding alone would
+   indent the labels; margin alone would leave the fill flush against them. */
 .verticalRow {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  margin-inline: calc(var(--helix-space-md) * -1);
   padding-block: var(--helix-space-lg);
+  padding-inline: var(--helix-space-md);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
