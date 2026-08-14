@@ -20,9 +20,10 @@ export const initialsOf = (name: string): string => {
  * Shows `src` until it fails to load. Without an image, or after a failure,
  * the default slot is shown; its own fallback is the initials.
  *
- * The host carries the accessible name, so the `<img>` takes an empty `alt` and
- * the initials are hidden from assistive technology. Announcing either would
- * repeat the name.
+ * The host carries the accessible name, taken from `name`, so the `<img>` has an
+ * empty `alt` and the initials are hidden from assistive technology. Announcing
+ * either would repeat the name. An `aria-label` on the host overrides `name`,
+ * for an avatar standing for something a person's name does not describe.
  *
  * `load` and `error` are relayed from the host. They are not composed, so they
  * stop at the shadow boundary otherwise.
@@ -50,10 +51,6 @@ export class HelixBaseAvatar extends HelixElement {
   @property()
   name = ''
 
-  /** Accessible name. Falls back to `name`, which the initials come from. */
-  @property()
-  label = ''
-
   /** Whether the image failed. The element's own observation, never set. */
   @state()
   private failed = false
@@ -70,7 +67,7 @@ export class HelixBaseAvatar extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.role = 'img'
-    this.internals.ariaLabel = this.label || this.name || null
+    this.internals.ariaLabel = this.name || null
   }
 
   protected override render(): TemplateResult {

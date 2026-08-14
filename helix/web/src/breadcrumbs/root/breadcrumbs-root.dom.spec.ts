@@ -14,11 +14,9 @@ const trail = `
   </helix-breadcrumbs>`
 
 describe('breadcrumbs', () => {
-  test('is a named landmark wrapping a list', async () => {
-    // Named because a page can hold more than one navigation, and landmarks are
-    // how a screen-reader user chooses between them.
+  test('the host is the landmark, wrapping a list', async () => {
     const crumbs = await mount(trail)
-    expect(part(crumbs, 'nav')?.getAttribute('aria-label')).toBe('Breadcrumb')
+    expect(role(crumbs)).toBe('navigation')
     expect(part(crumbs, 'list')?.tagName).toBe('OL')
   })
 
@@ -27,9 +25,12 @@ describe('breadcrumbs', () => {
     expect(part(crumbs, 'list')?.getAttribute('role')).toBe('list')
   })
 
-  test('the landmark can be renamed', async () => {
-    const crumbs = await mount('<helix-breadcrumbs label="You are here"></helix-breadcrumbs>')
-    expect(part(crumbs, 'nav')?.getAttribute('aria-label')).toBe('You are here')
+  test('the landmark is named by `aria-label` on the host', async () => {
+    // A page can hold more than one navigation, and landmarks are how a
+    // screen-reader user chooses between them. The host is the landmark, so the
+    // attribute names it directly and no property mirrors one.
+    const crumbs = await mount('<helix-breadcrumbs aria-label="You are here"></helix-breadcrumbs>')
+    expect(crumbs.getAttribute('aria-label')).toBe('You are here')
   })
 
   test('every item is a list item, so the list has contents', async () => {

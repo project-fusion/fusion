@@ -6,20 +6,20 @@ import '@helix-io/headless/breadcrumbs'
 import type { HelixBaseBreadcrumbs, HelixBaseBreadcrumbsItem } from '@helix-io/headless'
 
 /**
- * A navigation landmark wrapping a list. `role="list"` is set explicitly on the
-`<ol>` even though it is already a list: removing the markers with
-`list-style: none` strips list semantics in Safari, and a breadcrumb trail
-always removes its markers.
+ * The host is the landmark, so `aria-label` on it names the trail directly and
+there is no property mirroring one. A page may hold more than one navigation,
+and landmarks are how a screen-reader user chooses between them.
+
+`role="list"` is set explicitly on the `<ol>` even though it is already a
+list: removing the markers with `list-style: none` strips list semantics in
+Safari, and a breadcrumb trail always removes its markers.
 
 Items are slotted rather than wrapped, so they are `<ol>` children in the flat
 tree and each carries `role="listitem"` itself.
  *
  * Renders `<helix-base-breadcrumbs>`.
  */
-export interface BaseBreadcrumbsProps extends BaseProps {
-  /** Accessible name for the landmark. Named rather than left bare because a page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them. */
-  label?: string
-}
+export interface BaseBreadcrumbsProps extends BaseProps {}
 
 export const BaseBreadcrumbsRoot = createComponent<HelixBaseBreadcrumbs, BaseBreadcrumbsProps>({
   events: {},
