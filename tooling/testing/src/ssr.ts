@@ -47,7 +47,14 @@ export const hostTag = (markup: string, tagName: string): string =>
  * and measured geometry is written inside the shadow root.
  */
 export const hostAttributes = (markup: string, tagName: string): string[] =>
-  [...hostTag(markup, tagName).matchAll(/\s([a-z-]+[a-z0-9-]*)(?==|[\s>/])/g)]
+  // Values are stripped first. A word inside one is not an attribute, so
+  // `label="Choose a date"` otherwise reports an attribute named `a`.
+  [
+    ...hostTag(markup, tagName)
+      .replace(/=\s*"[^"]*"/g, '=')
+      .replace(/=\s*'[^']*'/g, '=')
+      .matchAll(/\s([a-z-]+[a-z0-9-]*)(?==|[\s>/])/g),
+  ]
     .map(([, name]) => name as string)
     .sort()
 

@@ -11,6 +11,7 @@ import type {
   HelixBaseBreadcrumbs,
   HelixBaseButton,
   HelixBaseButtonGroup,
+  HelixBaseCalendar,
   HelixBaseCallout,
   HelixBaseCard,
   HelixBaseDivider,
@@ -615,6 +616,59 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   "prop:focusable"?: HelixBaseButton["focusable"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseCalendar` component event */
+export type HelixBaseCalendarElementEvent<E = Event> = TypedEvent<
+  HelixBaseCalendar,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseCalendarHelixSelectElementEvent =
+  HelixBaseCalendarElementEvent<HelixSelectEvent>;
+
+export type HelixBaseCalendarProps = {
+  /** The selected date, as `YYYY-MM-DD`. */
+  value?: HelixBaseCalendar["value"];
+  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
+  month?: HelixBaseCalendar["month"];
+  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  min?: HelixBaseCalendar["min"];
+  /** Latest selectable date, as `YYYY-MM-DD`. */
+  max?: HelixBaseCalendar["max"];
+  /** Accessible name for the grid. */
+  label?: HelixBaseCalendar["label"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "first-day"?: HelixBaseCalendar["firstDay"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  firstDay?: HelixBaseCalendar["firstDay"];
+
+  /** Fired when a date is chosen, with the ISO date. */
+  "onhelix-select"?: (e: HelixBaseCalendarHelixSelectElementEvent) => void;
+};
+
+export type HelixBaseCalendarSolidJsProps = {
+  /** The selected date, as `YYYY-MM-DD`. */
+  "prop:value"?: HelixBaseCalendar["value"];
+  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
+  "prop:month"?: HelixBaseCalendar["month"];
+  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  "prop:min"?: HelixBaseCalendar["min"];
+  /** Latest selectable date, as `YYYY-MM-DD`. */
+  "prop:max"?: HelixBaseCalendar["max"];
+  /** Accessible name for the grid. */
+  "prop:label"?: HelixBaseCalendar["label"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "attr:first-day"?: HelixBaseCalendar["firstDay"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "prop:firstDay"?: HelixBaseCalendar["firstDay"];
+  /** Fired when a date is chosen, with the ISO date. */
+  "on:helix-select"?: (e: HelixBaseCalendarHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1832,6 +1886,57 @@ export type CustomElements = {
    */
   "helix-base-button": Partial<
     HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
+  >;
+
+  /**
+   * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
+   * move by day and week, `PageUp` and `PageDown` move by month, and `Home` and
+   * `End` go to the ends of the week. Only the focused cell is in the tab
+   * sequence.
+   *
+   * Roving `tabindex` is written on the cells, which is free here because they
+   * are rendered into this shadow root rather than being markup a consumer wrote.
+   *
+   * Dates are `YYYY-MM-DD` strings and every calculation is in UTC. A local-time
+   * `Date` shifts across a timezone or a daylight-saving boundary, so the string
+   * is what the component holds and the arithmetic never leaves UTC.
+   *
+   * `month` is what the grid shows, separately from `value`, so paging through
+   * months does not select anything and a consumer can drive the view. Left
+   * unset, it follows the selected date, and then the current month.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The selected date, as `YYYY-MM-DD`.
+   * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
+   * - `label`: Accessible name for the grid.
+   * - `first-day`/`firstDay`: First column of the week, `0` for Sunday through `6` for Saturday.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a date is chosen, with the ISO date.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The month name and its controls.
+   * - `previous`: The control that moves to the previous month.
+   * - `next`: The control that moves to the next month.
+   * - `heading`: The month and year being shown.
+   * - `grid`: The grid of days.
+   * - `weekday`: A column header naming a day of the week.
+   * - `week`: One row of days.
+   * - `day`: One day.
+   */
+  "helix-base-calendar": Partial<
+    HelixBaseCalendarProps & BaseProps<HelixBaseCalendar> & BaseEvents
   >;
 
   /**
@@ -3351,6 +3456,60 @@ export type CustomElementsSolidJs = {
     HelixBaseButtonProps &
       HelixBaseButtonSolidJsProps &
       BaseProps<HelixBaseButton> &
+      BaseEvents
+  >;
+
+  /**
+   * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
+   * move by day and week, `PageUp` and `PageDown` move by month, and `Home` and
+   * `End` go to the ends of the week. Only the focused cell is in the tab
+   * sequence.
+   *
+   * Roving `tabindex` is written on the cells, which is free here because they
+   * are rendered into this shadow root rather than being markup a consumer wrote.
+   *
+   * Dates are `YYYY-MM-DD` strings and every calculation is in UTC. A local-time
+   * `Date` shifts across a timezone or a daylight-saving boundary, so the string
+   * is what the component holds and the arithmetic never leaves UTC.
+   *
+   * `month` is what the grid shows, separately from `value`, so paging through
+   * months does not select anything and a consumer can drive the view. Left
+   * unset, it follows the selected date, and then the current month.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The selected date, as `YYYY-MM-DD`.
+   * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
+   * - `label`: Accessible name for the grid.
+   * - `first-day`/`firstDay`: First column of the week, `0` for Sunday through `6` for Saturday.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a date is chosen, with the ISO date.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The month name and its controls.
+   * - `previous`: The control that moves to the previous month.
+   * - `next`: The control that moves to the next month.
+   * - `heading`: The month and year being shown.
+   * - `grid`: The grid of days.
+   * - `weekday`: A column header naming a day of the week.
+   * - `week`: One row of days.
+   * - `day`: One day.
+   */
+  "helix-base-calendar": Partial<
+    HelixBaseCalendarProps &
+      HelixBaseCalendarSolidJsProps &
+      BaseProps<HelixBaseCalendar> &
       BaseEvents
   >;
 
