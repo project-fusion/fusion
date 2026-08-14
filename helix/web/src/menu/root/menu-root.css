@@ -1,0 +1,55 @@
+:host {
+  /* No box of its own: the trigger is the consumer's element and the surface is
+     in the top layer, so anything here would be a third box between them. */
+  display: contents;
+}
+
+[part="menu"] {
+  background-color: var(--menu-background-color, var(--helix-color-surface-raised));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-md);
+  /* The popover API puts it in the top layer, so the UA's own inset and border
+     have to be cleared or it sits in the middle of the window with a frame. */
+  inset: auto;
+  margin: var(--helix-space-none);
+  min-inline-size: var(--menu-min-inline-size, 12rem);
+  padding: var(--helix-space-2xs);
+}
+
+[part="menu"][hidden] {
+  display: none;
+}
+
+/* The way back out of a submenu. A row like any other, so the eye does not have
+   to learn a second shape, with the arrow on the side it came from. */
+[part="back"] {
+  align-items: center;
+  background: none;
+  border: none;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-none);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs);
+  inline-size: 100%;
+  margin-block-end: var(--helix-space-2xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  text-align: start;
+}
+
+[part="back"]::before {
+  content: "\2190";
+}
+
+[part="back"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="back"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}

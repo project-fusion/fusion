@@ -30,6 +30,8 @@ import type {
   HelixKbd,
   HelixList,
   HelixListItem,
+  HelixMenu,
+  HelixMenuItem,
   HelixNavBar,
   HelixOpenEvent,
   HelixQuote,
@@ -1343,6 +1345,154 @@ export type HelixListSolidJsProps = {
   "prop:divided"?: HelixList["divided"];
   /** Accessible name for the set. */
   "prop:label"?: HelixList["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixMenuItem` component event */
+export type HelixMenuItemElementEvent<E = Event> = TypedEvent<HelixMenuItem, E>;
+/** `helix-select` event type */
+export type HelixMenuItemHelixSelectElementEvent =
+  HelixMenuItemElementEvent<HelixSelectEvent>;
+
+export type HelixMenuItemProps = {
+  /** What this row stands for, carried in the event when it is chosen. */
+  value?: HelixMenuItem["value"];
+  /** Whether the row is one of a set of choices.
+
+Separate from `checked`, and it has to be. A row that is off is still a
+choice, and `checked` alone cannot say so: an unticked row and a row that
+was never tickable look identical from here. Announcing only the ticked one
+as a checkbox tells a reader its siblings are commands, which is the one
+thing they are not.
+
+`checked` implies it, so a row that is on never has to say both. */
+  checkable?: HelixMenuItem["checkable"];
+  /** Whether the row is ticked. */
+  checked?: HelixMenuItem["checked"];
+  /** Whether the row can be chosen. */
+  disabled?: HelixMenuItem["disabled"];
+  /** Whether this row is on the page currently showing.
+
+Set by the menu, and a property rather than an attribute for that reason.
+Public because the menu has to reach it, and not something a consumer
+writes: which page is open is the menu's business. */
+  onPage?: HelixMenuItem["onPage"];
+
+  /** Fired when the row is chosen. */
+  "onhelix-select"?: (e: HelixMenuItemHelixSelectElementEvent) => void;
+};
+
+export type HelixMenuItemSolidJsProps = {
+  /** What this row stands for, carried in the event when it is chosen. */
+  "prop:value"?: HelixMenuItem["value"];
+  /** Whether the row is one of a set of choices.
+
+Separate from `checked`, and it has to be. A row that is off is still a
+choice, and `checked` alone cannot say so: an unticked row and a row that
+was never tickable look identical from here. Announcing only the ticked one
+as a checkbox tells a reader its siblings are commands, which is the one
+thing they are not.
+
+`checked` implies it, so a row that is on never has to say both. */
+  "prop:checkable"?: HelixMenuItem["checkable"];
+  /** Whether the row is ticked. */
+  "prop:checked"?: HelixMenuItem["checked"];
+  /** Whether the row can be chosen. */
+  "prop:disabled"?: HelixMenuItem["disabled"];
+  /** Whether this row is on the page currently showing.
+
+Set by the menu, and a property rather than an attribute for that reason.
+Public because the menu has to reach it, and not something a consumer
+writes: which page is open is the menu's business. */
+  "prop:onPage"?: HelixMenuItem["onPage"];
+  /** Fired when the row is chosen. */
+  "on:helix-select"?: (e: HelixMenuItemHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixMenu` component event */
+export type HelixMenuElementEvent<E = Event> = TypedEvent<HelixMenu, E>;
+/** `helix-open` event type */
+export type HelixMenuHelixOpenElementEvent =
+  HelixMenuElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixMenuHelixCloseElementEvent =
+  HelixMenuElementEvent<HelixCloseEvent>;
+/** `helix-select` event type */
+export type HelixMenuHelixSelectElementEvent =
+  HelixMenuElementEvent<HelixSelectEvent>;
+
+export type HelixMenuProps = {
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixMenu["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixMenu["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixMenu["defaultOpen"];
+  /** Preferred side. It moves if that side does not fit. */
+  placement?: HelixMenu["placement"];
+  /** Space between the trigger and the surface, in pixels. */
+  offset?: HelixMenu["offset"];
+  /** Accessible name for the surface. */
+  label?: HelixMenu["label"];
+  /** What the row returning from a submenu reads. */
+  "back-label"?: HelixMenu["backLabel"];
+  /** What the row returning from a submenu reads. */
+  backLabel?: HelixMenu["backLabel"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixMenu["onOpenChange"];
+
+  /** Fired before it opens, and cancelable. */
+  "onhelix-open"?: (e: HelixMenuHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "onhelix-close"?: (e: HelixMenuHelixCloseElementEvent) => void;
+  /** Fired when an item is chosen. */
+  "onhelix-select"?: (e: HelixMenuHelixSelectElementEvent) => void;
+};
+
+export type HelixMenuSolidJsProps = {
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixMenu["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixMenu["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixMenu["defaultOpen"];
+  /** Preferred side. It moves if that side does not fit. */
+  "prop:placement"?: HelixMenu["placement"];
+  /** Space between the trigger and the surface, in pixels. */
+  "prop:offset"?: HelixMenu["offset"];
+  /** Accessible name for the surface. */
+  "prop:label"?: HelixMenu["label"];
+  /** What the row returning from a submenu reads. */
+  "attr:back-label"?: HelixMenu["backLabel"];
+  /** What the row returning from a submenu reads. */
+  "prop:backLabel"?: HelixMenu["backLabel"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixMenu["onOpenChange"];
+  /** Fired before it opens, and cancelable. */
+  "on:helix-open"?: (e: HelixMenuHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "on:helix-close"?: (e: HelixMenuHelixCloseElementEvent) => void;
+  /** Fired when an item is chosen. */
+  "on:helix-select"?: (e: HelixMenuHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3213,6 +3363,146 @@ export type CustomElements = {
    * - `--list-gap`: Space between rows. (default: `undefined`)
    */
   "helix-list": Partial<HelixListProps & BaseProps<HelixList> & BaseEvents>;
+
+  /**
+   * The tick and the arrow hold their space whether or not they are showing, so
+   * the labels in a menu start at one place and the rows read as a column rather
+   * than as a ragged list.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What this row stands for, carried in the event when it is chosen.
+   * - `checkable`: Whether the row is one of a set of choices.
+   *
+   * Separate from `checked`, and it has to be. A row that is off is still a
+   * choice, and `checked` alone cannot say so: an unticked row and a row that
+   * was never tickable look identical from here. Announcing only the ticked one
+   * as a checkbox tells a reader its siblings are commands, which is the one
+   * thing they are not.
+   *
+   * `checked` implies it, so a row that is on never has to say both.
+   * - `checked`: Whether the row is ticked.
+   * - `disabled`: Whether the row can be chosen.
+   * - `onPage`: Whether this row is on the page currently showing.
+   *
+   * Set by the menu, and a property rather than an attribute for that reason.
+   * Public because the menu has to reach it, and not something a consumer
+   * writes: which page is open is the menu's business. (property only)
+   * - `isMenuItem`: Marks this as a row a menu should count. Cheaper than an instanceof. (property only) (readonly)
+   * - `hasSubmenu`: Whether anything was slotted into `submenu`. Client only. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the row is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The label.
+   * - `submenu`: Rows this one opens, which makes it a way in.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus() => void`: Moves focus onto the row itself.
+   *
+   * The host is not focusable: what takes focus is the row inside this shadow
+   * root, and a menu moving between rows with the arrow keys has to reach it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--menu-item-hover-color`: Fill under the pointer. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row.
+   * - `check`: The mark shown when it is checked.
+   * - `arrow`: The mark shown when it opens a submenu.
+   */
+  "helix-menu-item": Partial<
+    HelixMenuItemProps & BaseProps<HelixMenuItem> & BaseEvents
+  >;
+
+  /**
+   * The surface is in the top layer, so it needs no `z-index` and cannot be
+   * clipped by whatever it sits inside.
+   *
+   * A submenu replaces the page rather than opening beside it, so the panel stays
+   * one panel and reads the same on a phone as on a desk.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `offset`: Space between the trigger and the surface, in pixels.
+   * - `label`: Accessible name for the surface.
+   * - `back-label`/`backLabel`: What the row returning from a submenu reads.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-select`: Fired when an item is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The items.
+   * - `trigger`: What opens it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `show() => void`: Opens the menu.
+   * - `hide() => void`: Closes the menu, and forgets which page was showing.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--menu-min-inline-size`: Narrowest the surface gets. (default: `undefined`)
+   * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `menu`: The surface.
+   * - `back`: The row that returns from a submenu.
+   */
+  "helix-menu": Partial<HelixMenuProps & BaseProps<HelixMenu> & BaseEvents>;
 
   /**
    * One marker that travels, rather than a background that appears on whichever
@@ -5308,6 +5598,151 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The tick and the arrow hold their space whether or not they are showing, so
+   * the labels in a menu start at one place and the rows read as a column rather
+   * than as a ragged list.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What this row stands for, carried in the event when it is chosen.
+   * - `checkable`: Whether the row is one of a set of choices.
+   *
+   * Separate from `checked`, and it has to be. A row that is off is still a
+   * choice, and `checked` alone cannot say so: an unticked row and a row that
+   * was never tickable look identical from here. Announcing only the ticked one
+   * as a checkbox tells a reader its siblings are commands, which is the one
+   * thing they are not.
+   *
+   * `checked` implies it, so a row that is on never has to say both.
+   * - `checked`: Whether the row is ticked.
+   * - `disabled`: Whether the row can be chosen.
+   * - `onPage`: Whether this row is on the page currently showing.
+   *
+   * Set by the menu, and a property rather than an attribute for that reason.
+   * Public because the menu has to reach it, and not something a consumer
+   * writes: which page is open is the menu's business. (property only)
+   * - `isMenuItem`: Marks this as a row a menu should count. Cheaper than an instanceof. (property only) (readonly)
+   * - `hasSubmenu`: Whether anything was slotted into `submenu`. Client only. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the row is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The label.
+   * - `submenu`: Rows this one opens, which makes it a way in.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus() => void`: Moves focus onto the row itself.
+   *
+   * The host is not focusable: what takes focus is the row inside this shadow
+   * root, and a menu moving between rows with the arrow keys has to reach it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--menu-item-hover-color`: Fill under the pointer. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row.
+   * - `check`: The mark shown when it is checked.
+   * - `arrow`: The mark shown when it opens a submenu.
+   */
+  "helix-menu-item": Partial<
+    HelixMenuItemProps &
+      HelixMenuItemSolidJsProps &
+      BaseProps<HelixMenuItem> &
+      BaseEvents
+  >;
+
+  /**
+   * The surface is in the top layer, so it needs no `z-index` and cannot be
+   * clipped by whatever it sits inside.
+   *
+   * A submenu replaces the page rather than opening beside it, so the panel stays
+   * one panel and reads the same on a phone as on a desk.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `offset`: Space between the trigger and the surface, in pixels.
+   * - `label`: Accessible name for the surface.
+   * - `back-label`/`backLabel`: What the row returning from a submenu reads.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-select`: Fired when an item is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The items.
+   * - `trigger`: What opens it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `show() => void`: Opens the menu.
+   * - `hide() => void`: Closes the menu, and forgets which page was showing.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--menu-min-inline-size`: Narrowest the surface gets. (default: `undefined`)
+   * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `menu`: The surface.
+   * - `back`: The row that returns from a submenu.
+   */
+  "helix-menu": Partial<
+    HelixMenuProps & HelixMenuSolidJsProps & BaseProps<HelixMenu> & BaseEvents
+  >;
+
+  /**
    * One marker that travels, rather than a background that appears on whichever
    * destination is current. A fill that swaps is two things changing at once and
    * reads as a flicker; one that moves is a single object the eye follows, and it
@@ -6239,6 +6674,12 @@ export type CustomCssProperties = {
   "--list-item-inset"?: string;
   /** Space between rows. */
   "--list-gap"?: string;
+  /** Fill under the pointer. */
+  "--menu-item-hover-color"?: string;
+  /** Narrowest the surface gets. */
+  "--menu-min-inline-size"?: string;
+  /** Fill of the surface. */
+  "--menu-background-color"?: string;
   /** Fill of the traveling marker. */
   "--nav-bar-indicator-color"?: string;
   /** Space between destinations. */

@@ -1,0 +1,60 @@
+:host {
+  display: block;
+}
+
+[part="item"] {
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: grid;
+  font-size: var(--helix-text-sm);
+  /* The tick, the label, then the arrow. All three columns exist on every row,
+     so labels start at one place whether or not the row is ticked and whether
+     or not it opens a page. A menu where the text moves is a menu that reads as
+     a list of unrelated things. */
+  grid-template-columns: 1rem minmax(0, 1fr) 1rem;
+  gap: var(--helix-space-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+  user-select: none;
+}
+
+[part="item"]:hover {
+  background-color: var(--menu-item-hover-color, var(--helix-color-surface-sunken));
+}
+
+[part="item"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="item"][aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Only drawn when the row is ticked, and its column is there either way. */
+[part="check"]::before {
+  color: var(--helix-color-primary);
+  content: "";
+}
+
+:host([checked]) [part="check"]::before {
+  content: "\2713";
+}
+
+[part="arrow"] {
+  color: var(--helix-color-foreground-subtle);
+  text-align: end;
+}
+
+[part="arrow"]::before {
+  content: "\203A";
+}
+
+/* A submenu is shown by the menu, on its own rows, so this element renders
+   nothing for it here. */
+slot[name="submenu"] {
+  display: contents;
+}

@@ -10,7 +10,7 @@ import {
   htmlToJsx,
 } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
-import type { HelixDrawer, HelixTabs, HelixToggleGroup, HelixTree } from '@helix-io/web'
+import type { HelixDrawer, HelixMenu, HelixTabs, HelixToggleGroup, HelixTree } from '@helix-io/web'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
@@ -27,6 +27,19 @@ import { useHelixEvent } from '../../../../lib/use-helix-event'
 interface Props {
   families: Family[]
 }
+
+/** How the preview lays the example out. */
+const LAYOUTS = [
+  { label: 'Padded', value: 'padded' },
+  { label: 'Centered', value: 'centered' },
+  { label: 'Fullscreen', value: 'fullscreen' },
+] as const
+
+/** Which way the preview reads. */
+const DIRECTIONS = [
+  { label: 'Left to right', value: 'ltr' },
+  { label: 'Right to left', value: 'rtl' },
+] as const
 
 /** The files a sandbox shows. */
 type Pane = 'html' | 'tsx' | 'css'
@@ -54,6 +67,11 @@ export function SandboxWorkbench({ families }: Props) {
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
   const [panelClosed, setPanelClosed] = useState(0)
+  const settings = useRef<HelixMenu>(null)
+  const [layout, setLayout] = useState<'padded' | 'centered' | 'fullscreen'>('padded')
+  const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
+  const [showPanel, setShowPanel] = useState(true)
+  const [showStatus, setShowStatus] = useState(true)
   const terminal = useRef<HelixSandboxTerminal>(null)
   const editors = useRef<Record<string, HelixSandboxEditor | null>>({})
   const [familySlug, setFamilySlug] = useState<string | null>(null)
@@ -114,6 +132,20 @@ export function SandboxWorkbench({ families }: Props) {
   useHelixEvent(sandbox, 'helix-change', (event) => {
     if (event.detail.name === 'html') {
       setMarkup(event.detail.value)
+    }
+  })
+  // One listener for the whole menu: the value says which setting and, where
+  // it drilled down, which option.
+  useHelixEvent(settings, 'helix-select', (event) => {
+    const [setting, option] = event.detail.value.split(':')
+    if (setting === 'layout' && option) {
+      setLayout(option as 'padded' | 'centered' | 'fullscreen')
+    } else if (setting === 'direction' && option) {
+      setDirection(option as 'ltr' | 'rtl')
+    } else if (setting === 'panel') {
+      setShowPanel((was) => !was)
+    } else if (setting === 'status') {
+      setShowStatus((was) => !was)
     }
   })
   useHelixEvent(treeRef, 'helix-select', (event) => {
@@ -243,8 +275,6 @@ export function SandboxWorkbench({ families }: Props) {
               ))}
             </helix-toggle-group>
 
-            {/* The Environment drilldown belongs here and waits on `helix-menu`
-                and `helix-popover`. These are the actions that exist today. */}
             <helix-toolbar label="Sandbox actions" slot="end">
               <helix-button
                 appearance="subtle"
@@ -258,6 +288,52 @@ export function SandboxWorkbench({ families }: Props) {
               <Link data-button="subtle" href={`/design/components/${family.slug}`}>
                 API
               </Link>
+
+              {/* Layout and Direction drill down; the last three tick. The menu
+                  reads its state from here rather than holding its own, so what
+                  is ticked is what is showing. */}
+              <helix-menu label="Environment" ref={settings}>
+                <helix-icon-button label="Environment" slot="trigger">
+                  <helix-icon name="gear"></helix-icon>
+                </helix-icon-button>
+
+                <helix-menu-item value="layout">
+                  Layout
+                  {LAYOUTS.map((option) => (
+                    <helix-menu-item
+                      checkable
+                      checked={layout === option.value ? true : undefined}
+                      key={option.value}
+                      slot="submenu"
+                      value={`layout:${option.value}`}
+                    >
+                      {option.label}
+                    </helix-menu-item>
+                  ))}
+                </helix-menu-item>
+
+                <helix-menu-item value="direction">
+                  Direction
+                  {DIRECTIONS.map((option) => (
+                    <helix-menu-item
+                      checkable
+                      checked={direction === option.value ? true : undefined}
+                      key={option.value}
+                      slot="submenu"
+                      value={`direction:${option.value}`}
+                    >
+                      {option.label}
+                    </helix-menu-item>
+                  ))}
+                </helix-menu-item>
+
+                <helix-menu-item checkable checked={showPanel ? true : undefined} value="panel">
+                  Panel
+                </helix-menu-item>
+                <helix-menu-item checkable checked={showStatus ? true : undefined} value="status">
+                  Status bar
+                </helix-menu-item>
+              </helix-menu>
             </helix-toolbar>
           </helix-sandbox-toolbar>
 
@@ -312,6 +388,8 @@ export function SandboxWorkbench({ families }: Props) {
 
           <helix-sandbox-preview
             data-color-mode={previewTheme}
+            direction={direction === 'rtl' ? 'rtl' : undefined}
+            layout={layout === 'padded' ? undefined : layout}
             ref={preview}
             slot="preview"
             src="/sandbox/frame.html"
@@ -320,32 +398,36 @@ export function SandboxWorkbench({ families }: Props) {
           {/* The panel's tabs are `helix-tabs`, not a second tab set built
               into the sandbox: tabs are the only behaviour the region has, and
               that behaviour already exists. */}
-          <helix-tabs
-            appearance="underline"
-            label="Panel"
-            ref={panelTabs}
-            slot="panel"
-            value="terminal"
-          >
-            <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
-            <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
-            <helix-tabs-panel slot="panels" value="terminal">
-              <helix-sandbox-terminal ref={terminal}></helix-sandbox-terminal>
-            </helix-tabs-panel>
-            <helix-tabs-panel slot="panels" value="specs">
-              {/* The family, not the example: specs belong to a component, and
+          {showPanel && (
+            <helix-tabs
+              appearance="underline"
+              label="Panel"
+              ref={panelTabs}
+              slot="panel"
+              value="terminal"
+            >
+              <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
+              <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
+              <helix-tabs-panel slot="panels" value="terminal">
+                <helix-sandbox-terminal ref={terminal}></helix-sandbox-terminal>
+              </helix-tabs-panel>
+              <helix-tabs-panel slot="panels" value="specs">
+                {/* The family, not the example: specs belong to a component, and
                   every example of it runs the same ones. */}
-              <helix-sandbox-specs
-                family={family.slug}
-                src="/design/sandbox/specs"
-              ></helix-sandbox-specs>
-            </helix-tabs-panel>
-          </helix-tabs>
+                <helix-sandbox-specs
+                  family={family.slug}
+                  src="/design/sandbox/specs"
+                ></helix-sandbox-specs>
+              </helix-tabs-panel>
+            </helix-tabs>
+          )}
 
           {/* Fed by the sandbox, not from here. `line` and `column` are never
               passed as props, so React leaves them alone and the element
               writes them on every cursor move without a re-render. */}
-          <helix-sandbox-status-bar language={pane} slot="status"></helix-sandbox-status-bar>
+          {showStatus && (
+            <helix-sandbox-status-bar language={pane} slot="status"></helix-sandbox-status-bar>
+          )}
         </helix-sandbox>
 
         {/* A real drawer on a phone: focus trapped, Escape closes, page behind
