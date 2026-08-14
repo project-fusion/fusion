@@ -469,25 +469,16 @@ helix-app-header {
   }
 }
 
-/* Children sit under their parent's name rather than past it.
+/* Chrome density, so the marks in a row come down with the type.
  *
- * Aligning the two means no step between them, which is what `--tree-indent: 0`
- * says: every row's label starts after the chevron gutter, whatever its depth.
- * Depth is carried by the chevron and by the type, which steps down once for a
- * child, rather than by position.
- *
- * It suits a rail two levels deep. A tree that nests further wants a step back,
- * because with none of it the third level is indistinguishable from the second.
+ * The children are indented again, which the chevron moving to the end is what
+ * allows. At the start it took a gutter every row had to reserve, so a child
+ * carried both that and its indent and sat two steps from its parent's name;
+ * aligning the two meant no indent at all. At the end there is no gutter, a
+ * label starts at its row's own inset, and one step of indent is one step.
  */
-/* Chrome density, so the marks in a row come down with the type. */
 .examplesRail,
 .examplesRail helix-tree,
 helix-drawer helix-tree {
-  /* `0px`, not `0`. The indent is multiplied by the level, and a unitless zero
-     makes that product a number: adding a number to a length is invalid at
-     computed-value time, which drops the whole declaration and takes the
-     chevron gutter with it. Measured, every row's padding fell to zero and the
-     children sat left of their parents. */
-  --tree-indent: 0px;
   --helix-size-icon: var(--helix-size-icon-sm);
 }
