@@ -27,8 +27,11 @@
   display: inline-flex;
   font-size: var(--_badge-text);
   font-weight: var(--helix-weight-semibold);
-  inset-block-start: 0;
-  inset-inline-end: 0;
+  /* Pinned to the corner, then pulled back along both axes. The mark's centre
+     sits on the corner by default, which is right for a square icon and wrong
+     for a circle, where the corner of the box is outside the shape. */
+  inset-block-start: var(--badge-offset, 0);
+  inset-inline-end: var(--badge-offset, 0);
   justify-content: center;
   line-height: 1;
   /* Square at minimum, so a single digit is a circle rather than a sliver. */

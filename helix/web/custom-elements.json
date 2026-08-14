@@ -1473,6 +1473,10 @@
               "name": "--badge-background-color"
             },
             {
+              "description": "Pulls the mark in from the corner, along both axes.",
+              "name": "--badge-offset"
+            },
+            {
               "description": "The ring separating it from what is behind.",
               "name": "--badge-ring-color"
             }
