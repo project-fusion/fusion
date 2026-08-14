@@ -275,21 +275,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/avatar/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/avatar/root/avatar-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/accordion/index.ts",
       "declarations": [],
       "exports": [
@@ -328,7 +313,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/badge/index.ts",
+      "path": "src/avatar/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -336,7 +321,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/badge/root/badge-root.js"
+            "module": "src/avatar/root/avatar-root.js"
           }
         }
       ]
@@ -352,21 +337,6 @@
           "declaration": {
             "name": "*",
             "module": "src/banner/root/banner-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/blockquote/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/blockquote/root/blockquote-root.js"
           }
         }
       ]
@@ -390,6 +360,21 @@
           "declaration": {
             "name": "*",
             "module": "src/breadcrumbs/root/breadcrumbs-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/blockquote/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/blockquote/root/blockquote-root.js"
           }
         }
       ]
@@ -435,6 +420,21 @@
           "declaration": {
             "name": "*",
             "module": "src/card/root/card-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/badge/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/badge/root/badge-root.js"
           }
         }
       ]
@@ -501,6 +501,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/kbd/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/kbd/root/kbd-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/list/index.ts",
       "declarations": [],
       "exports": [
@@ -524,7 +539,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/kbd/index.ts",
+      "path": "src/nav-bar/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -532,7 +547,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/kbd/root/kbd-root.js"
+            "module": "src/nav-bar/root/nav-bar-root.js"
           }
         }
       ]
@@ -563,36 +578,6 @@
           "declaration": {
             "name": "*",
             "module": "src/skeleton/root/skeleton-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/nav-bar/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/nav-bar/root/nav-bar-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/spinner/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/spinner/root/spinner-root.js"
           }
         }
       ]
@@ -684,6 +669,44 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/spinner/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/spinner/root/spinner-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toggle/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/toggle/group/toggle-group.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/toggle/root/toggle-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/tag/index.ts",
       "declarations": [],
       "exports": [
@@ -731,268 +754,6 @@
           "declaration": {
             "name": "*",
             "module": "src/tree/root/tree-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/avatar/root/avatar-root.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "initialsOf",
-          "return": {
-            "type": {
-              "text": "string"
-            }
-          },
-          "parameters": [
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Initials for a name: first letter of the first and last words.\n\nA pure function of the name, so the server and the client agree without\neither of them measuring anything."
-        },
-        {
-          "kind": "class",
-          "description": "The fallback is the reason this is an element. An image that fails to load\nleaves a broken icon and no name, so the avatar listens for the error and\nfalls back: to whatever was slotted, or to initials derived from `name`.\n\n**One element, not three.** A separate image and fallback would each need to\nbe written for every avatar and would have to coordinate through an event,\nand the only thing that buys is trying several sources in turn. The fallback\ncarries no behavior at all, which by the rule here makes it a slot; the image\ndoes own load state, but the root already owns it.\n\n`name` is required for the accessible name whether or not there is an image,\nbecause an avatar with no name tells a screen-reader user nothing. Initials\nare hidden from assistive technology: they are a visual shorthand for the\nname that is already announced, and would otherwise be read out letter by\nletter after it.\n\nThe `<img>` keeps an empty `alt` for the same reason. The host carries the\naccessible name through `ElementInternals`, so a populated `alt` would\nannounce the same person twice.\n\nThe image's own `load` and `error` are relayed from the host. They are not\ncomposed, so they stop at the shadow boundary otherwise, and relaying them\nunder their native names is what lets a consumer wait for an avatar the way\nthey would wait for any image.",
-          "name": "HelixBaseAvatar",
-          "cssParts": [
-            {
-              "description": "The image, when one is loading or loaded.",
-              "name": "image"
-            },
-            {
-              "description": "The initials shown when there is no usable image.",
-              "name": "initials"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Shown when there is no usable image, in place of the initials.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "src",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Image to show. Falls back to the slot, or to initials, if it fails.",
-              "attribute": "src"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name of the person or entity. Used for the label and the initials.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, when it should differ from `name`.\n\n`name` is what the initials are drawn from, so it has to be a person's\nname. This is for the cases where what should be announced is not: an\navatar standing for a whole team, or one whose label carries a role.",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
-              "name": "failed",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false",
-              "description": "Whether the image failed.\n\nState rather than a property: it is the element's own observation, not\nsomething a consumer sets, and it starts false on the server because the\nserver cannot know whether an image will load."
-            },
-            {
-              "kind": "field",
-              "name": "handleError",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleLoad",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "Event"
-              },
-              "description": "Relayed from the image once it has loaded.",
-              "name": "load",
-              "reactProp": "onLoad"
-            },
-            {
-              "type": {
-                "text": "Event"
-              },
-              "description": "Relayed from the image when it fails.",
-              "name": "error",
-              "reactProp": "onError"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "src",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Image to show. Falls back to the slot, or to initials, if it fails.",
-              "fieldName": "src"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name of the person or entity. Used for the label and the initials.",
-              "fieldName": "name"
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, when it should differ from `name`.\n\n`name` is what the initials are drawn from, so it has to be a person's\nname. This is for the cases where what should be announced is not: an\navatar standing for a whole team, or one whose label carries a role.",
-              "fieldName": "label"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Represents a person or entity with an image or their initials.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/avatar",
-            "aliases": [
-              "Profile picture",
-              "Gravatar"
-            ],
-            "tier": "headless",
-            "group": "BaseAvatar",
-            "part": "Root"
-          },
-          "tagName": "helix-base-avatar",
-          "customElement": true,
-          "modulePath": "src/avatar/root/avatar-root.ts",
-          "definitionPath": "src/avatar/root/avatar-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "initialsOf",
-          "declaration": {
-            "name": "initialsOf",
-            "module": "src/avatar/root/avatar-root.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixBaseAvatar",
-          "declaration": {
-            "name": "HelixBaseAvatar",
-            "module": "src/avatar/root/avatar-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-avatar",
-          "declaration": {
-            "name": "HelixBaseAvatar",
-            "module": "src/avatar/root/avatar-root.ts"
           }
         }
       ]
@@ -1389,29 +1150,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/toggle/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/toggle/group/toggle-group.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/toggle/root/toggle-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/accordion/root/accordion-root.ts",
       "declarations": [
         {
@@ -1754,54 +1492,66 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/badge/root/badge-root.ts",
+      "path": "src/avatar/root/avatar-root.ts",
       "declarations": [
         {
+          "kind": "function",
+          "name": "initialsOf",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Initials for a name: first letter of the first and last words."
+        },
+        {
           "kind": "class",
-          "description": "Wraps whatever it decorates and pins the indicator to its corner, so the\nthing being counted stays the thing in the layout: a badge is an annotation,\nnot a container that happens to hold an icon.\n\n`max` caps the number. Past it the indicator reads `9+` rather than growing\nto fit, because a corner mark that widens with its value pushes the layout\naround for the one case nobody planned for.\n\n**A dot needs a label.** Without one it is a coloured circle that announces\nnothing, which tells a sighted reader there is something new and tells\neveryone else there is not. The label is required in that form and the\nindicator is hidden from assistive technology when a number already says it.",
-          "name": "HelixBaseBadge",
+          "description": "Shows `src` until it fails to load. Without an image, or after a failure,\nthe default slot is shown; its own fallback is the initials.\n\nThe host carries the accessible name, so the `<img>` takes an empty `alt` and\nthe initials are hidden from assistive technology. Announcing either would\nrepeat the name.\n\n`load` and `error` are relayed from the host. They are not composed, so they\nstop at the shadow boundary otherwise.",
+          "name": "HelixBaseAvatar",
           "cssParts": [
             {
-              "description": "The count or dot.",
-              "name": "indicator"
+              "description": "The image, when one is loading or loaded.",
+              "name": "image"
+            },
+            {
+              "description": "The initials shown when there is no usable image.",
+              "name": "initials"
             }
           ],
           "slots": [
             {
-              "description": "The element being decorated.",
+              "description": "Shown when there is no usable image, in place of the initials.",
               "name": ""
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "value",
+              "name": "src",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "The count or short text to show.",
-              "attribute": "value"
+              "description": "Image to show. Falls back to the slot, or to initials, if it fails.",
+              "attribute": "src"
             },
             {
               "kind": "field",
-              "name": "max",
+              "name": "name",
               "type": {
-                "text": "number | undefined"
+                "text": "string"
               },
-              "description": "Cap for a numeric value. Past it the indicator reads `{max}+`.",
-              "attribute": "max"
-            },
-            {
-              "kind": "field",
-              "name": "dot",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Shows a presence mark with no text. `value` is ignored.",
-              "attribute": "dot",
-              "reflects": true
+              "default": "''",
+              "description": "Name of the person or entity. Used for the label and the initials.",
+              "attribute": "name"
             },
             {
               "kind": "field",
@@ -1810,17 +1560,29 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accessible name. Required for a dot, which has no text to read.",
+              "description": "Accessible name. Falls back to `name`, which the initials come from.",
               "attribute": "label"
             },
             {
               "kind": "field",
-              "name": "text",
+              "name": "failed",
               "type": {
-                "text": "string"
+                "text": "boolean"
               },
               "privacy": "private",
-              "description": "What the indicator reads, once the cap has been applied.",
+              "default": "false",
+              "description": "Whether the image failed. The element's own observation, never set."
+            },
+            {
+              "kind": "field",
+              "name": "handleError",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleLoad",
+              "privacy": "private",
               "readonly": true
             },
             {
@@ -1893,32 +1655,42 @@
               }
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed from the image once it has loaded.",
+              "name": "load",
+              "reactProp": "onLoad"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed from the image when it fails.",
+              "name": "error",
+              "reactProp": "onError"
+            }
+          ],
           "attributes": [
             {
-              "name": "value",
+              "name": "src",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "The count or short text to show.",
-              "fieldName": "value"
+              "description": "Image to show. Falls back to the slot, or to initials, if it fails.",
+              "fieldName": "src"
             },
             {
-              "name": "max",
+              "name": "name",
               "type": {
-                "text": "number | undefined"
+                "text": "string"
               },
-              "description": "Cap for a numeric value. Past it the indicator reads `{max}+`.",
-              "fieldName": "max"
-            },
-            {
-              "name": "dot",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Shows a presence mark with no text. `value` is ignored.",
-              "fieldName": "dot"
+              "default": "''",
+              "description": "Name of the person or entity. Used for the label and the initials.",
+              "fieldName": "name"
             },
             {
               "name": "label",
@@ -1926,7 +1698,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accessible name. Required for a dot, which has no text to read.",
+              "description": "Accessible name. Falls back to `name`, which the initials come from.",
               "fieldName": "label"
             }
           ],
@@ -1934,41 +1706,48 @@
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "Attaches a count or a presence mark to another element.",
+          "summary": "Represents a person or entity with an image or their initials.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/badge",
+            "documentation": "https://helix.fusion.dev/components/avatar",
             "aliases": [
-              "Count",
-              "Indicator",
-              "Pip"
+              "Profile picture",
+              "Gravatar"
             ],
             "tier": "headless",
-            "group": "BaseBadge",
+            "group": "BaseAvatar",
             "part": "Root"
           },
-          "tagName": "helix-base-badge",
+          "tagName": "helix-base-avatar",
           "customElement": true,
-          "modulePath": "src/badge/root/badge-root.ts",
-          "definitionPath": "src/badge/root/badge-root.ts"
+          "modulePath": "src/avatar/root/avatar-root.ts",
+          "definitionPath": "src/avatar/root/avatar-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseBadge",
+          "name": "initialsOf",
           "declaration": {
-            "name": "HelixBaseBadge",
-            "module": "src/badge/root/badge-root.ts"
+            "name": "initialsOf",
+            "module": "src/avatar/root/avatar-root.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBaseAvatar",
+          "declaration": {
+            "name": "HelixBaseAvatar",
+            "module": "src/avatar/root/avatar-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-badge",
+          "name": "helix-base-avatar",
           "declaration": {
-            "name": "HelixBaseBadge",
-            "module": "src/badge/root/badge-root.ts"
+            "name": "HelixBaseAvatar",
+            "module": "src/avatar/root/avatar-root.ts"
           }
         }
       ]
@@ -2194,169 +1973,6 @@
           "declaration": {
             "name": "HelixBaseBanner",
             "module": "src/banner/root/banner-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/blockquote/root/blockquote-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Renders a real `<blockquote>` with a `<footer>` for the attribution, which is\nthe structure the HTML spec describes for exactly this: the attribution is\nabout the quotation rather than part of it, and putting it inside the quoted\ntext claims the source said their own name.\n\nA quotation run inside a sentence is a `Quote`, which is a different element\nbecause it is a different job.",
-          "name": "HelixBaseBlockquote",
-          "cssParts": [
-            {
-              "description": "The quotation.",
-              "name": "blockquote"
-            },
-            {
-              "description": "The footer carrying the source.",
-              "name": "attribution"
-            }
-          ],
-          "slots": [
-            {
-              "description": "The quoted passage.",
-              "name": ""
-            },
-            {
-              "description": "Who said it, and where.",
-              "name": "attribution"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "cite",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "URL identifying where the passage came from.",
-              "attribute": "cite"
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cite",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "URL identifying where the passage came from.",
-              "fieldName": "cite"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "A passage set off from the prose around it.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/blockquote",
-            "aliases": [
-              "Pullquote",
-              "Citation",
-              "Excerpt"
-            ],
-            "tier": "headless",
-            "group": "BaseBlockquote",
-            "part": "Root"
-          },
-          "tagName": "helix-base-blockquote",
-          "customElement": true,
-          "modulePath": "src/blockquote/root/blockquote-root.ts",
-          "definitionPath": "src/blockquote/root/blockquote-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseBlockquote",
-          "declaration": {
-            "name": "HelixBaseBlockquote",
-            "module": "src/blockquote/root/blockquote-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-blockquote",
-          "declaration": {
-            "name": "HelixBaseBlockquote",
-            "module": "src/blockquote/root/blockquote-root.ts"
           }
         }
       ]
@@ -2696,6 +2312,169 @@
           "declaration": {
             "name": "HelixBaseBreadcrumbs",
             "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/blockquote/root/blockquote-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders a real `<blockquote>` with a `<footer>` for the attribution, which is\nthe structure the HTML spec describes for exactly this: the attribution is\nabout the quotation rather than part of it, and putting it inside the quoted\ntext claims the source said their own name.\n\nA quotation run inside a sentence is a `Quote`, which is a different element\nbecause it is a different job.",
+          "name": "HelixBaseBlockquote",
+          "cssParts": [
+            {
+              "description": "The quotation.",
+              "name": "blockquote"
+            },
+            {
+              "description": "The footer carrying the source.",
+              "name": "attribution"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The quoted passage.",
+              "name": ""
+            },
+            {
+              "description": "Who said it, and where.",
+              "name": "attribution"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "cite",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "URL identifying where the passage came from.",
+              "attribute": "cite"
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cite",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "URL identifying where the passage came from.",
+              "fieldName": "cite"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A passage set off from the prose around it.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/blockquote",
+            "aliases": [
+              "Pullquote",
+              "Citation",
+              "Excerpt"
+            ],
+            "tier": "headless",
+            "group": "BaseBlockquote",
+            "part": "Root"
+          },
+          "tagName": "helix-base-blockquote",
+          "customElement": true,
+          "modulePath": "src/blockquote/root/blockquote-root.ts",
+          "definitionPath": "src/blockquote/root/blockquote-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseBlockquote",
+          "declaration": {
+            "name": "HelixBaseBlockquote",
+            "module": "src/blockquote/root/blockquote-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-blockquote",
+          "declaration": {
+            "name": "HelixBaseBlockquote",
+            "module": "src/blockquote/root/blockquote-root.ts"
           }
         }
       ]
@@ -3112,173 +2891,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/divider/root/divider-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "The separator role lives on the rule inside the shadow root rather than on\nthe host. A role does not need to cross the shadow boundary the way an IDREF\ndoes, and putting it on the rendered element means the semantics are in the\nserver's markup with no attribute written during a lifecycle the server never\nruns.\n\nUse `orientation=\"vertical\"` between items on one line, such as inside a\ntoolbar. A vertical divider stretches to its flex parent rather than setting\na height of its own.",
-          "name": "HelixBaseDivider",
-          "cssParts": [
-            {
-              "description": "The rule itself.",
-              "name": "line"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | 'vertical' | undefined"
-              },
-              "description": "Which way the rule runs.",
-              "attribute": "orientation",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "announced",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the rule is announced as a separator.\n\nOff by default, and out of the accessibility tree. Most rules on a page\nseparate nothing: they underline a heading or close a section that space\nhad already closed, and announcing every one as a separator is noise a\nscreen-reader user has to walk past.\n\nStated this way round rather than as `decorative`, which is how the\nreference implementation has it, because a boolean attribute cannot be\nturned off: `decorative=\"false\"` is still `true` to the parser, so the\nquiet default would have been unreachable from HTML and settable only as a\nproperty. An opt-in has no such problem, and it is absent by default, which\nis what every reflected property here has to be.",
-              "attribute": "announced",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | 'vertical' | undefined"
-              },
-              "description": "Which way the rule runs.",
-              "fieldName": "orientation"
-            },
-            {
-              "name": "announced",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the rule is announced as a separator.\n\nOff by default, and out of the accessibility tree. Most rules on a page\nseparate nothing: they underline a heading or close a section that space\nhad already closed, and announcing every one as a separator is noise a\nscreen-reader user has to walk past.\n\nStated this way round rather than as `decorative`, which is how the\nreference implementation has it, because a boolean attribute cannot be\nturned off: `decorative=\"false\"` is still `true` to the parser, so the\nquiet default would have been unreachable from HTML and settable only as a\nproperty. An opt-in has no such problem, and it is absent by default, which\nis what every reflected property here has to be.",
-              "fieldName": "announced"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Separates content into groups with a rule.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/divider",
-            "aliases": [
-              "Separator",
-              "Rule"
-            ],
-            "tier": "headless",
-            "group": "BaseDivider",
-            "part": "Root"
-          },
-          "tagName": "helix-base-divider",
-          "customElement": true,
-          "modulePath": "src/divider/root/divider-root.ts",
-          "definitionPath": "src/divider/root/divider-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseDivider",
-          "declaration": {
-            "name": "HelixBaseDivider",
-            "module": "src/divider/root/divider-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-divider",
-          "declaration": {
-            "name": "HelixBaseDivider",
-            "module": "src/divider/root/divider-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/callout/root/callout-root.ts",
       "declarations": [
         {
@@ -3439,173 +3051,6 @@
           "declaration": {
             "name": "HelixBaseCallout",
             "module": "src/callout/root/callout-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/icon/root/icon-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is\nrendered as its own inner markup rather than as a single path. Most icons are\nseveral elements at once, each with its own stroke and fill, so a one-path\nmodel would draw a fraction of the set and quietly drop the rest.\n\n**The markup is trusted by construction.** It is generated at build time from\nSVG files in this repository, never from anything a user supplies, which is\nwhat makes `unsafeSVG` the right tool rather than a risk.\n\nThe `<svg>` carries `fill=\"currentColor\"` because the generator keeps only\nthe inner markup and discards the source's own root tag, and that tag is\nwhere Phosphor puts its fill. Without it, every solid glyph in the set, 65 of\nthem, falls back to the SVG default of black and disappears on a dark page.\nShapes that set their own `fill` or `stroke` are unaffected, which is why the\noutline icons looked fine and hid this.\n\nA name with no match renders nothing at all instead of an empty box, so a\ntypo cannot leave a hole in a layout that looks deliberate.\n\nAn icon is decorative by default and hidden from assistive technology. Give\nit a `label` only when the icon is the sole carrier of meaning, such as\ninside a button with no text.",
-          "name": "HelixBaseIcon",
-          "cssParts": [
-            {
-              "description": "The rendered SVG.",
-              "name": "svg"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name of the icon in the Helix set.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, for an icon that is not decorative.",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name of the icon in the Helix set.",
-              "fieldName": "name"
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, for an icon that is not decorative.",
-              "fieldName": "label"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Renders a named icon from the Helix set.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/icon",
-            "aliases": [
-              "Glyph",
-              "Symbol"
-            ],
-            "tier": "headless",
-            "group": "BaseIcon",
-            "part": "Root"
-          },
-          "tagName": "helix-base-icon",
-          "customElement": true,
-          "modulePath": "src/icon/root/icon-root.ts",
-          "definitionPath": "src/icon/root/icon-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseIcon",
-          "declaration": {
-            "name": "HelixBaseIcon",
-            "module": "src/icon/root/icon-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-icon",
-          "declaration": {
-            "name": "HelixBaseIcon",
-            "module": "src/icon/root/icon-root.ts"
           }
         }
       ]
@@ -4011,31 +3456,75 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/list/item/list-item.ts",
+      "path": "src/badge/root/badge-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Layout and semantics, and deliberately not a target.\n\n**It does not become a link.** The reference renders an `<a>` when given an\n`href`, which is the thing Button and Toggle both stopped doing: a router\nrenders its own anchor and cannot render it inside this shadow root, so a row\nthat navigates would force a full page load. A row whose label is a\ndestination slots the consumer's own link as that label, and the link is the\ntarget rather than the row around it.\n\nThat is a real constraint rather than an oversight: a whole-row target needs\nthe anchor to wrap the layout, and the layout is what this component is. When\nsomething needs it, it wants a `data-list-item` recipe styling the consumer's\nanchor, the way `data-button` and `data-nav-item` do.",
-          "name": "HelixBaseListItem",
+          "description": "Wraps whatever it decorates and pins the indicator to its corner, so the\nthing being counted stays the thing in the layout: a badge is an annotation,\nnot a container that happens to hold an icon.\n\n`max` caps the number. Past it the indicator reads `9+` rather than growing\nto fit, because a corner mark that widens with its value pushes the layout\naround for the one case nobody planned for.\n\n**A dot needs a label.** Without one it is a coloured circle that announces\nnothing, which tells a sighted reader there is something new and tells\neveryone else there is not. The label is required in that form and the\nindicator is hidden from assistive technology when a number already says it.",
+          "name": "HelixBaseBadge",
+          "cssParts": [
+            {
+              "description": "The count or dot.",
+              "name": "indicator"
+            }
+          ],
           "slots": [
             {
-              "description": "Leading content, usually an icon or an avatar.",
-              "name": "start"
-            },
-            {
-              "description": "The label.",
+              "description": "The element being decorated.",
               "name": ""
-            },
-            {
-              "description": "Secondary text under the label.",
-              "name": "supporting"
-            },
-            {
-              "description": "Trailing content.",
-              "name": "end"
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The count or short text to show.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Cap for a numeric value. Past it the indicator reads `{max}+`.",
+              "attribute": "max"
+            },
+            {
+              "kind": "field",
+              "name": "dot",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Shows a presence mark with no text. `value` is ignored.",
+              "attribute": "dot",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name. Required for a dot, which has no text to read.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "text",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What the indicator reads, once the cap has been applied.",
+              "readonly": true
+            },
             {
               "kind": "field",
               "name": "internals",
@@ -4106,44 +3595,82 @@
               }
             }
           ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The count or short text to show.",
+              "fieldName": "value"
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Cap for a numeric value. Past it the indicator reads `{max}+`.",
+              "fieldName": "max"
+            },
+            {
+              "name": "dot",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Shows a presence mark with no text. `value` is ignored.",
+              "fieldName": "dot"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name. Required for a dot, which has no text to read.",
+              "fieldName": "label"
+            }
+          ],
           "superclass": {
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "One row of a list.",
+          "summary": "Attaches a count or a presence mark to another element.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/list",
+            "documentation": "https://helix.fusion.dev/components/badge",
             "aliases": [
-              "Row",
-              "Entry"
+              "Count",
+              "Indicator",
+              "Pip"
             ],
             "tier": "headless",
-            "group": "BaseList",
-            "part": "Item"
+            "group": "BaseBadge",
+            "part": "Root"
           },
-          "tagName": "helix-base-list-item",
+          "tagName": "helix-base-badge",
           "customElement": true,
-          "modulePath": "src/list/item/list-item.ts",
-          "definitionPath": "src/list/item/list-item.ts"
+          "modulePath": "src/badge/root/badge-root.ts",
+          "definitionPath": "src/badge/root/badge-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseListItem",
+          "name": "HelixBaseBadge",
           "declaration": {
-            "name": "HelixBaseListItem",
-            "module": "src/list/item/list-item.ts"
+            "name": "HelixBaseBadge",
+            "module": "src/badge/root/badge-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-list-item",
+          "name": "helix-base-badge",
           "declaration": {
-            "name": "HelixBaseListItem",
-            "module": "src/list/item/list-item.ts"
+            "name": "HelixBaseBadge",
+            "module": "src/badge/root/badge-root.ts"
           }
         }
       ]
@@ -4312,19 +3839,196 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/list/root/list-root.ts",
+      "path": "src/divider/root/divider-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "`role=\"list\"` on the host, so the rows are counted and announced as \"1 of 7\"\nrather than as seven unrelated passages. That count is the whole reason to\nuse a list rather than a stack of divs.",
-          "name": "HelixBaseList",
-          "slots": [
+          "description": "The separator role lives on the rule inside the shadow root rather than on\nthe host. A role does not need to cross the shadow boundary the way an IDREF\ndoes, and putting it on the rendered element means the semantics are in the\nserver's markup with no attribute written during a lifecycle the server never\nruns.\n\nUse `orientation=\"vertical\"` between items on one line, such as inside a\ntoolbar. A vertical divider stretches to its flex parent rather than setting\na height of its own.",
+          "name": "HelixBaseDivider",
+          "cssParts": [
             {
-              "description": "The rows.",
-              "name": ""
+              "description": "The rule itself.",
+              "name": "line"
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the rule runs.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "announced",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rule is announced as a separator.\n\nOff by default, and out of the accessibility tree. Most rules on a page\nseparate nothing: they underline a heading or close a section that space\nhad already closed, and announcing every one as a separator is noise a\nscreen-reader user has to walk past.\n\nStated this way round rather than as `decorative`, which is how the\nreference implementation has it, because a boolean attribute cannot be\nturned off: `decorative=\"false\"` is still `true` to the parser, so the\nquiet default would have been unreachable from HTML and settable only as a\nproperty. An opt-in has no such problem, and it is absent by default, which\nis what every reflected property here has to be.",
+              "attribute": "announced",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the rule runs.",
+              "fieldName": "orientation"
+            },
+            {
+              "name": "announced",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rule is announced as a separator.\n\nOff by default, and out of the accessibility tree. Most rules on a page\nseparate nothing: they underline a heading or close a section that space\nhad already closed, and announcing every one as a separator is noise a\nscreen-reader user has to walk past.\n\nStated this way round rather than as `decorative`, which is how the\nreference implementation has it, because a boolean attribute cannot be\nturned off: `decorative=\"false\"` is still `true` to the parser, so the\nquiet default would have been unreachable from HTML and settable only as a\nproperty. An opt-in has no such problem, and it is absent by default, which\nis what every reflected property here has to be.",
+              "fieldName": "announced"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Separates content into groups with a rule.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/divider",
+            "aliases": [
+              "Separator",
+              "Rule"
+            ],
+            "tier": "headless",
+            "group": "BaseDivider",
+            "part": "Root"
+          },
+          "tagName": "helix-base-divider",
+          "customElement": true,
+          "modulePath": "src/divider/root/divider-root.ts",
+          "definitionPath": "src/divider/root/divider-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseDivider",
+          "declaration": {
+            "name": "HelixBaseDivider",
+            "module": "src/divider/root/divider-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-divider",
+          "declaration": {
+            "name": "HelixBaseDivider",
+            "module": "src/divider/root/divider-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon/root/icon-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is\nrendered as its own inner markup rather than as a single path. Most icons are\nseveral elements at once, each with its own stroke and fill, so a one-path\nmodel would draw a fraction of the set and quietly drop the rest.\n\n**The markup is trusted by construction.** It is generated at build time from\nSVG files in this repository, never from anything a user supplies, which is\nwhat makes `unsafeSVG` the right tool rather than a risk.\n\nThe `<svg>` carries `fill=\"currentColor\"` because the generator keeps only\nthe inner markup and discards the source's own root tag, and that tag is\nwhere Phosphor puts its fill. Without it, every solid glyph in the set, 65 of\nthem, falls back to the SVG default of black and disappears on a dark page.\nShapes that set their own `fill` or `stroke` are unaffected, which is why the\noutline icons looked fine and hid this.\n\nA name with no match renders nothing at all instead of an empty box, so a\ntypo cannot leave a hole in a layout that looks deliberate.\n\nAn icon is decorative by default and hidden from assistive technology. Give\nit a `label` only when the icon is the sole carrier of meaning, such as\ninside a button with no text.",
+          "name": "HelixBaseIcon",
+          "cssParts": [
+            {
+              "description": "The rendered SVG.",
+              "name": "svg"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name of the icon in the Helix set.",
+              "attribute": "name"
+            },
             {
               "kind": "field",
               "name": "label",
@@ -4332,7 +4036,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accessible name for the set.",
+              "description": "Accessible name, for an icon that is not decorative.",
               "attribute": "label"
             },
             {
@@ -4407,12 +4111,21 @@
           ],
           "attributes": [
             {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name of the icon in the Helix set.",
+              "fieldName": "name"
+            },
+            {
               "name": "label",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "Accessible name for the set.",
+              "description": "Accessible name, for an icon that is not decorative.",
               "fieldName": "label"
             }
           ],
@@ -4420,41 +4133,40 @@
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "A set of rows, read as a set.",
+          "summary": "Renders a named icon from the Helix set.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/list",
+            "documentation": "https://helix.fusion.dev/components/icon",
             "aliases": [
-              "Rows",
-              "Stack",
-              "Menu"
+              "Glyph",
+              "Symbol"
             ],
             "tier": "headless",
-            "group": "BaseList",
+            "group": "BaseIcon",
             "part": "Root"
           },
-          "tagName": "helix-base-list",
+          "tagName": "helix-base-icon",
           "customElement": true,
-          "modulePath": "src/list/root/list-root.ts",
-          "definitionPath": "src/list/root/list-root.ts"
+          "modulePath": "src/icon/root/icon-root.ts",
+          "definitionPath": "src/icon/root/icon-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseList",
+          "name": "HelixBaseIcon",
           "declaration": {
-            "name": "HelixBaseList",
-            "module": "src/list/root/list-root.ts"
+            "name": "HelixBaseIcon",
+            "module": "src/icon/root/icon-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-list",
+          "name": "helix-base-icon",
           "declaration": {
-            "name": "HelixBaseList",
-            "module": "src/list/root/list-root.ts"
+            "name": "HelixBaseIcon",
+            "module": "src/icon/root/icon-root.ts"
           }
         }
       ]
@@ -4589,6 +4301,145 @@
           "declaration": {
             "name": "HelixBaseKbd",
             "module": "src/kbd/root/kbd-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/list/item/list-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Layout and semantics, and deliberately not a target.\n\n**It does not become a link.** The reference renders an `<a>` when given an\n`href`, which is the thing Button and Toggle both stopped doing: a router\nrenders its own anchor and cannot render it inside this shadow root, so a row\nthat navigates would force a full page load. A row whose label is a\ndestination slots the consumer's own link as that label, and the link is the\ntarget rather than the row around it.\n\nThat is a real constraint rather than an oversight: a whole-row target needs\nthe anchor to wrap the layout, and the layout is what this component is. When\nsomething needs it, it wants a `data-list-item` recipe styling the consumer's\nanchor, the way `data-button` and `data-nav-item` do.",
+          "name": "HelixBaseListItem",
+          "slots": [
+            {
+              "description": "Leading content, usually an icon or an avatar.",
+              "name": "start"
+            },
+            {
+              "description": "The label.",
+              "name": ""
+            },
+            {
+              "description": "Secondary text under the label.",
+              "name": "supporting"
+            },
+            {
+              "description": "Trailing content.",
+              "name": "end"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One row of a list.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/list",
+            "aliases": [
+              "Row",
+              "Entry"
+            ],
+            "tier": "headless",
+            "group": "BaseList",
+            "part": "Item"
+          },
+          "tagName": "helix-base-list-item",
+          "customElement": true,
+          "modulePath": "src/list/item/list-item.ts",
+          "definitionPath": "src/list/item/list-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseListItem",
+          "declaration": {
+            "name": "HelixBaseListItem",
+            "module": "src/list/item/list-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-list-item",
+          "declaration": {
+            "name": "HelixBaseListItem",
+            "module": "src/list/item/list-item.ts"
           }
         }
       ]
@@ -4802,24 +4653,170 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/spinner/root/spinner-root.ts",
+      "path": "src/quote/root/quote-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Two concentric circles rather than one arc: the track is what makes the\nmoving part read as a proportion of a whole rather than as a shape drifting\non its own, and it costs one element.\n\nThe semantics are on the host through `ElementInternals`, not on an inner\nspan. A `role` written into the shadow root announces correctly but leaves\nthe host itself anonymous to anything walking the light DOM, and a `role`\nwritten onto the host as an attribute is one a React consumer's server markup\nnever had.",
-          "name": "HelixBaseSpinner",
+          "description": "Renders a real `<q>`, which is what supplies the quotation marks: the browser\ninserts the right ones for the document's language, and nests them correctly\nwhen one quotation sits inside another. Typing the marks into the content\ninstead gets both of those wrong in every language but one.\n\nA passage set off from the prose rather than run inside it is a blockquote,\nwhich is a different element for a different job.",
+          "name": "HelixBaseQuote",
           "cssParts": [
             {
-              "description": "The rotating circle pair.",
-              "name": "svg"
+              "description": "The quotation.",
+              "name": "quote"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The quoted text.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "cite",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "URL identifying where the quotation came from.",
+              "attribute": "cite"
             },
             {
-              "description": "The full circle behind the indicator.",
-              "name": "track"
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
             },
             {
-              "description": "The arc that turns.",
-              "name": "indicator"
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cite",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "URL identifying where the quotation came from.",
+              "fieldName": "cite"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A short quotation, set inline with the text around it.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/quote",
+            "aliases": [
+              "Q",
+              "InlineQuote"
+            ],
+            "tier": "headless",
+            "group": "BaseQuote",
+            "part": "Root"
+          },
+          "tagName": "helix-base-quote",
+          "customElement": true,
+          "modulePath": "src/quote/root/quote-root.ts",
+          "definitionPath": "src/quote/root/quote-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseQuote",
+          "declaration": {
+            "name": "HelixBaseQuote",
+            "module": "src/quote/root/quote-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-quote",
+          "declaration": {
+            "name": "HelixBaseQuote",
+            "module": "src/quote/root/quote-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/list/root/list-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "`role=\"list\"` on the host, so the rows are counted and announced as \"1 of 7\"\nrather than as seven unrelated passages. That count is the whole reason to\nuse a list rather than a stack of divs.",
+          "name": "HelixBaseList",
+          "slots": [
+            {
+              "description": "The rows.",
+              "name": ""
             }
           ],
           "members": [
@@ -4829,8 +4826,8 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Loading'",
-              "description": "Accessible name, announced while the work is outstanding.",
+              "default": "''",
+              "description": "Accessible name for the set.",
               "attribute": "label"
             },
             {
@@ -4909,8 +4906,8 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Loading'",
-              "description": "Accessible name, announced while the work is outstanding.",
+              "default": "''",
+              "description": "Accessible name for the set.",
               "fieldName": "label"
             }
           ],
@@ -4918,41 +4915,41 @@
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "Says that something indeterminate is in progress.",
+          "summary": "A set of rows, read as a set.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/spinner",
+            "documentation": "https://helix.fusion.dev/components/list",
             "aliases": [
-              "Loader",
-              "Busy",
-              "Activity"
+              "Rows",
+              "Stack",
+              "Menu"
             ],
             "tier": "headless",
-            "group": "BaseSpinner",
+            "group": "BaseList",
             "part": "Root"
           },
-          "tagName": "helix-base-spinner",
+          "tagName": "helix-base-list",
           "customElement": true,
-          "modulePath": "src/spinner/root/spinner-root.ts",
-          "definitionPath": "src/spinner/root/spinner-root.ts"
+          "modulePath": "src/list/root/list-root.ts",
+          "definitionPath": "src/list/root/list-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseSpinner",
+          "name": "HelixBaseList",
           "declaration": {
-            "name": "HelixBaseSpinner",
-            "module": "src/spinner/root/spinner-root.ts"
+            "name": "HelixBaseList",
+            "module": "src/list/root/list-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-spinner",
+          "name": "helix-base-list",
           "declaration": {
-            "name": "HelixBaseSpinner",
-            "module": "src/spinner/root/spinner-root.ts"
+            "name": "HelixBaseList",
+            "module": "src/list/root/list-root.ts"
           }
         }
       ]
@@ -5230,160 +5227,6 @@
           "declaration": {
             "name": "HelixBaseStatGroup",
             "module": "src/stat/group/stat-group.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/quote/root/quote-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Renders a real `<q>`, which is what supplies the quotation marks: the browser\ninserts the right ones for the document's language, and nests them correctly\nwhen one quotation sits inside another. Typing the marks into the content\ninstead gets both of those wrong in every language but one.\n\nA passage set off from the prose rather than run inside it is a blockquote,\nwhich is a different element for a different job.",
-          "name": "HelixBaseQuote",
-          "cssParts": [
-            {
-              "description": "The quotation.",
-              "name": "quote"
-            }
-          ],
-          "slots": [
-            {
-              "description": "The quoted text.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "cite",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "URL identifying where the quotation came from.",
-              "attribute": "cite"
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cite",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "URL identifying where the quotation came from.",
-              "fieldName": "cite"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "A short quotation, set inline with the text around it.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/quote",
-            "aliases": [
-              "Q",
-              "InlineQuote"
-            ],
-            "tier": "headless",
-            "group": "BaseQuote",
-            "part": "Root"
-          },
-          "tagName": "helix-base-quote",
-          "customElement": true,
-          "modulePath": "src/quote/root/quote-root.ts",
-          "definitionPath": "src/quote/root/quote-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseQuote",
-          "declaration": {
-            "name": "HelixBaseQuote",
-            "module": "src/quote/root/quote-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-quote",
-          "declaration": {
-            "name": "HelixBaseQuote",
-            "module": "src/quote/root/quote-root.ts"
           }
         }
       ]
@@ -5679,6 +5522,133 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/table/row/table-row.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "`display: contents` in the styled tier, so the row's cells become items of\nthe table's own grid and every column lines up across every row. The row\nstill exists as an element, which is what a `<table>` gives away when its\ncells are laid out by the table algorithm.",
+          "name": "HelixBaseTableRow",
+          "slots": [
+            {
+              "description": "The row's cells.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One row of a table.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/table",
+            "aliases": [
+              "Row",
+              "TableRow"
+            ],
+            "tier": "headless",
+            "group": "BaseTable",
+            "part": "Row"
+          },
+          "tagName": "helix-base-table-row",
+          "customElement": true,
+          "modulePath": "src/table/row/table-row.ts",
+          "definitionPath": "src/table/row/table-row.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTableRow",
+          "declaration": {
+            "name": "HelixBaseTableRow",
+            "module": "src/table/row/table-row.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-table-row",
+          "declaration": {
+            "name": "HelixBaseTableRow",
+            "module": "src/table/row/table-row.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/table/root/table-root.ts",
       "declarations": [
         {
@@ -5852,306 +5822,6 @@
           "declaration": {
             "name": "HelixBaseTable",
             "module": "src/table/root/table-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/row/table-row.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "`display: contents` in the styled tier, so the row's cells become items of\nthe table's own grid and every column lines up across every row. The row\nstill exists as an element, which is what a `<table>` gives away when its\ncells are laid out by the table algorithm.",
-          "name": "HelixBaseTableRow",
-          "slots": [
-            {
-              "description": "The row's cells.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "One row of a table.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/table",
-            "aliases": [
-              "Row",
-              "TableRow"
-            ],
-            "tier": "headless",
-            "group": "BaseTable",
-            "part": "Row"
-          },
-          "tagName": "helix-base-table-row",
-          "customElement": true,
-          "modulePath": "src/table/row/table-row.ts",
-          "definitionPath": "src/table/row/table-row.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseTableRow",
-          "declaration": {
-            "name": "HelixBaseTableRow",
-            "module": "src/table/row/table-row.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-table-row",
-          "declaration": {
-            "name": "HelixBaseTableRow",
-            "module": "src/table/row/table-row.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/tabs/panel/tabs-panel.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Hidden rather than unmounted when inactive, so anything typed into a panel is\nstill there when the reader comes back to it, and so the content is in the\nserver's markup for a crawler regardless of which tab is open.",
-          "name": "HelixBaseTabsPanel",
-          "cssParts": [
-            {
-              "description": "The panel container.",
-              "name": "panel"
-            }
-          ],
-          "slots": [
-            {
-              "description": "The panel's content.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Pairs the panel with the tab of the same value.",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "selected",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this panel is the visible one.",
-              "attribute": "selected",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Pairs the panel with the tab of the same value.",
-              "fieldName": "value"
-            },
-            {
-              "name": "selected",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this panel is the visible one.",
-              "fieldName": "selected"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "The content shown for one tab.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/tabs",
-            "aliases": [
-              "TabPanel"
-            ],
-            "tier": "headless",
-            "group": "BaseTabs",
-            "part": "Panel"
-          },
-          "tagName": "helix-base-tabs-panel",
-          "customElement": true,
-          "modulePath": "src/tabs/panel/tabs-panel.ts",
-          "definitionPath": "src/tabs/panel/tabs-panel.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseTabsPanel",
-          "declaration": {
-            "name": "HelixBaseTabsPanel",
-            "module": "src/tabs/panel/tabs-panel.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-tabs-panel",
-          "declaration": {
-            "name": "HelixBaseTabsPanel",
-            "module": "src/tabs/panel/tabs-panel.ts"
           }
         }
       ]
@@ -6410,6 +6080,179 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/tabs/panel/tabs-panel.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Hidden rather than unmounted when inactive, so anything typed into a panel is\nstill there when the reader comes back to it, and so the content is in the\nserver's markup for a crawler regardless of which tab is open.",
+          "name": "HelixBaseTabsPanel",
+          "cssParts": [
+            {
+              "description": "The panel container.",
+              "name": "panel"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The panel's content.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Pairs the panel with the tab of the same value.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this panel is the visible one.",
+              "attribute": "selected",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Pairs the panel with the tab of the same value.",
+              "fieldName": "value"
+            },
+            {
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this panel is the visible one.",
+              "fieldName": "selected"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "The content shown for one tab.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tabs",
+            "aliases": [
+              "TabPanel"
+            ],
+            "tier": "headless",
+            "group": "BaseTabs",
+            "part": "Panel"
+          },
+          "tagName": "helix-base-tabs-panel",
+          "customElement": true,
+          "modulePath": "src/tabs/panel/tabs-panel.ts",
+          "definitionPath": "src/tabs/panel/tabs-panel.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTabsPanel",
+          "declaration": {
+            "name": "HelixBaseTabsPanel",
+            "module": "src/tabs/panel/tabs-panel.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-tabs-panel",
+          "declaration": {
+            "name": "HelixBaseTabsPanel",
+            "module": "src/tabs/panel/tabs-panel.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/tabs/tab/tabs-tab.ts",
       "declarations": [
         {
@@ -6639,6 +6482,619 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/spinner/root/spinner-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Two concentric circles rather than one arc: the track is what makes the\nmoving part read as a proportion of a whole rather than as a shape drifting\non its own, and it costs one element.\n\nThe semantics are on the host through `ElementInternals`, not on an inner\nspan. A `role` written into the shadow root announces correctly but leaves\nthe host itself anonymous to anything walking the light DOM, and a `role`\nwritten onto the host as an attribute is one a React consumer's server markup\nnever had.",
+          "name": "HelixBaseSpinner",
+          "cssParts": [
+            {
+              "description": "The rotating circle pair.",
+              "name": "svg"
+            },
+            {
+              "description": "The full circle behind the indicator.",
+              "name": "track"
+            },
+            {
+              "description": "The arc that turns.",
+              "name": "indicator"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "Accessible name, announced while the work is outstanding.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "Accessible name, announced while the work is outstanding.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Says that something indeterminate is in progress.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/spinner",
+            "aliases": [
+              "Loader",
+              "Busy",
+              "Activity"
+            ],
+            "tier": "headless",
+            "group": "BaseSpinner",
+            "part": "Root"
+          },
+          "tagName": "helix-base-spinner",
+          "customElement": true,
+          "modulePath": "src/spinner/root/spinner-root.ts",
+          "definitionPath": "src/spinner/root/spinner-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseSpinner",
+          "declaration": {
+            "name": "HelixBaseSpinner",
+            "module": "src/spinner/root/spinner-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-spinner",
+          "declaration": {
+            "name": "HelixBaseSpinner",
+            "module": "src/spinner/root/spinner-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toggle/group/toggle-group.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The indicator is one element that travels, not a background that appears on\nwhichever item is current. That difference is the whole point: a fill that\nswaps is two things changing at once and reads as a flicker, while one that\nmoves is a single object the eye follows, and it says where the selection\ncame from as well as where it went.\n\nIts position and width are measured from the selected item and written onto\nthe indicator as custom properties, because labels are different lengths and\nno proportion of the group is the right answer. Measurement is client-side by\nnecessity, so the server renders the indicator hidden and it fades in once it\nhas somewhere to be, which is the harmless direction: it appears rather than\njumping from a wrong place.\n\nA radio group, and only that. It carried a `nav` mode once, which made the\nsame element a navigation landmark of links, and that was two components\nsharing a name: navigation borrowed the look and would have had to borrow\nradio semantics with it, announcing a set of destinations as a set of\nchoices. Navigation is the `data-nav-item` recipe now. A tab was never the\nanswer either, in that direction: a tab controls a panel.",
+          "name": "HelixBaseToggleGroup",
+          "cssParts": [
+            {
+              "description": "The moving marker behind the selected item.",
+              "name": "indicator"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The group's items.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Options'",
+              "description": "Accessible name for the group.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Value of the selected item.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "observer",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "HelixBaseToggle[]"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleSelection",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "place",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Measures the selected item and writes the geometry onto the indicator.\n\nOffsets rather than a proportion of the group: labels have different\nlengths, so no fraction is the right answer for all of them."
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when an item is chosen. Dispatched by the item and listened for here.",
+              "name": "helix-select",
+              "reactProp": "onSelect"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Options'",
+              "description": "Accessible name for the group.",
+              "fieldName": "label"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Value of the selected item.",
+              "fieldName": "value"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A row of options with the selection marked by a moving indicator.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toggle-group",
+            "aliases": [
+              "SegmentedControl",
+              "Segmented",
+              "NavBar",
+              "Switcher"
+            ],
+            "tier": "headless",
+            "group": "BaseToggle",
+            "part": "Group"
+          },
+          "tagName": "helix-base-toggle-group",
+          "customElement": true,
+          "modulePath": "src/toggle/group/toggle-group.ts",
+          "definitionPath": "src/toggle/group/toggle-group.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseToggleGroup",
+          "declaration": {
+            "name": "HelixBaseToggleGroup",
+            "module": "src/toggle/group/toggle-group.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-toggle-group",
+          "declaration": {
+            "name": "HelixBaseToggleGroup",
+            "module": "src/toggle/group/toggle-group.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toggle/root/toggle-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders a `<button role=\"radio\">`. This is a form control and nothing else.\n\nIt used to serve navigation too, behind a `nav` attribute on the group, and\nthat was two components wearing one name. Navigation is links marked with\n`aria-current`, styled by the `data-nav-item` recipe in the base layer; it\nonly ever borrowed this component's *look*. Borrowing radio semantics for it\nwould have announced a set of destinations as a set of choices.",
+          "name": "HelixBaseToggle",
+          "cssParts": [
+            {
+              "description": "The radio button.",
+              "name": "item"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The item's label.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies the item to the group.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item is the current one.",
+              "attribute": "selected",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the item can be chosen.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "focusItem",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Moves focus to this item.",
+              "type": {
+                "text": "focusItem() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Chooses this item and announces it.",
+              "type": {
+                "text": "select() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when the item is chosen.",
+              "name": "helix-select",
+              "reactProp": "onSelect"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies the item to the group.",
+              "fieldName": "value"
+            },
+            {
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item is the current one.",
+              "fieldName": "selected"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the item can be chosen.",
+              "fieldName": "disabled"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One option in a toggle group.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toggle",
+            "aliases": [
+              "Segment",
+              "NavItem",
+              "Option"
+            ],
+            "tier": "headless",
+            "group": "BaseToggle",
+            "part": "Root"
+          },
+          "tagName": "helix-base-toggle",
+          "customElement": true,
+          "modulePath": "src/toggle/root/toggle-root.ts",
+          "definitionPath": "src/toggle/root/toggle-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseToggle",
+          "declaration": {
+            "name": "HelixBaseToggle",
+            "module": "src/toggle/root/toggle-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-toggle",
+          "declaration": {
+            "name": "HelixBaseToggle",
+            "module": "src/toggle/root/toggle-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/tag/root/tag-root.ts",
       "declarations": [
         {
@@ -6824,240 +7280,6 @@
           "declaration": {
             "name": "HelixBaseTag",
             "module": "src/tag/root/tag-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/toolbar/root/toolbar-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Separate from a button group, and the difference is what it holds: a group is\nhomogeneous, a toolbar is not. A toolbar mixes buttons, toggles, and menus,\nwhich is why it is its own component rather than a variant of something.\n\nThe whole toolbar is one tab stop and the arrows move between controls, so a\npage with three toolbars costs three presses of Tab to get past rather than\nthirty. Controls are found by asking the browser what is focusable rather\nthan by matching tag names, so a toolbar works with anything put in it,\nincluding a consumer's own elements.",
-          "name": "HelixBaseToolbar",
-          "cssParts": [
-            {
-              "description": "The toolbar container.",
-              "name": "toolbar"
-            }
-          ],
-          "slots": [
-            {
-              "description": "The toolbar's controls.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Toolbar'",
-              "description": "Accessible name for the toolbar.",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | 'vertical' | undefined"
-              },
-              "description": "Which way the arrow keys move.",
-              "attribute": "orientation",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "controls",
-              "type": {
-                "text": "HTMLElement[]"
-              },
-              "privacy": "private",
-              "description": "Focusable controls, in document order.\n\nAsks each child for its own focus target rather than matching tag names, so\na toolbar holds anything, including elements this package has never heard\nof. Client only: there is no tree to walk on the server.",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "setTabStop",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "active",
-                  "type": {
-                    "text": "HTMLElement | undefined"
-                  }
-                }
-              ],
-              "description": "Moves the single tab stop to one control.\n\nPrefers the control's own `focusable` property to writing `tabindex` on it.\nThe attribute is a change to markup the consumer rendered, which a React\nconsumer's hydration reports and does not patch up; a control that offers\nthe property moves the stop inside its own shadow root instead.\n\n`tabindex` stays as the fallback, because a toolbar has to hold controls\nthis package has never heard of."
-            },
-            {
-              "kind": "method",
-              "name": "claimTabStop",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Promise<void>"
-                }
-              },
-              "description": "Sets the first tab stop once every custom control has upgraded.\n\nA custom element has no properties at all before it upgrades, so a pass\nthat ran first would find no `focusable`, take the `tabindex` fallback, and\nwrite the very attribute this exists to avoid."
-            },
-            {
-              "kind": "field",
-              "name": "handleFocusIn",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "axis",
-              "type": {
-                "text": "'horizontal' | 'vertical'"
-              },
-              "privacy": "private",
-              "description": "The orientation in force.\n\nUnset is horizontal, and stays unset: the default is the absent attribute,\nso a reflected default cannot appear on the host after hydration.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Toolbar'",
-              "description": "Accessible name for the toolbar.",
-              "fieldName": "label"
-            },
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | 'vertical' | undefined"
-              },
-              "description": "Which way the arrow keys move.",
-              "fieldName": "orientation"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "A group of controls that share one tab stop.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/toolbar",
-            "aliases": [
-              "Actions",
-              "Action bar"
-            ],
-            "tier": "headless",
-            "group": "BaseToolbar",
-            "part": "Root"
-          },
-          "tagName": "helix-base-toolbar",
-          "customElement": true,
-          "modulePath": "src/toolbar/root/toolbar-root.ts",
-          "definitionPath": "src/toolbar/root/toolbar-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseToolbar",
-          "declaration": {
-            "name": "HelixBaseToolbar",
-            "module": "src/toolbar/root/toolbar-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-toolbar",
-          "declaration": {
-            "name": "HelixBaseToolbar",
-            "module": "src/toolbar/root/toolbar-root.ts"
           }
         }
       ]
@@ -7634,21 +7856,21 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/toggle/group/toggle-group.ts",
+      "path": "src/toolbar/root/toolbar-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "The indicator is one element that travels, not a background that appears on\nwhichever item is current. That difference is the whole point: a fill that\nswaps is two things changing at once and reads as a flicker, while one that\nmoves is a single object the eye follows, and it says where the selection\ncame from as well as where it went.\n\nIts position and width are measured from the selected item and written onto\nthe indicator as custom properties, because labels are different lengths and\nno proportion of the group is the right answer. Measurement is client-side by\nnecessity, so the server renders the indicator hidden and it fades in once it\nhas somewhere to be, which is the harmless direction: it appears rather than\njumping from a wrong place.\n\nA radio group, and only that. It carried a `nav` mode once, which made the\nsame element a navigation landmark of links, and that was two components\nsharing a name: navigation borrowed the look and would have had to borrow\nradio semantics with it, announcing a set of destinations as a set of\nchoices. Navigation is the `data-nav-item` recipe now. A tab was never the\nanswer either, in that direction: a tab controls a panel.",
-          "name": "HelixBaseToggleGroup",
+          "description": "Separate from a button group, and the difference is what it holds: a group is\nhomogeneous, a toolbar is not. A toolbar mixes buttons, toggles, and menus,\nwhich is why it is its own component rather than a variant of something.\n\nThe whole toolbar is one tab stop and the arrows move between controls, so a\npage with three toolbars costs three presses of Tab to get past rather than\nthirty. Controls are found by asking the browser what is focusable rather\nthan by matching tag names, so a toolbar works with anything put in it,\nincluding a consumer's own elements.",
+          "name": "HelixBaseToolbar",
           "cssParts": [
             {
-              "description": "The moving marker behind the selected item.",
-              "name": "indicator"
+              "description": "The toolbar container.",
+              "name": "toolbar"
             }
           ],
           "slots": [
             {
-              "description": "The group's items.",
+              "description": "The toolbar's controls.",
               "name": ""
             }
           ],
@@ -7659,53 +7881,75 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Options'",
-              "description": "Accessible name for the group.",
+              "default": "'Toolbar'",
+              "description": "Accessible name for the toolbar.",
               "attribute": "label"
             },
             {
               "kind": "field",
-              "name": "value",
+              "name": "orientation",
               "type": {
-                "text": "string"
+                "text": "'horizontal' | 'vertical' | undefined"
               },
-              "default": "''",
-              "description": "Value of the selected item.",
-              "attribute": "value"
+              "description": "Which way the arrow keys move.",
+              "attribute": "orientation",
+              "reflects": true
             },
             {
               "kind": "field",
-              "name": "observer",
+              "name": "controls",
               "type": {
-                "text": "ResizeObserver | undefined"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "items",
-              "type": {
-                "text": "HelixBaseToggle[]"
+                "text": "HTMLElement[]"
               },
               "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleSelection",
-              "privacy": "private",
+              "description": "Focusable controls, in document order.\n\nAsks each child for its own focus target rather than matching tag names, so\na toolbar holds anything, including elements this package has never heard\nof. Client only: there is no tree to walk on the server.",
               "readonly": true
             },
             {
               "kind": "method",
-              "name": "place",
+              "name": "setTabStop",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Measures the selected item and writes the geometry onto the indicator.\n\nOffsets rather than a proportion of the group: labels have different\nlengths, so no fraction is the right answer for all of them."
+              "parameters": [
+                {
+                  "name": "active",
+                  "type": {
+                    "text": "HTMLElement | undefined"
+                  }
+                }
+              ],
+              "description": "Moves the single tab stop to one control.\n\nPrefers the control's own `focusable` property to writing `tabindex` on it.\nThe attribute is a change to markup the consumer rendered, which a React\nconsumer's hydration reports and does not patch up; a control that offers\nthe property moves the stop inside its own shadow root instead.\n\n`tabindex` stays as the fallback, because a toolbar has to hold controls\nthis package has never heard of."
+            },
+            {
+              "kind": "method",
+              "name": "claimTabStop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Sets the first tab stop once every custom control has upgraded.\n\nA custom element has no properties at all before it upgrades, so a pass\nthat ran first would find no `focusable`, take the `tabindex` fallback, and\nwrite the very attribute this exists to avoid."
+            },
+            {
+              "kind": "field",
+              "name": "handleFocusIn",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "axis",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "privacy": "private",
+              "description": "The orientation in force.\n\nUnset is horizontal, and stays unset: the default is the absent attribute,\nso a reflected default cannot appear on the host after hydration.",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -7783,307 +8027,63 @@
               }
             }
           ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixSelectEvent"
-              },
-              "description": "Fired when an item is chosen. Dispatched by the item and listened for here.",
-              "name": "helix-select",
-              "reactProp": "onSelect"
-            }
-          ],
           "attributes": [
             {
               "name": "label",
               "type": {
                 "text": "string"
               },
-              "default": "'Options'",
-              "description": "Accessible name for the group.",
+              "default": "'Toolbar'",
+              "description": "Accessible name for the toolbar.",
               "fieldName": "label"
             },
             {
-              "name": "value",
+              "name": "orientation",
               "type": {
-                "text": "string"
+                "text": "'horizontal' | 'vertical' | undefined"
               },
-              "default": "''",
-              "description": "Value of the selected item.",
-              "fieldName": "value"
+              "description": "Which way the arrow keys move.",
+              "fieldName": "orientation"
             }
           ],
           "superclass": {
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "A row of options with the selection marked by a moving indicator.",
+          "summary": "A group of controls that share one tab stop.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/toggle-group",
+            "documentation": "https://helix.fusion.dev/components/toolbar",
             "aliases": [
-              "SegmentedControl",
-              "Segmented",
-              "NavBar",
-              "Switcher"
+              "Actions",
+              "Action bar"
             ],
             "tier": "headless",
-            "group": "BaseToggle",
-            "part": "Group"
-          },
-          "tagName": "helix-base-toggle-group",
-          "customElement": true,
-          "modulePath": "src/toggle/group/toggle-group.ts",
-          "definitionPath": "src/toggle/group/toggle-group.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseToggleGroup",
-          "declaration": {
-            "name": "HelixBaseToggleGroup",
-            "module": "src/toggle/group/toggle-group.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-toggle-group",
-          "declaration": {
-            "name": "HelixBaseToggleGroup",
-            "module": "src/toggle/group/toggle-group.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/toggle/root/toggle-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Renders a `<button role=\"radio\">`. This is a form control and nothing else.\n\nIt used to serve navigation too, behind a `nav` attribute on the group, and\nthat was two components wearing one name. Navigation is links marked with\n`aria-current`, styled by the `data-nav-item` recipe in the base layer; it\nonly ever borrowed this component's *look*. Borrowing radio semantics for it\nwould have announced a set of destinations as a set of choices.",
-          "name": "HelixBaseToggle",
-          "cssParts": [
-            {
-              "description": "The radio button.",
-              "name": "item"
-            }
-          ],
-          "slots": [
-            {
-              "description": "The item's label.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Identifies the item to the group.",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "selected",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this item is the current one.",
-              "attribute": "selected",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the item can be chosen.",
-              "attribute": "disabled",
-              "reflects": true
-            },
-            {
-              "kind": "method",
-              "name": "focusItem",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Moves focus to this item.",
-              "type": {
-                "text": "focusItem() => void"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "select",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Chooses this item and announces it.",
-              "type": {
-                "text": "select() => void"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixSelectEvent"
-              },
-              "description": "Fired when the item is chosen.",
-              "name": "helix-select",
-              "reactProp": "onSelect"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Identifies the item to the group.",
-              "fieldName": "value"
-            },
-            {
-              "name": "selected",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this item is the current one.",
-              "fieldName": "selected"
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the item can be chosen.",
-              "fieldName": "disabled"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "One option in a toggle group.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/toggle",
-            "aliases": [
-              "Segment",
-              "NavItem",
-              "Option"
-            ],
-            "tier": "headless",
-            "group": "BaseToggle",
+            "group": "BaseToolbar",
             "part": "Root"
           },
-          "tagName": "helix-base-toggle",
+          "tagName": "helix-base-toolbar",
           "customElement": true,
-          "modulePath": "src/toggle/root/toggle-root.ts",
-          "definitionPath": "src/toggle/root/toggle-root.ts"
+          "modulePath": "src/toolbar/root/toolbar-root.ts",
+          "definitionPath": "src/toolbar/root/toolbar-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseToggle",
+          "name": "HelixBaseToolbar",
           "declaration": {
-            "name": "HelixBaseToggle",
-            "module": "src/toggle/root/toggle-root.ts"
+            "name": "HelixBaseToolbar",
+            "module": "src/toolbar/root/toolbar-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-toggle",
+          "name": "helix-base-toolbar",
           "declaration": {
-            "name": "HelixBaseToggle",
-            "module": "src/toggle/root/toggle-root.ts"
+            "name": "HelixBaseToolbar",
+            "module": "src/toolbar/root/toolbar-root.ts"
           }
         }
       ]
