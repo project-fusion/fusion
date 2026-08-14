@@ -12,12 +12,16 @@ import { VERTICALS } from './verticals'
 /**
  * Site navigation: the verticals, centered in the banner.
  *
- * Plain links inside the header's own `<nav>`, marked with `aria-current` and
- * styled by the `data-nav-item` recipe. Not tabs, because a tab controls a
- * panel and announces itself inside a `tablist`, and these are routes. Not a
- * toggle group either, which is a radio group and would announce a set of
- * destinations as a set of choices. The look was the only part navigation ever
- * wanted from either.
+ * Plain links inside a `NavBar`, marked with `aria-current` and styled by the
+ * `data-nav-item` recipe. Not tabs, because a tab controls a panel and
+ * announces itself inside a `tablist`, and these are routes. Not a toggle group
+ * either, which is a radio group and would announce a set of destinations as a
+ * set of choices. The look was the only part navigation ever wanted from
+ * either.
+ *
+ * The header's regions are named for where they are rather than what is in
+ * them, so the wordmark is `start` and the actions are `end`. The `<nav>`
+ * landmark and the traveling marker belong to `NavBar`.
  *
  * The current item comes from the pathname, so it is right on a cold load of
  * any URL rather than only after a click.
@@ -53,7 +57,7 @@ export function SiteNav() {
   return (
     <>
       <helix-app-header sticky>
-        <a data-link="quiet" href="/" slot="brand">
+        <a data-link="quiet" href="/" slot="start">
           <helix-flex align="center" gap="xs" inline>
             <FusionLogo size="1.5rem" />
             <helix-text appearance="body-strong" class="wordmark">
@@ -62,29 +66,32 @@ export function SiteNav() {
           </helix-flex>
         </a>
 
-        {!narrow &&
-          VERTICALS.map((vertical) => (
-            <Link
-              aria-current={current === vertical.href ? 'page' : undefined}
-              data-nav-item
-              href={vertical.href}
-              key={vertical.href}
-            >
-              {vertical.label}
-            </Link>
-          ))}
+        {!narrow && (
+          <helix-nav-bar label="Verticals">
+            {VERTICALS.map((vertical) => (
+              <Link
+                aria-current={current === vertical.href ? 'page' : undefined}
+                data-nav-item
+                href={vertical.href}
+                key={vertical.href}
+              >
+                {vertical.label}
+              </Link>
+            ))}
+          </helix-nav-bar>
+        )}
 
         <helix-icon-button
           label="Preferences"
           onClick={() => setPrefsOpen(true)}
           size="sm"
-          slot="actions"
+          slot="end"
         >
           <helix-icon name="gear"></helix-icon>
         </helix-icon-button>
 
         {narrow && (
-          <helix-button appearance="subtle" onClick={() => setOpen(true)} size="sm" slot="actions">
+          <helix-button appearance="subtle" onClick={() => setOpen(true)} size="sm" slot="end">
             Menu
           </helix-button>
         )}

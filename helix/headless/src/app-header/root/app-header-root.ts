@@ -34,15 +34,14 @@ import { property } from 'lit/decorators.js'
  * @aliases Masthead, Navbar, TopBar
  * @documentation https://helix.fusion.dev/components/app-header
  *
- * @slot brand - Wordmark or logo, at the inline start.
- * @slot - Primary navigation.
- * @slot actions - Trailing actions, such as a call to action.
+ * @slot start - Leading content, usually a wordmark.
+ * @slot - The middle region, usually a `NavBar`.
+ * @slot end - Trailing content.
  *
- * @csspart content - The centered row inside the banner.
- * @csspart brand - The leading region.
- * @csspart nav - The navigation region.
- * @csspart nav-indicator - The marker that travels to the current link.
- * @csspart actions - The trailing region.
+ * @csspart row - The centered row inside the banner.
+ * @csspart start - The leading region.
+ * @csspart content - The middle region.
+ * @csspart end - The trailing region.
  */
 @customElement('helix-base-app-header')
 export class HelixBaseAppHeader extends HelixElement {
@@ -64,74 +63,6 @@ export class HelixBaseAppHeader extends HelixElement {
     this.toggleAttribute('data-scrolled', window.scrollY > 0)
   }
 
-  private observer: ResizeObserver | undefined
-  private current: MutationObserver | undefined
-
-  /** The navigation links the consumer put in the default slot. */
-  private get items(): HTMLElement[] {
-    const slot = this.renderRoot.querySelector<HTMLSlotElement>('nav slot')
-    return (slot?.assignedElements() ?? []) as HTMLElement[]
-  }
-
-  /**
-   * Moves the marker to whichever link is current.
-   *
-   * The header owns this because it owns the `<nav>`. A marker that travels
-   * needs something that knows where every item is, and adding a component
-   * whose only job was to be that would be a container for links.
-   *
-   * `aria-current` is what it reads, rather than a second attribute mirroring
-   * it, so the thing that makes the marker right is the same thing that makes
-   * the page announce correctly.
-   *
-   * Geometry is written onto the marker inside the shadow root. On the host it
-   * would be an inline style the element gives itself after upgrading, which a
-   * consumer's server markup never has.
-   */
-  private place(): void {
-    const marker = this.renderRoot.querySelector<HTMLElement>('[part="nav-indicator"]')
-    const nav = this.renderRoot.querySelector<HTMLElement>('[part="nav"]')
-    if (!marker || !nav) {
-      return
-    }
-
-    const active = this.items.find((item) => item.getAttribute('aria-current') === 'page')
-    if (!active) {
-      marker.removeAttribute('data-placed')
-      return
-    }
-
-    const box = active.getBoundingClientRect()
-    if (box.width === 0) {
-      return
-    }
-    const own = nav.getBoundingClientRect()
-    marker.style.setProperty('--_nav-indicator-x', `${box.left - own.left}px`)
-    marker.style.setProperty('--_nav-indicator-w', `${box.width}px`)
-    marker.style.setProperty('--_nav-indicator-h', `${box.height}px`)
-    marker.toggleAttribute('data-placed', true)
-  }
-
-  /** Re-measures when the links change, move, or hand over the current page. */
-  private watch(): void {
-    this.observer?.disconnect()
-    this.current?.disconnect()
-    this.place()
-
-    this.observer = new ResizeObserver(() => this.place())
-    this.observer.observe(this)
-    for (const item of this.items) {
-      this.observer.observe(item)
-    }
-
-    // Client-side routing changes `aria-current` in place rather than
-    // reloading, so nothing else would tell the marker to move.
-    this.current = new MutationObserver(() => this.place())
-    for (const item of this.items) {
-      this.current.observe(item, { attributeFilter: ['aria-current'] })
-    }
-  }
-
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the banner.
@@ -150,24 +81,14 @@ export class HelixBaseAppHeader extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     window.removeEventListener('scroll', this.handleScroll)
-    this.observer?.disconnect()
-    this.current?.disconnect()
-  }
-
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    this.watch()
   }
 
   protected override render(): TemplateResult {
     return html`
-      <div part="content">
-        <div part="brand"><slot name="brand"></slot></div>
-        <nav part="nav">
-          <div part="nav-indicator" aria-hidden="true"></div>
-          <slot @slotchange=${() => this.watch()}></slot>
-        </nav>
-        <div part="actions"><slot name="actions"></slot></div>
+      <div part="row">
+        <div part="start"><slot name="start"></slot></div>
+        <div part="content"><slot></slot></div>
+        <div part="end"><slot name="end"></slot></div>
       </div>
     `
   }

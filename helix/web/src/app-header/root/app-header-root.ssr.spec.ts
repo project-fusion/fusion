@@ -6,7 +6,7 @@ import '../index.js'
 describe('app header server output', () => {
   const markup = ssr(html`
     <helix-app-header>
-      <span slot="brand">Fusion</span>
+      <span slot="start">Fusion</span>
       <a href="/work">Work</a>
     </helix-app-header>
   `)
@@ -16,7 +16,7 @@ describe('app header server output', () => {
     // so rendering here proves the element does not touch `window` to render.
     expect(markup).toContain('<helix-app-header')
     expect(hostAttributes(markup, 'helix-app-header')).toEqual([])
-    expect(withoutStyles(markup)).toContain('<slot name="brand">')
+    expect(withoutStyles(markup)).toContain('<slot name="start">')
     // The banner is full width and the row inside it is what centres.
     expect(hasPart(markup, 'content')).toBe(true)
   })
