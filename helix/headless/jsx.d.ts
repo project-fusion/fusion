@@ -42,6 +42,7 @@ import type {
   HelixBaseTooltip,
   HelixBaseTree,
   HelixBaseTreeItem,
+  HelixCloseEvent,
   HelixDismissEvent,
   HelixOpenEvent,
   HelixSelectEvent,
@@ -1471,6 +1472,18 @@ export type HelixBaseToolbarSolidJsProps = {
   textContent?: string | number;
 };
 
+/** `HelixBaseTooltip` component event */
+export type HelixBaseTooltipElementEvent<E = Event> = TypedEvent<
+  HelixBaseTooltip,
+  E
+>;
+/** `helix-open` event type */
+export type HelixBaseTooltipHelixOpenElementEvent =
+  HelixBaseTooltipElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBaseTooltipHelixCloseElementEvent =
+  HelixBaseTooltipElementEvent<HelixCloseEvent>;
+
 export type HelixBaseTooltipProps = {
   /** The text shown in the bubble. */
   content?: HelixBaseTooltip["content"];
@@ -1480,6 +1493,34 @@ export type HelixBaseTooltipProps = {
   offset?: HelixBaseTooltip["offset"];
   /** Whether the tooltip never shows. */
   disabled?: HelixBaseTooltip["disabled"];
+  /** How long the pointer must rest before the bubble appears, in milliseconds.
+
+Without one, sweeping across a row of controls flashes a tooltip for each
+of them, which is noise rather than help. Focus opens with no delay: a
+keyboard reader arriving on a control has already committed to it. */
+  delay?: HelixBaseTooltip["delay"];
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  "delay-out"?: HelixBaseTooltip["delayOut"];
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  delayOut?: HelixBaseTooltip["delayOut"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixBaseTooltip["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixBaseTooltip["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixBaseTooltip["defaultOpen"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixBaseTooltip["onOpenChange"];
+
+  /** Fired before the bubble shows, and cancelable. */
+  "onhelix-open"?: (e: HelixBaseTooltipHelixOpenElementEvent) => void;
+  /** Fired before it hides, and cancelable. */
+  "onhelix-close"?: (e: HelixBaseTooltipHelixCloseElementEvent) => void;
 };
 
 export type HelixBaseTooltipSolidJsProps = {
@@ -1491,6 +1532,33 @@ export type HelixBaseTooltipSolidJsProps = {
   "prop:offset"?: HelixBaseTooltip["offset"];
   /** Whether the tooltip never shows. */
   "prop:disabled"?: HelixBaseTooltip["disabled"];
+  /** How long the pointer must rest before the bubble appears, in milliseconds.
+
+Without one, sweeping across a row of controls flashes a tooltip for each
+of them, which is noise rather than help. Focus opens with no delay: a
+keyboard reader arriving on a control has already committed to it. */
+  "prop:delay"?: HelixBaseTooltip["delay"];
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  "attr:delay-out"?: HelixBaseTooltip["delayOut"];
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  "prop:delayOut"?: HelixBaseTooltip["delayOut"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixBaseTooltip["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixBaseTooltip["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixBaseTooltip["defaultOpen"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixBaseTooltip["onOpenChange"];
+  /** Fired before the bubble shows, and cancelable. */
+  "on:helix-open"?: (e: HelixBaseTooltipHelixOpenElementEvent) => void;
+  /** Fired before it hides, and cancelable. */
+  "on:helix-close"?: (e: HelixBaseTooltipHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3211,6 +3279,14 @@ export type CustomElements = {
    * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
    * A tooltip that answers only the pointer is one a keyboard reader never sees.
    *
+   * The pointer waits out `delay` first, or sweeping a row of controls flashes a
+   * tooltip for each of them. Focus does not wait: a keyboard reader landing on a
+   * control has already committed to it.
+   *
+   * Open state comes from `MixinControllerOpen`, so it announces `helix-open` and
+   * `helix-close` like every other overlay here, and a consumer can drive it with
+   * `open` where they need to.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -3219,6 +3295,28 @@ export type CustomElements = {
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    * - `disabled`: Whether the tooltip never shows.
+   * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
+   *
+   * Without one, sweeping across a row of controls flashes a tooltip for each
+   * of them, which is noise rather than help. Focus opens with no delay: a
+   * keyboard reader arriving on a control has already committed to it.
+   * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before the bubble shows, and cancelable.
+   * - `helix-close`: Fired before it hides, and cancelable.
    *
    * ## Slots
    *
@@ -3232,6 +3330,14 @@ export type CustomElements = {
    *
    * - `show() => void`: Shows the bubble, unless there is nothing to show.
    * - `hide() => void`: Hides the bubble.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
    *
@@ -5088,6 +5194,14 @@ export type CustomElementsSolidJs = {
    * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
    * A tooltip that answers only the pointer is one a keyboard reader never sees.
    *
+   * The pointer waits out `delay` first, or sweeping a row of controls flashes a
+   * tooltip for each of them. Focus does not wait: a keyboard reader landing on a
+   * control has already committed to it.
+   *
+   * Open state comes from `MixinControllerOpen`, so it announces `helix-open` and
+   * `helix-close` like every other overlay here, and a consumer can drive it with
+   * `open` where they need to.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -5096,6 +5210,28 @@ export type CustomElementsSolidJs = {
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    * - `disabled`: Whether the tooltip never shows.
+   * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
+   *
+   * Without one, sweeping across a row of controls flashes a tooltip for each
+   * of them, which is noise rather than help. Focus opens with no delay: a
+   * keyboard reader arriving on a control has already committed to it.
+   * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before the bubble shows, and cancelable.
+   * - `helix-close`: Fired before it hides, and cancelable.
    *
    * ## Slots
    *
@@ -5109,6 +5245,14 @@ export type CustomElementsSolidJs = {
    *
    * - `show() => void`: Shows the bubble, unless there is nothing to show.
    * - `hide() => void`: Hides the bubble.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
    *

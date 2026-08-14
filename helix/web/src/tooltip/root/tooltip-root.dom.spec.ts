@@ -8,6 +8,8 @@ beforeAll(async () => {
 
 type Tooltip = HTMLElement & {
   content: string
+  delay: number
+  isOpen: boolean
   placement: string
   show: () => void
   hide: () => void
@@ -50,6 +52,40 @@ describe('tooltip', () => {
       tip.hide()
     }
     expect(shown).toEqual(['pointerenter', 'focusin'])
+  })
+
+  test('the pointer waits out the delay, and focus does not', async () => {
+    // Sweeping a row of controls would otherwise flash a tooltip for each of
+    // them. A keyboard reader landing on one has already committed to it.
+    const tip = await tooltip('content="x" delay="50"')
+    tip.dispatchEvent(new Event('pointerenter'))
+    expect(tip.isOpen).toBe(false)
+
+    tip.dispatchEvent(new Event('focusin'))
+    await tip.updateComplete
+    expect(tip.isOpen).toBe(true)
+  })
+
+  test('it announces before it opens, and a refusal holds it shut', async () => {
+    const tip = await tooltip()
+    tip.addEventListener('helix-open', (event) => {
+      event.preventDefault()
+    })
+    tip.show()
+    await tip.updateComplete
+    expect(tip.isOpen).toBe(false)
+  })
+
+  test('it announces before it closes', async () => {
+    const tip = await tooltip()
+    tip.show()
+    await tip.updateComplete
+    let closed = false
+    tip.addEventListener('helix-close', () => {
+      closed = true
+    })
+    tip.hide()
+    expect(closed).toBe(true)
   })
 
   test('an empty tooltip never shows', async () => {

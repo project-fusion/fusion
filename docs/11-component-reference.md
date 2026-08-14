@@ -2233,31 +2233,89 @@ Description
 
 ### Root
 
-Description
+A short description that appears beside what it describes.
+
+Extends `HelixElement` with `MixinControllerOpen`, so it announces and can be
+driven like every other overlay here.
+
+The trigger is slotted and stays the consumer's own element. The bubble is
+rendered in the shadow root and put in the top layer through the popover API,
+so it clears any ancestor with `overflow: hidden` without a `z-index` anywhere.
+
+Position comes from `FloatingController`: it flips to another side when the
+preferred one does not fit, slides along to stay in view, and moves the arrow
+with it.
+
+**The description is linked by element reference, not by id.** An IDREF cannot
+cross a shadow boundary, so `aria-describedby` on a slotted trigger pointing at
+a bubble in the shadow root resolves to nothing.
+`ElementInternals.ariaDescribedByElements` takes the element itself, which does
+cross.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property      | Attribute    | Type                  | Default | Inherited From        | Description                                    |
+| ------------- | ------------ | --------------------- | ------- | --------------------- | ---------------------------------------------- |
+| `content`     | `content`    | `string`              | `''`    | -                     | The text shown in the bubble.                  |
+| `defaultOpen` | `default-open` | `boolean`           | `false` | `MixinControllerOpen` | Initial state for uncontrolled use.            |
+| `delay`       | `delay`      | `number`              | `400`   | -                     | How long the pointer rests before it appears.  |
+| `delayOut`    | `delay-out`  | `number`              | `100`   | -                     | How long it stays after the pointer leaves.    |
+| `disabled`    | `disabled`   | `boolean`             | `false` | -                     | Whether it never shows.                        |
+| `offset`      | `offset`     | `number`              | `8`     | -                     | Space between trigger and bubble, in pixels.   |
+| `open`        | `open`       | `boolean \| undefined` | -     | `MixinControllerOpen` | Whether it is showing. Setting this controls it. |
+| `placement`   | `placement`  | `Placement`           | `'top'` | -                     | Preferred side. It moves if that side does not fit. |
+
+#### Methods
+
+| Method   | Description                                    |
+| -------- | ---------------------------------------------- |
+| `show()` | Shows the bubble, unless there is nothing to show. |
+| `hide()` | Hides the bubble.                              |
 
 #### Events
 
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+| Event         | Type              | Description                                |
+| ------------- | ----------------- | ------------------------------------------ |
+| `helix-open`  | `HelixOpenEvent`  | Fired before the bubble shows, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before it hides, and cancelable.     |
+
+Neither bubbles nor composes. Overlays nest, and an inner one's lifecycle must
+never read as the outer one's.
+
+#### Timing
+
+**The pointer waits out `delay`; focus does not.** Sweeping across a row of
+controls would otherwise flash a tooltip for each of them, which is noise
+rather than help. A keyboard reader landing on a control has already committed
+to it.
+
+`delayOut` holds the bubble briefly after the pointer leaves, so crossing the
+gap between trigger and bubble does not close it.
 
 #### Slots
 
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
+| Slot        | Description  |
+| ----------- | ------------ |
+| _(default)_ | The trigger. |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+| Part      | Description                    |
+| --------- | ------------------------------ |
+| `tooltip` | The bubble.                    |
+| `arrow`   | The point aimed at the trigger. |
+
+The bubble carries `data-placement` with the side it actually landed on, which
+is what lets the arrow face the trigger and a styled tier animate from where
+the bubble came from rather than from where it was asked to go.
+
+### Styled
+
+The bubble sits on `--helix-color-surface-inverse`, so it reads as separate
+from the page rather than as part of it, and flips with the colour mode.
+
+The arrow is positioned by the same pass that positions the bubble, so it still
+points at the trigger after the bubble has slid along to stay in view.
 
 ## BaseTrend
 

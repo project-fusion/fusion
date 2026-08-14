@@ -1,6 +1,12 @@
-import { customElement, FloatingController, HelixElement, type Placement } from '@helix-io/core'
+import {
+  customElement,
+  FloatingController,
+  HelixElement,
+  MixinControllerOpen,
+  type Placement,
+} from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 
 /**
  * @summary A short description that appears beside what it describes.
@@ -22,6 +28,14 @@ import { property, state } from 'lit/decorators.js'
  * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
  * A tooltip that answers only the pointer is one a keyboard reader never sees.
  *
+ * The pointer waits out `delay` first, or sweeping a row of controls flashes a
+ * tooltip for each of them. Focus does not wait: a keyboard reader landing on a
+ * control has already committed to it.
+ *
+ * Open state comes from `MixinControllerOpen`, so it announces `helix-open` and
+ * `helix-close` like every other overlay here, and a consumer can drive it with
+ * `open` where they need to.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases Hint, Popup label
@@ -29,11 +43,14 @@ import { property, state } from 'lit/decorators.js'
  *
  * @slot - The trigger.
  *
+ * @event {HelixOpenEvent} helix-open - Fired before the bubble shows, and cancelable.
+ * @event {HelixCloseEvent} helix-close - Fired before it hides, and cancelable.
+ *
  * @csspart tooltip - The bubble.
  * @csspart arrow - The point aimed at the trigger.
  */
 @customElement('helix-base-tooltip')
-export class HelixBaseTooltip extends HelixElement {
+export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   /** The text shown in the bubble. */
   @property()
   content = ''
@@ -50,9 +67,21 @@ export class HelixBaseTooltip extends HelixElement {
   @property({ reflect: true, type: Boolean })
   disabled = false
 
-  /** Whether the bubble is showing. */
-  @state()
-  private showing = false
+  /**
+   * How long the pointer must rest before the bubble appears, in milliseconds.
+   *
+   * Without one, sweeping across a row of controls flashes a tooltip for each
+   * of them, which is noise rather than help. Focus opens with no delay: a
+   * keyboard reader arriving on a control has already committed to it.
+   */
+  @property({ attribute: 'delay', type: Number })
+  delay = 400
+
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  @property({ attribute: 'delay-out', type: Number })
+  delayOut = 100
+
+  private timer: ReturnType<typeof setTimeout> | undefined
 
   /**
    * The element the bubble points at.
@@ -82,10 +111,13 @@ export class HelixBaseTooltip extends HelixElement {
 
   /** Shows the bubble, unless there is nothing to show. */
   show(): void {
-    if (this.disabled || this.content === '' || this.showing) {
+    clearTimeout(this.timer)
+    if (this.disabled || this.content === '' || this.isOpen) {
       return
     }
-    this.showing = true
+    if (!this.requestOpen(true)) {
+      return
+    }
     this.updateComplete.then(() => {
       this.bubble?.showPopover?.()
       this.floating.start()
@@ -94,16 +126,31 @@ export class HelixBaseTooltip extends HelixElement {
 
   /** Hides the bubble. */
   hide(): void {
-    if (!this.showing) {
+    clearTimeout(this.timer)
+    if (!this.isOpen) {
       return
     }
-    this.showing = false
+    if (!this.requestOpen(false)) {
+      return
+    }
     this.bubble?.hidePopover?.()
     this.floating.stop()
   }
 
+  /** Shows after the pointer has rested for `delay`. */
+  private readonly showLater = (): void => {
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => this.show(), this.delay)
+  }
+
+  /** Hides after `delayOut`, so crossing the gap to the bubble does not close it. */
+  private readonly hideLater = (): void => {
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => this.hide(), this.delayOut)
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape' && this.showing) {
+    if (event.key === 'Escape' && this.isOpen) {
       // Not stopped from propagating: a tooltip is not what the reader was
       // trying to escape if it sits inside something else that also closes.
       this.hide()
@@ -112,8 +159,10 @@ export class HelixBaseTooltip extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('pointerenter', this.show)
-    this.addEventListener('pointerleave', this.hide)
+    this.addEventListener('pointerenter', this.showLater)
+    this.addEventListener('pointerleave', this.hideLater)
+    // Focus opens at once: a keyboard reader landing on a control has already
+    // committed to it, where a pointer crossing one has not.
     this.addEventListener('focusin', this.show)
     this.addEventListener('focusout', this.hide)
     this.addEventListener('keydown', this.handleKeydown)
@@ -121,11 +170,12 @@ export class HelixBaseTooltip extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('pointerenter', this.show)
-    this.removeEventListener('pointerleave', this.hide)
+    this.removeEventListener('pointerenter', this.showLater)
+    this.removeEventListener('pointerleave', this.hideLater)
     this.removeEventListener('focusin', this.show)
     this.removeEventListener('focusout', this.hide)
     this.removeEventListener('keydown', this.handleKeydown)
+    clearTimeout(this.timer)
   }
 
   protected override updated(changed: PropertyValues): void {

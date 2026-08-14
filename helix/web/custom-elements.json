@@ -7983,6 +7983,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixCloseEvent",
+          "declaration": {
+            "name": "HelixCloseEvent",
+            "package": "@helix-io/core"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixDismissEvent",
           "declaration": {
             "name": "HelixDismissEvent",
@@ -13302,6 +13310,130 @@
           "members": [
             {
               "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "default": "undefined",
+              "description": "Whether the element is open. Setting this enters controlled mode.",
+              "attribute": "open",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state for uncontrolled use. Ignored once `open` is set.",
+              "attribute": "default-open",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internalOpen",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The resolved open state, whichever mode the element is in.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onOpenChange",
+              "type": {
+                "text": "((open: boolean) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. In uncontrolled mode the\nelement then updates itself; in controlled mode it applies nothing and\nwaits for the consumer to pass a new `open`, which is what \"controlled\"\nmeans.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              },
+              "type": {
+                "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              },
+              "type": {
+                "text": "toggleOpen() => boolean"
+              }
+            },
+            {
+              "kind": "field",
               "name": "content",
               "type": {
                 "text": "string"
@@ -13359,13 +13491,39 @@
             },
             {
               "kind": "field",
-              "name": "showing",
+              "name": "delay",
               "type": {
-                "text": "boolean"
+                "text": "number"
+              },
+              "default": "400",
+              "description": "How long the pointer must rest before the bubble appears, in milliseconds.\n\nWithout one, sweeping across a row of controls flashes a tooltip for each\nof them, which is noise rather than help. Focus opens with no delay: a\nkeyboard reader arriving on a control has already committed to it.",
+              "attribute": "delay",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "delayOut",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "How long the bubble stays after the pointer leaves, in milliseconds.",
+              "attribute": "delay-out",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "timer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
               },
               "privacy": "private",
-              "default": "false",
-              "description": "Whether the bubble is showing.",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -13438,6 +13596,28 @@
               "type": {
                 "text": "hide() => void"
               },
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "showLater",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Shows after the pointer has rested for `delay`.",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hideLater",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Hides after `delayOut`, so crossing the gap to the bubble does not close it.",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -13542,35 +13722,33 @@
           },
           "tagName": "helix-tooltip",
           "customElement": true,
-          "slots": [
+          "attributes": [
             {
-              "description": "The trigger.",
-              "name": "",
+              "name": "open",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "default": "undefined",
+              "description": "Whether the element is open. Setting this enters controlled mode.",
+              "fieldName": "open",
               "inheritedFrom": {
-                "name": "HelixBaseTooltip",
-                "module": "src/tooltip/root/tooltip-root.ts"
-              }
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The bubble.",
-              "name": "tooltip",
-              "inheritedFrom": {
-                "name": "HelixBaseTooltip",
-                "module": "src/tooltip/root/tooltip-root.ts"
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
-              "description": "The point aimed at the trigger.",
-              "name": "arrow",
+              "name": "default-open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state for uncontrolled use. Ignored once `open` is set.",
+              "fieldName": "defaultOpen",
               "inheritedFrom": {
-                "name": "HelixBaseTooltip",
-                "module": "src/tooltip/root/tooltip-root.ts"
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
-            }
-          ],
-          "attributes": [
+            },
             {
               "name": "content",
               "type": {
@@ -13618,6 +13796,86 @@
               "default": "false",
               "description": "Whether the tooltip never shows.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "name": "delay",
+              "type": {
+                "text": "number"
+              },
+              "default": "400",
+              "description": "How long the pointer must rest before the bubble appears, in milliseconds.\n\nWithout one, sweeping across a row of controls flashes a tooltip for each\nof them, which is noise rather than help. Focus opens with no delay: a\nkeyboard reader arriving on a control has already committed to it.",
+              "fieldName": "delay",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "name": "delay-out",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "How long the bubble stays after the pointer leaves, in milliseconds.",
+              "fieldName": "delayOut",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The trigger.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The bubble.",
+              "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "description": "The point aimed at the trigger.",
+              "name": "arrow",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixOpenEvent"
+              },
+              "description": "Fired before the bubble shows, and cancelable.",
+              "name": "helix-open",
+              "reactProp": "onOpen",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired before it hides, and cancelable.",
+              "name": "helix-close",
+              "reactProp": "onClose",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
