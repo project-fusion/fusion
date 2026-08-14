@@ -293,13 +293,6 @@ helix-app-header {
   padding-inline: var(--helix-space-md);
 }
 
-/* The breadcrumb takes the slack, so the actions sit against the right edge
-   rather than trailing the title. */
-.workbenchTitle {
-  flex: 1 1 auto;
-  min-inline-size: 0;
-}
-
 /* Editor and preview take what is left; the examples keep a fixed rail on the
    right, which is where they were asked for and where a list you scan while
    working belongs. */
@@ -481,4 +474,10 @@ helix-app-header {
 .examplesRail helix-tree,
 helix-drawer helix-tree {
   --helix-size-icon: var(--helix-size-icon-sm);
+}
+
+/* The mark sits at the start and everything else at the end, with nothing
+   between them: the trail that used to be there said what the rail says. */
+.workbenchHeaderEnd {
+  margin-inline-start: auto;
 }

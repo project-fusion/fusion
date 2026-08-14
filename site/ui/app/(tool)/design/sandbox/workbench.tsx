@@ -15,6 +15,7 @@ import type { HelixDrawer, HelixMenu, HelixTabs, HelixToggleGroup, HelixTree } f
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
 import { useHelixEvent } from '../../../../lib/use-helix-event'
+import { FusionLogo } from '../../../fusion-logo'
 import { PreferencesDrawer } from '../../../preferences'
 
 /**
@@ -343,24 +344,12 @@ export function SandboxWorkbench({ families }: Props) {
   return (
     <>
       <helix-flex align="center" class="workbenchHeader" data-density="sm" gap="md">
-        <a data-link="quiet" href="/design">
-          <helix-flex align="baseline" gap="2xs" inline>
-            <helix-text appearance="body-strong">Helix</helix-text>
-            <helix-text appearance="label" tone="subtle">
-              sandbox
-            </helix-text>
-          </helix-flex>
+        {/* The mark, and the way out. No trail beside it: the rail already
+            says which component and which example, and a breadcrumb repeating
+            it is a second answer to a question nobody asked twice. */}
+        <a aria-label="Fusion" data-link="quiet" href="/design">
+          <FusionLogo size="1.25rem" />
         </a>
-
-        <helix-flex align="baseline" class="workbenchTitle" gap="2xs">
-          <helix-text appearance="caption">{family.label}</helix-text>
-          <helix-text appearance="caption" tone="subtle">
-            /
-          </helix-text>
-          <helix-text appearance="caption" tone="muted">
-            {example.label}
-          </helix-text>
-        </helix-flex>
 
         {/* What is about the site rather than the sandbox: how the whole thing
             looks, and on a phone, the way to the examples. The sandbox's own

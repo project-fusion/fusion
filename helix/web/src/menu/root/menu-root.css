@@ -38,10 +38,16 @@
 }
 
 /* A header, not a row in the list. The way back is not one of the things on
-   this page, so an arrow press should not land on it as though it were. */
+   this page, so an arrow press should not land on it as though it were.
+
+   `border-strong`, not `border`. This surface is `surface-raised`, and in dark
+   mode that token and `--helix-color-border` are the same neutral: a rule drawn
+   in it on this surface is the surface. Measured, both this and the slotted
+   divider below were painting themselves invisible. Anything drawing a line on
+   a raised surface wants the stronger step. */
 [part="header"] {
   align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border-strong);
   display: flex;
   gap: var(--helix-space-2xs);
   margin-block-end: var(--helix-space-2xs);
@@ -57,10 +63,12 @@
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
-  /* Square, and the height of a dense control: a mark this small needs a target
-     around it that a pointer can find without aiming. */
-  block-size: var(--helix-size-control-sm);
-  inline-size: var(--helix-size-control-sm);
+  /* Sized from the mark it holds rather than from the control scale. A dense
+     control is 32px, which beside twelve pixel rows reads as a button that
+     wandered in from a toolbar. The icon plus a step of space is a target a
+     pointer finds without aiming and still belongs to the header. */
+  block-size: calc(var(--helix-size-icon) + var(--helix-space-xs));
+  inline-size: calc(var(--helix-size-icon) + var(--helix-space-xs));
   padding: var(--helix-space-none);
 }
 
@@ -89,6 +97,8 @@
    is the consumer's arrangement, and `helix-divider` already knows how to be a
    separator a reader is told about. */
 ::slotted(helix-divider) {
+  --divider-color: var(--helix-color-border-strong);
+
   margin-block: var(--helix-space-2xs);
 }
 
