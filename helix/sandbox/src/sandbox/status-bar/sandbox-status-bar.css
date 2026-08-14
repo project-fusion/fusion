@@ -1,0 +1,27 @@
+:host {
+  align-items: center;
+  background-color: var(--helix-color-surface-raised);
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  color: var(--status-bar-color, var(--helix-color-foreground-subtle));
+  display: flex;
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-sm);
+  line-height: var(--helix-leading-tight);
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+  /* The readouts change under the pointer while text is being selected in the
+     editor above; a drag that crosses the bar should not start selecting it. */
+  user-select: none;
+}
+
+/* The start slot is first, so whatever follows it opens the gap that separates
+   the two ends of the bar. Which element that is depends on what there was to
+   report, and this does not need to know. */
+slot:first-child + * {
+  margin-inline-start: auto;
+}
+
+/* Fixed-width digits, or the bar shifts every time the column crosses a power
+   of ten and the eye is pulled to a number that did not change. */
+[part="caret"] {
+  font-variant-numeric: tabular-nums;
+}

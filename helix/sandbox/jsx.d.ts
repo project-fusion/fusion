@@ -1,10 +1,12 @@
 import type {
+  HelixCaretEvent,
   HelixChangeEvent,
   HelixConsoleEvent,
   HelixSandbox,
   HelixSandboxEditor,
   HelixSandboxPreview,
   HelixSandboxSource,
+  HelixSandboxStatusBar,
 } from '@helix-io/sandbox';
 
 /**
@@ -207,6 +209,9 @@ export type HelixSandboxEditorElementEvent<E = Event> = TypedEvent<
 /** `helix-change` event type */
 export type HelixSandboxEditorHelixChangeElementEvent =
   HelixSandboxEditorElementEvent<HelixChangeEvent>;
+/** `helix-caret` event type */
+export type HelixSandboxEditorHelixCaretElementEvent =
+  HelixSandboxEditorElementEvent<HelixCaretEvent>;
 
 export type HelixSandboxEditorProps = {
   /** The source being edited. */
@@ -220,10 +225,10 @@ export type HelixSandboxEditorProps = {
   /** Accessible name for the editable region. */
   fieldLabel?: HelixSandboxEditor["fieldLabel"];
 
-  /** Fired when the cursor moves, with its line and column. */
-  "onhelix-caret"?: (e: HelixSandboxEditorElementEvent) => void;
   /** Fired when the source is edited. */
   "onhelix-change"?: (e: HelixSandboxEditorHelixChangeElementEvent) => void;
+  /** Fired when the cursor moves, with its line and column. */
+  "onhelix-caret"?: (e: HelixSandboxEditorHelixCaretElementEvent) => void;
 };
 
 export type HelixSandboxEditorSolidJsProps = {
@@ -237,10 +242,10 @@ export type HelixSandboxEditorSolidJsProps = {
   "attr:field-label"?: HelixSandboxEditor["fieldLabel"];
   /** Accessible name for the editable region. */
   "prop:fieldLabel"?: HelixSandboxEditor["fieldLabel"];
-  /** Fired when the cursor moves, with its line and column. */
-  "on:helix-caret"?: (e: HelixSandboxEditorElementEvent) => void;
   /** Fired when the source is edited. */
   "on:helix-change"?: (e: HelixSandboxEditorHelixChangeElementEvent) => void;
+  /** Fired when the cursor moves, with its line and column. */
+  "on:helix-caret"?: (e: HelixSandboxEditorHelixCaretElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -383,6 +388,29 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   textContent?: string | number;
 };
 
+export type HelixSandboxStatusBarProps = {
+  /** One-based column of the cursor. Absent shows no readout. */
+  column?: HelixSandboxStatusBar["column"];
+  /** The language being edited, as a name or one the editor knows. */
+  language?: HelixSandboxStatusBar["language"];
+  /** One-based line of the cursor. Absent shows no readout. */
+  line?: HelixSandboxStatusBar["line"];
+};
+
+export type HelixSandboxStatusBarSolidJsProps = {
+  /** One-based column of the cursor. Absent shows no readout. */
+  "prop:column"?: HelixSandboxStatusBar["column"];
+  /** The language being edited, as a name or one the editor knows. */
+  "prop:language"?: HelixSandboxStatusBar["language"];
+  /** One-based line of the cursor. Absent shows no readout. */
+  "prop:line"?: HelixSandboxStatusBar["line"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type CustomElements = {
   /**
    * CodeMirror, not a `<textarea>`. The textarea it replaces was the right call
@@ -415,8 +443,18 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-caret`: Fired when the cursor moves, with its line and column.
    * - `helix-change`: Fired when the source is edited.
+   * - `helix-caret`: Fired when the cursor moves, with its line and column.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus() => void`: Moves focus into the text, not onto the host.
+   *
+   * The host is not focusable: what a reader types into is CodeMirror's
+   * contenteditable, several nodes down inside this shadow root. Without this,
+   * `editor.focus()` from outside silently does nothing.
    *
    * ## CSS Parts
    *
@@ -503,6 +541,7 @@ export type CustomElements = {
    *
    * - `source`: The editable source pane.
    * - `preview`: The live preview.
+   * - `status`: A status bar, spanning both panes at the bottom.
    *
    * ## CSS Custom Properties
    *
@@ -568,6 +607,52 @@ export type CustomElements = {
   "helix-sandbox-source": Partial<
     HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
   >;
+
+  /**
+   * Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`
+   * on every keystroke and every arrow press, the sandbox hears it and writes the
+   * position here. Nothing about that reaches the consumer's framework, which is
+   * the point. A caret position routed through React state would re-render the
+   * workbench on every cursor move, to update two numbers.
+   *
+   * **Not a live region.** The readout changes on every keystroke, so announcing
+   * it would talk over the reader continuously while they type. It is text they
+   * can navigate to, which is what a status bar is in every editor that has one.
+   *
+   * A readout with nothing to say is not rendered at all rather than rendered
+   * empty, or the bar keeps a gap where a value is not.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `column`: One-based column of the cursor. Absent shows no readout.
+   * - `language`: The language being edited, as a name or one the editor knows.
+   * - `line`: One-based line of the cursor. Absent shows no readout.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Items at the start of the bar.
+   * - `end`: Items after the readouts, at the end of the bar.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--status-bar-color`: Color of the bar's text. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `caret`: The line and column readout.
+   * - `language`: The language readout.
+   */
+  "helix-sandbox-status-bar": Partial<
+    HelixSandboxStatusBarProps & BaseProps<HelixSandboxStatusBar> & BaseEvents
+  >;
 };
 
 export type CustomElementsSolidJs = {
@@ -602,8 +687,18 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-caret`: Fired when the cursor moves, with its line and column.
    * - `helix-change`: Fired when the source is edited.
+   * - `helix-caret`: Fired when the cursor moves, with its line and column.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus() => void`: Moves focus into the text, not onto the host.
+   *
+   * The host is not focusable: what a reader types into is CodeMirror's
+   * contenteditable, several nodes down inside this shadow root. Without this,
+   * `editor.focus()` from outside silently does nothing.
    *
    * ## CSS Parts
    *
@@ -696,6 +791,7 @@ export type CustomElementsSolidJs = {
    *
    * - `source`: The editable source pane.
    * - `preview`: The live preview.
+   * - `status`: A status bar, spanning both panes at the bottom.
    *
    * ## CSS Custom Properties
    *
@@ -767,6 +863,55 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixSandboxSource> &
       BaseEvents
   >;
+
+  /**
+   * Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`
+   * on every keystroke and every arrow press, the sandbox hears it and writes the
+   * position here. Nothing about that reaches the consumer's framework, which is
+   * the point. A caret position routed through React state would re-render the
+   * workbench on every cursor move, to update two numbers.
+   *
+   * **Not a live region.** The readout changes on every keystroke, so announcing
+   * it would talk over the reader continuously while they type. It is text they
+   * can navigate to, which is what a status bar is in every editor that has one.
+   *
+   * A readout with nothing to say is not rendered at all rather than rendered
+   * empty, or the bar keeps a gap where a value is not.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `column`: One-based column of the cursor. Absent shows no readout.
+   * - `language`: The language being edited, as a name or one the editor knows.
+   * - `line`: One-based line of the cursor. Absent shows no readout.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Items at the start of the bar.
+   * - `end`: Items after the readouts, at the end of the bar.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--status-bar-color`: Color of the bar's text. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `caret`: The line and column readout.
+   * - `language`: The language readout.
+   */
+  "helix-sandbox-status-bar": Partial<
+    HelixSandboxStatusBarProps &
+      HelixSandboxStatusBarSolidJsProps &
+      BaseProps<HelixSandboxStatusBar> &
+      BaseEvents
+  >;
 };
 
 export type CustomCssProperties = {
@@ -778,6 +923,8 @@ export type CustomCssProperties = {
   "--sandbox-source-background"?: string;
   /** Minimum height of the pane. */
   "--sandbox-source-min-block-size"?: string;
+  /** Color of the bar's text. */
+  "--status-bar-color"?: string;
 };
 
 declare module "react" {

@@ -9,9 +9,11 @@ export {
 } from './controllers/floating-controller/floating-controller.js'
 export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {
+  type CaretDetail,
   type ChangeDetail,
   type ConsoleDetail,
   type DismissDetail,
+  HelixCaretEvent,
   HelixChangeEvent,
   HelixCloseEvent,
   HelixConsoleEvent,

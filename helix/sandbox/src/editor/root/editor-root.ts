@@ -5,7 +5,13 @@ import { javascript as javascriptLanguage } from '@codemirror/lang-javascript'
 import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers } from '@codemirror/view'
-import { customElement, HelixChangeEvent, HelixElement } from '@helix-io/core'
+import {
+  type CaretDetail,
+  customElement,
+  HelixCaretEvent,
+  HelixChangeEvent,
+  HelixElement,
+} from '@helix-io/core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -47,7 +53,7 @@ export type EditorLanguage = keyof typeof LANGUAGES
  * @documentation https://helix.fusion.dev/sandbox/editor
  *
  * @event {HelixChangeEvent} helix-change - Fired when the source is edited.
- * @event {CustomEvent} helix-caret - Fired when the cursor moves, with its line and column.
+ * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves, with its line and column.
  *
  * @csspart editor - The element CodeMirror is mounted into.
  */
@@ -73,7 +79,7 @@ export class HelixSandboxEditor extends HelixElement {
   private readonly language$ = new Compartment()
 
   /** Where the cursor is, counted from one, as an editor reports it. */
-  get caret(): { column: number; line: number } {
+  get caret(): CaretDetail {
     const state = this.view?.state
     if (!state) {
       return { column: 1, line: 1 }
@@ -115,20 +121,29 @@ export class HelixSandboxEditor extends HelixElement {
               this.value = update.state.doc.toString()
               this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: this.value }))
             }
-            if (update.selectionSet || update.docChanged) {
-              this.dispatchEvent(
-                new CustomEvent('helix-caret', {
-                  bubbles: true,
-                  composed: true,
-                  detail: this.caret,
-                }),
-              )
+            if (update.selectionSet || update.docChanged || update.focusChanged) {
+              this.dispatchEvent(new HelixCaretEvent(this.caret))
             }
           }),
           EditorView.contentAttributes.of({ 'aria-label': this.fieldLabel }),
         ],
       }),
     })
+    // Once, now. The update listener only runs on a transaction, so without
+    // this a freshly built editor reports nothing until it is touched, and the
+    // bar beside it reads blank on a page that just loaded.
+    this.dispatchEvent(new HelixCaretEvent(this.caret))
+  }
+
+  /**
+   * Moves focus into the text, not onto the host.
+   *
+   * The host is not focusable: what a reader types into is CodeMirror's
+   * contenteditable, several nodes down inside this shadow root. Without this,
+   * `editor.focus()` from outside silently does nothing.
+   */
+  override focus(): void {
+    this.view?.focus()
   }
 
   override disconnectedCallback(): void {

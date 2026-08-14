@@ -111,7 +111,7 @@
               "kind": "field",
               "name": "caret",
               "type": {
-                "text": "{ column: number; line: number }"
+                "text": "CaretDetail"
               },
               "description": "Where the cursor is, counted from one, as an editor reports it.",
               "readonly": true
@@ -135,6 +135,19 @@
                 }
               },
               "description": "Builds the view once the mount exists.\n\n`root` is the shadow root rather than the document, or CodeMirror puts its\nstylesheet where this element cannot see it and the editor renders unstyled."
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Moves focus into the text, not onto the host.\n\nThe host is not focusable: what a reader types into is CodeMirror's\ncontenteditable, several nodes down inside this shadow root. Without this,\n`editor.focus()` from outside silently does nothing.",
+              "type": {
+                "text": "focus() => void"
+              }
             },
             {
               "kind": "field",
@@ -208,20 +221,20 @@
           ],
           "events": [
             {
-              "name": "helix-caret",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the cursor moves, with its line and column.",
-              "reactProp": "onhelix-caret"
-            },
-            {
               "type": {
                 "text": "HelixChangeEvent"
               },
               "description": "Fired when the source is edited.",
               "name": "helix-change",
               "reactProp": "onhelix-change"
+            },
+            {
+              "type": {
+                "text": "HelixCaretEvent"
+              },
+              "description": "Fired when the cursor moves, with its line and column.",
+              "name": "helix-caret",
+              "reactProp": "onhelix-caret"
             }
           ],
           "attributes": [
@@ -331,6 +344,14 @@
           "declaration": {
             "name": "*",
             "module": "src/sandbox/source/sandbox-source.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/sandbox/status-bar/sandbox-status-bar.js"
           }
         }
       ]
@@ -699,6 +720,10 @@
             {
               "description": "The live preview.",
               "name": "preview"
+            },
+            {
+              "description": "A status bar, spanning both panes at the bottom.",
+              "name": "status"
             }
           ],
           "members": [
@@ -769,12 +794,29 @@
             },
             {
               "kind": "field",
+              "name": "handleCaret",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Writes the cursor position onto any status bar slotted here.\n\nThe same shape as the source-to-preview hand-off, and for the same reason:\nthe editor and the bar never speak, so either can be absent. It goes\nstraight to the element rather than through a property a framework owns,\nbecause this fires on every keystroke and every arrow press."
+            },
+            {
+              "kind": "field",
               "name": "previews",
               "type": {
                 "text": "HelixSandboxPreview[]"
               },
               "privacy": "private",
               "description": "Slotted previews. Client only: the server has no children to read.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "statusBars",
+              "type": {
+                "text": "HelixSandboxStatusBar[]"
+              },
+              "privacy": "private",
+              "description": "Slotted status bars. Client only, as above.",
               "readonly": true
             },
             {
@@ -1244,6 +1286,235 @@
           "declaration": {
             "name": "HelixSandboxSource",
             "module": "src/sandbox/source/sandbox-source.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/status-bar/sandbox-status-bar.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/sandbox/status-bar/sandbox-status-bar.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/status-bar/sandbox-status-bar.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`\non every keystroke and every arrow press, the sandbox hears it and writes the\nposition here. Nothing about that reaches the consumer's framework, which is\nthe point. A caret position routed through React state would re-render the\nworkbench on every cursor move, to update two numbers.\n\n**Not a live region.** The readout changes on every keystroke, so announcing\nit would talk over the reader continuously while they type. It is text they\ncan navigate to, which is what a status bar is in every editor that has one.\n\nA readout with nothing to say is not rendered at all rather than rendered\nempty, or the bar keeps a gap where a value is not.",
+          "name": "HelixSandboxStatusBar",
+          "cssProperties": [
+            {
+              "description": "Color of the bar's text.",
+              "name": "--status-bar-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The line and column readout.",
+              "name": "caret"
+            },
+            {
+              "description": "The language readout.",
+              "name": "language"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Items at the start of the bar.",
+              "name": ""
+            },
+            {
+              "description": "Items after the readouts, at the end of the bar.",
+              "name": "end"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "column",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "One-based column of the cursor. Absent shows no readout.",
+              "attribute": "column"
+            },
+            {
+              "kind": "field",
+              "name": "language",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "The language being edited, as a name or one the editor knows.",
+              "attribute": "language"
+            },
+            {
+              "kind": "field",
+              "name": "line",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "One-based line of the cursor. Absent shows no readout.",
+              "attribute": "line"
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "description": "How the position reads, or nothing when there is no cursor to report.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "column",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "One-based column of the cursor. Absent shows no readout.",
+              "fieldName": "column"
+            },
+            {
+              "name": "language",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "The language being edited, as a name or one the editor knows.",
+              "fieldName": "language"
+            },
+            {
+              "name": "line",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "One-based line of the cursor. Absent shows no readout.",
+              "fieldName": "line"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Reports where the cursor is and what is being edited.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/sandbox/status-bar",
+            "aliases": [
+              "Status line"
+            ],
+            "tier": "styled",
+            "group": "Sandbox",
+            "part": "StatusBar"
+          },
+          "tagName": "helix-sandbox-status-bar",
+          "customElement": true,
+          "modulePath": "src/sandbox/status-bar/sandbox-status-bar.ts",
+          "definitionPath": "src/sandbox/status-bar/sandbox-status-bar.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSandboxStatusBar",
+          "declaration": {
+            "name": "HelixSandboxStatusBar",
+            "module": "src/sandbox/status-bar/sandbox-status-bar.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-sandbox-status-bar",
+          "declaration": {
+            "name": "HelixSandboxStatusBar",
+            "module": "src/sandbox/status-bar/sandbox-status-bar.ts"
           }
         }
       ]

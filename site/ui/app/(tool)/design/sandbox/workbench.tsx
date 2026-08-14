@@ -4,10 +4,12 @@
 // element registration runs on every page.
 import '@helix-io/sandbox/editor'
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
-import type { HelixSelectEvent } from '@helix-io/web'
+import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
+import type { HelixDrawer, HelixTabs, HelixTree } from '@helix-io/web'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
+import { useHelixEvent } from '../../../../lib/use-helix-event'
 
 /**
  * The sandbox workbench: source files, a live preview, and the example tree.
@@ -31,6 +33,10 @@ const resolve = (families: Family[], familySlug: string | null, exampleSlug: str
 
 export function SandboxWorkbench({ families }: Props) {
   const preview = useRef<HelixSandboxPreview>(null)
+  const tabs = useRef<HelixTabs>(null)
+  const treeRef = useRef<HelixTree>(null)
+  const rail = useRef<HelixDrawer>(null)
+  const editors = useRef<Record<string, HelixSandboxEditor | null>>({})
   const [familySlug, setFamilySlug] = useState<string | null>(null)
   const [exampleSlug, setExampleSlug] = useState<string | null>(null)
   const [pane, setPane] = useState<'html' | 'css'>('html')
@@ -77,12 +83,36 @@ export function SandboxWorkbench({ families }: Props) {
     )
   }, [])
 
+  // Bound through an effect, not an `onhelix-select` prop. React does not
+  // attach custom-element listeners when it hydrates, so the prop form leaves
+  // both of these dead on a freshly loaded page. See `useHelixEvent`.
+  useHelixEvent(tabs, 'helix-select', (event) => {
+    setPane(event.detail.value as 'html' | 'css')
+  })
+  useHelixEvent(treeRef, 'helix-select', (event) => {
+    select(event.detail.value)
+  })
+  useHelixEvent(rail, 'helix-close', () => {
+    setRailOpen(false)
+  })
+  useHelixEvent(rail, 'helix-open', () => {
+    setRailOpen(true)
+  })
+
   useEffect(() => {
     if (preview.current && example) {
       preview.current.source = example.html
       preview.current.styles = ''
     }
   }, [example])
+
+  // Switching files moves focus into the file switched to. It is what you were
+  // going to do anyway, and it is also what corrects the status bar: the editor
+  // reports its cursor when it gains focus, so the position and the language
+  // beside it stay describing the same pane.
+  useEffect(() => {
+    editors.current[pane]?.focus()
+  }, [pane])
 
   const share = async () => {
     await navigator.clipboard.writeText(window.location.href)
@@ -101,11 +131,7 @@ export function SandboxWorkbench({ families }: Props) {
   const activeValue = `${family.slug}/${example.slug}`
 
   const tree = (
-    <helix-tree
-      label="Examples"
-      onhelix-select={(event: HelixSelectEvent) => select(event.detail.value)}
-      value={activeValue}
-    >
+    <helix-tree label="Examples" ref={treeRef} value={activeValue}>
       {withExamples.map((entry) => (
         <helix-tree-item expanded={entry.slug === family.slug} key={entry.slug} value={entry.slug}>
           {entry.label}
@@ -171,15 +197,7 @@ export function SandboxWorkbench({ families }: Props) {
         <helix-sandbox orientation={narrow ? 'vertical' : 'horizontal'} split={narrow ? 50 : 45}>
           {/* Panels stay mounted and hidden, so switching files does not
               discard what was typed in the other. */}
-          <helix-tabs
-            className="sourceTabs"
-            label="Files"
-            onhelix-select={(event: HelixSelectEvent) =>
-              setPane(event.detail.value as 'html' | 'css')
-            }
-            slot="source"
-            value={pane}
-          >
+          <helix-tabs className="sourceTabs" label="Files" ref={tabs} slot="source" value={pane}>
             <helix-tabs-tab value="html">index.html</helix-tabs-tab>
             <helix-tabs-tab value="css">styles.css</helix-tabs-tab>
             <helix-tabs-panel slot="panels" value="html">
@@ -188,6 +206,9 @@ export function SandboxWorkbench({ families }: Props) {
                 key={`${activeValue}-html`}
                 language="html"
                 name="html"
+                ref={(node: HelixSandboxEditor | null) => {
+                  editors.current.html = node
+                }}
                 value={example.html}
               ></helix-sandbox-editor>
             </helix-tabs-panel>
@@ -197,6 +218,9 @@ export function SandboxWorkbench({ families }: Props) {
                 key={`${activeValue}-css`}
                 language="css"
                 name="css"
+                ref={(node: HelixSandboxEditor | null) => {
+                  editors.current.css = node
+                }}
                 value=""
               ></helix-sandbox-editor>
             </helix-tabs-panel>
@@ -208,18 +232,17 @@ export function SandboxWorkbench({ families }: Props) {
             slot="preview"
             src="/design/sandbox/frame"
           ></helix-sandbox-preview>
+
+          {/* Fed by the sandbox, not from here. `line` and `column` are never
+              passed as props, so React leaves them alone and the element
+              writes them on every cursor move without a re-render. */}
+          <helix-sandbox-status-bar language={pane} slot="status"></helix-sandbox-status-bar>
         </helix-sandbox>
 
         {/* A real drawer on a phone: focus trapped, Escape closes, page behind
             covered. The CSS transform it replaced was none of those. */}
         {narrow ? (
-          <helix-drawer
-            label="Examples"
-            onhelix-close={() => setRailOpen(false)}
-            onhelix-open={() => setRailOpen(true)}
-            open={railOpen}
-            placement="end"
-          >
+          <helix-drawer label="Examples" open={railOpen} placement="end" ref={rail}>
             {tree}
           </helix-drawer>
         ) : (

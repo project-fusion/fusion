@@ -1,7 +1,8 @@
 'use client'
 
-import type { HelixSelectEvent } from '@helix-io/web'
-import { useEffect, useState } from 'react'
+import type { HelixDrawer, HelixToggleGroup } from '@helix-io/web'
+import { useEffect, useRef, useState } from 'react'
+import { useHelixEvent } from '../lib/use-helix-event'
 
 type ColorMode = 'system' | 'light' | 'dark'
 
@@ -43,6 +44,8 @@ interface Props {
  */
 export function PreferencesDrawer({ onOpenChange, open }: Props) {
   const [mode, setMode] = useState<ColorMode>('system')
+  const drawer = useRef<HelixDrawer>(null)
+  const modes = useRef<HelixToggleGroup>(null)
 
   // Read after mount. The server has no localStorage, so choosing a mode during
   // render would make the first paint disagree with the stored choice.
@@ -60,14 +63,20 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
     window.localStorage.setItem(STORAGE_KEY, next)
   }
 
+  // Bound from effects. A Helix event given to React as a prop is never
+  // listened for on a page that was server-rendered. See `useHelixEvent`.
+  useHelixEvent(drawer, 'helix-close', () => {
+    onOpenChange(false)
+  })
+  useHelixEvent(drawer, 'helix-open', () => {
+    onOpenChange(true)
+  })
+  useHelixEvent(modes, 'helix-select', (event) => {
+    choose(event.detail.value as ColorMode)
+  })
+
   return (
-    <helix-drawer
-      label="Preferences"
-      onhelix-close={() => onOpenChange(false)}
-      onhelix-open={() => onOpenChange(true)}
-      open={open}
-      placement="end"
-    >
+    <helix-drawer label="Preferences" open={open} placement="end" ref={drawer}>
       <helix-flex align="start" class="prefsPanel" direction="column" gap="lg">
         <helix-text as="h2" appearance="subheading">
           Preferences
@@ -77,11 +86,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           <helix-text appearance="label" tone="subtle">
             Color mode
           </helix-text>
-          <helix-toggle-group
-            label="Color mode"
-            onhelix-select={(event: HelixSelectEvent) => choose(event.detail.value as ColorMode)}
-            value={mode}
-          >
+          <helix-toggle-group label="Color mode" ref={modes} value={mode}>
             <helix-toggle value="system">System</helix-toggle>
             <helix-toggle value="light">Light</helix-toggle>
             <helix-toggle value="dark">Dark</helix-toggle>

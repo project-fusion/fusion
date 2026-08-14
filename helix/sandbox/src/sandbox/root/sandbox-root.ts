@@ -1,8 +1,14 @@
-import { customElement, type HelixChangeEvent, HelixElement } from '@helix-io/core'
+import {
+  customElement,
+  type HelixCaretEvent,
+  type HelixChangeEvent,
+  HelixElement,
+} from '@helix-io/core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixSandboxPreview } from '../preview/sandbox-preview.js'
+import { HelixSandboxStatusBar } from '../status-bar/sandbox-status-bar.js'
 import { styles } from './sandbox-root.css.js'
 
 /** How far one arrow press moves the split, in percent. */
@@ -36,6 +42,7 @@ const MAX = 85
  *
  * @slot source - The editable source pane.
  * @slot preview - The live preview.
+ * @slot status - A status bar, spanning both panes at the bottom.
  *
  * @csspart pane - Either pane.
  * @csspart separator - The draggable divider.
@@ -101,10 +108,36 @@ export class HelixSandbox extends HelixElement {
     }
   }
 
+  /**
+   * Writes the cursor position onto any status bar slotted here.
+   *
+   * The same shape as the source-to-preview hand-off, and for the same reason:
+   * the editor and the bar never speak, so either can be absent. It goes
+   * straight to the element rather than through a property a framework owns,
+   * because this fires on every keystroke and every arrow press.
+   */
+  private readonly handleCaret = (event: Event): void => {
+    if (!this.fromSource(event.target)) {
+      return
+    }
+    const { column, line } = (event as HelixCaretEvent).detail
+    for (const bar of this.statusBars) {
+      bar.column = column
+      bar.line = line
+    }
+  }
+
   /** Slotted previews. Client only: the server has no children to read. */
   private get previews(): HelixSandboxPreview[] {
     return [...this.children].filter(
       (child): child is HelixSandboxPreview => child instanceof HelixSandboxPreview,
+    )
+  }
+
+  /** Slotted status bars. Client only, as above. */
+  private get statusBars(): HelixSandboxStatusBar[] {
+    return [...this.children].filter(
+      (child): child is HelixSandboxStatusBar => child instanceof HelixSandboxStatusBar,
     )
   }
 
@@ -169,11 +202,13 @@ export class HelixSandbox extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('helix-caret', this.handleCaret)
     this.addEventListener('helix-change', this.handleSourceChange)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('helix-caret', this.handleCaret)
     this.removeEventListener('helix-change', this.handleSourceChange)
   }
 
@@ -232,7 +267,8 @@ export class HelixSandbox extends HelixElement {
         @pointermove=${this.handlePointerMove}
         @pointerup=${this.handlePointerUp}
       ></div>
-      <div part="pane" data-pane="preview"><slot name="preview"></slot></div>`
+      <div part="pane" data-pane="preview"><slot name="preview"></slot></div>
+      <slot name="status"></slot>`
   }
 
   static override styles: CSSResultGroup = styles

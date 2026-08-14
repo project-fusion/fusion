@@ -229,15 +229,32 @@ consumer would guess simply does nothing.
 **Write `<helix-card>` in JSX.** Plain custom elements, no wrapper, no patched
 React, and no React package: there is not one.
 
-**Events are `onhelix-{verb}`.** React binds a custom event on a custom element
-by stripping `on` and listening for exactly what is left, so `onhelix-open`
-reaches `helix-open`. `onHelixOpen` does not fail loudly; it binds an event
-called `HelixOpen` that nobody dispatches, which looks the same from outside.
+**Bind Helix events with `addEventListener`, not a prop.** `onhelix-select` and
+its siblings do not survive hydration: React records the prop and attaches no
+listener, so on a server-rendered page the handler never runs. The element still
+does its own job, nothing is logged, and it repairs itself the moment React
+commits an update for any other reason. That last part is why it passes every
+casual check. Use `useHelixEvent` in `site/ui/lib`, which binds from an effect
+and therefore runs on hydration and on mount alike.
 
-**It stops at one hyphen.** `onhelix-open` binds and `onhelix-value-change`
-binds nothing at all, measured against React 19.2.8. Every Helix event name
-therefore carries at most one hyphen, and `conventionLint` fails the build on
-one that carries two.
+Measured on the sandbox against React 19.2.8. Hydrated, a click on a file tab
+moved the tab and left the consumer's state untouched, and dispatching the event
+straight at the host reached nothing either, which is what distinguishes an
+absent listener from one that ignored the event. Navigating away and back so the
+same component *mounted* rather than hydrated, the first click worked. Before
+this was found, the sandbox's example tree and file tabs were dead on every
+fresh page load.
+
+React's own events are unaffected: `onClick` on a `<helix-button>` goes through
+the synthetic system, which hydration does set up.
+
+**The prop form still decides event names**, because it is what a consumer
+reaches for first and what has to keep working once React fixes this.
+`onhelix-open` reaches `helix-open`; `onHelixOpen` binds an event called
+`HelixOpen` that nobody dispatches. **And it stops at one hyphen**:
+`onhelix-value-change` binds nothing at all, measured against the same version.
+Every Helix event name therefore carries at most one hyphen, and
+`conventionLint` fails the build on one that carries two.
 
 **Register once, in a client component.** A custom element registers as a side
 effect of importing its module, and that import has to be in the client graph to
