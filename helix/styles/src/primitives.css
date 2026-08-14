@@ -41,6 +41,12 @@
 
   /* ------------------------------------------------------- neutral ----- */
   --_helix-neutral-0: oklch(1 0 0);
+  /* True black, and the only primitive with no tint in it besides white. The
+     page is the one surface with nothing behind it to sit against, so the trace
+     of brand hue that makes a card or a bar feel part of the palette has
+     nothing to do there and reads as a colour cast across the whole window.
+     Every step between these two keeps the hue. */
+  --_helix-neutral-1000: oklch(0 0 0);
   --_helix-neutral-50: oklch(
     0.985 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );

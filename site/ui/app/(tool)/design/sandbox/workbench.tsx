@@ -57,6 +57,9 @@ const SYNTAXES = [
 
 type Syntax = (typeof SYNTAXES)[number]['value']
 
+/** What the stylesheet opens with, so the file is not a blank box. */
+const CSS_START = '/* Styles for this example. They apply to the preview. */\n'
+
 /** How the preview lays the example out. */
 const LAYOUTS = [
   { label: 'Padded', value: 'padded' },
@@ -645,7 +648,7 @@ export function SandboxWorkbench({ families }: Props) {
                 ref={(node: HelixSandboxEditor | null) => {
                   editors.current.css = node
                 }}
-                value=""
+                value={CSS_START}
               ></helix-sandbox-editor>
             </div>
           </div>

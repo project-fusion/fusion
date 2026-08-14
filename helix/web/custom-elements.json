@@ -13684,6 +13684,20 @@
             },
             {
               "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is the one a reset returns to.\n\nSeparate from `value` for the reason `defaultChecked` is separate from\n`checked`: `value` is where the control is now, and a reset needs to know\nwhere it started, which is gone the moment anything is chosen.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -13691,6 +13705,20 @@
               "default": "'Options'",
               "description": "Accessible name for the group.",
               "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name the group reports under when its form is submitted.",
+              "attribute": "name",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
@@ -13747,6 +13775,48 @@
             },
             {
               "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the group to the choice its markup declared.",
+              "type": {
+                "text": "formResetCallback() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the choice when the browser brings a form back.",
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "place",
               "privacy": "private",
               "return": {
@@ -13768,6 +13838,62 @@
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
               }
             },
             {
@@ -13850,6 +13976,19 @@
               "fieldName": "appearance"
             },
             {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is the one a reset returns to.\n\nSeparate from `value` for the reason `defaultChecked` is separate from\n`checked`: `value` is where the control is now, and a reset needs to know\nwhere it started, which is gone the moment anything is chosen.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
               "name": "label",
               "type": {
                 "text": "string"
@@ -13857,6 +13996,19 @@
               "default": "'Options'",
               "description": "Accessible name for the group.",
               "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name the group reports under when its form is submitted.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
@@ -13873,6 +14025,19 @@
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
               }
             }
           ],

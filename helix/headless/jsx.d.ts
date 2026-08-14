@@ -48,6 +48,7 @@ import type {
   HelixChangeEvent,
   HelixCloseEvent,
   HelixDismissEvent,
+  HelixFormElement,
   HelixOpenEvent,
   HelixSelectEvent,
   initialsOf,
@@ -1620,20 +1621,60 @@ export type HelixBaseToggleGroupHelixSelectElementEvent =
   HelixBaseToggleGroupElementEvent<HelixSelectEvent>;
 
 export type HelixBaseToggleGroupProps = {
+  /** The value the markup declared, which is the one a reset returns to.
+
+Separate from `value` for the reason `defaultChecked` is separate from
+`checked`: `value` is where the control is now, and a reset needs to know
+where it started, which is gone the moment anything is chosen. */
+  "default-value"?: HelixBaseToggleGroup["defaultValue"];
+  /** The value the markup declared, which is the one a reset returns to.
+
+Separate from `value` for the reason `defaultChecked` is separate from
+`checked`: `value` is where the control is now, and a reset needs to know
+where it started, which is gone the moment anything is chosen. */
+  defaultValue?: HelixBaseToggleGroup["defaultValue"];
   /** Accessible name for the group. */
   label?: HelixBaseToggleGroup["label"];
+  /** Name the group reports under when its form is submitted. */
+  name?: HelixBaseToggleGroup["name"];
   /** Value of the selected item. */
   value?: HelixBaseToggleGroup["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixBaseToggleGroup["disabled"];
 
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "onhelix-select"?: (e: HelixBaseToggleGroupHelixSelectElementEvent) => void;
 };
 
 export type HelixBaseToggleGroupSolidJsProps = {
+  /** The value the markup declared, which is the one a reset returns to.
+
+Separate from `value` for the reason `defaultChecked` is separate from
+`checked`: `value` is where the control is now, and a reset needs to know
+where it started, which is gone the moment anything is chosen. */
+  "attr:default-value"?: HelixBaseToggleGroup["defaultValue"];
+  /** The value the markup declared, which is the one a reset returns to.
+
+Separate from `value` for the reason `defaultChecked` is separate from
+`checked`: `value` is where the control is now, and a reset needs to know
+where it started, which is gone the moment anything is chosen. */
+  "prop:defaultValue"?: HelixBaseToggleGroup["defaultValue"];
   /** Accessible name for the group. */
   "prop:label"?: HelixBaseToggleGroup["label"];
+  /** Name the group reports under when its form is submitted. */
+  "prop:name"?: HelixBaseToggleGroup["name"];
   /** Value of the selected item. */
   "prop:value"?: HelixBaseToggleGroup["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixBaseToggleGroup["disabled"];
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "on:helix-select"?: (e: HelixBaseToggleGroupHelixSelectElementEvent) => void;
 
@@ -3618,12 +3659,36 @@ export type CustomElements = {
    * and styled by the `data-nav-item` recipe: radio semantics would announce a
    * set of destinations as a set of choices. A tab controls a panel.
    *
+   * Being a radio group, it is a form control, and it says so through
+   * `HelixFormElement`: it reports its value under a `name`, comes back to the
+   * markup's choice on reset, and restores the one a reader made when the browser
+   * brings a form back.
+   *
+   * The semantics were already right: the host has carried `role="radiogroup"`
+   * and the items `role="radio"` from the start. What none of it did was reach a
+   * form. A button in a shadow root submits nothing whatever its role, so the
+   * value has to be reported by the host, which is the only thing a form can
+   * see.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is the one a reset returns to.
+   *
+   * Separate from `value` for the reason `defaultChecked` is separate from
+   * `checked`: `value` is where the control is now, and a reset needs to know
+   * where it started, which is gone the moment anything is chosen.
    * - `label`: Accessible name for the group.
+   * - `name`: Name the group reports under when its form is submitted.
    * - `value`: Value of the selected item.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
    *
    * ## Events
    *
@@ -3636,6 +3701,13 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The group's items.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the group to the choice its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the choice when the browser brings a form back.
    *
    * ## CSS Parts
    *
@@ -5757,12 +5829,36 @@ export type CustomElementsSolidJs = {
    * and styled by the `data-nav-item` recipe: radio semantics would announce a
    * set of destinations as a set of choices. A tab controls a panel.
    *
+   * Being a radio group, it is a form control, and it says so through
+   * `HelixFormElement`: it reports its value under a `name`, comes back to the
+   * markup's choice on reset, and restores the one a reader made when the browser
+   * brings a form back.
+   *
+   * The semantics were already right: the host has carried `role="radiogroup"`
+   * and the items `role="radio"` from the start. What none of it did was reach a
+   * form. A button in a shadow root submits nothing whatever its role, so the
+   * value has to be reported by the host, which is the only thing a form can
+   * see.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is the one a reset returns to.
+   *
+   * Separate from `value` for the reason `defaultChecked` is separate from
+   * `checked`: `value` is where the control is now, and a reset needs to know
+   * where it started, which is gone the moment anything is chosen.
    * - `label`: Accessible name for the group.
+   * - `name`: Name the group reports under when its form is submitted.
    * - `value`: Value of the selected item.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
    *
    * ## Events
    *
@@ -5775,6 +5871,13 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The group's items.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the group to the choice its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the choice when the browser brings a form back.
    *
    * ## CSS Parts
    *

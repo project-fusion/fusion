@@ -9519,7 +9519,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The indicator is one element that travels, not a background that appears on\nwhichever item is current. That difference is the whole point: a fill that\nswaps is two things changing at once and reads as a flicker, while one that\nmoves is a single object the eye follows, and it says where the selection\ncame from as well as where it went.\n\nIts whole box is measured from the selected item and written onto\nthe indicator as custom properties, because labels are different lengths and\nno proportion of the group is the right answer. Measurement is client-side by\nnecessity, so the server renders the indicator hidden and it fades in once it\nhas somewhere to be, which is the harmless direction: it appears rather than\njumping from a wrong place.\n\nA radio group, and only that. Navigation is links marked with `aria-current`\nand styled by the `data-nav-item` recipe: radio semantics would announce a\nset of destinations as a set of choices. A tab controls a panel.",
+          "description": "The indicator is one element that travels, not a background that appears on\nwhichever item is current. That difference is the whole point: a fill that\nswaps is two things changing at once and reads as a flicker, while one that\nmoves is a single object the eye follows, and it says where the selection\ncame from as well as where it went.\n\nIts whole box is measured from the selected item and written onto\nthe indicator as custom properties, because labels are different lengths and\nno proportion of the group is the right answer. Measurement is client-side by\nnecessity, so the server renders the indicator hidden and it fades in once it\nhas somewhere to be, which is the harmless direction: it appears rather than\njumping from a wrong place.\n\nA radio group, and only that. Navigation is links marked with `aria-current`\nand styled by the `data-nav-item` recipe: radio semantics would announce a\nset of destinations as a set of choices. A tab controls a panel.\n\nBeing a radio group, it is a form control, and it says so through\n`HelixFormElement`: it reports its value under a `name`, comes back to the\nmarkup's choice on reset, and restores the one a reader made when the browser\nbrings a form back.\n\nThe semantics were already right: the host has carried `role=\"radiogroup\"`\nand the items `role=\"radio\"` from the start. What none of it did was reach a\nform. A button in a shadow root submits nothing whatever its role, so the\nvalue has to be reported by the host, which is the only thing a form can\nsee.",
           "name": "HelixBaseToggleGroup",
           "cssParts": [
             {
@@ -9536,6 +9536,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is the one a reset returns to.\n\nSeparate from `value` for the reason `defaultChecked` is separate from\n`checked`: `value` is where the control is now, and a reset needs to know\nwhere it started, which is gone the moment anything is chosen.",
+              "attribute": "default-value"
+            },
+            {
+              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -9543,6 +9553,16 @@
               "default": "'Options'",
               "description": "Accessible name for the group.",
               "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name the group reports under when its form is submitted.",
+              "attribute": "name"
             },
             {
               "kind": "field",
@@ -9579,6 +9599,40 @@
             },
             {
               "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the group to the choice its markup declared.",
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the choice when the browser brings a form back.",
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "method",
               "name": "place",
               "privacy": "private",
               "return": {
@@ -9593,6 +9647,62 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
             },
             {
               "kind": "field",
@@ -9676,6 +9786,15 @@
           ],
           "attributes": [
             {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is the one a reset returns to.\n\nSeparate from `value` for the reason `defaultChecked` is separate from\n`checked`: `value` is where the control is now, and a reset needs to know\nwhere it started, which is gone the moment anything is chosen.",
+              "fieldName": "defaultValue"
+            },
+            {
               "name": "label",
               "type": {
                 "text": "string"
@@ -9685,6 +9804,15 @@
               "fieldName": "label"
             },
             {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name the group reports under when its form is submitted.",
+              "fieldName": "name"
+            },
+            {
               "name": "value",
               "type": {
                 "text": "string"
@@ -9692,10 +9820,23 @@
               "default": "''",
               "description": "Value of the selected item.",
               "fieldName": "value"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
             }
           ],
           "superclass": {
-            "name": "HelixElement",
+            "name": "HelixFormElement",
             "package": "@helix-io/core"
           },
           "summary": "A row of options with the selection marked by a moving indicator.",

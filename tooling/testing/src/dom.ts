@@ -31,13 +31,37 @@ export const registerDom = (): void => {
  * their semantics through internals so nothing lands on the host as an
  * attribute, and a spec reads them back through the `role` helper below.
  *
- * Only `form` is modelled with real behavior, because it is the only other part
- * the components currently rely on. It resolves the nearest ancestor form, which is
- * what the platform does in the absence of a `form` attribute; the attribute
- * form of ownership is not covered. Everything else is inert, so a test that
- * starts depending on validity or form values will read as obviously empty
- * rather than quietly passing against a stub.
+ * `form` and `setFormValue` are modelled with real behavior, because they are
+ * the parts the components rely on. `form` resolves the nearest ancestor form,
+ * which is what the platform does in the absence of a `form` attribute; the
+ * attribute form of ownership is not covered. `setFormValue` records what it
+ * was given, readable through `formValue` below.
+ *
+ * Recording rather than submitting, and the distinction is the point. Getting a
+ * reported value into `new FormData(form)` is the platform's job and happy-dom
+ * does not do it; what belongs to a component is reporting the right value at
+ * the right moment, and that is what the recording proves. A spec that needs
+ * the whole path from a press to a submitted field wants a real browser.
+ *
+ * Everything else is inert, so a test that starts depending on validity will
+ * read as obviously empty rather than quietly passing against a stub.
  */
+/** What a control may report: a field's value, a set of them, or nothing. */
+type FormValue = File | FormData | string | null
+
+/* Keyed by host and weak, so a mounted-and-discarded element in one spec does
+   not keep its value alive for the next. */
+const reported = new WeakMap<HTMLElement, FormValue>()
+
+/**
+ * The value a control last reported to its form.
+ *
+ * `undefined` means it never reported at all, which is a different failure from
+ * reporting `null`: the first is a control that is not wired to a form, the
+ * second is one that is wired and has nothing to submit.
+ */
+export const formValue = (host: HTMLElement): FormValue | undefined => reported.get(host)
+
 const shimElementInternals = (): void => {
   const proto = HTMLElement.prototype as HTMLElement & {
     attachInternals?: () => ElementInternals
@@ -71,7 +95,9 @@ const shimElementInternals = (): void => {
       },
       reportValidity: () => true,
       role: null,
-      setFormValue: () => undefined,
+      setFormValue: (value: unknown) => {
+        reported.set(host, value as FormValue)
+      },
       setValidity: () => undefined,
     } as unknown as ElementInternals
   }

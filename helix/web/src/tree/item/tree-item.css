@@ -20,7 +20,14 @@
   display: flex;
   font-size: var(--_tree-text, var(--helix-text-sm));
   gap: var(--helix-space-2xs);
-  padding-block: var(--helix-space-2xs);
+  /* A row you can hit, rather than one sized to the height of its own text. A
+     tree is a list you scan and point at, and four pixels above and below a
+     twelve pixel label made a target under twenty tall: two steps up puts it at
+     a size a pointer finds without care and a finger can reach at all. The
+     minimum is what holds a row with no icon in it to the same height as one
+     that has. */
+  min-block-size: var(--tree-row-size, var(--helix-size-control-sm));
+  padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-xs);
   padding-inline-start: calc(
     var(--helix-space-xs) +

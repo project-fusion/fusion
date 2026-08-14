@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixFormElement } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseToggle } from '../root/toggle-root.js'
@@ -27,6 +27,17 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  * and styled by the `data-nav-item` recipe: radio semantics would announce a
  * set of destinations as a set of choices. A tab controls a panel.
  *
+ * Being a radio group, it is a form control, and it says so through
+ * `HelixFormElement`: it reports its value under a `name`, comes back to the
+ * markup's choice on reset, and restores the one a reader made when the browser
+ * brings a form back.
+ *
+ * The semantics were already right: the host has carried `role="radiogroup"`
+ * and the items `role="radio"` from the start. What none of it did was reach a
+ * form. A button in a shadow root submits nothing whatever its role, so the
+ * value has to be reported by the host, which is the only thing a form can
+ * see.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases SegmentedControl, Segmented, NavBar, Switcher
@@ -39,10 +50,24 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here.
  */
 @customElement('helix-base-toggle-group')
-export class HelixBaseToggleGroup extends HelixElement {
+export class HelixBaseToggleGroup extends HelixFormElement {
+  /**
+   * The value the markup declared, which is the one a reset returns to.
+   *
+   * Separate from `value` for the reason `defaultChecked` is separate from
+   * `checked`: `value` is where the control is now, and a reset needs to know
+   * where it started, which is gone the moment anything is chosen.
+   */
+  @property({ attribute: 'default-value' })
+  defaultValue = ''
+
   /** Accessible name for the group. */
   @property()
   label = 'Options'
+
+  /** Name the group reports under when its form is submitted. */
+  @property()
+  name = ''
 
   /** Value of the selected item. */
   @property()
@@ -58,6 +83,16 @@ export class HelixBaseToggleGroup extends HelixElement {
 
   private readonly handleSelection = (event: Event): void => {
     this.value = (event as CustomEvent<{ value: string }>).detail.value
+  }
+
+  /** Returns the group to the choice its markup declared. */
+  formResetCallback(): void {
+    this.value = this.defaultValue
+  }
+
+  /** Restores the choice when the browser brings a form back. */
+  formStateRestoreCallback(state: string | null): void {
+    this.value = state ?? this.defaultValue
   }
 
   /**
@@ -162,6 +197,16 @@ export class HelixBaseToggleGroup extends HelixElement {
     // that, so the host stays neutral.
     this.internals.role = 'radiogroup'
     this.internals.ariaLabel = this.label
+    // Once, before anything has been chosen. `default-value` is what the markup
+    // asked for, so it is the starting selection as well as the one a reset
+    // comes back to; after that it is history and `value` is the answer.
+    if (!this.hasUpdated && this.value === '' && this.defaultValue !== '') {
+      this.value = this.defaultValue
+    }
+    // `null` rather than an empty string when nothing is chosen, which is the
+    // difference between a control that submits nothing and one that submits a
+    // blank.
+    this.internals.setFormValue(this.value === '' ? null : this.value)
   }
 
   protected override render(): TemplateResult {

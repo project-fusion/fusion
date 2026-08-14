@@ -41,7 +41,10 @@
 
   /* ======================================================== color ======= */
   /* Surfaces, from furthest back to nearest front. */
-  --helix-color-background: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-950));
+  /* The ends of the ramp: #ffffff and #000000. Everything else is a step in
+     from them, so a surface reads as lifted off the page rather than as one
+     more grey among several. */
+  --helix-color-background: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000));
   --helix-color-surface: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900));
   --helix-color-surface-raised: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800));
   /* Sunken is a step *lighter* than the page in dark mode, not darker. There is
