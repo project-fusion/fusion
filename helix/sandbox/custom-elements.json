@@ -422,7 +422,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A same-origin `<iframe>` pointed at `src`, which is a document the consumer\nprovides. That document imports whatever the examples need, listens for a\nrender message, and writes the markup into itself.\n\n**A frame rather than the page.** Rendering into the page meant an example\nwas styled by whatever surrounded it, which flatters the preview and lies\nabout it: an example that restyles `helix-card` restyled the sandbox too, a\nscript in an example ran against the real document, and a stray\n`position: fixed` escaped the pane. It also left nothing to capture console\noutput from, and the terminal has to come from somewhere.\n\nThe cost is that the frame starts empty. Styles and element definitions do\nnot cross into it, because a document has its own stylesheets and a window\nhas its own custom element registry, so `src` has to load them. That is the\nconsumer's document rather than something guessed at here.\n\n**The source is trusted.** It is markup a developer typed into their own\nsandbox. Never point this at input from anyone else.",
+          "description": "A sandboxed `<iframe>` pointed at `src`, which is a document the consumer\nprovides. That document imports whatever the examples need, listens for a\nrender message, and writes the markup into itself.\n\n**A frame rather than the page.** Rendering into the page meant an example\nwas styled by whatever surrounded it, which flatters the preview and lies\nabout it: an example that restyles `helix-card` restyled the sandbox too, a\nscript in an example ran against the real document, and a stray\n`position: fixed` escaped the pane. It also left nothing to capture console\noutput from, and the terminal has to come from somewhere.\n\nThe cost is that the frame starts empty. Styles and element definitions do\nnot cross into it, because a document has its own stylesheets and a window\nhas its own custom element registry, so `src` has to load them. That is the\nconsumer's document rather than something guessed at here.\n\n**The source is not trusted, and the frame is what makes that safe.**\n`sandbox=\"allow-scripts\"` and no `allow-same-origin`, so the document runs on\nan opaque origin: script in an example cannot reach this page, its storage,\nits cookies, or the editor the source was typed into. Without it they could,\nmeasured, through an `onerror` handler on an image that fails to load, which\n`innerHTML` does not strip the way it refuses a `<script>` tag.\n\nThat is what lets a sandbox hold markup a reader pasted from somewhere, or\none day arrived in a shared link, rather than only what its owner typed.\n\n`allow-forms` is granted because examples have forms in them and a submit\nthat silently does nothing is a worse lie than one that navigates a frame\nnobody is looking at. Top-level navigation, popups and modals are not.",
           "name": "HelixSandboxPreview",
           "cssParts": [
             {
@@ -505,17 +505,19 @@
               "name": "handleMessage",
               "privacy": "private",
               "readonly": true,
-              "description": "Takes messages from the frame.\n\nThe source is checked against this frame's own window, because every frame\non the page posts to the same parent and a sandbox is rarely alone."
+              "description": "Takes messages from the frame.\n\nTwo checks, and both earn their place.\n\nThe window is the identity: `event.source` is a reference the sender cannot\nforge, and this frame's `contentWindow` is one only this element holds.\n\nThe origin has to be opaque. The frame is sandboxed, so every message it\nsends arrives as `\"null\"`, measured. A real origin therefore means the\nframe is no longer showing the document it was given: `allow-scripts` lets\nan example navigate its own frame, and whatever it navigated to inherits\n`contentWindow` and could otherwise write lines into the terminal as though\nthe example had logged them."
             },
             {
               "kind": "field",
-              "name": "origin",
+              "name": "target",
               "type": {
                 "text": "string"
               },
               "privacy": "private",
-              "description": "The origin the frame is on, which is what it is answered at.\n\n`postMessage` to `'*'` delivers to whatever the frame has navigated to,\nwhich is not necessarily what `src` said. Naming the origin means a frame\nthat moved gets nothing rather than the sandbox's contents.",
-              "readonly": true
+              "static": true,
+              "readonly": true,
+              "default": "'*'",
+              "description": "Where messages to the frame are addressed.\n\n`'*'`, because there is nothing else to say: a sandboxed document has an\nopaque origin and `postMessage` has no target string that names one.\n\nIt costs nothing. What is sent is the example's own source and stylesheet,\nto the document that is about to render them, and that document is the one\nthing on the page already entitled to both."
             },
             {
               "kind": "method",

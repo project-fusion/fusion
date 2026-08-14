@@ -13,8 +13,6 @@ export interface PreviewReady {
 export interface PreviewRender {
   direction: 'ltr' | 'rtl'
   layout: 'padded' | 'centered' | 'fullscreen'
-  /** Where to answer, so the frame need not guess its parent's origin. */
-  origin: string
   source: string
   styles: string
   type: 'helix-preview-render'
@@ -33,7 +31,7 @@ export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender
  * @summary Renders sandbox source in a frame of its own.
  *
  * @description
- * A same-origin `<iframe>` pointed at `src`, which is a document the consumer
+ * A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
  * provides. That document imports whatever the examples need, listens for a
  * render message, and writes the markup into itself.
  *
@@ -49,8 +47,19 @@ export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender
  * has its own custom element registry, so `src` has to load them. That is the
  * consumer's document rather than something guessed at here.
  *
- * **The source is trusted.** It is markup a developer typed into their own
- * sandbox. Never point this at input from anyone else.
+ * **The source is not trusted, and the frame is what makes that safe.**
+ * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
+ * an opaque origin: script in an example cannot reach this page, its storage,
+ * its cookies, or the editor the source was typed into. Without it they could,
+ * measured, through an `onerror` handler on an image that fails to load, which
+ * `innerHTML` does not strip the way it refuses a `<script>` tag.
+ *
+ * That is what lets a sandbox hold markup a reader pasted from somewhere, or
+ * one day arrived in a shared link, rather than only what its owner typed.
+ *
+ * `allow-forms` is granted because examples have forms in them and a submit
+ * that silently does nothing is a worse lie than one that navigates a frame
+ * nobody is looking at. Top-level navigation, popups and modals are not.
  *
  * @since 0.1.0
  * @status experimental
@@ -97,11 +106,20 @@ export class HelixSandboxPreview extends HelixElement {
   /**
    * Takes messages from the frame.
    *
-   * The source is checked against this frame's own window, because every frame
-   * on the page posts to the same parent and a sandbox is rarely alone.
+   * Two checks, and both earn their place.
+   *
+   * The window is the identity: `event.source` is a reference the sender cannot
+   * forge, and this frame's `contentWindow` is one only this element holds.
+   *
+   * The origin has to be opaque. The frame is sandboxed, so every message it
+   * sends arrives as `"null"`, measured. A real origin therefore means the
+   * frame is no longer showing the document it was given: `allow-scripts` lets
+   * an example navigate its own frame, and whatever it navigated to inherits
+   * `contentWindow` and could otherwise write lines into the terminal as though
+   * the example had logged them.
    */
   private readonly handleMessage = (event: MessageEvent<PreviewMessage>): void => {
-    if (event.source !== this.frame?.contentWindow || event.origin !== this.origin) {
+    if (event.source !== this.frame?.contentWindow || event.origin !== 'null') {
       return
     }
     if (event.data?.type === 'helix-preview-ready') {
@@ -115,19 +133,16 @@ export class HelixSandboxPreview extends HelixElement {
   }
 
   /**
-   * The origin the frame is on, which is what it is answered at.
+   * Where messages to the frame are addressed.
    *
-   * `postMessage` to `'*'` delivers to whatever the frame has navigated to,
-   * which is not necessarily what `src` said. Naming the origin means a frame
-   * that moved gets nothing rather than the sandbox's contents.
+   * `'*'`, because there is nothing else to say: a sandboxed document has an
+   * opaque origin and `postMessage` has no target string that names one.
+   *
+   * It costs nothing. What is sent is the example's own source and stylesheet,
+   * to the document that is about to render them, and that document is the one
+   * thing on the page already entitled to both.
    */
-  private get origin(): string {
-    try {
-      return new URL(this.src, window.location.href).origin
-    } catch {
-      return window.location.origin
-    }
-  }
+  private static readonly target = '*'
 
   /** Sends the current source to the frame, once it is listening. */
   private send(): void {
@@ -137,12 +152,11 @@ export class HelixSandboxPreview extends HelixElement {
     const message: PreviewRender = {
       direction: this.direction ?? 'ltr',
       layout: this.layout ?? 'padded',
-      origin: window.location.origin,
       source: this.source,
       styles: this.styles,
       type: 'helix-preview-render',
     }
-    this.frame?.contentWindow?.postMessage(message, this.origin)
+    this.frame?.contentWindow?.postMessage(message, HelixSandboxPreview.target)
   }
 
   override connectedCallback(): void {
@@ -166,7 +180,12 @@ export class HelixSandboxPreview extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<iframe part="frame" src=${this.src} title=${this.label}></iframe>`
+    return html`<iframe
+      part="frame"
+      src=${this.src}
+      title=${this.label}
+      sandbox="allow-scripts allow-forms"
+    ></iframe>`
   }
 
   static override styles: CSSResultGroup = sheet

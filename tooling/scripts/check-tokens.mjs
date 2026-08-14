@@ -34,6 +34,9 @@ const IGNORED = new Set([
   '.turbo',
   'dist',
   'node_modules',
+  // Build output, not source. The sandbox frame's stylesheet is the style
+  // layers concatenated, so it holds the primitives by construction.
+  'public',
   'target',
 ])
 

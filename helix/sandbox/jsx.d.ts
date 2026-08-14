@@ -515,7 +515,7 @@ export type CustomElements = {
   >;
 
   /**
-   * A same-origin `<iframe>` pointed at `src`, which is a document the consumer
+   * A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
    * provides. That document imports whatever the examples need, listens for a
    * render message, and writes the markup into itself.
    *
@@ -531,8 +531,19 @@ export type CustomElements = {
    * has its own custom element registry, so `src` has to load them. That is the
    * consumer's document rather than something guessed at here.
    *
-   * **The source is trusted.** It is markup a developer typed into their own
-   * sandbox. Never point this at input from anyone else.
+   * **The source is not trusted, and the frame is what makes that safe.**
+   * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
+   * an opaque origin: script in an example cannot reach this page, its storage,
+   * its cookies, or the editor the source was typed into. Without it they could,
+   * measured, through an `onerror` handler on an image that fails to load, which
+   * `innerHTML` does not strip the way it refuses a `<script>` tag.
+   *
+   * That is what lets a sandbox hold markup a reader pasted from somewhere, or
+   * one day arrived in a shared link, rather than only what its owner typed.
+   *
+   * `allow-forms` is granted because examples have forms in them and a submit
+   * that silently does nothing is a worse lie than one that navigates a frame
+   * nobody is looking at. Top-level navigation, popups and modals are not.
    *
    * ## Attributes & Properties
    *
@@ -871,7 +882,7 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * A same-origin `<iframe>` pointed at `src`, which is a document the consumer
+   * A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
    * provides. That document imports whatever the examples need, listens for a
    * render message, and writes the markup into itself.
    *
@@ -887,8 +898,19 @@ export type CustomElementsSolidJs = {
    * has its own custom element registry, so `src` has to load them. That is the
    * consumer's document rather than something guessed at here.
    *
-   * **The source is trusted.** It is markup a developer typed into their own
-   * sandbox. Never point this at input from anyone else.
+   * **The source is not trusted, and the frame is what makes that safe.**
+   * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
+   * an opaque origin: script in an example cannot reach this page, its storage,
+   * its cookies, or the editor the source was typed into. Without it they could,
+   * measured, through an `onerror` handler on an image that fails to load, which
+   * `innerHTML` does not strip the way it refuses a `<script>` tag.
+   *
+   * That is what lets a sandbox hold markup a reader pasted from somewhere, or
+   * one day arrived in a shared link, rather than only what its owner typed.
+   *
+   * `allow-forms` is granted because examples have forms in them and a submit
+   * that silently does nothing is a worse lie than one that navigates a frame
+   * nobody is looking at. Top-level navigation, popups and modals are not.
    *
    * ## Attributes & Properties
    *

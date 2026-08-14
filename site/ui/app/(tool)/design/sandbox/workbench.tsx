@@ -234,7 +234,7 @@ export function SandboxWorkbench({ families }: Props) {
             data-color-mode={previewTheme}
             ref={preview}
             slot="preview"
-            src="/design/sandbox/frame"
+            src="/sandbox/frame.html"
           ></helix-sandbox-preview>
 
           {/* The panel's tabs are `helix-tabs`, not a second tab set built

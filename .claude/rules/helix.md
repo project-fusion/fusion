@@ -395,6 +395,40 @@ site, with element registration in one client component.
   arrow keys as well as by pointer. A divider only a mouse can move is unusable
   without one.
 
+### The preview runs untrusted code
+
+A sandbox executes whatever is typed into it, so the preview frame is the
+security boundary and everything about it follows from that.
+
+- **`sandbox="allow-scripts"`, and never `allow-same-origin` beside it.** The
+  two together are the same as no sandbox at all: a document on its own origin
+  can reach up and remove the attribute. `allow-forms` is granted because
+  examples have forms; top-level navigation, popups and modals are not.
+- **The frame is a static document, not a route.** A sandboxed frame has an
+  opaque origin, and from there every module import and `fetch` back to the site
+  is cross-origin without CORS headers, so a framework route's chunks never load
+  and the document never comes alive. A classic `<script src>` is not
+  CORS-checked and does run, which is why `bun run frame` emits one IIFE with
+  the component library inside it and a plain HTML file beside it.
+- **Messages are identified by window, not by origin.** An opaque origin arrives
+  as the string `"null"`, which any other sandboxed frame on the page also
+  reports, so matching on it proves nothing. `event.source` is a reference the
+  sender cannot forge. Sending goes to `'*'` because `postMessage` has no target
+  string naming an opaque origin, which costs nothing: what is sent is the
+  example's own source, to the document about to render it.
+
+What this prevents, measured before it was fixed: `innerHTML` refuses a
+`<script>` tag but not an `onerror` on an image that fails to load, and that
+handler read the site's `localStorage`, its cookies, and the editor's contents,
+and rewrote the page. Confirmed closed the same way, from inside the frame:
+every one of those is now a `SecurityError`.
+
+**The spec runner is a separate frame and is deliberately not sandboxed.** It
+has to `import()` a bundle, which an opaque origin cannot do, and what it runs
+is this repo's own spec files rather than anything a reader typed. The family
+name it is given is matched against `^[a-z][a-z0-9-]*$` before it reaches an
+import, so it cannot be steered off the path.
+
 ### The site
 
 Two page kinds, kept apart on purpose:

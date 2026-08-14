@@ -88,8 +88,11 @@ describe('sandbox coordination', () => {
   })
 
   test('a console call in the frame arrives as an event on the host', async () => {
-    // The terminal's whole source. A message from any other window, or from
-    // any other origin, is not this preview's.
+    // The terminal's whole source. A message from any other window is not this
+    // preview's, and neither is one carrying a real origin: the frame is
+    // sandboxed, so everything it genuinely sends arrives as `"null"`. A named
+    // origin means the frame has navigated somewhere else and that somewhere is
+    // writing lines as though the example had logged them.
     const sandbox = await mount(wired)
     const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable
     const frame = preview.shadowRoot?.querySelector('iframe') as HTMLIFrameElement
@@ -112,9 +115,12 @@ describe('sandbox coordination', () => {
         ),
       )
 
-    post(sender, window.location.origin)
-    post({}, window.location.origin)
+    post(sender, 'null')
+    post({}, 'null')
     post(sender, 'https://elsewhere.test')
+    // Not `window.location.origin`: happy-dom runs on `about:blank`, so its
+    // origin is `"null"` and posting with it is a valid message, not a
+    // rejected one.
 
     expect(heard).toEqual(['warn: from the example'])
   })
@@ -136,7 +142,7 @@ describe('sandbox coordination', () => {
 
     window.dispatchEvent(
       Object.assign(new MessageEvent('message', { data: { type: 'helix-preview-ready' } }), {
-        origin: window.location.origin,
+        origin: 'null',
         source: frame.contentWindow,
       }),
     )
@@ -150,9 +156,13 @@ describe('sandbox coordination', () => {
     expect(last?.direction).toBe('rtl')
   })
 
-  test('the frame is answered at a named origin, never at a wildcard', async () => {
-    // `'*'` delivers to whatever the frame has navigated to, which need not be
-    // what `src` said.
+  test('the frame is answered at a wildcard, because a sandbox has no origin to name', async () => {
+    // This asserted the opposite until the frame was sandboxed, and naming the
+    // origin was right while there was one. There is not: `postMessage` has no
+    // target string for an opaque origin, so `'*'` is the only thing that
+    // delivers. It costs nothing, because what is sent is the example's own
+    // source going to the document about to render it. What guards the other
+    // direction is the origin check on the way back in.
     const sandbox = await mount(wired)
     const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable
     const frame = preview.shadowRoot?.querySelector('iframe') as HTMLIFrameElement
@@ -163,13 +173,12 @@ describe('sandbox coordination', () => {
 
     window.dispatchEvent(
       Object.assign(new MessageEvent('message', { data: { type: 'helix-preview-ready' } }), {
-        origin: window.location.origin,
+        origin: 'null',
         source: frame.contentWindow,
       }),
     )
 
-    expect(origins).not.toContain('*')
-    expect(origins[0]).toBe(window.location.origin)
+    expect(origins).toEqual(['*'])
   })
 
   test('nothing is sent until the frame says it is listening', async () => {

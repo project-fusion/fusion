@@ -14,6 +14,7 @@
     "dev": "turbo run dev",
     "dev:watch": "turbo watch build --filter=@fusion-io/site-ui^...",
     "format": "biome format --write .",
+    "frame": "bun tooling/scripts/build-frame.mjs",
     "lint": "biome lint .",
     "order": "node tooling/scripts/order-manifests.mjs",
     "rs:build": "cargo build --workspace",
