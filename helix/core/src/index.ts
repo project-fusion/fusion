@@ -2,6 +2,7 @@ export {
   DismissController,
   type DismissOptions,
 } from './controllers/dismiss-controller/dismiss-controller.js'
+export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {
   HelixCloseEvent,
   HelixOpenEvent,
@@ -21,7 +22,10 @@ export {
 } from './mixins/mixin-controller-open/mixin-controller-open.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export { customElement } from './utils/custom-element/custom-element.js'
-export { FocusTrapController } from './utils/focus-trap/focus-trap.js'
+export {
+  deepActiveElement,
+  focusableElements,
+} from './utils/focusable-elements/focusable-elements.js'
 export {
   type ControlledChangeOptions,
   requestControlledChange,

@@ -1,0 +1,124 @@
+import { customElement, HelixElement } from '@helix-io/core'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
+
+/**
+ * @summary A set of destinations, with a marker on the current one.
+ *
+ * @description
+ * Renders a real `<nav>`, which is the landmark a screen-reader user jumps to.
+ * It exists as its own component rather than as a region of `AppHeader` because
+ * a header is not inherently navigation, and navigation is not only ever in a
+ * header: a footer and a sidebar hold the same thing.
+ *
+ * **It renders no links.** The consumer brings them, marked with
+ * `aria-current="page"` and styled by the `data-nav-item` recipe, for the same
+ * reason nothing else here renders an anchor: a router renders its own, and
+ * cannot render it inside this shadow root.
+ *
+ * What this owns is the marker that travels between them, and that is the whole
+ * reason it is a component. A marker that moves needs something that knows
+ * where every item is, and reading `aria-current` is how it knows which: the
+ * thing that makes the page announce correctly is the same thing that puts the
+ * marker in the right place.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @aliases Nav, NavList, Tabs
+ * @documentation https://helix.fusion.dev/components/nav-bar
+ *
+ * @slot - The destinations, as the consumer's own links.
+ *
+ * @csspart nav - The navigation landmark.
+ * @csspart indicator - The marker that travels to the current destination.
+ */
+@customElement('helix-base-nav-bar')
+export class HelixBaseNavBar extends HelixElement {
+  /** Accessible name for the landmark. */
+  @property()
+  label = 'Main'
+
+  private observer: ResizeObserver | undefined
+  private current: MutationObserver | undefined
+
+  /** The destinations the consumer slotted. */
+  private get items(): HTMLElement[] {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot')
+    return (slot?.assignedElements() ?? []) as HTMLElement[]
+  }
+
+  /**
+   * Moves the marker to whichever destination is current.
+   *
+   * Geometry goes onto the marker inside the shadow root. On the host it would
+   * be an inline style the element gives itself after upgrading, which a
+   * React consumer's server markup never has.
+   */
+  private place(): void {
+    const marker = this.renderRoot.querySelector<HTMLElement>('[part="indicator"]')
+    const nav = this.renderRoot.querySelector<HTMLElement>('[part="nav"]')
+    if (!marker || !nav) {
+      return
+    }
+
+    const active = this.items.find((item) => item.getAttribute('aria-current') === 'page')
+    if (!active) {
+      marker.removeAttribute('data-placed')
+      return
+    }
+
+    const box = active.getBoundingClientRect()
+    if (box.width === 0) {
+      return
+    }
+    const own = nav.getBoundingClientRect()
+    marker.style.setProperty('--_nav-indicator-x', `${box.left - own.left}px`)
+    marker.style.setProperty('--_nav-indicator-w', `${box.width}px`)
+    marker.style.setProperty('--_nav-indicator-h', `${box.height}px`)
+    marker.toggleAttribute('data-placed', true)
+  }
+
+  /** Re-measures when the links change, move, or hand over the current page. */
+  private watch(): void {
+    this.observer?.disconnect()
+    this.current?.disconnect()
+    this.place()
+
+    this.observer = new ResizeObserver(() => this.place())
+    this.observer.observe(this)
+    for (const item of this.items) {
+      this.observer.observe(item)
+    }
+
+    // Client-side routing changes `aria-current` in place rather than
+    // reloading, so nothing else would tell the marker to move.
+    this.current = new MutationObserver(() => this.place())
+    for (const item of this.items) {
+      this.current.observe(item, { attributeFilter: ['aria-current'] })
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.observer?.disconnect()
+    this.current?.disconnect()
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.watch()
+  }
+
+  protected override render(): TemplateResult {
+    return html`<nav part="nav" aria-label=${this.label}>
+      <div part="indicator" aria-hidden="true"></div>
+      <slot @slotchange=${() => this.watch()}></slot>
+    </nav>`
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'helix-base-nav-bar': HelixBaseNavBar
+  }
+}

@@ -61,13 +61,6 @@ helix-app-header {
   --app-header-max-inline-size: none;
 }
 
-/* No groove. The links sit on the page and the header's marker travels between
-   them, which is the whole treatment. */
-helix-app-header::part(nav) {
-  block-size: var(--helix-size-control-dense);
-  gap: var(--helix-space-2xs);
-}
-
 /* ============================================================ hero ======= */
 
 /* Tall enough that the claim is the only thing on screen. Not a full viewport:

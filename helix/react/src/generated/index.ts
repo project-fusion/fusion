@@ -42,6 +42,7 @@ export {
   type BaseListProps,
   BaseListRoot,
 } from './base-list.js'
+export { BaseNavBar, type BaseNavBarProps, BaseNavBarRoot } from './base-nav-bar.js'
 export { BaseQuote, type BaseQuoteProps, BaseQuoteRoot } from './base-quote.js'
 export { BaseSkeleton, type BaseSkeletonProps, BaseSkeletonRoot } from './base-skeleton.js'
 export { BaseSpinner, type BaseSpinnerProps, BaseSpinnerRoot } from './base-spinner.js'
@@ -106,6 +107,7 @@ export { Icon, type IconProps, IconRoot } from './icon.js'
 export { IconButton, type IconButtonProps, IconButtonRoot } from './icon-button.js'
 export { Kbd, type KbdProps, KbdRoot } from './kbd.js'
 export { List, ListItem, type ListItemProps, type ListProps, ListRoot } from './list.js'
+export { NavBar, type NavBarProps, NavBarRoot } from './nav-bar.js'
 export { Quote, type QuoteProps, QuoteRoot } from './quote.js'
 export { Skeleton, type SkeletonProps, SkeletonRoot } from './skeleton.js'
 export { Spinner, type SpinnerProps, SpinnerRoot } from './spinner.js'

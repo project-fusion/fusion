@@ -7,22 +7,27 @@ beforeAll(async () => {
 })
 
 describe('app header', () => {
-  test('is a banner holding three regions', async () => {
+  test('is a banner holding three regions, named for where they are', async () => {
     const header = await mount(`
       <helix-app-header>
-        <span slot="brand">Fusion</span>
-        <a href="/work">Work</a>
-        <helix-button slot="actions">Contact</helix-button>
+        <span slot="start">Fusion</span>
+        <helix-nav-bar><a href="/work">Work</a></helix-nav-bar>
+        <helix-button slot="end">Contact</helix-button>
       </helix-app-header>
     `)
     // On the host, since the host is the banner: it carries the material and
-    // spans the window, and `content` carries the measure.
+    // spans the window, and `row` carries the measure.
     expect(role(header)).toBe('banner')
-    // `<nav>` keeps a wrapper because it is a landmark; brand and actions are
-    // bare slots, so an omitted one renders nothing at all.
-    expect(part(header, 'nav')?.tagName).toBe('NAV')
-    expect(header.shadowRoot?.querySelector('slot[name="brand"]')).not.toBeNull()
-    expect(header.shadowRoot?.querySelector('slot[name="actions"]')).not.toBeNull()
+    expect(part(header, 'start')).not.toBeNull()
+    expect(part(header, 'content')).not.toBeNull()
+    expect(part(header, 'end')).not.toBeNull()
+  })
+
+  test('renders no landmark of its own, because a header is not navigation', async () => {
+    // The `<nav>` belongs to `NavBar`, which is what usually goes in the middle
+    // but is not what a header inherently is.
+    const header = await mount('<helix-app-header></helix-app-header>')
+    expect(header.shadowRoot?.querySelector('nav')).toBeNull()
   })
 
   test('starts un-scrolled, matching what the server rendered', async () => {
