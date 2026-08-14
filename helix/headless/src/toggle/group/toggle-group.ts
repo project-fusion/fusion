@@ -39,7 +39,7 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  *
  * @csspart indicator - The moving marker behind the selected item.
  *
- * @event {HelixSelectionChangeEvent} SelectionChange - Fired when an item is chosen. Dispatched by the item and listened for here.
+ * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here.
  */
 @customElement('helix-base-toggle-group')
 export class HelixBaseToggleGroup extends HelixElement {
@@ -126,13 +126,13 @@ export class HelixBaseToggleGroup extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('SelectionChange', this.handleSelection)
+    this.addEventListener('helix-select', this.handleSelection)
     this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('SelectionChange', this.handleSelection)
+    this.removeEventListener('helix-select', this.handleSelection)
     this.removeEventListener('keydown', this.handleKeydown)
     this.observer?.disconnect()
   }

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixSelectionChangeEvent } from '@helix-io/core'
+import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
 import { caretDown } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -31,7 +31,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart label - The label text.
  * @csspart group - The container for nested items.
  *
- * @event {HelixSelectionChangeEvent} SelectionChange - Fired when the item is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  */
 @customElement('helix-base-tree-item')
 export class HelixBaseTreeItem extends HelixElement {
@@ -87,7 +87,7 @@ export class HelixBaseTreeItem extends HelixElement {
 
   /** Selects this node and announces it. */
   select(): void {
-    this.dispatchEvent(new HelixSelectionChangeEvent({ value: this.value }))
+    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
   private readonly handleRowClick = (): void => {

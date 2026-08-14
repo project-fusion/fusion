@@ -52,6 +52,35 @@ export class HelixElement extends LitElement {
   }
 
   /**
+   * Re-emits a native event from the host, under its own name.
+   *
+   * A native event fired by an inner `<input>` or `<textarea>` is not composed,
+   * so it stops at the shadow boundary and a consumer listening on
+   * `<helix-input>` hears nothing. Re-dispatching it from the host is what
+   * makes the component behave like the control it wraps.
+   *
+   * The relayed event keeps the native name deliberately. `change` is `change`,
+   * which is what a consumer already knows to listen for, and it is what
+   * reaches React: its synthetic system claims `onChange` and wires it to that
+   * name, so a prefixed one would never arrive.
+   *
+   * `composed` is not forced. It defaults to the original event's own value, so
+   * a relayed `change` stops at the next shadow boundary exactly as a native
+   * one would. Pass it explicitly only where escaping is the intent, and say so
+   * where you do.
+   */
+  protected relayNativeEvent(event: Event, init?: EventInit): void {
+    this.dispatchEvent(
+      new Event(event.type, {
+        bubbles: event.bubbles,
+        cancelable: event.cancelable,
+        composed: event.composed,
+        ...init,
+      }),
+    )
+  }
+
+  /**
    * Prepends the shadow-root reset to every subclass's styles, so no component
    * has to remember to include it.
    */

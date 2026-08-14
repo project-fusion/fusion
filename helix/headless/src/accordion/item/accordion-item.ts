@@ -3,6 +3,7 @@ import { caretDown } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import type { HelixBaseAccordion } from '../root/accordion-root.js'
 
 /** Shadow-DOM id linking the trigger's aria-controls to the content region. */
 const CONTENT_ID = 'content'
@@ -45,7 +46,7 @@ const TRIGGER_ID = 'trigger'
  * @csspart content - The revealed region.
  * @csspart content-inner - Padding wrapper inside the animated region.
  *
- * @event {HelixOpenChangeEvent} OpenChange - Fired when the item opens or closes.
+ * @event {HelixOpenEvent} helix-open - Fired when the item opens or closes.
  */
 @customElement('helix-base-accordion-item')
 export class HelixBaseAccordionItem extends WithOpen(HelixElement) {
@@ -72,8 +73,64 @@ export class HelixBaseAccordionItem extends WithOpen(HelixElement) {
     </svg>`
   }
 
+  /**
+   * The nearest accordion above this item, if there is one.
+   *
+   * Resolved on demand rather than held, so an item moved between accordions
+   * coordinates with the one it is in now. `closest` crosses no shadow
+   * boundary, which is correct: an item inside another item's content is in
+   * that item's light DOM and finds the same accordion, so the check below is
+   * what keeps it independent.
+   */
+  private get accordion(): HelixBaseAccordion | null {
+    return this.closest<HelixBaseAccordion>('helix-base-accordion, helix-accordion')
+  }
+
+  /**
+   * The items this one coordinates with: its own siblings, and only those.
+   *
+   * Direct children only. An accordion nested inside an item's content is a
+   * separate set, and opening a section in it must not close anything outside.
+   */
+  private get peers(): HelixBaseAccordionItem[] {
+    const accordion = this.accordion
+    if (!accordion || accordion.items.indexOf(this) === -1) {
+      return []
+    }
+    return accordion.items
+  }
+
+  /**
+   * Opens or closes this item, and enforces the accordion's mode.
+   *
+   * The item that was clicked is the coordinator. It refuses first, then
+   * announces, then applies, then closes its peers, in that order: closing a
+   * peer before knowing whether this change was even allowed would leave the
+   * set collapsed after a listener refused it.
+   */
   protected handleToggle = (): void => {
-    this.setOpen(!this.isOpen)
+    const next = !this.isOpen
+    const mode = this.accordion?.mode
+
+    // `single` keeps one open at all times, so the last one cannot be closed.
+    // `single-collapsible` is the same rule without that floor.
+    if (!next && mode === 'single') {
+      return
+    }
+
+    if (!this.requestOpen(next)) {
+      return
+    }
+
+    if (next && mode !== undefined) {
+      for (const peer of this.peers) {
+        if (peer !== this && peer.isOpen) {
+          // A peer in controlled mode will only notify: its consumer owns the
+          // value and may decline, which can legitimately leave two open.
+          peer.requestOpen(false)
+        }
+      }
+    }
   }
 
   /**

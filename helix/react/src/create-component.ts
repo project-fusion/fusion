@@ -6,6 +6,7 @@ import {
   forwardRef,
   type HTMLAttributes,
   type PropsWithoutRef,
+  type ReactNode,
   type RefAttributes,
   useEffect,
   useLayoutEffect,
@@ -22,7 +23,7 @@ const useIsomorphicLayoutEffect = typeof document === 'undefined' ? useEffect : 
 export interface ComponentDefinition {
   /**
    * Custom event names the element dispatches, mapped to their React prop.
-   * `{ OpenChange: 'onOpenChange' }`.
+   * `{ 'helix-open': 'onOpen' }`.
    */
   events: Record<string, string>
 
@@ -65,7 +66,19 @@ export interface BaseProps extends HTMLAttributes<HTMLElement> {}
  * imperative methods is unreachable through a ref typed as a bare
  * `HTMLElement`.
  */
-export const createComponent = <Element extends HTMLElement, Props extends BaseProps>({
+export const createComponent = <
+  Element extends HTMLElement,
+  // Deliberately unconstrained beyond `object`. A generated props interface
+  // omits any key it overrides, because React's `HTMLAttributes` already
+  // declares some of the props an event derives: `helix-select` becomes
+  // `onSelect`, typed there as a `ReactEventHandler`. Ours carries a Helix
+  // event and is not assignable to that, so no constraint mentioning
+  // `BaseProps` can admit the very interfaces this exists to serve. The
+  // generated side is what enforces the shape; every caller is generated.
+  // `children` is the one member the body reads, so it is the one the
+  // constraint has to guarantee.
+  Props extends { children?: ReactNode },
+>({
   events,
   properties,
   tagName,

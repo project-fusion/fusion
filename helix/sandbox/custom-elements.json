@@ -79,6 +79,36 @@
             },
             {
               "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "finalizeStyles",
               "privacy": "protected",
               "static": true,
@@ -358,6 +388,36 @@
             },
             {
               "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "finalizeStyles",
               "privacy": "protected",
               "static": true,
@@ -576,6 +636,36 @@
             },
             {
               "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "finalizeStyles",
               "privacy": "protected",
               "static": true,
@@ -603,11 +693,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixSourceChangeEvent"
+                "text": "HelixValueChangeEvent"
               },
               "description": "Fired when the source is edited.",
-              "name": "SourceChange",
-              "reactProp": "onSourceChange"
+              "name": "helix-value-change",
+              "reactProp": "onValueChange"
             }
           ],
           "attributes": [

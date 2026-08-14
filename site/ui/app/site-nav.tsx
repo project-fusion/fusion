@@ -1,6 +1,7 @@
 'use client'
 
-import type { HelixOpenChangeEvent } from '@helix-io/web'
+import { Drawer } from '@helix-io/react'
+import type { HelixOpenEvent } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -91,12 +92,7 @@ export function SiteNav() {
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
-      <helix-drawer
-        label="Site navigation"
-        onOpenChange={(event: HelixOpenChangeEvent) => setOpen(event.detail.open)}
-        open={open}
-        placement="end"
-      >
+      <Drawer.Root label="Site navigation" onOpenChange={setOpen} open={open} placement="end">
         <helix-flex align="start" class="navDrawer" direction="column" gap="lg">
           {VERTICALS.map((vertical) => (
             <a
@@ -113,7 +109,7 @@ export function SiteNav() {
             Get in touch
           </a>
         </helix-flex>
-      </helix-drawer>
+      </Drawer.Root>
     </>
   )
 }

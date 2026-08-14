@@ -133,7 +133,21 @@ for (const [group, parts] of [...groups].sort(([a], [b]) => a.localeCompare(b)))
     body.push(` *`)
     body.push(` * Renders \`<${declaration.tagName}>\`.`)
     body.push(` */`)
-    body.push(`export interface ${propsName} extends BaseProps {`)
+    // React's own `HTMLAttributes` already declares some of the props an event
+    // derives: `helix-select` becomes `onSelect`, which React types as a
+    // `ReactEventHandler`. Ours carries a Helix event and is not assignable to
+    // that, so extending `BaseProps` unmodified is a type error. Omitting the
+    // ones we generate lets our typed handler win, which is what a consumer
+    // wants: our `onSelect` fires for `helix-select`, not for text selection.
+    const eventProps = events.map(
+      (event) => event.reactProp ?? `on${kebabToCamel(`-${event.name}`)}`,
+    )
+    const omitted = eventProps
+      .map((prop) => `'${prop}'`)
+      .sort()
+      .join(' | ')
+    const base = omitted ? `Omit<BaseProps, ${omitted}>` : 'BaseProps'
+    body.push(`export interface ${propsName} extends ${base} {`)
     for (const member of members.sort((a, b) => a.name.localeCompare(b.name))) {
       if (member.description) {
         body.push(`  /** ${member.description.replace(/\s+/g, ' ').trim()} */`)

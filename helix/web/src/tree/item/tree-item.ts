@@ -30,7 +30,7 @@ import { styles } from './tree-item.css.js'
  * @csspart label - The label text.
  * @csspart group - The container for nested items.
  *
- * @event {HelixSelectionChangeEvent} SelectionChange - Fired when the item is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  *
  * @cssproperty --tree-indent - Indent added per level.
  */

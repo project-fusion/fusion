@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixSelectionChangeEvent } from '@helix-io/core'
+import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -23,7 +23,7 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart item - The radio button.
  *
- * @event {HelixSelectionChangeEvent} SelectionChange - Fired when the item is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  */
 @customElement('helix-base-toggle')
 export class HelixBaseToggle extends HelixElement {
@@ -49,7 +49,7 @@ export class HelixBaseToggle extends HelixElement {
     if (this.disabled) {
       return
     }
-    this.dispatchEvent(new HelixSelectionChangeEvent({ value: this.value }))
+    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
   protected override render(): TemplateResult {

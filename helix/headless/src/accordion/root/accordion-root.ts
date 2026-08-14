@@ -1,4 +1,4 @@
-import { customElement, HelixElement, type HelixOpenChangeEvent } from '@helix-io/core'
+import { customElement, HelixElement } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseAccordionItem } from '../item/accordion-item.js'
@@ -10,10 +10,18 @@ const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
  * @summary Groups collapsible sections, one open at a time by default.
  *
  * @description
- * Coordination is by event rather than by registration. Items dispatch
- * `OpenChange`, which bubbles and is composed, so the accordion learns that one
- * opened by listening to itself. No ready handshake, no child registry, and
- * nothing to keep in step when items are added or removed.
+ * Holds the mode and nothing else. The item that was clicked is what
+ * coordinates: it walks up to the nearest accordion, reads the mode off it, and
+ * closes its peers itself.
+ *
+ * That is structural rather than a subscription, and it has to be. `helix-open`
+ * does not bubble and is not composed, because overlays nest and an inner one's
+ * lifecycle must never read as the outer one's. So an accordion cannot learn
+ * that a child opened by listening, and asking it to would mean a second,
+ * bubbling event whose only purpose was to say the same thing again.
+ *
+ * Resolving on demand also means there is no registry to keep in step: an item
+ * added a second after render coordinates on its first click, with no handshake.
  *
  * Items are matched with `instanceof HelixBaseAccordionItem`, never by tag
  * name. A headless component that looked for `helix-accordion-item` would only
@@ -28,34 +36,28 @@ const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
  * @documentation https://helix.fusion.dev/components/accordion
  *
  * @slot - The accordion's items.
- *
- * @csspart container - The stack of items.
  */
 @customElement('helix-base-accordion')
 export class HelixBaseAccordion extends HelixElement {
-  /** Whether more than one item may be open at once. */
-  @property({ reflect: true, type: Boolean })
-  multiple = false
+  /**
+   * How many sections may be open at once.
+   *
+   * Absent is `multiple`, so nothing closes unexpectedly and the default costs
+   * no attribute on the host. `single` keeps exactly one open and refuses to
+   * close the last; `single-collapsible` keeps at most one and lets it close.
+   *
+   * One property rather than a mode plus a `collapsible` boolean, because
+   * `collapsible` alongside `multiple` is a combination that means nothing and
+   * a union can simply not offer it.
+   */
+  @property({ reflect: true })
+  mode?: 'single' | 'single-collapsible'
 
-  /** Items in light-DOM order. Client only: the server has no children to read. */
-  private get items(): HelixBaseAccordionItem[] {
+  /** Direct items, in light-DOM order. Client only: the server has no tree. */
+  get items(): HelixBaseAccordionItem[] {
     return [...this.children].filter(
       (child): child is HelixBaseAccordionItem => child instanceof HelixBaseAccordionItem,
     )
-  }
-
-  private readonly handleOpenChange = (event: Event): void => {
-    if (this.multiple || !(event as HelixOpenChangeEvent).detail.open) {
-      return
-    }
-    // Retargeting means `target` is the item, not the button inside its shadow
-    // root, which is exactly the granularity needed here.
-    const opened = event.target
-    for (const item of this.items) {
-      if (item !== opened && item.isOpen) {
-        item.setOpen(false)
-      }
-    }
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -87,18 +89,16 @@ export class HelixBaseAccordion extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('OpenChange', this.handleOpenChange)
     this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('OpenChange', this.handleOpenChange)
     this.removeEventListener('keydown', this.handleKeydown)
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="container"><slot></slot></div>`
+    return html`<slot></slot>`
   }
 }
 

@@ -3,15 +3,20 @@ export { FocusTrapController } from './controllers/focus-trap.js'
 export { createSheet } from './create-sheet.js'
 export { customElement } from './custom-element.js'
 export {
-  HelixOpenChangeEvent,
-  HelixRemoveRequestEvent,
-  HelixSelectionChangeEvent,
-  HelixSourceChangeEvent,
-  type OpenChangeDetail,
-  type RemoveRequestDetail,
-  type SelectionChangeDetail,
-  type SourceChangeDetail,
+  HelixCloseEvent,
+  HelixOpenEvent,
+  HelixRemoveEvent,
+  HelixSelectEvent,
+  HelixValueChangeEvent,
+  type OpenDetail,
+  type RemoveDetail,
+  type SelectDetail,
+  type ValueChangeDetail,
 } from './events.js'
 export { HelixFormElement } from './form-element.js'
 export { HelixElement } from './helix-element.js'
 export { WithOpen, type WithOpenInterface } from './mixins/with-open.js'
+export {
+  type ControlledChangeOptions,
+  requestControlledChange,
+} from './request-controlled-change.js'

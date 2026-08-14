@@ -12,6 +12,35 @@ export interface ConventionLintOptions {
 /** Words that describe how a component looks rather than what it is for. */
 const APPEARANCE_OPENERS = ['themed', 'a styled', 'styled', 'a themed']
 
+/**
+ * Native events a component may re-emit from its host under the native name.
+ *
+ * Relaying is what makes a component behave like the control it wraps, and the
+ * name has to be the native one for a consumer, and for React, to hear it.
+ */
+const RELAYED_NATIVE = new Set(['blur', 'change', 'focus', 'input', 'invalid'])
+
+/**
+ * Verbs React's synthetic system claims on a custom element.
+ *
+ * Measured rather than assumed: a probe dispatched each name from a custom
+ * element and recorded which fired the matching React prop. `select`, `close`,
+ * `toggle`, `open`, `dismiss`, `navigate` and `remove` are all free, which is
+ * what lets the verb-only form work.
+ */
+const REACT_CLAIMED = new Set([
+  'blur',
+  'change',
+  'copy',
+  'drag',
+  'focus',
+  'input',
+  'paste',
+  'reset',
+  'scroll',
+  'submit',
+])
+
 const EM_DASH = /[—–]/
 
 /**
@@ -118,31 +147,37 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
             `${declaration.name}:${event.name}`,
             'Event has no description. Events are public API.',
           )
-          // React strips `on` from a prop and uses the remainder verbatim as
-          // the event name, so the name decides the React API. Two rules:
+          // The name decides the framework prop, because the manifest derives
+          // one from the other by stripping `helix-` and camel-casing. Two
+          // rules follow.
           //
-          // PascalCase, because every native event name is lowercase, so
-          // casing alone makes a collision with one impossible. That matters
-          // because an event from inside a shadow root is retargeted to look
-          // like it came from the host.
-          //
-          // Compound, because a single word is reachable through a React
-          // synthetic handler that has already claimed it: an event named
-          // `Change` would be bound by `onChange`, which React wires to the
-          // native `change`, so ours would never fire.
+          // Prefixed and lowercase, because an event from inside a shadow root
+          // is retargeted to look like it came from the host: a bare `input`
+          // from a `<helix-input>` is indistinguishable from the inner
+          // control's own. A relayed native event is exempt, since being
+          // indistinguishable from the native one is the entire point of it.
           check(
-            /^[A-Z][A-Za-z0-9]*$/.test(event.name),
-            'pascal-events',
+            /^helix-[a-z][a-z0-9-]*$/.test(event.name) || RELAYED_NATIVE.has(event.name),
+            'prefixed-events',
             path,
             `${declaration.name}:${event.name}`,
-            'Event names must be PascalCase, which cannot collide with a native event.',
+            'Event names must be `helix-{verb}`, or a native name being relayed.',
           )
+          // Verbs React has already claimed cannot be used, because stripping
+          // the prefix lands on a prop its synthetic system owns: a
+          // `helix-change` becomes `onChange`, which React has wired to the
+          // native `change`, so ours would never fire. Measured in a browser,
+          // not assumed.
+          //
+          // A relayed native is exempt, and has to be: landing on the prop
+          // React already wired to that event is precisely what relaying is
+          // for.
           check(
-            (event.name.match(/[A-Z]/g) ?? []).length >= 2,
-            'compound-events',
+            RELAYED_NATIVE.has(event.name) || !REACT_CLAIMED.has(event.name.replace(/^helix-/, '')),
+            'claimed-events',
             path,
             `${declaration.name}:${event.name}`,
-            'Event names must be compound (OpenChange, not Change), or a React synthetic handler claims the prop.',
+            'React already owns this prop. Qualify the verb (helix-value-change, not helix-change).',
           )
         }
 

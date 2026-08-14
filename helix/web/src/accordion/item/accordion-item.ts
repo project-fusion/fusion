@@ -29,7 +29,7 @@ import { styles } from './accordion-item.css.js'
  * @csspart content - The revealed region.
  * @csspart content-inner - Padding wrapper inside the animated region.
  *
- * @event {HelixOpenChangeEvent} OpenChange - Fired when the item opens or closes.
+ * @event {HelixOpenEvent} helix-open - Fired when the item opens or closes.
  *
  * @cssproperty --accordion-item-padding - Inset of the trigger and content.
  */

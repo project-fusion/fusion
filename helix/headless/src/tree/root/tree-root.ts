@@ -36,7 +36,7 @@ const KEYS = new Set([
  *
  * @csspart tree - The tree container.
  *
- * @event {HelixSelectionChangeEvent} SelectionChange - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+ * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
  */
 @customElement('helix-base-tree')
 export class HelixBaseTree extends HelixElement {
@@ -163,13 +163,13 @@ export class HelixBaseTree extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('SelectionChange', this.handleSelection)
+    this.addEventListener('helix-select', this.handleSelection)
     this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('SelectionChange', this.handleSelection)
+    this.removeEventListener('helix-select', this.handleSelection)
     this.removeEventListener('keydown', this.handleKeydown)
   }
 

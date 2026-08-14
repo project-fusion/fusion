@@ -7,7 +7,7 @@ import type {
   HelixBaseTabs,
   HelixBaseTabsPanel,
   HelixBaseTabsTab,
-  HelixSelectionChangeEvent,
+  HelixSelectEvent,
 } from '@helix-io/headless'
 
 /**
@@ -22,7 +22,7 @@ panel is cheap; a set where it is not should use `manual`.
  *
  * Renders `<helix-base-tabs>`.
  */
-export interface BaseTabsProps extends BaseProps {
+export interface BaseTabsProps extends Omit<BaseProps, 'onSelect'> {
   /** Accessible name for the tab list. */
   label?: string
   /** Whether arrowing to a tab also selects it. Automatic is the default because showing a panel is usually cheap. Set this where it is not, so a reader arrowing past four tabs does not load four panels on the way. */
@@ -30,11 +30,11 @@ export interface BaseTabsProps extends BaseProps {
   /** Value of the selected tab. */
   value?: string
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
-  onSelectionChange?: (event: HelixSelectionChangeEvent) => void
+  onSelect?: (event: HelixSelectEvent) => void
 }
 
 export const BaseTabsRoot = createComponent<HelixBaseTabs, BaseTabsProps>({
-  events: { SelectionChange: 'onSelectionChange' },
+  events: { 'helix-select': 'onSelect' },
   properties: ['manual'],
   tagName: 'helix-base-tabs',
 })
@@ -69,7 +69,7 @@ differ between the server's render and the client's and break the link, and
  *
  * Renders `<helix-base-tabs-tab>`.
  */
-export interface BaseTabsTabProps extends BaseProps {
+export interface BaseTabsTabProps extends Omit<BaseProps, 'onSelect'> {
   /** Whether the tab can be chosen. */
   disabled?: boolean
   /** Whether this tab is the current one. */
@@ -77,11 +77,11 @@ export interface BaseTabsTabProps extends BaseProps {
   /** Identifies the tab, and pairs it with the panel of the same value. */
   value?: string
   /** Fired when the tab is chosen. */
-  onSelectionChange?: (event: HelixSelectionChangeEvent) => void
+  onSelect?: (event: HelixSelectEvent) => void
 }
 
 export const BaseTabsTab = createComponent<HelixBaseTabsTab, BaseTabsTabProps>({
-  events: { SelectionChange: 'onSelectionChange' },
+  events: { 'helix-select': 'onSelect' },
   properties: ['disabled', 'selected'],
   tagName: 'helix-base-tabs-tab',
 })
