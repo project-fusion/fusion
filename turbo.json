@@ -16,11 +16,15 @@
       "persistent": true
     },
     "icons": {
-      "inputs": ["raw/**"],
+      "inputs": ["raw/**", "$TURBO_ROOT$/tooling/scripts/build-icons.mjs"],
       "outputs": ["src/generated.ts"]
     },
     "styles": {
-      "inputs": ["src/**/*.css"],
+      "inputs": [
+        "src/**/*.css",
+        "$TURBO_ROOT$/tooling/scripts/build-styles.mjs",
+        "$TURBO_ROOT$/tooling/scripts/build-elements-css.mjs"
+      ],
       "outputs": ["src/**/*.css.ts"]
     },
     "test": {

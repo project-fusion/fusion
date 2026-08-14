@@ -1,1 +1,6 @@
-<helix-button href="https://example.test" target="_blank">Opens a new tab</helix-button>
+<!-- A link that looks like a button is styling, so it is styling. Button
+     renders no anchor: a router renders its own, and cannot render it inside a
+     shadow root. -->
+<a data-button="primary" href="https://example.test" rel="noreferrer" target="_blank">
+  Opens a new tab
+</a>

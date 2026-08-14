@@ -17,7 +17,7 @@
  *
  * Run with `bun run styles` (part of `build`).
  */
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const IGNORED = new Set(['.git', '.local', '.next', '.turbo', 'dist', 'node_modules', 'target'])
@@ -25,15 +25,15 @@ const IGNORED = new Set(['.git', '.local', '.next', '.turbo', 'dist', 'node_modu
 /** The styles package ships raw CSS to consumers; it has no components. */
 const SKIP = /helix[/\\]styles[/\\]/
 
-const walk = function* (dir) {
+const walk = function* (dir, suffix) {
   for (const entry of readdirSync(dir)) {
     if (IGNORED.has(entry)) {
       continue
     }
     const full = join(dir, entry)
     if (statSync(full).isDirectory()) {
-      yield* walk(full)
-    } else if (entry.endsWith('.css')) {
+      yield* walk(full, suffix)
+    } else if (entry.endsWith(suffix)) {
       yield full
     }
   }
@@ -52,7 +52,7 @@ const escapeForTemplate = (css) =>
 const root = process.argv[2] ?? process.cwd()
 let written = 0
 
-for (const file of walk(root)) {
+for (const file of walk(root, '.css')) {
   const rel = relative(root, file)
   if (SKIP.test(rel)) {
     continue
@@ -79,4 +79,27 @@ export const styles = createSheet(\`${escapeForTemplate(css)}\`)
   }
 }
 
-console.log(written === 0 ? 'styles: already current' : `styles: compiled ${written} stylesheet(s)`)
+/**
+ * Deletes generated modules whose stylesheet is gone.
+ *
+ * Output is a declared Turborepo output, so it is restored from cache on every
+ * run. Deleting the `.css` alone therefore leaves the `.css.ts` behind and the
+ * cache puts it back, which is how a component that no longer exists kept a
+ * directory and a stylesheet in the tree.
+ */
+let pruned = 0
+for (const file of walk(root, '.css.ts')) {
+  if (SKIP.test(relative(root, file))) {
+    continue
+  }
+  try {
+    statSync(file.slice(0, -3))
+  } catch {
+    rmSync(file)
+    pruned += 1
+  }
+}
+
+const compiled =
+  written === 0 ? 'styles: already current' : `styles: compiled ${written} stylesheet(s)`
+console.log(pruned === 0 ? compiled : `${compiled}, pruned ${pruned} orphan(s)`)
