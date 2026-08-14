@@ -41,13 +41,15 @@ describe('avatar', () => {
     expect(avatar.hasAttribute('aria-label')).toBe(false)
   })
 
-  test('label overrides the name for what is announced', async () => {
+  test('an author `aria-label` overrides the name for what is announced', async () => {
     const avatar = (await mount(
-      '<helix-avatar label="The design team" name="Ross Sheppard"></helix-avatar>',
+      '<helix-avatar aria-label="The design team" name="Ross Sheppard"></helix-avatar>',
     )) as HTMLElement & { internals?: ElementInternals }
-    // Initials still come from the name, because that is what they are drawn
-    // from; only what is announced changes.
-    expect(avatar.internals?.ariaLabel).toBe('The design team')
+    // The attribute takes precedence over the implicit name from internals, so
+    // no property mirrors it. Initials still come from the name, because that is
+    // what they are drawn from; only what is announced changes.
+    expect(avatar.getAttribute('aria-label')).toBe('The design team')
+    expect(avatar.internals?.ariaLabel).toBe('Ross Sheppard')
     expect(part(avatar, 'initials')?.textContent?.trim()).toBe('RS')
   })
 

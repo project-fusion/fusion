@@ -9,9 +9,10 @@ import type { HelixBaseAvatar } from '@helix-io/headless'
  * Shows `src` until it fails to load. Without an image, or after a failure,
 the default slot is shown; its own fallback is the initials.
 
-The host carries the accessible name, so the `<img>` takes an empty `alt` and
-the initials are hidden from assistive technology. Announcing either would
-repeat the name.
+The host carries the accessible name, taken from `name`, so the `<img>` has an
+empty `alt` and the initials are hidden from assistive technology. Announcing
+either would repeat the name. An `aria-label` on the host overrides `name`,
+for an avatar standing for something a person's name does not describe.
 
 `load` and `error` are relayed from the host. They are not composed, so they
 stop at the shadow boundary otherwise.
@@ -19,8 +20,6 @@ stop at the shadow boundary otherwise.
  * Renders `<helix-base-avatar>`.
  */
 export interface BaseAvatarProps extends Omit<BaseProps, 'onError' | 'onLoad'> {
-  /** Accessible name. Falls back to `name`, which the initials come from. */
-  label?: string
   /** Name of the person or entity. Used for the label and the initials. */
   name?: string
   /** Image to show. Falls back to the slot, or to initials, if it fails. */

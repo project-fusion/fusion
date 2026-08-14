@@ -197,6 +197,33 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
+export type HelixSandboxPreviewProps = {
+  /** Markup to render. */
+  source?: HelixSandboxPreview["source"];
+  /** Stylesheet applied to the preview.
+
+Scoped by being written into the preview's own subtree rather than the
+document, so an example that restyles `helix-card` restyles the one being
+previewed and not the sandbox around it. */
+  styles?: HelixSandboxPreview["styles"];
+};
+
+export type HelixSandboxPreviewSolidJsProps = {
+  /** Markup to render. */
+  "prop:source"?: HelixSandboxPreview["source"];
+  /** Stylesheet applied to the preview.
+
+Scoped by being written into the preview's own subtree rather than the
+document, so an example that restyles `helix-card` restyles the one being
+previewed and not the sandbox around it. */
+  "prop:styles"?: HelixSandboxPreview["styles"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixSandboxProps = {
   /** Whether the panes sit side by side or stacked. */
   orientation?: HelixSandbox["orientation"];
@@ -287,34 +314,34 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   textContent?: string | number;
 };
 
-export type HelixSandboxPreviewProps = {
-  /** Markup to render. */
-  source?: HelixSandboxPreview["source"];
-  /** Stylesheet applied to the preview.
-
-Scoped by being written into the preview's own subtree rather than the
-document, so an example that restyles `helix-card` restyles the one being
-previewed and not the sandbox around it. */
-  styles?: HelixSandboxPreview["styles"];
-};
-
-export type HelixSandboxPreviewSolidJsProps = {
-  /** Markup to render. */
-  "prop:source"?: HelixSandboxPreview["source"];
-  /** Stylesheet applied to the preview.
-
-Scoped by being written into the preview's own subtree rather than the
-document, so an example that restyles `helix-card` restyles the one being
-previewed and not the sandbox around it. */
-  "prop:styles"?: HelixSandboxPreview["styles"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type CustomElements = {
+  /**
+   * Renders into the light DOM rather than a shadow root, which is the whole
+   * reason this is an element and not a `<div>` someone sets `innerHTML` on.
+   * Content inside a shadow root is cut off from the base layer, so a heading
+   * would come out at the browser's default size and a link in the wrong color,
+   * and the preview would be a worse likeness the more the design system does.
+   * In the light DOM it is styled exactly as it would be on a real page.
+   *
+   * **The source is trusted.** It is markup a developer typed into their own
+   * sandbox, and it is rendered as markup. Never point this at input from anyone
+   * else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `source`: Markup to render.
+   * - `styles`: Stylesheet applied to the preview.
+   *
+   * Scoped by being written into the preview's own subtree rather than the
+   * document, so an example that restyles `helix-card` restyles the one being
+   * previewed and not the sandbox around it.
+   */
+  "helix-sandbox-preview": Partial<
+    HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents
+  >;
+
   /**
    * Coordination is by event, the same way the accordion does it: a source pane
    * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
@@ -408,7 +435,9 @@ export type CustomElements = {
   "helix-sandbox-source": Partial<
     HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
   >;
+};
 
+export type CustomElementsSolidJs = {
   /**
    * Renders into the light DOM rather than a shadow root, which is the whole
    * reason this is an element and not a `<div>` someone sets `innerHTML` on.
@@ -433,11 +462,12 @@ export type CustomElements = {
    * previewed and not the sandbox around it.
    */
   "helix-sandbox-preview": Partial<
-    HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents
+    HelixSandboxPreviewProps &
+      HelixSandboxPreviewSolidJsProps &
+      BaseProps<HelixSandboxPreview> &
+      BaseEvents
   >;
-};
 
-export type CustomElementsSolidJs = {
   /**
    * Coordination is by event, the same way the accordion does it: a source pane
    * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
@@ -535,36 +565,6 @@ export type CustomElementsSolidJs = {
     HelixSandboxSourceProps &
       HelixSandboxSourceSolidJsProps &
       BaseProps<HelixSandboxSource> &
-      BaseEvents
-  >;
-
-  /**
-   * Renders into the light DOM rather than a shadow root, which is the whole
-   * reason this is an element and not a `<div>` someone sets `innerHTML` on.
-   * Content inside a shadow root is cut off from the base layer, so a heading
-   * would come out at the browser's default size and a link in the wrong color,
-   * and the preview would be a worse likeness the more the design system does.
-   * In the light DOM it is styled exactly as it would be on a real page.
-   *
-   * **The source is trusted.** It is markup a developer typed into their own
-   * sandbox, and it is rendered as markup. Never point this at input from anyone
-   * else.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `source`: Markup to render.
-   * - `styles`: Stylesheet applied to the preview.
-   *
-   * Scoped by being written into the preview's own subtree rather than the
-   * document, so an example that restyles `helix-card` restyles the one being
-   * previewed and not the sandbox around it.
-   */
-  "helix-sandbox-preview": Partial<
-    HelixSandboxPreviewProps &
-      HelixSandboxPreviewSolidJsProps &
-      BaseProps<HelixSandboxPreview> &
       BaseEvents
   >;
 };

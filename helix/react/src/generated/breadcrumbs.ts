@@ -11,10 +11,7 @@ because a truncated path tells the reader less than a two-line one.
  *
  * Renders `<helix-breadcrumbs>`.
  */
-export interface BreadcrumbsProps extends BaseProps {
-  /** Accessible name for the landmark. Named rather than left bare because a page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them. */
-  label?: string
-}
+export interface BreadcrumbsProps extends BaseProps {}
 
 export const BreadcrumbsRoot = createComponent<HelixBreadcrumbs, BreadcrumbsProps>({
   events: {},

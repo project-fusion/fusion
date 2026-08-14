@@ -14,8 +14,6 @@ every size, including one a consumer sets themselves through
  * Renders `<helix-avatar>`.
  */
 export interface AvatarProps extends Omit<BaseProps, 'onError' | 'onLoad'> {
-  /** Accessible name. Falls back to `name`, which the initials come from. */
-  label?: string
   /** Name of the person or entity. Used for the label and the initials. */
   name?: string
   /** Whether the avatar is a circle or a rounded square. */
