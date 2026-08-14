@@ -3291,6 +3291,570 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/calendar/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/calendar/root/calendar-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/calendar/root/calendar-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/calendar/root/calendar-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/calendar/root/calendar-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Six week rows always, so the grid keeps one height and a month change does\nnot move whatever sits beneath it.\n\nDays from the neighbouring months stay in place and stay selectable, marked\nquieter rather than hidden, so the first and last weeks are whole and the\ngrid reads as a continuous run of dates.",
+          "name": "HelixCalendar",
+          "cssProperties": [
+            {
+              "description": "Width and height of a day.",
+              "name": "--calendar-day-size"
+            },
+            {
+              "description": "Fill behind the selected day.",
+              "name": "--calendar-selected-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The selected date, as `YYYY-MM-DD`.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "month",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.",
+              "attribute": "month",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Earliest selectable date, as `YYYY-MM-DD`.",
+              "attribute": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Latest selectable date, as `YYYY-MM-DD`.",
+              "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Calendar'",
+              "description": "Accessible name for the grid.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "firstDay",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
+              "attribute": "first-day",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "focused",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The date the grid's tab stop is on. Absent until the grid is used.",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shown",
+              "type": {
+                "text": "Date"
+              },
+              "privacy": "private",
+              "description": "The month being shown, resolved from `month`, then `value`, then today.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "anchor",
+              "type": {
+                "text": "Date"
+              },
+              "privacy": "private",
+              "description": "The date the tab stop sits on, which is where the arrows move from.\n\nIt has to be a date the grid actually renders, so the month is compared\nwith its year. Comparing the month alone puts the stop on the same date a\nyear away, which is rendered nowhere, and the grid is left with no tab stop\nat all and no way into it from the keyboard.\n\nEach candidate is tested in turn rather than the first one winning\noutright. Where the last date focused is in some other month, the selected\ndate still holds the stop, and only with neither in view does it fall to\nthe first of the month.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "weeks",
+              "type": {
+                "text": "Date[][]"
+              },
+              "privacy": "private",
+              "description": "Six weeks of dates, so the grid does not change height between months.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "outOfRange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "moveTo",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseCalendar",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Shows a month, and takes a date from it.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/calendar",
+            "aliases": [
+              "Date grid",
+              "Month view"
+            ],
+            "tier": "styled",
+            "group": "Calendar",
+            "part": "Root"
+          },
+          "tagName": "helix-calendar",
+          "customElement": true,
+          "cssParts": [
+            {
+              "description": "The month name and its controls.",
+              "name": "header",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the previous month.",
+              "name": "previous",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the next month.",
+              "name": "next",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "The month and year being shown.",
+              "name": "heading",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "The grid of days.",
+              "name": "grid",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "A column header naming a day of the week.",
+              "name": "weekday",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "One row of days.",
+              "name": "week",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "One day.",
+              "name": "day",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The selected date, as `YYYY-MM-DD`.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "month",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.",
+              "fieldName": "month",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Earliest selectable date, as `YYYY-MM-DD`.",
+              "fieldName": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Latest selectable date, as `YYYY-MM-DD`.",
+              "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Calendar'",
+              "description": "Accessible name for the grid.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "first-day",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
+              "fieldName": "firstDay",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when a date is chosen, with the ISO date.",
+              "name": "helix-select",
+              "reactProp": "onSelect",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/calendar/root/calendar-root.ts",
+          "definitionPath": "src/calendar/root/calendar-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCalendar",
+          "declaration": {
+            "name": "HelixCalendar",
+            "module": "src/calendar/root/calendar-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-calendar",
+          "declaration": {
+            "name": "HelixCalendar",
+            "module": "src/calendar/root/calendar-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/callout/index.ts",
       "declarations": [],
       "exports": [
@@ -6088,6 +6652,14 @@
           "declaration": {
             "name": "*",
             "module": "src/button-group/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/calendar/index.js"
           }
         },
         {

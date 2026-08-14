@@ -11,6 +11,7 @@ import type {
   HelixBreadcrumbs,
   HelixButton,
   HelixButtonGroup,
+  HelixCalendar,
   HelixCallout,
   HelixCard,
   HelixDismissEvent,
@@ -664,6 +665,56 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   "prop:focusable"?: HelixButton["focusable"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixCalendar` component event */
+export type HelixCalendarElementEvent<E = Event> = TypedEvent<HelixCalendar, E>;
+/** `helix-select` event type */
+export type HelixCalendarHelixSelectElementEvent =
+  HelixCalendarElementEvent<HelixSelectEvent>;
+
+export type HelixCalendarProps = {
+  /** The selected date, as `YYYY-MM-DD`. */
+  value?: HelixCalendar["value"];
+  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
+  month?: HelixCalendar["month"];
+  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  min?: HelixCalendar["min"];
+  /** Latest selectable date, as `YYYY-MM-DD`. */
+  max?: HelixCalendar["max"];
+  /** Accessible name for the grid. */
+  label?: HelixCalendar["label"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "first-day"?: HelixCalendar["firstDay"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  firstDay?: HelixCalendar["firstDay"];
+
+  /** Fired when a date is chosen, with the ISO date. */
+  "onhelix-select"?: (e: HelixCalendarHelixSelectElementEvent) => void;
+};
+
+export type HelixCalendarSolidJsProps = {
+  /** The selected date, as `YYYY-MM-DD`. */
+  "prop:value"?: HelixCalendar["value"];
+  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
+  "prop:month"?: HelixCalendar["month"];
+  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  "prop:min"?: HelixCalendar["min"];
+  /** Latest selectable date, as `YYYY-MM-DD`. */
+  "prop:max"?: HelixCalendar["max"];
+  /** Accessible name for the grid. */
+  "prop:label"?: HelixCalendar["label"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "attr:first-day"?: HelixCalendar["firstDay"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "prop:firstDay"?: HelixCalendar["firstDay"];
+  /** Fired when a date is chosen, with the ISO date. */
+  "on:helix-select"?: (e: HelixCalendarHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2087,6 +2138,55 @@ export type CustomElements = {
    */
   "helix-button": Partial<
     HelixButtonProps & BaseProps<HelixButton> & BaseEvents
+  >;
+
+  /**
+   * Six week rows always, so the grid keeps one height and a month change does
+   * not move whatever sits beneath it.
+   *
+   * Days from the neighbouring months stay in place and stay selectable, marked
+   * quieter rather than hidden, so the first and last weeks are whole and the
+   * grid reads as a continuous run of dates.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The selected date, as `YYYY-MM-DD`.
+   * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
+   * - `label`: Accessible name for the grid.
+   * - `first-day`/`firstDay`: First column of the week, `0` for Sunday through `6` for Saturday.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a date is chosen, with the ISO date.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
+   * - `--calendar-selected-color`: Fill behind the selected day. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The month name and its controls.
+   * - `previous`: The control that moves to the previous month.
+   * - `next`: The control that moves to the next month.
+   * - `heading`: The month and year being shown.
+   * - `grid`: The grid of days.
+   * - `weekday`: A column header naming a day of the week.
+   * - `week`: One row of days.
+   * - `day`: One day.
+   */
+  "helix-calendar": Partial<
+    HelixCalendarProps & BaseProps<HelixCalendar> & BaseEvents
   >;
 
   /**
@@ -3799,6 +3899,58 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Six week rows always, so the grid keeps one height and a month change does
+   * not move whatever sits beneath it.
+   *
+   * Days from the neighbouring months stay in place and stay selectable, marked
+   * quieter rather than hidden, so the first and last weeks are whole and the
+   * grid reads as a continuous run of dates.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The selected date, as `YYYY-MM-DD`.
+   * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
+   * - `label`: Accessible name for the grid.
+   * - `first-day`/`firstDay`: First column of the week, `0` for Sunday through `6` for Saturday.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a date is chosen, with the ISO date.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
+   * - `--calendar-selected-color`: Fill behind the selected day. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The month name and its controls.
+   * - `previous`: The control that moves to the previous month.
+   * - `next`: The control that moves to the next month.
+   * - `heading`: The month and year being shown.
+   * - `grid`: The grid of days.
+   * - `weekday`: A column header naming a day of the week.
+   * - `week`: One row of days.
+   * - `day`: One day.
+   */
+  "helix-calendar": Partial<
+    HelixCalendarProps &
+      HelixCalendarSolidJsProps &
+      BaseProps<HelixCalendar> &
+      BaseEvents
+  >;
+
+  /**
    * Tinted from the severity's status color with `color-mix`, and marked with a
    * bar on the inline start so the severity survives being read in greyscale or
    * by anyone who does not distinguish the hues.
@@ -5089,6 +5241,10 @@ export type CustomCssProperties = {
   "--button-foreground-color"?: string;
   /** Corner radius of the control. */
   "--button-radii"?: string;
+  /** Width and height of a day. */
+  "--calendar-day-size"?: string;
+  /** Fill behind the selected day. */
+  "--calendar-selected-color"?: string;
   /** Fill behind the callout. */
   "--callout-background-color"?: string;
   /** Corner radius of the callout. */

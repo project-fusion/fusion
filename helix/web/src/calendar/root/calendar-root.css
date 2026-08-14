@@ -1,0 +1,105 @@
+:host {
+  display: inline-block;
+
+  --_calendar-day: var(--calendar-day-size, var(--helix-size-control-dense));
+}
+
+[part="header"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-2xs);
+  justify-content: space-between;
+  margin-block-end: var(--helix-space-xs);
+}
+
+[part="heading"] {
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="previous"],
+[part="next"] {
+  all: unset;
+  align-items: center;
+  block-size: var(--_calendar-day);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--_calendar-day);
+  justify-content: center;
+}
+
+[part="previous"]:hover,
+[part="next"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+  color: var(--helix-color-foreground);
+}
+
+[part="previous"] svg,
+[part="next"] svg {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
+[part="week"] {
+  display: grid;
+  grid-template-columns: repeat(7, var(--_calendar-day));
+}
+
+[part="weekday"] {
+  align-items: center;
+  color: var(--helix-color-foreground-subtle);
+  display: inline-flex;
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  justify-content: center;
+  block-size: var(--_calendar-day);
+}
+
+[part="day"] {
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: var(--helix-text-sm);
+  justify-content: center;
+  block-size: var(--_calendar-day);
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Days either side of the month stay in place and stay selectable, so the
+   first and last weeks are whole rows rather than ragged ones. */
+[part="day"][data-outside] {
+  color: var(--helix-color-foreground-subtle);
+}
+
+[part="day"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+[part="day"][aria-selected] {
+  background-color: var(--calendar-selected-color, var(--helix-color-primary));
+  color: var(--helix-color-foreground-on-accent);
+}
+
+[part="day"][aria-disabled] {
+  color: var(--helix-color-foreground-subtle);
+  cursor: default;
+  opacity: 0.4;
+}
+
+[part="day"][aria-disabled]:hover {
+  background-color: transparent;
+}
+
+[part="day"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="day"] {
+    transition: none;
+  }
+}
