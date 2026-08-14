@@ -1,31 +1,17 @@
-/* Hoisted into `elements.css` by the build, because a registration inside a
-   shadow root never takes effect. It is declared here, beside the property it
-   describes, and the generator is what puts it where it works.
-
-   Registration is what makes the `em` resolve on the host, where a consumer
-   writes it, and not here on the indicator, whose font size is 0.625 of the
-   host: unregistered, `0.5em` would mean 5px where the consumer wrote 8. */
-@property --badge-offset {
-  inherits: true;
-  initial-value: 0px;
-  syntax: "<length>";
-}
-
 :host {
   display: inline-flex;
   position: relative;
   vertical-align: middle;
 
-  /* Relative to the decorated element rather than on the type scale: a badge on
-     a 16px icon and one on a 32px avatar are the same mark at two sizes.
-
-     Only `--_badge-text` resolves against the host. The rest are used on the
-     indicator, whose own font size it sets, so their `em` is that: at a 16px
-     host the indicator is 10px, `1.25em` is 12.5px, and `0.8em` is 8px. */
-  --_badge-size: 1.25em;
-  --_badge-text: 0.625em;
-  --_badge-inset: 0.375em;
-  --_badge-dot: 0.8em;
+  /* Tokens, like every other component's sizing. These were `em`, on the
+     premise that the mark would scale with what it decorates. It does not: the
+     badge inherits `font-size` from the page, and an avatar sizes itself from
+     `size`, so the mark measured the same beside a 32px avatar and a 48px one.
+     The only way to move it was to write `font-size` on the badge by hand. */
+  --_badge-size: var(--helix-size-badge);
+  --_badge-text: var(--helix-text-xs);
+  --_badge-inset: var(--helix-space-2xs);
+  --_badge-dot: var(--helix-space-xs);
 }
 
 [part="indicator"] {
@@ -42,11 +28,7 @@
   font-weight: var(--helix-weight-semibold);
   /* Pinned to the corner, then pulled back along both axes. The mark's centre
      sits on the corner by default, which is right for a square icon and wrong
-     for a circle, where the corner of the box is outside the shape.
-
-     The fallback covers a page that did not import `elements.css`, where the
-     property is unregistered and the declaration would otherwise be invalid,
-     taking the mark's corner with it. */
+     for a circle, where the corner of the box is outside the shape. */
   inset-block-start: var(--badge-offset, 0px);
   inset-inline-end: var(--badge-offset, 0px);
   justify-content: center;
