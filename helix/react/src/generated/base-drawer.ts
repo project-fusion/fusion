@@ -6,7 +6,7 @@ import '@helix-io/headless/drawer'
 import type { HelixBaseDrawer, HelixOpenEvent } from '@helix-io/headless'
 
 /**
- * Takes `WithOpen`, so `open`, `defaultOpen`, and `OpenChange` behave exactly
+ * Takes `MixinControllerOpen`, so `open`, `defaultOpen`, and `OpenChange` behave exactly
 as they do on an accordion item, and a consumer already knows the API.
 
 Modal by default, which is three things together and not one: focus is
