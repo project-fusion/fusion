@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+[part="blockquote"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-md);
+  margin: var(--helix-space-none);
+}
+
+/* The passage itself, not a wrapper: the quoted content is slotted straight
+   into the blockquote, so the type lands on whatever the consumer wrote. */
+slot:not([name])::slotted(*) {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-display);
+  font-size: var(--blockquote-size, var(--helix-text-xl));
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  margin: var(--helix-space-none);
+}
+
+[part="attribution"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+}
