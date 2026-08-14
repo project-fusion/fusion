@@ -1,8 +1,11 @@
 :host {
   display: inline-block;
 
-  /* Square, and a size of its own rather than a control's: a day is a cell in
-     a grid of forty-two, not something the height of a button. */
+  /* Two sizes, not one. The column track is what the grid is laid out on, and
+     the day is the smaller shape centred in it. The difference is the space
+     between days, and it belongs to the track rather than to a `gap`, so a
+     range can paint the whole track and stay continuous. */
+  --_calendar-track: var(--calendar-track-size, 2.5rem);
   --_calendar-day: var(--calendar-day-size, 1.875rem);
 }
 
@@ -51,76 +54,95 @@
 
 [part="week"] {
   display: grid;
-  grid-template-columns: repeat(7, var(--_calendar-day));
-}
-
-/* The run of days between the ends of a range, so the two ends read as one
-   selection rather than as two separate dates. */
-[part="day"][aria-selected]:not([data-range-start]):not([data-range-end]) {
-  border-radius: var(--helix-radii-none);
-}
-
-[part="day"][data-range-start] {
-  border-end-end-radius: var(--helix-radii-none);
-  border-start-end-radius: var(--helix-radii-none);
-}
-
-[part="day"][data-range-end] {
-  border-end-start-radius: var(--helix-radii-none);
-  border-start-start-radius: var(--helix-radii-none);
+  grid-template-columns: repeat(7, var(--_calendar-track));
 }
 
 [part="weekday"] {
   align-items: center;
-  inline-size: var(--_calendar-day);
+  block-size: var(--_calendar-track);
   color: var(--helix-color-foreground-subtle);
   display: inline-flex;
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
+  inline-size: var(--_calendar-track);
   justify-content: center;
-  block-size: var(--_calendar-day);
+}
+
+/* The cell is the whole track and the day is the shape centred in it. A range
+   paints the cell, so it runs unbroken between days and stops at the ends of a
+   row on its own, where a fill painted on the day has to be bridged across the
+   space between them and then clipped at the row's edge. */
+[part="cell"] {
+  align-items: center;
+  block-size: var(--_calendar-track);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--_calendar-track);
+  justify-content: center;
 }
 
 [part="day"] {
   align-items: center;
-  inline-size: var(--_calendar-day);
-  border-radius: var(--helix-radii-sm);
-  cursor: pointer;
+  block-size: var(--_calendar-day);
+  border-radius: var(--helix-radii-full);
   display: inline-flex;
   font-size: var(--helix-text-sm);
+  inline-size: var(--_calendar-day);
   justify-content: center;
-  block-size: var(--_calendar-day);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* Days either side of the month stay in place and stay selectable, so the
    first and last weeks are whole rows rather than ragged ones. */
-[part="day"][data-outside] {
+[part="cell"][data-outside] [part="day"] {
   color: var(--helix-color-foreground-subtle);
 }
 
-[part="day"]:hover {
+[part="cell"]:hover:not([aria-disabled]) [part="day"] {
   background-color: var(--helix-color-surface-sunken);
 }
 
-[part="day"][aria-selected] {
+/* The band, on the cell. The ends round off so the run has a shape, and a lone
+   selected date is both ends at once and so rounds on both sides. */
+[part="cell"][aria-selected] {
+  background-color: var(--calendar-range-color, var(--helix-color-primary-subtle));
+}
+
+[part="cell"][data-range-start],
+[part="cell"][aria-selected]:not([data-range-middle]):not([data-range-end]) {
+  border-end-start-radius: var(--helix-radii-full);
+  border-start-start-radius: var(--helix-radii-full);
+}
+
+[part="cell"][data-range-end],
+[part="cell"][aria-selected]:not([data-range-middle]):not([data-range-start]) {
+  border-end-end-radius: var(--helix-radii-full);
+  border-start-end-radius: var(--helix-radii-full);
+}
+
+/* The ends of a range, and a single date, are the solid mark. The days between
+   them carry only the band. */
+[part="cell"][aria-selected]:not([data-range-middle]) [part="day"] {
   background-color: var(--calendar-selected-color, var(--helix-color-primary));
   color: var(--helix-color-foreground-on-accent);
 }
 
-[part="day"][aria-disabled] {
-  color: var(--helix-color-foreground-subtle);
+[part="cell"][aria-disabled] {
   cursor: default;
+}
+
+[part="cell"][aria-disabled] [part="day"] {
+  color: var(--helix-color-foreground-subtle);
   opacity: 0.4;
 }
 
-[part="day"][aria-disabled]:hover {
-  background-color: transparent;
+[part="cell"]:focus-visible {
+  outline: none;
 }
 
-[part="day"]:focus-visible {
+[part="cell"]:focus-visible [part="day"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+  outline-offset: var(--helix-size-focus-offset);
 }
 
 @media (prefers-reduced-motion: reduce) {

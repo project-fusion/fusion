@@ -2184,6 +2184,10 @@ export type CustomElements = {
    * Six week rows always, so the grid keeps one height and a month change does
    * not move whatever sits beneath it.
    *
+   * The column track is wider than the day, and the day is centred in it. The
+   * difference is the space between days, which belongs to the track rather than
+   * to a `gap`, so a range can paint across the whole track and stay continuous.
+   *
    * Days from the neighbouring months stay in place and stay selectable, marked
    * quieter rather than hidden, so the first and last weeks are whole and the
    * grid reads as a continuous run of dates.
@@ -2220,7 +2224,9 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
-   * - `--calendar-selected-color`: Fill behind the selected day. (default: `undefined`)
+   * - `--calendar-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
+   * - `--calendar-selected-color`: Fill behind a selected day. (default: `undefined`)
+   * - `--calendar-range-color`: Band behind the days in a range. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -2235,7 +2241,8 @@ export type CustomElements = {
    * - `grid`: The grid of days.
    * - `weekday`: A column header naming a day of the week.
    * - `week`: One row of days.
-   * - `day`: One day.
+   * - `cell`: One column of a row, which is what a range paints.
+   * - `day`: The shape inside a cell, which is what a single date paints.
    */
   "helix-calendar": Partial<
     HelixCalendarProps & BaseProps<HelixCalendar> & BaseEvents
@@ -3954,6 +3961,10 @@ export type CustomElementsSolidJs = {
    * Six week rows always, so the grid keeps one height and a month change does
    * not move whatever sits beneath it.
    *
+   * The column track is wider than the day, and the day is centred in it. The
+   * difference is the space between days, which belongs to the track rather than
+   * to a `gap`, so a range can paint across the whole track and stay continuous.
+   *
    * Days from the neighbouring months stay in place and stay selectable, marked
    * quieter rather than hidden, so the first and last weeks are whole and the
    * grid reads as a continuous run of dates.
@@ -3990,7 +4001,9 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
-   * - `--calendar-selected-color`: Fill behind the selected day. (default: `undefined`)
+   * - `--calendar-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
+   * - `--calendar-selected-color`: Fill behind a selected day. (default: `undefined`)
+   * - `--calendar-range-color`: Band behind the days in a range. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -4005,7 +4018,8 @@ export type CustomElementsSolidJs = {
    * - `grid`: The grid of days.
    * - `weekday`: A column header naming a day of the week.
    * - `week`: One row of days.
-   * - `day`: One day.
+   * - `cell`: One column of a row, which is what a range paints.
+   * - `day`: The shape inside a cell, which is what a single date paints.
    */
   "helix-calendar": Partial<
     HelixCalendarProps &
@@ -5307,8 +5321,12 @@ export type CustomCssProperties = {
   "--button-radii"?: string;
   /** Width and height of a day. */
   "--calendar-day-size"?: string;
-  /** Fill behind the selected day. */
+  /** Width of a column, which is what sets the space between days. */
+  "--calendar-track-size"?: string;
+  /** Fill behind a selected day. */
   "--calendar-selected-color"?: string;
+  /** Band behind the days in a range. */
+  "--calendar-range-color"?: string;
   /** Fill behind the callout. */
   "--callout-background-color"?: string;
   /** Corner radius of the callout. */
