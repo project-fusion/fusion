@@ -2753,7 +2753,7 @@
           ],
           "cssParts": [
             {
-              "description": "The inner button or anchor.",
+              "description": "The inner control.",
               "name": "button",
               "inheritedFrom": {
                 "name": "HelixBaseButton",

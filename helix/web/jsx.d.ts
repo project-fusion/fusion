@@ -2033,7 +2033,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `button`: The inner control.
    */
   "helix-button": Partial<
     HelixButtonProps & BaseProps<HelixButton> & BaseEvents
@@ -3708,7 +3708,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `button`: The inner control.
    */
   "helix-button": Partial<
     HelixButtonProps &

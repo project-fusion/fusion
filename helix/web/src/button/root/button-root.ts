@@ -21,7 +21,7 @@ import { styles } from './button-root.css.js'
  * @slot start - Content before the label, usually an icon.
  * @slot end - Content after the label.
  *
- * @csspart button - The inner button or anchor.
+ * @csspart button - The inner control.
  *
  * @cssproperty --button-background-color - Fill behind the button.
  * @cssproperty --button-foreground-color - Label and icon color.
