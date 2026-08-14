@@ -6,6 +6,7 @@ export {
   HelixSelectEvent,
   HelixValueChangeEvent,
   type OpenDetail,
+  type Placement,
   type SelectDetail,
   type ValueChangeDetail,
 } from '@helix-io/core'
@@ -39,4 +40,5 @@ export * from './tabs/index.js'
 export * from './tag/index.js'
 export * from './toggle/index.js'
 export * from './toolbar/index.js'
+export * from './tooltip/index.js'
 export * from './tree/index.js'

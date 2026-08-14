@@ -27,8 +27,7 @@ export const registerDom = (): void => {
  * runtime check there would make production code defensive about a browser
  * capability every browser has, and would swallow a real failure.
  *
- * `role`, `ariaLabel`, and `ariaCurrent` are plain slots rather than behavior:
- * components set
+ * The aria slots are plain values rather than behavior: components set
  * their semantics through internals so nothing lands on the host as an
  * attribute, and a spec reads them back through the `role` helper below.
  *
@@ -54,6 +53,10 @@ const shimElementInternals = (): void => {
     const host = this
     return {
       ariaCurrent: null,
+      // Declared, not merely assignable: a component that guards on
+      // `'ariaDescribedByElements' in internals` skips the link entirely when
+      // the slot is absent, which is the browser's own feature test.
+      ariaDescribedByElements: null,
       ariaLabel: null,
       checkValidity: () => true,
       get form(): HTMLFormElement | null {

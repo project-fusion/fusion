@@ -8,6 +8,7 @@ export {
   type SelectDetail,
   type ValueChangeDetail,
 } from '@helix-io/core'
+export type { Placement } from '@helix-io/headless'
 export * from './accordion/index.js'
 export * from './app-header/index.js'
 export * from './avatar/index.js'
@@ -42,4 +43,5 @@ export * from './tag/index.js'
 export * from './text/index.js'
 export * from './toggle/index.js'
 export * from './toolbar/index.js'
+export * from './tooltip/index.js'
 export * from './tree/index.js'

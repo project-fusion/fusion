@@ -2,6 +2,11 @@ export {
   DismissController,
   type DismissOptions,
 } from './controllers/dismiss-controller/dismiss-controller.js'
+export {
+  FloatingController,
+  type FloatingOptions,
+  type Placement,
+} from './controllers/floating-controller/floating-controller.js'
 export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {
   type DismissDetail,

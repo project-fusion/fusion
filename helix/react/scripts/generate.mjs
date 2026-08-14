@@ -70,6 +70,37 @@ const propType = (member) => {
   return text.replace(/\s*\|\s*undefined/g, '')
 }
 
+/** Types the runtime already has, which are never imported from a package. */
+const AMBIENT = new Set([
+  'Array',
+  'CustomEvent',
+  'Date',
+  'Element',
+  'Event',
+  'HTMLElement',
+  'HTMLFormElement',
+  'Map',
+  'Node',
+  'NodeList',
+  'Promise',
+  'ReadonlyArray',
+  'Record',
+  'Set',
+])
+
+/**
+ * The named types a property's type text refers to.
+ *
+ * A property typed by a name the package exports has to import that name, the
+ * same as an event type does. Without this the generated file refers to a type
+ * it never imported and does not compile, which stayed hidden until the first
+ * property that was not a primitive or a literal union.
+ */
+const namedTypes = (text) =>
+  [...text.matchAll(/\b([A-Z][A-Za-z0-9]*)\b/g)]
+    .map(([, name]) => name)
+    .filter((name) => !AMBIENT.has(name))
+
 /** group -> [{ declaration, part, pkg }] */
 const groups = new Map()
 
@@ -152,7 +183,11 @@ for (const [group, parts] of [...groups].sort(([a], [b]) => a.localeCompare(b)))
       if (member.description) {
         body.push(`  /** ${member.description.replace(/\s+/g, ' ').trim()} */`)
       }
-      body.push(`  ${member.name}?: ${propType(member)}`)
+      const type = propType(member)
+      for (const named of namedTypes(type)) {
+        elementImports.add(named)
+      }
+      body.push(`  ${member.name}?: ${type}`)
     }
     for (const event of events.sort((a, b) => a.name.localeCompare(b.name))) {
       const prop = event.reactProp ?? `on${kebabToCamel(`-${event.name}`)}`

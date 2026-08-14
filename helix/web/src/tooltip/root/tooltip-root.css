@@ -1,0 +1,50 @@
+:host {
+  display: contents;
+}
+
+/* In the top layer through `popover`, so there is no `z-index` here and nothing
+   above it can clip it. `margin: 0` because the UA gives a popover its own, and
+   the position written by the controller is measured from the border box. */
+[part="tooltip"] {
+  background-color: var(--tooltip-background-color, var(--helix-color-surface-inverse));
+  border: none;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-inverse);
+  font-size: var(--helix-text-xs);
+  inline-size: max-content;
+  line-height: var(--helix-leading-tight);
+  margin: var(--helix-space-none);
+  max-inline-size: var(--tooltip-max-inline-size, 16rem);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  position: fixed;
+}
+
+[part="tooltip"]:not(:popover-open) {
+  display: none;
+}
+
+/* Positioned by the same pass as the bubble, so it still points at the trigger
+   after the bubble has slid along to stay in view. */
+[part="arrow"] {
+  background-color: inherit;
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  position: absolute;
+  rotate: 45deg;
+}
+
+[part="tooltip"][data-placement^="top"] [part="arrow"] {
+  inset-block-end: -0.25rem;
+}
+
+[part="tooltip"][data-placement^="bottom"] [part="arrow"] {
+  inset-block-start: -0.25rem;
+}
+
+[part="tooltip"][data-placement^="left"] [part="arrow"] {
+  inset-inline-end: -0.25rem;
+}
+
+[part="tooltip"][data-placement^="right"] [part="arrow"] {
+  inset-inline-start: -0.25rem;
+}

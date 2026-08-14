@@ -46,6 +46,7 @@ import type {
   HelixToggle,
   HelixToggleGroup,
   HelixToolbar,
+  HelixTooltip,
   HelixTree,
   HelixTreeItem,
   HelixValueChangeEvent,
@@ -1746,6 +1747,33 @@ export type HelixToolbarSolidJsProps = {
   "prop:label"?: HelixToolbar["label"];
   /** Which way the arrow keys move. */
   "prop:orientation"?: HelixToolbar["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixTooltipProps = {
+  /** The text shown in the bubble. */
+  content?: HelixTooltip["content"];
+  /** Preferred side. It moves if that side does not fit. */
+  placement?: HelixTooltip["placement"];
+  /** Space between the trigger and the bubble, in pixels. */
+  offset?: HelixTooltip["offset"];
+  /** Whether the tooltip never shows. */
+  disabled?: HelixTooltip["disabled"];
+};
+
+export type HelixTooltipSolidJsProps = {
+  /** The text shown in the bubble. */
+  "prop:content"?: HelixTooltip["content"];
+  /** Preferred side. It moves if that side does not fit. */
+  "prop:placement"?: HelixTooltip["placement"];
+  /** Space between the trigger and the bubble, in pixels. */
+  "prop:offset"?: HelixTooltip["offset"];
+  /** Whether the tooltip never shows. */
+  "prop:disabled"?: HelixTooltip["disabled"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3621,6 +3649,53 @@ export type CustomElements = {
    */
   "helix-toolbar": Partial<
     HelixToolbarProps & BaseProps<HelixToolbar> & BaseEvents
+  >;
+
+  /**
+   * The bubble is in the top layer, so it needs no `z-index` and cannot be
+   * clipped by whatever it sits inside.
+   *
+   * The arrow is positioned by the same pass that positions the bubble, so it
+   * still points at the trigger after the bubble has slid along to stay in view.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `content`: The text shown in the bubble.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `offset`: Space between the trigger and the bubble, in pixels.
+   * - `disabled`: Whether the tooltip never shows.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The trigger.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `show() => void`: Shows the bubble, unless there is nothing to show.
+   * - `hide() => void`: Hides the bubble.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tooltip-background-color`: Fill of the bubble. (default: `undefined`)
+   * - `--tooltip-max-inline-size`: Widest the bubble grows before wrapping. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tooltip`: The bubble.
+   * - `arrow`: The point aimed at the trigger.
+   */
+  "helix-tooltip": Partial<
+    HelixTooltipProps & BaseProps<HelixTooltip> & BaseEvents
   >;
 
   /**
@@ -5642,6 +5717,56 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The bubble is in the top layer, so it needs no `z-index` and cannot be
+   * clipped by whatever it sits inside.
+   *
+   * The arrow is positioned by the same pass that positions the bubble, so it
+   * still points at the trigger after the bubble has slid along to stay in view.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `content`: The text shown in the bubble.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `offset`: Space between the trigger and the bubble, in pixels.
+   * - `disabled`: Whether the tooltip never shows.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The trigger.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `show() => void`: Shows the bubble, unless there is nothing to show.
+   * - `hide() => void`: Hides the bubble.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tooltip-background-color`: Fill of the bubble. (default: `undefined`)
+   * - `--tooltip-max-inline-size`: Widest the bubble grows before wrapping. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tooltip`: The bubble.
+   * - `arrow`: The point aimed at the trigger.
+   */
+  "helix-tooltip": Partial<
+    HelixTooltipProps &
+      HelixTooltipSolidJsProps &
+      BaseProps<HelixTooltip> &
+      BaseEvents
+  >;
+
+  /**
    * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
    * node moved to another depth re-indents without any nested selector. Nesting
    * selectors by depth is the usual approach and stops working at whatever depth
@@ -5874,6 +5999,10 @@ export type CustomCssProperties = {
   "--toggle-group-indicator-color"?: string;
   /** Space between controls. */
   "--toolbar-gap"?: string;
+  /** Fill of the bubble. */
+  "--tooltip-background-color"?: string;
+  /** Widest the bubble grows before wrapping. */
+  "--tooltip-max-inline-size"?: string;
   /** Indent added per level. */
   "--tree-indent"?: string;
 };
