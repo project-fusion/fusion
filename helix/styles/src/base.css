@@ -7,6 +7,25 @@
  * so component CSS can rely on border-box on both sides of the boundary.
  */
 
+/* Component custom properties that carry a length a consumer writes in `em`.
+ *
+ * Registration is what makes the `em` resolve where it is written, on the
+ * component's host, and not where the component happens to use it. An
+ * unregistered custom property substitutes as text, so `--badge-offset: 0.5em`
+ * would resolve against the badge's indicator, whose font size is 0.625 of the
+ * host, and mean 5px where the consumer wrote 8.
+ *
+ * They live here because a registration inside a shadow root does not register
+ * at all. Verified in a browser: an `@property` in an adopted stylesheet on a
+ * shadow root reports no initial value, where the same rule in the document
+ * does. So this is the only layer where it can take effect.
+ */
+@property --badge-offset {
+  inherits: true;
+  initial-value: 0px;
+  syntax: "<length>";
+}
+
 *,
 *::before,
 *::after {
