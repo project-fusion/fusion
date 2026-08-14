@@ -22,7 +22,8 @@
     "styles": "turbo run styles",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && bun run check:tokens && bun run typecheck && bun run analyze && bun run test && bun run rs:check && bun run rs:test"
+    "verify": "biome ci . && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run test && bun run rs:check && bun run rs:test",
+    "check:examples": "node tooling/scripts/check-examples.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",
