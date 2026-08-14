@@ -1,12 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import {
-  hasPart,
-  hostAttributes,
-  hostTag,
-  partTag,
-  ssr,
-  withoutStyles,
-} from '@fusion-io/testing/ssr'
+import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 

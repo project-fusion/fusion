@@ -2,7 +2,7 @@
 
 import { Drawer, Tabs, Tree } from '@helix-io/react'
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
-import type { HelixOpenEvent, HelixSelectEvent } from '@helix-io/web'
+import type { HelixSelectEvent } from '@helix-io/web'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
