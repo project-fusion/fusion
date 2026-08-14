@@ -1,0 +1,10 @@
+:host {
+  display: inline;
+  font: inherit;
+}
+
+[part="quote"] {
+  color: var(--quote-color, inherit);
+  font: inherit;
+  font-style: italic;
+}

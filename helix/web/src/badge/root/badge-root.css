@@ -1,0 +1,52 @@
+:host {
+  display: inline-flex;
+  position: relative;
+  vertical-align: middle;
+
+  /* Relative to the decorated element rather than on the type scale: a badge on
+     a 16px icon and one on a 32px avatar are the same mark at two sizes. */
+  --_badge-size: 1.25em;
+  --_badge-text: 0.625em;
+  --_badge-inset: 0.375em;
+}
+
+[part="indicator"] {
+  align-items: center;
+  background-color: var(--badge-background-color, var(--helix-color-danger));
+  block-size: var(--_badge-size);
+  border-radius: var(--helix-radii-full);
+  /* A ring in the page's own color, so the mark stays separate from whatever it
+     overlaps rather than merging into it. */
+  box-shadow: 0 0 0 2px var(--badge-ring-color, var(--helix-color-background));
+  color: var(--helix-color-foreground-on-accent);
+  display: inline-flex;
+  font-size: var(--_badge-text);
+  font-weight: var(--helix-weight-semibold);
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  justify-content: center;
+  line-height: 1;
+  /* Square at minimum, so a single digit is a circle rather than a sliver. */
+  min-inline-size: var(--_badge-size);
+  padding-inline: var(--_badge-inset);
+  /* An annotation is not a target: clicks belong to what it is pinned to. */
+  pointer-events: none;
+  position: absolute;
+  translate: 50% -50%;
+  white-space: nowrap;
+}
+
+:host([dot]) [part="indicator"] {
+  block-size: var(--_badge-inset);
+  min-inline-size: var(--_badge-inset);
+  padding-inline: var(--helix-space-none);
+}
+
+:host([appearance="primary"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-primary));
+}
+
+:host([appearance="neutral"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-surface-raised));
+  color: var(--helix-color-foreground);
+}
