@@ -1,0 +1,26 @@
+/* The preview document's own layout, which travels with the document.
+ *
+ * These lived in the site's stylesheet while the frame was a route, and stayed
+ * there when it became a static file: the frame loaded the style layers and the
+ * component library and none of this, so `data-layout="padded"` set an
+ * attribute that nothing read. Measured: a badge on an icon sat five pixels
+ * above the viewport and was clipped, because the padding meant to hold it was
+ * not there.
+ */
+
+#preview-root[data-layout="padded"] {
+  padding: var(--helix-space-lg);
+}
+
+#preview-root[data-layout="centered"] {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-block-size: 100dvh;
+  padding: var(--helix-space-lg);
+}
+
+#preview-root[data-layout="fullscreen"] {
+  min-block-size: 100dvh;
+  padding: var(--helix-space-none);
+}
