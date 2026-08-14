@@ -25,6 +25,7 @@ import { styles } from './calendar-root.css.js'
  *
  * @cssproperty --calendar-day-size - Width and height of a day.
  * @cssproperty --calendar-track-size - Width of a column, which is what sets the space between days.
+ * @cssproperty --calendar-row-size - Height of a week row.
  * @cssproperty --calendar-selected-color - Fill behind a selected day.
  * @cssproperty --calendar-range-color - Band behind the days in a range.
  */

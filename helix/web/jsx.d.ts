@@ -2225,6 +2225,7 @@ export type CustomElements = {
    *
    * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
    * - `--calendar-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
+   * - `--calendar-row-size`: Height of a week row. (default: `undefined`)
    * - `--calendar-selected-color`: Fill behind a selected day. (default: `undefined`)
    * - `--calendar-range-color`: Band behind the days in a range. (default: `undefined`)
    *
@@ -4002,6 +4003,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
    * - `--calendar-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
+   * - `--calendar-row-size`: Height of a week row. (default: `undefined`)
    * - `--calendar-selected-color`: Fill behind a selected day. (default: `undefined`)
    * - `--calendar-range-color`: Band behind the days in a range. (default: `undefined`)
    *
@@ -5323,6 +5325,8 @@ export type CustomCssProperties = {
   "--calendar-day-size"?: string;
   /** Width of a column, which is what sets the space between days. */
   "--calendar-track-size"?: string;
+  /** Height of a week row. */
+  "--calendar-row-size"?: string;
   /** Fill behind a selected day. */
   "--calendar-selected-color"?: string;
   /** Band behind the days in a range. */
