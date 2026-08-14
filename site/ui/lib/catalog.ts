@@ -114,11 +114,11 @@ const readManifest = (path: string): RawDeclaration[] => {
   return parsed.modules.flatMap((mod) => mod.declarations ?? []).filter((entry) => entry.tagName)
 }
 
-const declarations = [
+const MANIFESTS = [
   'helix/web/custom-elements.json',
   'helix/headless/custom-elements.json',
   'helix/sandbox/custom-elements.json',
-].flatMap(readManifest)
+]
 
 /** Examples live beside the styled component, keyed by family folder. */
 const examplesOf = (slug: string): Example[] => {
@@ -141,60 +141,84 @@ const examplesOf = (slug: string): Example[] => {
     })
 }
 
-const byFamily = new Map<string, RawDeclaration[]>()
-for (const declaration of declarations) {
-  const family = /^src\/([^/]+)\//.exec(declaration.modulePath ?? '')?.[1]
-  if (!family) {
-    continue
+/** Every family, alphabetical, each with its elements and examples. */
+const build = (): Family[] => {
+  const byFamily = new Map<string, RawDeclaration[]>()
+  for (const declaration of MANIFESTS.flatMap(readManifest)) {
+    const family = /^src\/([^/]+)\//.exec(declaration.modulePath ?? '')?.[1]
+    if (!family) {
+      continue
+    }
+    byFamily.set(family, [...(byFamily.get(family) ?? []), declaration])
   }
-  byFamily.set(family, [...(byFamily.get(family) ?? []), declaration])
+
+  return [...byFamily.entries()]
+    .map(([slug, entries]) => {
+      // The family's own description comes from its styled root: the element
+      // whose tag is the family name, rather than a part of it.
+      const root =
+        entries.find((entry) => entry.tagName === `helix-${slug}`) ?? (entries[0] as RawDeclaration)
+
+      return {
+        aliases: root.helix?.aliases ?? [],
+        documentation: root.helix?.documentation ?? '',
+        elements: entries
+          .map((entry) => ({
+            attributes: members(entry.attributes),
+            cssParts: members(entry.cssParts),
+            cssProperties: members(entry.cssProperties),
+            description: entry.description ?? '',
+            events: (entry.events ?? []).map((event) => ({
+              description: event.description ?? '',
+              name: event.name ?? '',
+              reactProp: event.reactProp ?? `on${event.name ?? ''}`,
+              type: event.type?.text ?? '',
+            })),
+            label: displayName(entry.tagName as string),
+            slots: members(entry.slots),
+            summary: entry.summary ?? '',
+            tagName: entry.tagName as string,
+            tier: tierOf(entry.tagName as string),
+          }))
+          // Styled first, then headless. Alphabetical order would put the
+          // headless tier on top, which is the one most readers never reach for.
+          .sort(
+            (a, b) =>
+              Number(a.tier === 'headless') - Number(b.tier === 'headless') ||
+              a.tagName.localeCompare(b.tagName),
+          ),
+        examples: examplesOf(slug),
+        label: startCase(slug),
+        since: root.helix?.since ?? '',
+        slug,
+        status: root.helix?.status ?? '',
+        summary: root.summary ?? '',
+      }
+    })
+    .sort((a, b) => a.label.localeCompare(b.label))
 }
 
-/** Every family, alphabetical, each with its elements and examples. */
-export const families: Family[] = [...byFamily.entries()]
-  .map(([slug, entries]) => {
-    // The family's own description comes from its styled root: the element
-    // whose tag is the family name, rather than a part of it.
-    const root =
-      entries.find((entry) => entry.tagName === `helix-${slug}`) ?? (entries[0] as RawDeclaration)
+let cached: Family[] | undefined
 
-    return {
-      aliases: root.helix?.aliases ?? [],
-      documentation: root.helix?.documentation ?? '',
-      elements: entries
-        .map((entry) => ({
-          attributes: members(entry.attributes),
-          cssParts: members(entry.cssParts),
-          cssProperties: members(entry.cssProperties),
-          description: entry.description ?? '',
-          events: (entry.events ?? []).map((event) => ({
-            description: event.description ?? '',
-            name: event.name ?? '',
-            reactProp: event.reactProp ?? `on${event.name ?? ''}`,
-            type: event.type?.text ?? '',
-          })),
-          label: displayName(entry.tagName as string),
-          slots: members(entry.slots),
-          summary: entry.summary ?? '',
-          tagName: entry.tagName as string,
-          tier: tierOf(entry.tagName as string),
-        }))
-        // Styled first, then headless. Alphabetical order would put the
-        // headless tier on top, which is the one most readers never reach for.
-        .sort(
-          (a, b) =>
-            Number(a.tier === 'headless') - Number(b.tier === 'headless') ||
-            a.tagName.localeCompare(b.tagName),
-        ),
-      examples: examplesOf(slug),
-      label: startCase(slug),
-      since: root.helix?.since ?? '',
-      slug,
-      status: root.helix?.status ?? '',
-      summary: root.summary ?? '',
-    }
-  })
-  .sort((a, b) => a.label.localeCompare(b.label))
+/**
+ * Every family, read fresh in development.
+ *
+ * `.examples/*.html` and the manifests are read with `fs`, not imported, so
+ * nothing puts them in the module graph and nothing invalidates a value
+ * computed once at import time. Adding an example then showed nothing until the
+ * dev server was restarted.
+ *
+ * Production still computes this once. Every page is static there, so the
+ * sources cannot change under a running server, and the cache is what keeps the
+ * manifests from being parsed for each page of the build.
+ */
+export const getFamilies = (): Family[] => {
+  if (cached && process.env.NODE_ENV === 'production') {
+    return cached
+  }
+  cached = build()
+  return cached
+}
 
 export const findFamily = (slug: string): Family | undefined =>
-  families.find((family) => family.slug === slug)
+  getFamilies().find((family) => family.slug === slug)

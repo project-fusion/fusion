@@ -29,6 +29,25 @@ describe('badge', () => {
     expect(badge.getAttributeNames()).toEqual(['value'])
   })
 
+  test('a one-character mark drops its padding, so it is a circle', async () => {
+    // `min-inline-size` alone does not get there. A wide glyph plus the inline
+    // padding is wider than the block size, so a 9 rendered as an oval where a
+    // 1 did not. CSS cannot count characters, so the marker comes from here.
+    const badge = await mount('<helix-badge value="9"><span>x</span></helix-badge>')
+    expect(part(badge, 'indicator')?.hasAttribute('data-single')).toBe(true)
+  })
+
+  test('two characters keep their padding, so the mark grows into a pill', async () => {
+    const badge = await mount('<helix-badge value="42"><span>x</span></helix-badge>')
+    expect(part(badge, 'indicator')?.hasAttribute('data-single')).toBe(false)
+  })
+
+  test('a capped count is measured after the cap, not before it', async () => {
+    // `42` capped at `9` reads `9+`, which is two characters and not one.
+    const badge = await mount('<helix-badge max="9" value="42"><span>x</span></helix-badge>')
+    expect(part(badge, 'indicator')?.hasAttribute('data-single')).toBe(false)
+  })
+
   test('a blank mark keeps its text, so it never matches the dot rule', async () => {
     // `:empty` is not asserted here. happy-dom answers it without looking at
     // text nodes, so it reports true for an indicator reading "0". The text is
