@@ -481,6 +481,58 @@ helix-toggle[disabled]::part(item) {
   opacity: 0.5;
 }
 
+/* The nav item.
+ *
+ * A recipe rather than an element, and for the same reason `Link` is not a
+ * component: navigation is links, a router renders its own anchor, and anything
+ * we wrap around it either nests an anchor or loses the cascade to the outer
+ * tree. There is no `NavBar` either. The landmark is the `<nav>` the header
+ * already renders, and a component whose whole job is to be a container for
+ * links is a container for links.
+ *
+ * The current item is marked by `aria-current="page"`, which is what navigation
+ * actually uses, rather than by a `selected` attribute mirroring it. That makes
+ * the correct semantics and the correct look the same act.
+ *
+ * It looks like a tab and is deliberately not one: `role="tab"` promises an
+ * `aria-controls` pointing at a panel, and a tab that controls nothing tells a
+ * screen-reader user to expect something that never arrives.
+ */
+[data-nav-item] {
+  align-items: center;
+  block-size: 100%;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  justify-content: center;
+  padding-inline: var(--helix-space-sm);
+  text-decoration: none;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+  white-space: nowrap;
+}
+
+[data-nav-item]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+/* A raised thumb, the same one the toggle group uses, because it is the same
+   idea: this is the one of these you are on. */
+[data-nav-item][aria-current="page"] {
+  background-color: var(--helix-color-surface-raised);
+  box-shadow: var(--helix-shadow-sm);
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
+  /* Named, so a view transition morphs the thumb from the old current item to
+     the new one instead of cross-fading two rectangles. Costs nothing where no
+     view transition is running. */
+  view-transition-name: helix-nav-current;
+}
+
 :where(code, kbd, samp, pre) {
   font-family: var(--helix-font-mono);
 }

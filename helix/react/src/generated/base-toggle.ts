@@ -10,29 +10,19 @@ import type {
 } from '@helix-io/headless'
 
 /**
- * Renders a `<button role="radio">`, or nothing at all when `link` is set and
-the consumer supplies their own interactive element.
+ * Renders a `<button role="radio">`. This is a form control and nothing else.
 
-**It never renders an anchor.** A framework's router has to render its own
-`<a>` to intercept a click, and it cannot render one inside this component's
-shadow root, so a component that renders the anchor itself forces every
-navigation to be a full page load. Wrapping the router's link in this one
-instead nests an anchor inside an anchor. So the component styles the element
-it is given: `link` says the consumer brings the interactive element, and
-this renders a bare slot around it.
-
-Roving `tabindex` applies only to the radio form. A set of links is not a
-composite widget, and taking every link but one out of the tab order would be
-wrong for a navigation landmark; arrow keys still move between them, because
-the group calls `focusItem`.
+It used to serve navigation too, behind a `nav` attribute on the group, and
+that was two components wearing one name. Navigation is links marked with
+`aria-current`, styled by the `data-nav-item` recipe in the base layer; it
+only ever borrowed this component's *look*. Borrowing radio semantics for it
+would have announced a set of destinations as a set of choices.
  *
  * Renders `<helix-base-toggle>`.
  */
 export interface BaseToggleProps extends BaseProps {
   /** Whether the item can be chosen. */
   disabled?: boolean
-  /** Whether the consumer supplies the interactive element. Declared rather than detected, because detection would have to read the assigned nodes and the server cannot: it would render the radio, then swap to a slot on upgrade, which is a nested anchor inside a button for as long as that takes. */
-  link?: boolean
   /** Whether this item is the current one. */
   selected?: boolean
   /** Identifies the item to the group. */
@@ -43,7 +33,7 @@ export interface BaseToggleProps extends BaseProps {
 
 export const BaseToggleRoot = createComponent<HelixBaseToggle, BaseToggleProps>({
   events: { SelectionChange: 'onSelectionChange' },
-  properties: ['disabled', 'link', 'selected'],
+  properties: ['disabled', 'selected'],
   tagName: 'helix-base-toggle',
 })
 
@@ -61,18 +51,18 @@ necessity, so the server renders the indicator hidden and it fades in once it
 has somewhere to be, which is the harmless direction: it appears rather than
 jumping from a wrong place.
 
-`nav` makes the group a navigation landmark whose items are links, rather
-than a radio group. A set of page links that announces itself as a radio
-group is a lie, and it is the reason this exists rather than tabs being bent
-to the purpose: a tab controls a panel.
+A radio group, and only that. It carried a `nav` mode once, which made the
+same element a navigation landmark of links, and that was two components
+sharing a name: navigation borrowed the look and would have had to borrow
+radio semantics with it, announcing a set of destinations as a set of
+choices. Navigation is the `data-nav-item` recipe now. A tab was never the
+answer either, in that direction: a tab controls a panel.
  *
  * Renders `<helix-base-toggle-group>`.
  */
 export interface BaseToggleGroupProps extends BaseProps {
   /** Accessible name for the group. */
   label?: string
-  /** Renders items as links in a navigation landmark rather than as radios. */
-  nav?: boolean
   /** Value of the selected item. */
   value?: string
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
@@ -81,7 +71,7 @@ export interface BaseToggleGroupProps extends BaseProps {
 
 export const BaseToggleGroup = createComponent<HelixBaseToggleGroup, BaseToggleGroupProps>({
   events: { SelectionChange: 'onSelectionChange' },
-  properties: ['nav'],
+  properties: [],
   tagName: 'helix-base-toggle-group',
 })
 
