@@ -807,6 +807,36 @@
             },
             {
               "kind": "field",
+              "name": "panelSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "192",
+              "description": "Height of the panel, in pixels.",
+              "attribute": "panel-size"
+            },
+            {
+              "kind": "field",
+              "name": "panelLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize panel'",
+              "description": "Accessible name for the panel's divider.",
+              "attribute": "panel-label"
+            },
+            {
+              "kind": "field",
+              "name": "cornerLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize panes and panel'",
+              "description": "Accessible name for the divider that moves both at once.",
+              "attribute": "corner-label"
+            },
+            {
+              "kind": "field",
               "name": "separatorLabel",
               "type": {
                 "text": "string"
@@ -823,6 +853,36 @@
               },
               "privacy": "private",
               "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "hasPanel",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether anything is in the panel region.\n\nThe dividers around the panel are only meaningful when there is a panel to\nsize, and there is no way to ask in CSS: `:host(:has([slot=\"panel\"]))` is\ninvalid, and the server has no children to look at. `slotchange` is the\nplatform answering on the client, which is where a divider is any use."
+            },
+            {
+              "kind": "field",
+              "name": "drag",
+              "type": {
+                "text": "'block' | 'both' | 'inline' | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "Which axes the drag in progress is moving, if any."
+            },
+            {
+              "kind": "field",
+              "name": "origin",
+              "type": {
+                "text": "{\n    bottom: number\n    height: number\n    left: number\n    top: number\n    width: number\n  } | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The sandbox's box, measured once when a drag starts.\n\nMeasuring per move is a forced layout on every pointer event, in the middle\nof a gesture whose whole job is to stay ahead of the pointer. None of it\nmoves while dragging: the sandbox is where it was, and the panel's floor is\nthe status bar, which is not going anywhere either."
             },
             {
               "kind": "method",
@@ -929,6 +989,31 @@
               ]
             },
             {
+              "kind": "method",
+              "name": "clampPanel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "height",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Keeps the panel between a usable floor and a ceiling that leaves panes.\n\nThe ceiling is skipped when the height is zero, which means the sandbox has\nnot been laid out: multiplying that by a ratio gives zero, and clamping to\nit would close the panel rather than bound it."
+            },
+            {
               "kind": "field",
               "name": "axis",
               "type": {
@@ -942,7 +1027,8 @@
               "kind": "field",
               "name": "handleKeydown",
               "privacy": "private",
-              "readonly": true
+              "readonly": true,
+              "description": "Moves a divider by the keyboard.\n\nOne handler for all three, reading which axes the divider it came from is\nallowed to move. The corner takes both, and each arrow moves the axis it\npoints along, which is the only reading of a diagonal handle that a\nkeyboard has."
             },
             {
               "kind": "field",
@@ -954,7 +1040,28 @@
               "kind": "field",
               "name": "handlePointerMove",
               "privacy": "private",
-              "readonly": true
+              "readonly": true,
+              "description": "Follows the pointer, without going through a render.\n\nThe sizes are written straight into the stylesheet rather than assigned to\nthe properties. A drag is a stream of events, and putting each one through\nan update cycle means a render, a re-render of every slotted pane's host\nbindings, and a style write, to move a divider by a pixel. Writing the two\ncustom properties is the only part of that which changes anything, and the\nproperties are set once at the end so the element still ends up saying what\nit is showing.\n\nThe box comes from `origin`, measured when the drag started, so no pointer\nevent forces a layout to ask where the sandbox is."
+            },
+            {
+              "kind": "field",
+              "name": "statusHeight",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "Height of anything below the panel, which the panel's own height excludes.\n\nRead once per drag along with the box. A status bar does not resize while\na divider is being dragged."
+            },
+            {
+              "kind": "field",
+              "name": "pending",
+              "type": {
+                "text": "{ panel: number; split: number } | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The sizes the drag has reached, to be committed when it ends."
             },
             {
               "kind": "field",
@@ -964,14 +1071,31 @@
             },
             {
               "kind": "method",
-              "name": "applySplit",
+              "name": "applySizes",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Writes the split into the shadow root's own stylesheet.\n\nInto a `<style>` rather than onto `this.style`, because an inline style on\nthe host is an attribute the element gives itself once it upgrades, and a\nReact consumer's server markup does not have it: hydration reports the\nmismatch and does not patch it up. The shadow root is not part of the tree\nReact hydrates.\n\nFilled imperatively because Lit rejects expressions inside `<style>`, which\nis why the template carries a static empty one. The server renders the\nstylesheet's default split, which is the same 45% this property defaults\nto."
+              "parameters": [
+                {
+                  "name": "split",
+                  "default": "this.split"
+                },
+                {
+                  "name": "panel",
+                  "default": "this.panelSize"
+                }
+              ],
+              "description": "Writes the sizes into the shadow root's own stylesheet.\n\nInto a `<style>` rather than onto `this.style`, because an inline style on\nthe host is an attribute the element gives itself once it upgrades, and a\nReact consumer's server markup does not have it: hydration reports the\nmismatch and does not patch it up. The shadow root is not part of the tree\nReact hydrates.\n\nFilled imperatively because Lit rejects expressions inside `<style>`, which\nis why the template carries a static empty one. The server renders the\nstylesheet's own defaults, which are the same values these properties\ndefault to."
+            },
+            {
+              "kind": "field",
+              "name": "readPanel",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Notes whether there is a panel, which is what its dividers depend on.\n\nAsked of the light DOM rather than of the slot. `slotchange` is the event\nthat says it changed, and it is listened for, but it is not the only way\nto know: a sandbox whose panel was in the markup all along has nothing to\nchange, and an environment that does not dispatch the event at all leaves\nthe dividers permanently absent. What is slotted into a named slot is a\nquestion the host can answer directly."
             },
             {
               "kind": "field",
@@ -1060,6 +1184,33 @@
               "default": "45",
               "description": "Percentage of the sandbox given to the source pane.",
               "fieldName": "split"
+            },
+            {
+              "name": "panel-size",
+              "type": {
+                "text": "number"
+              },
+              "default": "192",
+              "description": "Height of the panel, in pixels.",
+              "fieldName": "panelSize"
+            },
+            {
+              "name": "panel-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize panel'",
+              "description": "Accessible name for the panel's divider.",
+              "fieldName": "panelLabel"
+            },
+            {
+              "name": "corner-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize panes and panel'",
+              "description": "Accessible name for the divider that moves both at once.",
+              "fieldName": "cornerLabel"
             },
             {
               "name": "separator-label",

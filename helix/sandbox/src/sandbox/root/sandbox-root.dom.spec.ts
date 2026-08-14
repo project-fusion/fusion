@@ -12,6 +12,14 @@ const wired = `
     <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
   </helix-sandbox>`
 
+/** A sandbox with something in the panel, which its dividers depend on. */
+const withPanel = `
+  <helix-sandbox>
+    <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+    <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+    <helix-sandbox-terminal slot="panel"></helix-sandbox-terminal>
+  </helix-sandbox>`
+
 const withCss = `
   <helix-sandbox>
     <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
@@ -278,5 +286,66 @@ describe('sandbox source editing', () => {
 
     expect(tab.defaultPrevented).toBe(false)
     expect(field.value).toBe('x')
+  })
+
+  describe('sandbox dividers', () => {
+    test('the panel dividers appear only when there is a panel to size', async () => {
+      // There is no asking in CSS, `:host(:has([slot="panel"]))` being invalid,
+      // and nothing to ask on the server. `slotchange` is what answers.
+      const bare = (await mount(wired)) as Updatable
+      expect(bare.shadowRoot?.querySelector('[part="corner"]')).toBeNull()
+
+      const full = (await mount(withPanel)) as Updatable
+      await full.updateComplete
+      expect(full.shadowRoot?.querySelector('[part="separator"][data-axis="block"]')).not.toBeNull()
+      expect(full.shadowRoot?.querySelector('[part="corner"]')).not.toBeNull()
+    })
+
+    test('each divider answers only the arrows it can move', async () => {
+      const sandbox = (await mount(withPanel)) as Updatable & { panelSize: number; split: number }
+      await sandbox.updateComplete
+      const press = async (selector: string, key: string) => {
+        sandbox.shadowRoot
+          ?.querySelector(selector)
+          ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
+        await sandbox.updateComplete
+      }
+
+      await press('[part="separator"][data-drag="inline"]', 'ArrowLeft')
+      expect(sandbox.split).toBe(43)
+      await press('[part="separator"][data-drag="inline"]', 'ArrowUp')
+      expect(sandbox.panelSize).toBe(192)
+
+      await press('[part="separator"][data-axis="block"]', 'ArrowUp')
+      expect(sandbox.panelSize).toBe(208)
+      await press('[part="separator"][data-axis="block"]', 'ArrowLeft')
+      expect(sandbox.split).toBe(43)
+    })
+
+    test('the corner answers both, each arrow along its own axis', async () => {
+      const sandbox = (await mount(withPanel)) as Updatable & { panelSize: number; split: number }
+      await sandbox.updateComplete
+      const press = async (key: string) => {
+        sandbox.shadowRoot
+          ?.querySelector('[part="corner"]')
+          ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
+        await sandbox.updateComplete
+      }
+      await press('ArrowRight')
+      expect(sandbox.split).toBe(47)
+      await press('ArrowUp')
+      expect(sandbox.panelSize).toBe(208)
+    })
+
+    test('the corner is a separator with a name, and claims no single orientation', async () => {
+      // `aria-orientation` has no value meaning "both", and inventing one says
+      // less than saying nothing: the label is what carries it.
+      const sandbox = (await mount(withPanel)) as Updatable
+      await sandbox.updateComplete
+      const corner = sandbox.shadowRoot?.querySelector('[part="corner"]')
+      expect(corner?.getAttribute('role')).toBe('separator')
+      expect(corner?.getAttribute('aria-orientation')).toBeNull()
+      expect(corner?.getAttribute('aria-label')).toBe('Resize panes and panel')
+    })
   })
 })

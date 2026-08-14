@@ -310,6 +310,18 @@ export type HelixSandboxProps = {
   orientation?: HelixSandbox["orientation"];
   /** Percentage of the sandbox given to the source pane. */
   split?: HelixSandbox["split"];
+  /** Height of the panel, in pixels. */
+  "panel-size"?: HelixSandbox["panelSize"];
+  /** Height of the panel, in pixels. */
+  panelSize?: HelixSandbox["panelSize"];
+  /** Accessible name for the panel's divider. */
+  "panel-label"?: HelixSandbox["panelLabel"];
+  /** Accessible name for the panel's divider. */
+  panelLabel?: HelixSandbox["panelLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  "corner-label"?: HelixSandbox["cornerLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  cornerLabel?: HelixSandbox["cornerLabel"];
   /** Accessible name for the divider. */
   "separator-label"?: HelixSandbox["separatorLabel"];
   /** Accessible name for the divider. */
@@ -321,6 +333,18 @@ export type HelixSandboxSolidJsProps = {
   "prop:orientation"?: HelixSandbox["orientation"];
   /** Percentage of the sandbox given to the source pane. */
   "prop:split"?: HelixSandbox["split"];
+  /** Height of the panel, in pixels. */
+  "attr:panel-size"?: HelixSandbox["panelSize"];
+  /** Height of the panel, in pixels. */
+  "prop:panelSize"?: HelixSandbox["panelSize"];
+  /** Accessible name for the panel's divider. */
+  "attr:panel-label"?: HelixSandbox["panelLabel"];
+  /** Accessible name for the panel's divider. */
+  "prop:panelLabel"?: HelixSandbox["panelLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  "attr:corner-label"?: HelixSandbox["cornerLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  "prop:cornerLabel"?: HelixSandbox["cornerLabel"];
   /** Accessible name for the divider. */
   "attr:separator-label"?: HelixSandbox["separatorLabel"];
   /** Accessible name for the divider. */
@@ -602,6 +626,9 @@ export type CustomElements = {
    *
    * - `orientation`: Whether the panes sit side by side or stacked.
    * - `split`: Percentage of the sandbox given to the source pane.
+   * - `panel-size`/`panelSize`: Height of the panel, in pixels.
+   * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
+   * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
    *
    * ## Slots
@@ -1002,6 +1029,9 @@ export type CustomElementsSolidJs = {
    *
    * - `orientation`: Whether the panes sit side by side or stacked.
    * - `split`: Percentage of the sandbox given to the source pane.
+   * - `panel-size`/`panelSize`: Height of the panel, in pixels.
+   * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
+   * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
    *
    * ## Slots
