@@ -21,6 +21,20 @@
   padding: var(--helix-space-2xs);
 }
 
+/* Equal segments, which is what a segmented control is. Without this the items
+   sat at their label widths and the track ran on past them: in a drawer, where
+   the group stretches to the column, "System Light Dark" bunched at the leading
+   edge with half the groove empty behind them.
+
+   `flex-basis: 0` rather than `auto`, so the share is equal rather than
+   proportional to the label. That also keeps the travelling thumb one width as
+   it moves, where proportional segments make it resize on every change. In an
+   inline context, where there is no free space to share, equal shares resolve
+   to the width of the widest label, which is the same control either way. */
+::slotted(helix-toggle) {
+  flex: 1 1 0;
+}
+
 /* One marker that travels. Its geometry is measured from the selected item and
    written onto this element, because labels differ in length and no fraction of
    the group is right for all of them.

@@ -29,7 +29,7 @@
   /* Block only. The inset belongs to the rows, so a row's hover and focus reach
      the full width of the surface instead of stopping short of it and leaving a
      margin of unlit surface down both sides. */
-  padding-block: var(--helix-space-2xs);
+  padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-none);
 }
 

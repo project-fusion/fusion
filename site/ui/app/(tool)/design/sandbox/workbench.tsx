@@ -11,7 +11,14 @@ import {
   jsxToHtml,
 } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
-import type { HelixDrawer, HelixMenu, HelixTabs, HelixToggleGroup, HelixTree } from '@helix-io/web'
+import type {
+  HelixDrawer,
+  HelixMenu,
+  HelixTabs,
+  HelixToggleGroup,
+  HelixTree,
+  HelixTreeItem,
+} from '@helix-io/web'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
 import { useHelixEvent } from '../../../../lib/use-helix-event'
@@ -37,10 +44,15 @@ interface Props {
  * showing all of them at once invites a reader to edit one and wonder why the
  * others disagree. What is on screen is what runs.
  */
+/* Two files, not three. `index.jsx` was here and produced the same bytes as
+   `index.tsx`: an example is Helix elements with attributes, so there is no
+   annotation, no generic, and nothing else for TypeScript to hold. It was one
+   more row in the menu, one more file name, and no difference on screen. TSX is
+   the one kept, because a consumer scaffolding a React app gets TypeScript by
+   default and that is the file they will be pasting into. */
 const SYNTAXES = [
   { file: 'index.html', label: 'HTML', language: 'html', value: 'html' },
   { file: 'index.tsx', label: 'TSX', language: 'tsx', value: 'tsx' },
-  { file: 'index.jsx', label: 'JSX', language: 'tsx', value: 'jsx' },
 ] as const
 
 type Syntax = (typeof SYNTAXES)[number]['value']
@@ -121,6 +133,10 @@ export function SandboxWorkbench({ families }: Props) {
   const [previewTheme, setPreviewTheme] = useState<'dark' | 'light' | null>(null)
   const [siteTheme, setSiteTheme] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
+  const [filter, setFilter] = useState('')
+  // Null is "nobody has said", which is the current family open and the rest
+  // shut. Once the button is pressed it is an answer, and it holds.
+  const [expandAll, setExpandAll] = useState<boolean | null>(null)
   const [railOpen, setRailOpen] = useState(false)
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [narrow, setNarrow] = useState(false)
@@ -318,43 +334,124 @@ export function SandboxWorkbench({ families }: Props) {
 
   const activeValue = `${family.slug}/${example.slug}`
 
+  const query = filter.trim().toLowerCase()
+  const hit = (text: string) => text.toLowerCase().includes(query)
+
+  /* A family matching by name keeps all of its examples, because the reader
+     asked for the component and not for a particular one of its pages. A family
+     that does not match is kept only for the examples that do, and drops out
+     entirely when none of them do. */
+  const shown =
+    query === ''
+      ? withExamples
+      : withExamples
+          .map((entry) =>
+            hit(entry.label)
+              ? entry
+              : { ...entry, examples: entry.examples.filter((item) => hit(item.label)) },
+          )
+          .filter((entry) => hit(entry.label) || entry.examples.length > 0)
+
+  const allOpen = expandAll ?? false
+
+  /* Also set on the elements, not only through the prop. React writes a prop
+     when its own value changes, and a reader who opened a branch by pressing
+     its chevron changed the element without changing anything React holds: on
+     the next "collapse all" React would see `undefined` before and after, write
+     nothing, and leave that one branch open. The sweep is what makes the button
+     mean every branch. */
+  const toggleAll = () => {
+    const next = !allOpen
+    setExpandAll(next)
+    for (const item of treeRef.current?.querySelectorAll<HelixTreeItem>(
+      ':scope > helix-tree-item',
+    ) ?? []) {
+      item.expanded = next
+    }
+  }
+
+  /* A filter is a request to see what came back, so a narrowed tree opens
+     itself rather than making the reader open each branch to find out. */
+  const isOpen = (slug: string) => query !== '' || (expandAll ?? slug === family.slug)
+
   const tree = (
-    <helix-tree chevron="end" label="Examples" ref={treeRef} value={activeValue}>
-      {withExamples.map((entry) => (
-        <helix-tree-item expanded={entry.slug === family.slug} key={entry.slug} value={entry.slug}>
-          {/* Everything here is experimental, and saying so on each row is the
+    <>
+      <helix-flex align="center" class="examplesHeader" data-density="sm" gap="2xs">
+        <helix-flex align="center" class="examplesFilter" gap="2xs">
+          <helix-icon name="funnel-simple"></helix-icon>
+          <input
+            aria-label="Filter examples"
+            onChange={(event) => setFilter(event.target.value)}
+            placeholder="Filter"
+            type="search"
+            value={filter}
+          />
+        </helix-flex>
+        <helix-icon-button label={allOpen ? 'Collapse all' : 'Expand all'} onClick={toggleAll}>
+          <helix-icon name={allOpen ? 'caret-up' : 'caret-down'}></helix-icon>
+        </helix-icon-button>
+      </helix-flex>
+
+      <div className="examplesScroll">
+        {shown.length === 0 ? (
+          <helix-text appearance="caption" tone="subtle">
+            Nothing matches {filter}.
+          </helix-text>
+        ) : (
+          <helix-tree chevron="end" label="Examples" ref={treeRef} value={activeValue}>
+            {shown.map((entry) => (
+              <helix-tree-item
+                expanded={isOpen(entry.slug) ? true : undefined}
+                key={entry.slug}
+                value={entry.slug}
+              >
+                {/* Everything here is experimental, and saying so on each row is the
               honest form of that: a badge on the page a reader has already
               opened tells them after they chose it. */}
-          {entry.status === 'experimental' && (
-            <helix-tooltip content="Experimental. The API can change." slot="end">
-              <helix-icon label="Experimental" name="flask"></helix-icon>
-            </helix-tooltip>
-          )}
-          {entry.label}
-          {entry.examples.map((item) => (
-            <helix-tree-item key={item.slug} slot="children" value={`${entry.slug}/${item.slug}`}>
-              {item.label}
-            </helix-tree-item>
-          ))}
-        </helix-tree-item>
-      ))}
-    </helix-tree>
+                {entry.status === 'experimental' && (
+                  <helix-tooltip content="Experimental. The API can change." slot="end">
+                    <helix-icon label="Experimental" name="flask"></helix-icon>
+                  </helix-tooltip>
+                )}
+                {entry.label}
+                {entry.examples.map((item) => (
+                  <helix-tree-item
+                    key={item.slug}
+                    slot="children"
+                    value={`${entry.slug}/${item.slug}`}
+                  >
+                    {item.label}
+                  </helix-tree-item>
+                ))}
+              </helix-tree-item>
+            ))}
+          </helix-tree>
+        )}
+      </div>
+    </>
   )
 
   return (
     <>
-      <helix-flex align="center" class="workbenchHeader" data-density="sm" gap="md">
+      {/* The same component the site's own header is, rather than a flex row
+          shaped like one. It is a header with a brand at the start and actions
+          at the end, which is what this component is for, and taking it means
+          the header height and the dense-by-nature sizing come from one place
+          instead of being restated here. The class only makes it full bleed:
+          this is a tool, so the row runs to the window rather than to the
+          site's text column. */}
+      <helix-app-header class="workbenchHeader">
         {/* The mark, and the way out. No trail beside it: the rail already
             says which component and which example, and a breadcrumb repeating
             it is a second answer to a question nobody asked twice. */}
-        <a aria-label="Fusion" data-link="quiet" href="/design">
+        <a aria-label="Fusion" data-link="quiet" href="/design" slot="start">
           <FusionLogo size="1.25rem" />
         </a>
 
         {/* What is about the site rather than the sandbox: how the whole thing
             looks, and on a phone, the way to the examples. The sandbox's own
             settings are in its toolbar. */}
-        <helix-flex align="center" class="workbenchHeaderEnd" gap="2xs">
+        <helix-flex align="center" gap="2xs" slot="end">
           {narrow && (
             <helix-button appearance="subtle" onClick={() => setRailOpen(true)}>
               Examples
@@ -364,7 +461,7 @@ export function SandboxWorkbench({ families }: Props) {
             <helix-icon name="gear"></helix-icon>
           </helix-icon-button>
         </helix-flex>
-      </helix-flex>
+      </helix-app-header>
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 

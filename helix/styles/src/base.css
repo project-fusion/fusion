@@ -517,6 +517,11 @@ helix-toggle::part(item) {
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
+  /* Fills the segment rather than sitting at its label width inside it. The
+     host is what the group sizes, and an item narrower than its host leaves a
+     strip along each edge that looks like the control and does not respond to a
+     press. On both forms, which is why the rule covers both. */
+  flex: 1 1 auto;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);

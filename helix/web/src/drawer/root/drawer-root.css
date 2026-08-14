@@ -2,21 +2,41 @@
   --_drawer-size: var(--drawer-size, 20rem);
 }
 
+/* The cover fades. It did not before, and the reason is worth keeping.
+ *
+ * `hidden` on this element and `data-open` on the host change in the same Lit
+ * update, so the scrim went from `display: none` to rendered in a single style
+ * recalc. An element being rendered for the first time has no previous value to
+ * interpolate from, so the opacity transition never ran at all: the cover
+ * arrived at full strength in one frame while the panel beside it slid. It
+ * looked like a flicker and was a missing animation.
+ *
+ * `allow-discrete` moves `display` at the useful end of each direction, on at
+ * the start of the opening and off at the finish of the closing, and
+ * `@starting-style` gives the opening frame somewhere to come from. Driven off
+ * `hidden` alone rather than off `hidden` and `data-open` together, so there is
+ * one source for whether the cover is there instead of two that have to agree.
+ */
 [part="scrim"] {
   background-color: var(--helix-color-overlay);
   inset: 0;
-  opacity: 0;
-  position: fixed;
-  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
-  z-index: var(--helix-layer-overlay);
-}
-
-:host([data-open]) [part="scrim"] {
   opacity: 1;
+  position: fixed;
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    display var(--helix-duration-normal) allow-discrete;
+  z-index: var(--helix-layer-overlay);
 }
 
 [part="scrim"][hidden] {
   display: none;
+  opacity: 0;
+}
+
+@starting-style {
+  [part="scrim"]:not([hidden]) {
+    opacity: 0;
+  }
 }
 
 /* Transform and opacity only. The surface at rest is flat; the movement is
