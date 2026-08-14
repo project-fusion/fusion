@@ -388,19 +388,24 @@ export function SandboxWorkbench({ families }: Props) {
           />
         </helix-flex>
         {/* Filled, so it and the field beside it are one piece of chrome rather
-            than a box with a button floating after it. */}
-        <helix-icon-button
-          appearance="neutral"
-          label={allOpen ? 'Collapse all' : 'Expand all'}
-          onClick={toggleAll}
-        >
-          {/* The arrows say what the button does. A caret is what a thing to
+            than a box with a button floating after it. The tooltip repeats the
+            label rather than adding to it: a lone glyph is only guessable, and
+            the name a screen reader already reads is the thing a pointer user
+            is missing. */}
+        <helix-tooltip content={allOpen ? 'Collapse all' : 'Expand all'} placement="bottom">
+          <helix-icon-button
+            appearance="neutral"
+            label={allOpen ? 'Collapse all' : 'Expand all'}
+            onClick={toggleAll}
+          >
+            {/* The arrows say what the button does. A caret is what a thing to
               open looks like, not what opening everything looks like, and two of
               them stacked in a rail full of chevrons said nothing at all. */}
-          <helix-icon
-            name={allOpen ? 'arrows-in-line-vertical' : 'arrows-out-line-vertical'}
-          ></helix-icon>
-        </helix-icon-button>
+            <helix-icon
+              name={allOpen ? 'arrows-in-line-vertical' : 'arrows-out-line-vertical'}
+            ></helix-icon>
+          </helix-icon-button>
+        </helix-tooltip>
       </helix-flex>
 
       <div className="examplesScroll">
@@ -468,9 +473,11 @@ export function SandboxWorkbench({ families }: Props) {
               Examples
             </helix-button>
           )}
-          <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
-            <helix-icon name="gear"></helix-icon>
-          </helix-icon-button>
+          <helix-tooltip content="Preferences" placement="bottom">
+            <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
+              <helix-icon name="gear"></helix-icon>
+            </helix-icon-button>
+          </helix-tooltip>
         </helix-flex>
       </helix-app-header>
 
@@ -498,20 +505,27 @@ export function SandboxWorkbench({ families }: Props) {
             </helix-toggle-group>
 
             <helix-toolbar label="Sandbox actions" slot="end">
-              <helix-icon-button
-                label={copied ? 'Link copied' : 'Copy a link to this example'}
-                onClick={share}
+              <helix-tooltip
+                content={copied ? 'Link copied' : 'Copy a link to this example'}
+                placement="bottom"
               >
-                <helix-icon name={copied ? 'check' : 'share-network'}></helix-icon>
-              </helix-icon-button>
+                <helix-icon-button
+                  label={copied ? 'Link copied' : 'Copy a link to this example'}
+                  onClick={share}
+                >
+                  <helix-icon name={copied ? 'check' : 'share-network'}></helix-icon>
+                </helix-icon-button>
+              </helix-tooltip>
 
               {/* Layout and Direction drill down; the last three tick. The menu
                   reads its state from here rather than holding its own, so what
                   is ticked is what is showing. */}
               <helix-menu label="Environment" ref={settings}>
-                <helix-icon-button label="Sandbox settings" slot="trigger">
-                  <helix-icon name="sliders-horizontal"></helix-icon>
-                </helix-icon-button>
+                <helix-tooltip content="Sandbox settings" placement="bottom" slot="trigger">
+                  <helix-icon-button label="Sandbox settings">
+                    <helix-icon name="sliders-horizontal"></helix-icon>
+                  </helix-icon-button>
+                </helix-tooltip>
 
                 <helix-menu-item value="syntax">
                   Environment

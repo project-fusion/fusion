@@ -87,10 +87,40 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
     placement: () => this.placement,
   })
 
-  /** The element the surface opens against. */
+  /**
+   * The element the surface opens against.
+   *
+   * Past a wrapper that draws no box of its own. `display: contents` puts an
+   * element's children in the layout and leaves the element without one, so its
+   * `getBoundingClientRect()` is `0 0 0 0`: measured, a tooltip host reports
+   * exactly that while the button inside it reports 32 by 32. Anchoring to it
+   * would open the menu against the top left of the window, and focusing it on
+   * close would put focus nowhere.
+   *
+   * That matters because wrapping is how a tooltip attaches to what it
+   * describes, so without this an icon button used as a trigger is the one
+   * button on a toolbar that cannot have one. Descending is the whole fix: the
+   * wrapper is transparent by construction, so the thing with the box is the
+   * thing the reader is pointing at.
+   */
   private get trigger(): HTMLElement {
     const slot = this.renderRoot.querySelector('slot[name="trigger"]') as HTMLSlotElement | null
-    return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? this
+    const assigned = slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined
+    if (!assigned) {
+      return this
+    }
+    let element = assigned
+    // A guard rather than a `while (true)`: a chain of box-less wrappers is
+    // already unusual and an unbounded walk over a tree we do not own is worse
+    // than stopping.
+    for (let depth = 0; depth < 4; depth += 1) {
+      const child = element.firstElementChild as HTMLElement | null
+      if (!child || element.getClientRects().length > 0) {
+        return element
+      }
+      element = child
+    }
+    return element
   }
 
   private get surface(): HTMLElement | null {

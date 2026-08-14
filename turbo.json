@@ -16,7 +16,7 @@
       "persistent": true
     },
     "icons": {
-      "inputs": ["raw/**", "$TURBO_ROOT$/tooling/scripts/build-icons.mjs"],
+      "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/tooling/scripts/build-icons.mjs"],
       "outputs": ["src/generated.ts"]
     },
     "styles": {

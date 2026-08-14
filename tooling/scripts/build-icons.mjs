@@ -1,15 +1,29 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 /**
- * Generates the icon set from the raw SVGs.
+ * Generates the icon set.
+ *
+ * The set is a list of names in `helix/icons/icons.txt`, and each one is
+ * resolved from `@phosphor-icons/core` at build time: regular weight, then
+ * fill, then `raw/` for the marks that are not Phosphor at all. That package is
+ * a devDependency and nothing imports it at runtime. Six megabytes of every
+ * icon at every weight sits in `node_modules`; what ships is the handful named
+ * here, inlined into `generated.ts`.
+ *
+ * It used to be a folder of SVGs pasted in by hand, which drifted: the copies
+ * were the stroked form Phosphor's site exports and the package draws the
+ * regular weight as one filled path, so the same glyph was in the repo twice in
+ * two techniques with no way to tell which was current. Adding an icon is
+ * adding a line now.
  *
  * Icons are data, not components, and the data is the SVG's inner markup rather
- * than a single path string. Phosphor draws with several elements at once, a
- * `<polyline>` beside a `<circle>` beside a `<rect>`, and each carries its own
- * stroke and fill. Flattening that to one `d` attribute would lose most of the
- * set, so the inner markup is kept verbatim and the component renders it.
+ * than a single path string. Phosphor draws some glyphs with several elements
+ * at once, a `<polyline>` beside a `<circle>` beside a `<rect>`, and each
+ * carries its own stroke and fill. Flattening that to one `d` attribute would
+ * lose those, so the inner markup is kept verbatim and the component renders
+ * it.
  *
  * `fusion.svg` is skipped. It is a brand mark rather than an icon: it defines
  * gradients by id, and ids are document-global, so two of them on one page
@@ -21,17 +35,34 @@ import { fileURLToPath } from 'node:url'
 // under node, which is what runs the tooling scripts.
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const RAW = join(ROOT, 'helix/icons/raw')
+const LIST = join(ROOT, 'helix/icons/icons.txt')
+const PHOSPHOR = join(ROOT, 'node_modules/@phosphor-icons/core/assets')
 const OUT = join(ROOT, 'helix/icons/src/generated.ts')
+
+/* Regular first, then fill: the four `-fill` names in the set are the solid
+   variants Phosphor keeps in a separate weight, and asking for regular first
+   means a name only lands there when it is genuinely a fill. `raw/` last, for
+   the marks Phosphor does not draw. */
+const sourceFor = (slug) => {
+  for (const dir of [join(PHOSPHOR, 'regular'), join(PHOSPHOR, 'fill'), RAW]) {
+    const file = join(dir, `${slug}.svg`)
+    if (existsSync(file)) {
+      return readFileSync(file, 'utf8')
+    }
+  }
+  throw new Error(`icons: no SVG for "${slug}" in @phosphor-icons/core or helix/icons/raw`)
+}
 
 /** `caret-down` becomes `caretDown`, which is what a consumer imports. */
 const camel = (slug) => slug.replace(/-([a-z0-9])/g, (_, char) => char.toUpperCase())
 
-const entries = readdirSync(RAW)
-  .filter((file) => file.endsWith('.svg') && file !== 'fusion.svg')
+const entries = readFileSync(LIST, 'utf8')
+  .split('\n')
+  .map((line) => line.trim())
+  .filter((line) => line !== '' && !line.startsWith('#') && line !== 'fusion')
   .sort()
-  .map((file) => {
-    const slug = file.replace(/\.svg$/, '')
-    const source = readFileSync(join(RAW, file), 'utf8')
+  .map((slug) => {
+    const source = sourceFor(slug)
 
     const viewBox = /viewBox="([^"]+)"/.exec(source)?.[1] ?? '0 0 256 256'
     const inner = source

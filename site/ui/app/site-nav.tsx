@@ -91,9 +91,11 @@ export function SiteNav() {
           </helix-nav-bar>
         )}
 
-        <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)} slot="end">
-          <helix-icon name="gear"></helix-icon>
-        </helix-icon-button>
+        <helix-tooltip content="Preferences" placement="bottom" slot="end">
+          <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
+            <helix-icon name="gear"></helix-icon>
+          </helix-icon-button>
+        </helix-tooltip>
 
         {narrow && (
           <helix-button appearance="subtle" onClick={() => setOpen(true)} slot="end">

@@ -23,6 +23,9 @@
     "icons": "node ../../tooling/scripts/build-icons.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "devDependencies": {
+    "@phosphor-icons/core": "^2.1.1"
+  },
   "publishConfig": {
     "access": "public"
   }

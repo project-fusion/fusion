@@ -9843,7 +9843,7 @@
                 "text": "HTMLElement"
               },
               "privacy": "private",
-              "description": "The element the surface opens against.",
+              "description": "The element the surface opens against.\n\nPast a wrapper that draws no box of its own. `display: contents` puts an\nelement's children in the layout and leaves the element without one, so its\n`getBoundingClientRect()` is `0 0 0 0`: measured, a tooltip host reports\nexactly that while the button inside it reports 32 by 32. Anchoring to it\nwould open the menu against the top left of the window, and focusing it on\nclose would put focus nowhere.\n\nThat matters because wrapping is how a tooltip attaches to what it\ndescribes, so without this an icon button used as a trigger is the one\nbutton on a toolbar that cannot have one. Descending is the whole fix: the\nwrapper is transparent by construction, so the thing with the box is the\nthing the reader is pointing at.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
