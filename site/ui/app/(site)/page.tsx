@@ -135,7 +135,9 @@ export default function Home() {
                 <helix-text as="p" tone="muted">
                   {substrate.body}
                 </helix-text>
-                <helix-link href={substrate.href}>Read more</helix-link>
+                <a data-link href={substrate.href}>
+                  Read more
+                </a>
               </helix-flex>
             ))}
           </helix-grid>
@@ -179,9 +181,9 @@ export default function Home() {
                   </helix-flex>
                   <helix-text tone="muted">{vertical.summary}</helix-text>
                 </helix-flex>
-                <helix-link appearance="quiet" href={vertical.href}>
+                <a data-link="quiet" href={vertical.href}>
                   Open
-                </helix-link>
+                </a>
               </helix-flex>
             ))}
           </helix-flex>

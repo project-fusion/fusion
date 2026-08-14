@@ -80,7 +80,6 @@ export { Flex, type FlexProps, FlexRoot } from './flex.js'
 export { Grid, type GridProps, GridRoot } from './grid.js'
 export { Icon, type IconProps, IconRoot } from './icon.js'
 export { IconButton, type IconButtonProps, IconButtonRoot } from './icon-button.js'
-export { Link, type LinkProps, LinkRoot } from './link.js'
 export {
   Table,
   TableCell,

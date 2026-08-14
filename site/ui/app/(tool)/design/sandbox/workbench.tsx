@@ -118,14 +118,14 @@ export function SandboxWorkbench({ families }: Props) {
   return (
     <>
       <helix-flex align="center" class="workbenchHeader" gap="md">
-        <helix-link appearance="quiet" href="/design">
+        <a data-link="quiet" href="/design">
           <helix-flex align="baseline" gap="2xs" inline>
             <helix-text appearance="body-strong">Helix</helix-text>
             <helix-text appearance="label" tone="subtle">
               sandbox
             </helix-text>
           </helix-flex>
-        </helix-link>
+        </a>
 
         <helix-flex align="baseline" class="workbenchTitle" gap="2xs">
           <helix-text appearance="caption">{family.label}</helix-text>
