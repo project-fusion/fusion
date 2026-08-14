@@ -7975,82 +7975,10 @@
       "exports": [
         {
           "kind": "js",
-          "name": "DismissDetail",
+          "name": "*",
           "declaration": {
-            "name": "DismissDetail",
+            "name": "*",
             "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixCloseEvent",
-          "declaration": {
-            "name": "HelixCloseEvent",
-            "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixDismissEvent",
-          "declaration": {
-            "name": "HelixDismissEvent",
-            "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixOpenEvent",
-          "declaration": {
-            "name": "HelixOpenEvent",
-            "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixSelectEvent",
-          "declaration": {
-            "name": "HelixSelectEvent",
-            "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixValueChangeEvent",
-          "declaration": {
-            "name": "HelixValueChangeEvent",
-            "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "OpenDetail",
-          "declaration": {
-            "name": "OpenDetail",
-            "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "SelectDetail",
-          "declaration": {
-            "name": "SelectDetail",
-            "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "ValueChangeDetail",
-          "declaration": {
-            "name": "ValueChangeDetail",
-            "package": "@helix-io/core"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Placement",
-          "declaration": {
-            "name": "Placement",
-            "package": "@helix-io/headless"
           }
         },
         {

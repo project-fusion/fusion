@@ -1,15 +1,9 @@
-export {
-  type DismissDetail,
-  HelixCloseEvent,
-  HelixDismissEvent,
-  HelixOpenEvent,
-  HelixSelectEvent,
-  HelixValueChangeEvent,
-  type OpenDetail,
-  type SelectDetail,
-  type ValueChangeDetail,
-} from '@helix-io/core'
-export type { Placement } from '@helix-io/headless'
+/**
+ * Everything core exports, forwarded whole. See the note in `helix/headless`:
+ * a hand-kept list drifts, and it drifts silently until a component happens to
+ * declare a public member with a type nobody forwarded yet.
+ */
+export * from '@helix-io/core'
 export * from './accordion/index.js'
 export * from './app-header/index.js'
 export * from './avatar/index.js'
