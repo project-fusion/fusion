@@ -67,6 +67,21 @@ describe('breadcrumb items', () => {
     expect(current.hasAttribute('aria-current')).toBe(false)
   })
 
+  test('the separator is a chevron, and the slot is what replaces it', async () => {
+    // The chevron is the slot's own fallback, so a consumer replaces it by
+    // filling the slot rather than by turning a default off.
+    const crumbs = await mount(trail)
+    const second = [...crumbs.querySelectorAll('helix-breadcrumb')][1] as HTMLElement
+    expect(second.shadowRoot?.querySelector('[part="separator"] svg')).not.toBeNull()
+
+    const replaced = await mount(
+      '<helix-breadcrumbs><helix-breadcrumb><span slot="separator">/</span>A</helix-breadcrumb></helix-breadcrumbs>',
+    )
+    const item = replaced.querySelector('helix-breadcrumb') as HTMLElement
+    const slot = item.shadowRoot?.querySelector('slot[name="separator"]') as HTMLSlotElement
+    expect(slot.assignedElements()).toHaveLength(1)
+  })
+
   test('each item carries its own separator, hidden from assistive technology', async () => {
     // Every item renders one; CSS hides the first. No index, no coordination.
     const crumbs = await mount(trail)

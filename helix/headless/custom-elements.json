@@ -1694,7 +1694,7 @@
               "name": ""
             },
             {
-              "description": "Replaces the separator shown before this item.",
+              "description": "Replaces the chevron shown before this item.",
               "name": "separator"
             }
           ],

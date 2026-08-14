@@ -1673,7 +1673,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The step: a link, or the text of the current page. A link is styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
-   * - `separator`: Replaces the separator shown before this item.
+   * - `separator`: Replaces the chevron shown before this item.
    *
    * ## CSS Parts
    *
@@ -3147,7 +3147,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The step: a link, or the text of the current page. A link is styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
-   * - `separator`: Replaces the separator shown before this item.
+   * - `separator`: Replaces the chevron shown before this item.
    *
    * ## CSS Parts
    *

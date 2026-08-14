@@ -10,6 +10,11 @@
   user-select: none;
 }
 
+[part="separator"] svg {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
 /* Each item draws the separator that precedes it, and the first one hides it.
    Structural pseudo-classes are valid inside `:host()`, unlike `:has()`, so
    this needs no index, no parent coordination, and no JavaScript.
@@ -20,12 +25,39 @@
   display: none;
 }
 
-/* Nothing here styles the link. It is slotted, so it belongs to the outer tree,
-   and `:where(a)` in the base layer outranks any `::slotted` rule written here.
-   A breadcrumb link is `data-link="quiet"`, the same recipe navigation uses
-   everywhere else.
+/* The step reads as a subtle button under the pointer: transparent until then,
+   and the sunken surface on hover, which is what `data-button="subtle"` does.
 
-   The current page reads as where you are, not as somewhere you can go. It is
+   `::slotted` reaches the link here where it could not reach its color. The
+   base layer's `:where(a)` sets color and text-decoration and nothing else, so
+   the outer tree wins those and leaves box and background uncontested. Color
+   stays with `data-link="quiet"`, which is the recipe that owns it. */
+::slotted(a) {
+  background-color: transparent;
+  border-radius: var(--helix-radii-sm);
+  /* Pulled back by its own inline padding, so the trail keeps the spacing
+     it had and only the hover fill is new. */
+  margin-inline: calc(var(--helix-space-xs) * -1);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+::slotted(a:hover) {
+  background-color: var(--breadcrumb-hover-color, var(--helix-color-surface-sunken));
+}
+
+::slotted(a:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::slotted(a) {
+    transition: none;
+  }
+}
+
+/* The current page reads as where you are, not as somewhere you can go. It is
    text with no element to select, so this is on the host: color and weight
    inherit into it, where a selector has nothing to match. */
 :host([current]) {

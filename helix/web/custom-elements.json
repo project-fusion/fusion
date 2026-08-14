@@ -2314,12 +2314,16 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The separator is hidden on the first item with `:host(:first-child)`, so no\nitem needs to know its own index and the parent needs no coordination.\n\nThe link carries `data-link=\"quiet\"`, the recipe navigation uses everywhere\nelse. It cannot be styled from in here: a slotted anchor belongs to the outer\ntree, where `:where(a)` in the base layer outranks any `::slotted` rule.",
+          "description": "The separator is hidden on the first item with `:host(:first-child)`, so no\nitem needs to know its own index and the parent needs no coordination.\n\nThe link carries `data-link=\"quiet\"`, the recipe navigation uses everywhere\nelse, which is what owns its color. Under the pointer it reads as a subtle\nbutton. That part is styled from in here: the base layer sets color and\ntext-decoration on an anchor and nothing else, so the outer tree wins those\nand leaves box and background to `::slotted`.",
           "name": "HelixBreadcrumb",
           "cssProperties": [
             {
-              "description": "Color of the separator.",
+              "description": "Color of the chevron.",
               "name": "--breadcrumbs-separator-color"
+            },
+            {
+              "description": "Fill behind a step under the pointer.",
+              "name": "--breadcrumb-hover-color"
             }
           ],
           "cssParts": [
@@ -2342,7 +2346,7 @@
               }
             },
             {
-              "description": "Replaces the separator shown before this item.",
+              "description": "Replaces the chevron shown before this item.",
               "name": "separator",
               "inheritedFrom": {
                 "name": "HelixBaseBreadcrumb",
