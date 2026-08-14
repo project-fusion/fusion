@@ -243,31 +243,87 @@ The banner does not remove itself. `preventDefault()` refuses the request.
 
 ### Root
 
-Description
+Shows the path to the current page.
+
+The host is the landmark, so `aria-label` on it names the trail and no property
+mirrors one. A page may hold more than one navigation, and landmarks are how a
+screen-reader user chooses between them.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+None. Semantics are set through `ElementInternals`, so the host carries no
+attribute it was not given.
 
 #### Slots
 
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
+| Slot        | Description                                        |
+| ----------- | -------------------------------------------------- |
+| _(default)_ | The trail's items, from root to the current page.   |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+| Part   | Description       |
+| ------ | ----------------- |
+| `list` | The ordered list. |
+
+`role="list"` is set on the `<ol>` even though it is already a list. Removing
+the markers with `list-style: none` strips list semantics in Safari, and a
+breadcrumb trail always removes its markers.
+
+### Item
+
+One step in a breadcrumb trail. Contributes the separator and the list-item
+role.
+
+**The link is the consumer's own, slotted in.** An anchor rendered into the
+item's shadow root is unreachable to the framework that owns the route, so a
+router's `<a>` has to sit in the light DOM:
+
+```html
+<helix-breadcrumbs aria-label="Breadcrumb">
+  <helix-breadcrumbs-item><a data-link="quiet" href="/">Home</a></helix-breadcrumbs-item>
+  <helix-breadcrumbs-item current>Helix</helix-breadcrumbs-item>
+</helix-breadcrumbs>
+```
+
+```jsx
+<Breadcrumbs aria-label="Breadcrumb">
+  <Breadcrumbs.Item><Link data-link="quiet" href="/">Home</Link></Breadcrumbs.Item>
+  <Breadcrumbs.Item current>Helix</Breadcrumbs.Item>
+</Breadcrumbs>
+```
+
+The link is styled with `data-link="quiet"`, the recipe navigation uses
+everywhere else. The item cannot style it: a slotted anchor belongs to the outer
+tree, where `:where(a)` in the base layer outranks any `::slotted` rule the item
+could write.
+
+#### Properties
+
+| Property  | Attribute | Type      | Default | Inherited From | Description                                 |
+| --------- | --------- | --------- | ------- | -------------- | ------------------------------------------- |
+| `current` | `current` | `boolean` | `false` | -              | Whether this is the page the reader is on.  |
+
+The current page is text, not a link. Linking a page to itself is a known
+screen-reader annoyance, and `aria-current="page"` on the host is what conveys
+position.
+
+#### Slots
+
+| Slot        | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| _(default)_ | The step: a link, or the text of the current page.   |
+| `separator` | Replaces the separator shown before this item.       |
+
+#### CSS Parts
+
+| Part        | Description                        |
+| ----------- | ---------------------------------- |
+| `separator` | The separator preceding the item.  |
+
+Every item draws its own separator and the first hides it with
+`:host(:first-child)`, so the trail needs no index and no coordination from the
+parent.
 
 ## BaseButton
 

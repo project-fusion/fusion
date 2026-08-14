@@ -10,16 +10,19 @@ import { styles } from './breadcrumbs-item.css.js'
  * The separator is hidden on the first item with `:host(:first-child)`, so no
  * item needs to know its own index and the parent needs no coordination.
  *
+ * The link carries `data-link="quiet"`, the recipe navigation uses everywhere
+ * else. It cannot be styled from in here: a slotted anchor belongs to the outer
+ * tree, where `:where(a)` in the base layer outranks any `::slotted` rule.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases Crumb
  * @documentation https://helix.fusion.dev/components/breadcrumbs
  *
- * @slot - The item's label.
+ * @slot - The step: a link, or the text of the current page.
  * @slot separator - Replaces the separator shown before this item.
  *
  * @csspart separator - The separator preceding the item.
- * @csspart link - The item's link, or its text when current.
  *
  * @cssproperty --breadcrumbs-separator-color - Color of the separator.
  */

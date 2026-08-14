@@ -8,8 +8,8 @@ beforeAll(async () => {
 
 const trail = `
   <helix-breadcrumbs>
-    <helix-breadcrumbs-item href="/">Home</helix-breadcrumbs-item>
-    <helix-breadcrumbs-item href="/work">Work</helix-breadcrumbs-item>
+    <helix-breadcrumbs-item><a href="/">Home</a></helix-breadcrumbs-item>
+    <helix-breadcrumbs-item><a href="/work">Work</a></helix-breadcrumbs-item>
     <helix-breadcrumbs-item current>Helix</helix-breadcrumbs-item>
   </helix-breadcrumbs>`
 
@@ -44,24 +44,27 @@ describe('breadcrumbs', () => {
 })
 
 describe('breadcrumb items', () => {
-  test('a step is a link, the current page is not', async () => {
+  test("the anchor is the consumer's own, so a router keeps its route", async () => {
+    // An anchor rendered into the item's shadow root is unreachable to the
+    // framework that owns the route, which is why the item renders none.
+    const crumbs = await mount(trail)
+    const items = [...crumbs.querySelectorAll('helix-breadcrumbs-item')] as HTMLElement[]
+    expect(items[0]?.shadowRoot?.querySelector('a')).toBeNull()
+
+    const slotted = items[0]?.querySelector('a')
+    expect(slotted?.getAttribute('href')).toBe('/')
+  })
+
+  test('the current page is not a link, and says so on the host', async () => {
     // Linking a page to itself is a known screen-reader annoyance, and
     // aria-current is what actually conveys position.
     const crumbs = await mount(trail)
-    const items = [...crumbs.querySelectorAll('helix-breadcrumbs-item')] as HTMLElement[]
-    expect(items[0]?.shadowRoot?.querySelector('a[part="link"]')).not.toBeNull()
-
-    const current = items[2]?.shadowRoot?.querySelector('[part="link"]')
-    expect(current?.tagName).toBe('SPAN')
-    expect(current?.getAttribute('aria-current')).toBe('page')
-  })
-
-  test('an item with no href is text, not an empty link', async () => {
-    const crumbs = await mount(
-      '<helix-breadcrumbs><helix-breadcrumbs-item>Orphan</helix-breadcrumbs-item></helix-breadcrumbs>',
-    )
-    const item = crumbs.querySelector('helix-breadcrumbs-item') as HTMLElement
-    expect(item.shadowRoot?.querySelector('[part="link"]')?.tagName).toBe('SPAN')
+    const current = [...crumbs.querySelectorAll('helix-breadcrumbs-item')][2] as HTMLElement & {
+      internals?: ElementInternals
+    }
+    expect(current.querySelector('a')).toBeNull()
+    expect(current.internals?.ariaCurrent).toBe('page')
+    expect(current.hasAttribute('aria-current')).toBe(false)
   })
 
   test('each item carries its own separator, hidden from assistive technology', async () => {
@@ -77,7 +80,7 @@ describe('breadcrumb items', () => {
 
   test('the separator can be replaced without touching the parent', async () => {
     const crumbs = await mount(
-      '<helix-breadcrumbs><helix-breadcrumbs-item href="/">A</helix-breadcrumbs-item><helix-breadcrumbs-item><span slot="separator">&rsaquo;</span>B</helix-breadcrumbs-item></helix-breadcrumbs>',
+      '<helix-breadcrumbs><helix-breadcrumbs-item><a href="/">A</a></helix-breadcrumbs-item><helix-breadcrumbs-item><span slot="separator">&rsaquo;</span>B</helix-breadcrumbs-item></helix-breadcrumbs>',
     )
     const second = [...crumbs.querySelectorAll('helix-breadcrumbs-item')][1] as HTMLElement
     const slot = second.shadowRoot?.querySelector('slot[name="separator"]') as HTMLSlotElement

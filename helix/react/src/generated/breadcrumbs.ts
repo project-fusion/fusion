@@ -22,14 +22,16 @@ export const BreadcrumbsRoot = createComponent<HelixBreadcrumbs, BreadcrumbsProp
 /**
  * The separator is hidden on the first item with `:host(:first-child)`, so no
 item needs to know its own index and the parent needs no coordination.
+
+The link carries `data-link="quiet"`, the recipe navigation uses everywhere
+else. It cannot be styled from in here: a slotted anchor belongs to the outer
+tree, where `:where(a)` in the base layer outranks any `::slotted` rule.
  *
  * Renders `<helix-breadcrumbs-item>`.
  */
 export interface BreadcrumbsItemProps extends BaseProps {
   /** Whether this item is the page the reader is on. */
   current?: boolean
-  /** Where the step leads. Ignored when the item is the current page. */
-  href?: string
 }
 
 export const BreadcrumbsItem = createComponent<HelixBreadcrumbsItem, BreadcrumbsItemProps>({

@@ -345,99 +345,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/helix-element/helix-element.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Owns only what is universal: normalizing `box-sizing` inside the shadow root,\nso component CSS can rely on border-box on both sides of the boundary.\n\nThere is deliberately no `emit(name, detail)` helper. A dispatch through a\ngeneric helper cannot be named by the manifest analyzer, which recorded the\nparameter identifier and produced a phantom event on every element that\ninherited it. Components dispatch concrete event classes from `events.ts`,\nwhich the analyzer and TypeScript can both see.",
-          "name": "HelixElement",
-          "members": [
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard."
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do."
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it."
-            }
-          ],
-          "events": [],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "summary": "Base class every Helix element extends.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/core/helix-element",
-            "tier": "core"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixElement",
-          "declaration": {
-            "name": "HelixElement",
-            "module": "src/helix-element/helix-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/helix-form-element/helix-form-element.ts",
       "declarations": [
         {
@@ -587,6 +494,99 @@
           "declaration": {
             "name": "HelixFormElement",
             "module": "src/helix-form-element/helix-form-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/helix-element/helix-element.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Owns only what is universal: normalizing `box-sizing` inside the shadow root,\nso component CSS can rely on border-box on both sides of the boundary.\n\nThere is deliberately no `emit(name, detail)` helper. A dispatch through a\ngeneric helper cannot be named by the manifest analyzer, which recorded the\nparameter identifier and produced a phantom event on every element that\ninherited it. Components dispatch concrete event classes from `events.ts`,\nwhich the analyzer and TypeScript can both see.",
+          "name": "HelixElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard."
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do."
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it."
+            }
+          ],
+          "events": [],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "summary": "Base class every Helix element extends.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/core/helix-element",
+            "tier": "core"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixElement",
+          "declaration": {
+            "name": "HelixElement",
+            "module": "src/helix-element/helix-element.ts"
           }
         }
       ]
@@ -776,129 +776,6 @@
           "declaration": {
             "name": "FocusTrapController",
             "module": "src/controllers/focus-trap-controller/focus-trap-controller.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/create-sheet/create-sheet.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "createSheet",
-          "return": {
-            "type": {
-              "text": "CSSResult"
-            }
-          },
-          "parameters": [
-            {
-              "name": "cssText",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "createSheet",
-          "declaration": {
-            "name": "createSheet",
-            "module": "src/utils/create-sheet/create-sheet.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/custom-element/custom-element.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "customElement",
-          "parameters": [
-            {
-              "name": "tagName",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Registers a custom element, once.\n\nA drop-in replacement for Lit's `@customElement` that does not throw when the\ntag is already registered.\n\nThe duplicate is not hypothetical. Next.js evaluates a module in both the\nserver and client graphs, so a component imported by a server component and a\nclient component runs its registration twice against one registry, and\n`customElements.define` throws:\n\n> Failed to execute 'define': the name \"helix-card\" has already been used\n\nThat failure takes down the whole prerender, and it appears only once an app\nmixes server and client usage of the same component, which is exactly what a\nreal app does.\n\nThe analyzer detects `@customElement` **by decorator name**, not by where it\nis imported from, so the manifest still records `tagName` and nothing\ndownstream changes."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "customElement",
-          "declaration": {
-            "name": "customElement",
-            "module": "src/utils/custom-element/custom-element.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "tagName",
-          "declaration": {
-            "name": "target",
-            "module": "src/utils/custom-element/custom-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/focusable-elements/focusable-elements.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "focusableElements",
-          "return": {
-            "type": {
-              "text": "HTMLElement[]"
-            }
-          },
-          "parameters": [
-            {
-              "name": "root",
-              "type": {
-                "text": "HTMLElement"
-              }
-            }
-          ],
-          "description": "Everything inside `root` the reader can reach with Tab, in document order.\n\nSeparate from the focus trap because finding is the half most callers want:\nroving tabindex, arrow-key navigation and \"focus the first thing\" all need\nthis list and none of them traps anything.\n\nVisibility is tested with `getClientRects()` rather than `offsetParent`,\nwhich is null for anything inside a `position: fixed` container. A drawer is\nexactly that, so the `offsetParent` test excluded every control in the thing\nbeing trapped."
-        },
-        {
-          "kind": "function",
-          "name": "deepActiveElement",
-          "return": {
-            "type": {
-              "text": "Element | null"
-            }
-          },
-          "description": "The truly focused element, following shadow roots down.\n\n`document.activeElement` stops at the outermost host, so a button inside two\nshadow roots reports as the component rather than as itself."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "focusableElements",
-          "declaration": {
-            "name": "focusableElements",
-            "module": "src/utils/focusable-elements/focusable-elements.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "deepActiveElement",
-          "declaration": {
-            "name": "deepActiveElement",
-            "module": "src/utils/focusable-elements/focusable-elements.ts"
           }
         }
       ]
@@ -1119,6 +996,77 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/utils/custom-element/custom-element.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "customElement",
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Registers a custom element, once.\n\nA drop-in replacement for Lit's `@customElement` that does not throw when the\ntag is already registered.\n\nThe duplicate is not hypothetical. Next.js evaluates a module in both the\nserver and client graphs, so a component imported by a server component and a\nclient component runs its registration twice against one registry, and\n`customElements.define` throws:\n\n> Failed to execute 'define': the name \"helix-card\" has already been used\n\nThat failure takes down the whole prerender, and it appears only once an app\nmixes server and client usage of the same component, which is exactly what a\nreal app does.\n\nThe analyzer detects `@customElement` **by decorator name**, not by where it\nis imported from, so the manifest still records `tagName` and nothing\ndownstream changes."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "customElement",
+          "declaration": {
+            "name": "customElement",
+            "module": "src/utils/custom-element/custom-element.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "tagName",
+          "declaration": {
+            "name": "target",
+            "module": "src/utils/custom-element/custom-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/create-sheet/create-sheet.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSheet",
+          "return": {
+            "type": {
+              "text": "CSSResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createSheet",
+          "declaration": {
+            "name": "createSheet",
+            "module": "src/utils/create-sheet/create-sheet.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/utils/request-controlled-change/request-controlled-change.ts",
       "declarations": [
         {
@@ -1147,6 +1095,58 @@
           "declaration": {
             "name": "requestControlledChange",
             "module": "src/utils/request-controlled-change/request-controlled-change.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/focusable-elements/focusable-elements.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "focusableElements",
+          "return": {
+            "type": {
+              "text": "HTMLElement[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "root",
+              "type": {
+                "text": "HTMLElement"
+              }
+            }
+          ],
+          "description": "Everything inside `root` the reader can reach with Tab, in document order.\n\nSeparate from the focus trap because finding is the half most callers want:\nroving tabindex, arrow-key navigation and \"focus the first thing\" all need\nthis list and none of them traps anything.\n\nVisibility is tested with `getClientRects()` rather than `offsetParent`,\nwhich is null for anything inside a `position: fixed` container. A drawer is\nexactly that, so the `offsetParent` test excluded every control in the thing\nbeing trapped."
+        },
+        {
+          "kind": "function",
+          "name": "deepActiveElement",
+          "return": {
+            "type": {
+              "text": "Element | null"
+            }
+          },
+          "description": "The truly focused element, following shadow roots down.\n\n`document.activeElement` stops at the outermost host, so a button inside two\nshadow roots reports as the component rather than as itself."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "focusableElements",
+          "declaration": {
+            "name": "focusableElements",
+            "module": "src/utils/focusable-elements/focusable-elements.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "deepActiveElement",
+          "declaration": {
+            "name": "deepActiveElement",
+            "module": "src/utils/focusable-elements/focusable-elements.ts"
           }
         }
       ]
