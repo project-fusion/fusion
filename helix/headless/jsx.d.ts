@@ -1722,9 +1722,11 @@ export type CustomElements = {
    * that could also be a link forced every such navigation to be a full page
    * load. A link that looks like a button is styling rather than behavior, so it
    * is a recipe in the base layer: `<Link data-button="primary">` is the same
-   * control, and the consumer keeps their anchor. `delegatesFocus` puts focus on that inner control, and it
-   * serializes into the server's markup, so the button is keyboard reachable
-   * before any JavaScript loads.
+   * control, and the consumer keeps their anchor.
+   *
+   * `delegatesFocus` puts focus on the inner control, and it serializes into the
+   * server's markup, so the button is keyboard reachable before any JavaScript
+   * loads.
    *
    * Form submission is explicit. A `<button type="submit">` inside a shadow root
    * submits nothing, because the form is on the other side of the boundary, so
@@ -1772,7 +1774,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `button`: The inner control.
    */
   "helix-base-button": Partial<
     HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
@@ -3202,9 +3204,11 @@ export type CustomElementsSolidJs = {
    * that could also be a link forced every such navigation to be a full page
    * load. A link that looks like a button is styling rather than behavior, so it
    * is a recipe in the base layer: `<Link data-button="primary">` is the same
-   * control, and the consumer keeps their anchor. `delegatesFocus` puts focus on that inner control, and it
-   * serializes into the server's markup, so the button is keyboard reachable
-   * before any JavaScript loads.
+   * control, and the consumer keeps their anchor.
+   *
+   * `delegatesFocus` puts focus on the inner control, and it serializes into the
+   * server's markup, so the button is keyboard reachable before any JavaScript
+   * loads.
    *
    * Form submission is explicit. A `<button type="submit">` inside a shadow root
    * submits nothing, because the form is on the other side of the boundary, so
@@ -3252,7 +3256,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `button`: The inner button or anchor.
+   * - `button`: The inner control.
    */
   "helix-base-button": Partial<
     HelixBaseButtonProps &

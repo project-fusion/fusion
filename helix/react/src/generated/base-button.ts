@@ -14,9 +14,11 @@ intercept a click and cannot render one inside this shadow root, so a button
 that could also be a link forced every such navigation to be a full page
 load. A link that looks like a button is styling rather than behavior, so it
 is a recipe in the base layer: `<Link data-button="primary">` is the same
-control, and the consumer keeps their anchor. `delegatesFocus` puts focus on that inner control, and it
-serializes into the server's markup, so the button is keyboard reachable
-before any JavaScript loads.
+control, and the consumer keeps their anchor.
+
+`delegatesFocus` puts focus on the inner control, and it serializes into the
+server's markup, so the button is keyboard reachable before any JavaScript
+loads.
 
 Form submission is explicit. A `<button type="submit">` inside a shadow root
 submits nothing, because the form is on the other side of the boundary, so

@@ -14,9 +14,11 @@ import { property } from 'lit/decorators.js'
  * that could also be a link forced every such navigation to be a full page
  * load. A link that looks like a button is styling rather than behavior, so it
  * is a recipe in the base layer: `<Link data-button="primary">` is the same
- * control, and the consumer keeps their anchor. `delegatesFocus` puts focus on that inner control, and it
- * serializes into the server's markup, so the button is keyboard reachable
- * before any JavaScript loads.
+ * control, and the consumer keeps their anchor.
+ *
+ * `delegatesFocus` puts focus on the inner control, and it serializes into the
+ * server's markup, so the button is keyboard reachable before any JavaScript
+ * loads.
  *
  * Form submission is explicit. A `<button type="submit">` inside a shadow root
  * submits nothing, because the form is on the other side of the boundary, so
@@ -32,7 +34,7 @@ import { property } from 'lit/decorators.js'
  * @slot start - Content before the label, usually an icon.
  * @slot end - Content after the label.
  *
- * @csspart button - The inner button or anchor.
+ * @csspart button - The inner control.
  */
 @customElement('helix-base-button')
 export class HelixBaseButton extends HelixFormElement {
@@ -56,15 +58,7 @@ export class HelixBaseButton extends HelixFormElement {
     delegatesFocus: true,
   }
 
-  private readonly handleClick = (event: MouseEvent): void => {
-    if (this.disabled) {
-      // A disabled anchor still dispatches clicks, so the guard is what makes
-      // the link inert rather than merely dimmed.
-      event.preventDefault()
-      event.stopImmediatePropagation()
-      return
-    }
-
+  private readonly handleClick = (): void => {
     if (this.type === 'button') {
       return
     }
