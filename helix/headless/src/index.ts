@@ -1,15 +1,13 @@
-export {
-  type DismissDetail,
-  HelixCloseEvent,
-  HelixDismissEvent,
-  HelixOpenEvent,
-  HelixSelectEvent,
-  HelixValueChangeEvent,
-  type OpenDetail,
-  type Placement,
-  type SelectDetail,
-  type ValueChangeDetail,
-} from '@helix-io/core'
+/**
+ * Everything core exports, forwarded whole.
+ *
+ * Named individually before, and the list drifted every time a component used
+ * something new: a value-change event, a placement type, a close event. Each
+ * one compiled here and broke in the generated React package, which imports
+ * the type a public property is declared with. Forwarding the module has
+ * nothing to keep in step.
+ */
+export * from '@helix-io/core'
 export * from './accordion/index.js'
 export * from './app-header/index.js'
 export * from './avatar/index.js'
