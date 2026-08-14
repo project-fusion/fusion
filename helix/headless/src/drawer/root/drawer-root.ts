@@ -37,7 +37,7 @@ import { property } from 'lit/decorators.js'
  * @csspart header - The header region.
  * @csspart content - The scrolling content region.
  *
- * @event {HelixOpenChangeEvent} OpenChange - Fired when the drawer opens or closes.
+ * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
  */
 @customElement('helix-base-drawer')
 export class HelixBaseDrawer extends WithOpen(HelixElement) {
@@ -74,7 +74,7 @@ export class HelixBaseDrawer extends WithOpen(HelixElement) {
     boundary: () => this.renderRoot.querySelector('[part="panel"]'),
     onDismiss: () => {
       if (this.isOpen) {
-        this.setOpen(false)
+        this.requestOpen(false)
       }
     },
   })

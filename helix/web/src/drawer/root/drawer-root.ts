@@ -25,7 +25,7 @@ import { styles } from './drawer-root.css.js'
  * @csspart header - The header region.
  * @csspart content - The scrolling content region.
  *
- * @event {HelixOpenChangeEvent} OpenChange - Fired when the drawer opens or closes.
+ * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
  *
  * @cssproperty --drawer-size - Width or height of the panel.
  */

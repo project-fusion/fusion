@@ -1,10 +1,10 @@
 export {
-  HelixOpenChangeEvent,
-  HelixRemoveRequestEvent,
-  HelixSelectionChangeEvent,
-  type OpenChangeDetail,
-  type RemoveRequestDetail,
-  type SelectionChangeDetail,
+  HelixOpenEvent,
+  HelixRemoveEvent,
+  HelixSelectEvent,
+  type OpenDetail,
+  type RemoveDetail,
+  type SelectDetail,
 } from '@helix-io/core'
 export * from './accordion/index.js'
 export * from './app-header/index.js'

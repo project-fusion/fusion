@@ -31,7 +31,7 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'Home', 'End'])
  * @csspart tabs - The tab list.
  * @csspart panels - The panel container.
  *
- * @event {HelixSelectionChangeEvent} SelectionChange - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
+ * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
  */
 @customElement('helix-base-tabs')
 export class HelixBaseTabs extends HelixElement {
@@ -112,13 +112,13 @@ export class HelixBaseTabs extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('SelectionChange', this.handleSelection)
+    this.addEventListener('helix-select', this.handleSelection)
     this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('SelectionChange', this.handleSelection)
+    this.removeEventListener('helix-select', this.handleSelection)
     this.removeEventListener('keydown', this.handleKeydown)
   }
 

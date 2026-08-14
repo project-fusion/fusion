@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixSelectionChangeEvent } from '@helix-io/core'
+import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -22,7 +22,7 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart tab - The tab itself.
  *
- * @event {HelixSelectionChangeEvent} SelectionChange - Fired when the tab is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen.
  */
 @customElement('helix-base-tabs-tab')
 export class HelixBaseTabsTab extends HelixElement {
@@ -48,7 +48,7 @@ export class HelixBaseTabsTab extends HelixElement {
     if (this.disabled) {
       return
     }
-    this.dispatchEvent(new HelixSelectionChangeEvent({ value: this.value }))
+    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
   protected override render(): TemplateResult {

@@ -10,7 +10,7 @@ beforeAll(async () => {
 type Updatable = HTMLElement & {
   updateComplete: Promise<unknown>
   isOpen: boolean
-  setOpen(next: boolean): void
+  requestOpen(next: boolean): void
 }
 
 const markup = `
@@ -37,7 +37,7 @@ describe('drawer', () => {
 
   test('opening clears inert and shows the scrim', async () => {
     const drawer = (await mount(markup)) as Updatable
-    drawer.setOpen(true)
+    drawer.requestOpen(true)
     await drawer.updateComplete
 
     expect(drawer.isOpen).toBe(true)
@@ -52,7 +52,7 @@ describe('drawer', () => {
       markup.replace('<helix-drawer ', '<helix-drawer modal="false" '),
     )) as Updatable
     drawer.modal = false
-    drawer.setOpen(true)
+    drawer.requestOpen(true)
     await drawer.updateComplete
 
     expect(part(drawer, 'panel')?.getAttribute('role')).toBe('region')
@@ -62,10 +62,10 @@ describe('drawer', () => {
   test('announces its own open changes, like every other open component', async () => {
     const drawer = (await mount(markup)) as Updatable
     let seen: boolean | null = null
-    drawer.addEventListener('OpenChange', (event) => {
+    drawer.addEventListener('helix-open', (event) => {
       seen = (event as CustomEvent<{ open: boolean }>).detail.open
     })
-    drawer.setOpen(true)
+    drawer.requestOpen(true)
     expect(seen).toBe(true)
   })
 
@@ -74,7 +74,7 @@ describe('drawer', () => {
     // state does not live on `open`, so watching that property meant the trap
     // never engaged for the common case.
     const drawer = (await mount(markup)) as Updatable
-    drawer.setOpen(true)
+    drawer.requestOpen(true)
     await drawer.updateComplete
     await new Promise((resolve) => requestAnimationFrame(resolve))
 
@@ -84,7 +84,7 @@ describe('drawer', () => {
 
   test('Escape closes it', async () => {
     const drawer = (await mount(markup)) as Updatable
-    drawer.setOpen(true)
+    drawer.requestOpen(true)
     await drawer.updateComplete
 
     document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))

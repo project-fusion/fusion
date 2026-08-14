@@ -70,8 +70,15 @@ describe('toReactProp', () => {
 
   // React listens for the remainder of the prop character for character, so a
   // transformed name binds an event nobody dispatches.
-  test('does not transform the name', () => {
-    expect(toReactProp('value-change')).toBe('onvalue-change')
+  test('strips the prefix and camel-cases the rest', () => {
+    expect(toReactProp('helix-open')).toBe('onOpen')
+    expect(toReactProp('helix-value-change')).toBe('onValueChange')
+  })
+
+  test('a relayed native event keeps its own name', () => {
+    // `change` is the prop React has already wired to the native event, which
+    // is the whole reason a relayed event keeps the native name.
+    expect(toReactProp('change')).toBe('onChange')
   })
 })
 
@@ -133,7 +140,7 @@ describe('conventionLint', () => {
     expect(
       lintOf({
         cssParts: [{ description: 'The wrapper.', name: 'container' }],
-        events: [{ description: 'Fired on change.', name: 'OpenChange' }],
+        events: [{ description: 'Fired when it opens.', name: 'helix-open' }],
         members: [{ description: 'Whether it is open.', kind: 'field', name: 'open' }],
       }),
     ).not.toThrow()
@@ -153,14 +160,24 @@ describe('conventionLint', () => {
     expect(lintOf({ events: [{ name: 'OpenChange' }] })).toThrow(/documented-event/)
   })
 
-  test('rejects an event name that is not PascalCase', () => {
-    expect(lintOf({ events: [{ description: 'x', name: 'open-change' }] })).toThrow(/pascal-events/)
+  test('rejects an event name with no prefix', () => {
+    // An event from inside a shadow root is retargeted to look like it came
+    // from the host, so a bare name is indistinguishable from the inner
+    // control's own.
+    expect(lintOf({ events: [{ description: 'x', name: 'open' }] })).toThrow(/prefixed-events/)
   })
 
-  // `Change` would be bound by React's `onChange`, which is already wired to
-  // the native change event, so ours would never fire.
-  test('rejects a single-word event name', () => {
-    expect(lintOf({ events: [{ description: 'x', name: 'Change' }] })).toThrow(/compound-events/)
+  test('allows a native name that is being relayed', () => {
+    // Being indistinguishable from the native event is the point of relaying.
+    expect(lintOf({ events: [{ description: 'x', name: 'change' }] })).not.toThrow()
+  })
+
+  // Stripping the prefix lands on a prop React's synthetic system already owns,
+  // so ours would never fire. Measured in a browser rather than assumed.
+  test('rejects a verb React has already claimed', () => {
+    expect(lintOf({ events: [{ description: 'x', name: 'helix-change' }] })).toThrow(
+      /claimed-events/,
+    )
   })
 
   test('rejects an undocumented CSS part', () => {

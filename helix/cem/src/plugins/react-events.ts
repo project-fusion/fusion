@@ -3,14 +3,23 @@ import { eachComponent } from '../types.js'
 /**
  * The React prop for an event.
  *
- * `on` plus the event name **verbatim**, because that is exactly what React
- * does: it strips `on` from the prop and listens for the remainder, character
- * for character. Transforming the name here would produce a prop that binds an
- * event nobody dispatches, which is indistinguishable from doing nothing.
+ * `helix-` is stripped and the rest camel-cased, so `helix-open` is `onOpen`
+ * and `helix-value-change` is `onValueChange`. A relayed native event keeps its
+ * name, so `change` is `onChange`, which is the prop React has already wired to
+ * it.
  *
- * Event names are PascalCase, so `OpenChange` becomes `onOpenChange`.
+ * The wrapper attaches a real listener for the derived name rather than relying
+ * on React to bind it. React reserves every prop matching `on[A-Z]` for its own
+ * synthetic system and silently drops the ones it does not recognise, so
+ * `onOpen` on a custom element reaches nothing on its own. Measured: only
+ * `change`, `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`,
+ * `focus` and `blur` are bound by React itself.
  */
-export const toReactProp = (eventName: string): string => `on${eventName}`
+export const toReactProp = (eventName: string): string => {
+  const verb = eventName.replace(/^helix-/, '')
+  const camel = verb.replace(/-([a-z0-9])/g, (_, char: string) => char.toUpperCase())
+  return `on${camel.charAt(0).toUpperCase()}${camel.slice(1)}`
+}
 
 /**
  * Records the React prop name generated for each event.

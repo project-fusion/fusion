@@ -4,9 +4,9 @@
  * A named class rather than `dispatchEvent(new CustomEvent(name, …))` for three
  * reasons, all of them about the type reaching a consumer:
  *
- * 1. `@event {HelixOpenChangeEvent} OpenChange` puts the class name in the
- *    manifest, which is what lets the React generator emit a typed callback
- *    instead of `(detail: unknown)`.
+ * 1. `@event {HelixOpenEvent} helix-open` puts the class name in the manifest,
+ *    which is what lets the React generator emit a typed callback instead of
+ *    `(detail: unknown)`.
  * 2. The augmentation of `HTMLElementEventMap` below types `addEventListener`
  *    for consumers writing plain HTML, who never see the React wrappers.
  * 3. The event name lives on the class as `eventName`, so a listener and a
@@ -14,51 +14,83 @@
  */
 
 /**
- * Event names are PascalCase.
+ * Names are `helix-{verb}`, lowercase and prefixed.
  *
- * Events dispatched inside a shadow root are retargeted to look like they came
- * from the host, so a name that could collide with a native event is
- * indistinguishable from one escaping a component's internals: a
- * `<helix-input>` wrapping an `<input>` emits an `input` event that is not ours.
+ * The prefix is what stops a collision with a native name: an event dispatched
+ * inside a shadow root is retargeted to look like it came from the host, so a
+ * bare `input` from a `<helix-input>` is indistinguishable from the inner
+ * control's own. Prefixed, it cannot be mistaken for either.
  *
- * **Every native event name is lowercase**, so PascalCase cannot collide with
- * one. That is the same protection a `helix-` prefix gives, achieved by casing.
+ * The name also decides the framework prop, because the manifest derives one
+ * from the other by stripping `helix-` and camel-casing: `helix-open` is
+ * `onOpen`. Two consequences, both measured in a browser rather than assumed:
  *
- * It also decides the React prop, which is not a separate choice: React strips
- * `on` and uses the remainder verbatim, so `OpenChange` is `onOpenChange` and
- * `helix-open-change` would have been `onhelix-open-change`.
+ * 1. **A verb React has claimed cannot be used.** React's synthetic system owns
+ *    `change`, `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`,
+ *    `focus` and `blur` on custom elements: a `helix-change` would strip to
+ *    `onChange`, which React has already wired to the native `change`, so ours
+ *    would never fire. That is why a value change is `helix-value-change`.
+ * 2. **The rest are free.** `open`, `close`, `toggle`, `select`, `dismiss`,
+ *    `navigate` and `remove` are all unclaimed on a custom element, which is
+ *    what lets the verb-only form work everywhere else.
  *
- * Two rules follow:
+ * Propagation follows the event's role rather than a single house rule:
  *
- * 1. **Never a bare native name.** `Change` would be reached by React's
- *    `onChange`, which its synthetic system has already claimed for the native
- *    `change` event, so ours would never fire.
- * 2. **Always compound.** `ValueChange`, `CheckedChange`, `OpenChange`. No
- *    React synthetic handler is named for any of them.
+ * - **Lifecycle** (`helix-open`, `helix-close`) does not bubble and is not
+ *   composed. Overlays nest, and an inner one's lifecycle must never reach the
+ *   outer one that contains it.
+ * - **Coordination** (`helix-select`, `helix-remove`, `helix-value-change`)
+ *   bubbles and is composed, so a parent or a router can intercept it across a
+ *   shadow boundary.
  */
 
-/** Detail carried by `OpenChange`. */
-export interface OpenChangeDetail {
+/** Detail carried by `helix-open` and `helix-close`. */
+export interface OpenDetail {
   /** The state the element is moving to. */
   open: boolean
 }
 
-/** Fired when an element's open state changes, in either mode. */
-export class HelixOpenChangeEvent extends CustomEvent<OpenChangeDetail> {
-  static readonly eventName = 'OpenChange'
+/**
+ * Fired when an element is about to open.
+ *
+ * Cancelable: `preventDefault()` refuses the change, and the element stays
+ * closed. Paired with `helix-close` rather than being one event carrying a
+ * boolean, so a listener that only cares about one direction says so by which
+ * event it listens for.
+ *
+ * Neither bubbles nor composed. A dialog inside a drawer inside a popover is
+ * three overlays, and an inner one opening must not read as the outer one
+ * opening.
+ */
+export class HelixOpenEvent extends CustomEvent<OpenDetail> {
+  static readonly eventName = 'helix-open'
 
-  constructor(detail: OpenChangeDetail) {
-    super(HelixOpenChangeEvent.eventName, {
-      bubbles: true,
+  constructor() {
+    super(HelixOpenEvent.eventName, {
+      bubbles: false,
       cancelable: true,
-      composed: true,
-      detail,
+      composed: false,
+      detail: { open: true },
     })
   }
 }
 
-/** Detail carried by `RemoveRequest`. */
-export interface RemoveRequestDetail {
+/** Fired when an element is about to close. See `HelixOpenEvent`. */
+export class HelixCloseEvent extends CustomEvent<OpenDetail> {
+  static readonly eventName = 'helix-close'
+
+  constructor() {
+    super(HelixCloseEvent.eventName, {
+      bubbles: false,
+      cancelable: true,
+      composed: false,
+      detail: { open: false },
+    })
+  }
+}
+
+/** Detail carried by `helix-remove`. */
+export interface RemoveDetail {
   /** Text content of the element asking to be removed, for identifying it. */
   label: string
 }
@@ -70,15 +102,12 @@ export interface RemoveRequestDetail {
  * because the consumer owns the list it is in and removing the DOM node under
  * them would put their state and the document out of step. Cancelable, so
  * `preventDefault()` is a refusal.
- *
- * `RemoveRequest` rather than `Remove` because event names are always compound.
- * The name also happens to say the right thing.
  */
-export class HelixRemoveRequestEvent extends CustomEvent<RemoveRequestDetail> {
-  static readonly eventName = 'RemoveRequest'
+export class HelixRemoveEvent extends CustomEvent<RemoveDetail> {
+  static readonly eventName = 'helix-remove'
 
-  constructor(detail: RemoveRequestDetail) {
-    super(HelixRemoveRequestEvent.eventName, {
+  constructor(detail: RemoveDetail) {
+    super(HelixRemoveEvent.eventName, {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -87,26 +116,33 @@ export class HelixRemoveRequestEvent extends CustomEvent<RemoveRequestDetail> {
   }
 }
 
-/** Detail carried by `SourceChange`. */
-export interface SourceChangeDetail {
+/** Detail carried by `helix-value-change`. */
+export interface ValueChangeDetail {
   /**
-   * Which source was edited, so one listener can serve several panes.
+   * Which value changed, so one listener can serve several fields.
    *
    * A sandbox with a markup pane and a stylesheet pane emits the same event
    * from both; without a name the parent would have to identify the sender by
    * reference, which couples it to how the panes were arranged.
    */
   name: string
-  /** The full source after the edit. */
+  /** The value after the change. */
   value: string
 }
 
-/** Fired when editable source is changed by the reader. */
-export class HelixSourceChangeEvent extends CustomEvent<SourceChangeDetail> {
-  static readonly eventName = 'SourceChange'
+/**
+ * Fired when a value changes on something that is not a native input.
+ *
+ * `helix-value-change` rather than `helix-change`, because the manifest strips
+ * the prefix and React has already claimed `onChange` for the native `change`
+ * event: a prop by that name would be bound to React's own plumbing and ours
+ * would never arrive. A real input relays its native `change` instead.
+ */
+export class HelixValueChangeEvent extends CustomEvent<ValueChangeDetail> {
+  static readonly eventName = 'helix-value-change'
 
-  constructor(detail: SourceChangeDetail) {
-    super(HelixSourceChangeEvent.eventName, {
+  constructor(detail: ValueChangeDetail) {
+    super(HelixValueChangeEvent.eventName, {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -115,8 +151,8 @@ export class HelixSourceChangeEvent extends CustomEvent<SourceChangeDetail> {
   }
 }
 
-/** Detail carried by `SelectionChange`. */
-export interface SelectionChangeDetail {
+/** Detail carried by `helix-select`. */
+export interface SelectDetail {
   /** Value of the item the reader chose. */
   value: string
 }
@@ -124,14 +160,15 @@ export interface SelectionChangeDetail {
 /**
  * Fired when the reader selects an item in a set.
  *
- * A notification, not a request: selection within a tree or a list is the
- * component's own state, unlike removal, where the consumer owns the list.
+ * Bubbles and is composed, because this is how a set coordinates: a tree, a
+ * tab list and a toggle group all learn which of their children was chosen by
+ * hearing it arrive.
  */
-export class HelixSelectionChangeEvent extends CustomEvent<SelectionChangeDetail> {
-  static readonly eventName = 'SelectionChange'
+export class HelixSelectEvent extends CustomEvent<SelectDetail> {
+  static readonly eventName = 'helix-select'
 
-  constructor(detail: SelectionChangeDetail) {
-    super(HelixSelectionChangeEvent.eventName, {
+  constructor(detail: SelectDetail) {
+    super(HelixSelectEvent.eventName, {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -142,9 +179,10 @@ export class HelixSelectionChangeEvent extends CustomEvent<SelectionChangeDetail
 
 declare global {
   interface HTMLElementEventMap {
-    OpenChange: HelixOpenChangeEvent
-    RemoveRequest: HelixRemoveRequestEvent
-    SelectionChange: HelixSelectionChangeEvent
-    SourceChange: HelixSourceChangeEvent
+    'helix-close': HelixCloseEvent
+    'helix-open': HelixOpenEvent
+    'helix-remove': HelixRemoveEvent
+    'helix-select': HelixSelectEvent
+    'helix-value-change': HelixValueChangeEvent
   }
 }

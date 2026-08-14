@@ -79,8 +79,8 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Fired when an element's open state changes, in either mode.",
-          "name": "HelixOpenChangeEvent",
+          "description": "Fired when an element is about to open.\n\nCancelable: `preventDefault()` refuses the change, and the element stays\nclosed. Paired with `helix-close` rather than being one event carrying a\nboolean, so a listener that only cares about one direction says so by which\nevent it listens for.\n\nNeither bubbles nor composed. A dialog inside a drawer inside a popover is\nthree overlays, and an inner one opening must not read as the outer one\nopening.",
+          "name": "HelixOpenEvent",
           "members": [
             {
               "kind": "field",
@@ -90,7 +90,7 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'OpenChange'"
+              "default": "'helix-open'"
             }
           ],
           "superclass": {
@@ -101,8 +101,8 @@
         },
         {
           "kind": "class",
-          "description": "Fired when an element asks to be removed.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the list it is in and removing the DOM node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\n`RemoveRequest` rather than `Remove` because event names are always compound.\nThe name also happens to say the right thing.",
-          "name": "HelixRemoveRequestEvent",
+          "description": "Fired when an element is about to close. See `HelixOpenEvent`.",
+          "name": "HelixCloseEvent",
           "members": [
             {
               "kind": "field",
@@ -112,7 +112,7 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'RemoveRequest'"
+              "default": "'helix-close'"
             }
           ],
           "superclass": {
@@ -123,8 +123,8 @@
         },
         {
           "kind": "class",
-          "description": "Fired when editable source is changed by the reader.",
-          "name": "HelixSourceChangeEvent",
+          "description": "Fired when an element asks to be removed.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the list it is in and removing the DOM node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.",
+          "name": "HelixRemoveEvent",
           "members": [
             {
               "kind": "field",
@@ -134,7 +134,7 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'SourceChange'"
+              "default": "'helix-remove'"
             }
           ],
           "superclass": {
@@ -145,8 +145,8 @@
         },
         {
           "kind": "class",
-          "description": "Fired when the reader selects an item in a set.\n\nA notification, not a request: selection within a tree or a list is the\ncomponent's own state, unlike removal, where the consumer owns the list.",
-          "name": "HelixSelectionChangeEvent",
+          "description": "Fired when a value changes on something that is not a native input.\n\n`helix-value-change` rather than `helix-change`, because the manifest strips\nthe prefix and React has already claimed `onChange` for the native `change`\nevent: a prop by that name would be bound to React's own plumbing and ours\nwould never arrive. A real input relays its native `change` instead.",
+          "name": "HelixValueChangeEvent",
           "members": [
             {
               "kind": "field",
@@ -156,7 +156,29 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'SelectionChange'"
+              "default": "'helix-value-change'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "Fired when the reader selects an item in a set.\n\nBubbles and is composed, because this is how a set coordinates: a tree, a\ntab list and a toggle group all learn which of their children was chosen by\nhearing it arrive.",
+          "name": "HelixSelectEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-select'"
             }
           ],
           "superclass": {
@@ -169,33 +191,41 @@
       "exports": [
         {
           "kind": "js",
-          "name": "HelixOpenChangeEvent",
+          "name": "HelixOpenEvent",
           "declaration": {
-            "name": "HelixOpenChangeEvent",
+            "name": "HelixOpenEvent",
             "module": "src/events.ts"
           }
         },
         {
           "kind": "js",
-          "name": "HelixRemoveRequestEvent",
+          "name": "HelixCloseEvent",
           "declaration": {
-            "name": "HelixRemoveRequestEvent",
+            "name": "HelixCloseEvent",
             "module": "src/events.ts"
           }
         },
         {
           "kind": "js",
-          "name": "HelixSourceChangeEvent",
+          "name": "HelixRemoveEvent",
           "declaration": {
-            "name": "HelixSourceChangeEvent",
+            "name": "HelixRemoveEvent",
             "module": "src/events.ts"
           }
         },
         {
           "kind": "js",
-          "name": "HelixSelectionChangeEvent",
+          "name": "HelixValueChangeEvent",
           "declaration": {
-            "name": "HelixSelectionChangeEvent",
+            "name": "HelixValueChangeEvent",
+            "module": "src/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSelectEvent",
+          "declaration": {
+            "name": "HelixSelectEvent",
             "module": "src/events.ts"
           }
         }
@@ -266,6 +296,36 @@
             },
             {
               "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "finalizeStyles",
               "privacy": "protected",
               "static": true,
@@ -311,7 +371,8 @@
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/core/form-element",
             "tier": "core"
-          }
+          },
+          "events": []
         }
       ],
       "exports": [
@@ -346,6 +407,32 @@
             },
             {
               "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do."
+            },
+            {
+              "kind": "method",
               "name": "finalizeStyles",
               "privacy": "protected",
               "static": true,
@@ -366,6 +453,7 @@
               "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it."
             }
           ],
+          "events": [],
           "superclass": {
             "name": "LitElement",
             "package": "lit"
@@ -438,65 +526,73 @@
         },
         {
           "kind": "js",
-          "name": "HelixOpenChangeEvent",
+          "name": "HelixCloseEvent",
           "declaration": {
-            "name": "HelixOpenChangeEvent",
+            "name": "HelixCloseEvent",
             "module": "./events.js"
           }
         },
         {
           "kind": "js",
-          "name": "HelixRemoveRequestEvent",
+          "name": "HelixOpenEvent",
           "declaration": {
-            "name": "HelixRemoveRequestEvent",
+            "name": "HelixOpenEvent",
             "module": "./events.js"
           }
         },
         {
           "kind": "js",
-          "name": "HelixSelectionChangeEvent",
+          "name": "HelixRemoveEvent",
           "declaration": {
-            "name": "HelixSelectionChangeEvent",
+            "name": "HelixRemoveEvent",
             "module": "./events.js"
           }
         },
         {
           "kind": "js",
-          "name": "HelixSourceChangeEvent",
+          "name": "HelixSelectEvent",
           "declaration": {
-            "name": "HelixSourceChangeEvent",
+            "name": "HelixSelectEvent",
             "module": "./events.js"
           }
         },
         {
           "kind": "js",
-          "name": "OpenChangeDetail",
+          "name": "HelixValueChangeEvent",
           "declaration": {
-            "name": "OpenChangeDetail",
+            "name": "HelixValueChangeEvent",
             "module": "./events.js"
           }
         },
         {
           "kind": "js",
-          "name": "RemoveRequestDetail",
+          "name": "OpenDetail",
           "declaration": {
-            "name": "RemoveRequestDetail",
+            "name": "OpenDetail",
             "module": "./events.js"
           }
         },
         {
           "kind": "js",
-          "name": "SelectionChangeDetail",
+          "name": "RemoveDetail",
           "declaration": {
-            "name": "SelectionChangeDetail",
+            "name": "RemoveDetail",
             "module": "./events.js"
           }
         },
         {
           "kind": "js",
-          "name": "SourceChangeDetail",
+          "name": "SelectDetail",
           "declaration": {
-            "name": "SourceChangeDetail",
+            "name": "SelectDetail",
+            "module": "./events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ValueChangeDetail",
+          "declaration": {
+            "name": "ValueChangeDetail",
             "module": "./events.js"
           }
         },
@@ -530,6 +626,56 @@
           "declaration": {
             "name": "WithOpenInterface",
             "module": "./mixins/with-open.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ControlledChangeOptions",
+          "declaration": {
+            "name": "ControlledChangeOptions",
+            "module": "./request-controlled-change.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "requestControlledChange",
+          "declaration": {
+            "name": "requestControlledChange",
+            "module": "./request-controlled-change.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/request-controlled-change.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "requestControlledChange",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "{\n  apply,\n  event,\n  host,\n  notify,\n  next,\n}",
+              "type": {
+                "text": "ControlledChangeOptions<T>"
+              }
+            }
+          ],
+          "description": "Announces a change, then applies it if nobody refused.\n\nOne audited path for every stateful change in the system. The order is the\nwhole point: the event goes first and carries the state being *proposed*, so\na listener calling `preventDefault()` stops it before anything moves. A\ncomponent that mutated itself and then announced it would leave a consumer\nreacting to a decision already made.\n\nReturns whether the change was applied, so a caller that needs to know\n(a key handler deciding whether to also move focus) can ask.\n\nA throwing `notify` is caught and logged rather than rethrown. A consumer's\nbroken callback must not corrupt the element's state or abort the rest of a\ncoordinated update, and there is nothing useful this can do about it besides\nmake it visible."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "requestControlledChange",
+          "declaration": {
+            "name": "requestControlledChange",
+            "module": "src/request-controlled-change.ts"
           }
         }
       ]
@@ -779,11 +925,19 @@
               "description": "Whether the element is open. Setting this enters controlled mode."
             },
             {
+              "kind": "field",
+              "name": "onOpenChange",
+              "type": {
+                "text": "((open: boolean) => void) | undefined"
+              },
+              "description": "The consumer's callback, invoked after the state is applied.\n\nA React consumer cannot pass this through JSX: React reserves every prop\nmatching `on[A-Z]` and drops the ones it does not recognise. The generated\nwrapper attaches a listener for `helix-open` and `helix-close` instead.\nThis is for a consumer holding a reference, or a framework that assigns\nproperties."
+            },
+            {
               "kind": "method",
-              "name": "setOpen",
+              "name": "requestOpen",
               "return": {
                 "type": {
-                  "text": "void"
+                  "text": "boolean"
                 }
               },
               "parameters": [
@@ -794,7 +948,17 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change."
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts: a listener calling `preventDefault()` on the\n`helix-open` or `helix-close` refuses the change, and nothing moves."
+            },
+            {
+              "kind": "method",
+              "name": "toggleOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state."
             }
           ],
           "helix": {}
@@ -854,11 +1018,20 @@
               "readonly": true
             },
             {
+              "kind": "field",
+              "name": "onOpenChange",
+              "type": {
+                "text": "((open: boolean) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead."
+            },
+            {
               "kind": "method",
-              "name": "setOpen",
+              "name": "requestOpen",
               "return": {
                 "type": {
-                  "text": "void"
+                  "text": "boolean"
                 }
               },
               "parameters": [
@@ -869,14 +1042,17 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change. In uncontrolled mode the element updates\nitself; in controlled mode it only notifies and waits for the consumer."
-            }
-          ],
-          "events": [
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. In uncontrolled mode the\nelement then updates itself; in controlled mode it applies nothing and\nwaits for the consumer to pass a new `open`, which is what \"controlled\"\nmeans."
+            },
             {
-              "type": {
-                "text": "HelixOpenChangeEvent"
-              }
+              "kind": "method",
+              "name": "toggleOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state."
             }
           ],
           "attributes": [

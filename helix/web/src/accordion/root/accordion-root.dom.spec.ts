@@ -6,10 +6,21 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Item = HTMLElement & { isOpen: boolean; setOpen(next: boolean): void }
+type Item = HTMLElement & { isOpen: boolean; requestOpen(next: boolean): boolean }
 
 const items = (host: HTMLElement): Item[] =>
   [...host.querySelectorAll('helix-accordion-item')] as Item[]
+
+/**
+ * Clicks an item's trigger.
+ *
+ * Coordination lives on the click path, not in `requestOpen`: the item that was
+ * pressed is the one that enforces the mode, and `requestOpen` is the raw state
+ * change underneath it. Calling that directly would test the wrong thing.
+ */
+const click = (item: Item): void => {
+  item.shadowRoot?.querySelector<HTMLButtonElement>('[part="trigger"]')?.click()
+}
 
 const three = `
   <helix-accordion>
@@ -18,49 +29,92 @@ const three = `
     <helix-accordion-item><span slot="summary">Three</span>3</helix-accordion-item>
   </helix-accordion>`
 
+const single = three.replace('<helix-accordion>', '<helix-accordion mode="single-collapsible">')
+
 describe('accordion exclusivity', () => {
-  test('opening one closes the others', async () => {
+  test('nothing closes unexpectedly by default', async () => {
+    // Absent mode is `multiple`, which is the forgiving default: opening one
+    // section never takes another away.
     const accordion = await mount(three)
     const [first, second] = items(accordion)
-    first?.setOpen(true)
+    click(first as Item)
+    click(second as Item)
+    expect(first?.isOpen).toBe(true)
+    expect(second?.isOpen).toBe(true)
+  })
+
+  test('single-collapsible closes the others', async () => {
+    const accordion = await mount(single)
+    const [first, second] = items(accordion)
+    click(first as Item)
     expect(first?.isOpen).toBe(true)
 
-    second?.setOpen(true)
+    click(second as Item)
     expect(second?.isOpen).toBe(true)
     expect(first?.isOpen).toBe(false)
   })
 
-  test('multiple lets them coexist', async () => {
-    const accordion = await mount(three.replace('<helix-accordion>', '<helix-accordion multiple>'))
-    const [first, second] = items(accordion)
-    first?.setOpen(true)
-    second?.setOpen(true)
+  test('single-collapsible lets the last one close', async () => {
+    const accordion = await mount(single)
+    const [first] = items(accordion)
+    click(first as Item)
+    click(first as Item)
+    expect(first?.isOpen).toBe(false)
+  })
+
+  test('single refuses to close the last one', async () => {
+    // The difference between the two single modes, and the only difference.
+    const accordion = await mount(
+      three.replace('<helix-accordion>', '<helix-accordion mode="single">'),
+    )
+    const [first] = items(accordion)
+    click(first as Item)
+    click(first as Item)
     expect(first?.isOpen).toBe(true)
-    expect(second?.isOpen).toBe(true)
   })
 
   test('closing an item does not disturb the others', async () => {
-    const accordion = await mount(three.replace('<helix-accordion>', '<helix-accordion multiple>'))
+    const accordion = await mount(three)
     const [first, second] = items(accordion)
-    first?.setOpen(true)
-    second?.setOpen(true)
-    second?.setOpen(false)
+    click(first as Item)
+    click(second as Item)
+    click(second as Item)
     expect(first?.isOpen).toBe(true)
   })
 
-  test('coordination is by event, so an item added later is covered too', async () => {
+  test('membership is resolved on demand, so an item added later coordinates', async () => {
     // Nothing registers children, so there is no registry to fall out of step.
-    const accordion = await mount(three)
+    const accordion = await mount(single)
     const [first] = items(accordion)
-    first?.setOpen(true)
+    click(first as Item)
 
     const added = document.createElement('helix-accordion-item') as Item
     accordion.appendChild(added)
     await (added as unknown as { updateComplete: Promise<unknown> }).updateComplete
-    added.setOpen(true)
+    click(added)
 
     expect(added.isOpen).toBe(true)
     expect(first?.isOpen).toBe(false)
+  })
+
+  test('a nested accordion is a separate set', async () => {
+    // An item inside another item's content finds the same accordion through
+    // `closest`, so only being a *direct* child is what makes it a peer.
+    const accordion = await mount(`
+      <helix-accordion mode="single-collapsible">
+        <helix-accordion-item><span slot="summary">One</span>
+          <helix-accordion mode="single-collapsible">
+            <helix-accordion-item><span slot="summary">Inner</span>i</helix-accordion-item>
+          </helix-accordion>
+        </helix-accordion-item>
+        <helix-accordion-item><span slot="summary">Two</span>2</helix-accordion-item>
+      </helix-accordion>`)
+    const [outer] = items(accordion)
+    click(outer as Item)
+    const inner = (outer as HTMLElement).querySelector('helix-accordion-item') as Item
+    click(inner)
+    expect(inner.isOpen).toBe(true)
+    expect(outer?.isOpen).toBe(true)
   })
 })
 

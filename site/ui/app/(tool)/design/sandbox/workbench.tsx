@@ -1,7 +1,8 @@
 'use client'
 
+import { Drawer, Tabs, Tree } from '@helix-io/react'
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
-import type { HelixOpenChangeEvent, HelixSelectionChangeEvent } from '@helix-io/web'
+import type { HelixOpenEvent, HelixSelectEvent } from '@helix-io/web'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
@@ -98,9 +99,9 @@ export function SandboxWorkbench({ families }: Props) {
   const activeValue = `${family.slug}/${example.slug}`
 
   const tree = (
-    <helix-tree
+    <Tree.Root
       label="Examples"
-      onSelectionChange={(event: HelixSelectionChangeEvent) => select(event.detail.value)}
+      onSelect={(event: HelixSelectEvent) => select(event.detail.value)}
       value={activeValue}
     >
       {withExamples.map((entry) => (
@@ -113,7 +114,7 @@ export function SandboxWorkbench({ families }: Props) {
           ))}
         </helix-tree-item>
       ))}
-    </helix-tree>
+    </Tree.Root>
   )
 
   return (
@@ -168,12 +169,10 @@ export function SandboxWorkbench({ families }: Props) {
         <helix-sandbox orientation={narrow ? 'vertical' : 'horizontal'} split={narrow ? 50 : 45}>
           {/* Panels stay mounted and hidden, so switching files does not
               discard what was typed in the other. */}
-          <helix-tabs
-            class="sourceTabs"
+          <Tabs.Root
+            className="sourceTabs"
             label="Files"
-            onSelectionChange={(event: HelixSelectionChangeEvent) =>
-              setPane(event.detail.value as 'html' | 'css')
-            }
+            onSelect={(event: HelixSelectEvent) => setPane(event.detail.value as 'html' | 'css')}
             slot="source"
             value={pane}
           >
@@ -195,7 +194,7 @@ export function SandboxWorkbench({ families }: Props) {
                 value=""
               ></helix-sandbox-source>
             </helix-tabs-panel>
-          </helix-tabs>
+          </Tabs.Root>
 
           <helix-sandbox-preview
             data-color-mode={previewTheme}
@@ -207,14 +206,9 @@ export function SandboxWorkbench({ families }: Props) {
         {/* A real drawer on a phone: focus trapped, Escape closes, page behind
             covered. The CSS transform it replaced was none of those. */}
         {narrow ? (
-          <helix-drawer
-            label="Examples"
-            onOpenChange={(event: HelixOpenChangeEvent) => setRailOpen(event.detail.open)}
-            open={railOpen}
-            placement="end"
-          >
+          <Drawer.Root label="Examples" onOpenChange={setRailOpen} open={railOpen} placement="end">
             {tree}
-          </helix-drawer>
+          </Drawer.Root>
         ) : (
           <aside className="examplesRail">{tree}</aside>
         )}

@@ -34,7 +34,7 @@ describe('tag', () => {
     // them would put their state and the document out of step.
     const tag = await mount('<helix-tag removable>Draft</helix-tag>')
     let detail: { label: string } | null = null
-    tag.addEventListener('RemoveRequest', (event) => {
+    tag.addEventListener('helix-remove', (event) => {
       detail = (event as CustomEvent<{ label: string }>).detail
     })
     ;(part(tag, 'remove') as HTMLElement).click()
@@ -47,7 +47,7 @@ describe('tag', () => {
   test('the request can be refused', async () => {
     const tag = await mount('<helix-tag removable>Draft</helix-tag>')
     let cancelable = false
-    tag.addEventListener('RemoveRequest', (event) => {
+    tag.addEventListener('helix-remove', (event) => {
       cancelable = event.cancelable
       event.preventDefault()
     })
