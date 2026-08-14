@@ -5153,6 +5153,673 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/checkbox/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/checkbox/root/checkbox-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/checkbox/root/checkbox-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/checkbox/root/checkbox-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/checkbox/root/checkbox-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The box is the native input, restyled rather than replaced, so the tick and\nthe indeterminate dash are the browser's own and the control stays a control\nfor anything reading the page.\n\nThe label sits beside it and the whole thing is the click target, which is\nwhat a native `<label>` wrapping a checkbox gives and what a reader expects.",
+          "name": "HelixCheckbox",
+          "cssProperties": [
+            {
+              "description": "Width and height of the box.",
+              "name": "--checkbox-size"
+            },
+            {
+              "description": "Fill of a ticked box.",
+              "name": "--checkbox-checked-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | undefined"
+              },
+              "description": "Height of the control and the type beside it.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "default": "undefined",
+              "description": "Whether the control is checked. Setting this enters controlled mode.",
+              "attribute": "checked",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultChecked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set.",
+              "attribute": "default-checked",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internalChecked",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nNot seeded from `defaultChecked` in `connectedCallback`: SSR never calls\nthat hook, so a `default-checked` control would render unchecked on the\nserver and snap checked at hydration. Falling back in the getter needs no\nlifecycle at all, so server and client agree.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isChecked",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The resolved checked state, whichever mode the element is in.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onCheckedChange",
+              "type": {
+                "text": "((checked: boolean) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the event\ninstead.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestChecked",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-value-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              },
+              "type": {
+                "text": "requestChecked(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleChecked",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              },
+              "type": {
+                "text": "toggleChecked() => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resetChecked",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Drops the uncontrolled state, so the control reads `defaultChecked`\nagain.\n\nA form reset has to return a control to what its markup declared, and\nclearing `checked` alone only leaves controlled mode. The value the\nelement has been keeping lives here, so this is where it is dropped.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              },
+              "type": {
+                "text": "resetChecked() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.",
+              "attribute": "name",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "'on'",
+              "description": "Value submitted when the box is checked.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit while the box is unchecked.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the box shows as neither checked nor unchecked.\n\nPresentation only. It never submits, and the first change resolves it.",
+              "attribute": "indeterminate",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
+              "description": "Focus is delegated to the input, so the host is never the focus target.",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleChange",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "sync",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reports the value and the validity the host stands behind.",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the box to the state its markup declared.",
+              "type": {
+                "text": "formResetCallback() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the box when the browser brings a form back.",
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | undefined"
+              },
+              "description": "Height of the control and the type beside it.",
+              "fieldName": "size"
+            },
+            {
+              "name": "checked",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "default": "undefined",
+              "description": "Whether the control is checked. Setting this enters controlled mode.",
+              "fieldName": "checked",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "name": "default-checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set.",
+              "fieldName": "defaultChecked",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "'on'",
+              "description": "Value submitted when the box is checked.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit while the box is unchecked.",
+              "fieldName": "required",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "name": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the box shows as neither checked nor unchecked.\n\nPresentation only. It never submits, and the first change resolves it.",
+              "fieldName": "indeterminate",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseCheckbox",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A box that is ticked, or not, or neither.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/checkbox",
+            "aliases": [
+              "Tickbox",
+              "Toggle"
+            ],
+            "tier": "styled",
+            "group": "Checkbox",
+            "part": "Root"
+          },
+          "tagName": "helix-checkbox",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The label.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The input.",
+              "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "description": "The label beside it.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixValueChangeEvent"
+              },
+              "description": "Fired before the state changes, and cancelable.",
+              "name": "helix-value-change",
+              "reactProp": "onValueChange",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed from the input once the state has changed.",
+              "name": "change",
+              "reactProp": "onChange",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/checkbox/root/checkbox-root.ts",
+          "definitionPath": "src/checkbox/root/checkbox-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCheckbox",
+          "declaration": {
+            "name": "HelixCheckbox",
+            "module": "src/checkbox/root/checkbox-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-checkbox",
+          "declaration": {
+            "name": "HelixCheckbox",
+            "module": "src/checkbox/root/checkbox-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/divider/index.ts",
       "declarations": [],
       "exports": [
@@ -7472,6 +8139,14 @@
           "declaration": {
             "name": "*",
             "module": "src/carousel/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/checkbox/index.js"
           }
         },
         {

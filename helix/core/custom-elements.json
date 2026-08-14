@@ -716,6 +716,22 @@
         },
         {
           "kind": "js",
+          "name": "MixinControllerChecked",
+          "declaration": {
+            "name": "MixinControllerChecked",
+            "module": "./mixins/mixin-controller-checked/mixin-controller-checked.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControllerCheckedInterface",
+          "declaration": {
+            "name": "MixinControllerCheckedInterface",
+            "module": "./mixins/mixin-controller-checked/mixin-controller-checked.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "MixinControllerOpen",
           "declaration": {
             "name": "MixinControllerOpen",
@@ -776,6 +792,240 @@
           "declaration": {
             "name": "requestControlledChange",
             "module": "./utils/request-controlled-change/request-controlled-change.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The public surface `MixinControllerChecked` adds.\n\nDeclared separately because TypeScript cannot emit declarations for an\nanonymous class that has private members (TS4094). Casting the mixin's return\nto this interface keeps the internals private and the build working.",
+          "name": "MixinControllerCheckedInterface",
+          "members": [
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "description": "Whether the control is checked. Setting this enters controlled mode."
+            },
+            {
+              "kind": "field",
+              "name": "defaultChecked",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set."
+            },
+            {
+              "kind": "field",
+              "name": "isChecked",
+              "type": {
+                "text": "boolean"
+              },
+              "readonly": true,
+              "description": "The resolved checked state, whichever mode the element is in."
+            },
+            {
+              "kind": "field",
+              "name": "onCheckedChange",
+              "type": {
+                "text": "((checked: boolean) => void) | undefined"
+              },
+              "description": "The consumer's callback, invoked after the state is applied.\n\nA React consumer cannot pass this through JSX: React reserves every prop\nmatching `on[A-Z]` and drops the ones it does not recognise. The generated\nwrapper listens for `helix-value-change` instead. This is for a consumer\nholding a reference, or a framework that assigns properties."
+            },
+            {
+              "kind": "method",
+              "name": "requestChecked",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts: a listener calling `preventDefault()` on the\n`helix-value-change` refuses the change, and nothing moves."
+            },
+            {
+              "kind": "method",
+              "name": "toggleChecked",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state."
+            },
+            {
+              "kind": "method",
+              "name": "resetChecked",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Drops the uncontrolled state, so the control reads `defaultChecked` again.\n\nA form reset has to return a control to what its markup declared. Clearing\n`checked` alone cannot do it: that only leaves controlled mode, and the\nuncontrolled value the element has been keeping is private to the mixin\nand would still be what `isChecked` reports."
+            }
+          ],
+          "helix": {}
+        },
+        {
+          "kind": "mixin",
+          "description": "Grafts controlled and uncontrolled checked state onto a base class.\n\nControlled mode is detected automatically: once a consumer sets `checked`,\nthe element stops managing the value and only announces. Uncontrolled\nconsumers set `defaultChecked` and let the element own it.\n\nSets `data-checked` on the host whenever the element is checked, in either\nmode. Styled tiers select on that rather than `[checked]`, which is absent\nfor uncontrolled consumers.",
+          "name": "MixinControllerChecked",
+          "members": [
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "default": "undefined",
+              "description": "Whether the control is checked. Setting this enters controlled mode.",
+              "attribute": "checked",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "defaultChecked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set.",
+              "attribute": "default-checked"
+            },
+            {
+              "kind": "field",
+              "name": "internalChecked",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nNot seeded from `defaultChecked` in `connectedCallback`: SSR never calls\nthat hook, so a `default-checked` control would render unchecked on the\nserver and snap checked at hydration. Falling back in the getter needs no\nlifecycle at all, so server and client agree."
+            },
+            {
+              "kind": "field",
+              "name": "isChecked",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The resolved checked state, whichever mode the element is in.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "isControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "onCheckedChange",
+              "type": {
+                "text": "((checked: boolean) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the event\ninstead."
+            },
+            {
+              "kind": "method",
+              "name": "requestChecked",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-value-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means."
+            },
+            {
+              "kind": "method",
+              "name": "toggleChecked",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state."
+            },
+            {
+              "kind": "method",
+              "name": "resetChecked",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Drops the uncontrolled state, so the control reads `defaultChecked`\nagain.\n\nA form reset has to return a control to what its markup declared, and\nclearing `checked` alone only leaves controlled mode. The value the\nelement has been keeping lives here, so this is where it is dropped."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "checked",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "default": "undefined",
+              "description": "Whether the control is checked. Setting this enters controlled mode.",
+              "fieldName": "checked"
+            },
+            {
+              "name": "default-checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set.",
+              "fieldName": "defaultChecked"
+            }
+          ],
+          "parameters": [
+            {
+              "name": "Base",
+              "type": {
+                "text": "T"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "MixinControllerCheckedInterface",
+          "declaration": {
+            "name": "MixinControllerCheckedInterface",
+            "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControllerChecked",
+          "declaration": {
+            "name": "MixinControllerChecked",
+            "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
           }
         }
       ]

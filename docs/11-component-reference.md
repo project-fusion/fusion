@@ -668,31 +668,93 @@ the track rather than on the slide, which is the consumer's element.
 
 ### Root
 
-Description
+A box that is ticked, or not, or neither.
+
+Extends `HelixFormElement` with `MixinControllerChecked`.
+
+Renders a real `<input type="checkbox">`, so the space key, the focus ring, and
+the indeterminate glyph come from the platform. `delegatesFocus` puts focus on
+it, and it serializes into the server's markup, so the control is reachable
+before any script loads.
+
+**The input inside a shadow root submits nothing**, because the form is on the
+other side of the boundary. The host is form-associated instead and reports its
+own value through `ElementInternals`, which also carries validity and answers a
+form reset.
+
+A checked box submits its `value`; an unchecked one submits nothing at all.
+That is what a native checkbox does, and a form built around one reads the
+absence rather than a `false`.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property         | Attribute         | Type                 | Default | Inherited From             | Description                                          |
+| ---------------- | ----------------- | -------------------- | ------- | -------------------------- | ---------------------------------------------------- |
+| `checked`        | `checked`         | `boolean \| undefined` | -     | `MixinControllerChecked`   | Whether it is checked. Setting this controls it.     |
+| `defaultChecked` | `default-checked` | `boolean`            | `false` | `MixinControllerChecked`   | Initial state for uncontrolled use.                  |
+| `disabled`       | `disabled`        | `boolean`            | `false` | `HelixFormElement`         | Whether the control is inert.                        |
+| `indeterminate`  | `indeterminate`   | `boolean`            | `false` | -                          | Shows as neither checked nor unchecked.              |
+| `name`           | `name`            | `string`             | `''`    | -                          | Name submitted with the form.                        |
+| `onCheckedChange`| -                 | `(checked) => void`  | -       | `MixinControllerChecked`   | Called after the state is applied.                   |
+| `required`       | `required`        | `boolean`            | `false` | -                          | Whether the form refuses to submit while unticked.   |
+| `value`          | `value`           | `string`             | `'on'`  | -                          | Value submitted when the box is checked.             |
+
+#### Methods
+
+| Method                  | Inherited From           | Description                                            |
+| ----------------------- | ------------------------ | ------------------------------------------------------ |
+| `requestChecked(next)`  | `MixinControllerChecked` | Requests a change, and reports whether it was applied.  |
+| `toggleChecked()`       | `MixinControllerChecked` | Requests the opposite of the current state.             |
+| `resetChecked()`        | `MixinControllerChecked` | Drops the uncontrolled state, back to `defaultChecked`. |
+
+`resetChecked` is what a form reset needs. Clearing `checked` alone only leaves
+controlled mode: the uncontrolled value the element has been keeping is private
+to the mixin and would still be what `isChecked` reports.
+
+#### Getters
+
+| Getter      | Type      | Inherited From           | Description                        |
+| ----------- | --------- | ------------------------ | ---------------------------------- |
+| `isChecked` | `boolean` | `MixinControllerChecked` | The resolved state, either mode.   |
 
 #### Events
 
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+| Event                | Type                    | Description                                       |
+| -------------------- | ----------------------- | ------------------------------------------------- |
+| `helix-value-change` | `HelixValueChangeEvent` | Fired before the state changes, and cancelable.    |
+| `change`             | `Event`                 | Relayed from the input once the state has changed. |
+
+Two channels, and both are needed. `helix-value-change` announces before the
+change so `preventDefault()` refuses it. `change` is the native event under its
+native name, which is what makes `onChange` work for a React consumer, since
+React has already wired that prop to it.
+
+The input flips itself before either fires, so it is put back to whatever the
+element resolves to. Otherwise a refused change leaves the box showing a state
+the element does not hold.
+
+`indeterminate` is presentation and nothing else. It never submits, and the
+first change resolves it: a third state that survives interaction is a control
+nobody can finish.
 
 #### Slots
 
 | Slot        | Description |
 | ----------- | ----------- |
-| _(default)_ |             |
+| _(default)_ | The label.  |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+| Part      | Description          |
+| --------- | -------------------- |
+| `control` | The input.           |
+| `label`   | The label beside it. |
+
+### Styled
+
+Adds `size` (`sm`, `md`). The box is the native input restyled with
+`accent-color` rather than replaced, so the tick and the indeterminate dash are
+the browser's own and the control stays a control for anything reading the page.
 
 ## BaseCheckboxGroup
 
