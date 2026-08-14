@@ -22,7 +22,10 @@ describe('sandbox server output', () => {
     const separator = partTag(markup, 'separator')
     expect(separator).toContain('role="separator"')
     expect(separator).toContain('aria-valuenow="45"')
-    expect(separator).toContain('aria-valuemin="15"')
+    // 0, not the fifteen a drag stops at: past that floor the pane closes, so
+    // nothing is a position a reader can reach and the range has to say so.
+    expect(separator).toContain('aria-valuemin="0"')
+    expect(separator).toContain('aria-valuemax="100"')
     expect(separator).toContain('tabindex="0"')
   })
 

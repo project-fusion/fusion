@@ -16,7 +16,13 @@ import { styles } from './sandbox-root.css.js'
 /** How far one arrow press moves the split, in percent. */
 const STEP = 2
 
-/** Bounds, so a pane can never be dragged to nothing. */
+/**
+ * Bounds for a pane that is open.
+ *
+ * Not the whole range: past these a pane closes rather than shrinking further.
+ * A divider that stops dead at fifteen percent gives a reader no way to put a
+ * pane away, and inching one down to a sliver is nobody's intent.
+ */
 const MIN = 15
 const MAX = 85
 
@@ -26,6 +32,14 @@ const PANEL_STEP = 16
 /** Panel bounds. The floor leaves a line of output; the ceiling leaves panes. */
 const PANEL_MIN = 64
 const PANEL_MAX = 0.8
+
+/**
+ * How far past a floor a drag has to go before the pane closes.
+ *
+ * Half of it. Nearer the floor than to nothing reads as aiming for the floor,
+ * and nearer nothing reads as putting the pane away.
+ */
+const CLOSE_AT = 0.5
 
 /**
  * @summary Pairs an editable source pane with a live preview.
@@ -78,6 +92,16 @@ export class HelixSandbox extends HelixElement {
   @property({ attribute: 'panel-size', type: Number })
   panelSize = 192
 
+  /**
+   * What the panel's height becomes when it is closed.
+   *
+   * Zero closes it outright. A panel whose contents include the control that
+   * reopens it, a row of tabs being the usual one, wants that row left showing,
+   * and only whoever slotted it knows how tall that is.
+   */
+  @property({ attribute: 'panel-collapsed-size', type: Number })
+  panelCollapsedSize = 0
+
   /** Accessible name for the panel's divider. */
   @property({ attribute: 'panel-label' })
   panelLabel = 'Resize panel'
@@ -106,6 +130,15 @@ export class HelixSandbox extends HelixElement {
 
   /** Which axes the drag in progress is moving, if any. */
   private drag: 'block' | 'both' | 'inline' | null = null
+
+  /**
+   * The sizes the sandbox was given, which a double click returns it to.
+   *
+   * What the consumer wrote, not the property defaults. A sandbox opened at
+   * `split="30"` was arranged that way on purpose, and a reset that ignored it
+   * would be resetting to somebody else's idea of the arrangement.
+   */
+  private initial: { panel: number; split: number } | null = null
 
   /**
    * The sandbox's box, measured once when a drag starts.
@@ -233,7 +266,20 @@ export class HelixSandbox extends HelixElement {
     return this.parts<HelixSandboxStatusBar>('helix-sandbox-status-bar')
   }
 
+  /**
+   * The split a drag has reached, closed at either end.
+   *
+   * Between the bounds it follows the pointer. Past them by half the remaining
+   * distance it goes to nothing or to everything, so a pane can be put away and
+   * brought back with the same gesture.
+   */
   private clamp(next: number): number {
+    if (next < MIN * CLOSE_AT) {
+      return 0
+    }
+    if (next > 100 - (100 - MAX) * CLOSE_AT) {
+      return 100
+    }
     return Math.min(MAX, Math.max(MIN, next))
   }
 
@@ -245,6 +291,13 @@ export class HelixSandbox extends HelixElement {
    * it would close the panel rather than bound it.
    */
   private clampPanel(next: number, height: number): number {
+    // Below half the floor the panel closes, to whatever `panelCollapsedSize`
+    // says closed is. A panel holding tabs is not closed at nothing: the tabs
+    // are how it is opened again, so the consumer that put them there says how
+    // much to leave.
+    if (next < PANEL_MIN * CLOSE_AT) {
+      return this.panelCollapsedSize
+    }
     const floored = Math.max(PANEL_MIN, next)
     return height > 0 ? Math.min(height * PANEL_MAX, floored) : floored
   }
@@ -297,6 +350,27 @@ export class HelixSandbox extends HelixElement {
     }
 
     event.preventDefault()
+  }
+
+  /**
+   * Puts a divider back where it started.
+   *
+   * Only the axes that divider moves, so double clicking the panel's divider
+   * leaves the split alone. The corner answers for both, which is the only
+   * reading of a double click on a handle that moves both.
+   */
+  private readonly handleDoubleClick = (event: MouseEvent): void => {
+    const moves = (event.currentTarget as HTMLElement).dataset.drag ?? 'inline'
+    const initial = this.initial
+    if (!initial) {
+      return
+    }
+    if (moves !== 'block') {
+      this.split = initial.split
+    }
+    if (moves !== 'inline') {
+      this.panelSize = initial.panel
+    }
   }
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
@@ -422,6 +496,7 @@ export class HelixSandbox extends HelixElement {
     super.firstUpdated(changed)
     this.applySizes()
     this.readPanel()
+    this.initial = { panel: this.panelSize, split: this.split }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -458,9 +533,10 @@ export class HelixSandbox extends HelixElement {
         tabindex="0"
         aria-label=${this.separatorLabel}
         aria-orientation=${vertical ? 'horizontal' : 'vertical'}
-        aria-valuemax=${MAX}
-        aria-valuemin=${MIN}
+        aria-valuemax="100"
+        aria-valuemin="0"
         aria-valuenow=${Math.round(this.split)}
+        @dblclick=${this.handleDoubleClick}
         @keydown=${this.handleKeydown}
         @pointerdown=${this.handlePointerDown}
         @pointermove=${this.handlePointerMove}
@@ -478,6 +554,7 @@ export class HelixSandbox extends HelixElement {
               aria-label=${this.panelLabel}
               aria-orientation="horizontal"
               aria-valuenow=${Math.round(this.panelSize)}
+              @dblclick=${this.handleDoubleClick}
               @keydown=${this.handleKeydown}
               @pointerdown=${this.handlePointerDown}
               @pointermove=${this.handlePointerMove}
@@ -495,6 +572,7 @@ export class HelixSandbox extends HelixElement {
               role="separator"
               tabindex="0"
               aria-label=${this.cornerLabel}
+              @dblclick=${this.handleDoubleClick}
               @keydown=${this.handleKeydown}
               @pointerdown=${this.handlePointerDown}
               @pointermove=${this.handlePointerMove}

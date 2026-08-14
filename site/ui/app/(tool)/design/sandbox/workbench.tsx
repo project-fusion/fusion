@@ -10,7 +10,7 @@ import {
   htmlToJsx,
 } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
-import type { HelixDrawer, HelixToggleGroup, HelixTree } from '@helix-io/web'
+import type { HelixDrawer, HelixTabs, HelixToggleGroup, HelixTree } from '@helix-io/web'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
@@ -52,6 +52,8 @@ export function SandboxWorkbench({ families }: Props) {
   const treeRef = useRef<HelixTree>(null)
   const rail = useRef<HelixDrawer>(null)
   const sandbox = useRef<HelixSandbox>(null)
+  const panelTabs = useRef<HelixTabs>(null)
+  const [panelClosed, setPanelClosed] = useState(0)
   const terminal = useRef<HelixSandboxTerminal>(null)
   const editors = useRef<Record<string, HelixSandboxEditor | null>>({})
   const [familySlug, setFamilySlug] = useState<string | null>(null)
@@ -137,6 +139,16 @@ export function SandboxWorkbench({ families }: Props) {
     terminal.current?.clear()
   }, [example])
 
+  // Closed, for this panel, is the tab strip still showing: the tabs are how it
+  // is opened again. Only the thing that put them there knows how tall they are,
+  // so the sandbox takes the number rather than guessing at one.
+  useEffect(() => {
+    const strip = panelTabs.current?.shadowRoot?.querySelector('[part="tabs"]')
+    if (strip) {
+      setPanelClosed(Math.round(strip.getBoundingClientRect().height))
+    }
+  }, [])
+
   // Switching files moves focus into the file switched to. It is what you were
   // going to do anyway, and it is also what corrects the status bar: the editor
   // reports its cursor when it gains focus, so the position and the language
@@ -210,6 +222,7 @@ export function SandboxWorkbench({ families }: Props) {
       <div className="workbenchBody">
         <helix-sandbox
           orientation={narrow ? 'vertical' : 'horizontal'}
+          panel-collapsed-size={panelClosed}
           ref={sandbox}
           split={narrow ? 50 : 45}
         >
@@ -307,7 +320,13 @@ export function SandboxWorkbench({ families }: Props) {
           {/* The panel's tabs are `helix-tabs`, not a second tab set built
               into the sandbox: tabs are the only behaviour the region has, and
               that behaviour already exists. */}
-          <helix-tabs appearance="underline" label="Panel" slot="panel" value="terminal">
+          <helix-tabs
+            appearance="underline"
+            label="Panel"
+            ref={panelTabs}
+            slot="panel"
+            value="terminal"
+          >
             <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
             <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
             <helix-tabs-panel slot="panels" value="terminal">

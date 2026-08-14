@@ -338,6 +338,18 @@ export type HelixSandboxProps = {
   "panel-size"?: HelixSandbox["panelSize"];
   /** Height of the panel, in pixels. */
   panelSize?: HelixSandbox["panelSize"];
+  /** What the panel's height becomes when it is closed.
+
+Zero closes it outright. A panel whose contents include the control that
+reopens it, a row of tabs being the usual one, wants that row left showing,
+and only whoever slotted it knows how tall that is. */
+  "panel-collapsed-size"?: HelixSandbox["panelCollapsedSize"];
+  /** What the panel's height becomes when it is closed.
+
+Zero closes it outright. A panel whose contents include the control that
+reopens it, a row of tabs being the usual one, wants that row left showing,
+and only whoever slotted it knows how tall that is. */
+  panelCollapsedSize?: HelixSandbox["panelCollapsedSize"];
   /** Accessible name for the panel's divider. */
   "panel-label"?: HelixSandbox["panelLabel"];
   /** Accessible name for the panel's divider. */
@@ -361,6 +373,18 @@ export type HelixSandboxSolidJsProps = {
   "attr:panel-size"?: HelixSandbox["panelSize"];
   /** Height of the panel, in pixels. */
   "prop:panelSize"?: HelixSandbox["panelSize"];
+  /** What the panel's height becomes when it is closed.
+
+Zero closes it outright. A panel whose contents include the control that
+reopens it, a row of tabs being the usual one, wants that row left showing,
+and only whoever slotted it knows how tall that is. */
+  "attr:panel-collapsed-size"?: HelixSandbox["panelCollapsedSize"];
+  /** What the panel's height becomes when it is closed.
+
+Zero closes it outright. A panel whose contents include the control that
+reopens it, a row of tabs being the usual one, wants that row left showing,
+and only whoever slotted it knows how tall that is. */
+  "prop:panelCollapsedSize"?: HelixSandbox["panelCollapsedSize"];
   /** Accessible name for the panel's divider. */
   "attr:panel-label"?: HelixSandbox["panelLabel"];
   /** Accessible name for the panel's divider. */
@@ -659,6 +683,11 @@ export type CustomElements = {
    * - `orientation`: Whether the panes sit side by side or stacked.
    * - `split`: Percentage of the sandbox given to the source pane.
    * - `panel-size`/`panelSize`: Height of the panel, in pixels.
+   * - `panel-collapsed-size`/`panelCollapsedSize`: What the panel's height becomes when it is closed.
+   *
+   * Zero closes it outright. A panel whose contents include the control that
+   * reopens it, a row of tabs being the usual one, wants that row left showing,
+   * and only whoever slotted it knows how tall that is.
    * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
    * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
@@ -1070,6 +1099,11 @@ export type CustomElementsSolidJs = {
    * - `orientation`: Whether the panes sit side by side or stacked.
    * - `split`: Percentage of the sandbox given to the source pane.
    * - `panel-size`/`panelSize`: Height of the panel, in pixels.
+   * - `panel-collapsed-size`/`panelCollapsedSize`: What the panel's height becomes when it is closed.
+   *
+   * Zero closes it outright. A panel whose contents include the control that
+   * reopens it, a row of tabs being the usual one, wants that row left showing,
+   * and only whoever slotted it knows how tall that is.
    * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
    * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.

@@ -18,7 +18,7 @@
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: flex;
-  font-size: var(--helix-text-sm);
+  font-size: var(--_tree-text, var(--helix-text-sm));
   gap: var(--helix-space-2xs);
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-xs);
@@ -29,6 +29,39 @@
   );
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
   user-select: none;
+}
+
+/* A parent reads as a parent, and a leaf as a leaf.
+ 
+   Both keyed on whether the row drew a chevron, rather than on an attribute:
+   being a branch is detected from what was slotted, so reflecting it would put
+   an attribute on the host that the consumer never wrote and that appears only
+   after the element upgrades. `:has()` asks the same question of the shadow
+   tree, where the answer already is. */
+[part="row"]:has([part="toggle"]) {
+  font-weight: var(--helix-weight-medium);
+}
+
+/* A leaf holds the space a chevron would take, so labels at one depth start at
+   one place whether or not the item opens. Without it the eye reads two
+   columns where there is one list, and the deeper the tree the worse it looks.
+
+   `1em` is the chevron's own width, so it tracks whatever size the row is. */
+[part="row"]:not(:has([part="toggle"])) {
+  padding-inline-start: calc(
+    var(--helix-space-xs) +
+    (var(--_tree-level, 1) - 1) *
+    var(--tree-indent, var(--helix-space-md)) +
+    1em +
+    var(--helix-space-2xs)
+  );
+}
+
+/* Children read as children: one step down the type scale, and one only. A
+   tree six deep should not end in text nobody can read, so this sets the size
+   rather than scaling it, and a grandchild inherits the same step. */
+slot[name="children"]::slotted(*) {
+  --_tree-text: var(--helix-text-xs);
 }
 
 [part="row"]:hover {

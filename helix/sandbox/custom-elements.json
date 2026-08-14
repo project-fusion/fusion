@@ -890,6 +890,16 @@
             },
             {
               "kind": "field",
+              "name": "panelCollapsedSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "What the panel's height becomes when it is closed.\n\nZero closes it outright. A panel whose contents include the control that\nreopens it, a row of tabs being the usual one, wants that row left showing,\nand only whoever slotted it knows how tall that is.",
+              "attribute": "panel-collapsed-size"
+            },
+            {
+              "kind": "field",
               "name": "panelLabel",
               "type": {
                 "text": "string"
@@ -946,6 +956,16 @@
               "privacy": "private",
               "default": "null",
               "description": "Which axes the drag in progress is moving, if any."
+            },
+            {
+              "kind": "field",
+              "name": "initial",
+              "type": {
+                "text": "{ panel: number; split: number } | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The sizes the sandbox was given, which a double click returns it to.\n\nWhat the consumer wrote, not the property defaults. A sandbox opened at\n`split=\"30\"` was arranged that way on purpose, and a reset that ignored it\nwould be resetting to somebody else's idea of the arrangement."
             },
             {
               "kind": "field",
@@ -1059,7 +1079,8 @@
                     "text": "number"
                   }
                 }
-              ]
+              ],
+              "description": "The split a drag has reached, closed at either end.\n\nBetween the bounds it follows the pointer. Past them by half the remaining\ndistance it goes to nothing or to everything, so a pane can be put away and\nbrought back with the same gesture."
             },
             {
               "kind": "method",
@@ -1102,6 +1123,13 @@
               "privacy": "private",
               "readonly": true,
               "description": "Moves a divider by the keyboard.\n\nOne handler for all three, reading which axes the divider it came from is\nallowed to move. The corner takes both, and each arrow moves the axis it\npoints along, which is the only reading of a diagonal handle that a\nkeyboard has."
+            },
+            {
+              "kind": "field",
+              "name": "handleDoubleClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Puts a divider back where it started.\n\nOnly the axes that divider moves, so double clicking the panel's divider\nleaves the split alone. The corner answers for both, which is the only\nreading of a double click on a handle that moves both."
             },
             {
               "kind": "field",
@@ -1266,6 +1294,15 @@
               "default": "192",
               "description": "Height of the panel, in pixels.",
               "fieldName": "panelSize"
+            },
+            {
+              "name": "panel-collapsed-size",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "What the panel's height becomes when it is closed.\n\nZero closes it outright. A panel whose contents include the control that\nreopens it, a row of tabs being the usual one, wants that row left showing,\nand only whoever slotted it knows how tall that is.",
+              "fieldName": "panelCollapsedSize"
             },
             {
               "name": "panel-label",
