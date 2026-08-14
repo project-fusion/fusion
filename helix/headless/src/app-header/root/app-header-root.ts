@@ -16,9 +16,12 @@ import { property } from 'lit/decorators.js'
  * The listener is passive and reads `scrollY` only, so it never blocks
  * scrolling.
  *
- * Brand and actions are bare slots. `<nav>` keeps its wrapper because it is a
- * landmark the navigation needs whether or not anything is in it; the other two
- * are `display: contents` when unassigned and cost nothing.
+ * Three regions, each in its own wrapper, because the row is a grid and a grid
+ * needs three items to put the middle one in the middle. A bare slot is
+ * `display: contents`, so its assigned elements become grid items themselves:
+ * two actions would take two tracks and push the navigation off centre. These
+ * wrappers earn their boxes, which is the test; they carry no inset or fill of
+ * their own, so an empty one still paints nothing.
  *
  * The host is the banner and spans the viewport; the row inside it is what gets
  * centred. A banner that is itself narrowed leaves its background stopping
@@ -36,19 +39,25 @@ import { property } from 'lit/decorators.js'
  * @slot actions - Trailing actions, such as a call to action.
  *
  * @csspart content - The centred row inside the banner.
+ * @csspart brand - The leading region.
  * @csspart nav - The navigation region.
+ * @csspart actions - The trailing region.
  */
 @customElement('helix-base-app-header')
 export class HelixBaseAppHeader extends HelixElement {
   /**
    * Where the navigation sits in the bar.
    *
-   * `center` puts it in the middle of the banner rather than beside the brand,
-   * which reads as the site's spine when the nav is the primary thing in the
-   * header rather than an afterthought next to a logo.
+   * Centred by default, which reads as the site's spine when the navigation is
+   * the primary thing in the header rather than an afterthought beside a logo.
+   * Centred against the banner rather than against whatever space the brand
+   * left over, so the middle of the nav is the middle of the window whatever
+   * the wordmark and the actions happen to measure.
+   *
+   * `start` is the opt-out, for a header whose navigation trails the brand.
    */
   @property({ attribute: 'nav-align', reflect: true })
-  navAlign?: 'start' | 'center'
+  navAlign?: 'start'
 
   private readonly handleScroll = (): void => {
     this.toggleAttribute('data-scrolled', window.scrollY > 0)
@@ -77,9 +86,9 @@ export class HelixBaseAppHeader extends HelixElement {
   protected override render(): TemplateResult {
     return html`
       <div part="content">
-        <slot name="brand"></slot>
+        <div part="brand"><slot name="brand"></slot></div>
         <nav part="nav"><slot></slot></nav>
-        <slot name="actions"></slot>
+        <div part="actions"><slot name="actions"></slot></div>
       </div>
     `
   }

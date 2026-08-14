@@ -25,8 +25,18 @@
   white-space: nowrap;
 }
 
+/* A fill on hover, not just a colour change. Without it the only rounded thing
+   in the group is the indicator, so an item that is not current reads as bare
+   text rather than as something to press. */
 [part="item"]:hover {
+  background-color: var(--helix-color-surface-raised);
   color: var(--helix-color-foreground);
+}
+
+/* The current item already has the indicator behind it, and a second fill on
+   top of it would double the surface. */
+:host([selected]) [part="item"]:hover {
+  background-color: transparent;
 }
 
 :host([selected]) [part="item"] {

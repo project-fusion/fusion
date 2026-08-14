@@ -14,100 +14,22 @@
   display: block;
 }
 
-/* Body is the base rather than a ramp of its own, so anything with no
-   appearance and no pairing already reads as body text. */
+/* No ramps here. They live once in the base layer, keyed on `data-text` for any
+   element and on this component's own `appearance` and `as` for this one, so a
+   `<h2 data-text="caption">` and a `<helix-text as="h2" appearance="caption">`
+   cannot drift apart.
+
+   Those rules match the host, and this element takes them by inheritance:
+   font, colour, and tracking all cross a shadow boundary. `font: inherit` is
+   what makes that work rather than merely possible, because the UA's own `h2`
+   rules are declarations on this element and beat an inherited value. Resetting
+   to `inherit` puts the host's computed font back in charge.
+
+   The consequence worth knowing: `Text` now needs `@helix-io/styles/base.css`
+   loaded to look like anything. Every other component only needs the tokens. */
 [part="text"] {
-  color: var(--helix-color-foreground);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-md);
-  font-weight: var(--helix-weight-regular);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
   margin: var(--helix-space-none);
-}
-
-/* One rule per appearance, each setting the four things that move together.
-   Exposing them separately would offer a few hundred combinations of which a
-   handful are right; this is the handful. */
-:host([appearance="display"]) [part="text"],
-:host(:not([appearance])[as="h1"]) [part="text"] {
-  font-family: var(--helix-font-display);
-  font-size: var(--helix-text-3xl);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
-}
-
-:host([appearance="heading"]) [part="text"],
-:host(:not([appearance])[as="h2"]) [part="text"] {
-  font-size: var(--helix-text-2xl);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
-}
-
-:host([appearance="subheading"]) [part="text"],
-:host(:not([appearance])[as="h3"]) [part="text"] {
-  font-size: var(--helix-text-xl);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
-}
-
-:host([appearance="title"]) [part="text"],
-:host(:not([appearance])[as="h4"]) [part="text"] {
-  font-size: var(--helix-text-lg);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-tight);
-}
-
-:host([appearance="body-strong"]) [part="text"],
-:host(:not([appearance])[as="h5"]) [part="text"],
-:host(:not([appearance])[as="h6"]) [part="text"],
-:host(:not([appearance])[as="strong"]) [part="text"] {
-  font-size: var(--helix-text-md);
-  font-weight: var(--helix-weight-medium);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
-}
-
-/* No pairing: no element means "caption", so it is always deliberate. */
-:host([appearance="caption"]) [part="text"] {
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-regular);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
-}
-
-/* Wider tracking rather than capitals: a label reads as a label from its size
-   and spacing, and uppercase costs legibility. */
-:host([appearance="label"]) [part="text"],
-:host(:not([appearance])[as="label"]) [part="text"] {
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-medium);
-  letter-spacing: var(--helix-tracking-wide);
-  line-height: var(--helix-leading-normal);
-}
-
-:host([appearance="code"]) [part="text"],
-:host(:not([appearance])[as="code"]) [part="text"] {
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-regular);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
-}
-
-:host([tone="muted"]) [part="text"] {
-  color: var(--helix-color-foreground-muted);
-}
-:host([tone="subtle"]) [part="text"] {
-  color: var(--helix-color-foreground-subtle);
-}
-:host([tone="primary"]) [part="text"] {
-  color: var(--helix-color-primary);
-}
-:host([tone="danger"]) [part="text"] {
-  color: var(--helix-color-danger);
 }

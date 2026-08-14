@@ -27,15 +27,45 @@
 }
 
 /* The row is what gets centred, so the content lines up with the page while
-   the banner behind it runs edge to edge. */
+   the banner behind it runs edge to edge.
+
+   A grid with equal outer tracks, not a flex row. Flex centring puts the
+   navigation in the middle of whatever space the brand and the actions left,
+   which moves the moment either changes width: a longer wordmark shifts the
+   nav, and so does swapping a button for a menu at a breakpoint. Equal `1fr`
+   tracks put the middle of the nav at the middle of the window and keep it
+   there. */
 [part="content"] {
   align-items: center;
   block-size: var(--app-header-height, var(--helix-size-header));
-  display: flex;
+  display: grid;
   gap: var(--helix-space-lg);
+  grid-template-columns: 1fr auto 1fr;
   margin-inline: auto;
   max-inline-size: var(--app-header-max-inline-size, 72rem);
   padding-inline: var(--app-header-inset, var(--helix-space-lg));
+}
+
+[part="brand"] {
+  align-items: center;
+  display: flex;
+  min-inline-size: 0;
+}
+
+/* Against the trailing edge, so the row reads brand, navigation, actions from
+   the two window edges inwards. */
+[part="actions"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-xs);
+  justify-content: flex-end;
+  min-inline-size: 0;
+}
+
+/* Navigation beside the brand instead of centred in the banner. The outer
+   tracks stop being equal, so nothing is holding the middle any more. */
+:host([nav-align="start"]) [part="content"] {
+  grid-template-columns: auto 1fr auto;
 }
 
 /* Flat against the hero, lifted once content runs underneath. `data-scrolled`
@@ -57,23 +87,16 @@ slot[name="brand"]::slotted(*) {
   letter-spacing: var(--helix-tracking-tight);
 }
 
-slot[name="actions"]::slotted(*) {
-  flex: 0 0 auto;
-}
-
 [part="nav"] {
   align-items: center;
   display: flex;
-  flex: 1 1 auto;
   gap: var(--helix-space-md);
+  justify-content: center;
   /* Long navigation scrolls inside the bar instead of widening the page. */
   min-inline-size: 0;
   overflow-x: auto;
 }
 
-/* Centred navigation puts the sections in the middle of the banner rather than
-   trailing the wordmark, which reads as the site's spine when the nav is the
-   primary thing in the header rather than an afterthought beside a logo. */
-:host([nav-align="center"]) [part="nav"] {
-  justify-content: center;
+:host([nav-align="start"]) [part="nav"] {
+  justify-content: flex-start;
 }
