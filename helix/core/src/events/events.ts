@@ -29,7 +29,7 @@
  *    `change`, `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`,
  *    `focus` and `blur` on custom elements: a `helix-change` would strip to
  *    `onChange`, which React has already wired to the native `change`, so ours
- *    would never fire. That is why a value change is `helix-value-change`.
+ *    would never fire. That is why a value change is `helix-change`.
  * 2. **The rest are free.** `open`, `close`, `toggle`, `select`, `dismiss`,
  *    `navigate` and `remove` are all unclaimed on a custom element, which is
  *    what lets the verb-only form work everywhere else.
@@ -39,7 +39,7 @@
  * - **Lifecycle** (`helix-open`, `helix-close`) does not bubble and is not
  *   composed. Overlays nest, and an inner one's lifecycle must never reach the
  *   outer one that contains it.
- * - **Coordination** (`helix-select`, `helix-dismiss`, `helix-value-change`)
+ * - **Coordination** (`helix-select`, `helix-dismiss`, `helix-change`)
  *   bubbles and is composed, so a parent or a router can intercept it across a
  *   shadow boundary.
  */
@@ -119,8 +119,8 @@ export class HelixDismissEvent extends CustomEvent<DismissDetail> {
   }
 }
 
-/** Detail carried by `helix-value-change`. */
-export interface ValueChangeDetail {
+/** Detail carried by `helix-change`. */
+export interface ChangeDetail {
   /**
    * Which value changed, so one listener can serve several fields.
    *
@@ -136,16 +136,21 @@ export interface ValueChangeDetail {
 /**
  * Fired when a value changes on something that is not a native input.
  *
- * `helix-value-change` rather than `helix-change`, because the manifest strips
- * the prefix and React has already claimed `onChange` for the native `change`
- * event: a prop by that name would be bound to React's own plumbing and ours
- * would never arrive. A real input relays its native `change` instead.
+ * One hyphen, which is the limit of what React binds on a custom element.
+ * `onhelix-change` reaches this; `onhelix-value-change`, which this was called,
+ * reached nothing, because React stops at one hyphen and binds no event whose
+ * name carries two.
+ *
+ * The prefix is what keeps it clear of the native `change`. A consumer writes
+ * `onhelix-change` for this and `onChange` for a real input's own, and the two
+ * cannot be confused for each other. A control wrapping a native input relays
+ * that input's `change` under its own name as well.
  */
-export class HelixValueChangeEvent extends CustomEvent<ValueChangeDetail> {
-  static readonly eventName = 'helix-value-change'
+export class HelixChangeEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-change'
 
-  constructor(detail: ValueChangeDetail) {
-    super(HelixValueChangeEvent.eventName, {
+  constructor(detail: ChangeDetail) {
+    super(HelixChangeEvent.eventName, {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -186,6 +191,6 @@ declare global {
     'helix-open': HelixOpenEvent
     'helix-dismiss': HelixDismissEvent
     'helix-select': HelixSelectEvent
-    'helix-value-change': HelixValueChangeEvent
+    'helix-change': HelixChangeEvent
   }
 }

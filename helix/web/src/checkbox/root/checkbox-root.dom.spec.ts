@@ -34,7 +34,7 @@ describe('checkbox', () => {
 
   test('changing announces before it acts, and a refusal holds the state', async () => {
     const box = await checkbox()
-    box.addEventListener('helix-value-change', (event) => {
+    box.addEventListener('helix-change', (event) => {
       event.preventDefault()
     })
     control(box).click()

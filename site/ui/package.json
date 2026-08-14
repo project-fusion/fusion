@@ -12,7 +12,6 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@helix-io/react": "workspace:*",
     "@helix-io/sandbox": "workspace:*",
     "@helix-io/styles": "workspace:*",
     "@helix-io/web": "workspace:*",

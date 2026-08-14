@@ -1,8 +1,8 @@
 import type {
+  HelixChangeEvent,
   HelixSandbox,
   HelixSandboxPreview,
   HelixSandboxSource,
-  HelixValueChangeEvent,
 } from '@helix-io/sandbox';
 
 /**
@@ -256,9 +256,9 @@ export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
   HelixSandboxSource,
   E
 >;
-/** `helix-value-change` event type */
-export type HelixSandboxSourceHelixValueChangeElementEvent =
-  HelixSandboxSourceElementEvent<HelixValueChangeEvent>;
+/** `helix-change` event type */
+export type HelixSandboxSourceHelixChangeElementEvent =
+  HelixSandboxSourceElementEvent<HelixChangeEvent>;
 
 export type HelixSandboxSourceProps = {
   /** The source being edited. */
@@ -280,9 +280,7 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   tabIndents?: HelixSandboxSource["tabIndents"];
 
   /** Fired when the source is edited. */
-  "onhelix-value-change"?: (
-    e: HelixSandboxSourceHelixValueChangeElementEvent,
-  ) => void;
+  "onhelix-change"?: (e: HelixSandboxSourceHelixChangeElementEvent) => void;
 };
 
 export type HelixSandboxSourceSolidJsProps = {
@@ -304,9 +302,7 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   /** Whether Tab indents rather than moving focus. */
   "prop:tabIndents"?: HelixSandboxSource["tabIndents"];
   /** Fired when the source is edited. */
-  "on:helix-value-change"?: (
-    e: HelixSandboxSourceHelixValueChangeElementEvent,
-  ) => void;
+  "on:helix-change"?: (e: HelixSandboxSourceHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -417,7 +413,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-value-change`: Fired when the source is edited.
+   * - `helix-change`: Fired when the source is edited.
    *
    * ## CSS Custom Properties
    *
@@ -546,7 +542,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-value-change`: Fired when the source is edited.
+   * - `helix-change`: Fired when the source is edited.
    *
    * ## CSS Custom Properties
    *

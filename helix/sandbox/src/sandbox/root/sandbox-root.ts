@@ -1,4 +1,4 @@
-import { customElement, HelixElement, type HelixValueChangeEvent } from '@helix-io/core'
+import { customElement, type HelixChangeEvent, HelixElement } from '@helix-io/core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -61,7 +61,7 @@ export class HelixSandbox extends HelixElement {
   private dragging = false
 
   private readonly handleSourceChange = (event: Event): void => {
-    const { name, value } = (event as HelixValueChangeEvent).detail
+    const { name, value } = (event as HelixChangeEvent).detail
     for (const preview of this.previews) {
       if (name === 'css') {
         preview.styles = value
@@ -139,12 +139,12 @@ export class HelixSandbox extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-value-change', this.handleSourceChange)
+    this.addEventListener('helix-change', this.handleSourceChange)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-value-change', this.handleSourceChange)
+    this.removeEventListener('helix-change', this.handleSourceChange)
   }
 
   protected override willUpdate(changed: PropertyValues): void {

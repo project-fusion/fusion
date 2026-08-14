@@ -64,22 +64,15 @@ const subject = (pkg: HelixManifest): HelixDeclaration =>
   pkg.modules?.[0]?.declarations?.find((d) => d.name === 'HelixThing') ?? { name: 'missing' }
 
 describe('toReactProp', () => {
-  test('prefixes the event name verbatim', () => {
-    expect(toReactProp('OpenChange')).toBe('onOpenChange')
-    expect(toReactProp('ValueChangeComplete')).toBe('onValueChangeComplete')
-  })
-
-  // React listens for the remainder of the prop character for character, so a
-  // transformed name binds an event nobody dispatches.
-  test('strips the prefix and camel-cases the rest', () => {
-    expect(toReactProp('helix-open')).toBe('onOpen')
-    expect(toReactProp('helix-value-change')).toBe('onValueChange')
+  // React strips `on` and listens for exactly what is left, so any transform of
+  // the name binds an event nobody dispatches.
+  test('is `on` and the event name verbatim', () => {
+    expect(toReactProp('helix-open')).toBe('onhelix-open')
+    expect(toReactProp('helix-change')).toBe('onhelix-change')
   })
 
   test('a relayed native event keeps its own name', () => {
-    // `change` is the prop React has already wired to the native event, which
-    // is the whole reason a relayed event keeps the native name.
-    expect(toReactProp('change')).toBe('onChange')
+    expect(toReactProp('change')).toBe('onchange')
   })
 })
 
@@ -173,12 +166,16 @@ describe('conventionLint', () => {
     expect(lintOf({ events: [{ description: 'x', name: 'change' }] })).not.toThrow()
   })
 
-  // Stripping the prefix lands on a prop React's synthetic system already owns,
-  // which it has wired to the native event, so the Helix one would never fire.
-  test('rejects a verb React has already claimed', () => {
-    expect(lintOf({ events: [{ description: 'x', name: 'helix-change' }] })).toThrow(
-      /claimed-events/,
+  // React strips `on` and listens for exactly what is left, and it stops at one
+  // hyphen. An event nobody can listen for from JSX is one nobody can use.
+  test('rejects an event name carrying two hyphens', () => {
+    expect(lintOf({ events: [{ description: 'x', name: 'helix-value-change' }] })).toThrow(
+      /bindable-events/,
     )
+  })
+
+  test('allows a single hyphen', () => {
+    expect(lintOf({ events: [{ description: 'x', name: 'helix-change' }] })).not.toThrow()
   })
 
   test('rejects an undocumented CSS part', () => {

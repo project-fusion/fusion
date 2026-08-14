@@ -3,23 +3,15 @@ import { eachComponent } from '../types.js'
 /**
  * The React prop for an event.
  *
- * `helix-` is stripped and the rest camel-cased, so `helix-open` is `onOpen`
- * and `helix-value-change` is `onValueChange`. A relayed native event keeps its
- * name, so `change` is `onChange`, which is the prop React has already wired to
- * it.
+ * `on` and the event name verbatim, which is how React binds a custom event on
+ * a custom element: it strips `on` and listens for exactly what is left. So
+ * `helix-open` is `onhelix-open`.
  *
- * The wrapper attaches a real listener for the derived name rather than relying
- * on React to bind it. React reserves every prop matching `on[A-Z]` for its own
- * synthetic system and silently drops the ones it does not recognise, so
- * `onOpen` on a custom element reaches nothing on its own. Only `change`,
- * `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`, `focus` and
- * `blur` are bound by React itself.
+ * Measured against React 19.2.8. It stops at one hyphen: `onhelix-open` binds,
+ * `onhelix-value-change` binds nothing at all, which is why no event here
+ * carries two. `conventionLint` enforces that.
  */
-export const toReactProp = (eventName: string): string => {
-  const verb = eventName.replace(/^helix-/, '')
-  const camel = verb.replace(/-([a-z0-9])/g, (_, char: string) => char.toUpperCase())
-  return `on${camel.charAt(0).toUpperCase()}${camel.slice(1)}`
-}
+export const toReactProp = (eventName: string): string => `on${eventName}`
 
 /**
  * Records the React prop name generated for each event.

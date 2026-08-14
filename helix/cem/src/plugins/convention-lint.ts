@@ -20,28 +20,6 @@ const APPEARANCE_OPENERS = ['themed', 'a styled', 'styled', 'a themed']
  */
 const RELAYED_NATIVE = new Set(['blur', 'change', 'error', 'focus', 'input', 'invalid', 'load'])
 
-/**
- * Verbs React's synthetic system claims on a custom element.
- *
- * React binds each of these itself, so a `helix-` name stripping onto one lands
- * on a prop it has already wired. `select`, `close`, `toggle`, `open`,
- * `dismiss`, `navigate` and `remove` are free, which is what lets the verb-only
- * form work. Re-check by dispatching each name from a custom element and
- * watching whether the matching React prop fires.
- */
-const REACT_CLAIMED = new Set([
-  'blur',
-  'change',
-  'copy',
-  'drag',
-  'focus',
-  'input',
-  'paste',
-  'reset',
-  'scroll',
-  'submit',
-])
-
 const EM_DASH = /[—–]/
 
 /**
@@ -164,20 +142,17 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
             `${declaration.name}:${event.name}`,
             'Event names must be `helix-{verb}`, or a native name being relayed.',
           )
-          // Verbs React has already claimed cannot be used, because stripping
-          // the prefix lands on a prop its synthetic system owns: a
-          // `helix-change` becomes `onChange`, which React has wired to the
-          // native `change`, so the Helix event would never fire.
-          //
-          // A relayed native is exempt, and has to be: landing on the prop
-          // React already wired to that event is precisely what relaying is
-          // for.
+          // React binds a custom event on a custom element by stripping `on`
+          // and listening for exactly what is left, and it stops at one hyphen:
+          // measured against 19.2.8, `onhelix-open` binds and
+          // `onhelix-value-change` binds nothing at all. An event nobody can
+          // listen for from JSX is one nobody can use.
           check(
-            RELAYED_NATIVE.has(event.name) || !REACT_CLAIMED.has(event.name.replace(/^helix-/, '')),
-            'claimed-events',
+            (event.name.match(/-/g) ?? []).length <= 1,
+            'bindable-events',
             path,
             `${declaration.name}:${event.name}`,
-            'React already owns this prop. Qualify the verb (helix-value-change, not helix-change).',
+            'At most one hyphen: React binds no event whose name carries two.',
           )
         }
 

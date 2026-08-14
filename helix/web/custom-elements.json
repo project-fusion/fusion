@@ -416,7 +416,7 @@
               },
               "description": "Fired when the item opens or closes.",
               "name": "helix-open",
-              "reactProp": "onOpen",
+              "reactProp": "onhelix-open",
               "inheritedFrom": {
                 "name": "HelixBaseAccordionItem",
                 "module": "src/accordion/item/accordion-item.ts"
@@ -1382,7 +1382,7 @@
               },
               "description": "Relayed from the image once it has loaded.",
               "name": "load",
-              "reactProp": "onLoad",
+              "reactProp": "onload",
               "inheritedFrom": {
                 "name": "HelixBaseAvatar",
                 "module": "src/avatar/root/avatar-root.ts"
@@ -1394,7 +1394,7 @@
               },
               "description": "Relayed from the image when it fails.",
               "name": "error",
-              "reactProp": "onError",
+              "reactProp": "onerror",
               "inheritedFrom": {
                 "name": "HelixBaseAvatar",
                 "module": "src/avatar/root/avatar-root.ts"
@@ -2034,7 +2034,7 @@
               },
               "description": "Fired when the reader asks to close it.",
               "name": "helix-dismiss",
-              "reactProp": "onDismiss",
+              "reactProp": "onhelix-dismiss",
               "inheritedFrom": {
                 "name": "HelixBaseBanner",
                 "module": "src/banner/root/banner-root.ts"
@@ -4110,7 +4110,7 @@
               },
               "description": "Fired when a date is chosen, with the ISO date.",
               "name": "helix-select",
-              "reactProp": "onSelect",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -5121,7 +5121,7 @@
               },
               "description": "Fired when the slide in view changes, with its index.",
               "name": "helix-select",
-              "reactProp": "onSelect",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -5313,7 +5313,7 @@
                   }
                 }
               ],
-              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-value-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means.",
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means.",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -5772,11 +5772,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixValueChangeEvent"
+                "text": "HelixChangeEvent"
               },
               "description": "Fired before the state changes, and cancelable.",
-              "name": "helix-value-change",
-              "reactProp": "onValueChange",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
               "inheritedFrom": {
                 "name": "HelixBaseCheckbox",
                 "module": "src/checkbox/root/checkbox-root.ts"
@@ -5788,7 +5788,7 @@
               },
               "description": "Relayed from the input once the state has changed.",
               "name": "change",
-              "reactProp": "onChange",
+              "reactProp": "onchange",
               "inheritedFrom": {
                 "name": "HelixBaseCheckbox",
                 "module": "src/checkbox/root/checkbox-root.ts"
@@ -6441,7 +6441,7 @@
               },
               "description": "Fired when the drawer opens or closes.",
               "name": "helix-open",
-              "reactProp": "onOpen",
+              "reactProp": "onhelix-open",
               "inheritedFrom": {
                 "name": "HelixBaseDrawer",
                 "module": "src/drawer/root/drawer-root.ts"
@@ -11346,7 +11346,7 @@
               },
               "description": "Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.",
               "name": "helix-select",
-              "reactProp": "onSelect",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseTabs",
                 "module": "src/tabs/root/tabs-root.ts"
@@ -11636,7 +11636,7 @@
               },
               "description": "Fired when the tab is chosen.",
               "name": "helix-select",
-              "reactProp": "onSelect",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseTabsTab",
                 "module": "src/tabs/tab/tabs-tab.ts"
@@ -11880,7 +11880,7 @@
               },
               "description": "Fired when the reader asks to remove the tag.",
               "name": "helix-dismiss",
-              "reactProp": "onDismiss",
+              "reactProp": "onhelix-dismiss",
               "inheritedFrom": {
                 "name": "HelixBaseTag",
                 "module": "src/tag/root/tag-root.ts"
@@ -12507,7 +12507,7 @@
               },
               "description": "Fired when an item is chosen. Dispatched by the item and listened for here.",
               "name": "helix-select",
-              "reactProp": "onSelect",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
@@ -12825,7 +12825,7 @@
               },
               "description": "Fired when the item is chosen.",
               "name": "helix-select",
-              "reactProp": "onSelect",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseToggle",
                 "module": "src/toggle/root/toggle-root.ts"
@@ -13791,7 +13791,7 @@
               },
               "description": "Fired before the bubble shows, and cancelable.",
               "name": "helix-open",
-              "reactProp": "onOpen",
+              "reactProp": "onhelix-open",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -13803,7 +13803,7 @@
               },
               "description": "Fired before it hides, and cancelable.",
               "name": "helix-close",
-              "reactProp": "onClose",
+              "reactProp": "onhelix-close",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -14169,7 +14169,7 @@
               },
               "description": "Fired when the item is chosen.",
               "name": "helix-select",
-              "reactProp": "onSelect",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseTreeItem",
                 "module": "src/tree/item/tree-item.ts"
@@ -14545,7 +14545,7 @@
               },
               "description": "Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.",
               "name": "helix-select",
-              "reactProp": "onSelect",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseTree",
                 "module": "src/tree/root/tree-root.ts"

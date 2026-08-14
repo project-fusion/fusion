@@ -80,7 +80,7 @@ Every package within a domain shares one version; domains move independently.
 Full-repo lockstep is wrong here because docs packages carry the version of what
 they document: publishing a Cortex fix would bump the Helix docs to a version in
 which nothing about Helix changed. Per-domain keeps the property that matters,
-that `@helix-io/react@x` works with `@helix-io/web@x`.
+that `@helix-io/headless@x` works with `@helix-io/web@x`.
 
 The Rust workspace holds only Cortex crates today, so `[workspace.package]
 version` *is* the Cortex version. **When Helix gains a Rust crate, split it** or

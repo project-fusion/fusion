@@ -1,6 +1,5 @@
 'use client'
 
-import { Drawer } from '@helix-io/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -98,7 +97,13 @@ export function SiteNav() {
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
-      <Drawer.Root label="Site navigation" onOpenChange={setOpen} open={open} placement="end">
+      <helix-drawer
+        label="Site navigation"
+        onhelix-close={() => setOpen(false)}
+        onhelix-open={() => setOpen(true)}
+        open={open}
+        placement="end"
+      >
         <helix-flex align="start" class="navDrawer" direction="column" gap="lg">
           {VERTICALS.map((vertical) => (
             <a
@@ -115,7 +120,7 @@ export function SiteNav() {
             Get in touch
           </a>
         </helix-flex>
-      </Drawer.Root>
+      </helix-drawer>
     </>
   )
 }

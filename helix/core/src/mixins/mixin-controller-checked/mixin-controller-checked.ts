@@ -1,6 +1,6 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixValueChangeEvent } from '../../events/events.js'
+import { HelixChangeEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { requestControlledChange } from '../../utils/request-controlled-change/request-controlled-change.js'
 
@@ -29,7 +29,7 @@ export declare class MixinControllerCheckedInterface {
    *
    * A React consumer cannot pass this through JSX: React reserves every prop
    * matching `on[A-Z]` and drops the ones it does not recognise. The generated
-   * wrapper listens for `helix-value-change` instead. This is for a consumer
+   * wrapper listens for `helix-change` instead. This is for a consumer
    * holding a reference, or a framework that assigns properties.
    */
   onCheckedChange: ((checked: boolean) => void) | undefined
@@ -38,7 +38,7 @@ export declare class MixinControllerCheckedInterface {
    * Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
-   * `helix-value-change` refuses the change, and nothing moves.
+   * `helix-change` refuses the change, and nothing moves.
    */
   requestChecked(next: boolean): boolean
 
@@ -133,7 +133,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * Requests a checked change, and reports whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the
-     * `helix-value-change` is a refusal and nothing moves. In uncontrolled mode
+     * `helix-change` is a refusal and nothing moves. In uncontrolled mode
      * the element then updates itself; in controlled mode it applies nothing
      * and waits for the consumer to pass a new `checked`, which is what
      * "controlled" means.
@@ -151,7 +151,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
           this.requestUpdate()
         },
         event: (checked) =>
-          new HelixValueChangeEvent({
+          new HelixChangeEvent({
             name: (this as Named).name ?? '',
             value: String(checked),
           }),

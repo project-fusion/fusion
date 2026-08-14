@@ -721,10 +721,10 @@ to the mixin and would still be what `isChecked` reports.
 
 | Event                | Type                    | Description                                       |
 | -------------------- | ----------------------- | ------------------------------------------------- |
-| `helix-value-change` | `HelixValueChangeEvent` | Fired before the state changes, and cancelable.    |
+| `helix-change` | `HelixChangeEvent` | Fired before the state changes, and cancelable.    |
 | `change`             | `Event`                 | Relayed from the input once the state has changed. |
 
-Two channels, and both are needed. `helix-value-change` announces before the
+Two channels, and both are needed. `helix-change` announces before the
 change so `preventDefault()` refuses it. `change` is the native event under its
 native name, which is what makes `onChange` work for a React consumer, since
 React has already wired that prop to it.

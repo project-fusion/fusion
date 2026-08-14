@@ -1,6 +1,5 @@
 'use client'
 
-import { Drawer, Tabs, Tree } from '@helix-io/react'
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
 import type { HelixSelectEvent } from '@helix-io/web'
 import Link from 'next/link'
@@ -99,9 +98,9 @@ export function SandboxWorkbench({ families }: Props) {
   const activeValue = `${family.slug}/${example.slug}`
 
   const tree = (
-    <Tree.Root
+    <helix-tree
       label="Examples"
-      onSelect={(event: HelixSelectEvent) => select(event.detail.value)}
+      onhelix-select={(event: HelixSelectEvent) => select(event.detail.value)}
       value={activeValue}
     >
       {withExamples.map((entry) => (
@@ -114,7 +113,7 @@ export function SandboxWorkbench({ families }: Props) {
           ))}
         </helix-tree-item>
       ))}
-    </Tree.Root>
+    </helix-tree>
   )
 
   return (
@@ -169,10 +168,12 @@ export function SandboxWorkbench({ families }: Props) {
         <helix-sandbox orientation={narrow ? 'vertical' : 'horizontal'} split={narrow ? 50 : 45}>
           {/* Panels stay mounted and hidden, so switching files does not
               discard what was typed in the other. */}
-          <Tabs.Root
+          <helix-tabs
             className="sourceTabs"
             label="Files"
-            onSelect={(event: HelixSelectEvent) => setPane(event.detail.value as 'html' | 'css')}
+            onhelix-select={(event: HelixSelectEvent) =>
+              setPane(event.detail.value as 'html' | 'css')
+            }
             slot="source"
             value={pane}
           >
@@ -194,7 +195,7 @@ export function SandboxWorkbench({ families }: Props) {
                 value=""
               ></helix-sandbox-source>
             </helix-tabs-panel>
-          </Tabs.Root>
+          </helix-tabs>
 
           <helix-sandbox-preview
             data-color-mode={previewTheme}
@@ -206,9 +207,15 @@ export function SandboxWorkbench({ families }: Props) {
         {/* A real drawer on a phone: focus trapped, Escape closes, page behind
             covered. The CSS transform it replaced was none of those. */}
         {narrow ? (
-          <Drawer.Root label="Examples" onOpenChange={setRailOpen} open={railOpen} placement="end">
+          <helix-drawer
+            label="Examples"
+            onhelix-close={() => setRailOpen(false)}
+            onhelix-open={() => setRailOpen(true)}
+            open={railOpen}
+            placement="end"
+          >
             {tree}
-          </Drawer.Root>
+          </helix-drawer>
         ) : (
           <aside className="examplesRail">{tree}</aside>
         )}

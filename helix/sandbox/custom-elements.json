@@ -693,11 +693,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixValueChangeEvent"
+                "text": "HelixChangeEvent"
               },
               "description": "Fired when the source is edited.",
-              "name": "helix-value-change",
-              "reactProp": "onValueChange"
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
             }
           ],
           "attributes": [

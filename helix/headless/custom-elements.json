@@ -327,7 +327,7 @@
               },
               "description": "Fired when the item opens or closes.",
               "name": "helix-open",
-              "reactProp": "onOpen"
+              "reactProp": "onhelix-open"
             }
           ],
           "attributes": [
@@ -949,7 +949,7 @@
               },
               "description": "Relayed from the image once it has loaded.",
               "name": "load",
-              "reactProp": "onLoad"
+              "reactProp": "onload"
             },
             {
               "type": {
@@ -957,7 +957,7 @@
               },
               "description": "Relayed from the image when it fails.",
               "name": "error",
-              "reactProp": "onError"
+              "reactProp": "onerror"
             }
           ],
           "attributes": [
@@ -1422,7 +1422,7 @@
               },
               "description": "Fired when the reader asks to close it.",
               "name": "helix-dismiss",
-              "reactProp": "onDismiss"
+              "reactProp": "onhelix-dismiss"
             }
           ],
           "attributes": [
@@ -2896,7 +2896,7 @@
               },
               "description": "Fired when a date is chosen, with the ISO date.",
               "name": "helix-select",
-              "reactProp": "onSelect"
+              "reactProp": "onhelix-select"
             }
           ],
           "attributes": [
@@ -3649,7 +3649,7 @@
               },
               "description": "Fired when the slide in view changes, with its index.",
               "name": "helix-select",
-              "reactProp": "onSelect"
+              "reactProp": "onhelix-select"
             }
           ],
           "attributes": [
@@ -3983,7 +3983,7 @@
                   }
                 }
               ],
-              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-value-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means.",
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means.",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -4155,11 +4155,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixValueChangeEvent"
+                "text": "HelixChangeEvent"
               },
               "description": "Fired before the state changes, and cancelable.",
-              "name": "helix-value-change",
-              "reactProp": "onValueChange"
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
             },
             {
               "type": {
@@ -4167,7 +4167,7 @@
               },
               "description": "Relayed from the input once the state has changed.",
               "name": "change",
-              "reactProp": "onChange"
+              "reactProp": "onchange"
             }
           ],
           "attributes": [
@@ -4784,7 +4784,7 @@
               },
               "description": "Fired when the drawer opens or closes.",
               "name": "helix-open",
-              "reactProp": "onOpen"
+              "reactProp": "onhelix-open"
             }
           ],
           "attributes": [
@@ -7867,7 +7867,7 @@
               },
               "description": "Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.",
               "name": "helix-select",
-              "reactProp": "onSelect"
+              "reactProp": "onhelix-select"
             }
           ],
           "attributes": [
@@ -8097,7 +8097,7 @@
               },
               "description": "Fired when the tab is chosen.",
               "name": "helix-select",
-              "reactProp": "onSelect"
+              "reactProp": "onhelix-select"
             }
           ],
           "attributes": [
@@ -8310,7 +8310,7 @@
               },
               "description": "Fired when the reader asks to remove the tag.",
               "name": "helix-dismiss",
-              "reactProp": "onDismiss"
+              "reactProp": "onhelix-dismiss"
             }
           ],
           "attributes": [
@@ -8534,7 +8534,7 @@
               },
               "description": "Fired when an item is chosen. Dispatched by the item and listened for here.",
               "name": "helix-select",
-              "reactProp": "onSelect"
+              "reactProp": "onhelix-select"
             }
           ],
           "attributes": [
@@ -8780,7 +8780,7 @@
               },
               "description": "Fired when the item is chosen.",
               "name": "helix-select",
-              "reactProp": "onSelect"
+              "reactProp": "onhelix-select"
             }
           ],
           "attributes": [
@@ -9490,7 +9490,7 @@
               },
               "description": "Fired before the bubble shows, and cancelable.",
               "name": "helix-open",
-              "reactProp": "onOpen"
+              "reactProp": "onhelix-open"
             },
             {
               "type": {
@@ -9498,7 +9498,7 @@
               },
               "description": "Fired before it hides, and cancelable.",
               "name": "helix-close",
-              "reactProp": "onClose"
+              "reactProp": "onhelix-close"
             }
           ],
           "attributes": [
@@ -9873,7 +9873,7 @@
               },
               "description": "Fired when the item is chosen.",
               "name": "helix-select",
-              "reactProp": "onSelect"
+              "reactProp": "onhelix-select"
             }
           ],
           "attributes": [
@@ -10159,7 +10159,7 @@
               },
               "description": "Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.",
               "name": "helix-select",
-              "reactProp": "onSelect"
+              "reactProp": "onhelix-select"
             }
           ],
           "attributes": [

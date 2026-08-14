@@ -15,6 +15,7 @@ import type {
   HelixCallout,
   HelixCard,
   HelixCarousel,
+  HelixChangeEvent,
   HelixCheckbox,
   HelixCloseEvent,
   HelixDismissEvent,
@@ -50,7 +51,6 @@ import type {
   HelixTooltip,
   HelixTree,
   HelixTreeItem,
-  HelixValueChangeEvent,
 } from '@helix-io/web';
 
 /**
@@ -877,9 +877,9 @@ case is the absent attribute, and the styles read it that way. */
 
 /** `HelixCheckbox` component event */
 export type HelixCheckboxElementEvent<E = Event> = TypedEvent<HelixCheckbox, E>;
-/** `helix-value-change` event type */
-export type HelixCheckboxHelixValueChangeElementEvent =
-  HelixCheckboxElementEvent<HelixValueChangeEvent>;
+/** `helix-change` event type */
+export type HelixCheckboxHelixChangeElementEvent =
+  HelixCheckboxElementEvent<HelixChangeEvent>;
 
 export type HelixCheckboxProps = {
   /** Height of the control and the type beside it. */
@@ -915,9 +915,7 @@ instead. */
   onCheckedChange?: HelixCheckbox["onCheckedChange"];
 
   /** Fired before the state changes, and cancelable. */
-  "onhelix-value-change"?: (
-    e: HelixCheckboxHelixValueChangeElementEvent,
-  ) => void;
+  "onhelix-change"?: (e: HelixCheckboxHelixChangeElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   onchange?: (e: HelixCheckboxElementEvent) => void;
 };
@@ -955,9 +953,7 @@ what it does not recognise; the generated wrapper listens for the event
 instead. */
   "prop:onCheckedChange"?: HelixCheckbox["onCheckedChange"];
   /** Fired before the state changes, and cancelable. */
-  "on:helix-value-change"?: (
-    e: HelixCheckboxHelixValueChangeElementEvent,
-  ) => void;
+  "on:helix-change"?: (e: HelixCheckboxHelixChangeElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixCheckboxElementEvent) => void;
 
@@ -2692,7 +2688,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-value-change`: Fired before the state changes, and cancelable.
+   * - `helix-change`: Fired before the state changes, and cancelable.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -2708,7 +2704,7 @@ export type CustomElements = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-value-change` is a refusal and nothing moves. In uncontrolled mode
+   * `helix-change` is a refusal and nothing moves. In uncontrolled mode
    * the element then updates itself; in controlled mode it applies nothing
    * and waits for the consumer to pass a new `checked`, which is what
    * "controlled" means.
@@ -4708,7 +4704,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-value-change`: Fired before the state changes, and cancelable.
+   * - `helix-change`: Fired before the state changes, and cancelable.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -4724,7 +4720,7 @@ export type CustomElementsSolidJs = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-value-change` is a refusal and nothing moves. In uncontrolled mode
+   * `helix-change` is a refusal and nothing moves. In uncontrolled mode
    * the element then updates itself; in controlled mode it applies nothing
    * and waits for the consumer to pass a new `checked`, which is what
    * "controlled" means.

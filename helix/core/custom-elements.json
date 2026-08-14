@@ -351,8 +351,8 @@
         },
         {
           "kind": "class",
-          "description": "Fired when a value changes on something that is not a native input.\n\n`helix-value-change` rather than `helix-change`, because the manifest strips\nthe prefix and React has already claimed `onChange` for the native `change`\nevent: a prop by that name would be bound to React's own plumbing and ours\nwould never arrive. A real input relays its native `change` instead.",
-          "name": "HelixValueChangeEvent",
+          "description": "Fired when a value changes on something that is not a native input.\n\nOne hyphen, which is the limit of what React binds on a custom element.\n`onhelix-change` reaches this; `onhelix-value-change`, which this was called,\nreached nothing, because React stops at one hyphen and binds no event whose\nname carries two.\n\nThe prefix is what keeps it clear of the native `change`. A consumer writes\n`onhelix-change` for this and `onChange` for a real input's own, and the two\ncannot be confused for each other. A control wrapping a native input relays\nthat input's `change` under its own name as well.",
+          "name": "HelixChangeEvent",
           "members": [
             {
               "kind": "field",
@@ -362,7 +362,7 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'helix-value-change'"
+              "default": "'helix-change'"
             }
           ],
           "superclass": {
@@ -421,9 +421,9 @@
         },
         {
           "kind": "js",
-          "name": "HelixValueChangeEvent",
+          "name": "HelixChangeEvent",
           "declaration": {
-            "name": "HelixValueChangeEvent",
+            "name": "HelixChangeEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -740,9 +740,25 @@
         },
         {
           "kind": "js",
+          "name": "ChangeDetail",
+          "declaration": {
+            "name": "ChangeDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "DismissDetail",
           "declaration": {
             "name": "DismissDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixChangeEvent",
+          "declaration": {
+            "name": "HelixChangeEvent",
             "module": "./events/events.js"
           }
         },
@@ -780,14 +796,6 @@
         },
         {
           "kind": "js",
-          "name": "HelixValueChangeEvent",
-          "declaration": {
-            "name": "HelixValueChangeEvent",
-            "module": "./events/events.js"
-          }
-        },
-        {
-          "kind": "js",
           "name": "OpenDetail",
           "declaration": {
             "name": "OpenDetail",
@@ -799,14 +807,6 @@
           "name": "SelectDetail",
           "declaration": {
             "name": "SelectDetail",
-            "module": "./events/events.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "ValueChangeDetail",
-          "declaration": {
-            "name": "ValueChangeDetail",
             "module": "./events/events.js"
           }
         },
@@ -948,7 +948,7 @@
               "type": {
                 "text": "((checked: boolean) => void) | undefined"
               },
-              "description": "The consumer's callback, invoked after the state is applied.\n\nA React consumer cannot pass this through JSX: React reserves every prop\nmatching `on[A-Z]` and drops the ones it does not recognise. The generated\nwrapper listens for `helix-value-change` instead. This is for a consumer\nholding a reference, or a framework that assigns properties."
+              "description": "The consumer's callback, invoked after the state is applied.\n\nA React consumer cannot pass this through JSX: React reserves every prop\nmatching `on[A-Z]` and drops the ones it does not recognise. The generated\nwrapper listens for `helix-change` instead. This is for a consumer\nholding a reference, or a framework that assigns properties."
             },
             {
               "kind": "method",
@@ -966,7 +966,7 @@
                   }
                 }
               ],
-              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts: a listener calling `preventDefault()` on the\n`helix-value-change` refuses the change, and nothing moves."
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts: a listener calling `preventDefault()` on the\n`helix-change` refuses the change, and nothing moves."
             },
             {
               "kind": "method",
@@ -1070,7 +1070,7 @@
                   }
                 }
               ],
-              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-value-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means."
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means."
             },
             {
               "kind": "method",

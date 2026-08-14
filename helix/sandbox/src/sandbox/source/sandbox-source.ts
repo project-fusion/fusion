@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixValueChangeEvent } from '@helix-io/core'
+import { customElement, HelixChangeEvent, HelixElement } from '@helix-io/core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -24,7 +24,7 @@ import { styles } from './sandbox-source.css.js'
  *
  * @csspart source - The editable region.
  *
- * @event {HelixValueChangeEvent} helix-value-change - Fired when the source is edited.
+ * @event {HelixChangeEvent} helix-change - Fired when the source is edited.
  *
  * @cssproperty --sandbox-source-background - Fill behind the source.
  * @cssproperty --sandbox-source-min-block-size - Minimum height of the pane.
@@ -59,7 +59,7 @@ export class HelixSandboxSource extends HelixElement {
 
   private readonly handleInput = (event: Event): void => {
     this.value = (event.target as HTMLTextAreaElement).value
-    this.dispatchEvent(new HelixValueChangeEvent({ name: this.name, value: this.value }))
+    this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: this.value }))
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -80,7 +80,7 @@ export class HelixSandboxSource extends HelixElement {
     field.selectionStart = selectionStart + 2
     field.selectionEnd = field.selectionStart
     this.value = field.value
-    this.dispatchEvent(new HelixValueChangeEvent({ name: this.name, value: this.value }))
+    this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: this.value }))
   }
 
   protected override render(): TemplateResult {

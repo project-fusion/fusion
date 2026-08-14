@@ -1,7 +1,6 @@
 'use client'
 
-import { Drawer, Toggle } from '@helix-io/react'
-import type { HelixSelectEvent } from '@helix-io/web'
+import type { HelixCloseEvent, HelixOpenEvent, HelixSelectEvent } from '@helix-io/web'
 import { useEffect, useState } from 'react'
 
 type ColorMode = 'system' | 'light' | 'dark'
@@ -62,7 +61,13 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
   }
 
   return (
-    <Drawer.Root label="Preferences" onOpenChange={onOpenChange} open={open} placement="end">
+    <helix-drawer
+      label="Preferences"
+      onhelix-close={() => onOpenChange(false)}
+      onhelix-open={() => onOpenChange(true)}
+      open={open}
+      placement="end"
+    >
       <helix-flex align="start" class="prefsPanel" direction="column" gap="lg">
         <helix-text as="h2" appearance="subheading">
           Preferences
@@ -72,20 +77,20 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           <helix-text appearance="label" tone="subtle">
             Color mode
           </helix-text>
-          <Toggle.Group
+          <helix-toggle-group
             label="Color mode"
-            onSelect={(event: HelixSelectEvent) => choose(event.detail.value as ColorMode)}
+            onhelix-select={(event: HelixSelectEvent) => choose(event.detail.value as ColorMode)}
             value={mode}
           >
             <helix-toggle value="system">System</helix-toggle>
             <helix-toggle value="light">Light</helix-toggle>
             <helix-toggle value="dark">Dark</helix-toggle>
-          </Toggle.Group>
+          </helix-toggle-group>
           <helix-text appearance="caption" tone="subtle">
             System follows your operating system, and keeps following it.
           </helix-text>
         </helix-flex>
       </helix-flex>
-    </Drawer.Root>
+    </helix-drawer>
   )
 }

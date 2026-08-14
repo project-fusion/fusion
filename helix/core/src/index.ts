@@ -9,15 +9,15 @@ export {
 } from './controllers/floating-controller/floating-controller.js'
 export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {
+  type ChangeDetail,
   type DismissDetail,
+  HelixChangeEvent,
   HelixCloseEvent,
   HelixDismissEvent,
   HelixOpenEvent,
   HelixSelectEvent,
-  HelixValueChangeEvent,
   type OpenDetail,
   type SelectDetail,
-  type ValueChangeDetail,
 } from './events/events.js'
 export { HelixElement } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'

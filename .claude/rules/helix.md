@@ -226,15 +226,18 @@ consumer would guess simply does nothing.
 
 ## Use the elements directly
 
-**Write `<helix-card>` in JSX** for anything that only takes attributes and
-slots. No wrapper, no patched React.
+**Write `<helix-card>` in JSX.** Plain custom elements, no wrapper, no patched
+React, and no React package: there is not one.
 
-**Reach for `@helix-io/react` when a component's events are consumed.** React
-reserves every prop matching `on[A-Z]` for its synthetic system and drops the
-ones it does not recognise, so `onHelixOpen` on a bare `<helix-drawer>` binds
-nothing and fails silently. The generated wrapper attaches a real listener for
-the derived name, which is why the site imports `Drawer` and `Toggle` and
-nothing else from it.
+**Events are `onhelix-{verb}`.** React binds a custom event on a custom element
+by stripping `on` and listening for exactly what is left, so `onhelix-open`
+reaches `helix-open`. `onHelixOpen` does not fail loudly; it binds an event
+called `HelixOpen` that nobody dispatches, which looks the same from outside.
+
+**It stops at one hyphen.** `onhelix-open` binds and `onhelix-value-change`
+binds nothing at all, measured against React 19.2.8. Every Helix event name
+therefore carries at most one hyphen, and `conventionLint` fails the build on
+one that carries two.
 
 **Register once, in a client component.** A custom element registers as a side
 effect of importing its module, and that import has to be in the client graph to
@@ -359,7 +362,7 @@ prefix, because that is a real identifier a consumer types.
 
 ## Tree-shaking## Tree-shaking
 
-One family per module, subpath exports (`@helix-io/react/disclosure`) so
-consumers need not import the barrel, and `sideEffects` declared honestly: `web`
-has them because `@customElement` registers on import, `headless` and `react` do
-not. Getting it wrong is silent both ways.
+One family per module, subpath exports (`@helix-io/web/card`) so consumers need
+not import the barrel, and `sideEffects` declared honestly: `web` has them
+because `@customElement` registers on import, `headless` does not. Getting it
+wrong is silent both ways.

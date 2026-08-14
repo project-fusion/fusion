@@ -31,7 +31,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The label.
  *
- * @event {HelixValueChangeEvent} helix-value-change - Fired before the state changes, and cancelable.
+ * @event {HelixChangeEvent} helix-change - Fired before the state changes, and cancelable.
  * @event {Event} change - Relayed from the input once the state has changed.
  *
  * @csspart control - The input.
