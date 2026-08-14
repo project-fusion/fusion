@@ -1,7 +1,7 @@
 :host {
   align-items: center;
   display: inline-flex;
-  gap: var(--breadcrumbs-gap, var(--helix-space-2xs));
+  gap: var(--breadcrumbs-gap, var(--helix-space-xs));
 }
 
 [part="separator"] {
@@ -35,11 +35,16 @@
 ::slotted(a) {
   background-color: transparent;
   border-radius: var(--helix-radii-sm);
-  /* Pulled back by its own inline padding, so the trail keeps the spacing
-     it had and only the hover fill is new. */
-  margin-inline: calc(var(--helix-space-xs) * -1);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Only the first step is pulled back, and only on the side that faces the
+   edge, so the trail starts where the content around it starts. Pulling every
+   step back on both sides cancels the padding the fill is made of, which
+   collapses the space around each chevron to nothing. */
+:host(:first-child) ::slotted(a) {
+  margin-inline-start: calc(var(--helix-space-xs) * -1);
 }
 
 ::slotted(a:hover) {

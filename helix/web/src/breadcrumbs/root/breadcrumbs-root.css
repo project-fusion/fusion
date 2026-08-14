@@ -7,7 +7,7 @@
   display: flex;
   flex-wrap: wrap;
   font-size: var(--helix-text-sm);
-  gap: var(--breadcrumbs-gap, var(--helix-space-2xs));
+  gap: var(--breadcrumbs-gap, var(--helix-space-xs));
   /* Markers are removed, which is exactly why the headless tier sets
      `role="list"`: Safari drops list semantics when it sees this. */
   list-style: none;
