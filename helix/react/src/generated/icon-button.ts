@@ -24,16 +24,10 @@ export interface IconButtonProps extends BaseProps {
   disabled?: boolean
   /** Whether the button holds its group's tab stop. A toolbar keeps one tab stop across its children, and the obvious way to do that is to write `tabindex` onto each of them. That is a change to markup the consumer rendered, so a React consumer's hydration reports it and does not patch it up. A parent sets this property instead, which writes nothing, and the stop lands on the inner control inside the shadow root. No attribute, because it is coordination between elements rather than anything a consumer sets. */
   focusable?: boolean
-  /** Navigates to this URL instead of acting on a form. */
-  href?: string
   /** Accessible name, for a button whose content is not text. Lives here rather than only on `IconButton` so the two share one render. An icon-only button without it is a control a screen reader announces as "button" and nothing else. */
   label?: string
-  /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
-  rel?: string
   /** Edge length of the control. */
   size?: 'sm' | 'md' | 'lg'
-  /** Browsing context for `href`, such as `_blank`. */
-  target?: string
   /** What activating the button does to its form. */
   type?: 'button' | 'submit' | 'reset'
 }

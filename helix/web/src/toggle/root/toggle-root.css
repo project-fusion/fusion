@@ -1,54 +1,19 @@
+/* The item's own look lives in the base layer, paired across both forms: the
+   radio this renders and the link a consumer slots. It has to, because the
+   outer tree styles slotted content and a `::slotted()` rule here would lose to
+   it. What stays is the host box and the focus ring, which a document rule
+   cannot reach into a shadow root to declare. */
 :host {
+  block-size: 100%;
   display: inline-flex;
   /* Above the indicator, which sits behind every item. */
   position: relative;
   z-index: var(--helix-layer-raised);
 }
 
-/* No background here on purpose: the selected look is the group's indicator
-   behind this item, which is what lets the marker travel. */
 [part="item"] {
-  align-items: center;
-  background: none;
-  border: none;
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  cursor: pointer;
-  display: inline-flex;
-  font: inherit;
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
-  justify-content: center;
-  padding-inline: var(--helix-space-sm);
-  text-decoration: none;
-  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
-  white-space: nowrap;
-}
-
-/* A wash rather than a surface. The travelling thumb is the group's one real
-   surface; hover only has to say "this is reachable", and mixing a few percent
-   of the foreground into the track does that without competing. */
-[part="item"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
-  color: var(--helix-color-foreground);
-}
-
-/* The thumb is behind this item, so the label on top of it goes to full
-   strength and gains weight. Weight rather than colour, again because colour
-   is the one thing reserved for state. */
-:host([selected]) [part="item"] {
-  background-color: transparent;
-  color: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-semibold);
-}
-
-:host([selected]) [part="item"] {
-  color: var(--helix-color-foreground);
-}
-
-[part="item"]:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+  all: unset;
+  box-sizing: border-box;
 }
 
 [part="item"]:focus-visible {

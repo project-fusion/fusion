@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { stageAppearance, VERTICALS } from '../verticals'
 
 /**
@@ -70,12 +71,12 @@ export default function Home() {
             that makes that practical.
           </helix-text>
           <helix-flex gap="sm" wrap>
-            <helix-button appearance="primary" href="/design" size="lg">
+            <Link data-button="primary" data-button-size="lg" href="/design">
               See what is shipping
-            </helix-button>
-            <helix-button href="mailto:hello@fusion.dev" size="lg">
+            </Link>
+            <a data-button data-button-size="lg" href="mailto:hello@fusion.dev">
               Start a conversation
-            </helix-button>
+            </a>
           </helix-flex>
         </helix-flex>
       </section>
@@ -220,9 +221,9 @@ export default function Home() {
             that is what you need, say so plainly and we will tell you whether we are the right
             people.
           </helix-text>
-          <helix-button appearance="primary" href="mailto:hello@fusion.dev" size="lg">
+          <a data-button="primary" data-button-size="lg" href="mailto:hello@fusion.dev">
             hello@fusion.dev
-          </helix-button>
+          </a>
         </helix-flex>
       </section>
     </>

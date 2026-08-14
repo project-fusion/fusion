@@ -326,6 +326,158 @@ helix-text[tone="danger"] {
   color: var(--helix-color-danger);
 }
 
+/* The button recipe.
+ *
+ * Every rule names two selectors and they are one decision: `data-button` for
+ * an element the consumer renders, and `helix-button::part(button)` for the
+ * component's own control. `::part` from this document outranks the shadow's
+ * rules, so this is the single definition and `button-root.css` keeps only what
+ * cannot be reached from outside.
+ *
+ * It exists because `Button` no longer renders an anchor, for the same reason
+ * `Link` stopped existing: a router renders its own `<a>` and cannot render it
+ * inside a shadow root. A link that looks like a button is styling, so it is
+ * styling. `<Link data-button="primary">` is the same control.
+ */
+[data-button],
+helix-button::part(button) {
+  align-items: center;
+  background-color: var(--helix-color-surface);
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-xs);
+  justify-content: center;
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-tight);
+  padding-inline: var(--helix-space-md);
+  text-decoration: none;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+  white-space: nowrap;
+}
+
+[data-button]:hover,
+helix-button::part(button):hover {
+  background-color: var(--helix-color-surface-raised);
+  border-color: var(--helix-color-border-strong);
+}
+
+[data-button="primary"],
+helix-button[appearance="primary"]::part(button) {
+  background-color: var(--helix-color-primary);
+  border-color: transparent;
+  color: var(--helix-color-foreground-on-accent);
+}
+
+[data-button="primary"]:hover,
+helix-button[appearance="primary"]::part(button):hover {
+  background-color: var(--helix-color-primary-hover);
+  border-color: transparent;
+}
+
+[data-button="subtle"],
+helix-button[appearance="subtle"]::part(button) {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+[data-button="subtle"]:hover,
+helix-button[appearance="subtle"]::part(button):hover {
+  background-color: var(--helix-color-surface-sunken);
+  border-color: transparent;
+}
+
+[data-button="danger"],
+helix-button[appearance="danger"]::part(button) {
+  background-color: var(--helix-color-danger);
+  border-color: transparent;
+  color: var(--helix-color-foreground-on-accent);
+}
+
+/* `md` is absent, because it is the height a control is. */
+[data-button-size="sm"],
+helix-button[size="sm"]::part(button) {
+  block-size: var(--helix-size-control-dense);
+  font-size: var(--helix-text-xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+[data-button-size="lg"],
+helix-button[size="lg"]::part(button) {
+  block-size: var(--helix-size-control-large);
+  font-size: var(--helix-text-md);
+  padding-inline: var(--helix-space-lg);
+}
+
+[data-button][aria-disabled="true"],
+helix-button[disabled]::part(button) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* The toggle item.
+ *
+ * Paired the same way the button is, and for a sharper reason: when a consumer
+ * slots their own link, the *outer* tree styles it. A `::slotted()` rule in the
+ * component loses to any document rule, so `:where(a)` above was painting nav
+ * items blue and underlined and the component could not stop it. Styling it
+ * from here is not a workaround, it is where the cascade says the rule belongs.
+ *
+ * `::part(item)` covers the radio form the component renders itself, so both
+ * forms take one declaration.
+ */
+helix-toggle[link] > *,
+helix-toggle::part(item) {
+  align-items: center;
+  background: none;
+  block-size: 100%;
+  border: none;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  justify-content: center;
+  padding-inline: var(--helix-space-sm);
+  text-decoration: none;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+  white-space: nowrap;
+}
+
+helix-toggle[link] > *:hover,
+helix-toggle::part(item):hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+/* The travelling thumb is behind this item, so the label goes to full strength
+   and gains weight. Weight rather than colour: colour is reserved for state. */
+helix-toggle[link][selected] > *,
+helix-toggle[selected]::part(item) {
+  background-color: transparent;
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
+}
+
+helix-toggle[disabled][link] > *,
+helix-toggle[disabled]::part(item) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 :where(code, kbd, samp, pre) {
   font-family: var(--helix-font-mono);
 }

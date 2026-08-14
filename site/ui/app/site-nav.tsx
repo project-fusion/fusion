@@ -1,6 +1,7 @@
 'use client'
 
 import type { HelixOpenChangeEvent } from '@helix-io/web'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FusionLogo } from './fusion-logo'
@@ -62,8 +63,8 @@ export function SiteNav() {
         {!narrow && (
           <helix-toggle-group label="Verticals" nav value={current}>
             {VERTICALS.map((vertical) => (
-              <helix-toggle href={vertical.href} key={vertical.href} value={vertical.href}>
-                {vertical.label}
+              <helix-toggle key={vertical.href} link value={vertical.href}>
+                <Link href={vertical.href}>{vertical.label}</Link>
               </helix-toggle>
             ))}
           </helix-toggle-group>
@@ -105,9 +106,9 @@ export function SiteNav() {
               {vertical.label}
             </a>
           ))}
-          <helix-button appearance="primary" href="mailto:hello@fusion.dev" size="lg">
+          <a data-button="primary" data-button-size="lg" href="mailto:hello@fusion.dev">
             Get in touch
-          </helix-button>
+          </a>
         </helix-flex>
       </helix-drawer>
     </>

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { families } from '../../../lib/catalog'
 import { findVertical } from '../../verticals'
 import { VerticalPage } from '../vertical-page'
@@ -24,10 +25,12 @@ export default function Page() {
   return (
     <VerticalPage vertical={vertical}>
       <helix-flex gap="sm" wrap>
-        <helix-button appearance="primary" href="/design/sandbox">
+        <Link data-button="primary" href="/design/sandbox">
           Open the sandbox
-        </helix-button>
-        <helix-button href="/design/components/button">Read the API</helix-button>
+        </Link>
+        <Link data-button href="/design/components/button">
+          Read the API
+        </Link>
       </helix-flex>
 
       <helix-flex gap="2xl" wrap>
@@ -72,21 +75,21 @@ export default function Page() {
               </helix-text>
               <helix-flex gap="2xs" slot="footer">
                 {family.examples.length > 0 && (
-                  <helix-button
-                    appearance="subtle"
+                  <Link
+                    data-button="subtle"
+                    data-button-size="sm"
                     href={`/design/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
-                    size="sm"
                   >
                     Sandbox
-                  </helix-button>
+                  </Link>
                 )}
-                <helix-button
-                  appearance="subtle"
+                <Link
+                  data-button="subtle"
+                  data-button-size="sm"
                   href={`/design/components/${family.slug}`}
-                  size="sm"
                 >
                   API
-                </helix-button>
+                </Link>
               </helix-flex>
             </helix-card>
           ))}

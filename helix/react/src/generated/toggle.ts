@@ -15,8 +15,8 @@ one fill appearing as another disappears.
 export interface ToggleProps extends BaseProps {
   /** Whether the item can be chosen. */
   disabled?: boolean
-  /** Makes the item a link rather than a radio. */
-  href?: string
+  /** Whether the consumer supplies the interactive element. Declared rather than detected, because detection would have to read the assigned nodes and the server cannot: it would render the radio, then swap to a slot on upgrade, which is a nested anchor inside a button for as long as that takes. */
+  link?: boolean
   /** Whether this item is the current one. */
   selected?: boolean
   /** Identifies the item to the group. */
@@ -27,7 +27,7 @@ export interface ToggleProps extends BaseProps {
 
 export const ToggleRoot = createComponent<HelixToggle, ToggleProps>({
   events: { SelectionChange: 'onSelectionChange' },
-  properties: ['disabled', 'selected'],
+  properties: ['disabled', 'link', 'selected'],
   tagName: 'helix-toggle',
 })
 
