@@ -6,6 +6,7 @@
      between days, and it belongs to the track rather than to a `gap`, so a
      range can paint the whole track and stay continuous. */
   --_calendar-track: var(--calendar-track-size, 2.5rem);
+  --_calendar-row: var(--calendar-row-size, 2.25rem);
   --_calendar-day: var(--calendar-day-size, 1.875rem);
 }
 
@@ -57,6 +58,10 @@
   grid-template-columns: repeat(7, var(--_calendar-track));
 }
 
+/* Twenty of name over twenty of space, in a track's width.
+   `box-sizing` is border-box here as everywhere, so the forty is the whole box
+   and the padding takes half of it: the name occupies the top twenty and the
+   bottom twenty separates the heading row from the first week. */
 [part="weekday"] {
   align-items: center;
   block-size: var(--_calendar-track);
@@ -66,15 +71,18 @@
   font-weight: var(--helix-weight-medium);
   inline-size: var(--_calendar-track);
   justify-content: center;
+  padding-block-end: calc(var(--_calendar-track) / 2);
 }
 
 /* The cell is the whole track and the day is the shape centred in it. A range
    paints the cell, so it runs unbroken between days and stops at the ends of a
    row on its own, where a fill painted on the day has to be bridged across the
    space between them and then clipped at the row's edge. */
+/* Wider than it is tall: the track carries the space between days across, and
+   the row is only as tall as a day needs. */
 [part="cell"] {
   align-items: center;
-  block-size: var(--_calendar-track);
+  block-size: var(--_calendar-row);
   cursor: pointer;
   display: inline-flex;
   inline-size: var(--_calendar-track);

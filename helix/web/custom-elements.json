@@ -3342,6 +3342,10 @@
               "name": "--calendar-track-size"
             },
             {
+              "description": "Height of a week row.",
+              "name": "--calendar-row-size"
+            },
+            {
               "description": "Fill behind a selected day.",
               "name": "--calendar-selected-color"
             },
