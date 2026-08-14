@@ -1,7 +1,7 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseToggleGroupItem } from '@helix-io/headless'
+import { HelixBaseToggle } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './toggle-group-item.css.js'
+import { styles } from './toggle-root.css.js'
 
 /**
  * @summary One option in a toggle group.
@@ -20,13 +20,13 @@ import { styles } from './toggle-group-item.css.js'
  *
  * @csspart item - The button or anchor.
  */
-@customElement('helix-toggle-group-item')
-export class HelixToggleGroupItem extends HelixBaseToggleGroupItem {
+@customElement('helix-toggle')
+export class HelixToggle extends HelixBaseToggle {
   static override styles: CSSResultGroup = styles
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-toggle-group-item': HelixToggleGroupItem
+    'helix-toggle': HelixToggle
   }
 }

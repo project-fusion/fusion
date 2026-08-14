@@ -83,9 +83,9 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
             }
             value={mode}
           >
-            <helix-toggle-group-item value="system">System</helix-toggle-group-item>
-            <helix-toggle-group-item value="light">Light</helix-toggle-group-item>
-            <helix-toggle-group-item value="dark">Dark</helix-toggle-group-item>
+            <helix-toggle value="system">System</helix-toggle>
+            <helix-toggle value="light">Light</helix-toggle>
+            <helix-toggle value="dark">Dark</helix-toggle>
           </helix-toggle-group>
           <helix-text appearance="caption" tone="subtle">
             System follows your operating system, and keeps following it.

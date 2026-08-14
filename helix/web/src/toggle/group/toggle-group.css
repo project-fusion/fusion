@@ -9,11 +9,15 @@
   --_toggle-height: calc(var(--helix-size-control-dense) - var(--helix-space-xs));
 }
 
+/* A framed track, and it is what makes the whole control read. Without it the
+   marker is a lone shape floating on the page and scans as a stray rectangle
+   whatever its corner radius; inside a bordered, sunken track it reads as a
+   thumb sitting in a groove, which is the thing a segmented control is. */
 :host(:not([appearance])),
 :host([appearance="filled"]) {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--helix-radii-md);
   padding: var(--helix-space-2xs);
 }
 
@@ -26,15 +30,15 @@
    written onto this element, because labels differ in length and no fraction of
    the group is right for all of them.
 
-   Fully round. A fixed corner radius has to be chosen against the control's
-   height to read as anything, and at 32px tall neither 4px nor 8px did: both
-   still scanned as a rectangle. A pill is the shape regardless of height, which
-   is the property that matters for a marker that has to read as one travelling
-   object. */
+   A raised thumb rather than a flat fill: a lifted surface with a hairline of
+   shadow under it is what says "this one", and it does the saying without
+   colour, which stays reserved for state. One step rounder than nothing and one
+   step tighter than the track it sits in, so the two are concentric. */
 [part="indicator"] {
   background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
   block-size: var(--_toggle-height);
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-sm);
   inline-size: var(--_indicator-w, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;
@@ -57,9 +61,8 @@
   opacity: 1;
 }
 
-/* A surface, not an accent. The indicator says which item is current; the
-   accent colour is reserved for state, and using it here would make navigation
-   the loudest thing on the page. */
+/* Navigation sits on the page rather than in a panel, so its thumb takes the
+   page's own raised surface and keeps the shadow that lifts it off the track. */
 :host([nav]) [part="indicator"] {
   background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
 }

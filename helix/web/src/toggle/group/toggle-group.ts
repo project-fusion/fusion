@@ -2,7 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseToggleGroup } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './toggle-group-root.css.js'
+import { styles } from './toggle-group.css.js'
 
 /**
  * @summary A row of options with the selection marked by a moving indicator.
