@@ -37,11 +37,40 @@
 }
 
 /* No value, so nothing to read: the mark collapses to a dot. Shape follows
-   content, so there is no attribute saying which one this is. */
+   content, so there is no attribute saying which one this is.
+
+   `[data-blank]` is never `:empty`, since a value that counts nothing still has
+   text. The two rules cannot both apply, so a mark leaving keeps its size and
+   scales from it rather than snapping to a dot on the way out. */
 [part="indicator"]:empty {
   block-size: var(--_badge-inset);
   min-inline-size: var(--_badge-inset);
   padding-inline: var(--helix-space-none);
+}
+
+/* Arriving. The mark stays mounted with nothing to show, so this is a state
+   change and not an insertion, and both directions transition on their own. */
+[part="indicator"] {
+  scale: 1;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+/* Leaving. Out under acceleration, with no overshoot to draw the eye back to
+   something that is going away. */
+[part="indicator"][data-blank] {
+  opacity: 0;
+  scale: 0;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-accelerate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="indicator"] {
+    transition: none;
+  }
 }
 
 :host([appearance="primary"]) [part="indicator"] {

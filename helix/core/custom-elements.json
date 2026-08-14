@@ -782,6 +782,129 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/utils/create-sheet/create-sheet.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSheet",
+          "return": {
+            "type": {
+              "text": "CSSResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createSheet",
+          "declaration": {
+            "name": "createSheet",
+            "module": "src/utils/create-sheet/create-sheet.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/focusable-elements/focusable-elements.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "focusableElements",
+          "return": {
+            "type": {
+              "text": "HTMLElement[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "root",
+              "type": {
+                "text": "HTMLElement"
+              }
+            }
+          ],
+          "description": "Everything inside `root` the reader can reach with Tab, in document order.\n\nSeparate from the focus trap because finding is the half most callers want:\nroving tabindex, arrow-key navigation and \"focus the first thing\" all need\nthis list and none of them traps anything.\n\nVisibility is tested with `getClientRects()` rather than `offsetParent`,\nwhich is null for anything inside a `position: fixed` container. A drawer is\nexactly that, so the `offsetParent` test excluded every control in the thing\nbeing trapped."
+        },
+        {
+          "kind": "function",
+          "name": "deepActiveElement",
+          "return": {
+            "type": {
+              "text": "Element | null"
+            }
+          },
+          "description": "The truly focused element, following shadow roots down.\n\n`document.activeElement` stops at the outermost host, so a button inside two\nshadow roots reports as the component rather than as itself."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "focusableElements",
+          "declaration": {
+            "name": "focusableElements",
+            "module": "src/utils/focusable-elements/focusable-elements.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "deepActiveElement",
+          "declaration": {
+            "name": "deepActiveElement",
+            "module": "src/utils/focusable-elements/focusable-elements.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/custom-element/custom-element.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "customElement",
+          "parameters": [
+            {
+              "name": "tagName",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Registers a custom element, once.\n\nA drop-in replacement for Lit's `@customElement` that does not throw when the\ntag is already registered.\n\nThe duplicate is not hypothetical. Next.js evaluates a module in both the\nserver and client graphs, so a component imported by a server component and a\nclient component runs its registration twice against one registry, and\n`customElements.define` throws:\n\n> Failed to execute 'define': the name \"helix-card\" has already been used\n\nThat failure takes down the whole prerender, and it appears only once an app\nmixes server and client usage of the same component, which is exactly what a\nreal app does.\n\nThe analyzer detects `@customElement` **by decorator name**, not by where it\nis imported from, so the manifest still records `tagName` and nothing\ndownstream changes."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "customElement",
+          "declaration": {
+            "name": "customElement",
+            "module": "src/utils/custom-element/custom-element.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "tagName",
+          "declaration": {
+            "name": "target",
+            "module": "src/utils/custom-element/custom-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/mixins/mixin-controller-open/mixin-controller-open.ts",
       "declarations": [
         {
@@ -990,129 +1113,6 @@
           "declaration": {
             "name": "MixinControllerOpen",
             "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/custom-element/custom-element.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "customElement",
-          "parameters": [
-            {
-              "name": "tagName",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Registers a custom element, once.\n\nA drop-in replacement for Lit's `@customElement` that does not throw when the\ntag is already registered.\n\nThe duplicate is not hypothetical. Next.js evaluates a module in both the\nserver and client graphs, so a component imported by a server component and a\nclient component runs its registration twice against one registry, and\n`customElements.define` throws:\n\n> Failed to execute 'define': the name \"helix-card\" has already been used\n\nThat failure takes down the whole prerender, and it appears only once an app\nmixes server and client usage of the same component, which is exactly what a\nreal app does.\n\nThe analyzer detects `@customElement` **by decorator name**, not by where it\nis imported from, so the manifest still records `tagName` and nothing\ndownstream changes."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "customElement",
-          "declaration": {
-            "name": "customElement",
-            "module": "src/utils/custom-element/custom-element.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "tagName",
-          "declaration": {
-            "name": "target",
-            "module": "src/utils/custom-element/custom-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/create-sheet/create-sheet.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "createSheet",
-          "return": {
-            "type": {
-              "text": "CSSResult"
-            }
-          },
-          "parameters": [
-            {
-              "name": "cssText",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "createSheet",
-          "declaration": {
-            "name": "createSheet",
-            "module": "src/utils/create-sheet/create-sheet.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/focusable-elements/focusable-elements.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "focusableElements",
-          "return": {
-            "type": {
-              "text": "HTMLElement[]"
-            }
-          },
-          "parameters": [
-            {
-              "name": "root",
-              "type": {
-                "text": "HTMLElement"
-              }
-            }
-          ],
-          "description": "Everything inside `root` the reader can reach with Tab, in document order.\n\nSeparate from the focus trap because finding is the half most callers want:\nroving tabindex, arrow-key navigation and \"focus the first thing\" all need\nthis list and none of them traps anything.\n\nVisibility is tested with `getClientRects()` rather than `offsetParent`,\nwhich is null for anything inside a `position: fixed` container. A drawer is\nexactly that, so the `offsetParent` test excluded every control in the thing\nbeing trapped."
-        },
-        {
-          "kind": "function",
-          "name": "deepActiveElement",
-          "return": {
-            "type": {
-              "text": "Element | null"
-            }
-          },
-          "description": "The truly focused element, following shadow roots down.\n\n`document.activeElement` stops at the outermost host, so a button inside two\nshadow roots reports as the component rather than as itself."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "focusableElements",
-          "declaration": {
-            "name": "focusableElements",
-            "module": "src/utils/focusable-elements/focusable-elements.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "deepActiveElement",
-          "declaration": {
-            "name": "deepActiveElement",
-            "module": "src/utils/focusable-elements/focusable-elements.ts"
           }
         }
       ]

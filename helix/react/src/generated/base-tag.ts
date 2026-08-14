@@ -6,29 +6,29 @@ import '@helix-io/headless/tag'
 import type { HelixBaseTag, HelixDismissEvent } from '@helix-io/headless'
 
 /**
- * A tag is a label, and optionally a label the reader can take off. `removable`
-is what separates it from a badge: a badge reports a state the reader cannot
-change, a tag names something they can.
+ * A tag is a label, and optionally a label the reader can take off.
+`dismissible` is what separates it from a badge: a badge reports a state the
+reader cannot change, a tag names something they can.
 
-Removing is a request, not an action. The tag dispatches `RemoveRequest` and
-does nothing else, because the consumer owns the list it sits in; taking the
-node out from under them would put their state and the document out of step.
-The event is cancelable, so `preventDefault()` is a refusal.
+Dismissing is a request. The tag does not remove itself, because the consumer
+owns the list it sits in and taking the node out from under them would put
+their state and the document out of step. Cancelling `helix-dismiss` is a
+refusal.
  *
  * Renders `<helix-base-tag>`.
  */
 export interface BaseTagProps extends Omit<BaseProps, 'onDismiss'> {
   /** Whether the tag offers a control to remove itself. */
-  removable?: boolean
-  /** Accessible name for the remove control. A property rather than text read from the tag, because naming the button "Remove Draft" would mean reading `textContent` and the server has no tree to read it from. The attribute is named explicitly. Lit lowercases a property name to get an attribute rather than dash-casing it, so this would otherwise be reachable only as `removelabel`, which nobody would guess and no linter would catch. */
-  removeLabel?: string
+  dismissible?: boolean
+  /** Accessible name for the dismiss control. A property rather than text read from the tag, because naming the button "Remove Draft" would mean reading `textContent` and the server has no tree to read it from. The attribute is named explicitly. Lit lowercases a property name to get an attribute rather than dash-casing it, so this would otherwise be reachable only as `removelabel`, which nobody would guess and no linter would catch. */
+  dismissLabel?: string
   /** Fired when the reader asks to remove the tag. */
   onDismiss?: (event: HelixDismissEvent) => void
 }
 
 export const BaseTagRoot = createComponent<HelixBaseTag, BaseTagProps>({
   events: { 'helix-dismiss': 'onDismiss' },
-  properties: ['removable'],
+  properties: ['dismissible'],
   tagName: 'helix-base-tag',
 })
 

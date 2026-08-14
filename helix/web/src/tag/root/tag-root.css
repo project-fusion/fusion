@@ -54,7 +54,7 @@
 
 /* The remove control sits inside the tag's inline padding, so the tag does not
    grow a second inset around it. */
-[part="remove"] {
+[part="dismiss"] {
   background: none;
   border: none;
   border-radius: var(--helix-radii-sm);
@@ -65,16 +65,16 @@
   padding: var(--helix-space-2xs);
 }
 
-[part="remove"]:hover {
+[part="dismiss"]:hover {
   background-color: color-mix(in oklab, var(--_tag-color) 20%, transparent);
 }
 
-[part="remove"]:focus-visible {
+[part="dismiss"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
-[part="remove"] svg {
+[part="dismiss"] svg {
   block-size: 0.85em;
   inline-size: 0.85em;
 }
