@@ -36,7 +36,9 @@
   white-space: nowrap;
 }
 
-:host([dot]) [part="indicator"] {
+/* No value, so nothing to read: the mark collapses to a dot. Shape follows
+   content, so there is no attribute saying which one this is. */
+[part="indicator"]:empty {
   block-size: var(--_badge-inset);
   min-inline-size: var(--_badge-inset);
   padding-inline: var(--helix-space-none);

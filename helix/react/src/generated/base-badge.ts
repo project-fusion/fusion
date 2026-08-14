@@ -10,31 +10,31 @@ import type { HelixBaseBadge } from '@helix-io/headless'
 thing being counted stays the thing in the layout: a badge is an annotation,
 not a container that happens to hold an icon.
 
-`max` caps the number. Past it the indicator reads `9+` rather than growing
-to fit, because a corner mark that widens with its value pushes the layout
-around for the one case nobody planned for.
+The indicator says how many, and none is none. A `value` that reads as zero
+shows no mark at all, an absent one shows a bare dot, and any other value
+shows the value. `max` caps the top: past it the indicator reads `{max}+`
+rather than growing to fit, since a corner mark that widens with its value
+pushes the layout around.
 
-**A dot needs a label.** Without one it is a coloured circle that announces
+**A dot needs a label.** Without one it is a colored circle that announces
 nothing, which tells a sighted reader there is something new and tells
-everyone else there is not. The label is required in that form and the
+everyone else there is not. The label is required in that form, and the
 indicator is hidden from assistive technology when a number already says it.
  *
  * Renders `<helix-base-badge>`.
  */
 export interface BaseBadgeProps extends BaseProps {
-  /** Shows a presence mark with no text. `value` is ignored. */
-  dot?: boolean
   /** Accessible name. Required for a dot, which has no text to read. */
   label?: string
   /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
   max?: number
-  /** The count or short text to show. */
+  /** The count or short text to show. Absent shows a dot, zero shows nothing. */
   value?: string
 }
 
 export const BaseBadgeRoot = createComponent<HelixBaseBadge, BaseBadgeProps>({
   events: {},
-  properties: ['dot'],
+  properties: [],
   tagName: 'helix-base-badge',
 })
 
