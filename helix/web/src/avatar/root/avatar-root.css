@@ -1,8 +1,16 @@
 :host {
   --_avatar-size: var(--avatar-size, var(--helix-size-control));
 
+  align-items: center;
+  background-color: var(--avatar-background-color, var(--helix-color-primary-subtle));
+  block-size: var(--_avatar-size);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground);
   display: inline-flex;
   flex: 0 0 auto;
+  inline-size: var(--_avatar-size);
+  justify-content: center;
+  overflow: hidden;
 }
 
 :host([size="sm"]) {
@@ -13,20 +21,16 @@
   --_avatar-size: var(--avatar-size, var(--helix-size-control-large));
 }
 
-[part="avatar"] {
-  align-items: center;
-  background-color: var(--avatar-background-color, var(--helix-color-primary-subtle));
-  block-size: var(--_avatar-size);
-  border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground);
-  display: inline-flex;
-  inline-size: var(--_avatar-size);
-  justify-content: center;
-  overflow: hidden;
+:host([shape="square"]) {
+  border-radius: var(--helix-radii-md);
 }
 
-:host([shape="square"]) [part="avatar"] {
-  border-radius: var(--helix-radii-md);
+/* Whatever a consumer slots as the fallback fills the avatar the same way the
+   image would, so an icon does not sit at its own intrinsic size in a circle. */
+::slotted(*) {
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
 }
 
 [part="image"] {

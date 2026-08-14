@@ -8,25 +8,46 @@ import type { HelixBaseAvatar } from '@helix-io/headless'
 /**
  * The fallback is the reason this is an element. An image that fails to load
 leaves a broken icon and no name, so the avatar listens for the error and
-falls back to initials derived from `name`.
+falls back: to whatever was slotted, or to initials derived from `name`.
+
+**One element, not three.** A separate image and fallback would each need to
+be written for every avatar and would have to coordinate through an event,
+and the only thing that buys is trying several sources in turn. The fallback
+carries no behavior at all, which by the rule here makes it a slot; the image
+does own load state, but the root already owns it.
 
 `name` is required for the accessible name whether or not there is an image,
 because an avatar with no name tells a screen-reader user nothing. Initials
 are hidden from assistive technology: they are a visual shorthand for the
 name that is already announced, and would otherwise be read out letter by
 letter after it.
+
+The `<img>` keeps an empty `alt` for the same reason. The host carries the
+accessible name through `ElementInternals`, so a populated `alt` would
+announce the same person twice.
+
+The image's own `load` and `error` are relayed from the host. They are not
+composed, so they stop at the shadow boundary otherwise, and relaying them
+under their native names is what lets a consumer wait for an avatar the way
+they would wait for any image.
  *
  * Renders `<helix-base-avatar>`.
  */
-export interface BaseAvatarProps extends BaseProps {
+export interface BaseAvatarProps extends Omit<BaseProps, 'onError' | 'onLoad'> {
+  /** Accessible name, when it should differ from `name`. `name` is what the initials are drawn from, so it has to be a person's name. This is for the cases where what should be announced is not: an avatar standing for a whole team, or one whose label carries a role. */
+  label?: string
   /** Name of the person or entity. Used for the label and the initials. */
   name?: string
-  /** Image to show. Falls back to initials if it fails to load. */
+  /** Image to show. Falls back to the slot, or to initials, if it fails. */
   src?: string
+  /** Relayed from the image when it fails. */
+  onError?: (event: Event) => void
+  /** Relayed from the image once it has loaded. */
+  onLoad?: (event: Event) => void
 }
 
 export const BaseAvatarRoot = createComponent<HelixBaseAvatar, BaseAvatarProps>({
-  events: {},
+  events: { error: 'onError', load: 'onLoad' },
   properties: [],
   tagName: 'helix-base-avatar',
 })

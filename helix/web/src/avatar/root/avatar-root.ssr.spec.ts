@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -10,10 +10,12 @@ describe('avatar server output', () => {
     expect(markup).toContain('RS')
   })
 
-  test('the accessible name ships with it', () => {
+  test('the host carries nothing the consumer did not write', () => {
+    // The name and the role go through `ElementInternals`, which writes no
+    // attribute at all. A DOM spec asserts they are announced; what matters
+    // here is that the served host is exactly what was typed.
     const markup = ssr(html`<helix-avatar name="Ross Sheppard"></helix-avatar>`)
-    expect(partTag(markup, 'avatar')).toContain('aria-label="Ross Sheppard"')
-    expect(partTag(markup, 'avatar')).toContain('role="img"')
+    expect(hostAttributes(markup, 'helix-avatar')).toEqual(['name'])
   })
 
   test('an image renders as an image, with the fallback held back', () => {

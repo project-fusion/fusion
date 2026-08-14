@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role, slotted } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -25,8 +25,59 @@ describe('avatar', () => {
     // initials too would spell it out a second time, letter by letter.
     const avatar = await mount('<helix-avatar name="Ross Sheppard"></helix-avatar>')
     expect(part(avatar, 'initials')?.getAttribute('aria-hidden')).toBe('true')
-    expect(part(avatar, 'avatar')?.getAttribute('aria-label')).toBe('Ross Sheppard')
-    expect(part(avatar, 'avatar')?.getAttribute('role')).toBe('img')
+  })
+
+  test('the name is announced from the host, not from a wrapper', async () => {
+    // Through internals, so the host carries no attribute a consumer's server
+    // markup lacks, and the avatar itself is what announces rather than a span
+    // inside it.
+    const avatar = (await mount(
+      '<helix-avatar name="Ross Sheppard"></helix-avatar>',
+    )) as HTMLElement & {
+      internals?: ElementInternals
+    }
+    expect(role(avatar)).toBe('img')
+    expect(avatar.internals?.ariaLabel).toBe('Ross Sheppard')
+    expect(avatar.hasAttribute('aria-label')).toBe(false)
+  })
+
+  test('label overrides the name for what is announced', async () => {
+    const avatar = (await mount(
+      '<helix-avatar label="The design team" name="Ross Sheppard"></helix-avatar>',
+    )) as HTMLElement & { internals?: ElementInternals }
+    // Initials still come from the name, because that is what they are drawn
+    // from; only what is announced changes.
+    expect(avatar.internals?.ariaLabel).toBe('The design team')
+    expect(part(avatar, 'initials')?.textContent?.trim()).toBe('RS')
+  })
+
+  test('the slot is the fallback, not a replacement for the image', async () => {
+    // "This image, and my icon if it fails" is the case a total replacement
+    // could not express.
+    const avatar = (await mount(
+      '<helix-avatar name="Ross" src="/missing.avif"><span id="mine">icon</span></helix-avatar>',
+    )) as Updatable
+    expect(part(avatar, 'image')).not.toBeNull()
+
+    part(avatar, 'image')?.dispatchEvent(new Event('error'))
+    await avatar.updateComplete
+    expect(part(avatar, 'image')).toBeNull()
+    // The initials are the slot's own fallback, so they stay in the shadow tree
+    // and go inert rather than being removed. What matters is what the slot
+    // assigned, which is the consumer's element.
+    expect(slotted(avatar)[0]?.id).toBe('mine')
+  })
+
+  test('the image relays its load and error, which do not cross on their own', async () => {
+    const avatar = (await mount(
+      '<helix-avatar name="Ross" src="/me.avif"></helix-avatar>',
+    )) as Updatable
+    const heard: string[] = []
+    avatar.addEventListener('load', () => heard.push('load'))
+    avatar.addEventListener('error', () => heard.push('error'))
+
+    part(avatar, 'image')?.dispatchEvent(new Event('load'))
+    expect(heard).toEqual(['load'])
   })
 
   test('shows the image when there is one', async () => {

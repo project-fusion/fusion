@@ -13,19 +13,25 @@ every size, including one a consumer sets themselves through
  *
  * Renders `<helix-avatar>`.
  */
-export interface AvatarProps extends BaseProps {
+export interface AvatarProps extends Omit<BaseProps, 'onError' | 'onLoad'> {
+  /** Accessible name, when it should differ from `name`. `name` is what the initials are drawn from, so it has to be a person's name. This is for the cases where what should be announced is not: an avatar standing for a whole team, or one whose label carries a role. */
+  label?: string
   /** Name of the person or entity. Used for the label and the initials. */
   name?: string
   /** Whether the avatar is a circle or a rounded square. */
   shape?: 'circle' | 'square'
   /** Edge length of the avatar. */
   size?: 'sm' | 'md' | 'lg'
-  /** Image to show. Falls back to initials if it fails to load. */
+  /** Image to show. Falls back to the slot, or to initials, if it fails. */
   src?: string
+  /** Relayed from the image when it fails. */
+  onError?: (event: Event) => void
+  /** Relayed from the image once it has loaded. */
+  onLoad?: (event: Event) => void
 }
 
 export const AvatarRoot = createComponent<HelixAvatar, AvatarProps>({
-  events: {},
+  events: { error: 'onError', load: 'onLoad' },
   properties: [],
   tagName: 'helix-avatar',
 })
