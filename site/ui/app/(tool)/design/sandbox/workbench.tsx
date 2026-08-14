@@ -201,6 +201,7 @@ export function SandboxWorkbench({ families }: Props) {
             data-color-mode={previewTheme}
             ref={preview}
             slot="preview"
+            src="/design/sandbox/frame"
           ></helix-sandbox-preview>
         </helix-sandbox>
 

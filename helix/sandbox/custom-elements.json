@@ -35,13 +35,49 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/sandbox/preview/sandbox-preview.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/sandbox/preview/sandbox-preview.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/sandbox/preview/sandbox-preview.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Renders into the light DOM rather than a shadow root, which is the whole\nreason this is an element and not a `<div>` someone sets `innerHTML` on.\nContent inside a shadow root is cut off from the base layer, so a heading\nwould come out at the browser's default size and a link in the wrong color,\nand the preview would be a worse likeness the more the design system does.\nIn the light DOM it is styled exactly as it would be on a real page.\n\n**The source is trusted.** It is markup a developer typed into their own\nsandbox, and it is rendered as markup. Never point this at input from anyone\nelse.",
+          "description": "A same-origin `<iframe>` pointed at `src`, which is a document the consumer\nprovides. That document imports whatever the examples need, listens for a\nrender message, and writes the markup into itself.\n\n**A frame rather than the page.** Rendering into the page meant an example\nwas styled by whatever surrounded it, which flatters the preview and lies\nabout it: an example that restyles `helix-card` restyled the sandbox too, a\nscript in an example ran against the real document, and a stray\n`position: fixed` escaped the pane. It also left nothing to capture console\noutput from, and the terminal has to come from somewhere.\n\nThe cost is that the frame starts empty. Styles and element definitions do\nnot cross into it, because a document has its own stylesheets and a window\nhas its own custom element registry, so `src` has to load them. That is the\nconsumer's document rather than something guessed at here.\n\n**The source is trusted.** It is markup a developer typed into their own\nsandbox. Never point this at input from anyone else.",
           "name": "HelixSandboxPreview",
+          "cssParts": [
+            {
+              "description": "The iframe.",
+              "name": "frame"
+            }
+          ],
           "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Document the frame loads, which brings the styles and the elements.",
+              "attribute": "src"
+            },
             {
               "kind": "field",
               "name": "source",
@@ -53,15 +89,71 @@
               "attribute": "source"
             },
             {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Preview'",
+              "description": "Accessible name for the frame.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "direction",
+              "type": {
+                "text": "'rtl' | undefined"
+              },
+              "description": "Writing direction inside the frame.",
+              "attribute": "direction",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "layout",
+              "type": {
+                "text": "'padded' | 'centered' | 'fullscreen' | undefined"
+              },
+              "description": "How the example is placed in the frame.",
+              "attribute": "layout",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "ready",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the frame has said it is listening."
+            },
+            {
+              "kind": "field",
+              "name": "frame",
+              "type": {
+                "text": "HTMLIFrameElement | null"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleMessage",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Takes messages from the frame.\n\nThe source is checked against this frame's own window, because every frame\non the page posts to the same parent and a sandbox is rarely alone."
+            },
+            {
               "kind": "method",
-              "name": "applyStyles",
+              "name": "send",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Puts the stylesheet inside the preview, after the markup.\n\nRe-created whenever the markup is, because setting `innerHTML` removes it\nalong with everything else."
+              "description": "Sends the current source to the frame, once it is listening."
             },
             {
               "kind": "field",
@@ -133,7 +225,26 @@
               }
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Relayed from the frame, one per console call.",
+              "name": "helix-console",
+              "reactProp": "onhelix-console"
+            }
+          ],
           "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Document the frame loads, which brings the styles and the elements.",
+              "fieldName": "src"
+            },
             {
               "name": "source",
               "type": {
@@ -149,15 +260,40 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Stylesheet applied to the preview.\n\nScoped by being written into the preview's own subtree rather than the\ndocument, so an example that restyles `helix-card` restyles the one being\npreviewed and not the sandbox around it.",
+              "description": "Stylesheet applied inside the frame, alongside the markup.",
               "fieldName": "styles"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Preview'",
+              "description": "Accessible name for the frame.",
+              "fieldName": "label"
+            },
+            {
+              "name": "direction",
+              "type": {
+                "text": "'rtl' | undefined"
+              },
+              "description": "Writing direction inside the frame.",
+              "fieldName": "direction"
+            },
+            {
+              "name": "layout",
+              "type": {
+                "text": "'padded' | 'centered' | 'fullscreen' | undefined"
+              },
+              "description": "How the example is placed in the frame.",
+              "fieldName": "layout"
             }
           ],
           "superclass": {
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "Renders sandbox source as live markup.",
+          "summary": "Renders sandbox source in a frame of its own.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",

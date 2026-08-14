@@ -494,3 +494,23 @@ helix-app-header {
     min-block-size: auto;
   }
 }
+
+/* The sandbox preview frame's own document. Layout modes come from the
+   sandbox's Environment menu, and apply to the example's container rather than
+   to the example, so an example that fills its space still can. */
+#preview-root[data-layout="padded"] {
+  padding: var(--helix-space-lg);
+}
+
+#preview-root[data-layout="centered"] {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-block-size: 100dvh;
+  padding: var(--helix-space-lg);
+}
+
+#preview-root[data-layout="fullscreen"] {
+  min-block-size: 100dvh;
+  padding: var(--helix-space-none);
+}

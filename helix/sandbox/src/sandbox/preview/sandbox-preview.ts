@@ -1,99 +1,151 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { nothing, type PropertyValues } from 'lit'
+import type { CSSResultGroup } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as sheet } from './sandbox-preview.css.js'
+
+/** What the frame is told, and what it says back. */
+export interface PreviewMessage {
+  level?: 'log' | 'info' | 'warn' | 'error'
+  source?: string
+  styles?: string
+  text?: string
+  type: 'helix-preview-ready' | 'helix-preview-render' | 'helix-preview-console'
+}
 
 /**
- * @summary Renders sandbox source as live markup.
+ * @summary Renders sandbox source in a frame of its own.
  *
  * @description
- * Renders into the light DOM rather than a shadow root, which is the whole
- * reason this is an element and not a `<div>` someone sets `innerHTML` on.
- * Content inside a shadow root is cut off from the base layer, so a heading
- * would come out at the browser's default size and a link in the wrong color,
- * and the preview would be a worse likeness the more the design system does.
- * In the light DOM it is styled exactly as it would be on a real page.
+ * A same-origin `<iframe>` pointed at `src`, which is a document the consumer
+ * provides. That document imports whatever the examples need, listens for a
+ * render message, and writes the markup into itself.
+ *
+ * **A frame rather than the page.** Rendering into the page meant an example
+ * was styled by whatever surrounded it, which flatters the preview and lies
+ * about it: an example that restyles `helix-card` restyled the sandbox too, a
+ * script in an example ran against the real document, and a stray
+ * `position: fixed` escaped the pane. It also left nothing to capture console
+ * output from, and the terminal has to come from somewhere.
+ *
+ * The cost is that the frame starts empty. Styles and element definitions do
+ * not cross into it, because a document has its own stylesheets and a window
+ * has its own custom element registry, so `src` has to load them. That is the
+ * consumer's document rather than something guessed at here.
  *
  * **The source is trusted.** It is markup a developer typed into their own
- * sandbox, and it is rendered as markup. Never point this at input from anyone
- * else.
+ * sandbox. Never point this at input from anyone else.
  *
  * @since 0.1.0
  * @status experimental
  * @aliases Result, Output
  * @documentation https://helix.fusion.dev/sandbox/preview
+ *
+ * @event {CustomEvent} helix-console - Relayed from the frame, one per console call.
+ *
+ * @csspart frame - The iframe.
  */
 @customElement('helix-sandbox-preview')
 export class HelixSandboxPreview extends HelixElement {
+  /** Document the frame loads, which brings the styles and the elements. */
+  @property()
+  src = ''
+
   /** Markup to render. */
   @property()
   source = ''
 
-  /**
-   * Stylesheet applied to the preview.
-   *
-   * Scoped by being written into the preview's own subtree rather than the
-   * document, so an example that restyles `helix-card` restyles the one being
-   * previewed and not the sandbox around it.
-   */
+  /** Stylesheet applied inside the frame, alongside the markup. */
   @property()
   styles = ''
 
-  /**
-   * Renders into a throwaway node, and writes the preview into the light DOM
-   * by hand.
-   *
-   * The preview has to be in the light DOM so it sits under the page's own
-   * stylesheets, and it replaces its children wholesale with the source markup.
-   * Those two together rule out handing Lit this element: Lit keeps its part
-   * markers among the children, replacing them ejects the markers, and the next
-   * update throws rather than rendering.
-   *
-   * A wrapper the markup goes inside would fix that and break something worse.
-   * This element is in the light DOM, so its children are part of the tree
-   * React hydrates, and a node that appears on upgrade is a structural
-   * hydration failure rather than a mismatched attribute.
-   *
-   * So Lit gets somewhere else to render, and loses nothing: `render` returns
-   * nothing, and the preview writes into `this` itself.
-   */
-  protected override createRenderRoot(): HTMLElement {
-    return document.createElement('div')
+  /** Accessible name for the frame. */
+  @property()
+  label = 'Preview'
+
+  /** Writing direction inside the frame. */
+  @property({ reflect: true })
+  direction?: 'rtl'
+
+  /** How the example is placed in the frame. */
+  @property({ reflect: true })
+  layout?: 'padded' | 'centered' | 'fullscreen'
+
+  /** Whether the frame has said it is listening. */
+  private ready = false
+
+  private get frame(): HTMLIFrameElement | null {
+    return this.renderRoot.querySelector('iframe')
   }
 
   /**
-   * Nothing, because the children are set by hand below.
+   * Takes messages from the frame.
    *
-   * The source is a string of markup rather than a template, and Lit's own
-   * `unsafeHTML` would leave part markers among the previewed elements.
+   * The source is checked against this frame's own window, because every frame
+   * on the page posts to the same parent and a sandbox is rarely alone.
    */
-  protected override render(): typeof nothing {
-    return nothing
+  private readonly handleMessage = (event: MessageEvent<PreviewMessage>): void => {
+    if (event.source !== this.frame?.contentWindow) {
+      return
+    }
+    if (event.data?.type === 'helix-preview-ready') {
+      this.ready = true
+      this.send()
+      return
+    }
+    if (event.data?.type === 'helix-preview-console') {
+      this.dispatchEvent(
+        new CustomEvent('helix-console', {
+          bubbles: true,
+          composed: true,
+          detail: { level: event.data.level ?? 'log', text: event.data.text ?? '' },
+        }),
+      )
+    }
+  }
+
+  /** Sends the current source to the frame, once it is listening. */
+  private send(): void {
+    if (!this.ready) {
+      return
+    }
+    this.frame?.contentWindow?.postMessage(
+      {
+        direction: this.direction ?? 'ltr',
+        layout: this.layout ?? 'padded',
+        source: this.source,
+        styles: this.styles,
+        type: 'helix-preview-render',
+      } satisfies PreviewMessage & { direction: string; layout: string },
+      '*',
+    )
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    window.addEventListener('message', this.handleMessage)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    window.removeEventListener('message', this.handleMessage)
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('source')) {
-      this.innerHTML = this.source
-    }
-    if (changed.has('source') || changed.has('styles')) {
-      this.applyStyles()
-    }
-  }
-
-  /**
-   * Puts the stylesheet inside the preview, after the markup.
-   *
-   * Re-created whenever the markup is, because setting `innerHTML` removes it
-   * along with everything else.
-   */
-  private applyStyles(): void {
-    if (this.styles === '') {
+    // A new document has to say it is listening again before anything is sent.
+    if (changed.has('src')) {
+      this.ready = false
       return
     }
-    const sheet = document.createElement('style')
-    sheet.textContent = this.styles
-    this.append(sheet)
+    this.send()
   }
+
+  protected override render(): TemplateResult {
+    return html`<iframe part="frame" src=${this.src} title=${this.label}></iframe>`
+  }
+
+  static override styles: CSSResultGroup = sheet
 }
 
 declare global {

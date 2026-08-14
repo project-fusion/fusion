@@ -214,7 +214,7 @@ export class HelixSandbox extends HelixElement {
         @pointermove=${this.handlePointerMove}
         @pointerup=${this.handlePointerUp}
       ></div>
-      <div part="pane"><slot name="preview"></slot></div>`
+      <div part="pane" data-pane="preview"><slot name="preview"></slot></div>`
   }
 
   static override styles: CSSResultGroup = styles

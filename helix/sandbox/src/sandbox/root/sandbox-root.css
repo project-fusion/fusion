@@ -32,6 +32,12 @@
   overflow: auto;
 }
 
+/* The preview pane does not scroll: the frame inside it does, and two
+   scrollbars for one region is one too many. */
+[part="pane"][data-pane="preview"] {
+  overflow: hidden;
+}
+
 [part="separator"] {
   background-color: var(--sandbox-separator-color, var(--helix-color-border));
   border: none;
@@ -68,12 +74,16 @@
   user-select: none;
 }
 
-/* The preview carries its own background and foreground, because it can be set
-   to a different color mode than the page around it. Without them, a light
-   preview would be light-mode text on the page's dark surface. */
+/* The preview fills its pane, and carries its own background because it can be
+   set to a different color mode than the page around it.
+
+   No padding: the example is in a frame with its own document now, so spacing
+   around it belongs to that document, where the Environment menu's layout
+   modes can change it. Padding here would sit outside the frame and no layout
+   mode could reach it. */
 ::slotted(helix-sandbox-preview) {
   background-color: var(--helix-color-background);
+  block-size: 100%;
   color: var(--helix-color-foreground);
   display: block;
-  padding: var(--helix-space-md);
 }

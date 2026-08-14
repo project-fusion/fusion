@@ -34,10 +34,9 @@ describe('sandbox coordination', () => {
     await preview.updateComplete
 
     expect(preview.source).toBe('<p>two</p>')
-    expect(preview.innerHTML).toContain('two')
   })
 
-  test('a stylesheet pane styles the preview, not the sandbox around it', async () => {
+  test('a stylesheet pane reaches the preview separately from the markup', async () => {
     // The panes are told apart by name. Without it the root would have to
     // identify senders by reference, which couples it to how they are arranged.
     const sandbox = await mount(withCss)
@@ -48,6 +47,9 @@ describe('sandbox coordination', () => {
       source: string
       styles: string
     }
+
+    // Set by hand, because the panes reach the preview by event and an initial
+    // attribute dispatches nothing.
     preview.source = '<p>one</p>'
     await preview.updateComplete
 
@@ -57,38 +59,55 @@ describe('sandbox coordination', () => {
     await preview.updateComplete
 
     expect(preview.styles).toBe('p { color: rebeccapurple }')
-    // Inside the preview's own subtree, so it cannot reach the page.
-    expect(preview.querySelector('style')?.textContent).toBe('p { color: rebeccapurple }')
+    // The markup pane is untouched: they are told apart by name.
+    expect(preview.source).toBe('<p>one</p>')
   })
 
-  test('a markup edit keeps the stylesheet, which innerHTML would drop', async () => {
-    const sandbox = await mount(withCss)
+  test('the preview is a frame, and renders nothing into the page', async () => {
+    // An example rendered into the page is styled by whatever surrounds it,
+    // which flatters the preview and lies about it. It also leaves nothing to
+    // capture console output from.
+    const sandbox = await mount(wired)
     const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
       source: string
-      styles: string
+      src: string
     }
-    preview.styles = 'p { color: red }'
-    preview.source = '<p>one</p>'
-    await preview.updateComplete
-
-    preview.source = '<p>two</p>'
-    await preview.updateComplete
-
-    expect(preview.querySelector('style')?.textContent).toBe('p { color: red }')
-    expect(preview.querySelectorAll('style')).toHaveLength(1)
-  })
-
-  test('the preview renders into the light DOM, under the page stylesheets', async () => {
-    // A shadow root would cut the preview off from the base layer, so a heading
-    // would render at the browser default and the preview would stop being a
-    // likeness of a real page.
-    const sandbox = await mount(wired)
-    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & { source: string }
+    preview.src = '/frame'
     preview.source = '<h2>Heading</h2>'
     await preview.updateComplete
 
-    expect(preview.shadowRoot).toBeNull()
-    expect(preview.querySelector('h2')?.textContent).toBe('Heading')
+    expect(preview.shadowRoot?.querySelector('iframe')).not.toBeNull()
+    expect(preview.querySelector('h2')).toBeNull()
+    expect(preview.innerHTML).toBe('')
+  })
+
+  test('the frame is named, so it is not announced as an unlabelled frame', async () => {
+    const sandbox = await mount(wired)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable
+    expect(preview.shadowRoot?.querySelector('iframe')?.getAttribute('title')).toBe('Preview')
+  })
+
+  test('nothing is sent until the frame says it is listening', async () => {
+    // A document that has not loaded has no listener, so a render posted at it
+    // is lost and the preview stays empty until something else moves.
+    const sandbox = await mount(wired)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
+      source: string
+      src: string
+    }
+    const frame = preview.shadowRoot?.querySelector('iframe') as HTMLIFrameElement
+    let posted = 0
+    Object.defineProperty(frame, 'contentWindow', {
+      value: {
+        postMessage: () => {
+          posted += 1
+        },
+      },
+    })
+
+    preview.source = '<p>x</p>'
+    await preview.updateComplete
+    expect(posted).toBe(0)
   })
 })
 

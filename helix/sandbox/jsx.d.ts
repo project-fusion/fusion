@@ -197,26 +197,45 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
+/** `HelixSandboxPreview` component event */
+export type HelixSandboxPreviewElementEvent<E = Event> = TypedEvent<
+  HelixSandboxPreview,
+  E
+>;
+
 export type HelixSandboxPreviewProps = {
+  /** Document the frame loads, which brings the styles and the elements. */
+  src?: HelixSandboxPreview["src"];
   /** Markup to render. */
   source?: HelixSandboxPreview["source"];
-  /** Stylesheet applied to the preview.
-
-Scoped by being written into the preview's own subtree rather than the
-document, so an example that restyles `helix-card` restyles the one being
-previewed and not the sandbox around it. */
+  /** Stylesheet applied inside the frame, alongside the markup. */
   styles?: HelixSandboxPreview["styles"];
+  /** Accessible name for the frame. */
+  label?: HelixSandboxPreview["label"];
+  /** Writing direction inside the frame. */
+  direction?: HelixSandboxPreview["direction"];
+  /** How the example is placed in the frame. */
+  layout?: HelixSandboxPreview["layout"];
+
+  /** Relayed from the frame, one per console call. */
+  "onhelix-console"?: (e: HelixSandboxPreviewElementEvent) => void;
 };
 
 export type HelixSandboxPreviewSolidJsProps = {
+  /** Document the frame loads, which brings the styles and the elements. */
+  "prop:src"?: HelixSandboxPreview["src"];
   /** Markup to render. */
   "prop:source"?: HelixSandboxPreview["source"];
-  /** Stylesheet applied to the preview.
-
-Scoped by being written into the preview's own subtree rather than the
-document, so an example that restyles `helix-card` restyles the one being
-previewed and not the sandbox around it. */
+  /** Stylesheet applied inside the frame, alongside the markup. */
   "prop:styles"?: HelixSandboxPreview["styles"];
+  /** Accessible name for the frame. */
+  "prop:label"?: HelixSandboxPreview["label"];
+  /** Writing direction inside the frame. */
+  "prop:direction"?: HelixSandboxPreview["direction"];
+  /** How the example is placed in the frame. */
+  "prop:layout"?: HelixSandboxPreview["layout"];
+  /** Relayed from the frame, one per console call. */
+  "on:helix-console"?: (e: HelixSandboxPreviewElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -312,27 +331,47 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
 
 export type CustomElements = {
   /**
-   * Renders into the light DOM rather than a shadow root, which is the whole
-   * reason this is an element and not a `<div>` someone sets `innerHTML` on.
-   * Content inside a shadow root is cut off from the base layer, so a heading
-   * would come out at the browser's default size and a link in the wrong color,
-   * and the preview would be a worse likeness the more the design system does.
-   * In the light DOM it is styled exactly as it would be on a real page.
+   * A same-origin `<iframe>` pointed at `src`, which is a document the consumer
+   * provides. That document imports whatever the examples need, listens for a
+   * render message, and writes the markup into itself.
+   *
+   * **A frame rather than the page.** Rendering into the page meant an example
+   * was styled by whatever surrounded it, which flatters the preview and lies
+   * about it: an example that restyles `helix-card` restyled the sandbox too, a
+   * script in an example ran against the real document, and a stray
+   * `position: fixed` escaped the pane. It also left nothing to capture console
+   * output from, and the terminal has to come from somewhere.
+   *
+   * The cost is that the frame starts empty. Styles and element definitions do
+   * not cross into it, because a document has its own stylesheets and a window
+   * has its own custom element registry, so `src` has to load them. That is the
+   * consumer's document rather than something guessed at here.
    *
    * **The source is trusted.** It is markup a developer typed into their own
-   * sandbox, and it is rendered as markup. Never point this at input from anyone
-   * else.
+   * sandbox. Never point this at input from anyone else.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `src`: Document the frame loads, which brings the styles and the elements.
    * - `source`: Markup to render.
-   * - `styles`: Stylesheet applied to the preview.
+   * - `styles`: Stylesheet applied inside the frame, alongside the markup.
+   * - `label`: Accessible name for the frame.
+   * - `direction`: Writing direction inside the frame.
+   * - `layout`: How the example is placed in the frame.
    *
-   * Scoped by being written into the preview's own subtree rather than the
-   * document, so an example that restyles `helix-card` restyles the one being
-   * previewed and not the sandbox around it.
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-console`: Relayed from the frame, one per console call.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `frame`: The iframe.
    */
   "helix-sandbox-preview": Partial<
     HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents
@@ -435,27 +474,47 @@ export type CustomElements = {
 
 export type CustomElementsSolidJs = {
   /**
-   * Renders into the light DOM rather than a shadow root, which is the whole
-   * reason this is an element and not a `<div>` someone sets `innerHTML` on.
-   * Content inside a shadow root is cut off from the base layer, so a heading
-   * would come out at the browser's default size and a link in the wrong color,
-   * and the preview would be a worse likeness the more the design system does.
-   * In the light DOM it is styled exactly as it would be on a real page.
+   * A same-origin `<iframe>` pointed at `src`, which is a document the consumer
+   * provides. That document imports whatever the examples need, listens for a
+   * render message, and writes the markup into itself.
+   *
+   * **A frame rather than the page.** Rendering into the page meant an example
+   * was styled by whatever surrounded it, which flatters the preview and lies
+   * about it: an example that restyles `helix-card` restyled the sandbox too, a
+   * script in an example ran against the real document, and a stray
+   * `position: fixed` escaped the pane. It also left nothing to capture console
+   * output from, and the terminal has to come from somewhere.
+   *
+   * The cost is that the frame starts empty. Styles and element definitions do
+   * not cross into it, because a document has its own stylesheets and a window
+   * has its own custom element registry, so `src` has to load them. That is the
+   * consumer's document rather than something guessed at here.
    *
    * **The source is trusted.** It is markup a developer typed into their own
-   * sandbox, and it is rendered as markup. Never point this at input from anyone
-   * else.
+   * sandbox. Never point this at input from anyone else.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `src`: Document the frame loads, which brings the styles and the elements.
    * - `source`: Markup to render.
-   * - `styles`: Stylesheet applied to the preview.
+   * - `styles`: Stylesheet applied inside the frame, alongside the markup.
+   * - `label`: Accessible name for the frame.
+   * - `direction`: Writing direction inside the frame.
+   * - `layout`: How the example is placed in the frame.
    *
-   * Scoped by being written into the preview's own subtree rather than the
-   * document, so an example that restyles `helix-card` restyles the one being
-   * previewed and not the sandbox around it.
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-console`: Relayed from the frame, one per console call.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `frame`: The iframe.
    */
   "helix-sandbox-preview": Partial<
     HelixSandboxPreviewProps &

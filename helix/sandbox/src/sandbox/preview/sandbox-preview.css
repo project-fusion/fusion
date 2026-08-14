@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  min-block-size: 0;
+}
+
+[part="frame"] {
+  background-color: var(--helix-color-background);
+  block-size: 100%;
+  border: none;
+  display: block;
+  inline-size: 100%;
+}
