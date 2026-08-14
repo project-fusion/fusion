@@ -24,7 +24,8 @@ const group = async (attrs = 'label="Verticals" name="verticals" value="design,m
 
 const tick = async (g: Group, index: number) => {
   const box = g.boxes[index] as HTMLElement
-  ;(box.shadowRoot?.querySelector('[part="control"]') as HTMLElement).click()
+  const control = box.shadowRoot?.querySelector<HTMLElement>('[part="control"]')
+  control?.click()
   await g.updateComplete
   await Promise.all(g.boxes.map((b) => (b as unknown as Group).updateComplete))
 }
