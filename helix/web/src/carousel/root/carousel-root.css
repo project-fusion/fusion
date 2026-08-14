@@ -1,0 +1,95 @@
+:host {
+  display: block;
+
+  --_carousel-gap: var(--carousel-gap, var(--helix-space-md));
+  --_carousel-per-view: 1;
+}
+
+[part="controls"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-2xs);
+  justify-content: flex-end;
+  margin-block-end: var(--helix-space-sm);
+}
+
+[part="rotation"],
+[part="previous"],
+[part="next"] {
+  all: unset;
+  align-items: center;
+  block-size: var(--helix-size-control-dense);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--helix-size-control-dense);
+  justify-content: center;
+}
+
+[part="rotation"]:hover,
+[part="previous"]:hover,
+[part="next"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+  color: var(--helix-color-foreground);
+}
+
+[part="rotation"]:focus-visible,
+[part="previous"]:focus-visible,
+[part="next"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="rotation"] svg,
+[part="previous"] svg,
+[part="next"] svg {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
+/* A scroller with snap points, so a drag, a trackpad swipe, and the browser's
+   own momentum all work without any of them being reimplemented. The scrollbar
+   is hidden because the controls are the affordance, and the track still
+   scrolls by every other means. */
+[part="track"] {
+  display: flex;
+  gap: var(--_carousel-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+[part="track"]::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each slide is a share of the track, less its share of the gaps. Sized here
+   rather than on the slide, which is the consumer's own element. */
+[part="track"] ::slotted(*) {
+  flex: 0 0
+    calc(
+      (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
+      var(--_carousel-per-view)
+    );
+  scroll-snap-align: start;
+}
+
+:host([per-view="2"]) {
+  --_carousel-per-view: 2;
+}
+
+:host([per-view="3"]) {
+  --_carousel-per-view: 3;
+}
+
+:host([per-view="4"]) {
+  --_carousel-per-view: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="track"] {
+    scroll-behavior: auto;
+  }
+}
