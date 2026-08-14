@@ -9,13 +9,16 @@
   cursor: pointer;
   display: grid;
   font-size: var(--helix-text-sm);
-  /* The tick, the label, then the arrow. All three columns exist on every row,
-     so labels start at one place whether or not the row is ticked and whether
-     or not it opens a page. A menu where the text moves is a menu that reads as
-     a list of unrelated things. */
-  grid-template-columns: 1rem minmax(0, 1fr) 1rem;
   gap: var(--helix-space-xs);
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  /* The label, then one trailing column for the mark. A row is never both a
+     choice and a way into a page, so one column serves both and the marks line
+     up down the side they are read from. */
+  grid-template-columns: minmax(0, 1fr) var(--helix-size-icon);
+  /* The inset lives here rather than on the surface, so hover and focus reach
+     the full width of the menu. */
+  margin-inline: var(--helix-space-2xs);
+  min-block-size: var(--helix-size-control-sm);
+  padding-inline: var(--helix-space-xs);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
   user-select: none;
 }
@@ -34,23 +37,19 @@
   opacity: 0.5;
 }
 
-/* Only drawn when the row is ticked, and its column is there either way. */
-[part="check"]::before {
-  color: var(--helix-color-primary);
-  content: "";
+/* The column exists on every row, filled or not, so nothing shifts when a tick
+   appears or moves to a sibling. */
+[part="mark"] {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
 }
 
-:host([checked]) [part="check"]::before {
-  content: "\2713";
-}
-
-[part="arrow"] {
+svg[part="mark"] {
   color: var(--helix-color-foreground-subtle);
-  text-align: end;
 }
 
-[part="arrow"]::before {
-  content: "\203A";
+:host([checked]) svg[part="mark"] {
+  color: var(--helix-color-primary);
 }
 
 /* A submenu is shown by the menu, on its own rows, so this element renders

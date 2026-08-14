@@ -1167,11 +1167,21 @@
               "description": "Moves a divider by the keyboard.\n\nOne handler for all three, reading which axes the divider it came from is\nallowed to move. The corner takes both, and each arrow moves the axis it\npoints along, which is the only reading of a diagonal handle that a\nkeyboard has."
             },
             {
+              "kind": "method",
+              "name": "settled",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says the arrangement has settled, so a consumer can keep it.\n\nWhen it settles, not while it moves. A drag is a stream of positions and\nonly the one it ends at is a preference; announcing each would ask whoever\nis listening to write to storage a hundred times to record one decision.\n\nThe sandbox does not keep it. Where a preference lives, and whether it\nshould be kept at all, is the consumer's to decide, and a component that\nwrote to storage on its own would be deciding for all of them under a key\nit chose."
+            },
+            {
               "kind": "field",
               "name": "handleDoubleClick",
               "privacy": "private",
-              "readonly": true,
-              "description": "Puts a divider back where it started.\n\nOnly the axes that divider moves, so double clicking the panel's divider\nleaves the split alone. The corner answers for both, which is the only\nreading of a double click on a handle that moves both."
+              "readonly": true
             },
             {
               "kind": "field",
@@ -1310,6 +1320,7 @@
               }
             }
           ],
+          "events": [],
           "attributes": [
             {
               "name": "orientation",

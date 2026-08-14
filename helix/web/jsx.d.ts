@@ -1381,6 +1381,14 @@ Set by the menu, and a property rather than an attribute for that reason.
 Public because the menu has to reach it, and not something a consumer
 writes: which page is open is the menu's business. */
   onPage?: HelixMenuItem["onPage"];
+  /** Whether this row's submenu is the page showing.
+
+Separate from `onPage`, and it has to be. A row that opened a page is not
+itself on that page, so both are false for it, and rendering nothing on
+that basis takes its `slot[name="submenu"]` with it: the rows inside have
+nowhere to be assigned and are never laid out. The element that holds the
+page has to keep the slot even when it shows no row of its own. */
+  showingSubmenu?: HelixMenuItem["showingSubmenu"];
 
   /** Fired when the row is chosen. */
   "onhelix-select"?: (e: HelixMenuItemHelixSelectElementEvent) => void;
@@ -1409,6 +1417,14 @@ Set by the menu, and a property rather than an attribute for that reason.
 Public because the menu has to reach it, and not something a consumer
 writes: which page is open is the menu's business. */
   "prop:onPage"?: HelixMenuItem["onPage"];
+  /** Whether this row's submenu is the page showing.
+
+Separate from `onPage`, and it has to be. A row that opened a page is not
+itself on that page, so both are false for it, and rendering nothing on
+that basis takes its `slot[name="submenu"]` with it: the rows inside have
+nowhere to be assigned and are never laid out. The element that holds the
+page has to keep the slot even when it shows no row of its own. */
+  "prop:showingSubmenu"?: HelixMenuItem["showingSubmenu"];
   /** Fired when the row is chosen. */
   "on:helix-select"?: (e: HelixMenuItemHelixSelectElementEvent) => void;
 
@@ -3390,6 +3406,13 @@ export type CustomElements = {
    * Set by the menu, and a property rather than an attribute for that reason.
    * Public because the menu has to reach it, and not something a consumer
    * writes: which page is open is the menu's business. (property only)
+   * - `showingSubmenu`: Whether this row's submenu is the page showing.
+   *
+   * Separate from `onPage`, and it has to be. A row that opened a page is not
+   * itself on that page, so both are false for it, and rendering nothing on
+   * that basis takes its `slot[name="submenu"]` with it: the rows inside have
+   * nowhere to be assigned and are never laid out. The element that holds the
+   * page has to keep the slot even when it shows no row of its own. (property only)
    * - `isMenuItem`: Marks this as a row a menu should count. Cheaper than an instanceof. (property only) (readonly)
    * - `hasSubmenu`: Whether anything was slotted into `submenu`. Client only. (property only) (readonly)
    *
@@ -3426,8 +3449,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The row.
-   * - `check`: The mark shown when it is checked.
-   * - `arrow`: The mark shown when it opens a submenu.
+   * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-menu-item": Partial<
     HelixMenuItemProps & BaseProps<HelixMenuItem> & BaseEvents
@@ -3500,7 +3522,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `menu`: The surface.
-   * - `back`: The row that returns from a submenu.
+   * - `header`: The bar above a submenu, holding the way back and its name.
+   * - `back`: The control that returns from a submenu.
+   * - `title`: The name of the submenu that is showing.
    */
   "helix-menu": Partial<HelixMenuProps & BaseProps<HelixMenu> & BaseEvents>;
 
@@ -5623,6 +5647,13 @@ export type CustomElementsSolidJs = {
    * Set by the menu, and a property rather than an attribute for that reason.
    * Public because the menu has to reach it, and not something a consumer
    * writes: which page is open is the menu's business. (property only)
+   * - `showingSubmenu`: Whether this row's submenu is the page showing.
+   *
+   * Separate from `onPage`, and it has to be. A row that opened a page is not
+   * itself on that page, so both are false for it, and rendering nothing on
+   * that basis takes its `slot[name="submenu"]` with it: the rows inside have
+   * nowhere to be assigned and are never laid out. The element that holds the
+   * page has to keep the slot even when it shows no row of its own. (property only)
    * - `isMenuItem`: Marks this as a row a menu should count. Cheaper than an instanceof. (property only) (readonly)
    * - `hasSubmenu`: Whether anything was slotted into `submenu`. Client only. (property only) (readonly)
    *
@@ -5659,8 +5690,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The row.
-   * - `check`: The mark shown when it is checked.
-   * - `arrow`: The mark shown when it opens a submenu.
+   * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-menu-item": Partial<
     HelixMenuItemProps &
@@ -5736,7 +5766,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `menu`: The surface.
-   * - `back`: The row that returns from a submenu.
+   * - `header`: The bar above a submenu, holding the way back and its name.
+   * - `back`: The control that returns from a submenu.
+   * - `title`: The name of the submenu that is showing.
    */
   "helix-menu": Partial<
     HelixMenuProps & HelixMenuSolidJsProps & BaseProps<HelixMenu> & BaseEvents

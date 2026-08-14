@@ -9289,6 +9289,19 @@
             },
             {
               "kind": "field",
+              "name": "showingSubmenu",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this row's submenu is the page showing.\n\nSeparate from `onPage`, and it has to be. A row that opened a page is not\nitself on that page, so both are false for it, and rendering nothing on\nthat basis takes its `slot[name=\"submenu\"]` with it: the rows inside have\nnowhere to be assigned and are never laid out. The element that holds the\npage has to keep the slot even when it shows no row of its own.",
+              "inheritedFrom": {
+                "name": "HelixBaseMenuItem",
+                "module": "src/menu/item/menu-item.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "isMenuItem",
               "type": {
                 "text": "boolean"
@@ -9469,16 +9482,8 @@
               }
             },
             {
-              "description": "The mark shown when it is checked.",
-              "name": "check",
-              "inheritedFrom": {
-                "name": "HelixBaseMenuItem",
-                "module": "src/menu/item/menu-item.ts"
-              }
-            },
-            {
-              "description": "The mark shown when it opens a submenu.",
-              "name": "arrow",
+              "description": "The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseMenuItem",
                 "module": "src/menu/item/menu-item.ts"
@@ -9860,6 +9865,20 @@
             },
             {
               "kind": "field",
+              "name": "pageLabel",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What the page showing is called.\n\nThe item's own text and not its subtree: a row that opens a page contains\nthat page's rows, so `textContent` would read back the whole submenu.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "items",
               "type": {
                 "text": "HelixBaseMenuItem[]"
@@ -10172,8 +10191,24 @@
               }
             },
             {
-              "description": "The row that returns from a submenu.",
+              "description": "The bar above a submenu, holding the way back and its name.",
+              "name": "header",
+              "inheritedFrom": {
+                "name": "HelixBaseMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
+              "description": "The control that returns from a submenu.",
               "name": "back",
+              "inheritedFrom": {
+                "name": "HelixBaseMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
+              "description": "The name of the submenu that is showing.",
+              "name": "title",
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
                 "module": "src/menu/root/menu-root.ts"

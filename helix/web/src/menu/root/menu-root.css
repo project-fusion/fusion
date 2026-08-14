@@ -14,42 +14,75 @@
   inset: auto;
   margin: var(--helix-space-none);
   min-inline-size: var(--menu-min-inline-size, 12rem);
-  padding: var(--helix-space-2xs);
+  /* Block only. The inset belongs to the rows, so a row's hover and focus reach
+     the full width of the surface instead of stopping short of it and leaving a
+     margin of unlit surface down both sides. */
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-none);
 }
 
 [part="menu"][hidden] {
   display: none;
 }
 
-/* The way back out of a submenu. A row like any other, so the eye does not have
-   to learn a second shape, with the arrow on the side it came from. */
+/* A header, not a row in the list. The way back is not one of the things on
+   this page, so an arrow press should not land on it as though it were. */
+[part="header"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-2xs);
+  margin-block-end: var(--helix-space-2xs);
+  padding: var(--helix-space-none) var(--helix-space-xs) var(--helix-space-2xs);
+}
+
 [part="back"] {
   align-items: center;
   background: none;
   border: none;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-none);
+  border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
-  display: flex;
-  font: inherit;
-  font-size: var(--helix-text-sm);
-  gap: var(--helix-space-xs);
-  inline-size: 100%;
-  margin-block-end: var(--helix-space-2xs);
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
-  text-align: start;
+  display: inline-flex;
+  justify-content: center;
+  /* Square, and the height of a dense control: a mark this small needs a target
+     around it that a pointer can find without aiming. */
+  block-size: var(--helix-size-control-sm);
+  inline-size: var(--helix-size-control-sm);
+  padding: var(--helix-space-none);
 }
 
-[part="back"]::before {
-  content: "\2190";
+[part="back"] svg {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
 }
 
 [part="back"]:hover {
+  background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
 }
 
 [part="back"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="title"] {
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* A rule between the pages and the switches. Slotted, because where one belongs
+   is the consumer's arrangement, and `helix-divider` already knows how to be a
+   separator a reader is told about. */
+::slotted(helix-divider) {
+  margin-block: var(--helix-space-2xs);
+}
+
+/* Anything that is not a row leaves with the page it was on. An item takes
+   itself off, having been told which page is showing; a divider has no such
+   idea, and a rule left behind on a submenu is a rule between nothing. */
+[part="menu"][data-drilled] slot::slotted(:not(helix-menu-item)) {
+  display: none;
 }

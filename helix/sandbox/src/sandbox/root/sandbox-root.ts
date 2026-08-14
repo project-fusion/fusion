@@ -1,7 +1,7 @@
 import {
   customElement,
   type HelixCaretEvent,
-  type HelixChangeEvent,
+  HelixChangeEvent,
   type HelixConsoleEvent,
   HelixElement,
 } from '@helix-io/core'
@@ -359,6 +359,27 @@ export class HelixSandbox extends HelixElement {
    * leaves the split alone. The corner answers for both, which is the only
    * reading of a double click on a handle that moves both.
    */
+  /**
+   * Says the arrangement has settled, so a consumer can keep it.
+   *
+   * When it settles, not while it moves. A drag is a stream of positions and
+   * only the one it ends at is a preference; announcing each would ask whoever
+   * is listening to write to storage a hundred times to record one decision.
+   *
+   * The sandbox does not keep it. Where a preference lives, and whether it
+   * should be kept at all, is the consumer's to decide, and a component that
+   * wrote to storage on its own would be deciding for all of them under a key
+   * it chose.
+   */
+  private settled(): void {
+    this.dispatchEvent(
+      new HelixChangeEvent({
+        name: 'arrangement',
+        value: JSON.stringify({ panelSize: this.panelSize, split: this.split }),
+      }),
+    )
+  }
+
   private readonly handleDoubleClick = (event: MouseEvent): void => {
     const moves = (event.currentTarget as HTMLElement).dataset.drag ?? 'inline'
     const initial = this.initial
@@ -371,6 +392,7 @@ export class HelixSandbox extends HelixElement {
     if (moves !== 'inline') {
       this.panelSize = initial.panel
     }
+    this.settled()
   }
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
@@ -450,6 +472,7 @@ export class HelixSandbox extends HelixElement {
     this.drag = null
     this.origin = null
     ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+    this.settled()
   }
 
   override connectedCallback(): void {

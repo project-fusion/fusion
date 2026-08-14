@@ -6,8 +6,10 @@ import {
   MixinControllerOpen,
   type Placement,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { caretLeft } from '@helix-io/icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixBaseMenuItem } from '../item/menu-item.js'
 
 /**
@@ -44,7 +46,9 @@ import type { HelixBaseMenuItem } from '../item/menu-item.js'
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen.
  *
  * @csspart menu - The surface.
- * @csspart back - The row that returns from a submenu.
+ * @csspart header - The bar above a submenu, holding the way back and its name.
+ * @csspart back - The control that returns from a submenu.
+ * @csspart title - The name of the submenu that is showing.
  */
 @customElement('helix-base-menu')
 export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
@@ -91,6 +95,20 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
 
   private get surface(): HTMLElement | null {
     return this.renderRoot.querySelector<HTMLElement>('[part="menu"]')
+  }
+
+  /**
+   * What the page showing is called.
+   *
+   * The item's own text and not its subtree: a row that opens a page contains
+   * that page's rows, so `textContent` would read back the whole submenu.
+   */
+  private get pageLabel(): string {
+    return [...(this.page?.childNodes ?? [])]
+      .filter((node) => node.nodeType === Node.TEXT_NODE)
+      .map((node) => node.textContent?.trim() ?? '')
+      .filter(Boolean)
+      .join(' ')
   }
 
   /** The items on the page that is showing, which is what the keys move over. */
@@ -225,6 +243,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
         continue
       }
       item.onPage = this.page === null
+      item.showingSubmenu = this.page === child
       for (const nested of child.children) {
         const inner = nested as HelixBaseMenuItem
         if (inner.isMenuItem === true) {
@@ -241,14 +260,28 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
         popover="manual"
         role="menu"
         aria-label=${this.label}
+        data-drilled=${this.page === null ? nothing : ''}
         ?hidden=${!this.isOpen}
       >
         ${
+          // A header rather than a row in the list. The way back is not one of
+          // the things on this page, and putting it in the list means an arrow
+          // press lands on it as though it were.
           this.page === null
-            ? ''
-            : html`<button part="back" type="button" @click=${() => this.leave()}>
-                ${this.backLabel}
-              </button>`
+            ? nothing
+            : html`<div part="header">
+                <button
+                  part="back"
+                  type="button"
+                  aria-label=${this.backLabel}
+                  @click=${() => this.leave()}
+                >
+                  <svg fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+                    ${unsafeSVG(caretLeft.content)}
+                  </svg>
+                </button>
+                <span part="title">${this.pageLabel}</span>
+              </div>`
         }
         <slot></slot>
       </div>`

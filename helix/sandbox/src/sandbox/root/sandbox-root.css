@@ -85,23 +85,42 @@
   overflow: hidden;
 }
 
+/* The line is two pixels and the handle is not.
+ *
+ * A divider that is only as wide as the rule it draws is a two-pixel target,
+ * which is a hard thing to hit with a mouse and an impossible one with a
+ * finger. The element is a grab area; the rule inside it is what is seen.
+ * `background-clip: content-box` paints only the content box, so padding widens
+ * what can be grabbed without widening what is drawn.
+ *
+ * The padding is not part of the grid track either: the track is sized from the
+ * element's own inline size, and the padding is what overflows into the panes.
+ */
 [part="separator"] {
+  background-clip: content-box;
   background-color: var(--sandbox-separator-color, var(--helix-color-border));
   border: none;
   padding: var(--helix-space-none);
   touch-action: none;
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+  z-index: var(--helix-layer-base);
 }
 
 :host(:not([orientation])) [part="separator"][data-drag="inline"],
 :host([orientation="horizontal"]) [part="separator"][data-drag="inline"] {
+  box-sizing: content-box;
   cursor: col-resize;
   inline-size: var(--helix-border-thick);
+  margin-inline: calc(var(--sandbox-grab, var(--helix-space-2xs)) * -1);
+  padding-inline: var(--sandbox-grab, var(--helix-space-2xs));
 }
 
 :host([orientation="vertical"]) [part="separator"][data-drag="inline"] {
   block-size: var(--helix-border-thick);
+  box-sizing: content-box;
   cursor: row-resize;
+  margin-block: calc(var(--sandbox-grab, var(--helix-space-2xs)) * -1);
+  padding-block: var(--sandbox-grab, var(--helix-space-2xs));
 }
 
 [part="separator"]:hover,
@@ -164,9 +183,12 @@
    side that can be taken hold of. */
 :host [part="separator"][data-axis="block"] {
   block-size: var(--helix-border-thick);
+  box-sizing: content-box;
   cursor: row-resize;
   grid-column: 1 / -1;
   inline-size: auto;
+  margin-block: calc(var(--sandbox-grab, var(--helix-space-2xs)) * -1);
+  padding-block: var(--sandbox-grab, var(--helix-space-2xs));
 }
 
 /* Where the two cross. The grid puts it in the cell the dividers share, which

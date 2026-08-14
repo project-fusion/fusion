@@ -60,6 +60,31 @@ const DIRECTIONS = [
 /** The files a sandbox shows: the example, in one syntax, and its stylesheet. */
 type Pane = 'source' | 'css'
 
+/**
+ * Where the arrangement is kept between visits.
+ *
+ * The site's business, not the sandbox's. What a reader dragged is a preference
+ * about this page, and a component that wrote to storage on its own would be
+ * deciding for every consumer that it should, under a key it chose.
+ */
+const ARRANGEMENT = 'fusion-sandbox-arrangement'
+
+interface Arrangement {
+  panelSize?: number
+  split?: number
+  syntax?: Syntax
+}
+
+const readArrangement = (): Arrangement => {
+  try {
+    return JSON.parse(window.localStorage.getItem(ARRANGEMENT) ?? '{}') as Arrangement
+  } catch {
+    // Storage can be unavailable or hold something else entirely. An arrangement
+    // is a convenience, so a broken one is worth nothing more than the default.
+    return {}
+  }
+}
+
 const resolve = (families: Family[], familySlug: string | null, exampleSlug: string | null) => {
   const withExamples = families.filter((entry) => entry.examples.length > 0)
   const family =
@@ -95,13 +120,43 @@ export function SandboxWorkbench({ families }: Props) {
 
   // Read the URL after mount, not during render: the page is static, so the
   // server has no query string and reading one would make the first paint
-  // disagree with the address bar.
+  // disagree with the address bar. The stored arrangement is read here for the
+  // same reason.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     setFamilySlug(params.get('family'))
     setExampleSlug(params.get('example'))
     setPreviewTheme(document.documentElement.dataset.colorMode === 'light' ? 'light' : 'dark')
+
+    const stored = readArrangement()
+    if (stored.syntax) {
+      setSyntax(stored.syntax)
+    }
+    if (sandbox.current) {
+      if (typeof stored.split === 'number') {
+        sandbox.current.split = stored.split
+      }
+      if (typeof stored.panelSize === 'number') {
+        sandbox.current.panelSize = stored.panelSize
+      }
+    }
   }, [])
+
+  // Written back when a divider is let go, not while it is moving: a drag is a
+  // stream of positions and only the one it ends at is a preference.
+  useHelixEvent(sandbox, 'helix-change', (event) => {
+    if (event.detail.name !== 'arrangement') {
+      return
+    }
+    const element = sandbox.current
+    if (!element) {
+      return
+    }
+    window.localStorage.setItem(
+      ARRANGEMENT,
+      JSON.stringify({ panelSize: element.panelSize, split: element.split, syntax }),
+    )
+  })
 
   // Side by side is unusable on a phone: at 375px a 45/55 split leaves two
   // slivers. Orientation is a property rather than a stylesheet override,
@@ -151,8 +206,18 @@ export function SandboxWorkbench({ families }: Props) {
   useHelixEvent(settings, 'helix-select', (event) => {
     const [setting, option] = event.detail.value.split(':')
     if (setting === 'syntax' && option) {
-      setSyntax(option as Syntax)
+      const next = option as Syntax
+      setSyntax(next)
       setPane('source')
+      const element = sandbox.current
+      window.localStorage.setItem(
+        ARRANGEMENT,
+        JSON.stringify({
+          panelSize: element?.panelSize,
+          split: element?.split,
+          syntax: next,
+        }),
+      )
     } else if (setting === 'layout' && option) {
       setLayout(option as 'padded' | 'centered' | 'fullscreen')
     } else if (setting === 'direction' && option) {
@@ -363,6 +428,8 @@ export function SandboxWorkbench({ families }: Props) {
                     </helix-menu-item>
                   ))}
                 </helix-menu-item>
+
+                <helix-divider announced></helix-divider>
 
                 <helix-menu-item checkable checked={showPanel ? true : undefined} value="panel">
                   Panel

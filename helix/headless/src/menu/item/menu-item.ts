@@ -1,6 +1,8 @@
 import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
+import { caretRight, check } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary One row in a menu: a command, a choice, or a way into a submenu.
@@ -32,8 +34,8 @@ import { property } from 'lit/decorators.js'
  * @event {HelixSelectEvent} helix-select - Fired when the row is chosen.
  *
  * @csspart item - The row.
- * @csspart check - The mark shown when it is checked.
- * @csspart arrow - The mark shown when it opens a submenu.
+ * @csspart mark - The trailing mark: a tick when checked, a caret when it opens
+ * a page. One column, because a row is never both.
  */
 @customElement('helix-base-menu-item')
 export class HelixBaseMenuItem extends HelixElement {
@@ -72,6 +74,18 @@ export class HelixBaseMenuItem extends HelixElement {
    */
   @property({ attribute: false })
   onPage = true
+
+  /**
+   * Whether this row's submenu is the page showing.
+   *
+   * Separate from `onPage`, and it has to be. A row that opened a page is not
+   * itself on that page, so both are false for it, and rendering nothing on
+   * that basis takes its `slot[name="submenu"]` with it: the rows inside have
+   * nowhere to be assigned and are never laid out. The element that holds the
+   * page has to keep the slot even when it shows no row of its own.
+   */
+  @property({ attribute: false })
+  showingSubmenu = false
 
   /** Marks this as a row a menu should count. Cheaper than an instanceof. */
   readonly isMenuItem = true
@@ -112,6 +126,12 @@ export class HelixBaseMenuItem extends HelixElement {
   }
 
   protected override render(): TemplateResult | typeof nothing {
+    // The page this row opened is showing, so what it contributes is the slot
+    // its rows are assigned to and nothing else. Its own row belongs to the
+    // page above.
+    if (this.showingSubmenu) {
+      return html`<slot name="submenu"></slot>`
+    }
     // Not on the page showing, so there is nothing to draw. Rendering nothing
     // rather than hiding it with an attribute, because the attribute would be
     // one this element wrote onto itself, and there is no state to keep: the
@@ -130,9 +150,32 @@ export class HelixBaseMenuItem extends HelixElement {
         @click=${this.handleClick}
         @keydown=${this.handleKeydown}
       >
-        <span part="check" aria-hidden="true"></span>
         <slot></slot>
-        ${submenu ? html`<span part="arrow" aria-hidden="true"></span>` : nothing}
+        ${
+          // One trailing column, and a row is never both: a way into a page has
+          // nothing to tick, and a choice opens nothing. The tick sits after the
+          // label rather than before it, so the labels start at the edge of the
+          // row and the marks line up down the side they are read from.
+          submenu
+            ? html`<svg
+                part="mark"
+                fill="currentColor"
+                viewBox=${caretRight.viewBox}
+                aria-hidden="true"
+              >
+                ${unsafeSVG(caretRight.content)}
+              </svg>`
+            : this.checked
+              ? html`<svg
+                  part="mark"
+                  fill="currentColor"
+                  viewBox=${check.viewBox}
+                  aria-hidden="true"
+                >
+                  ${unsafeSVG(check.content)}
+                </svg>`
+              : html`<span part="mark" aria-hidden="true"></span>`
+        }
       </div>
       <slot name="submenu"></slot>`
   }
