@@ -459,7 +459,16 @@ helix-toggle[link] > *,
 helix-toggle::part(item) {
   align-items: center;
   background: none;
-  block-size: 100%;
+  /* The control height, from the group. It was `100%`, which resolved against
+     whatever the group happened to be: the item came out the height of its own
+     text, the group's thumb came out the height of the token, and the two were
+     never the same box. Hovering an item drew a rectangle seven pixels shorter
+     than the thumb that marks the selected one, and `size="sm"` shrank the
+     thumb and left the items alone.
+
+     The fallback is for an item outside a group, which has no control height to
+     inherit and should size to what it holds. */
+  block-size: var(--_toggle-height, 100%);
   border: none;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);

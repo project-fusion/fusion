@@ -3259,7 +3259,7 @@ export type CustomElements = {
    * moves is a single object the eye follows, and it says where the selection
    * came from as well as where it went.
    *
-   * Its position and width are measured from the selected item and written onto
+   * Its whole box is measured from the selected item and written onto
    * the indicator as custom properties, because labels are different lengths and
    * no proportion of the group is the right answer. Measurement is client-side by
    * necessity, so the server renders the indicator hidden and it fades in once it
@@ -5222,7 +5222,7 @@ export type CustomElementsSolidJs = {
    * moves is a single object the eye follows, and it says where the selection
    * came from as well as where it went.
    *
-   * Its position and width are measured from the selected item and written onto
+   * Its whole box is measured from the selected item and written onto
    * the indicator as custom properties, because labels are different lengths and
    * no proportion of the group is the right answer. Measurement is client-side by
    * necessity, so the server renders the indicator hidden and it fades in once it

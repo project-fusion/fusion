@@ -16,7 +16,7 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  * moves is a single object the eye follows, and it says where the selection
  * came from as well as where it went.
  *
- * Its position and width are measured from the selected item and written onto
+ * Its whole box is measured from the selected item and written onto
  * the indicator as custom properties, because labels are different lengths and
  * no proportion of the group is the right answer. Measurement is client-side by
  * necessity, so the server renders the indicator hidden and it fades in once it
@@ -90,7 +90,9 @@ export class HelixBaseToggleGroup extends HelixElement {
       return
     }
     indicator.style.setProperty('--_indicator-x', `${box.left - own.left}px`)
+    indicator.style.setProperty('--_indicator-y', `${box.top - own.top}px`)
     indicator.style.setProperty('--_indicator-w', `${box.width}px`)
+    indicator.style.setProperty('--_indicator-h', `${box.height}px`)
     indicator.toggleAttribute('data-placed', true)
   }
 

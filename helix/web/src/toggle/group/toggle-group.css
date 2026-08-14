@@ -31,15 +31,15 @@
    step tighter than the track it sits in, so the two are concentric. */
 [part="indicator"] {
   background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
-  block-size: var(--_toggle-height);
+  block-size: var(--_indicator-h, 0);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-sm);
   inline-size: var(--_indicator-w, 0);
-  inset-block-start: 50%;
+  inset-block-start: 0;
   inset-inline-start: 0;
   opacity: 0;
   position: absolute;
-  translate: var(--_indicator-x, 0) -50%;
+  translate: var(--_indicator-x, 0) var(--_indicator-y, 0);
   /* Width is a layout property and the rule is transform and opacity only. The
      indicator is out of flow, so animating it reflows nothing else, and scaling
      instead would distort the corner radius. */
