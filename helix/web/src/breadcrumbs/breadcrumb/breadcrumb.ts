@@ -11,8 +11,10 @@ import { styles } from './breadcrumb.css.js'
  * item needs to know its own index and the parent needs no coordination.
  *
  * The link carries `data-link="quiet"`, the recipe navigation uses everywhere
- * else. It cannot be styled from in here: a slotted anchor belongs to the outer
- * tree, where `:where(a)` in the base layer outranks any `::slotted` rule.
+ * else, which is what owns its color. Under the pointer it reads as a subtle
+ * button. That part is styled from in here: the base layer sets color and
+ * text-decoration on an anchor and nothing else, so the outer tree wins those
+ * and leaves box and background to `::slotted`.
  *
  * @since 0.1.0
  * @status experimental
@@ -20,11 +22,12 @@ import { styles } from './breadcrumb.css.js'
  * @documentation https://helix.fusion.dev/components/breadcrumbs
  *
  * @slot - The step: a link, or the text of the current page.
- * @slot separator - Replaces the separator shown before this item.
+ * @slot separator - Replaces the chevron shown before this item.
  *
  * @csspart separator - The separator preceding the item.
  *
- * @cssproperty --breadcrumbs-separator-color - Color of the separator.
+ * @cssproperty --breadcrumbs-separator-color - Color of the chevron.
+ * @cssproperty --breadcrumb-hover-color - Fill behind a step under the pointer.
  */
 @customElement('helix-breadcrumb')
 export class HelixBreadcrumb extends HelixBaseBreadcrumb {

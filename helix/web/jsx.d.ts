@@ -1914,8 +1914,10 @@ export type CustomElements = {
    * item needs to know its own index and the parent needs no coordination.
    *
    * The link carries `data-link="quiet"`, the recipe navigation uses everywhere
-   * else. It cannot be styled from in here: a slotted anchor belongs to the outer
-   * tree, where `:where(a)` in the base layer outranks any `::slotted` rule.
+   * else, which is what owns its color. Under the pointer it reads as a subtle
+   * button. That part is styled from in here: the base layer sets color and
+   * text-decoration on an anchor and nothing else, so the outer tree wins those
+   * and leaves box and background to `::slotted`.
    *
    * ## Attributes & Properties
    *
@@ -1928,13 +1930,14 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The step: a link, or the text of the current page.
-   * - `separator`: Replaces the separator shown before this item.
+   * - `separator`: Replaces the chevron shown before this item.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--breadcrumbs-separator-color`: Color of the separator. (default: `undefined`)
+   * - `--breadcrumbs-separator-color`: Color of the chevron. (default: `undefined`)
+   * - `--breadcrumb-hover-color`: Fill behind a step under the pointer. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -3579,8 +3582,10 @@ export type CustomElementsSolidJs = {
    * item needs to know its own index and the parent needs no coordination.
    *
    * The link carries `data-link="quiet"`, the recipe navigation uses everywhere
-   * else. It cannot be styled from in here: a slotted anchor belongs to the outer
-   * tree, where `:where(a)` in the base layer outranks any `::slotted` rule.
+   * else, which is what owns its color. Under the pointer it reads as a subtle
+   * button. That part is styled from in here: the base layer sets color and
+   * text-decoration on an anchor and nothing else, so the outer tree wins those
+   * and leaves box and background to `::slotted`.
    *
    * ## Attributes & Properties
    *
@@ -3593,13 +3598,14 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The step: a link, or the text of the current page.
-   * - `separator`: Replaces the separator shown before this item.
+   * - `separator`: Replaces the chevron shown before this item.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
-   * - `--breadcrumbs-separator-color`: Color of the separator. (default: `undefined`)
+   * - `--breadcrumbs-separator-color`: Color of the chevron. (default: `undefined`)
+   * - `--breadcrumb-hover-color`: Fill behind a step under the pointer. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -4986,8 +4992,10 @@ export type CustomCssProperties = {
   "--banner-inset"?: string;
   /** Size of the quoted passage. */
   "--blockquote-size"?: string;
-  /** Color of the separator. */
+  /** Color of the chevron. */
   "--breadcrumbs-separator-color"?: string;
+  /** Fill behind a step under the pointer. */
+  "--breadcrumb-hover-color"?: string;
   /** Space between items and separators. */
   "--breadcrumbs-gap"?: string;
   /** Fill behind the button. */
