@@ -2,11 +2,15 @@
   display: inline-flex;
   position: relative;
 
-  --_toggle-height: calc(var(--helix-size-control-dense) - var(--helix-space-2xs));
+  /* The height a control is, the same one a button takes. It was
+     `control-dense` minus a space, which is a fourth height nothing else in the
+     system uses and which made a segmented control sit shorter than the buttons
+     beside it in a toolbar. */
+  --_toggle-height: var(--helix-size-control);
 }
 
 :host([size="sm"]) {
-  --_toggle-height: calc(var(--helix-size-control-dense) - var(--helix-space-xs));
+  --_toggle-height: var(--helix-size-control-dense);
 }
 
 /* A framed track, and it is what makes the whole control read. Without it the

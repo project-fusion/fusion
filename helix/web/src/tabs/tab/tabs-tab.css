@@ -9,7 +9,12 @@
    would look like with no set around it, which is not an arrangement that
    ships, so they are the plainest thing rather than a second design. */
 [part="tab"] {
+  align-items: center;
   background-color: var(--_tab-surface, transparent);
+  /* The height a control is. A tab was as tall as its own text plus whatever
+     padding the appearance asked for, which came out at 31px next to a 40px
+     button and made a toolbar look assembled from parts. */
+  block-size: var(--helix-size-control);
   border: none;
   border-block-end: var(--helix-border-thick) solid transparent;
   border-radius: var(--_tab-radius, var(--helix-radii-none));
@@ -18,7 +23,9 @@
   font: inherit;
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
-  padding: var(--_tab-padding-block, var(--helix-space-xs)) var(--helix-space-sm);
+  display: inline-flex;
+  justify-content: center;
+  padding-inline: var(--helix-space-sm);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard),

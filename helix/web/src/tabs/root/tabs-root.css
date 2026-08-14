@@ -8,7 +8,6 @@
      `surface-sunken` is the reverse, so either one is invisible half the time.
      What reads in both is the lift. */
   --_tabs-rule: none;
-  --_tab-padding-block: var(--helix-space-2xs);
   --_tab-radius: var(--helix-radii-sm);
   --_tab-selected-rule: transparent;
   --_tab-selected-shadow: var(--helix-shadow-sm);
@@ -45,7 +44,6 @@
    element gave itself. Custom properties cross both boundaries on their own. */
 :host([appearance="underline"]) {
   --_tabs-rule: var(--helix-border-thin) solid var(--helix-color-border);
-  --_tab-padding-block: var(--helix-space-xs);
   --_tab-radius: var(--helix-radii-none);
   --_tab-selected-rule: var(--helix-color-primary);
   --_tab-selected-shadow: none;
