@@ -2,7 +2,7 @@
   display: inline-flex;
   position: relative;
 
-  --_toggle-height: var(--helix-size-control-dense);
+  --_toggle-height: calc(var(--helix-size-control-dense) - var(--helix-space-2xs));
 }
 
 :host([size="sm"]) {

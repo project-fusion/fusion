@@ -451,6 +451,9 @@ helix-toggle::part(item) {
   justify-content: center;
   padding-inline: var(--helix-space-sm);
   text-decoration: none;
+  /* Nothing of its own behind it: the group's travelling thumb is the one
+     surface, and this sits above it. */
+  background-color: transparent;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard);

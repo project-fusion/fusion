@@ -44,7 +44,12 @@
   --helix-color-background: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-950));
   --helix-color-surface: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900));
   --helix-color-surface-raised: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800));
-  --helix-color-surface-sunken: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-950));
+  /* Sunken is a step *lighter* than the page in dark mode, not darker. There is
+     nowhere below near-black to go, so a groove reads by being nearer the
+     viewer's eye rather than further from it. It was neutral-950, identical to
+     the background, which meant every sunken surface was invisible: a segmented
+     control's track vanished and its thumb floated as a loose grey rectangle. */
+  --helix-color-surface-sunken: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-900));
   --helix-color-overlay: color-mix(
     in oklab,
     var(--_helix-neutral-950) light-dark(40%, 64%),
