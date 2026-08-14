@@ -24,8 +24,8 @@ export { BaseBanner, type BaseBannerProps, BaseBannerRoot } from './base-banner.
 export { BaseBlockquote, type BaseBlockquoteProps, BaseBlockquoteRoot } from './base-blockquote.js'
 export {
   BaseBreadcrumbs,
-  BaseBreadcrumbsItem,
-  type BaseBreadcrumbsItemProps,
+  BaseBreadcrumbsBreadcrumb,
+  type BaseBreadcrumbsBreadcrumbProps,
   type BaseBreadcrumbsProps,
   BaseBreadcrumbsRoot,
 } from './base-breadcrumbs.js'
@@ -92,8 +92,8 @@ export {
 export { Blockquote, type BlockquoteProps, BlockquoteRoot } from './blockquote.js'
 export {
   Breadcrumbs,
-  BreadcrumbsItem,
-  type BreadcrumbsItemProps,
+  BreadcrumbsBreadcrumb,
+  type BreadcrumbsBreadcrumbProps,
   type BreadcrumbsProps,
   BreadcrumbsRoot,
 } from './breadcrumbs.js'

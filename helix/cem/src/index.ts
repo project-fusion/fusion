@@ -8,6 +8,7 @@ import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { metadata } from './plugins/metadata.js'
 import { reactEvents } from './plugins/react-events.js'
+import { stableOrder } from './plugins/stable-order.js'
 import type { HelixMetadata, Plugin } from './types.js'
 
 export interface HelixCemOptions {
@@ -61,6 +62,9 @@ export const createHelixCemConfig = ({
     declaredEvents(),
     reactEvents(),
     ...(lint === false ? [] : [conventionLint(lint)]),
+    // Before the JSX generator, which walks modules in order, so both the
+    // manifest and the declarations generated from it land in a stable order.
+    stableOrder(),
     ...(jsxTypes
       ? [
           jsxTypesPlugin({

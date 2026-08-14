@@ -1,2 +1,2 @@
-export * from './item/breadcrumbs-item.js'
+export * from './breadcrumb/breadcrumb.js'
 export * from './root/breadcrumbs-root.js'

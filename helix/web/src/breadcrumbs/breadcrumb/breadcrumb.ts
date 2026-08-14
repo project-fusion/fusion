@@ -1,7 +1,7 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseBreadcrumbsItem } from '@helix-io/headless'
+import { HelixBaseBreadcrumb } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './breadcrumbs-item.css.js'
+import { styles } from './breadcrumb.css.js'
 
 /**
  * @summary One step in a breadcrumb trail.
@@ -26,13 +26,13 @@ import { styles } from './breadcrumbs-item.css.js'
  *
  * @cssproperty --breadcrumbs-separator-color - Color of the separator.
  */
-@customElement('helix-breadcrumbs-item')
-export class HelixBreadcrumbsItem extends HelixBaseBreadcrumbsItem {
+@customElement('helix-breadcrumb')
+export class HelixBreadcrumb extends HelixBaseBreadcrumb {
   static override styles: CSSResultGroup = styles
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-breadcrumbs-item': HelixBreadcrumbsItem
+    'helix-breadcrumb': HelixBreadcrumb
   }
 }

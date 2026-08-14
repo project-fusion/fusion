@@ -26,7 +26,16 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
-const IGNORED = new Set(['.git', '.local', '.next', '.turbo', 'dist', 'node_modules', 'target'])
+const IGNORED = new Set([
+  '.git',
+  '.local',
+  '.next',
+  '.next-dev',
+  '.turbo',
+  'dist',
+  'node_modules',
+  'target',
+])
 
 /** The styles package owns primitives and raw values by definition. */
 const OWNS_PRIMITIVES = /helix[/\\]styles[/\\]/

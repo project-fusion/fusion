@@ -31,8 +31,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart separator - The separator preceding the item.
  */
-@customElement('helix-base-breadcrumbs-item')
-export class HelixBaseBreadcrumbsItem extends HelixElement {
+@customElement('helix-base-breadcrumb')
+export class HelixBaseBreadcrumb extends HelixElement {
   /** Whether this item is the page the reader is on. */
   @property({ reflect: true, type: Boolean })
   current = false
@@ -55,6 +55,6 @@ export class HelixBaseBreadcrumbsItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-breadcrumbs-item': HelixBaseBreadcrumbsItem
+    'helix-base-breadcrumb': HelixBaseBreadcrumb
   }
 }

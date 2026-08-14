@@ -39,3 +39,6 @@ sandbox/ui/dist/
 
 # Generated icon set, built from raw/.
 helix/icons/src/generated.ts
+
+# Dev server output, kept apart from the cached `.next` build.
+.next-dev/
