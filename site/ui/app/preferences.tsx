@@ -1,7 +1,7 @@
 'use client'
 
 import { Drawer, Toggle } from '@helix-io/react'
-import type { HelixOpenEvent, HelixSelectEvent } from '@helix-io/web'
+import type { HelixSelectEvent } from '@helix-io/web'
 import { useEffect, useState } from 'react'
 
 type ColorMode = 'system' | 'light' | 'dark'

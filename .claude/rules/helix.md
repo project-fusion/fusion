@@ -226,8 +226,15 @@ consumer would guess simply does nothing.
 
 ## Use the elements directly
 
-**Write `<helix-card>` in JSX.** Plain custom elements, no wrapper, no patched
-React.
+**Write `<helix-card>` in JSX** for anything that only takes attributes and
+slots. No wrapper, no patched React.
+
+**Reach for `@helix-io/react` when a component's events are consumed.** React
+reserves every prop matching `on[A-Z]` for its synthetic system and drops the
+ones it does not recognise, so `onHelixOpen` on a bare `<helix-drawer>` binds
+nothing and fails silently. The generated wrapper attaches a real listener for
+the derived name, which is why the site imports `Drawer` and `Toggle` and
+nothing else from it.
 
 **Register once, in a client component.** A custom element registers as a side
 effect of importing its module, and that import has to be in the client graph to

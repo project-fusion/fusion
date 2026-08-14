@@ -1,7 +1,6 @@
 'use client'
 
 import { Drawer } from '@helix-io/react'
-import type { HelixOpenEvent } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
