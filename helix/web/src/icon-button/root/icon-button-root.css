@@ -55,7 +55,14 @@
  * `neutral` is the raised form of the same idea and stays: a button that sits
  * on the page, where this one sits in it. */
 :host([appearance="filled"]) [part="button"] {
-  background-color: var(--helix-color-surface-sunken);
+  /* The page's own colour, which is the one that recesses from a bar in both
+     modes: darker than `surface` in dark and lighter in light. Not
+     `surface-sunken`, which is the token whose name says exactly this and whose
+     value cannot do it, being the same neutral as `surface` in dark mode. A
+     button filled with it on a surface bar is the bar, which is what this was
+     when it was written. Tabs found the same wall and worked around it with a
+     lift instead of a fill. */
+  background-color: var(--helix-color-background);
   border-color: var(--helix-color-border);
 }
 

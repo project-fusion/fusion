@@ -644,13 +644,7 @@ export function SandboxWorkbench({ families }: Props) {
               into the sandbox: tabs are the only behaviour the region has, and
               that behaviour already exists. */}
           {showPanel && (
-            <helix-tabs
-              appearance="underline"
-              label="Panel"
-              ref={panelTabs}
-              slot="panel"
-              value="terminal"
-            >
+            <helix-tabs label="Panel" ref={panelTabs} slot="panel" value="terminal">
               <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
               <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
               <helix-tabs-panel slot="panels" value="terminal">
