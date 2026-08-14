@@ -1,3 +1,16 @@
+/* Hoisted into `elements.css` by the build, because a registration inside a
+   shadow root never takes effect. It is declared here, beside the property it
+   describes, and the generator is what puts it where it works.
+
+   Registration is what makes the `em` resolve on the host, where a consumer
+   writes it, and not here on the indicator, whose font size is 0.625 of the
+   host: unregistered, `0.5em` would mean 5px where the consumer wrote 8. */
+@property --badge-offset {
+  inherits: true;
+  initial-value: 0px;
+  syntax: "<length>";
+}
+
 :host {
   display: inline-flex;
   position: relative;
@@ -31,10 +44,9 @@
      sits on the corner by default, which is right for a square icon and wrong
      for a circle, where the corner of the box is outside the shape.
 
-     `--badge-offset` is registered in the base layer, which is what makes its
-     `em` resolve on the host rather than here. The fallback covers a page that
-     did not import that layer, where the declaration would otherwise be
-     invalid and the mark would lose its corner entirely. */
+     The fallback covers a page that did not import `elements.css`, where the
+     property is unregistered and the declaration would otherwise be invalid,
+     taking the mark's corner with it. */
   inset-block-start: var(--badge-offset, 0px);
   inset-inline-end: var(--badge-offset, 0px);
   justify-content: center;
