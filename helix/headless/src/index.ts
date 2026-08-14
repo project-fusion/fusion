@@ -1,10 +1,13 @@
 export {
   type DismissDetail,
+  HelixCloseEvent,
   HelixDismissEvent,
   HelixOpenEvent,
   HelixSelectEvent,
+  HelixValueChangeEvent,
   type OpenDetail,
   type SelectDetail,
+  type ValueChangeDetail,
 } from '@helix-io/core'
 export * from './accordion/index.js'
 export * from './app-header/index.js'
@@ -19,6 +22,7 @@ export * from './calendar/index.js'
 export * from './callout/index.js'
 export * from './card/index.js'
 export * from './carousel/index.js'
+export * from './checkbox/index.js'
 export * from './divider/index.js'
 export * from './drawer/index.js'
 export * from './empty-state/index.js'

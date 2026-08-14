@@ -15,6 +15,7 @@ import type {
   HelixCallout,
   HelixCard,
   HelixCarousel,
+  HelixCheckbox,
   HelixDismissEvent,
   HelixDivider,
   HelixDrawer,
@@ -47,6 +48,7 @@ import type {
   HelixToolbar,
   HelixTree,
   HelixTreeItem,
+  HelixValueChangeEvent,
 } from '@helix-io/web';
 
 /**
@@ -864,6 +866,98 @@ case is the absent attribute, and the styles read it that way. */
   "prop:interval"?: HelixCarousel["interval"];
   /** Fired when the slide in view changes, with its index. */
   "on:helix-select"?: (e: HelixCarouselHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixCheckbox` component event */
+export type HelixCheckboxElementEvent<E = Event> = TypedEvent<HelixCheckbox, E>;
+/** `helix-value-change` event type */
+export type HelixCheckboxHelixValueChangeElementEvent =
+  HelixCheckboxElementEvent<HelixValueChangeEvent>;
+
+export type HelixCheckboxProps = {
+  /** Height of the control and the type beside it. */
+  size?: HelixCheckbox["size"];
+  /** Whether the control is checked. Setting this enters controlled mode. */
+  checked?: HelixCheckbox["checked"];
+  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  "default-checked"?: HelixCheckbox["defaultChecked"];
+  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  defaultChecked?: HelixCheckbox["defaultChecked"];
+  /** Name submitted with the form. */
+  name?: HelixCheckbox["name"];
+  /** Value submitted when the box is checked. */
+  value?: HelixCheckbox["value"];
+  /** Whether the form refuses to submit while the box is unchecked. */
+  required?: HelixCheckbox["required"];
+  /** Whether the box shows as neither checked nor unchecked.
+
+Presentation only. It never submits, and the first change resolves it. */
+  indeterminate?: HelixCheckbox["indeterminate"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixCheckbox["disabled"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the event
+instead. */
+  onCheckedChange?: HelixCheckbox["onCheckedChange"];
+
+  /** Fired before the state changes, and cancelable. */
+  "onhelix-value-change"?: (
+    e: HelixCheckboxHelixValueChangeElementEvent,
+  ) => void;
+  /** Relayed from the input once the state has changed. */
+  onchange?: (e: HelixCheckboxElementEvent) => void;
+};
+
+export type HelixCheckboxSolidJsProps = {
+  /** Height of the control and the type beside it. */
+  "prop:size"?: HelixCheckbox["size"];
+  /** Whether the control is checked. Setting this enters controlled mode. */
+  "prop:checked"?: HelixCheckbox["checked"];
+  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  "bool:default-checked"?: HelixCheckbox["defaultChecked"];
+  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  "prop:defaultChecked"?: HelixCheckbox["defaultChecked"];
+  /** Name submitted with the form. */
+  "prop:name"?: HelixCheckbox["name"];
+  /** Value submitted when the box is checked. */
+  "prop:value"?: HelixCheckbox["value"];
+  /** Whether the form refuses to submit while the box is unchecked. */
+  "prop:required"?: HelixCheckbox["required"];
+  /** Whether the box shows as neither checked nor unchecked.
+
+Presentation only. It never submits, and the first change resolves it. */
+  "prop:indeterminate"?: HelixCheckbox["indeterminate"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixCheckbox["disabled"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the event
+instead. */
+  "prop:onCheckedChange"?: HelixCheckbox["onCheckedChange"];
+  /** Fired before the state changes, and cancelable. */
+  "on:helix-value-change"?: (
+    e: HelixCheckboxHelixValueChangeElementEvent,
+  ) => void;
+  /** Relayed from the input once the state has changed. */
+  "on:change"?: (e: HelixCheckboxElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2463,6 +2557,94 @@ export type CustomElements = {
    */
   "helix-carousel": Partial<
     HelixCarouselProps & BaseProps<HelixCarousel> & BaseEvents
+  >;
+
+  /**
+   * The box is the native input, restyled rather than replaced, so the tick and
+   * the indeterminate dash are the browser's own and the control stays a control
+   * for anything reading the page.
+   *
+   * The label sits beside it and the whole thing is the click target, which is
+   * what a native `<label>` wrapping a checkbox gives and what a reader expects.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `size`: Height of the control and the type beside it.
+   * - `checked`: Whether the control is checked. Setting this enters controlled mode.
+   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `name`: Name submitted with the form.
+   * - `value`: Value submitted when the box is checked.
+   * - `required`: Whether the form refuses to submit while the box is unchecked.
+   * - `indeterminate`: Whether the box shows as neither checked nor unchecked.
+   *
+   * Presentation only. It never submits, and the first change resolves it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `isChecked`: The resolved checked state, whichever mode the element is in. (property only) (readonly)
+   * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the event
+   * instead. (property only)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-value-change`: Fired before the state changes, and cancelable.
+   * - `change`: Relayed from the input once the state has changed.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the
+   * `helix-value-change` is a refusal and nothing moves. In uncontrolled mode
+   * the element then updates itself; in controlled mode it applies nothing
+   * and waits for the consumer to pass a new `checked`, which is what
+   * "controlled" means.
+   * - `toggleChecked() => boolean`: Requests the opposite of the current state.
+   * - `resetChecked() => void`: Drops the uncontrolled state, so the control reads `defaultChecked`
+   * again.
+   *
+   * A form reset has to return a control to what its markup declared, and
+   * clearing `checked` alone only leaves controlled mode. The value the
+   * element has been keeping lives here, so this is where it is dropped.
+   * - `formResetCallback() => void`: Returns the box to the state its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the box when the browser brings a form back.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--checkbox-size`: Width and height of the box. (default: `undefined`)
+   * - `--checkbox-checked-color`: Fill of a ticked box. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `control`: The input.
+   * - `label`: The label beside it.
+   */
+  "helix-checkbox": Partial<
+    HelixCheckboxProps & BaseProps<HelixCheckbox> & BaseEvents
   >;
 
   /**
@@ -4317,6 +4499,97 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The box is the native input, restyled rather than replaced, so the tick and
+   * the indeterminate dash are the browser's own and the control stays a control
+   * for anything reading the page.
+   *
+   * The label sits beside it and the whole thing is the click target, which is
+   * what a native `<label>` wrapping a checkbox gives and what a reader expects.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `size`: Height of the control and the type beside it.
+   * - `checked`: Whether the control is checked. Setting this enters controlled mode.
+   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `name`: Name submitted with the form.
+   * - `value`: Value submitted when the box is checked.
+   * - `required`: Whether the form refuses to submit while the box is unchecked.
+   * - `indeterminate`: Whether the box shows as neither checked nor unchecked.
+   *
+   * Presentation only. It never submits, and the first change resolves it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `isChecked`: The resolved checked state, whichever mode the element is in. (property only) (readonly)
+   * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the event
+   * instead. (property only)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-value-change`: Fired before the state changes, and cancelable.
+   * - `change`: Relayed from the input once the state has changed.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the
+   * `helix-value-change` is a refusal and nothing moves. In uncontrolled mode
+   * the element then updates itself; in controlled mode it applies nothing
+   * and waits for the consumer to pass a new `checked`, which is what
+   * "controlled" means.
+   * - `toggleChecked() => boolean`: Requests the opposite of the current state.
+   * - `resetChecked() => void`: Drops the uncontrolled state, so the control reads `defaultChecked`
+   * again.
+   *
+   * A form reset has to return a control to what its markup declared, and
+   * clearing `checked` alone only leaves controlled mode. The value the
+   * element has been keeping lives here, so this is where it is dropped.
+   * - `formResetCallback() => void`: Returns the box to the state its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the box when the browser brings a form back.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--checkbox-size`: Width and height of the box. (default: `undefined`)
+   * - `--checkbox-checked-color`: Fill of a ticked box. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `control`: The input.
+   * - `label`: The label beside it.
+   */
+  "helix-checkbox": Partial<
+    HelixCheckboxProps &
+      HelixCheckboxSolidJsProps &
+      BaseProps<HelixCheckbox> &
+      BaseEvents
+  >;
+
+  /**
    * A one-pixel rule in the border color, running the full inline size by
    * default. A vertical divider stretches to its flex parent instead of setting
    * its own height, so it matches whatever it sits beside without being told how
@@ -5545,6 +5818,10 @@ export type CustomCssProperties = {
   "--card-radii"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
+  /** Width and height of the box. */
+  "--checkbox-size"?: string;
+  /** Fill of a ticked box. */
+  "--checkbox-checked-color"?: string;
   /** Color of the rule. */
   "--divider-color"?: string;
   /** Thickness of the rule. */

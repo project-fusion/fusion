@@ -17,6 +17,10 @@ export {
 export { HelixElement } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
 export {
+  MixinControllerChecked,
+  type MixinControllerCheckedInterface,
+} from './mixins/mixin-controller-checked/mixin-controller-checked.js'
+export {
   MixinControllerOpen,
   type MixinControllerOpenInterface,
 } from './mixins/mixin-controller-open/mixin-controller-open.js'

@@ -1,0 +1,50 @@
+:host {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--helix-space-xs);
+
+  --_checkbox-size: var(--checkbox-size, 1.125rem);
+}
+
+:host([size="sm"]) {
+  --_checkbox-size: var(--checkbox-size, 1rem);
+}
+
+:host([disabled]) {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* The native input, restyled rather than replaced: the tick and the
+   indeterminate dash are the browser's own, drawn with `accent-color`, so the
+   control stays a control for anything reading the page. */
+[part="control"] {
+  accent-color: var(--checkbox-checked-color, var(--helix-color-primary));
+  block-size: var(--_checkbox-size);
+  cursor: inherit;
+  flex: 0 0 auto;
+  inline-size: var(--_checkbox-size);
+  margin: var(--helix-space-none);
+}
+
+[part="control"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="label"] {
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-tight);
+}
+
+:host([size="sm"]) [part="label"] {
+  font-size: var(--helix-text-xs);
+}
+
+/* Nothing to read, so nothing to space away from the box. */
+[part="label"]:not(:has(slot)),
+slot:not([name]):empty {
+  display: contents;
+}
