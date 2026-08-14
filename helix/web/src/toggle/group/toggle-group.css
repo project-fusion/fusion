@@ -9,14 +9,6 @@
   --_toggle-height: var(--helix-size-control);
 }
 
-:host([size="lg"]) {
-  --_toggle-height: var(--helix-size-control-lg);
-}
-
-:host([size="sm"]) {
-  --_toggle-height: var(--helix-size-control-sm);
-}
-
 /* A framed track, and it is what makes the whole control read. Without it the
    marker is a lone shape floating on the page and scans as a stray rectangle
    whatever its corner radius; inside a bordered, sunken track it reads as a

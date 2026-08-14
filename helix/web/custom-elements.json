@@ -2995,16 +2995,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height and inset of the control.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "type",
               "type": {
                 "text": "'button' | 'submit' | 'reset'"
@@ -3202,14 +3192,6 @@
               },
               "description": "How much visual weight the button carries.",
               "fieldName": "appearance"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height and inset of the control.",
-              "fieldName": "size"
             },
             {
               "name": "type",
@@ -5533,16 +5515,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height of the control and the type beside it.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "checked",
               "type": {
                 "text": "boolean | undefined"
@@ -5947,15 +5919,26 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseCheckbox",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A box that is ticked, or not, or neither.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/checkbox",
+            "aliases": [
+              "Tickbox",
+              "Toggle"
+            ],
+            "tier": "styled",
+            "group": "Checkbox",
+            "part": "Root"
+          },
+          "tagName": "helix-checkbox",
+          "customElement": true,
           "attributes": [
-            {
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height of the control and the type beside it.",
-              "fieldName": "size"
-            },
             {
               "name": "checked",
               "type": {
@@ -6048,25 +6031,6 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseCheckbox",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A box that is ticked, or not, or neither.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/checkbox",
-            "aliases": [
-              "Tickbox",
-              "Toggle"
-            ],
-            "tier": "styled",
-            "group": "Checkbox",
-            "part": "Root"
-          },
-          "tagName": "helix-checkbox",
-          "customElement": true,
           "slots": [
             {
               "description": "The label.",
@@ -7768,16 +7732,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Edge length of the control.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "type",
               "type": {
                 "text": "'button' | 'submit' | 'reset'"
@@ -7975,14 +7929,6 @@
               },
               "description": "How much visual weight the button carries.",
               "fieldName": "appearance"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Edge length of the control.",
-              "fieldName": "size"
             },
             {
               "name": "type",
@@ -12116,16 +12062,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height and inset of the tag.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "dismissible",
               "type": {
                 "text": "boolean"
@@ -12255,14 +12191,6 @@
               },
               "description": "Which status the tag reports.",
               "fieldName": "appearance"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height and inset of the tag.",
-              "fieldName": "size"
             },
             {
               "name": "dismissible",
@@ -12629,16 +12557,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height and inset of the items.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -12803,14 +12721,6 @@
               },
               "description": "How much chrome the group carries around its items.",
               "fieldName": "appearance"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height and inset of the items.",
-              "fieldName": "size"
             },
             {
               "name": "label",

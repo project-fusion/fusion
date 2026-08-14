@@ -34,10 +34,6 @@ export class HelixIconButton extends HelixBaseButton {
   @property({ reflect: true })
   appearance?: 'primary' | 'neutral' | 'subtle' | 'danger'
 
-  /** Edge length of the control. */
-  @property({ reflect: true })
-  size?: 'sm' | 'md' | 'lg'
-
   static override styles: CSSResultGroup = styles
 }
 

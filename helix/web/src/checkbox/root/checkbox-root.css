@@ -4,15 +4,7 @@
   display: inline-flex;
   gap: var(--helix-space-xs);
 
-  --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox-md));
-}
-
-:host([size="sm"]) {
-  --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox-sm));
-}
-
-:host([size="lg"]) {
-  --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox-lg));
+  --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox));
 }
 
 :host([disabled]) {
@@ -41,10 +33,6 @@
   color: var(--helix-color-foreground);
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-tight);
-}
-
-:host([size="sm"]) [part="label"] {
-  font-size: var(--helix-text-xs);
 }
 
 /* Nothing to read, so nothing to space away from the box. */

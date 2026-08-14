@@ -423,19 +423,27 @@ helix-button[appearance="danger"]::part(button) {
   color: var(--helix-color-foreground-on-accent);
 }
 
-/* `md` is absent, because it is the height a control is. */
-[data-button-size="sm"],
-helix-button[size="sm"]::part(button) {
-  block-size: var(--helix-size-control-sm);
+/* Type and inset follow the density the button is in, the same way its height
+   does. They were three rules keyed on a `size` that no longer exists. */
+[data-density="sm"] :is([data-button], helix-button::part(button)),
+[data-density="sm"][data-button] {
   font-size: var(--helix-text-xs);
   padding-inline: var(--helix-space-sm);
 }
 
-[data-button-size="lg"],
-helix-button[size="lg"]::part(button) {
-  block-size: var(--helix-size-control-lg);
+[data-density="lg"] :is([data-button], helix-button::part(button)),
+[data-density="lg"][data-button] {
   font-size: var(--helix-text-md);
   padding-inline: var(--helix-space-lg);
+}
+
+/* A checkbox's label reads at the density it is in, the same as a button's. */
+[data-density="sm"] helix-checkbox::part(label) {
+  font-size: var(--helix-text-xs);
+}
+
+[data-density="lg"] helix-checkbox::part(label) {
+  font-size: var(--helix-text-md);
 }
 
 [data-button][aria-disabled="true"],
@@ -444,29 +452,36 @@ helix-button[disabled]::part(button) {
   opacity: 0.5;
 }
 
-/* Density.
+/* Density. How big the controls in a region are.
  *
- * The other half of sizing, and the half that scales. `size` on a control is a
- * choice about that one control; density is a fact about a region, and every
- * control inside takes it without being told individually.
+ * The only size axis a control has. A control does not carry one of its own,
+ * and that is the point rather than an omission: two controls sitting together
+ * never legitimately differ in height, so a per-instance size is only ever used
+ * to say something about the region, one element at a time. Said once here, a
+ * ragged row is not merely discouraged, it is unwritable.
  *
- * It is the same `sm` / `md` / `lg` scale, so there is one set of names to
- * know and one question to ask: is this whole area tighter, or is this one
- * control different?
+ * What size used to be reached for otherwise is `appearance`. A filled primary
+ * button says "this one matters" far louder than eight more pixels ever did.
  *
- * A custom property rather than a class per component, so it reaches into every
- * shadow root on its own and costs no component any API at all.
+ * Custom properties rather than a class per component, so it crosses every
+ * shadow boundary on its own and costs no component any API.
  */
 [data-density="sm"] {
+  --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-tag: var(--helix-size-tag-sm);
 }
 
 [data-density="md"] {
+  --helix-size-checkbox: var(--helix-size-checkbox-md);
   --helix-size-control: var(--helix-size-control-md);
+  --helix-size-tag: var(--helix-size-tag-md);
 }
 
 [data-density="lg"] {
+  --helix-size-checkbox: var(--helix-size-checkbox-lg);
   --helix-size-control: var(--helix-size-control-lg);
+  --helix-size-tag: var(--helix-size-tag-lg);
 }
 
 /* The toggle item.

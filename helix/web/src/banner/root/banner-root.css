@@ -1,4 +1,7 @@
 :host {
+  /* A compact strip, said once, so its actions need not each be told. */
+  --helix-size-control: var(--helix-size-control-sm);
+
   --_banner-color: var(--helix-color-foreground-muted);
 
   align-items: center;

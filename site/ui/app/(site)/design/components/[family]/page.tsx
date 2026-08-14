@@ -77,9 +77,9 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
           <helix-text as="h1" appearance="heading">
             {family.label}
           </helix-text>
-          <helix-flex align="center" gap="xs" wrap>
+          <helix-flex align="center" data-density="sm" gap="xs" wrap>
             {family.status && (
-              <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'} size="sm">
+              <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'}>
                 {family.status}
               </helix-tag>
             )}
@@ -98,10 +98,9 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             {family.summary}
           </helix-text>
           {family.examples.length > 0 && (
-            <helix-flex>
+            <helix-flex data-density="sm">
               <Link
                 data-button="subtle"
-                data-button-size="sm"
                 href={`/design/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
               >
                 Open in the sandbox
@@ -119,11 +118,11 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             key={element.tagName}
           >
             <helix-flex direction="column" gap="2xs">
-              <helix-flex align="center" gap="sm">
+              <helix-flex align="center" data-density="sm" gap="sm">
                 <helix-text as="h2" appearance="subheading">
                   {element.label}
                 </helix-text>
-                <helix-tag size="sm">{element.tier}</helix-tag>
+                <helix-tag>{element.tier}</helix-tag>
               </helix-flex>
               <helix-text appearance="code" tone="subtle">
                 &lt;{element.tagName}&gt;

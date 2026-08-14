@@ -151,7 +151,7 @@ export function SandboxWorkbench({ families }: Props) {
 
   return (
     <>
-      <helix-flex align="center" class="workbenchHeader" gap="md">
+      <helix-flex align="center" class="workbenchHeader" data-density="sm" gap="md">
         <a data-link="quiet" href="/design">
           <helix-flex align="baseline" gap="2xs" inline>
             <helix-text appearance="body-strong">Helix</helix-text>
@@ -174,7 +174,7 @@ export function SandboxWorkbench({ families }: Props) {
         {/* The sandbox's own actions live in its toolbar now. What stays here
             is the one control that is about the page rather than the sandbox. */}
         {narrow && (
-          <helix-button appearance="subtle" onClick={() => setRailOpen(true)} size="sm">
+          <helix-button appearance="subtle" onClick={() => setRailOpen(true)}>
             Examples
           </helix-button>
         )}

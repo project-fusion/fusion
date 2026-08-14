@@ -33,10 +33,6 @@ export class HelixTag extends HelixBaseTag {
   @property({ reflect: true })
   appearance?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger'
 
-  /** Height and inset of the tag. */
-  @property({ reflect: true })
-  size?: 'sm' | 'md' | 'lg'
-
   static override styles: CSSResultGroup = styles
 }
 

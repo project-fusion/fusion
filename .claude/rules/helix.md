@@ -153,38 +153,49 @@ defensive about a capability every browser has, and swallow a real failure.
 
 ## Size and density
 
-Two axes, one scale, and a rule for which to reach for:
+**A control has no size. It takes its height from the region it is in.**
 
-- **`size` on a control** is a choice about that one control. A hero call to
-  action is `lg`; a tag beside prose is `sm`.
-- **`data-density` on a container** is a fact about a region. Everything inside
-  takes it, without being told individually.
+```html
+<helix-flex data-density="lg">
+  <helix-button appearance="primary">See what is shipping</helix-button>
+</helix-flex>
+```
 
-Both are `sm` / `md` / `lg`, in properties and in tokens, so a name means the
-same thing wherever it is read. `md` is the absent default at both scopes and is
-never written.
+The reasoning, because the conclusion looks like a restriction and is not. Size
+gets asked to do three jobs at once, and only one of them belongs to the
+control:
 
-Density is a custom property, `--helix-size-control`, which is why it costs no
-component any API: it inherits into every shadow root on its own. The three
-`--helix-size-control-*` tokens are the scale and never move; the unsuffixed one
-is the current step. A control reads the unsuffixed one, and a control asked for
-its own `size` reads the scale directly, so an instance still wins inside a
-dense region.
+- **Emphasis.** `appearance` carries it. A filled primary button says "this one
+  matters" far louder than eight more pixels.
+- **Fit.** A fact about the region: a toolbar is tight, a hero is spacious, a
+  table row is tighter still.
+- **Optical role.** Real, and only for things that are not controls. An avatar
+  at 24 in a list and 96 on a profile is a different graphic, not a taller
+  control.
 
-**Every sized component takes all three steps.** Spinner took `sm` and `lg` with
-no `md`; checkbox, tag and toggle group took `sm` and `md` with no `lg`. Each of
-those is a plausible thing to write that silently does nothing, which is the
-worst shape an API can have and worse still for anything generating code.
+The test that settles it: *can two controls sitting together legitimately differ
+in height?* Save and Cancel, an icon button beside a text button, an input and
+its submit, the halves of a split button. In every case, no. So a per-instance
+size is only ever used to say something about the region, one element at a time,
+which is precisely how a row ends up with one member the wrong height. Said once
+on the region, a ragged row is not discouraged, it is unwritable.
 
-The controls that sit in a row agree exactly: button, icon button, avatar and
-toggle group are 32, 40 and 48. Things that are pictures rather than controls
-keep their own scale, because a large avatar is a different graphic and not a
-taller control.
+That is also what makes it safe for anything generating code: there is no size
+to get wrong, and one question to ask per region rather than one per element.
 
-**Reach for density before size.** Six of the twenty `size="sm"` in this repo
-were one region saying it was compact, one control at a time: four in the
-sandbox toolbar and two in the site header. That is the case density is for, and
-writing it per control is how a row ends up with one member the wrong height.
+- **`data-density` on any container**, `sm` / `md` / `lg`. `md` is the default
+  and is never written.
+- **Containers that are dense by nature declare it themselves**: app header,
+  toolbar and banner do, so a control put in one is already right.
+- **`size` survives only on avatar and spinner**, which are pictures.
+
+It works through custom properties (`--helix-size-control`,
+`--helix-size-checkbox`, `--helix-size-tag`), which is why it costs no component
+any API and crosses every shadow boundary on its own. The `-sm` / `-md` / `-lg`
+tokens are the scale and never move; the unsuffixed ones are the current step.
+
+`data-link-size` stays. A text link has no control height: its size is
+typography, and it follows the text around it.
 
 ## Tokens
 

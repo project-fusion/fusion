@@ -1,7 +1,6 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseCheckbox } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { property } from 'lit/decorators.js'
 import { styles } from './checkbox-root.css.js'
 
 /**
@@ -25,10 +24,6 @@ import { styles } from './checkbox-root.css.js'
  */
 @customElement('helix-checkbox')
 export class HelixCheckbox extends HelixBaseCheckbox {
-  /** Height of the control and the type beside it. */
-  @property({ reflect: true })
-  size?: 'sm' | 'md' | 'lg'
-
   static override styles: CSSResultGroup = styles
 }
 

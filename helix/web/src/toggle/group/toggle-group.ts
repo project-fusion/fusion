@@ -35,10 +35,6 @@ export class HelixToggleGroup extends HelixBaseToggleGroup {
   @property({ reflect: true })
   appearance?: 'filled' | 'plain'
 
-  /** Height and inset of the items. */
-  @property({ reflect: true })
-  size?: 'sm' | 'md' | 'lg'
-
   static override styles: CSSResultGroup = styles
 }
 

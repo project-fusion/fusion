@@ -63,10 +63,7 @@ export default function Page() {
                   {family.label}
                 </helix-text>
                 {family.status && (
-                  <helix-tag
-                    appearance={family.status === 'stable' ? 'success' : 'warning'}
-                    size="sm"
-                  >
+                  <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'}>
                     {family.status}
                   </helix-tag>
                 )}
@@ -74,21 +71,16 @@ export default function Page() {
               <helix-text appearance="caption" tone="muted">
                 {family.summary}
               </helix-text>
-              <helix-flex gap="2xs" slot="footer">
+              <helix-flex data-density="sm" gap="2xs" slot="footer">
                 {family.examples.length > 0 && (
                   <Link
                     data-button="subtle"
-                    data-button-size="sm"
                     href={`/design/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
                   >
                     Sandbox
                   </Link>
                 )}
-                <Link
-                  data-button="subtle"
-                  data-button-size="sm"
-                  href={`/design/components/${family.slug}`}
-                >
+                <Link data-button="subtle" href={`/design/components/${family.slug}`}>
                   API
                 </Link>
               </helix-flex>

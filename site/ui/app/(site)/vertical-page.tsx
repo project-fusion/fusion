@@ -12,11 +12,9 @@ export function VerticalPage({ children, vertical }: { children?: ReactNode; ver
   return (
     <helix-flex class="shell verticalShell" direction="column" gap="xl">
       <helix-flex direction="column" gap="sm">
-        <helix-flex align="center" gap="sm" wrap>
+        <helix-flex align="center" data-density="sm" gap="sm" wrap>
           <helix-text as="h1">{vertical.name}</helix-text>
-          <helix-tag appearance={stageAppearance(vertical.stage)} size="sm">
-            {vertical.stage}
-          </helix-tag>
+          <helix-tag appearance={stageAppearance(vertical.stage)}>{vertical.stage}</helix-tag>
         </helix-flex>
         <helix-text as="p" class="lede" tone="muted">
           {vertical.body}

@@ -612,8 +612,6 @@ it and nothing lands on the host that a consumer's markup did not have. */
 export type HelixButtonProps = {
   /** How much visual weight the button carries. */
   appearance?: HelixButton["appearance"];
-  /** Height and inset of the control. */
-  size?: HelixButton["size"];
   /** What activating the button does to its form. */
   type?: HelixButton["type"];
   /** Accessible name, for a button whose content is not text.
@@ -644,8 +642,6 @@ anything a consumer sets. */
 export type HelixButtonSolidJsProps = {
   /** How much visual weight the button carries. */
   "prop:appearance"?: HelixButton["appearance"];
-  /** Height and inset of the control. */
-  "prop:size"?: HelixButton["size"];
   /** What activating the button does to its form. */
   "prop:type"?: HelixButton["type"];
   /** Accessible name, for a button whose content is not text.
@@ -924,8 +920,6 @@ export type HelixCheckboxHelixChangeElementEvent =
   HelixCheckboxElementEvent<HelixChangeEvent>;
 
 export type HelixCheckboxProps = {
-  /** Height of the control and the type beside it. */
-  size?: HelixCheckbox["size"];
   /** Whether the control is checked. Setting this enters controlled mode. */
   checked?: HelixCheckbox["checked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
@@ -963,8 +957,6 @@ instead. */
 };
 
 export type HelixCheckboxSolidJsProps = {
-  /** Height of the control and the type beside it. */
-  "prop:size"?: HelixCheckbox["size"];
   /** Whether the control is checked. Setting this enters controlled mode. */
   "prop:checked"?: HelixCheckbox["checked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
@@ -1240,8 +1232,6 @@ is two intentions in one element. */
 export type HelixIconButtonProps = {
   /** How much visual weight the button carries. */
   appearance?: HelixIconButton["appearance"];
-  /** Edge length of the control. */
-  size?: HelixIconButton["size"];
   /** What activating the button does to its form. */
   type?: HelixIconButton["type"];
   /** Accessible name, for a button whose content is not text.
@@ -1272,8 +1262,6 @@ anything a consumer sets. */
 export type HelixIconButtonSolidJsProps = {
   /** How much visual weight the button carries. */
   "prop:appearance"?: HelixIconButton["appearance"];
-  /** Edge length of the control. */
-  "prop:size"?: HelixIconButton["size"];
   /** What activating the button does to its form. */
   "prop:type"?: HelixIconButton["type"];
   /** Accessible name, for a button whose content is not text.
@@ -1633,8 +1621,6 @@ export type HelixTagHelixDismissElementEvent =
 export type HelixTagProps = {
   /** Which status the tag reports. */
   appearance?: HelixTag["appearance"];
-  /** Height and inset of the tag. */
-  size?: HelixTag["size"];
   /** Whether the tag offers a control to remove itself. */
   dismissible?: HelixTag["dismissible"];
   /** Accessible name for the dismiss control.
@@ -1665,8 +1651,6 @@ only as `removelabel`, which nobody would guess and no linter would catch. */
 export type HelixTagSolidJsProps = {
   /** Which status the tag reports. */
   "prop:appearance"?: HelixTag["appearance"];
-  /** Height and inset of the tag. */
-  "prop:size"?: HelixTag["size"];
   /** Whether the tag offers a control to remove itself. */
   "prop:dismissible"?: HelixTag["dismissible"];
   /** Accessible name for the dismiss control.
@@ -1733,8 +1717,6 @@ export type HelixToggleGroupHelixSelectElementEvent =
 export type HelixToggleGroupProps = {
   /** How much chrome the group carries around its items. */
   appearance?: HelixToggleGroup["appearance"];
-  /** Height and inset of the items. */
-  size?: HelixToggleGroup["size"];
   /** Accessible name for the group. */
   label?: HelixToggleGroup["label"];
   /** Value of the selected item. */
@@ -1747,8 +1729,6 @@ export type HelixToggleGroupProps = {
 export type HelixToggleGroupSolidJsProps = {
   /** How much chrome the group carries around its items. */
   "prop:appearance"?: HelixToggleGroup["appearance"];
-  /** Height and inset of the items. */
-  "prop:size"?: HelixToggleGroup["size"];
   /** Accessible name for the group. */
   "prop:label"?: HelixToggleGroup["label"];
   /** Value of the selected item. */
@@ -2455,7 +2435,6 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much visual weight the button carries.
-   * - `size`: Height and inset of the control.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
@@ -2768,7 +2747,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `size`: Height of the control and the type beside it.
    * - `checked`: Whether the control is checked. Setting this enters controlled mode.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `name`: Name submitted with the form.
@@ -3081,7 +3059,6 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much visual weight the button carries.
-   * - `size`: Edge length of the control.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
@@ -3617,7 +3594,6 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: Which status the tag reports.
-   * - `size`: Height and inset of the tag.
    * - `dismissible`: Whether the tag offers a control to remove itself.
    * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
    *
@@ -3723,7 +3699,6 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much chrome the group carries around its items.
-   * - `size`: Height and inset of the items.
    * - `label`: Accessible name for the group.
    * - `value`: Value of the selected item.
    *
@@ -4508,7 +4483,6 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much visual weight the button carries.
-   * - `size`: Height and inset of the control.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
@@ -4838,7 +4812,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `size`: Height of the control and the type beside it.
    * - `checked`: Whether the control is checked. Setting this enters controlled mode.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `name`: Name submitted with the form.
@@ -5167,7 +5140,6 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much visual weight the button carries.
-   * - `size`: Edge length of the control.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
@@ -5753,7 +5725,6 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: Which status the tag reports.
-   * - `size`: Height and inset of the tag.
    * - `dismissible`: Whether the tag offers a control to remove itself.
    * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
    *
@@ -5863,7 +5834,6 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much chrome the group carries around its items.
-   * - `size`: Height and inset of the items.
    * - `label`: Accessible name for the group.
    * - `value`: Value of the selected item.
    *

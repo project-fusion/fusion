@@ -246,9 +246,11 @@
   /* Smaller than a control on purpose: a tag is a label, not something to
      press, and matching control height would make a row of them read as a row
      of buttons. */
+  --helix-size-tag: var(--helix-size-tag-md);
   --helix-size-tag-lg: calc(1.75rem * var(--_helix-seed-density));
   --helix-size-tag-md: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-tag-sm: calc(1.25rem * var(--_helix-seed-density));
+  --helix-size-checkbox: var(--helix-size-checkbox-md);
   --helix-size-checkbox-lg: calc(1.375rem * var(--_helix-seed-density));
   --helix-size-checkbox-md: calc(1.125rem * var(--_helix-seed-density));
   --helix-size-checkbox-sm: calc(1rem * var(--_helix-seed-density));

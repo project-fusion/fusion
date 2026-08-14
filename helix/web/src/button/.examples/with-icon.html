@@ -1,4 +1,8 @@
-<helix-button appearance="primary" size="lg">
-  Start a conversation
-  <helix-icon name="caret-down" slot="end"></helix-icon>
-</helix-button>
+<!-- Size comes from the region, not the button. A spacious area says so once
+     and everything in it follows, so two buttons side by side cannot disagree. -->
+<div data-density="lg">
+  <helix-button appearance="primary">
+    Start a conversation
+    <helix-icon name="caret-down" slot="end"></helix-icon>
+  </helix-button>
+</div>

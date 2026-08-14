@@ -91,17 +91,12 @@ export function SiteNav() {
           </helix-nav-bar>
         )}
 
-        <helix-icon-button
-          label="Preferences"
-          onClick={() => setPrefsOpen(true)}
-          size="sm"
-          slot="end"
-        >
+        <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)} slot="end">
           <helix-icon name="gear"></helix-icon>
         </helix-icon-button>
 
         {narrow && (
-          <helix-button appearance="subtle" onClick={() => setOpen(true)} size="sm" slot="end">
+          <helix-button appearance="subtle" onClick={() => setOpen(true)} slot="end">
             Menu
           </helix-button>
         )}
@@ -122,7 +117,7 @@ export function SiteNav() {
               {vertical.label}
             </a>
           ))}
-          <a data-button="primary" data-button-size="lg" href="mailto:hello@fusion.dev">
+          <a data-button="primary" data-density="lg" href="mailto:hello@fusion.dev">
             Get in touch
           </a>
         </helix-flex>

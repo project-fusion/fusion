@@ -4,6 +4,13 @@
    traps any overlay rendered inside it. Flat is both the quieter look and the
    one that does not surprise. */
 :host {
+  /* Dense by nature, and it says so once. A control put in here takes this
+     without being told, so a row cannot end up with one member the wrong height
+     because somebody added it later and forgot. */
+  --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-tag: var(--helix-size-tag-sm);
+
   background-color: var(--app-header-background, var(--helix-color-background));
   border-block-end: var(--helix-border-thin) solid transparent;
   display: block;

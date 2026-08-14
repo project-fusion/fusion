@@ -70,11 +70,11 @@ export default function Home() {
             affordable only to an institution becomes affordable to a person. We build the stack
             that makes that practical.
           </helix-text>
-          <helix-flex gap="sm" wrap>
-            <Link data-button="primary" data-button-size="lg" href="/design">
+          <helix-flex data-density="lg" gap="sm" wrap>
+            <Link data-button="primary" href="/design">
               See what is shipping
             </Link>
-            <a data-button data-button-size="lg" href="mailto:hello@fusion.dev">
+            <a data-button href="mailto:hello@fusion.dev">
               Start a conversation
             </a>
           </helix-flex>
@@ -172,11 +172,11 @@ export default function Home() {
                 wrap
               >
                 <helix-flex direction="column" gap="2xs">
-                  <helix-flex align="center" gap="sm">
+                  <helix-flex align="center" data-density="sm" gap="sm">
                     <helix-text as="h3" class="verticalName">
                       {vertical.name}
                     </helix-text>
-                    <helix-tag appearance={stageAppearance(vertical.stage)} size="sm">
+                    <helix-tag appearance={stageAppearance(vertical.stage)}>
                       {vertical.stage}
                     </helix-tag>
                   </helix-flex>
@@ -221,7 +221,7 @@ export default function Home() {
             that is what you need, say so plainly and we will tell you whether we are the right
             people.
           </helix-text>
-          <a data-button="primary" data-button-size="lg" href="mailto:hello@fusion.dev">
+          <a data-button="primary" data-density="lg" href="mailto:hello@fusion.dev">
             hello@fusion.dev
           </a>
         </helix-flex>

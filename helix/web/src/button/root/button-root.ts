@@ -33,10 +33,6 @@ export class HelixButton extends HelixBaseButton {
   @property({ reflect: true })
   appearance?: 'primary' | 'neutral' | 'subtle' | 'danger'
 
-  /** Height and inset of the control. */
-  @property({ reflect: true })
-  size?: 'sm' | 'md' | 'lg'
-
   static override styles: CSSResultGroup = styles
 }
 
