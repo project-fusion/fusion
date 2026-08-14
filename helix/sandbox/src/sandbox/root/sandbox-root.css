@@ -1,9 +1,14 @@
-/* The host is the split. A wrapper would be a second box with the same border
-   and the same grid on it. */
+/* The host is the split. A wrapper would be a second box with the same grid
+   on it.
+
+   No border and no radius. Every boundary in a sandbox is already drawn by
+   whatever sits on one side of it: the divider between the panes, the status
+   bar's top edge, and in a page the toolbar above and the rail beside. A box
+   around the whole thing lands on top of those, so each edge was two lines a
+   pixel apart, and the radius rounded a corner that was flush against the
+   window. One line per boundary, owned by one side of it. */
 :host {
   background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
   display: grid;
   min-block-size: var(--sandbox-min-block-size, 20rem);
   overflow: hidden;

@@ -72,6 +72,30 @@
   --_helix-warning-500: oklch(0.72 0.16 75);
   --_helix-danger-500: oklch(0.57 0.21 27);
 
+  /* ------------------------------------------------------- syntax ------ */
+  /* Fixed values, not derived from the seed like everything above.
+     Highlighting is read by convention rather than by brand: a reader knows a
+     string from a keyword because of where the hue sits, and rotating the whole
+     palette with the brand color would make every theme a new language to
+     learn. These are GitHub's, which is the set most engineers already read
+     without thinking about it, and the pair below is light then dark. */
+  --_helix-syntax-comment-light: #6e7781;
+  --_helix-syntax-comment-dark: #8b949e;
+  --_helix-syntax-keyword-light: #cf222e;
+  --_helix-syntax-keyword-dark: #ff7b72;
+  --_helix-syntax-string-light: #0a3069;
+  --_helix-syntax-string-dark: #a5d6ff;
+  --_helix-syntax-tag-light: #116329;
+  --_helix-syntax-tag-dark: #7ee787;
+  --_helix-syntax-name-light: #0550ae;
+  --_helix-syntax-name-dark: #79c0ff;
+  --_helix-syntax-callable-light: #8250df;
+  --_helix-syntax-callable-dark: #d2a8ff;
+  --_helix-syntax-constant-light: #953800;
+  --_helix-syntax-constant-dark: #ffa657;
+  --_helix-syntax-invalid-light: #82071e;
+  --_helix-syntax-invalid-dark: #ffa198;
+
   /* ------------------------------------------------------- scale ------- */
   --_helix-scale-0: 0rem;
   --_helix-scale-1: calc(0.25rem * var(--_helix-seed-density));

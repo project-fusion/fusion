@@ -2,7 +2,7 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { css as cssLanguage } from '@codemirror/lang-css'
 import { html as htmlLanguage } from '@codemirror/lang-html'
 import { javascript as javascriptLanguage } from '@codemirror/lang-javascript'
-import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language'
+import { syntaxHighlighting } from '@codemirror/language'
 import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers } from '@codemirror/view'
 import {
@@ -16,6 +16,7 @@ import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './editor-root.css.js'
+import { highlightStyle } from './highlight.js'
 
 /** Languages the editor knows, keyed by the name a file carries. */
 const LANGUAGES = {
@@ -113,7 +114,7 @@ export class HelixSandboxEditor extends HelixElement {
           lineNumbers(),
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap]),
-          syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+          syntaxHighlighting(highlightStyle, { fallback: true }),
           this.language$.of(LANGUAGES[this.language]()),
           EditorView.lineWrapping,
           EditorView.updateListener.of((update) => {

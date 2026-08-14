@@ -319,6 +319,30 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/editor/root/highlight.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "highlightStyle",
+          "type": {
+            "text": "HighlightStyle"
+          },
+          "description": "How source is coloured, in Helix tokens.\n\nCodeMirror ships `defaultHighlightStyle`, which is a fixed set of hex values\nand therefore one palette in both colour modes: readable on white, wrong on\nanything else. These are `--helix-color-syntax-*`, which resolve through\n`light-dark()` like every other colour in the system, so the editor follows\nthe page rather than declaring its own mode.\n\nThe palette is GitHub's, which is what the sandbox this replaces used, and\nwhat most engineers already read without having to learn it.\n\nA tag not named here inherits the editor's foreground. That is deliberate:\npunctuation, operators and separators are structure a reader skims past, and\ncolouring them competes with the names that carry the meaning."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "highlightStyle",
+          "declaration": {
+            "name": "highlightStyle",
+            "module": "src/editor/root/highlight.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/index.ts",
       "declarations": [],
       "exports": [
