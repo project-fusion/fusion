@@ -27,7 +27,8 @@ export const registerDom = (): void => {
  * runtime check there would make production code defensive about a browser
  * capability every browser has, and would swallow a real failure.
  *
- * `role` and `ariaLabel` are plain slots rather than behavior: components set
+ * `role`, `ariaLabel`, and `ariaCurrent` are plain slots rather than behavior:
+ * components set
  * their semantics through internals so nothing lands on the host as an
  * attribute, and a spec reads them back through the `role` helper below.
  *
@@ -52,6 +53,7 @@ const shimElementInternals = (): void => {
   proto.attachInternals = function attachInternals(this: HTMLElement): ElementInternals {
     const host = this
     return {
+      ariaCurrent: null,
       ariaLabel: null,
       checkValidity: () => true,
       get form(): HTMLFormElement | null {

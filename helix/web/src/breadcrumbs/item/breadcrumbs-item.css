@@ -20,24 +20,15 @@
   display: none;
 }
 
-[part="link"] {
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  text-decoration: none;
-}
+/* Nothing here styles the link. It is slotted, so it belongs to the outer tree,
+   and `:where(a)` in the base layer outranks any `::slotted` rule written here.
+   A breadcrumb link is `data-link="quiet"`, the same recipe navigation uses
+   everywhere else.
 
-a[part="link"]:hover {
-  color: var(--helix-color-primary);
-  text-decoration: underline;
-}
-
-[part="link"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
-}
-
-/* The current page reads as where you are, not as somewhere you can go. */
-:host([current]) [part="link"] {
+   The current page reads as where you are, not as somewhere you can go. It is
+   text with no element to select, so this is on the host: color and weight
+   inherit into it, where a selector has nothing to match. */
+:host([current]) {
   color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-medium);
 }

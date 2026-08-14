@@ -1,20 +1,22 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
  * @summary One step in a breadcrumb trail.
  *
  * @description
- * An element rather than a slot because it carries API of its own: `href`,
- * whether it is the current page, and the separator that precedes it.
+ * Contributes the separator and the list-item role. The link is the consumer's
+ * own, slotted in, because an anchor rendered into this element's shadow root
+ * is unreachable to the framework that owns the route: a router renders its own
+ * `<a>`, and one written here would be a full page load instead.
  *
  * Each item renders its own separator and hides it with `:host(:first-child)`,
  * so the trail needs no index and no coordination from the parent. `:host()`
  * takes a structural pseudo-class, unlike `:has()`, which it rejects.
  *
- * The current page is a `<span>`, not a link. Linking a page to itself is a
- * known screen-reader annoyance, and `aria-current="page"` is what actually
+ * The current page is text, not a link. Linking a page to itself is a known
+ * screen-reader annoyance, and `aria-current="page"` on the host is what
  * conveys position.
  *
  * @since 0.1.0
@@ -22,18 +24,15 @@ import { property } from 'lit/decorators.js'
  * @aliases Crumb
  * @documentation https://helix.fusion.dev/components/breadcrumbs
  *
- * @slot - The item's label.
+ * @slot - The step: a link, or the text of the current page. A link is styled
+ * with `data-link="quiet"`, since a slotted anchor belongs to the outer tree
+ * and cannot be reached from this component's styles.
  * @slot separator - Replaces the separator shown before this item.
  *
  * @csspart separator - The separator preceding the item.
- * @csspart link - The item's link, or its text when current.
  */
 @customElement('helix-base-breadcrumbs-item')
 export class HelixBaseBreadcrumbsItem extends HelixElement {
-  /** Where the step leads. Ignored when the item is the current page. */
-  @property()
-  href = ''
-
   /** Whether this item is the page the reader is on. */
   @property({ reflect: true, type: Boolean })
   current = false
@@ -44,18 +43,13 @@ export class HelixBaseBreadcrumbsItem extends HelixElement {
     // role has to be there for the list to have items. In `willUpdate` rather
     // than `connectedCallback`, which the server never calls.
     this.internals.role = 'listitem'
+    this.internals.ariaCurrent = this.current ? 'page' : null
   }
 
   protected override render(): TemplateResult {
-    const label = html`<slot></slot>`
-
     return html`<span part="separator" aria-hidden="true"
         ><slot name="separator">/</slot></span
-      >${
-        this.current || !this.href
-          ? html`<span part="link" aria-current=${this.current ? 'page' : nothing}>${label}</span>`
-          : html`<a part="link" href=${this.href}>${label}</a>`
-      }`
+      ><slot></slot>`
   }
 }
 

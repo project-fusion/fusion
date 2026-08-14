@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, hostTag, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 const trail = html`<helix-breadcrumbs>
-  <helix-breadcrumbs-item href="/">Home</helix-breadcrumbs-item>
+  <helix-breadcrumbs-item><a href="/">Home</a></helix-breadcrumbs-item>
   <helix-breadcrumbs-item current>Helix</helix-breadcrumbs-item>
 </helix-breadcrumbs>`
 
@@ -20,13 +20,13 @@ describe('breadcrumbs server output', () => {
   test('the list-item role is on internals, so the host stays as written', () => {
     // Set in `willUpdate`, which the server does call, unlike
     // `connectedCallback`. Without it the list would have no items.
-    expect(hostAttributes(ssr(trail), 'helix-breadcrumbs-item')).toEqual(['href'])
+    expect(hostAttributes(ssr(trail), 'helix-breadcrumbs-item')).toEqual([])
   })
 
-  test('links are crawlable and the current page is not a link', () => {
-    const markup = withoutStyles(ssr(trail))
-    expect(markup).toContain('href="/"')
-    expect(markup).toContain('aria-current="page"')
+  test('the slotted link is crawlable in the served markup', () => {
+    // It sits in the light DOM, so it is in the document rather than behind a
+    // declarative shadow root.
+    expect(withoutStyles(ssr(trail))).toContain('href="/"')
   })
 
   test('separators ship with the markup rather than being added on connect', () => {

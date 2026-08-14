@@ -28,15 +28,17 @@ export const BaseBreadcrumbsRoot = createComponent<HelixBaseBreadcrumbs, BaseBre
 })
 
 /**
- * An element rather than a slot because it carries API of its own: `href`,
-whether it is the current page, and the separator that precedes it.
+ * Contributes the separator and the list-item role. The link is the consumer's
+own, slotted in, because an anchor rendered into this element's shadow root
+is unreachable to the framework that owns the route: a router renders its own
+`<a>`, and one written here would be a full page load instead.
 
 Each item renders its own separator and hides it with `:host(:first-child)`,
 so the trail needs no index and no coordination from the parent. `:host()`
 takes a structural pseudo-class, unlike `:has()`, which it rejects.
 
-The current page is a `<span>`, not a link. Linking a page to itself is a
-known screen-reader annoyance, and `aria-current="page"` is what actually
+The current page is text, not a link. Linking a page to itself is a known
+screen-reader annoyance, and `aria-current="page"` on the host is what
 conveys position.
  *
  * Renders `<helix-base-breadcrumbs-item>`.
@@ -44,8 +46,6 @@ conveys position.
 export interface BaseBreadcrumbsItemProps extends BaseProps {
   /** Whether this item is the page the reader is on. */
   current?: boolean
-  /** Where the step leads. Ignored when the item is the current page. */
-  href?: string
 }
 
 export const BaseBreadcrumbsItem = createComponent<
