@@ -30,6 +30,8 @@ export { BaseCard, type BaseCardProps, BaseCardRoot } from './base-card.js'
 export { BaseDivider, type BaseDividerProps, BaseDividerRoot } from './base-divider.js'
 export { BaseDrawer, type BaseDrawerProps, BaseDrawerRoot } from './base-drawer.js'
 export { BaseIcon, type BaseIconProps, BaseIconRoot } from './base-icon.js'
+export { BaseSkeleton, type BaseSkeletonProps, BaseSkeletonRoot } from './base-skeleton.js'
+export { BaseSpinner, type BaseSpinnerProps, BaseSpinnerRoot } from './base-spinner.js'
 export {
   BaseTable,
   BaseTableCell,
@@ -80,6 +82,8 @@ export { Flex, type FlexProps, FlexRoot } from './flex.js'
 export { Grid, type GridProps, GridRoot } from './grid.js'
 export { Icon, type IconProps, IconRoot } from './icon.js'
 export { IconButton, type IconButtonProps, IconButtonRoot } from './icon-button.js'
+export { Skeleton, type SkeletonProps, SkeletonRoot } from './skeleton.js'
+export { Spinner, type SpinnerProps, SpinnerRoot } from './spinner.js'
 export {
   Table,
   TableCell,
