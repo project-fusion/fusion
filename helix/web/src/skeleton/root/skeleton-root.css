@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  inline-size: 100%;
+}
+
+/* A line of text is one line tall whatever it is standing in for. */
+:host([shape="text"]) {
+  block-size: 1em;
+}
+
+:host([shape="circle"]) {
+  aspect-ratio: 1 / 1;
+  inline-size: var(--skeleton-size, 2.5rem);
+}
+
+[part="skeleton"] {
+  animation: helix-skeleton-sweep 1.4s ease-in-out infinite;
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  block-size: 100%;
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  inline-size: 100%;
+}
+
+:host([shape="text"]) [part="skeleton"] {
+  border-radius: var(--helix-radii-full);
+}
+
+:host([shape="circle"]) [part="skeleton"] {
+  border-radius: 50%;
+}
+
+@keyframes helix-skeleton-sweep {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* The sweep is the whole effect, so with motion reduced the placeholder simply
+   sits there rather than animating something else instead. */
+@media (prefers-reduced-motion: reduce) {
+  [part="skeleton"] {
+    animation: none;
+    background-image: none;
+  }
+}

@@ -1,0 +1,52 @@
+:host {
+  color: inherit;
+  display: inline-flex;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+:host([size="sm"]) {
+  --_spinner-size: 1em;
+}
+
+:host([size="lg"]) {
+  --_spinner-size: 2.5em;
+}
+
+[part="svg"] {
+  animation: helix-spinner-turn 0.8s linear infinite;
+  block-size: var(--spinner-size, var(--_spinner-size, 1.5em));
+  inline-size: var(--spinner-size, var(--_spinner-size, 1.5em));
+}
+
+[part="track"] {
+  opacity: 0.18;
+  stroke: var(--spinner-track-color, currentColor);
+  stroke-width: 2;
+}
+
+/* A gap in the dash is what makes the rotation visible. A full circle turning
+   looks like nothing at all. */
+[part="indicator"] {
+  stroke: var(--spinner-color, currentColor);
+  stroke-dasharray: 50, 100;
+  stroke-linecap: round;
+  stroke-width: 2;
+}
+
+@keyframes helix-spinner-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* Reduced motion still needs the work to read as outstanding, so the turn slows
+   to a crawl rather than stopping: a frozen spinner reads as broken rather than
+   as busy. Scaled from a token instead of a raw duration, and it has to be
+   declared here at all because the base layer's blanket rule is a document rule
+   and does not reach into a shadow root. */
+@media (prefers-reduced-motion: reduce) {
+  [part="svg"] {
+    animation-duration: calc(var(--helix-duration-slow) * 12);
+  }
+}

@@ -19,13 +19,15 @@ a height of its own.
  * Renders `<helix-base-divider>`.
  */
 export interface BaseDividerProps extends BaseProps {
+  /** Whether the rule is announced as a separator. Off by default, and out of the accessibility tree. Most rules on a page separate nothing: they underline a heading or close a section that space had already closed, and announcing every one as a separator is noise a screen-reader user has to walk past. Stated this way round rather than as `decorative`, which is how the reference implementation has it, because a boolean attribute cannot be turned off: `decorative="false"` is still `true` to the parser, so the quiet default would have been unreachable from HTML and settable only as a property. An opt-in has no such problem, and it is absent by default, which is what every reflected property here has to be. */
+  announced?: boolean
   /** Which way the rule runs. */
   orientation?: 'horizontal' | 'vertical'
 }
 
 export const BaseDividerRoot = createComponent<HelixBaseDivider, BaseDividerProps>({
   events: {},
-  properties: [],
+  properties: ['announced'],
   tagName: 'helix-base-divider',
 })
 
