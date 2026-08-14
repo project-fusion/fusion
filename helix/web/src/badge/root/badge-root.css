@@ -4,10 +4,15 @@
   vertical-align: middle;
 
   /* Relative to the decorated element rather than on the type scale: a badge on
-     a 16px icon and one on a 32px avatar are the same mark at two sizes. */
+     a 16px icon and one on a 32px avatar are the same mark at two sizes.
+
+     Only `--_badge-text` resolves against the host. The rest are used on the
+     indicator, whose own font size it sets, so their `em` is that: at a 16px
+     host the indicator is 10px, `1.25em` is 12.5px, and `0.8em` is 8px. */
   --_badge-size: 1.25em;
   --_badge-text: 0.625em;
   --_badge-inset: 0.375em;
+  --_badge-dot: 0.8em;
 }
 
 [part="indicator"] {
@@ -36,15 +41,17 @@
   white-space: nowrap;
 }
 
-/* No value, so nothing to read: the mark collapses to a dot. Shape follows
-   content, so there is no attribute saying which one this is.
+/* No value, so nothing to read: the mark collapses to a dot. It has its own
+   size rather than borrowing the inline padding, which is a different quantity
+   that happened to be close enough to pass for one. Shape follows content, so
+   there is no attribute saying which one this is.
 
    `[data-blank]` is never `:empty`, since a value that counts nothing still has
    text. The two rules cannot both apply, so a mark leaving keeps its size and
    scales from it rather than snapping to a dot on the way out. */
 [part="indicator"]:empty {
-  block-size: var(--_badge-inset);
-  min-inline-size: var(--_badge-inset);
+  block-size: var(--_badge-dot);
+  min-inline-size: var(--_badge-dot);
   padding-inline: var(--helix-space-none);
 }
 
