@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { type ApiMember, families, findFamily } from '../../../../../lib/catalog'
 
@@ -98,13 +99,13 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
           </helix-text>
           {family.examples.length > 0 && (
             <helix-flex>
-              <helix-button
-                appearance="subtle"
+              <Link
+                data-button="subtle"
+                data-button-size="sm"
                 href={`/design/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
-                size="sm"
               >
                 Open in the sandbox
-              </helix-button>
+              </Link>
             </helix-flex>
           )}
         </helix-flex>

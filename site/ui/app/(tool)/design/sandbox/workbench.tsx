@@ -2,6 +2,7 @@
 
 import type { HelixSandboxPreview } from '@helix-io/sandbox'
 import type { HelixOpenChangeEvent, HelixSelectionChangeEvent } from '@helix-io/web'
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
 
@@ -148,9 +149,13 @@ export function SandboxWorkbench({ families }: Props) {
           <helix-button appearance="subtle" onClick={share} size="sm">
             {copied ? 'Copied' : 'Share'}
           </helix-button>
-          <helix-button appearance="subtle" href={`/design/components/${family.slug}`} size="sm">
+          <Link
+            data-button="subtle"
+            data-button-size="sm"
+            href={`/design/components/${family.slug}`}
+          >
             API
-          </helix-button>
+          </Link>
           {narrow && (
             <helix-button appearance="subtle" onClick={() => setRailOpen(true)} size="sm">
               Examples

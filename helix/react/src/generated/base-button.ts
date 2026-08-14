@@ -6,9 +6,15 @@ import '@helix-io/headless/button'
 import type { HelixBaseButton } from '@helix-io/headless'
 
 /**
- * Renders a real `<button>`, or an `<a>` when `href` is set, so activation,
-focus, and the browser's own affordances come from the platform rather than
-from key handlers. `delegatesFocus` puts focus on that inner control, and it
+ * Renders a real `<button>`, so activation, focus, and the browser's own
+affordances come from the platform rather than from key handlers.
+
+**It never renders an anchor.** A router has to render its own `<a>` to
+intercept a click and cannot render one inside this shadow root, so a button
+that could also be a link forced every such navigation to be a full page
+load. A link that looks like a button is styling rather than behaviour, so it
+is a recipe in the base layer: `<Link data-button="primary">` is the same
+control, and the consumer keeps their anchor. `delegatesFocus` puts focus on that inner control, and it
 serializes into the server's markup, so the button is keyboard reachable
 before any JavaScript loads.
 
@@ -25,14 +31,8 @@ export interface BaseButtonProps extends BaseProps {
   disabled?: boolean
   /** Whether the button holds its group's tab stop. A toolbar keeps one tab stop across its children, and the obvious way to do that is to write `tabindex` onto each of them. That is a change to markup the consumer rendered, so a React consumer's hydration reports it and does not patch it up. A parent sets this property instead, which writes nothing, and the stop lands on the inner control inside the shadow root. No attribute, because it is coordination between elements rather than anything a consumer sets. */
   focusable?: boolean
-  /** Navigates to this URL instead of acting on a form. */
-  href?: string
   /** Accessible name, for a button whose content is not text. Lives here rather than only on `IconButton` so the two share one render. An icon-only button without it is a control a screen reader announces as "button" and nothing else. */
   label?: string
-  /** Relationship of the linked URL, defaulted when `target` opens a new tab. */
-  rel?: string
-  /** Browsing context for `href`, such as `_blank`. */
-  target?: string
   /** What activating the button does to its form. */
   type?: 'button' | 'submit' | 'reset'
 }

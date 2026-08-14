@@ -1,47 +1,17 @@
+/* The box lives in the base layer, paired with the `data-button` recipe so one
+   declaration serves both this control and a consumer's own anchor. What stays
+   here is what a document rule cannot reach: the host, and the slotted icon. */
 :host {
   display: inline-flex;
-
-  --_button-height: var(--helix-size-control);
-  --_button-inset: var(--helix-space-md);
-  --_button-text: var(--helix-text-sm);
 }
 
-:host([size="sm"]) {
-  --_button-height: var(--helix-size-control-dense);
-  --_button-inset: var(--helix-space-sm);
-  --_button-text: var(--helix-text-xs);
-}
-
-:host([size="lg"]) {
-  --_button-height: var(--helix-size-control-large);
-  --_button-inset: var(--helix-space-lg);
-  --_button-text: var(--helix-text-md);
-}
-
+/* `all: unset` first, so the UA's own button styling is gone before the base
+   layer's `::part` rules land on it. Without it the UA border and background
+   win on properties the recipe does not name. */
 [part="button"] {
-  align-items: center;
-  background-color: var(--button-background-color, transparent);
-  block-size: var(--_button-height);
-  border: var(--helix-border-thin) solid transparent;
-  border-radius: var(--button-radii, var(--helix-radii-sm));
-  color: var(--button-foreground-color, var(--helix-color-foreground));
-  cursor: pointer;
-  display: inline-flex;
-  font-family: inherit;
-  font-size: var(--_button-text);
-  font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-xs);
+  all: unset;
+  box-sizing: border-box;
   inline-size: 100%;
-  justify-content: center;
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-tight);
-  padding-inline: var(--_button-inset);
-  text-decoration: none;
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    border-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
-  white-space: nowrap;
 }
 
 /* Icons scale with the label rather than holding the global icon size, so a
@@ -55,65 +25,4 @@
 [part="button"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
-}
-
-:host([appearance="primary"]) [part="button"] {
-  background-color: var(--button-background-color, var(--helix-color-primary));
-  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
-}
-
-:host([appearance="primary"]) [part="button"]:hover {
-  background-color: var(--helix-color-primary-hover);
-}
-
-:host([appearance="primary"]) [part="button"]:active {
-  background-color: var(--helix-color-primary-active);
-}
-
-:host(:not([appearance])) [part="button"],
-:host([appearance="neutral"]) [part="button"] {
-  background-color: var(--button-background-color, var(--helix-color-surface));
-  border-color: var(--helix-color-border);
-}
-
-:host(:not([appearance])) [part="button"]:hover,
-:host([appearance="neutral"]) [part="button"]:hover {
-  background-color: var(--helix-color-surface-raised);
-  border-color: var(--helix-color-border-strong);
-}
-
-:host([appearance="subtle"]) [part="button"]:hover {
-  background-color: var(--helix-color-surface-sunken);
-}
-
-:host([appearance="danger"]) [part="button"] {
-  background-color: var(--button-background-color, var(--helix-color-danger));
-  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
-}
-
-/* Covers both branches: the inner `<button>` takes the native attribute, and
-   the anchor branch is inert through `aria-disabled` instead, since an `<a>`
-   has no disabled state to take. */
-:host([disabled]) [part="button"] {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-:host([disabled]) [part="button"]:hover {
-  background-color: var(--button-background-color, transparent);
-  border-color: transparent;
-}
-
-:host([disabled][appearance="primary"]) [part="button"]:hover {
-  background-color: var(--button-background-color, var(--helix-color-primary));
-}
-
-:host([disabled]:not([appearance])) [part="button"]:hover,
-:host([disabled][appearance="neutral"]) [part="button"]:hover {
-  background-color: var(--button-background-color, var(--helix-color-surface));
-  border-color: var(--helix-color-border);
-}
-
-:host([disabled][appearance="danger"]) [part="button"]:hover {
-  background-color: var(--button-background-color, var(--helix-color-danger));
 }

@@ -235,6 +235,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/app-header/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/app-header/root/app-header-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/accordion/index.ts",
       "declarations": [],
       "exports": [
@@ -258,21 +273,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/app-header/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/app-header/root/app-header-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/avatar/index.ts",
       "declarations": [],
       "exports": [
@@ -282,36 +282,6 @@
           "declaration": {
             "name": "*",
             "module": "src/avatar/root/avatar-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/button/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/button/root/button-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/callout/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/callout/root/callout-root.js"
           }
         }
       ]
@@ -341,6 +311,36 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/callout/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/callout/root/callout-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/button/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/button/root/button-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/card/index.ts",
       "declarations": [],
       "exports": [
@@ -356,7 +356,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/divider/index.ts",
+      "path": "src/drawer/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -364,7 +364,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/divider/root/divider-root.js"
+            "module": "src/drawer/root/drawer-root.js"
           }
         }
       ]
@@ -386,7 +386,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/drawer/index.ts",
+      "path": "src/divider/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -394,7 +394,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/drawer/root/drawer-root.js"
+            "module": "src/divider/root/divider-root.js"
           }
         }
       ]
@@ -446,37 +446,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/table/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/table/cell/table-cell.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/table/root/table-root.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/table/row/table-row.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/tabs/index.ts",
       "declarations": [],
       "exports": [
@@ -502,6 +471,37 @@
           "declaration": {
             "name": "*",
             "module": "src/tabs/tab/tabs-tab.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/table/cell/table-cell.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/table/root/table-root.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/table/row/table-row.js"
           }
         }
       ]
@@ -593,6 +593,272 @@
           "declaration": {
             "name": "*",
             "module": "src/tree/root/tree-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/app-header/root/app-header-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/app-header/root/app-header-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/app-header/root/app-header-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Sticky and translucent, drawn on the material tokens so the page content\nblurs behind it rather than being hidden by an opaque bar. The separating\nrule and shadow appear only once the page has scrolled, which keeps the bar\nflat against the hero and lifts it off the content afterwards.",
+          "name": "HelixAppHeader",
+          "cssProperties": [
+            {
+              "description": "Fill behind the banner.",
+              "name": "--app-header-background"
+            },
+            {
+              "description": "Height of the banner.",
+              "name": "--app-header-height"
+            },
+            {
+              "description": "Inline padding of the banner.",
+              "name": "--app-header-inset"
+            },
+            {
+              "description": "Width the content is centered in.",
+              "name": "--app-header-max-inline-size"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The centred row inside the banner.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "The navigation region.",
+              "name": "nav",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "The leading region.",
+              "name": "brand",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "The trailing region.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "Wordmark or logo, at the inline start.",
+              "name": "brand",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "Primary navigation.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "description": "Trailing actions, such as a call to action.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'flat' | 'material' | undefined"
+              },
+              "description": "Whether the banner is flat or a pane of material.\n\nFlat by default. Material is translucency plus blur, and a filter makes the\nheader a containing block for `position: fixed` descendants, so any overlay\nrendered inside it is positioned against the header rather than the\nviewport. Opt in knowing that.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "sticky",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the banner sticks to the top of the viewport.\n\nOpt in, because a reflected `true` writes an attribute the server's markup\ndoes not have. Every default here is the absent attribute.",
+              "attribute": "sticky",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "navAlign",
+              "type": {
+                "text": "'start' | undefined"
+              },
+              "description": "Where the navigation sits in the bar.\n\nCentred by default, which reads as the site's spine when the navigation is\nthe primary thing in the header rather than an afterthought beside a logo.\nCentred against the banner rather than against whatever space the brand\nleft over, so the middle of the nav is the middle of the window whatever\nthe wordmark and the actions happen to measure.\n\n`start` is the opt-out, for a header whose navigation trails the brand.",
+              "attribute": "nav-align",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'flat' | 'material' | undefined"
+              },
+              "description": "Whether the banner is flat or a pane of material.\n\nFlat by default. Material is translucency plus blur, and a filter makes the\nheader a containing block for `position: fixed` descendants, so any overlay\nrendered inside it is positioned against the header rather than the\nviewport. Opt in knowing that.",
+              "fieldName": "appearance"
+            },
+            {
+              "name": "sticky",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the banner sticks to the top of the viewport.\n\nOpt in, because a reflected `true` writes an attribute the server's markup\ndoes not have. Every default here is the absent attribute.",
+              "fieldName": "sticky"
+            },
+            {
+              "name": "nav-align",
+              "type": {
+                "text": "'start' | undefined"
+              },
+              "description": "Where the navigation sits in the bar.\n\nCentred by default, which reads as the site's spine when the navigation is\nthe primary thing in the header rather than an afterthought beside a logo.\nCentred against the banner rather than against whatever space the brand\nleft over, so the middle of the nav is the middle of the window whatever\nthe wordmark and the actions happen to measure.\n\n`start` is the opt-out, for a header whose navigation trails the brand.",
+              "fieldName": "navAlign",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseAppHeader",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Page-level banner holding brand, navigation, and actions.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/app-header",
+            "aliases": [
+              "Masthead",
+              "Navbar",
+              "TopBar"
+            ],
+            "tier": "styled",
+            "group": "AppHeader",
+            "part": "Root"
+          },
+          "tagName": "helix-app-header",
+          "customElement": true,
+          "modulePath": "src/app-header/root/app-header-root.ts",
+          "definitionPath": "src/app-header/root/app-header-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixAppHeader",
+          "declaration": {
+            "name": "HelixAppHeader",
+            "module": "src/app-header/root/app-header-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-app-header",
+          "declaration": {
+            "name": "HelixAppHeader",
+            "module": "src/app-header/root/app-header-root.ts"
           }
         }
       ]
@@ -1223,272 +1489,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/app-header/root/app-header-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/app-header/root/app-header-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/app-header/root/app-header-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Sticky and translucent, drawn on the material tokens so the page content\nblurs behind it rather than being hidden by an opaque bar. The separating\nrule and shadow appear only once the page has scrolled, which keeps the bar\nflat against the hero and lifts it off the content afterwards.",
-          "name": "HelixAppHeader",
-          "cssProperties": [
-            {
-              "description": "Fill behind the banner.",
-              "name": "--app-header-background"
-            },
-            {
-              "description": "Height of the banner.",
-              "name": "--app-header-height"
-            },
-            {
-              "description": "Inline padding of the banner.",
-              "name": "--app-header-inset"
-            },
-            {
-              "description": "Width the content is centered in.",
-              "name": "--app-header-max-inline-size"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The centred row inside the banner.",
-              "name": "content",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "description": "The navigation region.",
-              "name": "nav",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "description": "The leading region.",
-              "name": "brand",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "description": "The trailing region.",
-              "name": "actions",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "Wordmark or logo, at the inline start.",
-              "name": "brand",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "description": "Primary navigation.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "description": "Trailing actions, such as a call to action.",
-              "name": "actions",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'flat' | 'material' | undefined"
-              },
-              "description": "Whether the banner is flat or a pane of material.\n\nFlat by default. Material is translucency plus blur, and a filter makes the\nheader a containing block for `position: fixed` descendants, so any overlay\nrendered inside it is positioned against the header rather than the\nviewport. Opt in knowing that.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "sticky",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the banner sticks to the top of the viewport.\n\nOpt in, because a reflected `true` writes an attribute the server's markup\ndoes not have. Every default here is the absent attribute.",
-              "attribute": "sticky",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "navAlign",
-              "type": {
-                "text": "'start' | undefined"
-              },
-              "description": "Where the navigation sits in the bar.\n\nCentred by default, which reads as the site's spine when the navigation is\nthe primary thing in the header rather than an afterthought beside a logo.\nCentred against the banner rather than against whatever space the brand\nleft over, so the middle of the nav is the middle of the window whatever\nthe wordmark and the actions happen to measure.\n\n`start` is the opt-out, for a header whose navigation trails the brand.",
-              "attribute": "nav-align",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleScroll",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "appearance",
-              "type": {
-                "text": "'flat' | 'material' | undefined"
-              },
-              "description": "Whether the banner is flat or a pane of material.\n\nFlat by default. Material is translucency plus blur, and a filter makes the\nheader a containing block for `position: fixed` descendants, so any overlay\nrendered inside it is positioned against the header rather than the\nviewport. Opt in knowing that.",
-              "fieldName": "appearance"
-            },
-            {
-              "name": "sticky",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the banner sticks to the top of the viewport.\n\nOpt in, because a reflected `true` writes an attribute the server's markup\ndoes not have. Every default here is the absent attribute.",
-              "fieldName": "sticky"
-            },
-            {
-              "name": "nav-align",
-              "type": {
-                "text": "'start' | undefined"
-              },
-              "description": "Where the navigation sits in the bar.\n\nCentred by default, which reads as the site's spine when the navigation is\nthe primary thing in the header rather than an afterthought beside a logo.\nCentred against the banner rather than against whatever space the brand\nleft over, so the middle of the nav is the middle of the window whatever\nthe wordmark and the actions happen to measure.\n\n`start` is the opt-out, for a header whose navigation trails the brand.",
-              "fieldName": "navAlign",
-              "inheritedFrom": {
-                "name": "HelixBaseAppHeader",
-                "module": "src/app-header/root/app-header-root.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseAppHeader",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Page-level banner holding brand, navigation, and actions.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/app-header",
-            "aliases": [
-              "Masthead",
-              "Navbar",
-              "TopBar"
-            ],
-            "tier": "styled",
-            "group": "AppHeader",
-            "part": "Root"
-          },
-          "tagName": "helix-app-header",
-          "customElement": true,
-          "modulePath": "src/app-header/root/app-header-root.ts",
-          "definitionPath": "src/app-header/root/app-header-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixAppHeader",
-          "declaration": {
-            "name": "HelixAppHeader",
-            "module": "src/app-header/root/app-header-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-app-header",
-          "declaration": {
-            "name": "HelixAppHeader",
-            "module": "src/app-header/root/app-header-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/avatar/root/avatar-root.css.ts",
       "declarations": [
         {
@@ -1756,643 +1756,6 @@
           "declaration": {
             "name": "HelixAvatar",
             "module": "src/avatar/root/avatar-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/button/root/button-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/button/root/button-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/button/root/button-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Four appearances and three sizes, all drawn on one control so a link styled\nas a button and a real button are indistinguishable to a reader. The focus\nring is declared here rather than inherited, because the base layer's\n`:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.",
-          "name": "HelixButton",
-          "cssProperties": [
-            {
-              "description": "Fill behind the button.",
-              "name": "--button-background-color"
-            },
-            {
-              "description": "Label and icon color.",
-              "name": "--button-foreground-color"
-            },
-            {
-              "description": "Corner radius of the control.",
-              "name": "--button-radii"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The inner button or anchor.",
-              "name": "button",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The button's label.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "description": "Content before the label, usually an icon.",
-              "name": "start",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "description": "Content after the label.",
-              "name": "end",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'primary' | 'neutral' | 'subtle' | 'danger' | undefined"
-              },
-              "description": "How much visual weight the button carries.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height and inset of the control.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "type",
-              "type": {
-                "text": "'button' | 'submit' | 'reset'"
-              },
-              "default": "'button'",
-              "description": "What activating the button does to its form.",
-              "attribute": "type",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Navigates to this URL instead of acting on a form.",
-              "attribute": "href",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "target",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Browsing context for `href`, such as `_blank`.",
-              "attribute": "target",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "rel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Relationship of the linked URL, defaulted when `target` opens a new tab.",
-              "attribute": "rel",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, for a button whose content is not text.\n\nLives here rather than only on `IconButton` so the two share one render.\nAn icon-only button without it is a control a screen reader announces as\n\"button\" and nothing else.",
-              "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "shadowRootOptions",
-              "type": {
-                "text": "ShadowRootInit"
-              },
-              "static": true,
-              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
-              "description": "Moves focus to the inner control, so the host is never the focus target.",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedRel",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "description": "`rel` as sent, including the safety default.\n\nA new browsing context gets `noreferrer noopener` unless the consumer said\notherwise, because without it the opened page can reach back through\n`window.opener`.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleClick",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "focusable",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "description": "Whether the button holds its group's tab stop.\n\nA toolbar keeps one tab stop across its children, and the obvious way to do\nthat is to write `tabindex` onto each of them. That is a change to markup\nthe consumer rendered, so a React consumer's hydration reports it and does\nnot patch it up. A parent sets this property instead, which writes nothing,\nand the stop lands on the inner control inside the shadow root.\n\nNo attribute, because it is coordination between elements rather than\nanything a consumer sets.",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "formAssociated",
-              "type": {
-                "text": "boolean"
-              },
-              "static": true,
-              "readonly": true,
-              "default": "true",
-              "description": "Opts the element into form ownership, labels, and submission.",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
-              "attribute": "disabled",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "form",
-              "type": {
-                "text": "HTMLFormElement | null"
-              },
-              "description": "The form this control belongs to, if any.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "labels",
-              "type": {
-                "text": "NodeList"
-              },
-              "description": "Labels associated with this control.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "appearance",
-              "type": {
-                "text": "'primary' | 'neutral' | 'subtle' | 'danger' | undefined"
-              },
-              "description": "How much visual weight the button carries.",
-              "fieldName": "appearance"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | undefined"
-              },
-              "description": "Height and inset of the control.",
-              "fieldName": "size"
-            },
-            {
-              "name": "type",
-              "type": {
-                "text": "'button' | 'submit' | 'reset'"
-              },
-              "default": "'button'",
-              "description": "What activating the button does to its form.",
-              "fieldName": "type",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Navigates to this URL instead of acting on a form.",
-              "fieldName": "href",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "name": "target",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Browsing context for `href`, such as `_blank`.",
-              "fieldName": "target",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "name": "rel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Relationship of the linked URL, defaulted when `target` opens a new tab.",
-              "fieldName": "rel",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, for a button whose content is not text.\n\nLives here rather than only on `IconButton` so the two share one render.\nAn icon-only button without it is a control a screen reader announces as\n\"button\" and nothing else.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
-              "fieldName": "disabled",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/form-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseButton",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Triggers an action, submits a form, or navigates.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/button",
-            "tier": "styled",
-            "group": "Button",
-            "part": "Root"
-          },
-          "tagName": "helix-button",
-          "customElement": true,
-          "modulePath": "src/button/root/button-root.ts",
-          "definitionPath": "src/button/root/button-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixButton",
-          "declaration": {
-            "name": "HelixButton",
-            "module": "src/button/root/button-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-button",
-          "declaration": {
-            "name": "HelixButton",
-            "module": "src/button/root/button-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/callout/root/callout-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/callout/root/callout-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/callout/root/callout-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Tinted from the severity's status color with `color-mix`, and marked with a\nbar on the inline start so the severity survives being read in greyscale or\nby anyone who does not distinguish the hues.\n\nThere is no `appearance` here. `severity` carries the meaning and lives on\nthe headless tier; this tier only decides what that meaning looks like.",
-          "name": "HelixCallout",
-          "cssProperties": [
-            {
-              "description": "Fill behind the callout.",
-              "name": "--callout-background-color"
-            },
-            {
-              "description": "Corner radius of the callout.",
-              "name": "--callout-radii"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The icon region.",
-              "name": "icon",
-              "inheritedFrom": {
-                "name": "HelixBaseCallout",
-                "module": "src/callout/root/callout-root.ts"
-              }
-            },
-            {
-              "description": "The content region.",
-              "name": "content",
-              "inheritedFrom": {
-                "name": "HelixBaseCallout",
-                "module": "src/callout/root/callout-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The callout's content.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseCallout",
-                "module": "src/callout/root/callout-root.ts"
-              }
-            },
-            {
-              "description": "Replaces the icon chosen by `severity`.",
-              "name": "icon",
-              "inheritedFrom": {
-                "name": "HelixBaseCallout",
-                "module": "src/callout/root/callout-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "severity",
-              "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
-              },
-              "description": "What kind of attention the passage needs.",
-              "attribute": "severity",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCallout",
-                "module": "src/callout/root/callout-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseCallout",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Sets a passage apart as information, a warning, or an error.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/callout",
-            "aliases": [
-              "Alert",
-              "Banner",
-              "Admonition",
-              "Notice"
-            ],
-            "tier": "styled",
-            "group": "Callout",
-            "part": "Root"
-          },
-          "tagName": "helix-callout",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "severity",
-              "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
-              },
-              "description": "What kind of attention the passage needs.",
-              "fieldName": "severity",
-              "inheritedFrom": {
-                "name": "HelixBaseCallout",
-                "module": "src/callout/root/callout-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/callout/root/callout-root.ts",
-          "definitionPath": "src/callout/root/callout-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCallout",
-          "declaration": {
-            "name": "HelixCallout",
-            "module": "src/callout/root/callout-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-callout",
-          "declaration": {
-            "name": "HelixCallout",
-            "module": "src/callout/root/callout-root.ts"
           }
         }
       ]
@@ -2782,6 +2145,568 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/callout/root/callout-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/callout/root/callout-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/callout/root/callout-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Tinted from the severity's status color with `color-mix`, and marked with a\nbar on the inline start so the severity survives being read in greyscale or\nby anyone who does not distinguish the hues.\n\nThere is no `appearance` here. `severity` carries the meaning and lives on\nthe headless tier; this tier only decides what that meaning looks like.",
+          "name": "HelixCallout",
+          "cssProperties": [
+            {
+              "description": "Fill behind the callout.",
+              "name": "--callout-background-color"
+            },
+            {
+              "description": "Corner radius of the callout.",
+              "name": "--callout-radii"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The icon region.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseCallout",
+                "module": "src/callout/root/callout-root.ts"
+              }
+            },
+            {
+              "description": "The content region.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseCallout",
+                "module": "src/callout/root/callout-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The callout's content.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseCallout",
+                "module": "src/callout/root/callout-root.ts"
+              }
+            },
+            {
+              "description": "Replaces the icon chosen by `severity`.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseCallout",
+                "module": "src/callout/root/callout-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the passage needs.",
+              "attribute": "severity",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCallout",
+                "module": "src/callout/root/callout-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseCallout",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Sets a passage apart as information, a warning, or an error.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/callout",
+            "aliases": [
+              "Alert",
+              "Banner",
+              "Admonition",
+              "Notice"
+            ],
+            "tier": "styled",
+            "group": "Callout",
+            "part": "Root"
+          },
+          "tagName": "helix-callout",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the passage needs.",
+              "fieldName": "severity",
+              "inheritedFrom": {
+                "name": "HelixBaseCallout",
+                "module": "src/callout/root/callout-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/callout/root/callout-root.ts",
+          "definitionPath": "src/callout/root/callout-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCallout",
+          "declaration": {
+            "name": "HelixCallout",
+            "module": "src/callout/root/callout-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-callout",
+          "declaration": {
+            "name": "HelixCallout",
+            "module": "src/callout/root/callout-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/button/root/button-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/button/root/button-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/button/root/button-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Four appearances and three sizes, all drawn on one control so a link styled\nas a button and a real button are indistinguishable to a reader. The focus\nring is declared here rather than inherited, because the base layer's\n`:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.",
+          "name": "HelixButton",
+          "cssProperties": [
+            {
+              "description": "Fill behind the button.",
+              "name": "--button-background-color"
+            },
+            {
+              "description": "Label and icon color.",
+              "name": "--button-foreground-color"
+            },
+            {
+              "description": "Corner radius of the control.",
+              "name": "--button-radii"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The inner button or anchor.",
+              "name": "button",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The button's label.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "description": "Content before the label, usually an icon.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "description": "Content after the label.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'primary' | 'neutral' | 'subtle' | 'danger' | undefined"
+              },
+              "description": "How much visual weight the button carries.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg' | undefined"
+              },
+              "description": "Height and inset of the control.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "What activating the button does to its form.",
+              "attribute": "type",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, for a button whose content is not text.\n\nLives here rather than only on `IconButton` so the two share one render.\nAn icon-only button without it is a control a screen reader announces as\n\"button\" and nothing else.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
+              "description": "Moves focus to the inner control, so the host is never the focus target.",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleClick",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "focusable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether the button holds its group's tab stop.\n\nA toolbar keeps one tab stop across its children, and the obvious way to do\nthat is to write `tabindex` onto each of them. That is a change to markup\nthe consumer rendered, so a React consumer's hydration reports it and does\nnot patch it up. A parent sets this property instead, which writes nothing,\nand the stop lands on the inner control inside the shadow root.\n\nNo attribute, because it is coordination between elements rather than\nanything a consumer sets.",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'primary' | 'neutral' | 'subtle' | 'danger' | undefined"
+              },
+              "description": "How much visual weight the button carries.",
+              "fieldName": "appearance"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg' | undefined"
+              },
+              "description": "Height and inset of the control.",
+              "fieldName": "size"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "What activating the button does to its form.",
+              "fieldName": "type",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, for a button whose content is not text.\n\nLives here rather than only on `IconButton` so the two share one render.\nAn icon-only button without it is a control a screen reader announces as\n\"button\" and nothing else.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/form-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseButton",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Triggers an action, submits a form, or navigates.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/button",
+            "tier": "styled",
+            "group": "Button",
+            "part": "Root"
+          },
+          "tagName": "helix-button",
+          "customElement": true,
+          "modulePath": "src/button/root/button-root.ts",
+          "definitionPath": "src/button/root/button-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixButton",
+          "declaration": {
+            "name": "HelixButton",
+            "module": "src/button/root/button-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-button",
+          "declaration": {
+            "name": "HelixButton",
+            "module": "src/button/root/button-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/disclosure/root/disclosure-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/disclosure/root/disclosure-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/card/root/card-root.css.ts",
       "declarations": [
         {
@@ -3007,7 +2932,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/divider/root/divider-root.css.ts",
+      "path": "src/flex/root/flex-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -3020,53 +2945,87 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/divider/root/divider-root.css.ts"
+            "module": "src/flex/root/flex-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/divider/root/divider-root.ts",
+      "path": "src/flex/root/flex-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "A one-pixel rule in the border color, running the full inline size by\ndefault. A vertical divider stretches to its flex parent instead of setting\nits own height, so it matches whatever it sits beside without being told how\ntall that is.",
-          "name": "HelixDivider",
-          "cssProperties": [
+          "description": "The host is the flex container itself and the only child is a slot, so the\nelement adds no box of its own: `<helix-flex>` costs exactly the `<div>` it\nreplaces.\n\nThere is no separate Stack. A stack is this with `direction=\"column\"`, and a\nsecond element whose whole definition is one default of the first is a name\nto learn rather than a capability to gain.\n\nGap takes a space token name rather than a length, so spacing stays on the\nscale. A layout that can say `gap=\"13px\"` is one that will.\n\nPresentation only, so there is no headless tier: the split exists to keep\nbehavior separate from styling, and this is entirely styling.",
+          "name": "HelixFlex",
+          "slots": [
             {
-              "description": "Color of the rule.",
-              "name": "--divider-color"
-            },
-            {
-              "description": "Thickness of the rule.",
-              "name": "--divider-thickness"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The rule itself.",
-              "name": "line",
-              "inheritedFrom": {
-                "name": "HelixBaseDivider",
-                "module": "src/divider/root/divider-root.ts"
-              }
+              "description": "The items to lay out.",
+              "name": ""
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "orientation",
+              "name": "direction",
               "type": {
-                "text": "'horizontal' | 'vertical' | undefined"
+                "text": "'row' | 'column' | undefined"
               },
-              "description": "Which way the rule runs.",
-              "attribute": "orientation",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseDivider",
-                "module": "src/divider/root/divider-root.ts"
-              }
+              "description": "Whether items run across or down.",
+              "attribute": "direction",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "gap",
+              "type": {
+                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined"
+              },
+              "description": "Space between items, named on the space scale.",
+              "attribute": "gap",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "align",
+              "type": {
+                "text": "'start' | 'center' | 'end' | 'stretch' | 'baseline' | undefined"
+              },
+              "description": "Alignment across the direction.",
+              "attribute": "align",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "justify",
+              "type": {
+                "text": "'start' | 'center' | 'end' | 'between' | 'around' | undefined"
+              },
+              "description": "Distribution along the direction.",
+              "attribute": "justify",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "wrap",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether items wrap onto more lines.",
+              "attribute": "wrap",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "inline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Flows with surrounding text instead of taking the full width.",
+              "attribute": "inline",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -3108,78 +3067,99 @@
               }
             }
           ],
+          "attributes": [
+            {
+              "name": "direction",
+              "type": {
+                "text": "'row' | 'column' | undefined"
+              },
+              "description": "Whether items run across or down.",
+              "fieldName": "direction"
+            },
+            {
+              "name": "gap",
+              "type": {
+                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined"
+              },
+              "description": "Space between items, named on the space scale.",
+              "fieldName": "gap"
+            },
+            {
+              "name": "align",
+              "type": {
+                "text": "'start' | 'center' | 'end' | 'stretch' | 'baseline' | undefined"
+              },
+              "description": "Alignment across the direction.",
+              "fieldName": "align"
+            },
+            {
+              "name": "justify",
+              "type": {
+                "text": "'start' | 'center' | 'end' | 'between' | 'around' | undefined"
+              },
+              "description": "Distribution along the direction.",
+              "fieldName": "justify"
+            },
+            {
+              "name": "wrap",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether items wrap onto more lines.",
+              "fieldName": "wrap"
+            },
+            {
+              "name": "inline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Flows with surrounding text instead of taking the full width.",
+              "fieldName": "inline"
+            }
+          ],
           "superclass": {
-            "name": "HelixBaseDivider",
-            "package": "@helix-io/headless"
+            "name": "HelixElement",
+            "package": "@helix-io/core"
           },
-          "summary": "Separates content into groups with a rule.",
+          "summary": "Lays children out in a row or a column.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/divider",
+            "documentation": "https://helix.fusion.dev/components/flex",
             "aliases": [
-              "Separator",
-              "Rule"
+              "Stack",
+              "Row",
+              "Column",
+              "HStack",
+              "VStack"
             ],
             "tier": "styled",
-            "group": "Divider",
+            "group": "Flex",
             "part": "Root"
           },
-          "tagName": "helix-divider",
+          "tagName": "helix-flex",
           "customElement": true,
-          "attributes": [
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | 'vertical' | undefined"
-              },
-              "description": "Which way the rule runs.",
-              "fieldName": "orientation",
-              "inheritedFrom": {
-                "name": "HelixBaseDivider",
-                "module": "src/divider/root/divider-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/divider/root/divider-root.ts",
-          "definitionPath": "src/divider/root/divider-root.ts"
+          "modulePath": "src/flex/root/flex-root.ts",
+          "definitionPath": "src/flex/root/flex-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixDivider",
+          "name": "HelixFlex",
           "declaration": {
-            "name": "HelixDivider",
-            "module": "src/divider/root/divider-root.ts"
+            "name": "HelixFlex",
+            "module": "src/flex/root/flex-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-divider",
+          "name": "helix-flex",
           "declaration": {
-            "name": "HelixDivider",
-            "module": "src/divider/root/divider-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/disclosure/root/disclosure-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/disclosure/root/disclosure-root.css.ts"
+            "name": "HelixFlex",
+            "module": "src/flex/root/flex-root.ts"
           }
         }
       ]
@@ -3627,7 +3607,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/flex/root/flex-root.css.ts",
+      "path": "src/divider/root/divider-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -3640,296 +3620,52 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/flex/root/flex-root.css.ts"
+            "module": "src/divider/root/divider-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/flex/root/flex-root.ts",
+      "path": "src/divider/root/divider-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "The host is the flex container itself and the only child is a slot, so the\nelement adds no box of its own: `<helix-flex>` costs exactly the `<div>` it\nreplaces.\n\nThere is no separate Stack. A stack is this with `direction=\"column\"`, and a\nsecond element whose whole definition is one default of the first is a name\nto learn rather than a capability to gain.\n\nGap takes a space token name rather than a length, so spacing stays on the\nscale. A layout that can say `gap=\"13px\"` is one that will.\n\nPresentation only, so there is no headless tier: the split exists to keep\nbehavior separate from styling, and this is entirely styling.",
-          "name": "HelixFlex",
-          "slots": [
-            {
-              "description": "The items to lay out.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "direction",
-              "type": {
-                "text": "'row' | 'column' | undefined"
-              },
-              "description": "Whether items run across or down.",
-              "attribute": "direction",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "gap",
-              "type": {
-                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined"
-              },
-              "description": "Space between items, named on the space scale.",
-              "attribute": "gap",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "align",
-              "type": {
-                "text": "'start' | 'center' | 'end' | 'stretch' | 'baseline' | undefined"
-              },
-              "description": "Alignment across the direction.",
-              "attribute": "align",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "justify",
-              "type": {
-                "text": "'start' | 'center' | 'end' | 'between' | 'around' | undefined"
-              },
-              "description": "Distribution along the direction.",
-              "attribute": "justify",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "wrap",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether items wrap onto more lines.",
-              "attribute": "wrap",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "inline",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Flows with surrounding text instead of taking the full width.",
-              "attribute": "inline",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "direction",
-              "type": {
-                "text": "'row' | 'column' | undefined"
-              },
-              "description": "Whether items run across or down.",
-              "fieldName": "direction"
-            },
-            {
-              "name": "gap",
-              "type": {
-                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined"
-              },
-              "description": "Space between items, named on the space scale.",
-              "fieldName": "gap"
-            },
-            {
-              "name": "align",
-              "type": {
-                "text": "'start' | 'center' | 'end' | 'stretch' | 'baseline' | undefined"
-              },
-              "description": "Alignment across the direction.",
-              "fieldName": "align"
-            },
-            {
-              "name": "justify",
-              "type": {
-                "text": "'start' | 'center' | 'end' | 'between' | 'around' | undefined"
-              },
-              "description": "Distribution along the direction.",
-              "fieldName": "justify"
-            },
-            {
-              "name": "wrap",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether items wrap onto more lines.",
-              "fieldName": "wrap"
-            },
-            {
-              "name": "inline",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Flows with surrounding text instead of taking the full width.",
-              "fieldName": "inline"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Lays children out in a row or a column.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/flex",
-            "aliases": [
-              "Stack",
-              "Row",
-              "Column",
-              "HStack",
-              "VStack"
-            ],
-            "tier": "styled",
-            "group": "Flex",
-            "part": "Root"
-          },
-          "tagName": "helix-flex",
-          "customElement": true,
-          "modulePath": "src/flex/root/flex-root.ts",
-          "definitionPath": "src/flex/root/flex-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixFlex",
-          "declaration": {
-            "name": "HelixFlex",
-            "module": "src/flex/root/flex-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-flex",
-          "declaration": {
-            "name": "HelixFlex",
-            "module": "src/flex/root/flex-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/icon/root/icon-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/icon/root/icon-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/icon/root/icon-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the\ncolor of the text it sits in and a container can resize it without reaching\nfor a prop. Inside a button that hook is set in `em`, which keeps the icon in\nproportion as the button's own size changes.",
-          "name": "HelixIcon",
+          "description": "A one-pixel rule in the border color, running the full inline size by\ndefault. A vertical divider stretches to its flex parent instead of setting\nits own height, so it matches whatever it sits beside without being told how\ntall that is.",
+          "name": "HelixDivider",
           "cssProperties": [
             {
-              "description": "Edge length of the icon's box.",
-              "name": "--icon-size"
+              "description": "Color of the rule.",
+              "name": "--divider-color"
+            },
+            {
+              "description": "Thickness of the rule.",
+              "name": "--divider-thickness"
             }
           ],
           "cssParts": [
             {
-              "description": "The rendered SVG.",
-              "name": "svg",
+              "description": "The rule itself.",
+              "name": "line",
               "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
+                "name": "HelixBaseDivider",
+                "module": "src/divider/root/divider-root.ts"
               }
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "name",
+              "name": "orientation",
               "type": {
-                "text": "string"
+                "text": "'horizontal' | 'vertical' | undefined"
               },
-              "default": "''",
-              "description": "Name of the icon in the Helix set.",
-              "attribute": "name",
+              "description": "Which way the rule runs.",
+              "attribute": "orientation",
+              "reflects": true,
               "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, for an icon that is not decorative.",
-              "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
+                "name": "HelixBaseDivider",
+                "module": "src/divider/root/divider-root.ts"
               }
             },
             {
@@ -3973,71 +3709,57 @@
             }
           ],
           "superclass": {
-            "name": "HelixBaseIcon",
+            "name": "HelixBaseDivider",
             "package": "@helix-io/headless"
           },
-          "summary": "Renders a named icon from the Helix set.",
+          "summary": "Separates content into groups with a rule.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/icon",
+            "documentation": "https://helix.fusion.dev/components/divider",
             "aliases": [
-              "Glyph",
-              "Symbol"
+              "Separator",
+              "Rule"
             ],
             "tier": "styled",
-            "group": "Icon",
+            "group": "Divider",
             "part": "Root"
           },
-          "tagName": "helix-icon",
+          "tagName": "helix-divider",
           "customElement": true,
           "attributes": [
             {
-              "name": "name",
+              "name": "orientation",
               "type": {
-                "text": "string"
+                "text": "'horizontal' | 'vertical' | undefined"
               },
-              "default": "''",
-              "description": "Name of the icon in the Helix set.",
-              "fieldName": "name",
+              "description": "Which way the rule runs.",
+              "fieldName": "orientation",
               "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
-              }
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name, for an icon that is not decorative.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseIcon",
-                "module": "src/icon/root/icon-root.ts"
+                "name": "HelixBaseDivider",
+                "module": "src/divider/root/divider-root.ts"
               }
             }
           ],
-          "modulePath": "src/icon/root/icon-root.ts",
-          "definitionPath": "src/icon/root/icon-root.ts"
+          "modulePath": "src/divider/root/divider-root.ts",
+          "definitionPath": "src/divider/root/divider-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixIcon",
+          "name": "HelixDivider",
           "declaration": {
-            "name": "HelixIcon",
-            "module": "src/icon/root/icon-root.ts"
+            "name": "HelixDivider",
+            "module": "src/divider/root/divider-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-icon",
+          "name": "helix-divider",
           "declaration": {
-            "name": "HelixIcon",
-            "module": "src/icon/root/icon-root.ts"
+            "name": "HelixDivider",
+            "module": "src/divider/root/divider-root.ts"
           }
         }
       ]
@@ -4358,48 +4080,6 @@
             },
             {
               "kind": "field",
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Navigates to this URL instead of acting on a form.",
-              "attribute": "href",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "target",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Browsing context for `href`, such as `_blank`.",
-              "attribute": "target",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "rel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Relationship of the linked URL, defaulted when `target` opens a new tab.",
-              "attribute": "rel",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -4421,20 +4101,6 @@
               "static": true,
               "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
               "description": "Moves focus to the inner control, so the host is never the focus target.",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedRel",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "description": "`rel` as sent, including the safety default.\n\nA new browsing context gets `noreferrer noopener` unless the consumer said\notherwise, because without it the opened page can reach back through\n`window.opener`.",
-              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"
@@ -4590,45 +4256,6 @@
               }
             },
             {
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Navigates to this URL instead of acting on a form.",
-              "fieldName": "href",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "name": "target",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Browsing context for `href`, such as `_blank`.",
-              "fieldName": "target",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "name": "rel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Relationship of the linked URL, defaulted when `target` opens a new tab.",
-              "fieldName": "rel",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
               "name": "label",
               "type": {
                 "text": "string"
@@ -4699,7 +4326,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/table/cell/table-cell.css.ts",
+      "path": "src/icon/root/icon-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -4712,326 +4339,48 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/table/cell/table-cell.css.ts"
+            "module": "src/icon/root/icon-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/table/cell/table-cell.ts",
+      "path": "src/icon/root/icon-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
-          "name": "HelixTableCell",
-          "slots": [
-            {
-              "description": "The cell's content.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseTableCell",
-                "module": "src/table/cell/table-cell.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "header",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the cell heads its column.",
-              "attribute": "header",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseTableCell",
-                "module": "src/table/cell/table-cell.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseTableCell",
-            "package": "@helix-io/headless"
-          },
-          "summary": "One cell of a table.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/table",
-            "tier": "styled",
-            "group": "Table",
-            "part": "Cell"
-          },
-          "tagName": "helix-table-cell",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "header",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the cell heads its column.",
-              "fieldName": "header",
-              "inheritedFrom": {
-                "name": "HelixBaseTableCell",
-                "module": "src/table/cell/table-cell.ts"
-              }
-            }
-          ],
-          "modulePath": "src/table/cell/table-cell.ts",
-          "definitionPath": "src/table/cell/table-cell.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixTableCell",
-          "declaration": {
-            "name": "HelixTableCell",
-            "module": "src/table/cell/table-cell.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-table-cell",
-          "declaration": {
-            "name": "HelixTableCell",
-            "module": "src/table/cell/table-cell.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/row/table-row.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/table/row/table-row.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/row/table-row.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
-          "name": "HelixTableRow",
-          "slots": [
-            {
-              "description": "The row's cells.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseTableRow",
-                "module": "src/table/row/table-row.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseTableRow",
-            "package": "@helix-io/headless"
-          },
-          "summary": "One row of a table.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/table",
-            "tier": "styled",
-            "group": "Table",
-            "part": "Row"
-          },
-          "tagName": "helix-table-row",
-          "customElement": true,
-          "modulePath": "src/table/row/table-row.ts",
-          "definitionPath": "src/table/row/table-row.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixTableRow",
-          "declaration": {
-            "name": "HelixTableRow",
-            "module": "src/table/row/table-row.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-table-row",
-          "declaration": {
-            "name": "HelixTableRow",
-            "module": "src/table/row/table-row.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/root/table-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/table/root/table-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/table/root/table-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
-          "name": "HelixTable",
+          "description": "Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the\ncolor of the text it sits in and a container can resize it without reaching\nfor a prop. Inside a button that hook is set in `em`, which keeps the icon in\nproportion as the button's own size changes.",
+          "name": "HelixIcon",
           "cssProperties": [
             {
-              "description": "Track list for the columns.",
-              "name": "--table-columns",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
+              "description": "Edge length of the icon's box.",
+              "name": "--icon-size"
             }
           ],
           "cssParts": [
             {
-              "description": "The grid.",
-              "name": "table",
+              "description": "The rendered SVG.",
+              "name": "svg",
               "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The table's rows.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
               }
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "columns",
+              "name": "name",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
-              "attribute": "columns",
+              "description": "Name of the icon in the Helix set.",
+              "attribute": "name",
               "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
               }
             },
             {
@@ -5041,11 +4390,11 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accessible name for the table.",
+              "description": "Accessible name, for an icon that is not decorative.",
               "attribute": "label",
               "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
               }
             },
             {
@@ -5089,32 +4438,36 @@
             }
           ],
           "superclass": {
-            "name": "HelixBaseTable",
+            "name": "HelixBaseIcon",
             "package": "@helix-io/headless"
           },
-          "summary": "Tabular data laid out on a grid.",
+          "summary": "Renders a named icon from the Helix set.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/table",
+            "documentation": "https://helix.fusion.dev/components/icon",
+            "aliases": [
+              "Glyph",
+              "Symbol"
+            ],
             "tier": "styled",
-            "group": "Table",
+            "group": "Icon",
             "part": "Root"
           },
-          "tagName": "helix-table",
+          "tagName": "helix-icon",
           "customElement": true,
           "attributes": [
             {
-              "name": "columns",
+              "name": "name",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
-              "fieldName": "columns",
+              "description": "Name of the icon in the Helix set.",
+              "fieldName": "name",
               "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
               }
             },
             {
@@ -5123,33 +4476,33 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accessible name for the table.",
+              "description": "Accessible name, for an icon that is not decorative.",
               "fieldName": "label",
               "inheritedFrom": {
-                "name": "HelixBaseTable",
-                "module": "src/table/root/table-root.ts"
+                "name": "HelixBaseIcon",
+                "module": "src/icon/root/icon-root.ts"
               }
             }
           ],
-          "modulePath": "src/table/root/table-root.ts",
-          "definitionPath": "src/table/root/table-root.ts"
+          "modulePath": "src/icon/root/icon-root.ts",
+          "definitionPath": "src/icon/root/icon-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixTable",
+          "name": "HelixIcon",
           "declaration": {
-            "name": "HelixTable",
-            "module": "src/table/root/table-root.ts"
+            "name": "HelixIcon",
+            "module": "src/icon/root/icon-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-table",
+          "name": "helix-icon",
           "declaration": {
-            "name": "HelixTable",
-            "module": "src/table/root/table-root.ts"
+            "name": "HelixIcon",
+            "module": "src/icon/root/icon-root.ts"
           }
         }
       ]
@@ -5334,6 +4687,153 @@
           "declaration": {
             "name": "HelixTabsPanel",
             "module": "src/tabs/panel/tabs-panel.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/cell/table-cell.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/table/cell/table-cell.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/cell/table-cell.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
+          "name": "HelixTableCell",
+          "slots": [
+            {
+              "description": "The cell's content.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTableCell",
+                "module": "src/table/cell/table-cell.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "header",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the cell heads its column.",
+              "attribute": "header",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTableCell",
+                "module": "src/table/cell/table-cell.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTableCell",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One cell of a table.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/table",
+            "tier": "styled",
+            "group": "Table",
+            "part": "Cell"
+          },
+          "tagName": "helix-table-cell",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "header",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the cell heads its column.",
+              "fieldName": "header",
+              "inheritedFrom": {
+                "name": "HelixBaseTableCell",
+                "module": "src/table/cell/table-cell.ts"
+              }
+            }
+          ],
+          "modulePath": "src/table/cell/table-cell.ts",
+          "definitionPath": "src/table/cell/table-cell.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTableCell",
+          "declaration": {
+            "name": "HelixTableCell",
+            "module": "src/table/cell/table-cell.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-table-cell",
+          "declaration": {
+            "name": "HelixTableCell",
+            "module": "src/table/cell/table-cell.ts"
           }
         }
       ]
@@ -5902,6 +5402,199 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/table/root/table-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/table/root/table-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/root/table-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
+          "name": "HelixTable",
+          "cssProperties": [
+            {
+              "description": "Track list for the columns.",
+              "name": "--table-columns",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The grid.",
+              "name": "table",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The table's rows.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "columns",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
+              "attribute": "columns",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the table.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTable",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Tabular data laid out on a grid.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/table",
+            "tier": "styled",
+            "group": "Table",
+            "part": "Root"
+          },
+          "tagName": "helix-table",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "columns",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
+              "fieldName": "columns",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the table.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/table/root/table-root.ts",
+          "definitionPath": "src/table/root/table-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTable",
+          "declaration": {
+            "name": "HelixTable",
+            "module": "src/table/root/table-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-table",
+          "declaration": {
+            "name": "HelixTable",
+            "module": "src/table/root/table-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/tag/root/tag-root.css.ts",
       "declarations": [
         {
@@ -6159,6 +5852,123 @@
           "declaration": {
             "name": "HelixTag",
             "module": "src/tag/root/tag-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/row/table-row.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/table/row/table-row.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table/row/table-row.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Hairline rules between rows and no fill, per the rule that depth comes from a\nsingle border rather than from elevation. A dense table earns its density by\ndecorating none of it.",
+          "name": "HelixTableRow",
+          "slots": [
+            {
+              "description": "The row's cells.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTableRow",
+                "module": "src/table/row/table-row.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTableRow",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One row of a table.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/table",
+            "tier": "styled",
+            "group": "Table",
+            "part": "Row"
+          },
+          "tagName": "helix-table-row",
+          "customElement": true,
+          "modulePath": "src/table/row/table-row.ts",
+          "definitionPath": "src/table/row/table-row.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTableRow",
+          "declaration": {
+            "name": "HelixTableRow",
+            "module": "src/table/row/table-row.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-table-row",
+          "declaration": {
+            "name": "HelixTableRow",
+            "module": "src/table/row/table-row.ts"
           }
         }
       ]
@@ -6744,13 +6554,14 @@
             },
             {
               "kind": "field",
-              "name": "href",
+              "name": "link",
               "type": {
-                "text": "string"
+                "text": "boolean"
               },
-              "default": "''",
-              "description": "Makes the item a link rather than a radio.",
-              "attribute": "href",
+              "default": "false",
+              "description": "Whether the consumer supplies the interactive element.\n\nDeclared rather than detected, because detection would have to read the\nassigned nodes and the server cannot: it would render the radio, then swap\nto a slot on upgrade, which is a nested anchor inside a button for as long\nas that takes.",
+              "attribute": "link",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseToggle",
                 "module": "src/toggle/root/toggle-root.ts"
@@ -6787,6 +6598,20 @@
               }
             },
             {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private",
+              "description": "The element that takes focus: the radio, or whatever was slotted.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToggle",
+                "module": "src/toggle/root/toggle-root.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "focusItem",
               "return": {
@@ -6815,6 +6640,17 @@
               "type": {
                 "text": "select() => void"
               },
+              "inheritedFrom": {
+                "name": "HelixBaseToggle",
+                "module": "src/toggle/root/toggle-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleHostClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Announces a press on the consumer's own element.\n\nOnly in the `link` form: the radio form has its own listener, and a second\none on the host would fire the event twice for one press.",
               "inheritedFrom": {
                 "name": "HelixBaseToggle",
                 "module": "src/toggle/root/toggle-root.ts"
@@ -6895,13 +6731,13 @@
               }
             },
             {
-              "name": "href",
+              "name": "link",
               "type": {
-                "text": "string"
+                "text": "boolean"
               },
-              "default": "''",
-              "description": "Makes the item a link rather than a radio.",
-              "fieldName": "href",
+              "default": "false",
+              "description": "Whether the consumer supplies the interactive element.\n\nDeclared rather than detected, because detection would have to read the\nassigned nodes and the server cannot: it would render the radio, then swap\nto a slot on upgrade, which is a nested anchor inside a button for as long\nas that takes.",
+              "fieldName": "link",
               "inheritedFrom": {
                 "name": "HelixBaseToggle",
                 "module": "src/toggle/root/toggle-root.ts"
@@ -7245,326 +7081,6 @@
           "declaration": {
             "name": "HelixToolbar",
             "module": "src/toolbar/root/toolbar-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/tree/root/tree-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/tree/root/tree-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/tree/root/tree-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Quiet by default: no rules between rows and no fill except on the selected\nitem. A navigation tree is read by scanning, and every line of chrome added\nto it is one more thing between the reader and the label.",
-          "name": "HelixTree",
-          "cssProperties": [
-            {
-              "description": "Indent added per level.",
-              "name": "--tree-indent"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The tree container.",
-              "name": "tree",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            }
-          ],
-          "slots": [
-            {
-              "description": "The tree's items.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Tree'",
-              "description": "Accessible name for the tree.",
-              "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the selected item, kept in step with the items themselves.",
-              "attribute": "value",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "items",
-              "type": {
-                "text": "HelixBaseTreeItem[]"
-              },
-              "privacy": "private",
-              "description": "Every item, in the order a reader moving down would meet them.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "visibleItems",
-              "type": {
-                "text": "HelixBaseTreeItem[]"
-              },
-              "privacy": "private",
-              "description": "Items a reader can actually reach: not inside a collapsed branch.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleSelection",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "syncItems",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Pushes tree-owned state down: which item is selected, which holds the tab\nstop, and how deep each one sits.\n\nDepth is computed here rather than by each item counting its own ancestors,\nso an item moved in the tree gets the right indent without knowing it moved.",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "move",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "from",
-                  "type": {
-                    "text": "HelixBaseTreeItem"
-                  }
-                },
-                {
-                  "name": "delta",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ],
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "focusOn",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "item",
-                  "type": {
-                    "text": "HelixBaseTreeItem | undefined"
-                  }
-                }
-              ],
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixSelectionChangeEvent"
-              },
-              "description": "Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.",
-              "name": "SelectionChange",
-              "reactProp": "onSelectionChange",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseTree",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A tree of items, navigable entirely from the keyboard.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/tree",
-            "aliases": [
-              "FileTree",
-              "Navigation tree"
-            ],
-            "tier": "styled",
-            "group": "Tree",
-            "part": "Root"
-          },
-          "tagName": "helix-tree",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Tree'",
-              "description": "Accessible name for the tree.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the selected item, kept in step with the items themselves.",
-              "fieldName": "value",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/tree/root/tree-root.ts",
-          "definitionPath": "src/tree/root/tree-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixTree",
-          "declaration": {
-            "name": "HelixTree",
-            "module": "src/tree/root/tree-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-tree",
-          "declaration": {
-            "name": "HelixTree",
-            "module": "src/tree/root/tree-root.ts"
           }
         }
       ]
@@ -7951,6 +7467,326 @@
           "declaration": {
             "name": "HelixTreeItem",
             "module": "src/tree/item/tree-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tree/root/tree-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/tree/root/tree-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tree/root/tree-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Quiet by default: no rules between rows and no fill except on the selected\nitem. A navigation tree is read by scanning, and every line of chrome added\nto it is one more thing between the reader and the label.",
+          "name": "HelixTree",
+          "cssProperties": [
+            {
+              "description": "Indent added per level.",
+              "name": "--tree-indent"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The tree container.",
+              "name": "tree",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The tree's items.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Tree'",
+              "description": "Accessible name for the tree.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Value of the selected item, kept in step with the items themselves.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "HelixBaseTreeItem[]"
+              },
+              "privacy": "private",
+              "description": "Every item, in the order a reader moving down would meet them.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "visibleItems",
+              "type": {
+                "text": "HelixBaseTreeItem[]"
+              },
+              "privacy": "private",
+              "description": "Items a reader can actually reach: not inside a collapsed branch.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSelection",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "syncItems",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Pushes tree-owned state down: which item is selected, which holds the tab\nstop, and how deep each one sits.\n\nDepth is computed here rather than by each item counting its own ancestors,\nso an item moved in the tree gets the right indent without knowing it moved.",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "move",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "from",
+                  "type": {
+                    "text": "HelixBaseTreeItem"
+                  }
+                },
+                {
+                  "name": "delta",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "focusOn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "HelixBaseTreeItem | undefined"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectionChangeEvent"
+              },
+              "description": "Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.",
+              "name": "SelectionChange",
+              "reactProp": "onSelectionChange",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTree",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A tree of items, navigable entirely from the keyboard.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tree",
+            "aliases": [
+              "FileTree",
+              "Navigation tree"
+            ],
+            "tier": "styled",
+            "group": "Tree",
+            "part": "Root"
+          },
+          "tagName": "helix-tree",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Tree'",
+              "description": "Accessible name for the tree.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Value of the selected item, kept in step with the items themselves.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/tree/root/tree-root.ts",
+          "definitionPath": "src/tree/root/tree-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTree",
+          "declaration": {
+            "name": "HelixTree",
+            "module": "src/tree/root/tree-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-tree",
+          "declaration": {
+            "name": "HelixTree",
+            "module": "src/tree/root/tree-root.ts"
           }
         }
       ]

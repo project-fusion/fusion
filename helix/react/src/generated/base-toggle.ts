@@ -10,22 +10,29 @@ import type {
 } from '@helix-io/headless'
 
 /**
- * Renders an `<a>` when given an `href` and a `<button role="radio">`
-otherwise, which is what lets one component serve both a set of options and a
-navigation bar without either being a lie. A nav item that announces itself
-as a radio is wrong, and so is a link that cannot be opened in a new tab.
+ * Renders a `<button role="radio">`, or nothing at all when `link` is set and
+the consumer supplies their own interactive element.
 
-The selected item carries `aria-current="page"` in the link form and
-`aria-checked` in the radio form, because those are the words each context
-uses for the same idea.
+**It never renders an anchor.** A framework's router has to render its own
+`<a>` to intercept a click, and it cannot render one inside this component's
+shadow root, so a component that renders the anchor itself forces every
+navigation to be a full page load. Wrapping the router's link in this one
+instead nests an anchor inside an anchor. So the component styles the element
+it is given: `link` says the consumer brings the interactive element, and
+this renders a bare slot around it.
+
+Roving `tabindex` applies only to the radio form. A set of links is not a
+composite widget, and taking every link but one out of the tab order would be
+wrong for a navigation landmark; arrow keys still move between them, because
+the group calls `focusItem`.
  *
  * Renders `<helix-base-toggle>`.
  */
 export interface BaseToggleProps extends BaseProps {
   /** Whether the item can be chosen. */
   disabled?: boolean
-  /** Makes the item a link rather than a radio. */
-  href?: string
+  /** Whether the consumer supplies the interactive element. Declared rather than detected, because detection would have to read the assigned nodes and the server cannot: it would render the radio, then swap to a slot on upgrade, which is a nested anchor inside a button for as long as that takes. */
+  link?: boolean
   /** Whether this item is the current one. */
   selected?: boolean
   /** Identifies the item to the group. */
@@ -36,7 +43,7 @@ export interface BaseToggleProps extends BaseProps {
 
 export const BaseToggleRoot = createComponent<HelixBaseToggle, BaseToggleProps>({
   events: { SelectionChange: 'onSelectionChange' },
-  properties: ['disabled', 'selected'],
+  properties: ['disabled', 'link', 'selected'],
   tagName: 'helix-base-toggle',
 })
 
