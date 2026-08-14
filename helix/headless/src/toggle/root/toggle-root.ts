@@ -6,31 +6,22 @@ import { property } from 'lit/decorators.js'
  * @summary One option in a toggle group.
  *
  * @description
- * Renders a `<button role="radio">`, or nothing at all when `link` is set and
- * the consumer supplies their own interactive element.
+ * Renders a `<button role="radio">`. This is a form control and nothing else.
  *
- * **It never renders an anchor.** A framework's router has to render its own
- * `<a>` to intercept a click, and it cannot render one inside this component's
- * shadow root, so a component that renders the anchor itself forces every
- * navigation to be a full page load. Wrapping the router's link in this one
- * instead nests an anchor inside an anchor. So the component styles the element
- * it is given: `link` says the consumer brings the interactive element, and
- * this renders a bare slot around it.
- *
- * Roving `tabindex` applies only to the radio form. A set of links is not a
- * composite widget, and taking every link but one out of the tab order would be
- * wrong for a navigation landmark; arrow keys still move between them, because
- * the group calls `focusItem`.
+ * It used to serve navigation too, behind a `nav` attribute on the group, and
+ * that was two components wearing one name. Navigation is links marked with
+ * `aria-current`, styled by the `data-nav-item` recipe in the base layer; it
+ * only ever borrowed this component's *look*. Borrowing radio semantics for it
+ * would have announced a set of destinations as a set of choices.
  *
  * @since 0.1.0
  * @status experimental
  * @aliases Segment, NavItem, Option
  * @documentation https://helix.fusion.dev/components/toggle
  *
- * @slot - The item's label, or the consumer's own link when `link` is set.
+ * @slot - The item's label.
  *
- * @csspart item - The radio button. Absent in the `link` form, where the
- * consumer's own element is the item and is styled through `::slotted`.
+ * @csspart item - The radio button.
  *
  * @event {HelixSelectionChangeEvent} SelectionChange - Fired when the item is chosen.
  */
@@ -40,17 +31,6 @@ export class HelixBaseToggle extends HelixElement {
   @property()
   value = ''
 
-  /**
-   * Whether the consumer supplies the interactive element.
-   *
-   * Declared rather than detected, because detection would have to read the
-   * assigned nodes and the server cannot: it would render the radio, then swap
-   * to a slot on upgrade, which is a nested anchor inside a button for as long
-   * as that takes.
-   */
-  @property({ reflect: true, type: Boolean })
-  link = false
-
   /** Whether this item is the current one. */
   @property({ reflect: true, type: Boolean })
   selected = false
@@ -59,18 +39,9 @@ export class HelixBaseToggle extends HelixElement {
   @property({ reflect: true, type: Boolean })
   disabled = false
 
-  /** The element that takes focus: the radio, or whatever was slotted. */
-  private get target(): HTMLElement | undefined {
-    if (!this.link) {
-      return this.renderRoot.querySelector<HTMLElement>('[part="item"]') ?? undefined
-    }
-    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot')
-    return slot?.assignedElements()[0] as HTMLElement | undefined
-  }
-
   /** Moves focus to this item. */
   focusItem(): void {
-    this.target?.focus()
+    this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
   }
 
   /** Chooses this item and announces it. */
@@ -81,33 +52,7 @@ export class HelixBaseToggle extends HelixElement {
     this.dispatchEvent(new HelixSelectionChangeEvent({ value: this.value }))
   }
 
-  /**
-   * Announces a press on the consumer's own element.
-   *
-   * Only in the `link` form: the radio form has its own listener, and a second
-   * one on the host would fire the event twice for one press.
-   */
-  private readonly handleHostClick = (): void => {
-    if (this.link) {
-      this.select()
-    }
-  }
-
-  override connectedCallback(): void {
-    super.connectedCallback()
-    this.addEventListener('click', this.handleHostClick)
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    this.removeEventListener('click', this.handleHostClick)
-  }
-
   protected override render(): TemplateResult {
-    if (this.link) {
-      return html`<slot></slot>`
-    }
-
     return html`<button
       part="item"
       type="button"

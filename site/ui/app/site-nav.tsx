@@ -11,11 +11,12 @@ import { VERTICALS } from './verticals'
 /**
  * Site navigation: the verticals, centred in the banner.
  *
- * A toggle group in `nav` mode, so the items are real links inside a navigation
- * landmark and the selection is marked by an indicator that travels between
- * them. Not tabs: a tab controls a panel and announces itself inside a
- * `tablist`, and these are routes. The moving marker was the part that was
- * wanted, and it does not need the wrong semantics to get.
+ * Plain links inside the header's own `<nav>`, marked with `aria-current` and
+ * styled by the `data-nav-item` recipe. Not tabs, because a tab controls a
+ * panel and announces itself inside a `tablist`, and these are routes. Not a
+ * toggle group either, which is a radio group and would announce a set of
+ * destinations as a set of choices. The look was the only part navigation ever
+ * wanted from either.
  *
  * The current item comes from the pathname, so it is right on a cold load of
  * any URL rather than only after a click.
@@ -60,15 +61,17 @@ export function SiteNav() {
           </helix-flex>
         </a>
 
-        {!narrow && (
-          <helix-toggle-group label="Verticals" nav value={current}>
-            {VERTICALS.map((vertical) => (
-              <helix-toggle key={vertical.href} link value={vertical.href}>
-                <Link href={vertical.href}>{vertical.label}</Link>
-              </helix-toggle>
-            ))}
-          </helix-toggle-group>
-        )}
+        {!narrow &&
+          VERTICALS.map((vertical) => (
+            <Link
+              aria-current={current === vertical.href ? 'page' : undefined}
+              data-nav-item
+              href={vertical.href}
+              key={vertical.href}
+            >
+              {vertical.label}
+            </Link>
+          ))}
 
         <helix-icon-button
           label="Preferences"

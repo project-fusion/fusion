@@ -15,8 +15,6 @@ one fill appearing as another disappears.
 export interface ToggleProps extends BaseProps {
   /** Whether the item can be chosen. */
   disabled?: boolean
-  /** Whether the consumer supplies the interactive element. Declared rather than detected, because detection would have to read the assigned nodes and the server cannot: it would render the radio, then swap to a slot on upgrade, which is a nested anchor inside a button for as long as that takes. */
-  link?: boolean
   /** Whether this item is the current one. */
   selected?: boolean
   /** Identifies the item to the group. */
@@ -27,7 +25,7 @@ export interface ToggleProps extends BaseProps {
 
 export const ToggleRoot = createComponent<HelixToggle, ToggleProps>({
   events: { SelectionChange: 'onSelectionChange' },
-  properties: ['disabled', 'link', 'selected'],
+  properties: ['disabled', 'selected'],
   tagName: 'helix-toggle',
 })
 
@@ -49,8 +47,6 @@ export interface ToggleGroupProps extends BaseProps {
   appearance?: 'filled' | 'plain'
   /** Accessible name for the group. */
   label?: string
-  /** Renders items as links in a navigation landmark rather than as radios. */
-  nav?: boolean
   /** Height and inset of the items. */
   size?: 'sm' | 'md'
   /** Value of the selected item. */
@@ -61,7 +57,7 @@ export interface ToggleGroupProps extends BaseProps {
 
 export const ToggleGroup = createComponent<HelixToggleGroup, ToggleGroupProps>({
   events: { SelectionChange: 'onSelectionChange' },
-  properties: ['nav'],
+  properties: [],
   tagName: 'helix-toggle-group',
 })
 

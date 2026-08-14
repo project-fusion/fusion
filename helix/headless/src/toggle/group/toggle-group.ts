@@ -23,10 +23,12 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  * has somewhere to be, which is the harmless direction: it appears rather than
  * jumping from a wrong place.
  *
- * `nav` makes the group a navigation landmark whose items are links, rather
- * than a radio group. A set of page links that announces itself as a radio
- * group is a lie, and it is the reason this exists rather than tabs being bent
- * to the purpose: a tab controls a panel.
+ * A radio group, and only that. It carried a `nav` mode once, which made the
+ * same element a navigation landmark of links, and that was two components
+ * sharing a name: navigation borrowed the look and would have had to borrow
+ * radio semantics with it, announcing a set of destinations as a set of
+ * choices. Navigation is the `data-nav-item` recipe now. A tab was never the
+ * answer either, in that direction: a tab controls a panel.
  *
  * @since 0.1.0
  * @status experimental
@@ -48,10 +50,6 @@ export class HelixBaseToggleGroup extends HelixElement {
   /** Value of the selected item. */
   @property()
   value = ''
-
-  /** Renders items as links in a navigation landmark rather than as radios. */
-  @property({ reflect: true, type: Boolean })
-  nav = false
 
   private observer: ResizeObserver | undefined
 
@@ -153,9 +151,7 @@ export class HelixBaseToggleGroup extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    // `nav` swaps the template branch, which builds a fresh indicator with no
-    // geometry on it, so it has to be measured again.
-    if (changed.has('value') || changed.has('nav')) {
+    if (changed.has('value')) {
       this.place()
     }
   }
@@ -165,14 +161,13 @@ export class HelixBaseToggleGroup extends HelixElement {
     // Through internals, so nothing lands on the host as an attribute. A nav
     // renders a real `<nav>` in the shadow root and takes its semantics from
     // that, so the host stays neutral.
-    this.internals.role = this.nav ? null : 'radiogroup'
-    this.internals.ariaLabel = this.nav ? null : this.label
+    this.internals.role = 'radiogroup'
+    this.internals.ariaLabel = this.label
   }
 
   protected override render(): TemplateResult {
-    const items = html`<div part="indicator" aria-hidden="true"></div>
+    return html`<div part="indicator" aria-hidden="true"></div>
       <slot @slotchange=${() => this.place()}></slot>`
-    return this.nav ? html`<nav aria-label=${this.label}>${items}</nav>` : items
   }
 }
 

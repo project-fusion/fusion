@@ -21,11 +21,6 @@
   padding: var(--helix-space-2xs);
 }
 
-:host([nav]) nav {
-  display: inline-flex;
-  gap: var(--helix-space-2xs);
-}
-
 /* One marker that travels. Its geometry is measured from the selected item and
    written onto this element, because labels differ in length and no fraction of
    the group is right for all of them.
@@ -59,12 +54,6 @@
    a wrong place on first paint. */
 [part="indicator"][data-placed] {
   opacity: 1;
-}
-
-/* Navigation sits on the page rather than in a panel, so its thumb takes the
-   page's own raised surface and keeps the shadow that lifts it off the track. */
-:host([nav]) [part="indicator"] {
-  background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
 }
 
 @media (prefers-reduced-motion: reduce) {
