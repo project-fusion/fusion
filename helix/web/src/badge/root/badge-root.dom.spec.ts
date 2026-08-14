@@ -19,19 +19,30 @@ describe('badge', () => {
     expect(part(badge, 'indicator')?.textContent?.trim()).toBe('3')
   })
 
-  test('no value renders no indicator, because zero does not look like this', async () => {
-    const badge = await mount('<helix-badge><span>x</span></helix-badge>')
+  test('a value that counts nothing renders no mark at all', async () => {
+    const badge = await mount('<helix-badge value="0"><span>x</span></helix-badge>')
     expect(part(badge, 'indicator')).toBeNull()
   })
 
+  test('no value leaves an empty indicator, which is what `:empty` draws as a dot', async () => {
+    // Shape follows content, so the dot is the indicator with nothing in it.
+    // Lit's marker comments do not count against `:empty`, but a whitespace
+    // text node would, so the check is on the text and not just the node.
+    const badge = await mount('<helix-badge label="3 unread"><span>x</span></helix-badge>')
+    const indicator = part(badge, 'indicator')
+    expect(indicator).not.toBeNull()
+    expect(indicator?.textContent).toBe('')
+    expect(indicator?.matches(':empty')).toBe(true)
+  })
+
   test('a dot with a label announces it, and one without says nothing at all', async () => {
-    // A bare coloured circle tells a sighted reader there is something new and
+    // A bare colored circle tells a sighted reader there is something new and
     // tells everyone else there is not.
-    const named = await mount('<helix-badge dot label="3 unread"><span>x</span></helix-badge>')
+    const named = await mount('<helix-badge label="3 unread"><span>x</span></helix-badge>')
     expect(part(named, 'indicator')?.getAttribute('aria-label')).toBe('3 unread')
     expect(part(named, 'indicator')?.getAttribute('role')).toBe('status')
 
-    const bare = await mount('<helix-badge dot><span>x</span></helix-badge>')
+    const bare = await mount('<helix-badge><span>x</span></helix-badge>')
     expect(part(bare, 'indicator')?.getAttribute('aria-hidden')).toBe('true')
   })
 })

@@ -165,15 +165,23 @@ Attaches a count or a presence mark to another element, pinned to its corner.
 
 #### Properties
 
-| Property | Attribute | Type                   | Default | Inherited From | Description                                 |
-| -------- | --------- | ---------------------- | ------- | -------------- | ------------------------------------------- |
-| `dot`    | `dot`     | `boolean`              | `false` | -              | Shows a presence mark with no text.         |
-| `label`  | `label`   | `string`               | `''`    | -              | Accessible name. Required for a dot.        |
+| Property | Attribute | Type                  | Default | Inherited From | Description                                 |
+| -------- | --------- | --------------------- | ------- | -------------- | ------------------------------------------- |
+| `label`  | `label`   | `string`              | `''`    | -              | Accessible name. Required for a dot.        |
 | `max`    | `max`     | `number \| undefined` | -       | -              | Cap for a numeric value. Past it, `{max}+`. |
-| `value`  | `value`   | `string`               | `''`    | -              | The count or short text to show.            |
+| `value`  | `value`   | `string`              | `''`    | -              | The count or short text to show.            |
 
-A dot with no `label` is hidden from assistive technology. With no `value` and
-no `dot`, no indicator is rendered at all.
+`value` decides the mark, and there is no property for its shape:
+
+| `value`            | Mark                |
+| ------------------ | ------------------- |
+| absent             | A dot.              |
+| reads as zero      | None.               |
+| anything else      | The value, capped by `max`. |
+
+The dot is the indicator with nothing in it, drawn by
+`[part="indicator"]:empty`. An indicator with no `label` is hidden from
+assistive technology.
 
 #### Slots
 

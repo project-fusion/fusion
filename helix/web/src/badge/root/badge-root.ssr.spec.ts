@@ -10,7 +10,19 @@ describe('badge server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    const markup = ssr(html`<helix-badge dot label="new">x</helix-badge>`)
-    expect(hostAttributes(markup, 'helix-badge')).toEqual(['dot', 'label'])
+    const markup = ssr(html`<helix-badge label="new">x</helix-badge>`)
+    expect(hostAttributes(markup, 'helix-badge')).toEqual(['label'])
+  })
+
+  test('the dot is empty in the server markup, so `:empty` holds before upgrade', () => {
+    // A whitespace text node inside the indicator would defeat the selector,
+    // and the server is where that would first show.
+    const markup = withoutStyles(ssr(html`<helix-badge label="new">x</helix-badge>`))
+    expect(markup).toMatch(/<span[^>]*part="indicator"[^>]*>(<!--[^>]*-->)*<\/span/)
+  })
+
+  test('a value that counts nothing renders no indicator', () => {
+    const markup = withoutStyles(ssr(html`<helix-badge value="0">x</helix-badge>`))
+    expect(markup).not.toContain('part="indicator"')
   })
 })

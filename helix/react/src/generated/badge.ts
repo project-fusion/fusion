@@ -15,19 +15,17 @@ on a dark icon reads as a bite taken out of the icon.
 export interface BadgeProps extends BaseProps {
   /** How much attention the mark asks for. */
   appearance?: 'primary' | 'neutral'
-  /** Shows a presence mark with no text. `value` is ignored. */
-  dot?: boolean
   /** Accessible name. Required for a dot, which has no text to read. */
   label?: string
   /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
   max?: number
-  /** The count or short text to show. */
+  /** The count or short text to show. Absent shows a dot, zero shows nothing. */
   value?: string
 }
 
 export const BadgeRoot = createComponent<HelixBadge, BadgeProps>({
   events: {},
-  properties: ['dot'],
+  properties: [],
   tagName: 'helix-badge',
 })
 
