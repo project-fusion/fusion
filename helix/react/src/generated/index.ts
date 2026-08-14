@@ -30,6 +30,11 @@ export {
   BaseBreadcrumbsRoot,
 } from './base-breadcrumbs.js'
 export { BaseButton, type BaseButtonProps, BaseButtonRoot } from './base-button.js'
+export {
+  BaseButtonGroup,
+  type BaseButtonGroupProps,
+  BaseButtonGroupRoot,
+} from './base-button-group.js'
 export { BaseCallout, type BaseCalloutProps, BaseCalloutRoot } from './base-callout.js'
 export { BaseCard, type BaseCardProps, BaseCardRoot } from './base-card.js'
 export { BaseDivider, type BaseDividerProps, BaseDividerRoot } from './base-divider.js'
@@ -98,6 +103,7 @@ export {
   BreadcrumbsRoot,
 } from './breadcrumbs.js'
 export { Button, type ButtonProps, ButtonRoot } from './button.js'
+export { ButtonGroup, type ButtonGroupProps, ButtonGroupRoot } from './button-group.js'
 export { Callout, type CalloutProps, CalloutRoot } from './callout.js'
 export { Card, type CardProps, CardRoot } from './card.js'
 export { Divider, type DividerProps, DividerRoot } from './divider.js'

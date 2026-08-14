@@ -1,0 +1,17 @@
+:host {
+  display: inline-flex;
+}
+
+/* Each button after the first is pulled onto its neighbour's border, so the two
+   share one line rather than drawing two against each other. */
+::slotted(*:not(:first-child)) {
+  margin-inline-start: calc(var(--helix-border-thin) * -1);
+}
+
+/* A hovered or focused button has to draw above its neighbours, or the border
+   it lights up is half covered by the one overlapping it. */
+::slotted(*:hover),
+::slotted(*:focus-within) {
+  position: relative;
+  z-index: 1;
+}

@@ -10,6 +10,7 @@ import type {
   HelixBreadcrumb,
   HelixBreadcrumbs,
   HelixButton,
+  HelixButtonGroup,
   HelixCallout,
   HelixCard,
   HelixDismissEvent,
@@ -574,6 +575,27 @@ export type HelixBreadcrumbSolidJsProps = {
 export type HelixBreadcrumbsProps = {};
 
 export type HelixBreadcrumbsSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixButtonGroupProps = {
+  /** Accessible name for the group.
+
+On the host through internals, so an author's `aria-label` still overrides
+it and nothing lands on the host that a consumer's markup did not have. */
+  label?: HelixButtonGroup["label"];
+};
+
+export type HelixButtonGroupSolidJsProps = {
+  /** Accessible name for the group.
+
+On the host through internals, so an author's `aria-label` still overrides
+it and nothing lands on the host that a consumer's markup did not have. */
+  "prop:label"?: HelixButtonGroup["label"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -1975,6 +1997,34 @@ export type CustomElements = {
    */
   "helix-breadcrumbs": Partial<
     HelixBreadcrumbsProps & BaseProps<HelixBreadcrumbs> & BaseEvents
+  >;
+
+  /**
+   * The buttons are joined into a single shape: the outer corners keep their
+   * radius, the inner ones lose it, and adjacent borders collapse into one line.
+   *
+   * That joining is in the base layer, paired with `data-button` the way the
+   * button's own box is, because the corner belongs to the control inside each
+   * button's shadow root and a rule in here cannot reach it. The same rule
+   * therefore serves a consumer's own anchor styled as a button.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the group.
+   *
+   * On the host through internals, so an author's `aria-label` still overrides
+   * it and nothing lands on the host that a consumer's markup did not have.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The buttons in the group.
+   */
+  "helix-button-group": Partial<
+    HelixButtonGroupProps & BaseProps<HelixButtonGroup> & BaseEvents
   >;
 
   /**
@@ -3649,6 +3699,37 @@ export type CustomElementsSolidJs = {
     HelixBreadcrumbsProps &
       HelixBreadcrumbsSolidJsProps &
       BaseProps<HelixBreadcrumbs> &
+      BaseEvents
+  >;
+
+  /**
+   * The buttons are joined into a single shape: the outer corners keep their
+   * radius, the inner ones lose it, and adjacent borders collapse into one line.
+   *
+   * That joining is in the base layer, paired with `data-button` the way the
+   * button's own box is, because the corner belongs to the control inside each
+   * button's shadow root and a rule in here cannot reach it. The same rule
+   * therefore serves a consumer's own anchor styled as a button.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the group.
+   *
+   * On the host through internals, so an author's `aria-label` still overrides
+   * it and nothing lands on the host that a consumer's markup did not have.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The buttons in the group.
+   */
+  "helix-button-group": Partial<
+    HelixButtonGroupProps &
+      HelixButtonGroupSolidJsProps &
+      BaseProps<HelixButtonGroup> &
       BaseEvents
   >;
 
