@@ -48,3 +48,9 @@
 [part="editor"] .cm-editor.cm-focused {
   outline: none;
 }
+
+/* A read-only pane still shows a cursor, because a reader puts one where they
+   are reading. What it does not show is a caret colour that says "type here". */
+:host([read-only]) [part="editor"] .cm-cursor {
+  border-left-color: var(--helix-color-foreground-subtle);
+}

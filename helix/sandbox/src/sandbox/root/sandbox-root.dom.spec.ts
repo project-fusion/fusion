@@ -288,6 +288,39 @@ describe('sandbox source editing', () => {
     expect(field.value).toBe('x')
   })
 
+  describe('sandbox panes', () => {
+    test('a pane the preview does not know about drives nothing', async () => {
+      // The rule was that `css` is the stylesheet and anything else is markup,
+      // which held while there were two panes. A third one showing the example as
+      // JSX announced itself the same way, and the preview rendered the text of a
+      // React component as though it were markup.
+      const sandbox = (await mount(`
+      <helix-sandbox>
+        <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="tsx" value="export function Example() {}"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+      </helix-sandbox>`)) as Updatable
+      const preview = sandbox.querySelector('helix-sandbox-preview') as HTMLElement & {
+        source: string
+        styles: string
+      }
+      await sandbox.updateComplete
+
+      const jsx = sandbox.querySelectorAll('helix-sandbox-source')[1] as HTMLElement & {
+        value: string
+      }
+      jsx.dispatchEvent(
+        new CustomEvent('helix-change', {
+          bubbles: true,
+          composed: true,
+          detail: { name: 'tsx', value: 'export function Example() {}' },
+        }),
+      )
+      await sandbox.updateComplete
+      expect(preview.source).not.toContain('export function')
+    })
+  })
+
   describe('sandbox dividers', () => {
     test('the panel dividers appear only when there is a panel to size', async () => {
       // There is no asking in CSS, `:host(:has([slot="panel"]))` being invalid,

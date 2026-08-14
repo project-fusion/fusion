@@ -3,7 +3,12 @@
 // The editor is on its own path: it carries CodeMirror, and the site's
 // element registration runs on every page.
 import '@helix-io/sandbox/editor'
-import type { HelixSandboxPreview, HelixSandboxTerminal } from '@helix-io/sandbox'
+import {
+  type HelixSandbox,
+  type HelixSandboxPreview,
+  type HelixSandboxTerminal,
+  htmlToJsx,
+} from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type { HelixDrawer, HelixToggleGroup, HelixTree } from '@helix-io/web'
 import Link from 'next/link'
@@ -23,6 +28,16 @@ interface Props {
   families: Family[]
 }
 
+/** The files a sandbox shows. */
+type Pane = 'html' | 'tsx' | 'css'
+
+/** What each file is called and how it is highlighted. */
+const FILES: { label: string; language: 'css' | 'html' | 'tsx'; value: Pane }[] = [
+  { label: 'index.html', language: 'html', value: 'html' },
+  { label: 'Example.tsx', language: 'tsx', value: 'tsx' },
+  { label: 'styles.css', language: 'css', value: 'css' },
+]
+
 const resolve = (families: Family[], familySlug: string | null, exampleSlug: string | null) => {
   const withExamples = families.filter((entry) => entry.examples.length > 0)
   const family =
@@ -36,11 +51,13 @@ export function SandboxWorkbench({ families }: Props) {
   const files = useRef<HelixToggleGroup>(null)
   const treeRef = useRef<HelixTree>(null)
   const rail = useRef<HelixDrawer>(null)
+  const sandbox = useRef<HelixSandbox>(null)
   const terminal = useRef<HelixSandboxTerminal>(null)
   const editors = useRef<Record<string, HelixSandboxEditor | null>>({})
   const [familySlug, setFamilySlug] = useState<string | null>(null)
   const [exampleSlug, setExampleSlug] = useState<string | null>(null)
-  const [pane, setPane] = useState<'html' | 'css'>('html')
+  const [pane, setPane] = useState<Pane>('html')
+  const [markup, setMarkup] = useState('')
   const [previewTheme, setPreviewTheme] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
   const [railOpen, setRailOpen] = useState(false)
@@ -88,7 +105,14 @@ export function SandboxWorkbench({ families }: Props) {
   // attach custom-element listeners when it hydrates, so the prop form leaves
   // both of these dead on a freshly loaded page. See `useHelixEvent`.
   useHelixEvent(files, 'helix-select', (event) => {
-    setPane(event.detail.value as 'html' | 'css')
+    setPane(event.detail.value as Pane)
+  })
+  // The JSX view is a rendering of the markup, so it follows what is typed
+  // rather than what the example shipped with.
+  useHelixEvent(sandbox, 'helix-change', (event) => {
+    if (event.detail.name === 'html') {
+      setMarkup(event.detail.value)
+    }
   })
   useHelixEvent(treeRef, 'helix-select', (event) => {
     select(event.detail.value)
@@ -101,6 +125,9 @@ export function SandboxWorkbench({ families }: Props) {
   })
 
   useEffect(() => {
+    if (example) {
+      setMarkup(example.html)
+    }
     if (preview.current && example) {
       preview.current.source = example.html
       preview.current.styles = ''
@@ -181,7 +208,11 @@ export function SandboxWorkbench({ families }: Props) {
       </helix-flex>
 
       <div className="workbenchBody">
-        <helix-sandbox orientation={narrow ? 'vertical' : 'horizontal'} split={narrow ? 50 : 45}>
+        <helix-sandbox
+          orientation={narrow ? 'vertical' : 'horizontal'}
+          ref={sandbox}
+          split={narrow ? 50 : 45}
+        >
           {/* One declaration for the region, rather than `size="sm"` on each
               control in it. Nothing inside can be missed, and adding a control
               later cannot forget. */}
@@ -192,8 +223,11 @@ export function SandboxWorkbench({ families }: Props) {
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
             <helix-toggle-group appearance="plain" label="Files" ref={files} value={pane}>
-              <helix-toggle value="html">index.html</helix-toggle>
-              <helix-toggle value="css">styles.css</helix-toggle>
+              {FILES.map((file) => (
+                <helix-toggle key={file.value} value={file.value}>
+                  {file.label}
+                </helix-toggle>
+              ))}
             </helix-toggle-group>
 
             {/* The Environment drilldown belongs here and waits on `helix-menu`
@@ -230,6 +264,25 @@ export function SandboxWorkbench({ families }: Props) {
                 value={example.html}
               ></helix-sandbox-editor>
             </div>
+
+            {/* Derived from the markup, not a second copy of it: two authored
+                files drift the first time one is edited, and the sandbox would
+                be showing a component it is not previewing. Read-only for the
+                same reason, and because nothing here compiles TSX. */}
+            <div data-file hidden={pane !== 'tsx'}>
+              <helix-sandbox-editor
+                field-label="Example as JSX, derived from the markup"
+                key={`${activeValue}-tsx`}
+                language="tsx"
+                name="tsx"
+                read-only
+                ref={(node: HelixSandboxEditor | null) => {
+                  editors.current.tsx = node
+                }}
+                value={htmlToJsx(markup)}
+              ></helix-sandbox-editor>
+            </div>
+
             <div data-file hidden={pane !== 'css'}>
               <helix-sandbox-editor
                 field-label="Example stylesheet"

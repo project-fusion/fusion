@@ -36,9 +36,12 @@ const PANEL_MAX = 0.8
  * whatever preview is slotted into it. Neither child knows the other exists, so
  * either can be replaced or used alone.
  *
- * The event carries the pane's `name`, which is what lets one sandbox hold a
- * markup pane and a stylesheet pane without the root identifying senders by
- * reference. `css` becomes the preview's stylesheet; anything else is markup.
+ * The event carries the pane's `name`, which is what lets one sandbox hold
+ * several panes without the root identifying senders by reference. `html` is
+ * the preview's markup and `css` is its stylesheet. A pane named anything else
+ * is showing something rather than driving it, and is ignored: the sandbox has
+ * a pane rendering the example as JSX, and guessing would have put the text of
+ * a React component into the preview.
  *
  * The split is a real `role="separator"` with `aria-valuenow`, movable by
  * pointer and by arrow keys, because a divider that only responds to dragging
@@ -152,6 +155,14 @@ export class HelixSandbox extends HelixElement {
       return
     }
     const { name, value } = (event as HelixChangeEvent).detail
+    // Named, not guessed. The rule was that `css` is the stylesheet and
+    // anything else is markup, which was true while there were two panes and
+    // wrong the moment there was a third: a pane showing the example as JSX
+    // announced itself the same way, and the preview rendered the text of a
+    // React component as though it were markup.
+    if (name !== 'css' && name !== 'html') {
+      return
+    }
     for (const preview of this.previews) {
       if (name === 'css') {
         preview.styles = value

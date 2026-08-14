@@ -76,6 +76,18 @@ export class HelixSandboxEditor extends HelixElement {
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
 
+  /**
+   * Whether the text can be changed.
+   *
+   * `EditorState.readOnly` rather than removing the editor's focus or its
+   * keymap: a reader still needs to select the text, scroll it, and put a
+   * cursor in it to read a long line. What it stops is the typing.
+   */
+  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  readOnly = false
+
+  private readonly readOnly$ = new Compartment()
+
   private view: EditorView | undefined
   private readonly language$ = new Compartment()
 
@@ -116,6 +128,7 @@ export class HelixSandboxEditor extends HelixElement {
           keymap.of([...defaultKeymap, ...historyKeymap]),
           syntaxHighlighting(highlightStyle, { fallback: true }),
           this.language$.of(LANGUAGES[this.language]()),
+          this.readOnly$.of(EditorState.readOnly.of(this.readOnly)),
           EditorView.lineWrapping,
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
@@ -163,6 +176,12 @@ export class HelixSandboxEditor extends HelixElement {
 
     if (changed.has('language')) {
       view.dispatch({ effects: this.language$.reconfigure(LANGUAGES[this.language]()) })
+    }
+
+    if (changed.has('readOnly')) {
+      view.dispatch({
+        effects: this.readOnly$.reconfigure(EditorState.readOnly.of(this.readOnly)),
+      })
     }
 
     // Only when it differs, or an edit would be dispatched back into the

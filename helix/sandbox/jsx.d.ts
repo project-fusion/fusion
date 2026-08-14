@@ -227,6 +227,18 @@ export type HelixSandboxEditorProps = {
   "field-label"?: HelixSandboxEditor["fieldLabel"];
   /** Accessible name for the editable region. */
   fieldLabel?: HelixSandboxEditor["fieldLabel"];
+  /** Whether the text can be changed.
+
+`EditorState.readOnly` rather than removing the editor's focus or its
+keymap: a reader still needs to select the text, scroll it, and put a
+cursor in it to read a long line. What it stops is the typing. */
+  "read-only"?: HelixSandboxEditor["readOnly"];
+  /** Whether the text can be changed.
+
+`EditorState.readOnly` rather than removing the editor's focus or its
+keymap: a reader still needs to select the text, scroll it, and put a
+cursor in it to read a long line. What it stops is the typing. */
+  readOnly?: HelixSandboxEditor["readOnly"];
 
   /** Fired when the source is edited. */
   "onhelix-change"?: (e: HelixSandboxEditorHelixChangeElementEvent) => void;
@@ -245,6 +257,18 @@ export type HelixSandboxEditorSolidJsProps = {
   "attr:field-label"?: HelixSandboxEditor["fieldLabel"];
   /** Accessible name for the editable region. */
   "prop:fieldLabel"?: HelixSandboxEditor["fieldLabel"];
+  /** Whether the text can be changed.
+
+`EditorState.readOnly` rather than removing the editor's focus or its
+keymap: a reader still needs to select the text, scroll it, and put a
+cursor in it to read a long line. What it stops is the typing. */
+  "bool:read-only"?: HelixSandboxEditor["readOnly"];
+  /** Whether the text can be changed.
+
+`EditorState.readOnly` rather than removing the editor's focus or its
+keymap: a reader still needs to select the text, scroll it, and put a
+cursor in it to read a long line. What it stops is the typing. */
+  "prop:readOnly"?: HelixSandboxEditor["readOnly"];
   /** Fired when the source is edited. */
   "on:helix-change"?: (e: HelixSandboxEditorHelixChangeElementEvent) => void;
   /** Fired when the cursor moves, with its line and column. */
@@ -519,6 +543,11 @@ export type CustomElements = {
    * - `name`: Which source this pane holds, echoed in every change.
    * - `language`: How to highlight it.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `read-only`/`readOnly`: Whether the text can be changed.
+   *
+   * `EditorState.readOnly` rather than removing the editor's focus or its
+   * keymap: a reader still needs to select the text, scroll it, and put a
+   * cursor in it to read a long line. What it stops is the typing.
    * - `caret`: Where the cursor is, counted from one, as an editor reports it. (property only) (readonly)
    *
    * ## Events
@@ -612,9 +641,12 @@ export type CustomElements = {
    * whatever preview is slotted into it. Neither child knows the other exists, so
    * either can be replaced or used alone.
    *
-   * The event carries the pane's `name`, which is what lets one sandbox hold a
-   * markup pane and a stylesheet pane without the root identifying senders by
-   * reference. `css` becomes the preview's stylesheet; anything else is markup.
+   * The event carries the pane's `name`, which is what lets one sandbox hold
+   * several panes without the root identifying senders by reference. `html` is
+   * the preview's markup and `css` is its stylesheet. A pane named anything else
+   * is showing something rather than driving it, and is ignored: the sandbox has
+   * a pane rendering the example as JSX, and guessing would have put the text of
+   * a React component into the preview.
    *
    * The split is a real `role="separator"` with `aria-valuenow`, movable by
    * pointer and by arrow keys, because a divider that only responds to dragging
@@ -916,6 +948,11 @@ export type CustomElementsSolidJs = {
    * - `name`: Which source this pane holds, echoed in every change.
    * - `language`: How to highlight it.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `read-only`/`readOnly`: Whether the text can be changed.
+   *
+   * `EditorState.readOnly` rather than removing the editor's focus or its
+   * keymap: a reader still needs to select the text, scroll it, and put a
+   * cursor in it to read a long line. What it stops is the typing.
    * - `caret`: Where the cursor is, counted from one, as an editor reports it. (property only) (readonly)
    *
    * ## Events
@@ -1015,9 +1052,12 @@ export type CustomElementsSolidJs = {
    * whatever preview is slotted into it. Neither child knows the other exists, so
    * either can be replaced or used alone.
    *
-   * The event carries the pane's `name`, which is what lets one sandbox hold a
-   * markup pane and a stylesheet pane without the root identifying senders by
-   * reference. `css` becomes the preview's stylesheet; anything else is markup.
+   * The event carries the pane's `name`, which is what lets one sandbox hold
+   * several panes without the root identifying senders by reference. `html` is
+   * the preview's markup and `css` is its stylesheet. A pane named anything else
+   * is showing something rather than driving it, and is ignored: the sandbox has
+   * a pane rendering the example as JSX, and guessing would have put the text of
+   * a React component into the preview.
    *
    * The split is a real `role="separator"` with `aria-valuenow`, movable by
    * pointer and by arrow keys, because a divider that only responds to dragging
