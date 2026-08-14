@@ -340,7 +340,7 @@ helix-text[tone="danger"] {
 helix-button::part(button) {
   align-items: center;
   background-color: var(--helix-color-surface);
-  block-size: var(--helix-size-control);
+  block-size: var(--helix-size-control-md);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground);
@@ -426,14 +426,14 @@ helix-button[appearance="danger"]::part(button) {
 /* `md` is absent, because it is the height a control is. */
 [data-button-size="sm"],
 helix-button[size="sm"]::part(button) {
-  block-size: var(--helix-size-control-dense);
+  block-size: var(--helix-size-control-sm);
   font-size: var(--helix-text-xs);
   padding-inline: var(--helix-space-sm);
 }
 
 [data-button-size="lg"],
 helix-button[size="lg"]::part(button) {
-  block-size: var(--helix-size-control-large);
+  block-size: var(--helix-size-control-lg);
   font-size: var(--helix-text-md);
   padding-inline: var(--helix-space-lg);
 }

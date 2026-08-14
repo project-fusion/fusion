@@ -1,5 +1,5 @@
 :host {
-  --_avatar-size: var(--avatar-size, var(--helix-size-control));
+  --_avatar-size: var(--avatar-size, var(--helix-size-control-md));
 
   align-items: center;
   background-color: var(--avatar-background-color, var(--helix-color-primary-subtle));
@@ -14,11 +14,11 @@
 }
 
 :host([size="sm"]) {
-  --_avatar-size: var(--avatar-size, var(--helix-size-control-dense));
+  --_avatar-size: var(--avatar-size, var(--helix-size-control-sm));
 }
 
 :host([size="lg"]) {
-  --_avatar-size: var(--avatar-size, var(--helix-size-control-large));
+  --_avatar-size: var(--avatar-size, var(--helix-size-control-lg));
 }
 
 :host([shape="square"]) {

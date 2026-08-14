@@ -12,13 +12,13 @@
   font-weight: var(--helix-weight-medium);
   inline-size: 100%;
   justify-content: space-between;
-  min-block-size: var(--helix-size-control);
+  min-block-size: var(--helix-size-control-md);
   padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 :host([dense]) [part="trigger"] {
-  min-block-size: var(--helix-size-control-dense);
+  min-block-size: var(--helix-size-control-sm);
 }
 
 /* Rotation rather than a swapped glyph: opening is a short movement, not a

@@ -19,7 +19,7 @@
   padding-inline: var(--_tag-inset);
   white-space: nowrap;
 
-  --_tag-height: var(--helix-size-tag);
+  --_tag-height: var(--helix-size-tag-md);
 
   /* Every appearance is one status color, tinted for the fill and used at full
      strength for the label. Deriving beats a token per status: the alternative
@@ -46,8 +46,12 @@
   --_tag-color: var(--helix-color-danger);
 }
 
+:host([size="lg"]) {
+  --_tag-height: var(--helix-size-tag-lg);
+}
+
 :host([size="sm"]) {
-  --_tag-height: var(--helix-size-tag-dense);
+  --_tag-height: var(--helix-size-tag-sm);
   --_tag-inset: var(--helix-space-2xs);
   --_tag-text: var(--helix-text-xs);
 }

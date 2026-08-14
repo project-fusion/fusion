@@ -27,7 +27,7 @@ import { styles } from './checkbox-root.css.js'
 export class HelixCheckbox extends HelixBaseCheckbox {
   /** Height of the control and the type beside it. */
   @property({ reflect: true })
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
 
   static override styles: CSSResultGroup = styles
 }

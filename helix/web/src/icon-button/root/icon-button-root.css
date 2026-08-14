@@ -1,15 +1,15 @@
 :host {
   display: inline-flex;
 
-  --_icon-button-size: var(--icon-button-size, var(--helix-size-control));
+  --_icon-button-size: var(--icon-button-size, var(--helix-size-control-md));
 }
 
 :host([size="sm"]) {
-  --_icon-button-size: var(--icon-button-size, var(--helix-size-control-dense));
+  --_icon-button-size: var(--icon-button-size, var(--helix-size-control-sm));
 }
 
 :host([size="lg"]) {
-  --_icon-button-size: var(--icon-button-size, var(--helix-size-control-large));
+  --_icon-button-size: var(--icon-button-size, var(--helix-size-control-lg));
 }
 
 /* Square by construction: one dimension for both axes, so the control stays a

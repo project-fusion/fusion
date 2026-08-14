@@ -4,11 +4,15 @@
   display: inline-flex;
   gap: var(--helix-space-xs);
 
-  --_checkbox-size: var(--checkbox-size, 1.125rem);
+  --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox-md));
 }
 
 :host([size="sm"]) {
-  --_checkbox-size: var(--checkbox-size, 1rem);
+  --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox-sm));
+}
+
+:host([size="lg"]) {
+  --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox-lg));
 }
 
 :host([disabled]) {

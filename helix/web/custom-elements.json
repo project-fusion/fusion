@@ -5535,7 +5535,7 @@
               "kind": "field",
               "name": "size",
               "type": {
-                "text": "'sm' | 'md' | undefined"
+                "text": "'sm' | 'md' | 'lg' | undefined"
               },
               "description": "Height of the control and the type beside it.",
               "attribute": "size",
@@ -5951,7 +5951,7 @@
             {
               "name": "size",
               "type": {
-                "text": "'sm' | 'md' | undefined"
+                "text": "'sm' | 'md' | 'lg' | undefined"
               },
               "description": "Height of the control and the type beside it.",
               "fieldName": "size"
@@ -9961,7 +9961,7 @@
               "kind": "field",
               "name": "size",
               "type": {
-                "text": "'sm' | 'lg' | undefined"
+                "text": "'sm' | 'md' | 'lg' | undefined"
               },
               "description": "Diameter relative to the surrounding text.",
               "attribute": "size",
@@ -10055,7 +10055,7 @@
             {
               "name": "size",
               "type": {
-                "text": "'sm' | 'lg' | undefined"
+                "text": "'sm' | 'md' | 'lg' | undefined"
               },
               "description": "Diameter relative to the surrounding text.",
               "fieldName": "size"
@@ -12118,7 +12118,7 @@
               "kind": "field",
               "name": "size",
               "type": {
-                "text": "'sm' | 'md' | undefined"
+                "text": "'sm' | 'md' | 'lg' | undefined"
               },
               "description": "Height and inset of the tag.",
               "attribute": "size",
@@ -12259,7 +12259,7 @@
             {
               "name": "size",
               "type": {
-                "text": "'sm' | 'md' | undefined"
+                "text": "'sm' | 'md' | 'lg' | undefined"
               },
               "description": "Height and inset of the tag.",
               "fieldName": "size"
@@ -12631,7 +12631,7 @@
               "kind": "field",
               "name": "size",
               "type": {
-                "text": "'sm' | 'md' | undefined"
+                "text": "'sm' | 'md' | 'lg' | undefined"
               },
               "description": "Height and inset of the items.",
               "attribute": "size",
@@ -12807,7 +12807,7 @@
             {
               "name": "size",
               "type": {
-                "text": "'sm' | 'md' | undefined"
+                "text": "'sm' | 'md' | 'lg' | undefined"
               },
               "description": "Height and inset of the items.",
               "fieldName": "size"

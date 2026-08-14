@@ -35,7 +35,7 @@ export class HelixTag extends HelixBaseTag {
 
   /** Height and inset of the tag. */
   @property({ reflect: true })
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
 
   static override styles: CSSResultGroup = styles
 }

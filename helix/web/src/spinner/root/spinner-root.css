@@ -7,15 +7,15 @@
   /* Tokens, so a spinner is the same size wherever it is placed. Set
      `--spinner-size: 1em` for one that should match the text beside it, which
      is the case inside a button. */
-  --_spinner-size: var(--helix-size-spinner);
+  --_spinner-size: var(--helix-size-spinner-md);
 }
 
 :host([size="sm"]) {
-  --_spinner-size: var(--helix-size-spinner-dense);
+  --_spinner-size: var(--helix-size-spinner-sm);
 }
 
 :host([size="lg"]) {
-  --_spinner-size: var(--helix-size-spinner-large);
+  --_spinner-size: var(--helix-size-spinner-lg);
 }
 
 [part="svg"] {

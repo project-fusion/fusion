@@ -4,7 +4,7 @@
 
 [part="nav"] {
   align-items: center;
-  block-size: var(--helix-size-control-dense);
+  block-size: var(--helix-size-control-sm);
   display: flex;
   gap: var(--nav-bar-gap, var(--helix-space-2xs));
   /* Long navigation scrolls inside the bar instead of widening the page. */

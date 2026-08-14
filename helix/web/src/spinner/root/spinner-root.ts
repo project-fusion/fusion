@@ -26,7 +26,7 @@ import { styles } from './spinner-root.css.js'
 export class HelixSpinner extends HelixBaseSpinner {
   /** Diameter relative to the surrounding text. */
   @property({ reflect: true })
-  size?: 'sm' | 'lg'
+  size?: 'sm' | 'md' | 'lg'
 
   static override styles: CSSResultGroup = styles
 }

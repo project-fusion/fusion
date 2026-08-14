@@ -52,13 +52,13 @@
 
 [part="dismiss"] {
   all: unset;
-  block-size: var(--helix-size-control-dense);
+  block-size: var(--helix-size-control-sm);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
-  inline-size: var(--helix-size-control-dense);
+  inline-size: var(--helix-size-control-sm);
   place-content: center;
   place-items: center;
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);

@@ -37,7 +37,7 @@ export class HelixToggleGroup extends HelixBaseToggleGroup {
 
   /** Height and inset of the items. */
   @property({ reflect: true })
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
 
   static override styles: CSSResultGroup = styles
 }

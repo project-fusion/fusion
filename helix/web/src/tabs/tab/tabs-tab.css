@@ -14,7 +14,7 @@
   /* The height a control is. A tab was as tall as its own text plus whatever
      padding the appearance asked for, which came out at 31px next to a 40px
      button and made a toolbar look assembled from parts. */
-  block-size: var(--helix-size-control);
+  block-size: var(--helix-size-control-md);
   border: none;
   border-block-end: var(--helix-border-thick) solid transparent;
   border-radius: var(--_tab-radius, var(--helix-radii-none));
