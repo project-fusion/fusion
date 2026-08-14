@@ -5,7 +5,7 @@
 import '@helix-io/sandbox/editor'
 import type { HelixSandboxPreview, HelixSandboxTerminal } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
-import type { HelixDrawer, HelixTabs, HelixTree } from '@helix-io/web'
+import type { HelixDrawer, HelixToggleGroup, HelixTree } from '@helix-io/web'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
@@ -33,7 +33,7 @@ const resolve = (families: Family[], familySlug: string | null, exampleSlug: str
 
 export function SandboxWorkbench({ families }: Props) {
   const preview = useRef<HelixSandboxPreview>(null)
-  const tabs = useRef<HelixTabs>(null)
+  const files = useRef<HelixToggleGroup>(null)
   const treeRef = useRef<HelixTree>(null)
   const rail = useRef<HelixDrawer>(null)
   const terminal = useRef<HelixSandboxTerminal>(null)
@@ -87,7 +87,7 @@ export function SandboxWorkbench({ families }: Props) {
   // Bound through an effect, not an `onhelix-select` prop. React does not
   // attach custom-element listeners when it hydrates, so the prop form leaves
   // both of these dead on a freshly loaded page. See `useHelixEvent`.
-  useHelixEvent(tabs, 'helix-select', (event) => {
+  useHelixEvent(files, 'helix-select', (event) => {
     setPane(event.detail.value as 'html' | 'css')
   })
   useHelixEvent(treeRef, 'helix-select', (event) => {
@@ -171,40 +171,56 @@ export function SandboxWorkbench({ families }: Props) {
           </helix-text>
         </helix-flex>
 
-        <helix-toolbar label="Sandbox actions">
-          <helix-button
-            appearance="subtle"
-            onClick={() => setPreviewTheme(previewTheme === 'light' ? 'dark' : 'light')}
-            size="sm"
-          >
-            {previewTheme === 'light' ? 'Light' : 'Dark'}
+        {/* The sandbox's own actions live in its toolbar now. What stays here
+            is the one control that is about the page rather than the sandbox. */}
+        {narrow && (
+          <helix-button appearance="subtle" onClick={() => setRailOpen(true)} size="sm">
+            Examples
           </helix-button>
-          <helix-button appearance="subtle" onClick={share} size="sm">
-            {copied ? 'Copied' : 'Share'}
-          </helix-button>
-          <Link
-            data-button="subtle"
-            data-button-size="sm"
-            href={`/design/components/${family.slug}`}
-          >
-            API
-          </Link>
-          {narrow && (
-            <helix-button appearance="subtle" onClick={() => setRailOpen(true)} size="sm">
-              Examples
-            </helix-button>
-          )}
-        </helix-toolbar>
+        )}
       </helix-flex>
 
       <div className="workbenchBody">
         <helix-sandbox orientation={narrow ? 'vertical' : 'horizontal'} split={narrow ? 50 : 45}>
-          {/* Panels stay mounted and hidden, so switching files does not
-              discard what was typed in the other. */}
-          <helix-tabs className="sourceTabs" label="Files" ref={tabs} slot="source" value={pane}>
-            <helix-tabs-tab value="html">index.html</helix-tabs-tab>
-            <helix-tabs-tab value="css">styles.css</helix-tabs-tab>
-            <helix-tabs-panel slot="panels" value="html">
+          <helix-sandbox-toolbar slot="toolbar">
+            {/* A toggle group, not a tab list. A tab in the toolbar would carry
+                `aria-controls` for a panel down in the source pane, and an
+                IDREF cannot leave the tab's shadow root to reach it: the
+                component's own note is that pointing at nothing is worse than
+                not pointing. This is a choice among files, and it says so. */}
+            <helix-toggle-group label="Files" ref={files} value={pane}>
+              <helix-toggle value="html">index.html</helix-toggle>
+              <helix-toggle value="css">styles.css</helix-toggle>
+            </helix-toggle-group>
+
+            {/* The Environment drilldown belongs here and waits on `helix-menu`
+                and `helix-popover`. These are the actions that exist today. */}
+            <helix-toolbar label="Sandbox actions" slot="end">
+              <helix-button
+                appearance="subtle"
+                onClick={() => setPreviewTheme(previewTheme === 'light' ? 'dark' : 'light')}
+                size="sm"
+              >
+                {previewTheme === 'light' ? 'Light' : 'Dark'}
+              </helix-button>
+              <helix-button appearance="subtle" onClick={share} size="sm">
+                {copied ? 'Copied' : 'Share'}
+              </helix-button>
+              <Link
+                data-button="subtle"
+                data-button-size="sm"
+                href={`/design/components/${family.slug}`}
+              >
+                API
+              </Link>
+            </helix-toolbar>
+          </helix-sandbox-toolbar>
+
+          {/* Both stay mounted, so switching files does not discard what was
+              typed in the other, and they share one cell so the hidden one
+              costs no height. */}
+          <div className="sourceFiles" slot="source">
+            <div data-file hidden={pane !== 'html'}>
               <helix-sandbox-editor
                 field-label="Example markup"
                 key={`${activeValue}-html`}
@@ -215,8 +231,8 @@ export function SandboxWorkbench({ families }: Props) {
                 }}
                 value={example.html}
               ></helix-sandbox-editor>
-            </helix-tabs-panel>
-            <helix-tabs-panel slot="panels" value="css">
+            </div>
+            <div data-file hidden={pane !== 'css'}>
               <helix-sandbox-editor
                 field-label="Example stylesheet"
                 key={`${activeValue}-css`}
@@ -227,8 +243,8 @@ export function SandboxWorkbench({ families }: Props) {
                 }}
                 value=""
               ></helix-sandbox-editor>
-            </helix-tabs-panel>
-          </helix-tabs>
+            </div>
+          </div>
 
           <helix-sandbox-preview
             data-color-mode={previewTheme}

@@ -44,6 +44,7 @@ const MAX = 85
  *
  * @slot source - The editable source pane.
  * @slot preview - The live preview.
+ * @slot toolbar - A bar across the top, spanning both panes.
  * @slot panel - A panel under both panes, usually a terminal.
  * @slot status - A status bar, spanning both panes at the bottom.
  *
@@ -285,7 +286,8 @@ export class HelixSandbox extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`<style id="split"></style>
-      <div part="pane"><slot name="source"></slot></div>
+      <slot name="toolbar"></slot>
+      <div part="pane" data-pane="source"><slot name="source"></slot></div>
       <div
         part="separator"
         role="separator"

@@ -4,17 +4,21 @@
 
 /* A rule under the active tab rather than a filled pill: the row stays flat,
    and the underline reads as one mark moving rather than two fills swapping. */
+/* The defaults here are the underline look. A tab set asking for the segmented
+   one sets these from its host, and they inherit in. */
 [part="tab"] {
-  background: none;
+  background-color: var(--_tab-surface, transparent);
   border: none;
   border-block-end: var(--helix-border-thick) solid transparent;
+  border-radius: var(--_tab-radius, var(--helix-radii-none));
   color: var(--helix-color-foreground-subtle);
   cursor: pointer;
   font: inherit;
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
-  padding: var(--helix-space-xs) var(--helix-space-sm);
+  padding: var(--_tab-padding-block, var(--helix-space-xs)) var(--helix-space-sm);
   transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard);
   white-space: nowrap;
@@ -25,7 +29,9 @@
 }
 
 :host([selected]) [part="tab"] {
-  border-block-end-color: var(--helix-color-primary);
+  background-color: var(--_tab-selected-surface, transparent);
+  border-block-end-color: var(--_tab-selected-rule, var(--helix-color-primary));
+  box-shadow: var(--_tab-selected-shadow, none);
   color: var(--helix-color-foreground);
 }
 

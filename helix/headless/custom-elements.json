@@ -7966,6 +7966,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'toggle' | undefined"
+              },
+              "description": "How the row reads.\n\nUnset is a row of underlines. `toggle` is a segmented control: a framed,\nsunken track with the selected tab raised inside it, which is what a set of\nfiles or modes wants when it sits in a toolbar rather than above a page.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -8117,6 +8127,14 @@
             }
           ],
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'toggle' | undefined"
+              },
+              "description": "How the row reads.\n\nUnset is a row of underlines. `toggle` is a segmented control: a framed,\nsunken track with the selected tab raised inside it, which is what a set of\nfiles or modes wants when it sits in a toolbar rather than above a page.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
+              "fieldName": "appearance"
+            },
             {
               "name": "label",
               "type": {

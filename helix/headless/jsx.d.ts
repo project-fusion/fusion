@@ -1281,6 +1281,15 @@ export type HelixBaseTabsHelixSelectElementEvent =
   HelixBaseTabsElementEvent<HelixSelectEvent>;
 
 export type HelixBaseTabsProps = {
+  /** How the row reads.
+
+Unset is a row of underlines. `toggle` is a segmented control: a framed,
+sunken track with the selected tab raised inside it, which is what a set of
+files or modes wants when it sits in a toolbar rather than above a page.
+
+Reflected and left unset by default, so the host carries nothing a
+consumer's server markup does not already have. */
+  appearance?: HelixBaseTabs["appearance"];
   /** Accessible name for the tab list. */
   label?: HelixBaseTabs["label"];
   /** Value of the selected tab. */
@@ -1297,6 +1306,15 @@ panels on the way. */
 };
 
 export type HelixBaseTabsSolidJsProps = {
+  /** How the row reads.
+
+Unset is a row of underlines. `toggle` is a segmented control: a framed,
+sunken track with the selected tab raised inside it, which is what a set of
+files or modes wants when it sits in a toolbar rather than above a page.
+
+Reflected and left unset by default, so the host carries nothing a
+consumer's server markup does not already have. */
+  "prop:appearance"?: HelixBaseTabs["appearance"];
   /** Accessible name for the tab list. */
   "prop:label"?: HelixBaseTabs["label"];
   /** Value of the selected tab. */
@@ -3096,6 +3114,14 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: How the row reads.
+   *
+   * Unset is a row of underlines. `toggle` is a segmented control: a framed,
+   * sunken track with the selected tab raised inside it, which is what a set of
+   * files or modes wants when it sits in a toolbar rather than above a page.
+   *
+   * Reflected and left unset by default, so the host carries nothing a
+   * consumer's server markup does not already have.
    * - `label`: Accessible name for the tab list.
    * - `value`: Value of the selected tab.
    * - `manual`: Whether arrowing to a tab also selects it.
@@ -5040,6 +5066,14 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: How the row reads.
+   *
+   * Unset is a row of underlines. `toggle` is a segmented control: a framed,
+   * sunken track with the selected tab raised inside it, which is what a set of
+   * files or modes wants when it sits in a toolbar rather than above a page.
+   *
+   * Reflected and left unset by default, so the host carries nothing a
+   * consumer's server markup does not already have.
    * - `label`: Accessible name for the tab list.
    * - `value`: Value of the selected tab.
    * - `manual`: Whether arrowing to a tab also selects it.

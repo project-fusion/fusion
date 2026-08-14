@@ -1,0 +1,27 @@
+:host {
+  align-items: center;
+  background-color: var(--helix-color-surface);
+  /* The line under the bar, and the only line at that boundary: the panes below
+     draw none of their own. */
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  min-block-size: 0;
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+}
+
+/* Each region is a flex row of its own, which is what lets the gap live inside
+   it. A `gap` on the host instead would space the two regions apart, and an
+   empty end slot would still take one of them: a bar with nothing at its end
+   would carry a stray gap where the nothing is. */
+slot {
+  align-items: center;
+  display: flex;
+  gap: var(--toolbar-gap, var(--helix-space-sm));
+  min-inline-size: 0;
+}
+
+/* The free space between the two ends. On the slot rather than on what was
+   slotted into it, so it applies once however many items the end holds. */
+slot[name="end"] {
+  margin-inline-start: auto;
+}

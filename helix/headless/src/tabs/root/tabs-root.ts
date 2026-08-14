@@ -35,6 +35,19 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'Home', 'End'])
  */
 @customElement('helix-base-tabs')
 export class HelixBaseTabs extends HelixElement {
+  /**
+   * How the row reads.
+   *
+   * Unset is a row of underlines. `toggle` is a segmented control: a framed,
+   * sunken track with the selected tab raised inside it, which is what a set of
+   * files or modes wants when it sits in a toolbar rather than above a page.
+   *
+   * Reflected and left unset by default, so the host carries nothing a
+   * consumer's server markup does not already have.
+   */
+  @property({ reflect: true })
+  appearance?: 'toggle'
+
   /** Accessible name for the tab list. */
   @property()
   label = 'Tabs'

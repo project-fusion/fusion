@@ -23,11 +23,47 @@
 :host(:not([orientation])),
 :host([orientation="horizontal"]) {
   grid-template-columns: var(--_sandbox-split, 45%) auto minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
 }
 
 :host([orientation="vertical"]) {
-  grid-template-rows: var(--_sandbox-split, 45%) auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto var(--_sandbox-split, 45%) auto minmax(0, 1fr) auto auto;
+}
+
+/* The panes and the divider sit in the row under the toolbar, and in the split
+   rows when the sandbox is stacked. */
+:host(:not([orientation])) [part="pane"],
+:host(:not([orientation])) [part="separator"],
+:host([orientation="horizontal"]) [part="pane"],
+:host([orientation="horizontal"]) [part="separator"] {
+  grid-row: 2;
+}
+
+:host(:not([orientation])) [part="pane"][data-pane="source"],
+:host([orientation="horizontal"]) [part="pane"][data-pane="source"] {
+  grid-column: 1;
+}
+
+:host(:not([orientation])) [part="separator"],
+:host([orientation="horizontal"]) [part="separator"] {
+  grid-column: 2;
+}
+
+:host(:not([orientation])) [part="pane"][data-pane="preview"],
+:host([orientation="horizontal"]) [part="pane"][data-pane="preview"] {
+  grid-column: 3;
+}
+
+:host([orientation="vertical"]) [part="pane"][data-pane="source"] {
+  grid-row: 2;
+}
+
+:host([orientation="vertical"]) [part="separator"] {
+  grid-row: 3;
+}
+
+:host([orientation="vertical"]) [part="pane"][data-pane="preview"] {
+  grid-row: 4;
 }
 
 /* Both panes must be allowed to shrink below their content, or a wide preview
@@ -80,16 +116,23 @@
   user-select: none;
 }
 
-/* Both run under the panes and the divider between them. Selected by the slot
-   they were put in rather than by tag, because what goes in the panel is
-   whatever holds its tabs, and the sandbox has no business naming it.
+/* The full-width regions, placed rather than left to auto-placement: a spanning
+   item and an auto-placed one in the same grid is a arrangement that changes
+   shape whenever a region is added or left out. Selected by the slot they were
+   put in rather than by tag, because what goes in the toolbar or the panel is
+   whatever holds its contents, and the sandbox has no business naming it.
 
-   Both slots are bare, so with nothing in them there is no box, the `auto`
-   tracks collapse to zero, and a sandbox with neither is the height it always
-   was. */
+   Every one of these slots is bare, so with nothing in it there is no box, its
+   `auto` track collapses to zero, and a sandbox without it is the height it
+   always was. */
+::slotted([slot="toolbar"]),
 ::slotted([slot="panel"]),
 ::slotted([slot="status"]) {
   grid-column: 1 / -1;
+}
+
+::slotted([slot="toolbar"]) {
+  grid-row: 1;
 }
 
 /* The panel's own height, and the line above it. The line belongs to this

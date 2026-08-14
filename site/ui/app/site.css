@@ -322,27 +322,29 @@ helix-app-header {
   padding: var(--helix-space-sm);
 }
 
-/* The editor pane fills the tab set and scrolls inside it. Everything that
-   used to be here, the grid on the host, the grid on `::part(panels)`, and the
-   stacking of the panel hosts, moved into `helix-tabs` itself: a tab set given
-   a height should be that height, and panels that are not showing should cost
-   nothing, whoever is using it. */
-.sourceTabs {
+/* The files share one cell, so the one that is hidden costs no height and the
+   one that shows fills the pane. `minmax(0, 1fr)` rather than `1fr`, because a
+   `1fr` track keeps an automatic minimum and refuses to shrink under its
+   content: the editor would push the pane taller instead of scrolling in it. */
+.sourceFiles {
   block-size: 100%;
-
-  --sandbox-source-min-block-size: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
 }
 
-/* Sizing only, and deliberately no `display`. A `::part` rule from this
-   document outranks the component's own, so setting `display` here would beat
-   the `[part="panel"][hidden] { display: none }` that hides the inactive file
-   and both would render at once. */
-.sourceTabs helix-tabs-panel::part(panel) {
-  block-size: 100%;
-  padding-block-start: 0;
+.sourceFiles [data-file] {
+  display: grid;
+  grid-area: 1 / 1;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
 }
 
-.sourceTabs helix-sandbox-source {
+.sourceFiles [data-file][hidden] {
+  display: none;
+}
+
+.sourceFiles helix-sandbox-editor {
   min-block-size: 0;
 }
 

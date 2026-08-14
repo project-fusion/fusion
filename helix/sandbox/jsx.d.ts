@@ -9,6 +9,7 @@ import type {
   HelixSandboxSpecs,
   HelixSandboxStatusBar,
   HelixSandboxTerminal,
+  HelixSandboxToolbar,
 } from '@helix-io/sandbox';
 
 /**
@@ -459,6 +460,15 @@ export type HelixSandboxTerminalSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixSandboxToolbarProps = {};
+
+export type HelixSandboxToolbarSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type CustomElements = {
   /**
    * CodeMirror, not a `<textarea>`. The textarea it replaces was the right call
@@ -600,6 +610,7 @@ export type CustomElements = {
    *
    * - `source`: The editable source pane.
    * - `preview`: The live preview.
+   * - `toolbar`: A bar across the top, spanning both panes.
    * - `panel`: A panel under both panes, usually a terminal.
    * - `status`: A status bar, spanning both panes at the bottom.
    *
@@ -821,6 +832,35 @@ export type CustomElements = {
   "helix-sandbox-terminal": Partial<
     HelixSandboxTerminalProps & BaseProps<HelixSandboxTerminal> & BaseEvents
   >;
+
+  /**
+   * Spans the source pane and the preview together, so what it holds is about the
+   * sandbox rather than about one side of it. The files go at the start and the
+   * menus at the end, which is the arrangement every editor has settled on.
+   *
+   * **Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
+   * for the whole group, and it is for a set of controls of the same kind. This
+   * holds a tab list, which owns its own arrow-key behaviour and would lose it.
+   * Use `helix-toolbar` where the contents really are a row of buttons.
+   *
+   * Both slots are bare, so an unfilled one generates no box and costs no gap.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Items at the start, usually the files.
+   * - `end`: Items at the end, usually menus.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toolbar-gap`: Space between items. (default: `undefined`)
+   */
+  "helix-sandbox-toolbar": Partial<
+    HelixSandboxToolbarProps & BaseProps<HelixSandboxToolbar> & BaseEvents
+  >;
 };
 
 export type CustomElementsSolidJs = {
@@ -970,6 +1010,7 @@ export type CustomElementsSolidJs = {
    *
    * - `source`: The editable source pane.
    * - `preview`: The live preview.
+   * - `toolbar`: A bar across the top, spanning both panes.
    * - `panel`: A panel under both panes, usually a terminal.
    * - `status`: A status bar, spanning both panes at the bottom.
    *
@@ -1206,6 +1247,38 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixSandboxTerminal> &
       BaseEvents
   >;
+
+  /**
+   * Spans the source pane and the preview together, so what it holds is about the
+   * sandbox rather than about one side of it. The files go at the start and the
+   * menus at the end, which is the arrangement every editor has settled on.
+   *
+   * **Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
+   * for the whole group, and it is for a set of controls of the same kind. This
+   * holds a tab list, which owns its own arrow-key behaviour and would lose it.
+   * Use `helix-toolbar` where the contents really are a row of buttons.
+   *
+   * Both slots are bare, so an unfilled one generates no box and costs no gap.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Items at the start, usually the files.
+   * - `end`: Items at the end, usually menus.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toolbar-gap`: Space between items. (default: `undefined`)
+   */
+  "helix-sandbox-toolbar": Partial<
+    HelixSandboxToolbarProps &
+      HelixSandboxToolbarSolidJsProps &
+      BaseProps<HelixSandboxToolbar> &
+      BaseEvents
+  >;
 };
 
 export type CustomCssProperties = {
@@ -1225,6 +1298,8 @@ export type CustomCssProperties = {
   "--status-bar-color"?: string;
   /** Height of the scrolling region. */
   "--terminal-size"?: string;
+  /** Space between items. */
+  "--toolbar-gap"?: string;
 };
 
 declare module "react" {
