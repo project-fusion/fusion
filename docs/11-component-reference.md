@@ -463,31 +463,90 @@ consumer's own anchor styled as a button:
 
 ### Root
 
-Description
+Shows a month, and takes a date from it.
+
+A grid of days per the APG date pattern: the whole grid is one tab stop, arrows
+move by day and week, `PageUp` and `PageDown` by month, `Shift` with either by
+a year, and `Home` and `End` to the ends of the week. Only the focused cell is
+in the tab sequence.
+
+Roving `tabindex` is written on the cells, which is free here because they are
+rendered into this shadow root rather than being markup a consumer wrote. That
+is why this needs no `focusable` property, where Toolbar and Tree do.
+
+**Dates are `YYYY-MM-DD` and every calculation is in UTC.** A local-time `Date`
+shifts across a timezone or a daylight-saving boundary, so the same calendar
+would render a different grid depending on where it is read. A month step
+clamps, so the 31st plus a month is the 28th and not the 3rd.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property         | Attribute           | Type                       | Default      | Inherited From | Description                                              |
+| ---------------- | ------------------- | -------------------------- | ------------ | -------------- | -------------------------------------------------------- |
+| `disableDates`   | `disable-dates`     | `string`                   | `''`         | -              | Dates that cannot be chosen, comma separated.            |
+| `disableDays`    | `disable-days`      | `string`                   | `''`         | -              | Days of the week that cannot be chosen, `0` to `6`.      |
+| `firstDayOfWeek` | `first-day-of-week` | `number`                   | `0`          | -              | First column of the week, `0` for Sunday.                |
+| `invalid`        | `invalid`           | `boolean`                  | `false`      | -              | Whether the current selection fails validation.          |
+| `label`          | `label`             | `string`                   | `'Calendar'` | -              | Accessible name for the grid.                            |
+| `locale`         | `locale`            | `string`                   | `''`         | -              | Locale for month and day names.                          |
+| `max`            | `max`               | `string`                   | `''`         | -              | Latest selectable date.                                  |
+| `min`            | `min`               | `string`                   | `''`         | -              | Earliest selectable date.                                |
+| `mode`           | `mode`              | `'range' \| 'multiple'`    | -            | -              | How many dates can be held at once.                      |
+| `month`          | `month`             | `string`                   | `''`         | -              | The month on show, as `YYYY-MM`.                         |
+| `months`         | `months`            | `number`                   | `1`          | -              | How many months to show, side by side.                   |
+| `value`          | `value`             | `string`                   | `''`         | -              | The selected dates, comma separated.                     |
+
+**`mode` decides how many dates `value` holds, and all three read the same
+attribute.** Absent takes one. `range` takes two and marks everything between
+them, starting over on the third click rather than replacing an end at random.
+`multiple` toggles, so clicking a chosen date takes it out.
+
+`month` is separate from `value`, so paging through months selects nothing and
+a consumer can drive the view. Left unset it follows the first selected date,
+and then the current month.
+
+**Set `locale` where output is compared across environments.** Left unset,
+month and day names come from the runtime's own locale, and a server and a
+browser need not agree on what that is.
+
+A date is barred by any of four axes, which compose: `min`, `max`,
+`disableDays` by weekday, and `disableDates` by name. A barred date stays in the
+grid, marked `aria-disabled`, rather than being dropped, so the weeks keep
+their shape.
 
 #### Events
 
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
+| Event          | Type                | Description                                            |
+| -------------- | ------------------- | ------------------------------------------------------ |
+| `helix-select` | `HelixSelectEvent`  | Fired when a date is chosen, carrying the whole `value`. |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+| Part       | Description                              |
+| ---------- | ---------------------------------------- |
+| `months`   | The run of months.                       |
+| `month`    | One month, its header and its grid.      |
+| `header`   | The month name and its controls.         |
+| `previous` | The control that moves back a month.     |
+| `next`     | The control that moves on a month.       |
+| `heading`  | The month and year being shown.          |
+| `grid`     | The grid of days.                        |
+| `weekday`  | A column header naming a day of the week. |
+| `week`     | One row of days.                         |
+| `day`      | One day.                                 |
+
+With more than one month, the controls appear once across the run: back on the
+first, forward on the last. A pair per month would offer several ways to make
+the same move.
+
+A day carries `data-outside` when it belongs to a neighbouring month, and
+`data-range-start` or `data-range-end` at the ends of a range.
+
+### Styled
+
+Days are 30 by 30, sized by `--calendar-day-size`, and six week rows always
+render so the grid keeps one height between months. Days from neighbouring
+months stay in place and stay selectable, marked quieter rather than hidden.
 
 ## BaseCard
 

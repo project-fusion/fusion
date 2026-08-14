@@ -37,6 +37,13 @@ const toUtc = (iso: string): Date | null => {
 
 const toIso = (date: Date): string => date.toISOString().slice(0, 10)
 
+/** Splits a comma-separated attribute, tolerating spaces and empty entries. */
+const list = (value: string): string[] =>
+  value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+
 const addDays = (date: Date, days: number): Date =>
   new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + days))
 
@@ -72,7 +79,17 @@ const addMonths = (date: Date, months: number): Date => {
  *
  * `month` is what the grid shows, separately from `value`, so paging through
  * months does not select anything and a consumer can drive the view. Left
- * unset, it follows the selected date, and then the current month.
+ * unset, it follows the first selected date, and then the current month.
+ *
+ * `mode` decides how many dates are held. Absent takes one. `range` takes two
+ * and marks everything between them, starting over on the third click rather
+ * than replacing an end at random. `multiple` toggles, so clicking a chosen
+ * date takes it out. All three read and write the same comma-separated
+ * `value`.
+ *
+ * `locale` is worth setting where the output is compared across environments.
+ * Left unset, month and day names come from the runtime's own locale, and a
+ * server and a browser need not agree on what that is.
  *
  * @since 0.1.0
  * @status experimental
@@ -81,6 +98,8 @@ const addMonths = (date: Date, months: number): Date => {
  *
  * @event {HelixSelectEvent} helix-select - Fired when a date is chosen, with the ISO date.
  *
+ * @csspart months - The run of months.
+ * @csspart month - One month, its header and its grid.
  * @csspart header - The month name and its controls.
  * @csspart previous - The control that moves to the previous month.
  * @csspart next - The control that moves to the next month.
@@ -92,9 +111,39 @@ const addMonths = (date: Date, months: number): Date => {
  */
 @customElement('helix-base-calendar')
 export class HelixBaseCalendar extends HelixElement {
-  /** The selected date, as `YYYY-MM-DD`. */
+  /**
+   * The selected dates, comma separated, as `YYYY-MM-DD`.
+   *
+   * One date in `single`. Two in `range`, the earlier first. Any number in
+   * `multiple`. One attribute across all three, so a consumer reads and writes
+   * the same thing whatever the mode is.
+   */
   @property()
   value = ''
+
+  /** How many dates can be held at once. */
+  @property({ reflect: true })
+  mode?: 'range' | 'multiple'
+
+  /** How many months to show, side by side. */
+  @property({ type: Number })
+  months = 1
+
+  /** Locale for month and day names. Absent uses the runtime's own. */
+  @property()
+  locale = ''
+
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  @property({ attribute: 'disable-dates' })
+  disableDates = ''
+
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  @property({ attribute: 'disable-days' })
+  disableDays = ''
+
+  /** Whether the current selection fails validation. */
+  @property({ reflect: true, type: Boolean })
+  invalid = false
 
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
   @property()
@@ -113,12 +162,35 @@ export class HelixBaseCalendar extends HelixElement {
   label = 'Calendar'
 
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  @property({ attribute: 'first-day', type: Number })
-  firstDay = 0
+  @property({ attribute: 'first-day-of-week', type: Number })
+  firstDayOfWeek = 0
 
   /** The date the grid's tab stop is on. Absent until the grid is used. */
   @state()
   private focused = ''
+
+  /** The selected dates, in order. */
+  private get selected(): string[] {
+    return list(this.value)
+  }
+
+  /** The range's ends, when there are two and the mode asks for them. */
+  private get range(): [string, string] | null {
+    const dates = this.selected
+    if (this.mode !== 'range' || dates.length < 2) {
+      return null
+    }
+    const [first, second] = [dates[0] as string, dates[1] as string]
+    return first <= second ? [first, second] : [second, first]
+  }
+
+  private isSelected(iso: string): boolean {
+    const range = this.range
+    if (range) {
+      return iso >= range[0] && iso <= range[1]
+    }
+    return this.selected.includes(iso)
+  }
 
   /** The month being shown, resolved from `month`, then `value`, then today. */
   private get shown(): Date {
@@ -126,8 +198,7 @@ export class HelixBaseCalendar extends HelixElement {
     if (explicit) {
       return new Date(Date.UTC(Number(explicit[1]), Number(explicit[2]) - 1, 1))
     }
-    const selected = toUtc(this.value)
-    const from = selected ?? new Date()
+    const from = toUtc(this.selected[0] ?? '') ?? new Date()
     return new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), 1))
   }
 
@@ -146,7 +217,7 @@ export class HelixBaseCalendar extends HelixElement {
    */
   private get anchor(): Date {
     const shown = this.shown
-    for (const candidate of [toUtc(this.focused), toUtc(this.value)]) {
+    for (const candidate of [toUtc(this.focused), toUtc(this.selected[0] ?? '')]) {
       if (candidate && sameMonth(candidate, shown)) {
         return candidate
       }
@@ -154,19 +225,28 @@ export class HelixBaseCalendar extends HelixElement {
     return shown
   }
 
-  /** Six weeks of dates, so the grid does not change height between months. */
-  private get weeks(): Date[][] {
-    const shown = this.shown
-    const offset = (shown.getUTCDay() - this.firstDay + 7) % 7
-    const start = addDays(shown, -offset)
+  /** Six weeks of dates, so a grid does not change height between months. */
+  private weeksOf(month: Date): Date[][] {
+    const offset = (month.getUTCDay() - this.firstDayOfWeek + 7) % 7
+    const start = addDays(month, -offset)
     return Array.from({ length: 6 }, (_, week) =>
       Array.from({ length: 7 }, (_, day) => addDays(start, week * 7 + day)),
     )
   }
 
-  private outOfRange(date: Date): boolean {
+  /** Whether a date is barred, by bound, by weekday, or by name. */
+  private disabled(date: Date): boolean {
     const iso = toIso(date)
-    return (this.min !== '' && iso < this.min) || (this.max !== '' && iso > this.max)
+    if (this.min !== '' && iso < this.min) {
+      return true
+    }
+    if (this.max !== '' && iso > this.max) {
+      return true
+    }
+    if (list(this.disableDays).includes(String(date.getUTCDay()))) {
+      return true
+    }
+    return list(this.disableDates).includes(iso)
   }
 
   private show(date: Date): void {
@@ -181,14 +261,32 @@ export class HelixBaseCalendar extends HelixElement {
     })
   }
 
+  /**
+   * Adds a date to the selection, as the mode allows.
+   *
+   * `range` starts over once it holds two, so a third click begins a new range
+   * rather than extending or replacing an end at random. `multiple` toggles, so
+   * clicking a chosen date takes it out.
+   */
   private select(date: Date): void {
-    if (this.outOfRange(date)) {
+    if (this.disabled(date)) {
       return
     }
     const iso = toIso(date)
-    this.value = iso
+    const held = this.selected
+
+    let next: string[]
+    if (this.mode === 'range') {
+      next = held.length === 1 ? [...held, iso].sort() : [iso]
+    } else if (this.mode === 'multiple') {
+      next = held.includes(iso) ? held.filter((entry) => entry !== iso) : [...held, iso].sort()
+    } else {
+      next = [iso]
+    }
+
+    this.value = next.join(',')
     this.focused = iso
-    this.dispatchEvent(new HelixSelectEvent({ value: iso }))
+    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -208,9 +306,9 @@ export class HelixBaseCalendar extends HelixElement {
     } else if (event.key === 'ArrowDown') {
       this.moveTo(addDays(from, 7))
     } else if (event.key === 'Home') {
-      this.moveTo(addDays(from, -((from.getUTCDay() - this.firstDay + 7) % 7)))
+      this.moveTo(addDays(from, -((from.getUTCDay() - this.firstDayOfWeek + 7) % 7)))
     } else if (event.key === 'End') {
-      this.moveTo(addDays(from, 6 - ((from.getUTCDay() - this.firstDay + 7) % 7)))
+      this.moveTo(addDays(from, 6 - ((from.getUTCDay() - this.firstDayOfWeek + 7) % 7)))
     } else {
       // Shift pages by a year, which is the same move twelve months over.
       const step = event.key === 'PageUp' ? -1 : 1
@@ -234,64 +332,81 @@ export class HelixBaseCalendar extends HelixElement {
     super.willUpdate(changed)
     this.internals.role = 'group'
     this.internals.ariaLabel = this.label
+    this.internals.ariaInvalid = this.invalid ? 'true' : null
   }
 
-  protected override render(): TemplateResult {
-    const shown = this.shown
-    const anchor = toIso(this.anchor)
-    const names = new Intl.DateTimeFormat(undefined, {
+  private renderMonth(month: Date, index: number): TemplateResult {
+    const locale = this.locale || undefined
+    const heading = new Intl.DateTimeFormat(locale, {
       month: 'long',
       timeZone: 'UTC',
       year: 'numeric',
     })
-    const weekday = new Intl.DateTimeFormat(undefined, { timeZone: 'UTC', weekday: 'short' })
-    const full = new Intl.DateTimeFormat(undefined, { dateStyle: 'full', timeZone: 'UTC' })
+    const weekday = new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short' })
+    const full = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' })
+    const weeks = this.weeksOf(month)
+    const anchor = toIso(this.anchor)
+    const range = this.range
 
-    return html`<div part="header">
-        <button
-          part="previous"
-          type="button"
-          aria-label="Previous month"
-          @click=${() => this.show(addMonths(shown, -1))}
-        >
-          <svg fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
-            ${unsafeSVG(caretLeft.content)}
-          </svg>
-        </button>
-        <span part="heading" aria-live="polite">${names.format(shown)}</span>
-        <button
-          part="next"
-          type="button"
-          aria-label="Next month"
-          @click=${() => this.show(addMonths(shown, 1))}
-        >
-          <svg fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
-            ${unsafeSVG(caretRight.content)}
-          </svg>
-        </button>
+    // One set of controls across the whole run: back on the first month,
+    // forward on the last. A pair per month would offer six ways to make the
+    // same move and leave the reader to work out which.
+    const first = index === 0
+    const last = index === this.months - 1
+
+    return html`<div part="month">
+      <div part="header">
+        ${
+          first
+            ? html`<button
+                part="previous"
+                type="button"
+                aria-label="Previous month"
+                @click=${() => this.show(addMonths(this.shown, -1))}
+              >
+                <svg fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+                  ${unsafeSVG(caretLeft.content)}
+                </svg>
+              </button>`
+            : nothing
+        }
+        <span part="heading">${heading.format(month)}</span>
+        ${
+          last
+            ? html`<button
+                part="next"
+                type="button"
+                aria-label="Next month"
+                @click=${() => this.show(addMonths(this.shown, 1))}
+              >
+                <svg fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+                  ${unsafeSVG(caretRight.content)}
+                </svg>
+              </button>`
+            : nothing
+        }
       </div>
-      <div part="grid" role="grid" aria-label=${names.format(shown)}>
+      <div part="grid" role="grid" aria-label=${heading.format(month)}>
         <div part="week" role="row">
-          ${this.weeks[0]?.map(
-            (date) =>
-              html`<span part="weekday" role="columnheader" abbr=${weekday.format(date)}
-                >${weekday.format(date)}</span
-              >`,
+          ${weeks[0]?.map(
+            (date) => html`<span part="weekday" role="columnheader">${weekday.format(date)}</span>`,
           )}
         </div>
-        ${this.weeks.map(
+        ${weeks.map(
           (week) => html`<div part="week" role="row">
             ${week.map((date) => {
               const iso = toIso(date)
-              const outside = !sameMonth(date, shown)
-              const disabled = this.outOfRange(date)
+              const disabled = this.disabled(date)
+              const selected = this.isSelected(iso)
               return html`<span
                 part="day"
                 role="gridcell"
                 aria-disabled=${disabled ? 'true' : nothing}
                 aria-label=${full.format(date)}
-                aria-selected=${iso === this.value ? 'true' : nothing}
-                data-outside=${outside ? '' : nothing}
+                aria-selected=${selected ? 'true' : nothing}
+                data-outside=${sameMonth(date, month) ? nothing : ''}
+                data-range-end=${range && iso === range[1] ? '' : nothing}
+                data-range-start=${range && iso === range[0] ? '' : nothing}
                 tabindex=${iso === anchor ? '0' : '-1'}
                 @click=${() => this.select(date)}
                 >${date.getUTCDate()}</span
@@ -299,7 +414,18 @@ export class HelixBaseCalendar extends HelixElement {
             })}
           </div>`,
         )}
-      </div>`
+      </div>
+    </div>`
+  }
+
+  protected override render(): TemplateResult {
+    const shown = this.shown
+    const count = Math.max(1, this.months)
+    return html`<div part="months">
+      ${Array.from({ length: count }, (_, index) =>
+        this.renderMonth(addMonths(shown, index), index),
+      )}
+    </div>`
   }
 }
 

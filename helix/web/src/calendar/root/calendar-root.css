@@ -1,7 +1,14 @@
 :host {
   display: inline-block;
 
-  --_calendar-day: var(--calendar-day-size, var(--helix-size-control-dense));
+  /* Square, and a size of its own rather than a control's: a day is a cell in
+     a grid of forty-two, not something the height of a button. */
+  --_calendar-day: var(--calendar-day-size, 1.875rem);
+}
+
+[part="months"] {
+  display: flex;
+  gap: var(--helix-space-md);
 }
 
 [part="header"] {
@@ -47,8 +54,25 @@
   grid-template-columns: repeat(7, var(--_calendar-day));
 }
 
+/* The run of days between the ends of a range, so the two ends read as one
+   selection rather than as two separate dates. */
+[part="day"][aria-selected]:not([data-range-start]):not([data-range-end]) {
+  border-radius: var(--helix-radii-none);
+}
+
+[part="day"][data-range-start] {
+  border-end-end-radius: var(--helix-radii-none);
+  border-start-end-radius: var(--helix-radii-none);
+}
+
+[part="day"][data-range-end] {
+  border-end-start-radius: var(--helix-radii-none);
+  border-start-start-radius: var(--helix-radii-none);
+}
+
 [part="weekday"] {
   align-items: center;
+  inline-size: var(--_calendar-day);
   color: var(--helix-color-foreground-subtle);
   display: inline-flex;
   font-size: var(--helix-text-xs);
@@ -59,6 +83,7 @@
 
 [part="day"] {
   align-items: center;
+  inline-size: var(--_calendar-day);
   border-radius: var(--helix-radii-sm);
   cursor: pointer;
   display: inline-flex;

@@ -20,22 +20,44 @@ is what the component holds and the arithmetic never leaves UTC.
 
 `month` is what the grid shows, separately from `value`, so paging through
 months does not select anything and a consumer can drive the view. Left
-unset, it follows the selected date, and then the current month.
+unset, it follows the first selected date, and then the current month.
+
+`mode` decides how many dates are held. Absent takes one. `range` takes two
+and marks everything between them, starting over on the third click rather
+than replacing an end at random. `multiple` toggles, so clicking a chosen
+date takes it out. All three read and write the same comma-separated
+`value`.
+
+`locale` is worth setting where the output is compared across environments.
+Left unset, month and day names come from the runtime's own locale, and a
+server and a browser need not agree on what that is.
  *
  * Renders `<helix-base-calendar>`.
  */
 export interface BaseCalendarProps extends Omit<BaseProps, 'onSelect'> {
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  disableDates?: string
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  disableDays?: string
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  firstDay?: number
+  firstDayOfWeek?: number
+  /** Whether the current selection fails validation. */
+  invalid?: boolean
   /** Accessible name for the grid. */
   label?: string
+  /** Locale for month and day names. Absent uses the runtime's own. */
+  locale?: string
   /** Latest selectable date, as `YYYY-MM-DD`. */
   max?: string
   /** Earliest selectable date, as `YYYY-MM-DD`. */
   min?: string
+  /** How many dates can be held at once. */
+  mode?: 'range' | 'multiple'
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
   month?: string
-  /** The selected date, as `YYYY-MM-DD`. */
+  /** How many months to show, side by side. */
+  months?: number
+  /** The selected dates, comma separated, as `YYYY-MM-DD`. One date in `single`. Two in `range`, the earlier first. Any number in `multiple`. One attribute across all three, so a consumer reads and writes the same thing whatever the mode is. */
   value?: string
   /** Fired when a date is chosen, with the ISO date. */
   onSelect?: (event: HelixSelectEvent) => void
@@ -43,7 +65,7 @@ export interface BaseCalendarProps extends Omit<BaseProps, 'onSelect'> {
 
 export const BaseCalendarRoot = createComponent<HelixBaseCalendar, BaseCalendarProps>({
   events: { 'helix-select': 'onSelect' },
-  properties: [],
+  properties: ['invalid'],
   tagName: 'helix-base-calendar',
 })
 
