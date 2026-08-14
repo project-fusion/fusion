@@ -345,6 +345,99 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/helix-element/helix-element.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Owns only what is universal: normalizing `box-sizing` inside the shadow root,\nso component CSS can rely on border-box on both sides of the boundary.\n\nThere is deliberately no `emit(name, detail)` helper. A dispatch through a\ngeneric helper cannot be named by the manifest analyzer, which recorded the\nparameter identifier and produced a phantom event on every element that\ninherited it. Components dispatch concrete event classes from `events.ts`,\nwhich the analyzer and TypeScript can both see.",
+          "name": "HelixElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard."
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do."
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it."
+            }
+          ],
+          "events": [],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "summary": "Base class every Helix element extends.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/core/helix-element",
+            "tier": "core"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixElement",
+          "declaration": {
+            "name": "HelixElement",
+            "module": "src/helix-element/helix-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/helix-form-element/helix-form-element.ts",
       "declarations": [
         {
@@ -494,99 +587,6 @@
           "declaration": {
             "name": "HelixFormElement",
             "module": "src/helix-form-element/helix-form-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/helix-element/helix-element.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Owns only what is universal: normalizing `box-sizing` inside the shadow root,\nso component CSS can rely on border-box on both sides of the boundary.\n\nThere is deliberately no `emit(name, detail)` helper. A dispatch through a\ngeneric helper cannot be named by the manifest analyzer, which recorded the\nparameter identifier and produced a phantom event on every element that\ninherited it. Components dispatch concrete event classes from `events.ts`,\nwhich the analyzer and TypeScript can both see.",
-          "name": "HelixElement",
-          "members": [
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\nEvery component that is a landmark, a list item, or a cell used to write\n`role` onto its own host in `willUpdate`. That is an attribute the element\nadds to itself after it upgrades, so a React consumer's server markup never\nhas it and hydration reports a mismatch on every one of them.\n`ElementInternals` exists for exactly this: it sets the implicit role an\nauthor's `role` attribute still overrides, and it writes nothing.\n\nAvailable during server rendering: Lit's shim implements\n`attachInternals`, verified, so nothing here needs a guard."
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do."
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it."
-            }
-          ],
-          "events": [],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "summary": "Base class every Helix element extends.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/core/helix-element",
-            "tier": "core"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixElement",
-          "declaration": {
-            "name": "HelixElement",
-            "module": "src/helix-element/helix-element.ts"
           }
         }
       ]
@@ -782,6 +782,40 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/utils/create-sheet/create-sheet.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSheet",
+          "return": {
+            "type": {
+              "text": "CSSResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createSheet",
+          "declaration": {
+            "name": "createSheet",
+            "module": "src/utils/create-sheet/create-sheet.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/utils/custom-element/custom-element.ts",
       "declarations": [
         {
@@ -813,6 +847,40 @@
           "declaration": {
             "name": "target",
             "module": "src/utils/custom-element/custom-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/request-controlled-change/request-controlled-change.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "requestControlledChange",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "{\n  apply,\n  event,\n  host,\n  notify,\n  next,\n}",
+              "type": {
+                "text": "ControlledChangeOptions<T>"
+              }
+            }
+          ],
+          "description": "Announces a change, then applies it if nobody refused.\n\nOne audited path for every stateful change in the system. The order is the\nwhole point: the event goes first and carries the state being *proposed*, so\na listener calling `preventDefault()` stops it before anything moves. A\ncomponent that mutated itself and then announced it would leave a consumer\nreacting to a decision already made.\n\nReturns whether the change was applied, so a caller that needs to know\n(a key handler deciding whether to also move focus) can ask.\n\nA throwing `notify` is caught and logged rather than rethrown. A consumer's\nbroken callback must not corrupt the element's state or abort the rest of a\ncoordinated update, and there is nothing useful this can do about it besides\nmake it visible."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "requestControlledChange",
+          "declaration": {
+            "name": "requestControlledChange",
+            "module": "src/utils/request-controlled-change/request-controlled-change.ts"
           }
         }
       ]
@@ -865,40 +933,6 @@
           "declaration": {
             "name": "deepActiveElement",
             "module": "src/utils/focusable-elements/focusable-elements.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/request-controlled-change/request-controlled-change.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "requestControlledChange",
-          "return": {
-            "type": {
-              "text": "boolean"
-            }
-          },
-          "parameters": [
-            {
-              "name": "{\n  apply,\n  event,\n  host,\n  notify,\n  next,\n}",
-              "type": {
-                "text": "ControlledChangeOptions<T>"
-              }
-            }
-          ],
-          "description": "Announces a change, then applies it if nobody refused.\n\nOne audited path for every stateful change in the system. The order is the\nwhole point: the event goes first and carries the state being *proposed*, so\na listener calling `preventDefault()` stops it before anything moves. A\ncomponent that mutated itself and then announced it would leave a consumer\nreacting to a decision already made.\n\nReturns whether the change was applied, so a caller that needs to know\n(a key handler deciding whether to also move focus) can ask.\n\nA throwing `notify` is caught and logged rather than rethrown. A consumer's\nbroken callback must not corrupt the element's state or abort the rest of a\ncoordinated update, and there is nothing useful this can do about it besides\nmake it visible."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "requestControlledChange",
-          "declaration": {
-            "name": "requestControlledChange",
-            "module": "src/utils/request-controlled-change/request-controlled-change.ts"
           }
         }
       ]
@@ -1113,40 +1147,6 @@
           "declaration": {
             "name": "MixinControllerOpen",
             "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/utils/create-sheet/create-sheet.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "createSheet",
-          "return": {
-            "type": {
-              "text": "CSSResult"
-            }
-          },
-          "parameters": [
-            {
-              "name": "cssText",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "createSheet",
-          "declaration": {
-            "name": "createSheet",
-            "module": "src/utils/create-sheet/create-sheet.ts"
           }
         }
       ]

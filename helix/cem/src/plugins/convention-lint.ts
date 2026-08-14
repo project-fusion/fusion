@@ -18,7 +18,7 @@ const APPEARANCE_OPENERS = ['themed', 'a styled', 'styled', 'a themed']
  * Relaying is what makes a component behave like the control it wraps, and the
  * name has to be the native one for a consumer, and for React, to hear it.
  */
-const RELAYED_NATIVE = new Set(['blur', 'change', 'focus', 'input', 'invalid'])
+const RELAYED_NATIVE = new Set(['blur', 'change', 'error', 'focus', 'input', 'invalid', 'load'])
 
 /**
  * Verbs React's synthetic system claims on a custom element.
