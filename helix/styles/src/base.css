@@ -543,6 +543,24 @@ helix-toggle::part(item):hover {
   color: var(--helix-color-foreground);
 }
 
+/* In a group, the thumb is the only surface.
+ *
+ * The wash above used to be the width of the label, so it sat inside the
+ * segment with a margin around it and read as a hint. Once the item filled its
+ * segment the same wash became segment-sized, which puts it flush against the
+ * thumb on the segment next door: two rounded rectangles of near enough the
+ * same value, touching, merge into one shape and the control appears to have a
+ * selection two segments wide. Measured at the time, the thumb was exactly one
+ * segment and the geometry was never wrong; the second rectangle was this.
+ *
+ * So hover says its piece in the label, which the rule above already brightens
+ * to full strength. A toggle outside a group keeps the wash: there is no thumb
+ * there for it to be confused with. */
+helix-toggle-group helix-toggle[link] > *:hover,
+helix-toggle-group helix-toggle::part(item):hover {
+  background-color: transparent;
+}
+
 /* The travelling thumb is behind this item, so the label goes to full strength.
    Colour only, and no change of weight: a heavier label is a wider one, and the
    thumb measures the item it marks. Measured, the same text came out 94.2px

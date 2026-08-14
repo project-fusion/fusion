@@ -44,6 +44,28 @@
   border-color: var(--helix-color-border);
 }
 
+/* Filled, for a button standing next to a field.
+ *
+ * The default is transparent until hovered, which is right in a toolbar full of
+ * them and wrong beside an input: the field paints a sunken surface and the
+ * button paints nothing, so a row that is one piece of chrome reads as a box
+ * with something floating after it. This takes the field's own surface and
+ * border, so the two are the same material at the same depth.
+ *
+ * `neutral` is the raised form of the same idea and stays: a button that sits
+ * on the page, where this one sits in it. */
+:host([appearance="filled"]) [part="button"] {
+  background-color: var(--helix-color-surface-sunken);
+  border-color: var(--helix-color-border);
+}
+
+/* Named again for hover, which the bare `[part="button"]:hover` above cannot
+   reach: this selector is a step more specific, so without it a filled button
+   would be the one that does not answer the pointer. */
+:host([appearance="filled"]) [part="button"]:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
 :host([appearance="danger"]) [part="button"] {
   color: var(--helix-color-danger);
 }

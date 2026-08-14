@@ -387,7 +387,13 @@ export function SandboxWorkbench({ families }: Props) {
             value={filter}
           />
         </helix-flex>
-        <helix-icon-button label={allOpen ? 'Collapse all' : 'Expand all'} onClick={toggleAll}>
+        {/* Filled, so it and the field beside it are one piece of chrome rather
+            than a box with a button floating after it. */}
+        <helix-icon-button
+          appearance="filled"
+          label={allOpen ? 'Collapse all' : 'Expand all'}
+          onClick={toggleAll}
+        >
           <helix-icon name={allOpen ? 'caret-up' : 'caret-down'}></helix-icon>
         </helix-icon-button>
       </helix-flex>

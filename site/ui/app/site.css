@@ -325,9 +325,16 @@ helix-app-header {
   min-block-size: 0;
 }
 
+/* The same figure the sandbox toolbar takes, because these two bars sit either
+   side of the split and a reader sees them as one line across the window. It
+   was eight pixels of padding around a thirty-two pixel field, so it stood at
+   forty-eight against the toolbar's forty and the two rules were nowhere near
+   each other. */
 .examplesHeader {
+  block-size: var(--helix-size-control-md);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  padding: var(--helix-space-xs) var(--helix-space-sm);
+  padding-block: var(--helix-space-none);
+  padding-inline: var(--helix-space-sm);
 }
 
 .examplesScroll {

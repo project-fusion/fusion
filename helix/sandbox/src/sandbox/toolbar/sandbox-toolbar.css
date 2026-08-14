@@ -1,12 +1,24 @@
 :host {
   align-items: center;
   background-color: var(--helix-color-surface);
+  /* Said, not left to fall out of the padding. The bar was four pixels of space
+     around whatever it held, so its height was a consequence of its contents
+     and any bar beside it with different contents stood at a different height.
+     Stated once, two bars either side of a split line up and stay lined up.
+
+     `control-md` rather than `control`, because this bar declares itself dense
+     and the controls in it are the small size: taking the current step would
+     make the bar the height of one of its own buttons with nothing around it,
+     and would shrink whenever the density did. Forty is the figure, and the
+     rule below is inside it. */
+  block-size: var(--sandbox-toolbar-size, var(--helix-size-control-md));
   /* The line under the bar, and the only line at that boundary: the panes below
      draw none of their own. */
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
   min-block-size: 0;
-  padding: var(--helix-space-2xs) var(--helix-space-sm);
+  padding-block: var(--helix-space-none);
+  padding-inline: var(--helix-space-sm);
 }
 
 /* Each region is a flex row of its own, which is what lets the gap live inside
