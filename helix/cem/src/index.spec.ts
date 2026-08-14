@@ -3,6 +3,7 @@ import { createHelixCemConfig } from './index.js'
 import { conventionLint } from './plugins/convention-lint.js'
 import { helixTier } from './plugins/helix-tier.js'
 import { reactEvents, toReactProp } from './plugins/react-events.js'
+import { stableOrder } from './plugins/stable-order.js'
 import type { HelixContext, HelixDeclaration, HelixManifest } from './types.js'
 
 /**
@@ -272,6 +273,31 @@ describe('component predicate', () => {
   })
 })
 
+describe('stableOrder', () => {
+  test('sorts modules by path, so an unchanged tree emits an unchanged manifest', () => {
+    // The analyzer emits modules in the order its globs resolved, which is
+    // filesystem order and not stable between runs.
+    const pkg: HelixManifest = {
+      modules: [
+        { path: 'src/toggle/root.ts' },
+        { path: 'src/accordion/root.ts' },
+        { path: 'src/badge/root.ts' },
+      ],
+    }
+    run(stableOrder(), pkg)
+    expect((pkg.modules ?? []).map((module) => module.path)).toEqual([
+      'src/accordion/root.ts',
+      'src/badge/root.ts',
+      'src/toggle/root.ts',
+    ])
+  })
+
+  test('leaves a manifest with no modules alone', () => {
+    const pkg = {} as HelixManifest
+    expect(() => run(stableOrder(), pkg)).not.toThrow()
+  })
+})
+
 describe('createHelixCemConfig', () => {
   test('ships the Helix plugin set and enables Lit handling', () => {
     const config = createHelixCemConfig({ tier: 'styled' })
@@ -289,6 +315,7 @@ describe('createHelixCemConfig', () => {
       'helix-declared-events',
       'helix-react-events',
       'helix-convention-lint',
+      'helix-stable-order',
     ])
   })
 

@@ -4,8 +4,8 @@ import { html } from 'lit'
 import '../index.js'
 
 const trail = html`<helix-breadcrumbs>
-  <helix-breadcrumbs-item><a href="/">Home</a></helix-breadcrumbs-item>
-  <helix-breadcrumbs-item current>Helix</helix-breadcrumbs-item>
+  <helix-breadcrumb><a href="/">Home</a></helix-breadcrumb>
+  <helix-breadcrumb current>Helix</helix-breadcrumb>
 </helix-breadcrumbs>`
 
 describe('breadcrumbs server output', () => {
@@ -20,7 +20,7 @@ describe('breadcrumbs server output', () => {
   test('the list-item role is on internals, so the host stays as written', () => {
     // Set in `willUpdate`, which the server does call, unlike
     // `connectedCallback`. Without it the list would have no items.
-    expect(hostAttributes(ssr(trail), 'helix-breadcrumbs-item')).toEqual([])
+    expect(hostAttributes(ssr(trail), 'helix-breadcrumb')).toEqual([])
   })
 
   test('the slotted link is crawlable in the served markup', () => {

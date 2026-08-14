@@ -281,8 +281,8 @@ router's `<a>` has to sit in the light DOM:
 
 ```html
 <helix-breadcrumbs aria-label="Breadcrumb">
-  <helix-breadcrumbs-item><a data-link="quiet" href="/">Home</a></helix-breadcrumbs-item>
-  <helix-breadcrumbs-item current>Helix</helix-breadcrumbs-item>
+  <helix-breadcrumb><a data-link="quiet" href="/">Home</a></helix-breadcrumb>
+  <helix-breadcrumb current>Helix</helix-breadcrumb>
 </helix-breadcrumbs>
 ```
 
