@@ -193,12 +193,17 @@
   --helix-size-control: calc(2.5rem * var(--_helix-seed-density));
   --helix-size-control-dense: calc(2rem * var(--_helix-seed-density));
   --helix-size-control-large: calc(3rem * var(--_helix-seed-density));
+  /* A mark pinned to something else, so it is sized against that rather than
+     against a control. */
+  --helix-size-badge: calc(1rem * var(--_helix-seed-density));
   /* Smaller than a control on purpose: a tag is a label, not something to
      press, and matching control height would make a row of them read as a row
      of buttons. */
-  --helix-size-badge: calc(1rem * var(--_helix-seed-density));
   --helix-size-tag: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-tag-dense: calc(1.25rem * var(--_helix-seed-density));
+  --helix-size-spinner: calc(1.5rem * var(--_helix-seed-density));
+  --helix-size-spinner-dense: calc(1rem * var(--_helix-seed-density));
+  --helix-size-spinner-large: calc(2.5rem * var(--_helix-seed-density));
   --helix-size-header: calc(3.5rem * var(--_helix-seed-density));
   --helix-size-icon: 1.25rem;
   --helix-size-focus-ring: var(--helix-border-thick);
