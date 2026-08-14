@@ -10,5 +10,6 @@
 export * from './sandbox/preview/sandbox-preview.js'
 export * from './sandbox/root/sandbox-root.js'
 export * from './sandbox/source/sandbox-source.js'
+export * from './sandbox/specs/sandbox-specs.js'
 export * from './sandbox/status-bar/sandbox-status-bar.js'
 export * from './sandbox/terminal/sandbox-terminal.js'

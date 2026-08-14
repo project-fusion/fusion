@@ -6,6 +6,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "exports": {
+    "./browser": "./src/browser.ts",
     "./dom": "./src/dom.ts",
     "./ssr": "./src/ssr.ts"
   },

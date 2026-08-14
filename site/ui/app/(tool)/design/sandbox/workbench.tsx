@@ -242,8 +242,17 @@ export function SandboxWorkbench({ families }: Props) {
               that behaviour already exists. */}
           <helix-tabs label="Panel" slot="panel" value="terminal">
             <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
+            <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
             <helix-tabs-panel slot="panels" value="terminal">
               <helix-sandbox-terminal ref={terminal}></helix-sandbox-terminal>
+            </helix-tabs-panel>
+            <helix-tabs-panel slot="panels" value="specs">
+              {/* The family, not the example: specs belong to a component, and
+                  every example of it runs the same ones. */}
+              <helix-sandbox-specs
+                family={family.slug}
+                src="/design/sandbox/specs"
+              ></helix-sandbox-specs>
             </helix-tabs-panel>
           </helix-tabs>
 

@@ -6,6 +6,7 @@ import type {
   HelixSandboxEditor,
   HelixSandboxPreview,
   HelixSandboxSource,
+  HelixSandboxSpecs,
   HelixSandboxStatusBar,
   HelixSandboxTerminal,
 } from '@helix-io/sandbox';
@@ -389,6 +390,29 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   textContent?: string | number;
 };
 
+export type HelixSandboxSpecsProps = {
+  /** Which family's specs to run. Changing it runs them. */
+  family?: HelixSandboxSpecs["family"];
+  /** The document that runs them. Same origin, and it must stay that way. */
+  src?: HelixSandboxSpecs["src"];
+  /** Accessible name for the results. */
+  label?: HelixSandboxSpecs["label"];
+};
+
+export type HelixSandboxSpecsSolidJsProps = {
+  /** Which family's specs to run. Changing it runs them. */
+  "prop:family"?: HelixSandboxSpecs["family"];
+  /** The document that runs them. Same origin, and it must stay that way. */
+  "prop:src"?: HelixSandboxSpecs["src"];
+  /** Accessible name for the results. */
+  "prop:label"?: HelixSandboxSpecs["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixSandboxStatusBarProps = {
   /** One-based column of the cursor. Absent shows no readout. */
   column?: HelixSandboxStatusBar["column"];
@@ -631,6 +655,61 @@ export type CustomElements = {
    */
   "helix-sandbox-source": Partial<
     HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
+  >;
+
+  /**
+   * The specs are not rewritten for this. The same `*.dom.spec.ts` files that run
+   * in CI are bundled for the browser with `bun:test` and the DOM helpers pointed
+   * at a browser harness, so a spec deleted in the morning stops being reported
+   * in the afternoon and there is no second suite to keep in step.
+   *
+   * **A browser is the stricter environment, not the looser one.** The node
+   * harness runs against happy-dom, which does not implement `attachInternals` at
+   * all and has to be handed an inert stub, reports `:popover-open` as unmatched
+   * for a popover that is open, and returns nothing from `assignedNodes({ flatten:
+   * true })` where a browser returns the fallback. Each of those has already
+   * produced a spec that passed while asserting the opposite of what ships. Here
+   * they are the platform's own.
+   *
+   * They run in a frame of their own rather than the preview's, because `mount`
+   * replaces the document body for every test and would take the example with it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `family`: Which family's specs to run. Changing it runs them.
+   * - `src`: The document that runs them. Same origin, and it must stay that way.
+   * - `label`: Accessible name for the results.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `run() => void`: Runs the current family's specs.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--specs-pass-color`: Colour of a passing test. (default: `undefined`)
+   * - `--specs-fail-color`: Colour of a failing one. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `frame`: The document the specs run in.
+   * - `summary`: The counts, and how long the run took.
+   * - `results`: The scrolling list.
+   * - `suite`: A describe block's heading.
+   * - `result`: One test.
+   * - `status`: Whether that test passed.
+   * - `error`: Why it failed.
+   * - `empty`: Shown when there is nothing to report.
+   */
+  "helix-sandbox-specs": Partial<
+    HelixSandboxSpecsProps & BaseProps<HelixSandboxSpecs> & BaseEvents
   >;
 
   /**
@@ -944,6 +1023,64 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The specs are not rewritten for this. The same `*.dom.spec.ts` files that run
+   * in CI are bundled for the browser with `bun:test` and the DOM helpers pointed
+   * at a browser harness, so a spec deleted in the morning stops being reported
+   * in the afternoon and there is no second suite to keep in step.
+   *
+   * **A browser is the stricter environment, not the looser one.** The node
+   * harness runs against happy-dom, which does not implement `attachInternals` at
+   * all and has to be handed an inert stub, reports `:popover-open` as unmatched
+   * for a popover that is open, and returns nothing from `assignedNodes({ flatten:
+   * true })` where a browser returns the fallback. Each of those has already
+   * produced a spec that passed while asserting the opposite of what ships. Here
+   * they are the platform's own.
+   *
+   * They run in a frame of their own rather than the preview's, because `mount`
+   * replaces the document body for every test and would take the example with it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `family`: Which family's specs to run. Changing it runs them.
+   * - `src`: The document that runs them. Same origin, and it must stay that way.
+   * - `label`: Accessible name for the results.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `run() => void`: Runs the current family's specs.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--specs-pass-color`: Colour of a passing test. (default: `undefined`)
+   * - `--specs-fail-color`: Colour of a failing one. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `frame`: The document the specs run in.
+   * - `summary`: The counts, and how long the run took.
+   * - `results`: The scrolling list.
+   * - `suite`: A describe block's heading.
+   * - `result`: One test.
+   * - `status`: Whether that test passed.
+   * - `error`: Why it failed.
+   * - `empty`: Shown when there is nothing to report.
+   */
+  "helix-sandbox-specs": Partial<
+    HelixSandboxSpecsProps &
+      HelixSandboxSpecsSolidJsProps &
+      BaseProps<HelixSandboxSpecs> &
+      BaseEvents
+  >;
+
+  /**
    * Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`
    * on every keystroke and every arrow press, the sandbox hears it and writes the
    * position here. Nothing about that reaches the consumer's framework, which is
@@ -1058,6 +1195,10 @@ export type CustomCssProperties = {
   "--sandbox-source-background"?: string;
   /** Minimum height of the pane. */
   "--sandbox-source-min-block-size"?: string;
+  /** Colour of a passing test. */
+  "--specs-pass-color"?: string;
+  /** Colour of a failing one. */
+  "--specs-fail-color"?: string;
   /** Color of the bar's text. */
   "--status-bar-color"?: string;
   /** Height of the scrolling region. */

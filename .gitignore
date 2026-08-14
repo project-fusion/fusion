@@ -42,3 +42,6 @@ helix/icons/src/generated.ts
 
 # Dev server output, kept apart from the cached `.next` build.
 .next-dev/
+
+# Spec bundles for the sandbox, built from the spec files by `bun run specs`.
+site/ui/public/specs

@@ -8,6 +8,7 @@
     "analyze": "turbo run analyze",
     "build": "turbo run build",
     "check": "bun run order && biome check --write . && bun run check:tokens",
+    "check:examples": "node tooling/scripts/check-examples.mjs",
     "check:tokens": "node tooling/scripts/check-tokens.mjs",
     "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
     "dev": "turbo run dev",
@@ -19,11 +20,11 @@
     "rs:check": "cargo clippy --workspace --all-targets -- -D warnings",
     "rs:fmt": "cargo fmt --all",
     "rs:test": "cargo test --workspace",
+    "specs": "bun tooling/scripts/build-specs.mjs",
     "styles": "turbo run styles",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run test && bun run rs:check && bun run rs:test",
-    "check:examples": "node tooling/scripts/check-examples.mjs"
+    "verify": "biome ci . && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run test && bun run rs:check && bun run rs:test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",

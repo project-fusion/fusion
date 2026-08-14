@@ -375,6 +375,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/sandbox/specs/sandbox-specs.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/sandbox/status-bar/sandbox-status-bar.js"
           }
         },
@@ -1355,6 +1363,391 @@
           "declaration": {
             "name": "HelixSandboxSource",
             "module": "src/sandbox/source/sandbox-source.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/specs/sandbox-specs.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/sandbox/specs/sandbox-specs.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/specs/sandbox-specs.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The specs are not rewritten for this. The same `*.dom.spec.ts` files that run\nin CI are bundled for the browser with `bun:test` and the DOM helpers pointed\nat a browser harness, so a spec deleted in the morning stops being reported\nin the afternoon and there is no second suite to keep in step.\n\n**A browser is the stricter environment, not the looser one.** The node\nharness runs against happy-dom, which does not implement `attachInternals` at\nall and has to be handed an inert stub, reports `:popover-open` as unmatched\nfor a popover that is open, and returns nothing from `assignedNodes({ flatten:\ntrue })` where a browser returns the fallback. Each of those has already\nproduced a spec that passed while asserting the opposite of what ships. Here\nthey are the platform's own.\n\nThey run in a frame of their own rather than the preview's, because `mount`\nreplaces the document body for every test and would take the example with it.",
+          "name": "HelixSandboxSpecs",
+          "cssProperties": [
+            {
+              "description": "Colour of a passing test.",
+              "name": "--specs-pass-color"
+            },
+            {
+              "description": "Colour of a failing one.",
+              "name": "--specs-fail-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The document the specs run in.",
+              "name": "frame"
+            },
+            {
+              "description": "The counts, and how long the run took.",
+              "name": "summary"
+            },
+            {
+              "description": "The scrolling list.",
+              "name": "results"
+            },
+            {
+              "description": "A describe block's heading.",
+              "name": "suite"
+            },
+            {
+              "description": "One test.",
+              "name": "result"
+            },
+            {
+              "description": "Whether that test passed.",
+              "name": "status"
+            },
+            {
+              "description": "Why it failed.",
+              "name": "error"
+            },
+            {
+              "description": "Shown when there is nothing to report.",
+              "name": "empty"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "family",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which family's specs to run. Changing it runs them.",
+              "attribute": "family"
+            },
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The document that runs them. Same origin, and it must stay that way.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Spec results'",
+              "description": "Accessible name for the results.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "results",
+              "type": {
+                "text": "SpecResult[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "failure",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "running",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "elapsed",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "ready",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the frame has said it is listening."
+            },
+            {
+              "kind": "field",
+              "name": "pending",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "Asked for before the frame was ready, and sent the moment it is."
+            },
+            {
+              "kind": "field",
+              "name": "frame",
+              "type": {
+                "text": "HTMLIFrameElement | null"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "frameOrigin",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The origin the frame runs at, derived from `src`.\n\nNamed rather than `*`, so a message meant for the runner cannot be read by\na document that happens to be listening.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleMessage",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "request",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "family",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "run",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Runs the current family's specs.",
+              "type": {
+                "text": "run() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "failed",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "grouped",
+              "type": {
+                "text": "{ results: SpecResult[]; suite: string }[]"
+              },
+              "privacy": "private",
+              "description": "The results grouped under the describe block they were written in.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "summary",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "family",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which family's specs to run. Changing it runs them.",
+              "fieldName": "family"
+            },
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The document that runs them. Same origin, and it must stay that way.",
+              "fieldName": "src"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Spec results'",
+              "description": "Accessible name for the results.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Runs a component's own specs and shows how they came out.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/sandbox/specs",
+            "aliases": [
+              "Tests",
+              "Suite"
+            ],
+            "tier": "styled",
+            "group": "Sandbox",
+            "part": "Specs"
+          },
+          "tagName": "helix-sandbox-specs",
+          "customElement": true,
+          "modulePath": "src/sandbox/specs/sandbox-specs.ts",
+          "definitionPath": "src/sandbox/specs/sandbox-specs.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSandboxSpecs",
+          "declaration": {
+            "name": "HelixSandboxSpecs",
+            "module": "src/sandbox/specs/sandbox-specs.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-sandbox-specs",
+          "declaration": {
+            "name": "HelixSandboxSpecs",
+            "module": "src/sandbox/specs/sandbox-specs.ts"
           }
         }
       ]

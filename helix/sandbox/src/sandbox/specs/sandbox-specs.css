@@ -1,0 +1,107 @@
+:host {
+  /* Fills the box it is given and scrolls inside it, like the terminal. The
+     list is as long as the suite is, which is not something the panel holding
+     it should have to absorb. */
+  block-size: 100%;
+  display: grid;
+  font-size: var(--helix-text-xs);
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+/* The runner is a document, not a picture: there is nothing in it to look at.
+
+   Hidden by being transparent and out of the way, and never by `display: none`,
+   `visibility: hidden` or a zero-sized box. A browser is entitled to stop
+   running `requestAnimationFrame` for a frame it is not painting, and specs
+   await a frame to let a component settle: one that never arrives is a test
+   that hangs rather than one that fails. A pixel it does paint costs nothing
+   and keeps the callback coming. */
+[part="frame"] {
+  block-size: 1px;
+  border: none;
+  inline-size: 1px;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+[part="summary"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-mono);
+  margin: var(--helix-space-none);
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+}
+
+[part="summary"][data-state="pass"] {
+  color: var(--specs-pass-color, var(--helix-color-success));
+}
+
+[part="summary"][data-state="fail"] {
+  color: var(--specs-fail-color, var(--helix-color-danger));
+}
+
+[part="results"] {
+  overflow: auto;
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+}
+
+[part="results"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="empty"] {
+  color: var(--helix-color-foreground-subtle);
+  margin: var(--helix-space-none);
+}
+
+[part="suite"] {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  margin: var(--helix-space-sm) var(--helix-space-none) var(--helix-space-2xs);
+}
+
+[part="suite"]:first-child {
+  margin-block-start: var(--helix-space-none);
+}
+
+/* The tick in its own column, so the names line up down the left edge and a
+   failure's message sits under the name it belongs to rather than beside it. */
+[part="result"] {
+  color: var(--helix-color-foreground-muted);
+  display: grid;
+  gap: var(--helix-space-xs);
+  grid-template-columns: 1rem minmax(0, 1fr);
+  padding-block: var(--helix-space-2xs);
+}
+
+[part="status"] {
+  text-align: center;
+}
+
+[part="result"][data-state="pass"] [part="status"] {
+  color: var(--specs-pass-color, var(--helix-color-success));
+}
+
+[part="result"][data-state="fail"] {
+  color: var(--helix-color-foreground);
+}
+
+[part="result"][data-state="fail"] [part="status"] {
+  color: var(--specs-fail-color, var(--helix-color-danger));
+}
+
+/* Under the name, in the second column, so it reads as belonging to it. */
+[part="error"] {
+  color: var(--specs-fail-color, var(--helix-color-danger));
+  font-family: var(--helix-font-mono);
+  grid-column: 2;
+  margin: var(--helix-space-2xs) var(--helix-space-none) var(--helix-space-none);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
