@@ -1809,7 +1809,11 @@ export type HelixTooltipProps = {
   "default-open"?: HelixTooltip["defaultOpen"];
   /** Initial open state for uncontrolled use. Ignored once `open` is set. */
   defaultOpen?: HelixTooltip["defaultOpen"];
-  /** The text shown in the bubble. */
+  /** The text shown in the bubble.
+
+The common case, and the fallback for the `content` slot: slot something
+there and it replaces this. Both cannot show at once, which is the point
+of using fallback content rather than rendering whichever is present. */
   content?: HelixTooltip["content"];
   /** Preferred side. It moves if that side does not fit. */
   placement?: HelixTooltip["placement"];
@@ -1848,7 +1852,11 @@ export type HelixTooltipSolidJsProps = {
   "bool:default-open"?: HelixTooltip["defaultOpen"];
   /** Initial open state for uncontrolled use. Ignored once `open` is set. */
   "prop:defaultOpen"?: HelixTooltip["defaultOpen"];
-  /** The text shown in the bubble. */
+  /** The text shown in the bubble.
+
+The common case, and the fallback for the `content` slot: slot something
+there and it replaces this. Both cannot show at once, which is the point
+of using fallback content rather than rendering whichever is present. */
   "prop:content"?: HelixTooltip["content"];
   /** Preferred side. It moves if that side does not fit. */
   "prop:placement"?: HelixTooltip["placement"];
@@ -3804,6 +3812,10 @@ export type CustomElements = {
    * - `open`: Whether the element is open. Setting this enters controlled mode.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
    * - `content`: The text shown in the bubble.
+   *
+   * The common case, and the fallback for the `content` slot: slot something
+   * there and it replaces this. Both cannot show at once, which is the point
+   * of using fallback content rather than rendering whichever is present.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    * - `disabled`: Whether the tooltip never shows.
@@ -3833,6 +3845,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The trigger.
+   * - `content`: The bubble's content, when `content` is not enough. Anything slotted here replaces the property, which is this slot's fallback.
    *
    * ## Methods
    *
@@ -5938,6 +5951,10 @@ export type CustomElementsSolidJs = {
    * - `open`: Whether the element is open. Setting this enters controlled mode.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
    * - `content`: The text shown in the bubble.
+   *
+   * The common case, and the fallback for the `content` slot: slot something
+   * there and it replaces this. Both cannot show at once, which is the point
+   * of using fallback content rather than rendering whichever is present.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    * - `disabled`: Whether the tooltip never shows.
@@ -5967,6 +5984,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The trigger.
+   * - `content`: The bubble's content, when `content` is not enough. Anything slotted here replaces the property, which is this slot's fallback.
    *
    * ## Methods
    *

@@ -1,0 +1,11 @@
+<!-- Anything slotted as `content` replaces the `content` property, which is
+     this slot's fallback rather than a second thing rendered beside it. Text
+     stays an attribute, because that is what most tooltips hold. -->
+<helix-tooltip placement="top">
+  <helix-button>Save</helix-button>
+  <span slot="content">
+    Write the file to disk
+    <helix-kbd>Cmd</helix-kbd>
+    <helix-kbd>S</helix-kbd>
+  </span>
+</helix-tooltip>

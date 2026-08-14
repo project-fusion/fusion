@@ -103,6 +103,40 @@ Use the helpers in `web/src/testing/ssr.ts`: `withoutStyles`, `hasPart`,
 `partTag`, `hostTag`. Attribute bindings render across multiple lines, so match
 with `/<a\s+part="button"/`, never `'<a part="button"'`.
 
+## A content property is its slot's fallback
+
+Where a property carries content rather than configuration, it is the fallback
+content of a slot of the same name, never a second thing rendered beside it:
+
+```ts
+html`<slot name="content">${this.content}</slot>`
+```
+
+Text stays an attribute, because that is what most tooltips and most avatars
+hold, and `content="Save"` is less to write than a slotted span. Anything
+richer replaces it by being slotted. Both can never show at once.
+
+**Fallback, because detection does not exist.** This is the same wall as the
+bare-slot rule above: `:host(:has([slot='content']))` is invalid CSS, and the
+server has no children to inspect, so a component cannot ask whether it was
+given anything and choose. Slot fallback is the platform answering that
+question itself, at assignment time, with no code, no attribute on the host,
+and no disagreement between what the server rendered and what the client shows.
+
+Two things follow for the component:
+
+- **Ask the slot, not the property, whether there is anything to show.** Any
+  logic gated on emptiness (`show()` refusing to open an empty tooltip) reads
+  `assignedNodes()` *without* `flatten`, which answers what the consumer
+  provided rather than what the fallback would render. Client only, which is
+  where such logic runs anyway.
+- **Re-read on `slotchange`.** Content arriving from the light DOM changes no
+  property, so nothing schedules an update. A framework rendering the content
+  after the element upgrades would otherwise leave a stale accessible name.
+
+`Avatar` had this before it was written down: its default slot falls back to
+the initials derived from `name`. `Tooltip` follows it.
+
 **Reflect only what CSS selects on.** Reflection exists so a selector can reach a
 value. `href`, `target`, and `rel` reflected on Button until they were told not
 to, which wrote a destination onto a host that is not a link and put a bare

@@ -42,6 +42,8 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/tooltip
  *
  * @slot - The trigger.
+ * @slot content - The bubble's content, when `content` is not enough. Anything
+ * slotted here replaces the property, which is this slot's fallback.
  *
  * @event {HelixOpenEvent} helix-open - Fired before the bubble shows, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it hides, and cancelable.
@@ -51,7 +53,13 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-tooltip')
 export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
-  /** The text shown in the bubble. */
+  /**
+   * The text shown in the bubble.
+   *
+   * The common case, and the fallback for the `content` slot: slot something
+   * there and it replaces this. Both cannot show at once, which is the point
+   * of using fallback content rather than rendering whichever is present.
+   */
   @property()
   content = ''
 
@@ -109,10 +117,50 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     return this.renderRoot.querySelector<HTMLElement>('[part="tooltip"]')
   }
 
+  /**
+   * Whether there is anything to show.
+   *
+   * Asked of the slot rather than of the property, because either can carry
+   * the content. `assignedNodes` without `flatten` answers what the consumer
+   * provided and not what the fallback would render, which is exactly the
+   * question: a bubble with only fallback and an empty property is empty.
+   *
+   * Text or an element, because neither alone is the test. An element on its
+   * own would count `<span slot="content">   </span>` as something to say,
+   * and text on its own would count an icon as nothing, when an icon is the
+   * whole point of slotting rather than setting the property.
+   *
+   * Client only. The server has no assignment to inspect, and nothing calls
+   * this there: a tooltip opens in response to a pointer or to focus.
+   */
+  private get hasContent(): boolean {
+    if (this.content !== '') {
+      return true
+    }
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="content"]')
+    return (slot?.assignedNodes() ?? []).some((node) => {
+      const holdsElement =
+        node.nodeType === Node.ELEMENT_NODE && (node as Element).childElementCount > 0
+      return holdsElement || node.textContent?.trim() !== ''
+    })
+  }
+
+  /**
+   * Re-links the description when what is in the bubble changes.
+   *
+   * `updated` alone is not enough: content arriving from the light DOM changes
+   * no property here, so nothing would schedule the update that re-reads it. A
+   * consumer rendering the bubble's content after this upgrades, which is what
+   * a framework does, would leave the trigger describing nothing.
+   */
+  private readonly handleContentChange = (): void => {
+    this.requestUpdate()
+  }
+
   /** Shows the bubble, unless there is nothing to show. */
   show(): void {
     clearTimeout(this.timer)
-    if (this.disabled || this.content === '' || this.isOpen) {
+    if (this.disabled || !this.hasContent || this.isOpen) {
       return
     }
     if (!this.requestOpen(true)) {
@@ -189,14 +237,16 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
       ariaDescribedByElements?: Element[] | null
     }
     if ('ariaDescribedByElements' in internals) {
-      internals.ariaDescribedByElements = this.content === '' ? null : [bubble]
+      internals.ariaDescribedByElements = this.hasContent ? [bubble] : null
     }
   }
 
   protected override render(): TemplateResult {
     return html`<slot></slot>
       <div part="tooltip" popover="manual" role="tooltip">
-        ${this.content}
+        <slot name="content" @slotchange=${this.handleContentChange}
+          >${this.content}</slot
+        >
         <div part="arrow"></div>
       </div>`
   }

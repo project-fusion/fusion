@@ -20,6 +20,25 @@ type Tooltip = HTMLElement & {
 const tooltip = async (attrs = 'content="Regenerates the manifests"'): Promise<Tooltip> =>
   (await mount(`<helix-tooltip ${attrs}><button>Analyze</button></helix-tooltip>`)) as Tooltip
 
+/** A tooltip whose bubble is filled from the light DOM instead of `content`. */
+const slotted = async (attrs = '', inner = '<b>Rich</b>'): Promise<Tooltip> =>
+  (await mount(
+    `<helix-tooltip ${attrs}><button>Analyze</button><span slot="content">${inner}</span></helix-tooltip>`,
+  )) as Tooltip
+
+/**
+ * The content slot, and what a consumer put in it.
+ *
+ * `assignedNodes` without `flatten` on purpose, and not only because that is
+ * the question being asked. happy-dom returns an empty list from the flattened
+ * form where a browser returns the fallback, so a test written on `flatten`
+ * would assert the opposite of what ships.
+ */
+const contentSlot = (tip: Tooltip): HTMLSlotElement | null =>
+  tip.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="content"]') ?? null
+
+const assigned = (tip: Tooltip): Node[] => contentSlot(tip)?.assignedNodes() ?? []
+
 describe('tooltip', () => {
   test("the bubble is a tooltip, and the trigger stays the consumer's element", async () => {
     const tip = await tooltip()
@@ -93,6 +112,47 @@ describe('tooltip', () => {
     tip.show()
     await tip.updateComplete
     expect(part(tip, 'tooltip')?.matches(':popover-open') ?? false).toBe(false)
+  })
+
+  test('slotted content replaces the property rather than joining it', async () => {
+    // Anything assigned wins, and the property is what the slot falls back to,
+    // so a non-empty assignment is what settles which of the two shows.
+    const tip = await slotted('content="Replaced"')
+    expect(assigned(tip).map((node) => (node as Element).tagName)).toEqual(['SPAN'])
+  })
+
+  test('the property is the fallback, and lives in the slot', async () => {
+    // Nothing assigned, so what shows is the slot's own content: the property.
+    const tip = await tooltip()
+    expect(assigned(tip)).toEqual([])
+    expect(contentSlot(tip)?.textContent).toContain('Regenerates the manifests')
+  })
+
+  test('a tooltip with only slotted content shows, and is linked', async () => {
+    // `content` is empty here, so an emptiness test that asked the property
+    // rather than the slot would refuse to open a tooltip that has content.
+    const tip = await slotted()
+    tip.show()
+    await tip.updateComplete
+    expect(tip.isOpen).toBe(true)
+    const linked = tip.internals?.ariaDescribedByElements
+    expect(Array.isArray(linked) ? linked[0] : null).toBe(part(tip, 'tooltip'))
+  })
+
+  test('an empty slot is as empty as an empty property', async () => {
+    const tip = await slotted('', '   ')
+    tip.show()
+    await tip.updateComplete
+    expect(tip.isOpen).toBe(false)
+  })
+
+  test('an element with no text of its own is still something to say', async () => {
+    // The reason emptiness cannot be a text test. An icon is exactly what a
+    // consumer reaches for the slot to say.
+    const tip = await slotted('', '<helix-icon name="info"></helix-icon>')
+    tip.show()
+    await tip.updateComplete
+    expect(tip.isOpen).toBe(true)
   })
 
   test('disabled never shows', async () => {

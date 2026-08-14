@@ -13701,7 +13701,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The text shown in the bubble.",
+              "description": "The text shown in the bubble.\n\nThe common case, and the fallback for the `content` slot: slot something\nthere and it replaces this. Both cannot show at once, which is the point\nof using fallback content rather than rendering whichever is present.",
               "attribute": "content",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
@@ -13824,6 +13824,31 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether there is anything to show.\n\nAsked of the slot rather than of the property, because either can carry\nthe content. `assignedNodes` without `flatten` answers what the consumer\nprovided and not what the fallback would render, which is exactly the\nquestion: a bubble with only fallback and an empty property is empty.\n\nText or an element, because neither alone is the test. An element on its\nown would count `<span slot=\"content\">   </span>` as something to say,\nand text on its own would count an icon as nothing, when an icon is the\nwhole point of slotting rather than setting the property.\n\nClient only. The server has no assignment to inspect, and nothing calls\nthis there: a tooltip opens in response to a pointer or to focus.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleContentChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Re-links the description when what is in the bubble changes.\n\n`updated` alone is not enough: content arriving from the light DOM changes\nno property here, so nothing would schedule the update that re-reads it. A\nconsumer rendering the bubble's content after this upgrades, which is what\na framework does, would leave the trigger describing nothing.",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -14017,7 +14042,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The text shown in the bubble.",
+              "description": "The text shown in the bubble.\n\nThe common case, and the fallback for the `content` slot: slot something\nthere and it replaces this. Both cannot show at once, which is the point\nof using fallback content rather than rendering whichever is present.",
               "fieldName": "content",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
@@ -14094,6 +14119,14 @@
             {
               "description": "The trigger.",
               "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "description": "The bubble's content, when `content` is not enough. Anything slotted here replaces the property, which is this slot's fallback.",
+              "name": "content",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
