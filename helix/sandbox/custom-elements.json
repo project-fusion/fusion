@@ -386,6 +386,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/jsx/jsx-to-html.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/sandbox/preview/sandbox-preview.js"
           }
         },
@@ -473,6 +481,40 @@
           "declaration": {
             "name": "htmlToJsx",
             "module": "src/jsx/html-to-jsx.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/jsx/jsx-to-html.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "jsxToHtml",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "jsx",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "The markup a JSX example stands for."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "jsxToHtml",
+          "declaration": {
+            "name": "jsxToHtml",
+            "module": "src/jsx/jsx-to-html.ts"
           }
         }
       ]

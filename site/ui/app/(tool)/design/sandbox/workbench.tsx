@@ -8,6 +8,7 @@ import {
   type HelixSandboxPreview,
   type HelixSandboxTerminal,
   htmlToJsx,
+  jsxToHtml,
 } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type { HelixDrawer, HelixMenu, HelixTabs, HelixToggleGroup, HelixTree } from '@helix-io/web'
@@ -28,6 +29,21 @@ interface Props {
   families: Family[]
 }
 
+/**
+ * Which syntax the example is written in.
+ *
+ * One file, not three: the syntaxes are the same tree said differently, and
+ * showing all of them at once invites a reader to edit one and wonder why the
+ * others disagree. What is on screen is what runs.
+ */
+const SYNTAXES = [
+  { file: 'index.html', label: 'HTML', language: 'html', value: 'html' },
+  { file: 'index.tsx', label: 'TSX', language: 'tsx', value: 'tsx' },
+  { file: 'index.jsx', label: 'JSX', language: 'tsx', value: 'jsx' },
+] as const
+
+type Syntax = (typeof SYNTAXES)[number]['value']
+
 /** How the preview lays the example out. */
 const LAYOUTS = [
   { label: 'Padded', value: 'padded' },
@@ -41,15 +57,8 @@ const DIRECTIONS = [
   { label: 'Right to left', value: 'rtl' },
 ] as const
 
-/** The files a sandbox shows. */
-type Pane = 'html' | 'tsx' | 'css'
-
-/** What each file is called and how it is highlighted. */
-const FILES: { label: string; language: 'css' | 'html' | 'tsx'; value: Pane }[] = [
-  { label: 'index.html', language: 'html', value: 'html' },
-  { label: 'Example.tsx', language: 'tsx', value: 'tsx' },
-  { label: 'styles.css', language: 'css', value: 'css' },
-]
+/** The files a sandbox shows: the example, in one syntax, and its stylesheet. */
+type Pane = 'source' | 'css'
 
 const resolve = (families: Family[], familySlug: string | null, exampleSlug: string | null) => {
   const withExamples = families.filter((entry) => entry.examples.length > 0)
@@ -76,7 +85,8 @@ export function SandboxWorkbench({ families }: Props) {
   const editors = useRef<Record<string, HelixSandboxEditor | null>>({})
   const [familySlug, setFamilySlug] = useState<string | null>(null)
   const [exampleSlug, setExampleSlug] = useState<string | null>(null)
-  const [pane, setPane] = useState<Pane>('html')
+  const [pane, setPane] = useState<Pane>('source')
+  const [syntax, setSyntax] = useState<Syntax>('html')
   const [markup, setMarkup] = useState('')
   const [previewTheme, setPreviewTheme] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
@@ -105,6 +115,7 @@ export function SandboxWorkbench({ families }: Props) {
   }, [])
 
   const { example, family, withExamples } = resolve(families, familySlug, exampleSlug)
+  const current = SYNTAXES.find((entry) => entry.value === syntax) ?? SYNTAXES[0]
 
   const select = useCallback((value: string) => {
     const [nextFamily, nextExample] = value.split('/')
@@ -130,15 +141,19 @@ export function SandboxWorkbench({ families }: Props) {
   // The JSX view is a rendering of the markup, so it follows what is typed
   // rather than what the example shipped with.
   useHelixEvent(sandbox, 'helix-change', (event) => {
-    if (event.detail.name === 'html') {
-      setMarkup(event.detail.value)
+    if (event.detail.name !== 'source') {
+      return
     }
+    setMarkup(syntax === 'html' ? event.detail.value : jsxToHtml(event.detail.value))
   })
   // One listener for the whole menu: the value says which setting and, where
   // it drilled down, which option.
   useHelixEvent(settings, 'helix-select', (event) => {
     const [setting, option] = event.detail.value.split(':')
-    if (setting === 'layout' && option) {
+    if (setting === 'syntax' && option) {
+      setSyntax(option as Syntax)
+      setPane('source')
+    } else if (setting === 'layout' && option) {
       setLayout(option as 'padded' | 'centered' | 'fullscreen')
     } else if (setting === 'direction' && option) {
       setDirection(option as 'ltr' | 'rtl')
@@ -162,14 +177,24 @@ export function SandboxWorkbench({ families }: Props) {
     if (example) {
       setMarkup(example.html)
     }
-    if (preview.current && example) {
-      preview.current.source = example.html
+    if (preview.current) {
       preview.current.styles = ''
     }
     // Output belongs to the example that wrote it. Carrying it across reads as
     // the new example having produced warnings it never produced.
     terminal.current?.clear()
   }, [example])
+
+  // The preview follows the markup, and the site is what puts it there. The
+  // sandbox forwards a pane it can render, which is one named `html`; this one
+  // is named `source` and holds whichever syntax is selected, so converting it
+  // and handing over the result is the consumer's job rather than a rule the
+  // component has to guess at.
+  useEffect(() => {
+    if (preview.current) {
+      preview.current.source = markup
+    }
+  }, [markup])
 
   // Closed, for this panel, is the tab strip still showing: the tabs are how it
   // is opened again. Only the thing that put them there knows how tall they are,
@@ -268,11 +293,8 @@ export function SandboxWorkbench({ families }: Props) {
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
             <helix-toggle-group appearance="plain" label="Files" ref={files} value={pane}>
-              {FILES.map((file) => (
-                <helix-toggle key={file.value} value={file.value}>
-                  {file.label}
-                </helix-toggle>
-              ))}
+              <helix-toggle value="source">{current.file}</helix-toggle>
+              <helix-toggle value="css">styles.css</helix-toggle>
             </helix-toggle-group>
 
             <helix-toolbar label="Sandbox actions" slot="end">
@@ -296,6 +318,21 @@ export function SandboxWorkbench({ families }: Props) {
                 <helix-icon-button label="Environment" slot="trigger">
                   <helix-icon name="gear"></helix-icon>
                 </helix-icon-button>
+
+                <helix-menu-item value="syntax">
+                  Environment
+                  {SYNTAXES.map((option) => (
+                    <helix-menu-item
+                      checkable
+                      checked={syntax === option.value ? true : undefined}
+                      key={option.value}
+                      slot="submenu"
+                      value={`syntax:${option.value}`}
+                    >
+                      {option.label}
+                    </helix-menu-item>
+                  ))}
+                </helix-menu-item>
 
                 <helix-menu-item value="layout">
                   Layout
@@ -341,34 +378,20 @@ export function SandboxWorkbench({ families }: Props) {
               typed in the other, and they share one cell so the hidden one
               costs no height. */}
           <div className="sourceFiles" slot="source">
-            <div data-file hidden={pane !== 'html'}>
+            {/* One editor, keyed on the syntax so a change of environment
+                rebuilds it rather than reconfiguring a document in place. What
+                is on screen is what runs: an edit here is read back into the
+                markup, and the markup is what the preview renders. */}
+            <div data-file hidden={pane !== 'source'}>
               <helix-sandbox-editor
-                field-label="Example markup"
-                key={`${activeValue}-html`}
-                language="html"
-                name="html"
+                field-label={`Example, as ${current.label}`}
+                key={`${activeValue}-${syntax}`}
+                language={current.language}
+                name="source"
                 ref={(node: HelixSandboxEditor | null) => {
-                  editors.current.html = node
+                  editors.current.source = node
                 }}
-                value={example.html}
-              ></helix-sandbox-editor>
-            </div>
-
-            {/* Derived from the markup, not a second copy of it: two authored
-                files drift the first time one is edited, and the sandbox would
-                be showing a component it is not previewing. Read-only for the
-                same reason, and because nothing here compiles TSX. */}
-            <div data-file hidden={pane !== 'tsx'}>
-              <helix-sandbox-editor
-                field-label="Example as JSX, derived from the markup"
-                key={`${activeValue}-tsx`}
-                language="tsx"
-                name="tsx"
-                read-only
-                ref={(node: HelixSandboxEditor | null) => {
-                  editors.current.tsx = node
-                }}
-                value={htmlToJsx(markup)}
+                value={syntax === 'html' ? markup : htmlToJsx(markup)}
               ></helix-sandbox-editor>
             </div>
 
@@ -426,7 +449,10 @@ export function SandboxWorkbench({ families }: Props) {
               passed as props, so React leaves them alone and the element
               writes them on every cursor move without a re-render. */}
           {showStatus && (
-            <helix-sandbox-status-bar language={pane} slot="status"></helix-sandbox-status-bar>
+            <helix-sandbox-status-bar
+              language={pane === 'css' ? 'css' : current.value}
+              slot="status"
+            ></helix-sandbox-status-bar>
           )}
         </helix-sandbox>
 

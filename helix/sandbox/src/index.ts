@@ -8,6 +8,7 @@
  * for one it never renders.
  */
 export * from './jsx/html-to-jsx.js'
+export * from './jsx/jsx-to-html.js'
 export * from './sandbox/preview/sandbox-preview.js'
 export * from './sandbox/root/sandbox-root.js'
 export * from './sandbox/source/sandbox-source.js'
