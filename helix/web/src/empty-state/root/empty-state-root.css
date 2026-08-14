@@ -1,0 +1,40 @@
+:host {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+  padding: var(--empty-state-inset, var(--helix-space-2xl));
+  text-align: center;
+}
+
+:host([appearance="outlined"]) {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+}
+
+slot[name="icon"]::slotted(*) {
+  --icon-size: 2rem;
+
+  color: var(--helix-color-foreground-subtle);
+}
+
+slot[name="heading"]::slotted(*) {
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  margin: var(--helix-space-none);
+}
+
+/* The explanation runs to a measure even though the block is centered: centered
+   text past about 50 characters loses the reader on the return sweep. */
+slot:not([name])::slotted(*) {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  max-inline-size: 46ch;
+}
+
+slot[name="actions"]::slotted(*) {
+  margin-block-start: var(--helix-space-sm);
+}
