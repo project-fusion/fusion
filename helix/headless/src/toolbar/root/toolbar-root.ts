@@ -75,12 +75,12 @@ export class HelixBaseToolbar extends HelixElement {
    * `tabindex` stays as the fallback, because a toolbar has to hold controls
    * this package has never heard of.
    */
-  private setTabStop(active: HTMLElement | undefined): void {
+  private setTabStop(active: HTMLElement | undefined, foreign = true): void {
     for (const control of this.controls) {
       const stop = control === active
       if (ownsTabStop(control)) {
         control.focusable = stop
-      } else {
+      } else if (foreign) {
         control.tabIndex = stop ? 0 : -1
       }
     }
@@ -98,7 +98,12 @@ export class HelixBaseToolbar extends HelixElement {
       name.includes('-'),
     )
     await Promise.all(pending.map((name) => customElements.whenDefined(name)))
-    this.setTabStop(this.controls[0])
+    // Foreign controls are left alone until focus arrives. Writing `tabindex`
+    // on one before any interaction changes markup the consumer rendered while
+    // React is still hydrating it, which it reports and does not patch up.
+    // Until then they keep the tab order the document already gave them, and
+    // the first `focusin` takes over from there.
+    this.setTabStop(this.controls[0], false)
   }
 
   private readonly handleFocusIn = (event: FocusEvent): void => {

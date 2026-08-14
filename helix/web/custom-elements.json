@@ -10776,6 +10776,10 @@
                   "type": {
                     "text": "HTMLElement | undefined"
                   }
+                },
+                {
+                  "name": "foreign",
+                  "default": "true"
                 }
               ],
               "description": "Moves the single tab stop to one control.\n\nPrefers the control's own `focusable` property to writing `tabindex` on it.\nThe attribute is a change to markup the consumer rendered, which a React\nconsumer's hydration reports and does not patch up; a control that offers\nthe property moves the stop inside its own shadow root instead.\n\n`tabindex` stays as the fallback, because a toolbar has to hold controls\nthis package has never heard of.",
