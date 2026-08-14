@@ -22,7 +22,7 @@ import { styles } from './tag-root.css.js'
  *
  * @csspart remove - The remove button, when `removable`.
  *
- * @event {HelixRemoveEvent} helix-remove - Fired when the reader asks to remove the tag.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  *
  * @cssproperty --tag-background-color - Fill behind the tag.
  * @cssproperty --tag-foreground-color - Label color.

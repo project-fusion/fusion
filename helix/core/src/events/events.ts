@@ -39,7 +39,7 @@
  * - **Lifecycle** (`helix-open`, `helix-close`) does not bubble and is not
  *   composed. Overlays nest, and an inner one's lifecycle must never reach the
  *   outer one that contains it.
- * - **Coordination** (`helix-select`, `helix-remove`, `helix-value-change`)
+ * - **Coordination** (`helix-select`, `helix-dismiss`, `helix-value-change`)
  *   bubbles and is composed, so a parent or a router can intercept it across a
  *   shadow boundary.
  */
@@ -89,25 +89,30 @@ export class HelixCloseEvent extends CustomEvent<OpenDetail> {
   }
 }
 
-/** Detail carried by `helix-remove`. */
-export interface RemoveDetail {
-  /** Text content of the element asking to be removed, for identifying it. */
+/** Detail carried by `helix-dismiss`. */
+export interface DismissDetail {
+  /** Text content of the element asking to go, for identifying which it was. */
   label: string
 }
 
 /**
- * Fired when an element asks to be removed.
+ * Fired when an element asks to be taken away.
  *
  * A request rather than a notification: the element does not remove itself,
- * because the consumer owns the list it is in and removing the DOM node under
+ * because the consumer owns the markup it is in and removing the node under
  * them would put their state and the document out of step. Cancelable, so
  * `preventDefault()` is a refusal.
+ *
+ * One verb for both shapes. A tag leaving a list and a banner closing itself
+ * are the same act from the element's side, and splitting them into `remove`
+ * and `dismiss` would have meant two names for one thing that a consumer has to
+ * learn separately.
  */
-export class HelixRemoveEvent extends CustomEvent<RemoveDetail> {
-  static readonly eventName = 'helix-remove'
+export class HelixDismissEvent extends CustomEvent<DismissDetail> {
+  static readonly eventName = 'helix-dismiss'
 
-  constructor(detail: RemoveDetail) {
-    super(HelixRemoveEvent.eventName, {
+  constructor(detail: DismissDetail) {
+    super(HelixDismissEvent.eventName, {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -181,7 +186,7 @@ declare global {
   interface HTMLElementEventMap {
     'helix-close': HelixCloseEvent
     'helix-open': HelixOpenEvent
-    'helix-remove': HelixRemoveEvent
+    'helix-dismiss': HelixDismissEvent
     'helix-select': HelixSelectEvent
     'helix-value-change': HelixValueChangeEvent
   }

@@ -33,6 +33,14 @@
         },
         {
           "kind": "js",
+          "name": "DismissDetail",
+          "declaration": {
+            "name": "DismissDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixCloseEvent",
           "declaration": {
             "name": "HelixCloseEvent",
@@ -41,17 +49,17 @@
         },
         {
           "kind": "js",
-          "name": "HelixOpenEvent",
+          "name": "HelixDismissEvent",
           "declaration": {
-            "name": "HelixOpenEvent",
+            "name": "HelixDismissEvent",
             "module": "./events/events.js"
           }
         },
         {
           "kind": "js",
-          "name": "HelixRemoveEvent",
+          "name": "HelixOpenEvent",
           "declaration": {
-            "name": "HelixRemoveEvent",
+            "name": "HelixOpenEvent",
             "module": "./events/events.js"
           }
         },
@@ -76,14 +84,6 @@
           "name": "OpenDetail",
           "declaration": {
             "name": "OpenDetail",
-            "module": "./events/events.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "RemoveDetail",
-          "declaration": {
-            "name": "RemoveDetail",
             "module": "./events/events.js"
           }
         },
@@ -235,8 +235,8 @@
         },
         {
           "kind": "class",
-          "description": "Fired when an element asks to be removed.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the list it is in and removing the DOM node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.",
-          "name": "HelixRemoveEvent",
+          "description": "Fired when an element asks to be taken away.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the markup it is in and removing the node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\nOne verb for both shapes. A tag leaving a list and a banner closing itself\nare the same act from the element's side, and splitting them into `remove`\nand `dismiss` would have meant two names for one thing that a consumer has to\nlearn separately.",
+          "name": "HelixDismissEvent",
           "members": [
             {
               "kind": "field",
@@ -246,7 +246,7 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'helix-remove'"
+              "default": "'helix-dismiss'"
             }
           ],
           "superclass": {
@@ -319,9 +319,9 @@
         },
         {
           "kind": "js",
-          "name": "HelixRemoveEvent",
+          "name": "HelixDismissEvent",
           "declaration": {
-            "name": "HelixRemoveEvent",
+            "name": "HelixDismissEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -782,40 +782,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/utils/create-sheet/create-sheet.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "createSheet",
-          "return": {
-            "type": {
-              "text": "CSSResult"
-            }
-          },
-          "parameters": [
-            {
-              "name": "cssText",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "createSheet",
-          "declaration": {
-            "name": "createSheet",
-            "module": "src/utils/create-sheet/create-sheet.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/utils/custom-element/custom-element.ts",
       "declarations": [
         {
@@ -881,6 +847,40 @@
           "declaration": {
             "name": "requestControlledChange",
             "module": "src/utils/request-controlled-change/request-controlled-change.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/create-sheet/create-sheet.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSheet",
+          "return": {
+            "type": {
+              "text": "CSSResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "cssText",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Builds a stylesheet from CSS authored in a `.css` file.\n\nComponent styles live in real `.css` files rather than `css` tagged\ntemplates, so they get CSS tooling: syntax highlighting, formatters, the\ntoken linter, and a diff that reads as CSS. `bun run styles` compiles each\none into a sibling `.css.ts` that calls this.\n\nThe `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a\nstylesheet. That is not what happens here: the argument is a build-time\nconstant read from a file in this repo, never a runtime value. Wrapping it\nkeeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam\nto change if constructable stylesheets become the better primitive."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createSheet",
+          "declaration": {
+            "name": "createSheet",
+            "module": "src/utils/create-sheet/create-sheet.ts"
           }
         }
       ]

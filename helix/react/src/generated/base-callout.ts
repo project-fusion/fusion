@@ -15,6 +15,11 @@ say nothing to them at all.
 The icon is the fallback content of a slot, so a consumer replaces it by
 slotting their own and the default disappears with no emptiness check. That
 is what slot fallback is for.
+
+Not a `Banner`, which is the other thing this could be mistaken for. A
+callout interrupts a document to set a passage apart and is read where it
+sits; a banner is page-level chrome above the masthead, announces itself as a
+live region, and can be dismissed. Neither is a variant of the other.
  *
  * Renders `<helix-base-callout>`.
  */
