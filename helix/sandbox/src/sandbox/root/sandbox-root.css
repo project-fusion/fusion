@@ -1,6 +1,8 @@
 /* The host is the split. A wrapper would be a second box with the same grid
    on it.
 
+   Positioned, so the corner can be taken out of flow against it. See below.
+
    No border and no radius. Every boundary in a sandbox is already drawn by
    whatever sits on one side of it: the divider between the panes, the status
    bar's top edge, and in a page the toolbar above and the rail beside. A box
@@ -12,6 +14,7 @@
   display: grid;
   min-block-size: var(--sandbox-min-block-size, 20rem);
   overflow: hidden;
+  position: relative;
 }
 
 /* The fallback is the split's own default, so the served markup and the
@@ -133,14 +136,6 @@
   grid-column: 1 / -1;
 }
 
-/* The corner is the one thing allowed out of its cell, and the host clips, so
-   the panes below have to leave it room to be seen. They do: it overflows into
-   the dividers it sits on, which are the only things it can cover. */
-[part="separator"][data-axis="block"],
-[part="corner"] {
-  touch-action: none;
-}
-
 ::slotted([slot="toolbar"]) {
   grid-row: 1;
 }
@@ -156,9 +151,6 @@
   grid-row: 5;
 }
 
-/* The panel's own height, and the line above it. The line belongs to this
-   boundary and to nothing else: the panel holds a general tab set, which has
-   no business growing a border because of where it was put. */
 /* The panel's height is what the divider above it moves, so it is the same
    custom property the divider writes. The hook stays as the value before
    anything has been dragged, and as the way to set it from outside. */
@@ -194,7 +186,18 @@
   cursor: move;
   grid-column: 2;
   inline-size: var(--helix-space-md);
-  place-self: start;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  /* Out of flow, and this is the whole reason for it. The tracks it sits in are
+     `auto` and size to their largest item, so an in-flow corner sixteen pixels
+     across made the divider's column sixteen pixels wide: a grey band opened
+     between the divider and the preview, and another between the panes and the
+     panel. Measured, fourteen pixels of each.
+
+     An absolutely positioned grid item is still placed in its grid area, which
+     is what keeps it on the crossing wherever the split moves to, and takes no
+     part in sizing the tracks. */
+  position: absolute;
   touch-action: none;
   translate: calc(var(--helix-border-thick) / 2 - 50%) calc(var(--helix-border-thick) / 2 - 50%);
   z-index: var(--helix-layer-raised);
