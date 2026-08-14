@@ -1,6 +1,6 @@
 :host {
   align-items: center;
-  background-color: var(--helix-color-surface);
+  background-color: var(--helix-color-background);
   /* Said, not left to fall out of the padding. The bar was four pixels of space
      around whatever it held, so its height was a consequence of its contents
      and any bar beside it with different contents stood at a different height.
@@ -11,7 +11,7 @@
      make the bar the height of one of its own buttons with nothing around it,
      and would shrink whenever the density did. Forty is the figure, and the
      rule below is inside it. */
-  block-size: var(--sandbox-toolbar-size, var(--helix-size-control-md));
+  block-size: var(--sandbox-toolbar-size, var(--helix-size-control-lg));
   /* The line under the bar, and the only line at that boundary: the panes below
      draw none of their own. */
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);

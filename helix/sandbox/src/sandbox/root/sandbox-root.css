@@ -10,7 +10,7 @@
    pixel apart, and the radius rounded a corner that was flush against the
    window. One line per boundary, owned by one side of it. */
 :host {
-  background-color: var(--helix-color-surface);
+  background-color: var(--helix-color-background);
   display: grid;
   min-block-size: var(--sandbox-min-block-size, 20rem);
   overflow: hidden;
@@ -174,6 +174,13 @@
    custom property the divider writes. The hook stays as the value before
    anything has been dragged, and as the way to set it from outside. */
 ::slotted([slot="panel"]) {
+  /* The only region that is not the page. Everything else in the sandbox is one
+     flat surface now, which is what lets the console read as a thing sitting in
+     front of it rather than another pane of the same thing. On the slot rather
+     than inside the panel, so the tab strip and whatever is under it are one
+     surface: the terminal painted itself and the tabs above it did not, so the
+     region was two colours with a seam across it. */
+  background-color: var(--helix-color-surface-sunken);
   block-size: var(--_sandbox-panel, var(--sandbox-panel-size, 12rem));
   min-block-size: 0;
 }

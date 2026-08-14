@@ -4,7 +4,7 @@
 }
 
 [part="source"] {
-  background-color: var(--sandbox-source-background, var(--helix-color-surface-sunken));
+  background-color: var(--sandbox-source-background, var(--helix-color-background));
   block-size: 100%;
   border: none;
   color: var(--helix-color-foreground-muted);

@@ -1,6 +1,6 @@
 :host {
   align-items: center;
-  background-color: var(--helix-color-surface-raised);
+  background-color: var(--helix-color-background);
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   color: var(--status-bar-color, var(--helix-color-foreground-subtle));
   display: flex;

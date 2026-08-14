@@ -7724,7 +7724,7 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'primary' | 'neutral' | 'filled' | 'subtle' | 'danger' | undefined"
+                "text": "'primary' | 'neutral' | 'subtle' | 'danger' | undefined"
               },
               "description": "How much visual weight the button carries.",
               "attribute": "appearance",
@@ -7925,7 +7925,7 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'primary' | 'neutral' | 'filled' | 'subtle' | 'danger' | undefined"
+                "text": "'primary' | 'neutral' | 'subtle' | 'danger' | undefined"
               },
               "description": "How much visual weight the button carries.",
               "fieldName": "appearance"

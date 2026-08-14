@@ -32,7 +32,7 @@ import { styles } from './icon-button-root.css.js'
 export class HelixIconButton extends HelixBaseButton {
   /** How much visual weight the button carries. */
   @property({ reflect: true })
-  appearance?: 'primary' | 'neutral' | 'filled' | 'subtle' | 'danger'
+  appearance?: 'primary' | 'neutral' | 'subtle' | 'danger'
 
   static override styles: CSSResultGroup = styles
 }

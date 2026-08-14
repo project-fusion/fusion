@@ -335,8 +335,8 @@ helix-app-header {
      and sit either side of the split, so the same fill is what makes them read
      as one strip across the window rather than two bars that happen to line
      up. */
-  background-color: var(--helix-color-surface);
-  block-size: var(--helix-size-control-md);
+  background-color: var(--helix-color-background);
+  block-size: var(--helix-size-control-lg);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   padding-block: var(--helix-space-none);
   padding-inline: var(--helix-space-sm);
@@ -354,13 +354,12 @@ helix-app-header {
    validity, and a label, and none of that gets designed properly while doing
    something else. */
 .examplesFilter {
-  /* Inverted against the bar: the bar is `surface` and this is the page under
-     it, so the field reads as a well cut back through the chrome. That holds in
-     both modes, the page being darker than the surface in dark and lighter in
-     light. `surface-sunken` is the token that ought to say this and cannot: it
-     is the same neutral as `surface` in dark mode, so a field painted with it
-     on a surface bar is the bar. */
-  background-color: var(--helix-color-background);
+  /* Inverted against the bar, which is now the page itself, so this goes the
+     other way: `surface` is one step up from `background` in both modes, lighter
+     in dark and lighter still in light. Not `surface-sunken`, the token whose
+     name says this and whose value cannot do it, being the same neutral as
+     `surface` in dark mode. */
+  background-color: var(--helix-color-surface);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   block-size: var(--helix-size-control);

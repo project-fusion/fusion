@@ -390,11 +390,16 @@ export function SandboxWorkbench({ families }: Props) {
         {/* Filled, so it and the field beside it are one piece of chrome rather
             than a box with a button floating after it. */}
         <helix-icon-button
-          appearance="filled"
+          appearance="neutral"
           label={allOpen ? 'Collapse all' : 'Expand all'}
           onClick={toggleAll}
         >
-          <helix-icon name={allOpen ? 'caret-up' : 'caret-down'}></helix-icon>
+          {/* The arrows say what the button does. A caret is what a thing to
+              open looks like, not what opening everything looks like, and two of
+              them stacked in a rail full of chevrons said nothing at all. */}
+          <helix-icon
+            name={allOpen ? 'arrows-in-line-vertical' : 'arrows-out-line-vertical'}
+          ></helix-icon>
         </helix-icon-button>
       </helix-flex>
 

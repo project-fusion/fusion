@@ -39,37 +39,20 @@
   color: var(--helix-color-foreground-on-accent);
 }
 
+/* The filled one. A button that carries a surface and a border rather than
+   waiting to be hovered, which is what a control standing beside a field wants:
+   the field paints itself and a transparent button next to it reads as a box
+   with something floating after it, not as one piece of chrome. */
 :host([appearance="neutral"]) [part="button"] {
   background-color: var(--helix-color-surface);
   border-color: var(--helix-color-border);
 }
 
-/* Filled, for a button standing next to a field.
- *
- * The default is transparent until hovered, which is right in a toolbar full of
- * them and wrong beside an input: the field paints a sunken surface and the
- * button paints nothing, so a row that is one piece of chrome reads as a box
- * with something floating after it. This takes the field's own surface and
- * border, so the two are the same material at the same depth.
- *
- * `neutral` is the raised form of the same idea and stays: a button that sits
- * on the page, where this one sits in it. */
-:host([appearance="filled"]) [part="button"] {
-  /* The page's own colour, which is the one that recesses from a bar in both
-     modes: darker than `surface` in dark and lighter in light. Not
-     `surface-sunken`, which is the token whose name says exactly this and whose
-     value cannot do it, being the same neutral as `surface` in dark mode. A
-     button filled with it on a surface bar is the bar, which is what this was
-     when it was written. Tabs found the same wall and worked around it with a
-     lift instead of a fill. */
-  background-color: var(--helix-color-background);
-  border-color: var(--helix-color-border);
-}
-
 /* Named again for hover, which the bare `[part="button"]:hover` above cannot
-   reach: this selector is a step more specific, so without it a filled button
-   would be the one that does not answer the pointer. */
-:host([appearance="filled"]) [part="button"]:hover {
+   reach: that rule is two selectors' worth of specificity and this is three, so
+   the fill won in every state and a neutral button was the one variant that did
+   not answer the pointer at all. */
+:host([appearance="neutral"]) [part="button"]:hover {
   background-color: var(--helix-color-surface-raised);
 }
 
