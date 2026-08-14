@@ -4,7 +4,9 @@
 
 [part="item"] {
   align-items: center;
-  border-radius: var(--helix-radii-sm);
+  /* No corner: a row that reaches both edges of the surface has no outside
+     corner to round, and rounding it draws a notch against the surface's own. */
+  border-radius: var(--helix-radii-none);
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: grid;
@@ -18,11 +20,13 @@
      choice and a way into a page, so one column serves both and the marks line
      up down the side they are read from. */
   grid-template-columns: minmax(0, 1fr) var(--helix-size-icon);
-  /* The inset lives here rather than on the surface, so hover and focus reach
-     the full width of the menu. */
-  margin-inline: var(--helix-space-2xs);
   min-block-size: var(--helix-size-control-sm);
-  padding-inline: var(--helix-space-xs);
+  /* The inset is padding on the row and nothing else. A margin here would put
+     the same gap back that taking the surface's padding away removed: the row
+     would stop short of both edges and hover would light a stripe with unlit
+     surface down either side of it. The row runs edge to edge; the text inside
+     it is what is inset. */
+  padding-inline: var(--helix-space-sm);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
   user-select: none;
 }

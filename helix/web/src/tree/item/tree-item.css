@@ -46,13 +46,15 @@
    one place whether or not the item opens. Without it the eye reads two
    columns where there is one list, and the deeper the tree the worse it looks.
 
-   `1em` is the chevron's own width, so it tracks whatever size the row is. */
+   The reservation is the chevron's own fixed width, not `1em`: a parent reads
+   at one size and its child at another, and a gutter measured in the row's own
+   type could never line the two up. */
 [part="row"]:not(:has([part="toggle"])) {
   padding-inline-start: calc(
     var(--helix-space-xs) +
     (var(--_tree-level, 1) - 1) *
     var(--tree-indent, var(--helix-space-md)) +
-    1em +
+    var(--helix-size-icon) +
     var(--helix-space-2xs)
   );
 }
@@ -87,12 +89,17 @@ slot[name="children"]::slotted(*) {
 }
 
 /* Rotation rather than a swapped glyph: opening a branch is a short movement,
-   not a substitution. The surface stays flat; the motion carries the change. */
+   not a substitution. The surface stays flat; the motion carries the change.
+
+   A fixed width, not `1em`. The gutter a chevron sits in is what a row without
+   one has to reserve, and `1em` makes that reservation follow the row's own
+   type size: a parent at 14px reserved 14 and its child at 12px reserved 12, so
+   the two could not line up whatever the indent was. */
 [part="toggle"] {
-  block-size: 1em;
+  block-size: var(--helix-size-icon);
   color: var(--helix-color-foreground-subtle);
   flex: 0 0 auto;
-  inline-size: 1em;
+  inline-size: var(--helix-size-icon);
   transform: rotate(-90deg);
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
