@@ -29,9 +29,14 @@
   font-weight: var(--helix-weight-semibold);
   /* Pinned to the corner, then pulled back along both axes. The mark's centre
      sits on the corner by default, which is right for a square icon and wrong
-     for a circle, where the corner of the box is outside the shape. */
-  inset-block-start: var(--badge-offset, 0);
-  inset-inline-end: var(--badge-offset, 0);
+     for a circle, where the corner of the box is outside the shape.
+
+     `--badge-offset` is registered in the base layer, which is what makes its
+     `em` resolve on the host rather than here. The fallback covers a page that
+     did not import that layer, where the declaration would otherwise be
+     invalid and the mark would lose its corner entirely. */
+  inset-block-start: var(--badge-offset, 0px);
+  inset-inline-end: var(--badge-offset, 0px);
   justify-content: center;
   line-height: 1;
   /* Square at minimum, so a single digit is a circle rather than a sliver. */

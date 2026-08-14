@@ -1818,7 +1818,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--badge-background-color`: Fill of the indicator. (default: `undefined`)
-   * - `--badge-offset`: Pulls the mark in from the corner, along both axes. (default: `undefined`)
+   * - `--badge-offset`: Pulls the mark in from the corner, along both axes. Relative to the host, so `0.5em` on a 16px host is 8px. (default: `undefined`)
    * - `--badge-ring-color`: The ring separating it from what is behind. (default: `undefined`)
    *
    * ## CSS Parts
@@ -3476,7 +3476,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--badge-background-color`: Fill of the indicator. (default: `undefined`)
-   * - `--badge-offset`: Pulls the mark in from the corner, along both axes. (default: `undefined`)
+   * - `--badge-offset`: Pulls the mark in from the corner, along both axes. Relative to the host, so `0.5em` on a 16px host is 8px. (default: `undefined`)
    * - `--badge-ring-color`: The ring separating it from what is behind. (default: `undefined`)
    *
    * ## CSS Parts
@@ -4988,7 +4988,7 @@ export type CustomCssProperties = {
   "--avatar-size"?: string;
   /** Fill of the indicator. */
   "--badge-background-color"?: string;
-  /** Pulls the mark in from the corner, along both axes. */
+  /** Pulls the mark in from the corner, along both axes. Relative to the host, so `0.5em` on a 16px host is 8px. */
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;

@@ -1473,7 +1473,7 @@
               "name": "--badge-background-color"
             },
             {
-              "description": "Pulls the mark in from the corner, along both axes.",
+              "description": "Pulls the mark in from the corner, along both axes. Relative to the host, so `0.5em` on a 16px host is 8px.",
               "name": "--badge-offset"
             },
             {
