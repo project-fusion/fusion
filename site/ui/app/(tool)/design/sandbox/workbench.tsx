@@ -182,7 +182,10 @@ export function SandboxWorkbench({ families }: Props) {
 
       <div className="workbenchBody">
         <helix-sandbox orientation={narrow ? 'vertical' : 'horizontal'} split={narrow ? 50 : 45}>
-          <helix-sandbox-toolbar slot="toolbar">
+          {/* One declaration for the region, rather than `size="sm"` on each
+              control in it. Nothing inside can be missed, and adding a control
+              later cannot forget. */}
+          <helix-sandbox-toolbar data-density="sm" slot="toolbar">
             {/* A toggle group, not a tab list. A tab in the toolbar would carry
                 `aria-controls` for a panel down in the source pane, and an
                 IDREF cannot leave the tab's shadow root to reach it: the
@@ -199,18 +202,13 @@ export function SandboxWorkbench({ families }: Props) {
               <helix-button
                 appearance="subtle"
                 onClick={() => setPreviewTheme(previewTheme === 'light' ? 'dark' : 'light')}
-                size="sm"
               >
                 {previewTheme === 'light' ? 'Light' : 'Dark'}
               </helix-button>
-              <helix-button appearance="subtle" onClick={share} size="sm">
+              <helix-button appearance="subtle" onClick={share}>
                 {copied ? 'Copied' : 'Share'}
               </helix-button>
-              <Link
-                data-button="subtle"
-                data-button-size="sm"
-                href={`/design/components/${family.slug}`}
-              >
+              <Link data-button="subtle" href={`/design/components/${family.slug}`}>
                 API
               </Link>
             </helix-toolbar>

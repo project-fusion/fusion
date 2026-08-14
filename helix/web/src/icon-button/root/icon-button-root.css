@@ -1,7 +1,7 @@
 :host {
   display: inline-flex;
 
-  --_icon-button-size: var(--icon-button-size, var(--helix-size-control-md));
+  --_icon-button-size: var(--icon-button-size, var(--helix-size-control));
 }
 
 :host([size="sm"]) {

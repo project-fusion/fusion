@@ -340,7 +340,7 @@ helix-text[tone="danger"] {
 helix-button::part(button) {
   align-items: center;
   background-color: var(--helix-color-surface);
-  block-size: var(--helix-size-control-md);
+  block-size: var(--helix-size-control);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground);
@@ -442,6 +442,31 @@ helix-button[size="lg"]::part(button) {
 helix-button[disabled]::part(button) {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+/* Density.
+ *
+ * The other half of sizing, and the half that scales. `size` on a control is a
+ * choice about that one control; density is a fact about a region, and every
+ * control inside takes it without being told individually.
+ *
+ * It is the same `sm` / `md` / `lg` scale, so there is one set of names to
+ * know and one question to ask: is this whole area tighter, or is this one
+ * control different?
+ *
+ * A custom property rather than a class per component, so it reaches into every
+ * shadow root on its own and costs no component any API at all.
+ */
+[data-density="sm"] {
+  --helix-size-control: var(--helix-size-control-sm);
+}
+
+[data-density="md"] {
+  --helix-size-control: var(--helix-size-control-md);
+}
+
+[data-density="lg"] {
+  --helix-size-control: var(--helix-size-control-lg);
 }
 
 /* The toggle item.

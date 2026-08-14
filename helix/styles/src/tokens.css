@@ -234,6 +234,11 @@
   /* ======================================================== size ======== */
   --helix-size-control-md: calc(2.5rem * var(--_helix-seed-density));
   --helix-size-control-sm: calc(2rem * var(--_helix-seed-density));
+  /* The height a control is here. The three below are the scale and never
+     move; this one is the current step, it inherits, and `data-density` on any
+     container changes it for everything inside. A control reads this; a
+     control asking for its own size reads the scale directly. */
+  --helix-size-control: var(--helix-size-control-md);
   --helix-size-control-lg: calc(3rem * var(--_helix-seed-density));
   /* A mark pinned to something else, so it is sized against that rather than
      against a control. */
