@@ -2,13 +2,15 @@ import {
   customElement,
   type HelixCaretEvent,
   type HelixChangeEvent,
+  type HelixConsoleEvent,
   HelixElement,
 } from '@helix-io/core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { HelixSandboxPreview } from '../preview/sandbox-preview.js'
-import { HelixSandboxStatusBar } from '../status-bar/sandbox-status-bar.js'
+import type { HelixSandboxPreview } from '../preview/sandbox-preview.js'
+import type { HelixSandboxStatusBar } from '../status-bar/sandbox-status-bar.js'
+import type { HelixSandboxTerminal } from '../terminal/sandbox-terminal.js'
 import { styles } from './sandbox-root.css.js'
 
 /** How far one arrow press moves the split, in percent. */
@@ -42,6 +44,7 @@ const MAX = 85
  *
  * @slot source - The editable source pane.
  * @slot preview - The live preview.
+ * @slot panel - A panel under both panes, usually a terminal.
  * @slot status - A status bar, spanning both panes at the bottom.
  *
  * @csspart pane - Either pane.
@@ -127,18 +130,46 @@ export class HelixSandbox extends HelixElement {
     }
   }
 
-  /** Slotted previews. Client only: the server has no children to read. */
-  private get previews(): HelixSandboxPreview[] {
-    return [...this.children].filter(
-      (child): child is HelixSandboxPreview => child instanceof HelixSandboxPreview,
-    )
+  /**
+   * The parts of this sandbox it drives, wherever they sit inside it.
+   *
+   * Descendants, not children. A preview and a status bar happen to be slotted
+   * directly, but a terminal lives inside the tab set that holds the panel, so
+   * a search of `children` found none and the console went nowhere. Where a
+   * consumer nests a pane is their arrangement to make.
+   *
+   * Client only: the server has no children to read.
+   */
+  private parts<T extends Element>(selector: string): T[] {
+    return [...this.querySelectorAll<T>(selector)]
   }
 
-  /** Slotted status bars. Client only, as above. */
+  private get previews(): HelixSandboxPreview[] {
+    return this.parts<HelixSandboxPreview>('helix-sandbox-preview')
+  }
+
+  /**
+   * Hands a console line from the preview to any terminal slotted here.
+   *
+   * Every `helix-console` is forwarded, with no check on where it came from.
+   * Unlike a change, which any form control in a sandbox emits, this event is
+   * dispatched by exactly one thing: a preview relaying what the document
+   * inside its frame wrote. There is nothing else here it could be confused
+   * with.
+   */
+  private readonly handleConsole = (event: Event): void => {
+    const detail = (event as HelixConsoleEvent).detail
+    for (const terminal of this.terminals) {
+      terminal.write(detail)
+    }
+  }
+
+  private get terminals(): HelixSandboxTerminal[] {
+    return this.parts<HelixSandboxTerminal>('helix-sandbox-terminal')
+  }
+
   private get statusBars(): HelixSandboxStatusBar[] {
-    return [...this.children].filter(
-      (child): child is HelixSandboxStatusBar => child instanceof HelixSandboxStatusBar,
-    )
+    return this.parts<HelixSandboxStatusBar>('helix-sandbox-status-bar')
   }
 
   private clamp(next: number): number {
@@ -203,12 +234,14 @@ export class HelixSandbox extends HelixElement {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-caret', this.handleCaret)
+    this.addEventListener('helix-console', this.handleConsole)
     this.addEventListener('helix-change', this.handleSourceChange)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-caret', this.handleCaret)
+    this.removeEventListener('helix-console', this.handleConsole)
     this.removeEventListener('helix-change', this.handleSourceChange)
   }
 
@@ -268,6 +301,7 @@ export class HelixSandbox extends HelixElement {
         @pointerup=${this.handlePointerUp}
       ></div>
       <div part="pane" data-pane="preview"><slot name="preview"></slot></div>
+      <slot name="panel"></slot>
       <slot name="status"></slot>`
   }
 

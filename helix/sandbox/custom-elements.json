@@ -377,6 +377,14 @@
             "name": "*",
             "module": "src/sandbox/status-bar/sandbox-status-bar.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/sandbox/terminal/sandbox-terminal.js"
+          }
         }
       ]
     },
@@ -746,6 +754,10 @@
               "name": "preview"
             },
             {
+              "description": "A panel under both panes, usually a terminal.",
+              "name": "panel"
+            },
+            {
               "description": "A status bar, spanning both panes at the bottom.",
               "name": "status"
             }
@@ -824,13 +836,47 @@
               "description": "Writes the cursor position onto any status bar slotted here.\n\nThe same shape as the source-to-preview hand-off, and for the same reason:\nthe editor and the bar never speak, so either can be absent. It goes\nstraight to the element rather than through a property a framework owns,\nbecause this fires on every keystroke and every arrow press."
             },
             {
+              "kind": "method",
+              "name": "parts",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "T[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "selector",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The parts of this sandbox it drives, wherever they sit inside it.\n\nDescendants, not children. A preview and a status bar happen to be slotted\ndirectly, but a terminal lives inside the tab set that holds the panel, so\na search of `children` found none and the console went nowhere. Where a\nconsumer nests a pane is their arrangement to make.\n\nClient only: the server has no children to read."
+            },
+            {
               "kind": "field",
               "name": "previews",
               "type": {
                 "text": "HelixSandboxPreview[]"
               },
               "privacy": "private",
-              "description": "Slotted previews. Client only: the server has no children to read.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleConsole",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Hands a console line from the preview to any terminal slotted here.\n\nEvery `helix-console` is forwarded, with no check on where it came from.\nUnlike a change, which any form control in a sandbox emits, this event is\ndispatched by exactly one thing: a preview relaying what the document\ninside its frame wrote. There is nothing else here it could be confused\nwith."
+            },
+            {
+              "kind": "field",
+              "name": "terminals",
+              "type": {
+                "text": "HelixSandboxTerminal[]"
+              },
+              "privacy": "private",
               "readonly": true
             },
             {
@@ -840,7 +886,6 @@
                 "text": "HelixSandboxStatusBar[]"
               },
               "privacy": "private",
-              "description": "Slotted status bars. Client only, as above.",
               "readonly": true
             },
             {
@@ -1539,6 +1584,281 @@
           "declaration": {
             "name": "HelixSandboxStatusBar",
             "module": "src/sandbox/status-bar/sandbox-status-bar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/terminal/sandbox-terminal.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/sandbox/terminal/sandbox-terminal.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sandbox/terminal/sandbox-terminal.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Fed by the sandbox, which hears `helix-console` from the preview and hands it\nhere. The preview is a separate document, so what arrives has already crossed\n`postMessage`: text, not values.\n\n**Repeats collapse.** An example with a render loop can write the same\nwarning hundreds of times, and two hundred identical lines say nothing that\none line and a count does not. Only consecutive repeats collapse, so the\norder of what happened survives.\n\nA `role=\"log\"` rather than a live region by hand. It is the semantic for an\nappend-only stream, and it means a reader is told about new output without\nthe whole panel being re-announced each time.",
+          "name": "HelixSandboxTerminal",
+          "cssProperties": [
+            {
+              "description": "Height of the scrolling region.",
+              "name": "--terminal-size"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The scrolling region.",
+              "name": "log"
+            },
+            {
+              "description": "One line.",
+              "name": "entry"
+            },
+            {
+              "description": "The level a line came in at.",
+              "name": "level"
+            },
+            {
+              "description": "The text of a line.",
+              "name": "message"
+            },
+            {
+              "description": "How many times a repeated line arrived.",
+              "name": "count"
+            },
+            {
+              "description": "Shown while nothing has been written.",
+              "name": "empty"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "emptyLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing written to the console yet.'",
+              "description": "What to show before anything has been written.",
+              "attribute": "empty-label"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Console output'",
+              "description": "Accessible name for the log.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "entries",
+              "type": {
+                "text": "Entry[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "following",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Whether the reader is at the bottom, and so wants to follow new output.\n\nRead before the render that adds a line and applied after it. Scrolling to\nthe bottom on every line would drag a reader off whatever they had scrolled\nup to look at, which for a log of errors is the one thing they are doing."
+            },
+            {
+              "kind": "field",
+              "name": "log",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "write",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "detail",
+                  "type": {
+                    "text": "ConsoleDetail"
+                  }
+                }
+              ],
+              "description": "Adds a line, collapsing it into the one above when they are identical.\n\n`write` rather than `append`, which every element already has from\n`ParentNode` and which takes nodes. Shadowing it would break\n`terminal.append(node)` for anyone who reasonably expected the DOM method.",
+              "type": {
+                "text": "write(detail: ConsoleDetail) => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "clear",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Empties the log.",
+              "type": {
+                "text": "clear() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "empty-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing written to the console yet.'",
+              "description": "What to show before anything has been written.",
+              "fieldName": "emptyLabel"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Console output'",
+              "description": "Accessible name for the log.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Shows what the previewed example wrote to the console.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/sandbox/terminal",
+            "aliases": [
+              "Console",
+              "Output"
+            ],
+            "tier": "styled",
+            "group": "Sandbox",
+            "part": "Terminal"
+          },
+          "tagName": "helix-sandbox-terminal",
+          "customElement": true,
+          "modulePath": "src/sandbox/terminal/sandbox-terminal.ts",
+          "definitionPath": "src/sandbox/terminal/sandbox-terminal.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSandboxTerminal",
+          "declaration": {
+            "name": "HelixSandboxTerminal",
+            "module": "src/sandbox/terminal/sandbox-terminal.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-sandbox-terminal",
+          "declaration": {
+            "name": "HelixSandboxTerminal",
+            "module": "src/sandbox/terminal/sandbox-terminal.ts"
           }
         }
       ]

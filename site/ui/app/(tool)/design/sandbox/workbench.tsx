@@ -3,7 +3,7 @@
 // The editor is on its own path: it carries CodeMirror, and the site's
 // element registration runs on every page.
 import '@helix-io/sandbox/editor'
-import type { HelixSandboxPreview } from '@helix-io/sandbox'
+import type { HelixSandboxPreview, HelixSandboxTerminal } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type { HelixDrawer, HelixTabs, HelixTree } from '@helix-io/web'
 import Link from 'next/link'
@@ -36,6 +36,7 @@ export function SandboxWorkbench({ families }: Props) {
   const tabs = useRef<HelixTabs>(null)
   const treeRef = useRef<HelixTree>(null)
   const rail = useRef<HelixDrawer>(null)
+  const terminal = useRef<HelixSandboxTerminal>(null)
   const editors = useRef<Record<string, HelixSandboxEditor | null>>({})
   const [familySlug, setFamilySlug] = useState<string | null>(null)
   const [exampleSlug, setExampleSlug] = useState<string | null>(null)
@@ -104,6 +105,9 @@ export function SandboxWorkbench({ families }: Props) {
       preview.current.source = example.html
       preview.current.styles = ''
     }
+    // Output belongs to the example that wrote it. Carrying it across reads as
+    // the new example having produced warnings it never produced.
+    terminal.current?.clear()
   }, [example])
 
   // Switching files moves focus into the file switched to. It is what you were
@@ -232,6 +236,16 @@ export function SandboxWorkbench({ families }: Props) {
             slot="preview"
             src="/design/sandbox/frame"
           ></helix-sandbox-preview>
+
+          {/* The panel's tabs are `helix-tabs`, not a second tab set built
+              into the sandbox: tabs are the only behaviour the region has, and
+              that behaviour already exists. */}
+          <helix-tabs label="Panel" slot="panel" value="terminal">
+            <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
+            <helix-tabs-panel slot="panels" value="terminal">
+              <helix-sandbox-terminal ref={terminal}></helix-sandbox-terminal>
+            </helix-tabs-panel>
+          </helix-tabs>
 
           {/* Fed by the sandbox, not from here. `line` and `column` are never
               passed as props, so React leaves them alone and the element

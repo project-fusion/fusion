@@ -23,11 +23,11 @@
 :host(:not([orientation])),
 :host([orientation="horizontal"]) {
   grid-template-columns: var(--_sandbox-split, 45%) auto minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
 }
 
 :host([orientation="vertical"]) {
-  grid-template-rows: var(--_sandbox-split, 45%) auto minmax(0, 1fr) auto;
+  grid-template-rows: var(--_sandbox-split, 45%) auto minmax(0, 1fr) auto auto;
 }
 
 /* Both panes must be allowed to shrink below their content, or a wide preview
@@ -80,11 +80,25 @@
   user-select: none;
 }
 
-/* The bar runs under both panes and the divider between them. The status slot
-   is bare, so with nothing in it there is no box, the `auto` track collapses to
-   zero, and a sandbox without a status bar is the same height it always was. */
-::slotted(helix-sandbox-status-bar) {
+/* Both run under the panes and the divider between them. Selected by the slot
+   they were put in rather than by tag, because what goes in the panel is
+   whatever holds its tabs, and the sandbox has no business naming it.
+
+   Both slots are bare, so with nothing in them there is no box, the `auto`
+   tracks collapse to zero, and a sandbox with neither is the height it always
+   was. */
+::slotted([slot="panel"]),
+::slotted([slot="status"]) {
   grid-column: 1 / -1;
+}
+
+/* The panel's own height, and the line above it. The line belongs to this
+   boundary and to nothing else: the panel holds a general tab set, which has
+   no business growing a border because of where it was put. */
+::slotted([slot="panel"]) {
+  block-size: var(--sandbox-panel-size, 12rem);
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  min-block-size: 0;
 }
 
 /* The preview fills its pane, and carries its own background because it can be

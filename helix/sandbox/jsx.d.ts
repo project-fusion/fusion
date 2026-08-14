@@ -7,6 +7,7 @@ import type {
   HelixSandboxPreview,
   HelixSandboxSource,
   HelixSandboxStatusBar,
+  HelixSandboxTerminal,
 } from '@helix-io/sandbox';
 
 /**
@@ -411,6 +412,29 @@ export type HelixSandboxStatusBarSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixSandboxTerminalProps = {
+  /** What to show before anything has been written. */
+  "empty-label"?: HelixSandboxTerminal["emptyLabel"];
+  /** What to show before anything has been written. */
+  emptyLabel?: HelixSandboxTerminal["emptyLabel"];
+  /** Accessible name for the log. */
+  label?: HelixSandboxTerminal["label"];
+};
+
+export type HelixSandboxTerminalSolidJsProps = {
+  /** What to show before anything has been written. */
+  "attr:empty-label"?: HelixSandboxTerminal["emptyLabel"];
+  /** What to show before anything has been written. */
+  "prop:emptyLabel"?: HelixSandboxTerminal["emptyLabel"];
+  /** Accessible name for the log. */
+  "prop:label"?: HelixSandboxTerminal["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type CustomElements = {
   /**
    * CodeMirror, not a `<textarea>`. The textarea it replaces was the right call
@@ -541,6 +565,7 @@ export type CustomElements = {
    *
    * - `source`: The editable source pane.
    * - `preview`: The live preview.
+   * - `panel`: A panel under both panes, usually a terminal.
    * - `status`: A status bar, spanning both panes at the bottom.
    *
    * ## CSS Custom Properties
@@ -652,6 +677,59 @@ export type CustomElements = {
    */
   "helix-sandbox-status-bar": Partial<
     HelixSandboxStatusBarProps & BaseProps<HelixSandboxStatusBar> & BaseEvents
+  >;
+
+  /**
+   * Fed by the sandbox, which hears `helix-console` from the preview and hands it
+   * here. The preview is a separate document, so what arrives has already crossed
+   * `postMessage`: text, not values.
+   *
+   * **Repeats collapse.** An example with a render loop can write the same
+   * warning hundreds of times, and two hundred identical lines say nothing that
+   * one line and a count does not. Only consecutive repeats collapse, so the
+   * order of what happened survives.
+   *
+   * A `role="log"` rather than a live region by hand. It is the semantic for an
+   * append-only stream, and it means a reader is told about new output without
+   * the whole panel being re-announced each time.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `empty-label`/`emptyLabel`: What to show before anything has been written.
+   * - `label`: Accessible name for the log.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `write(detail: ConsoleDetail) => void`: Adds a line, collapsing it into the one above when they are identical.
+   *
+   * `write` rather than `append`, which every element already has from
+   * `ParentNode` and which takes nodes. Shadowing it would break
+   * `terminal.append(node)` for anyone who reasonably expected the DOM method.
+   * - `clear() => void`: Empties the log.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--terminal-size`: Height of the scrolling region. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `log`: The scrolling region.
+   * - `entry`: One line.
+   * - `level`: The level a line came in at.
+   * - `message`: The text of a line.
+   * - `count`: How many times a repeated line arrived.
+   * - `empty`: Shown while nothing has been written.
+   */
+  "helix-sandbox-terminal": Partial<
+    HelixSandboxTerminalProps & BaseProps<HelixSandboxTerminal> & BaseEvents
   >;
 };
 
@@ -791,6 +869,7 @@ export type CustomElementsSolidJs = {
    *
    * - `source`: The editable source pane.
    * - `preview`: The live preview.
+   * - `panel`: A panel under both panes, usually a terminal.
    * - `status`: A status bar, spanning both panes at the bottom.
    *
    * ## CSS Custom Properties
@@ -912,6 +991,62 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixSandboxStatusBar> &
       BaseEvents
   >;
+
+  /**
+   * Fed by the sandbox, which hears `helix-console` from the preview and hands it
+   * here. The preview is a separate document, so what arrives has already crossed
+   * `postMessage`: text, not values.
+   *
+   * **Repeats collapse.** An example with a render loop can write the same
+   * warning hundreds of times, and two hundred identical lines say nothing that
+   * one line and a count does not. Only consecutive repeats collapse, so the
+   * order of what happened survives.
+   *
+   * A `role="log"` rather than a live region by hand. It is the semantic for an
+   * append-only stream, and it means a reader is told about new output without
+   * the whole panel being re-announced each time.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `empty-label`/`emptyLabel`: What to show before anything has been written.
+   * - `label`: Accessible name for the log.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `write(detail: ConsoleDetail) => void`: Adds a line, collapsing it into the one above when they are identical.
+   *
+   * `write` rather than `append`, which every element already has from
+   * `ParentNode` and which takes nodes. Shadowing it would break
+   * `terminal.append(node)` for anyone who reasonably expected the DOM method.
+   * - `clear() => void`: Empties the log.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--terminal-size`: Height of the scrolling region. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `log`: The scrolling region.
+   * - `entry`: One line.
+   * - `level`: The level a line came in at.
+   * - `message`: The text of a line.
+   * - `count`: How many times a repeated line arrived.
+   * - `empty`: Shown while nothing has been written.
+   */
+  "helix-sandbox-terminal": Partial<
+    HelixSandboxTerminalProps &
+      HelixSandboxTerminalSolidJsProps &
+      BaseProps<HelixSandboxTerminal> &
+      BaseEvents
+  >;
 };
 
 export type CustomCssProperties = {
@@ -925,6 +1060,8 @@ export type CustomCssProperties = {
   "--sandbox-source-min-block-size"?: string;
   /** Color of the bar's text. */
   "--status-bar-color"?: string;
+  /** Height of the scrolling region. */
+  "--terminal-size"?: string;
 };
 
 declare module "react" {

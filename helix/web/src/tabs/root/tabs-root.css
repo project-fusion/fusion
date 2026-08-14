@@ -1,5 +1,15 @@
 :host {
-  display: block;
+  display: grid;
+  /* The tab strip takes what it needs, the panels take the rest. `minmax(0,
+     1fr)` rather than `1fr`, because a `1fr` track keeps an automatic minimum
+     and refuses to shrink under its content, which is the whole question here.
+
+     It was `display: block`, and then a height on the host meant nothing: the
+     panels sized to their content and overflowed it. A tab set given 12rem is
+     12rem. With no height set, the row still sizes to content, so a tab set
+     that was laying itself out is laying itself out the same way. */
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
 }
 
 [part="tabs"] {
@@ -9,6 +19,12 @@
   overflow-x: auto;
 }
 
+/* Panels share one cell rather than stacking. Only one is ever shown, so
+   auto-placement would give each its own row and divide the height between
+   panels that render nothing. */
 [part="panels"] {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
   min-inline-size: 0;
 }

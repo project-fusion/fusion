@@ -1,0 +1,79 @@
+:host {
+  /* Fills the box it is given, and scrolls inside it. Auto height meant the
+     log grew to its content and spilled out of the panel holding it, which for
+     a component whose content is unbounded is the one thing it must not do.
+
+     `100%` of an auto-height parent is auto, so a terminal used somewhere with
+     no height still sizes to what it holds. */
+  block-size: var(--terminal-size, 100%);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+[part="log"] {
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-normal);
+  overflow: auto;
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+}
+
+/* Focusable, so a keyboard reader can scroll it. An outline drawn outside
+   would be clipped by the scroll container, so it goes inside. */
+[part="log"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="empty"] {
+  color: var(--helix-color-foreground-subtle);
+  margin: var(--helix-space-none);
+}
+
+/* The level in its own column, so messages line up down the left edge however
+   long the level's name is and the text stays readable as a column. */
+[part="entry"] {
+  align-items: baseline;
+  color: var(--helix-color-foreground-muted);
+  display: grid;
+  gap: var(--helix-space-xs);
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  padding-block: var(--helix-space-2xs);
+}
+
+[part="level"] {
+  color: var(--helix-color-foreground-subtle);
+  text-transform: uppercase;
+}
+
+/* Wraps, and keeps the shape of what was logged. A stack trace loses its
+   meaning when its newlines are collapsed. */
+[part="message"] {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* A repeat count, reading as a quantity rather than as more log. */
+[part="count"] {
+  background-color: var(--helix-color-surface-sunken);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-subtle);
+  padding-inline: var(--helix-space-2xs);
+}
+
+[part="entry"][data-level="warn"] {
+  color: var(--helix-color-warning);
+}
+
+[part="entry"][data-level="warn"] [part="level"] {
+  color: var(--helix-color-warning);
+}
+
+[part="entry"][data-level="error"] {
+  color: var(--helix-color-danger);
+}
+
+[part="entry"][data-level="error"] [part="level"] {
+  color: var(--helix-color-danger);
+}
