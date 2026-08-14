@@ -9,7 +9,7 @@ import { styles } from './spinner-root.css.js'
  *
  * @description
  * Sized in `em`, so it matches whatever text it sits beside without being told.
- * The colour is `currentColor` for the same reason: a spinner inside a primary
+ * The color is `currentColor` for the same reason: a spinner inside a primary
  * button is on the accent, and one in body copy is not, and neither should have
  * to say so.
  *
@@ -19,8 +19,8 @@ import { styles } from './spinner-root.css.js'
  * @documentation https://helix.fusion.dev/components/spinner
  *
  * @cssproperty --spinner-size - Diameter. Defaults to 1.5em.
- * @cssproperty --spinner-color - Colour of the moving arc.
- * @cssproperty --spinner-track-color - Colour of the circle behind it.
+ * @cssproperty --spinner-color - Color of the moving arc.
+ * @cssproperty --spinner-track-color - Color of the circle behind it.
  */
 @customElement('helix-spinner')
 export class HelixSpinner extends HelixBaseSpinner {

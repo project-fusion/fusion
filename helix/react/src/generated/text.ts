@@ -29,7 +29,7 @@ caller then picks one. An appearance is a decision the system already made:
 the ramp is named, and a page built from it is consistent because there was
 nothing else to choose.
 
-`tone` stays separate, because colour carries state rather than typography.
+`tone` stays separate, because color carries state rather than typography.
 Folding it in would mean `caption-danger` and `label-primary` and the rest of
 the cross product, which is the explosion `appearance` exists to prevent.
  *
@@ -49,7 +49,7 @@ export interface TextProps extends BaseProps {
     | 'code'
   /** Which element to render. Decides the outline and the semantics. */
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
-  /** Colour role. Separate from `appearance`, because colour carries state. */
+  /** Color role. Separate from `appearance`, because color carries state. */
   tone?: 'default' | 'muted' | 'subtle' | 'primary' | 'danger'
 }
 

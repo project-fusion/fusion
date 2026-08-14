@@ -51,7 +51,7 @@ export class DismissController implements ReactiveController {
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
     // `composedPath` rather than `target`, so a press inside the overlay's own
-    // shadow root is still recognised as inside it.
+    // shadow root is still recognized as inside it.
     const inside = this.boundary?.() ?? this.host
     if (!event.composedPath().includes(inside)) {
       this.onDismiss()

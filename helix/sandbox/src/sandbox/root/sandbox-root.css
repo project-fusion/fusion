@@ -69,7 +69,7 @@
 }
 
 /* The preview carries its own background and foreground, because it can be set
-   to a different colour mode than the page around it. Without them, a light
+   to a different color mode than the page around it. Without them, a light
    preview would be light-mode text on the page's dark surface. */
 ::slotted(helix-sandbox-preview) {
   background-color: var(--helix-color-background);

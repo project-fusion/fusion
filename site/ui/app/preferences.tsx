@@ -8,7 +8,7 @@ type ColorMode = 'system' | 'light' | 'dark'
 const STORAGE_KEY = 'fusion-color-mode'
 
 /**
- * Applies a colour mode to the document.
+ * Applies a color mode to the document.
  *
  * `system` removes the attribute rather than writing a resolved value, so the
  * page keeps following the OS afterwards. Writing "light" because the OS is
@@ -74,10 +74,10 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
 
         <helix-flex direction="column" gap="xs">
           <helix-text appearance="label" tone="subtle">
-            Colour mode
+            Color mode
           </helix-text>
           <helix-toggle-group
-            label="Colour mode"
+            label="Color mode"
             onSelectionChange={(event: HelixSelectionChangeEvent) =>
               choose(event.detail.value as ColorMode)
             }

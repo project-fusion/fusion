@@ -47,7 +47,7 @@ const TAGS: Record<string, StaticValue> = {
  * the ramp is named, and a page built from it is consistent because there was
  * nothing else to choose.
  *
- * `tone` stays separate, because colour carries state rather than typography.
+ * `tone` stays separate, because color carries state rather than typography.
  * Folding it in would mean `caption-danger` and `label-primary` and the rest of
  * the cross product, which is the explosion `appearance` exists to prevent.
  *
@@ -79,7 +79,7 @@ export class HelixText extends HelixElement {
     | 'label'
     | 'code'
 
-  /** Colour role. Separate from `appearance`, because colour carries state. */
+  /** Color role. Separate from `appearance`, because color carries state. */
   @property({ reflect: true })
   tone?: 'default' | 'muted' | 'subtle' | 'primary' | 'danger'
 

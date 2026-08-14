@@ -28,8 +28,8 @@
 
 :root {
   /* One declaration per token, both modes inside it. Which half resolves is
-     decided by `color-scheme` and nothing else, so the colour mode is a single
-     attribute on the root and no token has to be restated to honour it.
+     decided by `color-scheme` and nothing else, so the color mode is a single
+     attribute on the root and no token has to be restated to honor it.
 
      This replaced three hand-maintained lists: light defaults, an OS-preference
      block, and one block per explicit mode. They drifted, exactly as duplicated
@@ -212,7 +212,7 @@
   --helix-layer-toast: 1200;
 }
 
-/* The colour mode, and the only thing that decides it. Absent follows the
+/* The color mode, and the only thing that decides it. Absent follows the
    operating system, which is what `color-scheme: light dark` above means.
 
    Not scoped to `:root`. `color-scheme` inherits, and every token above is

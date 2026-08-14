@@ -9,7 +9,7 @@ import { PreferencesDrawer } from './preferences'
 import { VERTICALS } from './verticals'
 
 /**
- * Site navigation: the verticals, centred in the banner.
+ * Site navigation: the verticals, centered in the banner.
  *
  * Plain links inside the header's own `<nav>`, marked with `aria-current` and
  * styled by the `data-nav-item` recipe. Not tabs, because a tab controls a

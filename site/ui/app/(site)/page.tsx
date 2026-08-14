@@ -18,7 +18,7 @@ import { stageAppearance, VERTICALS } from '../verticals'
 
 const substrates = [
   {
-    body: 'The design system. Web components with a token layer that derives an accessible palette from one brand colour, so an interface is consistent because there was nothing else to choose. Components ship as custom elements, which keeps the framework above them a choice rather than a commitment.',
+    body: 'The design system. Web components with a token layer that derives an accessible palette from one brand color, so an interface is consistent because there was nothing else to choose. Components ship as custom elements, which keeps the framework above them a choice rather than a commitment.',
     href: '/design',
     name: 'Helix',
     role: 'The DNA',

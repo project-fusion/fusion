@@ -26,7 +26,7 @@
   z-index: var(--helix-layer-sticky);
 }
 
-/* The row is what gets centred, so the content lines up with the page while
+/* The row is what gets centered, so the content lines up with the page while
    the banner behind it runs edge to edge.
 
    A grid with equal outer tracks, not a flex row. Flex centring puts the
@@ -62,7 +62,7 @@
   min-inline-size: 0;
 }
 
-/* Navigation beside the brand instead of centred in the banner. The outer
+/* Navigation beside the brand instead of centered in the banner. The outer
    tracks stop being equal, so nothing is holding the middle any more. */
 :host([nav-align="start"]) [part="content"] {
   grid-template-columns: auto 1fr auto;
@@ -90,6 +90,8 @@ slot[name="brand"]::slotted(*) {
 [part="nav"] {
   align-items: center;
   display: flex;
+  /* The marker is positioned against this region. */
+  position: relative;
   gap: var(--helix-space-md);
   justify-content: center;
   /* Long navigation scrolls inside the bar instead of widening the page. */
@@ -99,4 +101,40 @@ slot[name="brand"]::slotted(*) {
 
 :host([nav-align="start"]) [part="nav"] {
   justify-content: flex-start;
+}
+
+/* One marker that travels between the links, rather than a background that
+   appears on whichever one is current. A fill that swaps is two things changing
+   at once and reads as a flicker; one that moves is a single object the eye
+   follows, and it says where the current page was as well as where it is.
+
+   Behind the links, and out of flow, so animating it reflows nothing. */
+[part="nav-indicator"] {
+  background-color: var(--app-header-indicator-color, var(--helix-color-surface-sunken));
+  block-size: var(--_nav-indicator-h, 0);
+  border-radius: var(--helix-radii-sm);
+  inline-size: var(--_nav-indicator-w, 0);
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  opacity: 0;
+  position: absolute;
+  translate: var(--_nav-indicator-x, 0) -50%;
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  z-index: var(--helix-layer-base);
+}
+
+/* Hidden until it has somewhere to be, so it fades in rather than sliding from
+   a wrong place on first paint. The server cannot measure, so the current link
+   is legible from its own weight until this arrives. */
+[part="nav-indicator"][data-placed] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="nav-indicator"] {
+    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  }
 }

@@ -325,7 +325,7 @@ site, with element registration in one client component.
 - **The preview renders into the light DOM.** `createRenderRoot()` returns
   `this`. A shadow root would cut the preview off from the base layer, so a
   heading would come out at the browser's default size and a link in the wrong
-  colour, and the preview would be a worse likeness the more the design system
+  color, and the preview would be a worse likeness the more the design system
   does.
 - **Source and preview never speak directly.** The source pane dispatches
   `SourceChange` and the root hands the value to whatever preview is slotted

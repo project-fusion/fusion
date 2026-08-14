@@ -22,7 +22,7 @@ import { styles } from './app-header-root.css.js'
  * @slot - Primary navigation.
  * @slot actions - Trailing actions, such as a call to action.
  *
- * @csspart content - The centred row inside the banner.
+ * @csspart content - The centered row inside the banner.
  * @csspart nav - The navigation region.
  *
  * @cssproperty --app-header-background - Fill behind the banner.

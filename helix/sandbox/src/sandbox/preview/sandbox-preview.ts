@@ -9,7 +9,7 @@ import { property } from 'lit/decorators.js'
  * Renders into the light DOM rather than a shadow root, which is the whole
  * reason this is an element and not a `<div>` someone sets `innerHTML` on.
  * Content inside a shadow root is cut off from the base layer, so a heading
- * would come out at the browser's default size and a link in the wrong colour,
+ * would come out at the browser's default size and a link in the wrong color,
  * and the preview would be a worse likeness the more the design system does.
  * In the light DOM it is styled exactly as it would be on a real page.
  *

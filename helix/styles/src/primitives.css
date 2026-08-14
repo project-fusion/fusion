@@ -1,7 +1,7 @@
 /**
  * Helix primitive tokens. INTERNAL.
  *
- * Raw values with no meaning attached: a colour ramp, a spacing scale, a set of
+ * Raw values with no meaning attached: a color ramp, a spacing scale, a set of
  * durations. They answer "what values exist", never "what is this for".
  *
  * The leading underscore marks them private. **Components must never reference

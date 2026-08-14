@@ -19,12 +19,12 @@ scrolling.
 Three regions, each in its own wrapper, because the row is a grid and a grid
 needs three items to put the middle one in the middle. A bare slot is
 `display: contents`, so its assigned elements become grid items themselves:
-two actions would take two tracks and push the navigation off centre. These
+two actions would take two tracks and push the navigation off center. These
 wrappers earn their boxes, which is the test; they carry no inset or fill of
 their own, so an empty one still paints nothing.
 
 The host is the banner and spans the viewport; the row inside it is what gets
-centred. A banner that is itself narrowed leaves its background stopping
+centered. A banner that is itself narrowed leaves its background stopping
 short of the window edges, which reads as a floating bar rather than as the
 top of the page. That needs one element and one row, not a wrapper as well:
 the host carries the material and `content` carries the measure.
@@ -32,7 +32,7 @@ the host carries the material and `content` carries the measure.
  * Renders `<helix-base-app-header>`.
  */
 export interface BaseAppHeaderProps extends BaseProps {
-  /** Where the navigation sits in the bar. Centred by default, which reads as the site's spine when the navigation is the primary thing in the header rather than an afterthought beside a logo. Centred against the banner rather than against whatever space the brand left over, so the middle of the nav is the middle of the window whatever the wordmark and the actions happen to measure. `start` is the opt-out, for a header whose navigation trails the brand. */
+  /** Where the navigation sits in the bar. Centered by default, which reads as the site's spine when the navigation is the primary thing in the header rather than an afterthought beside a logo. Centered against the banner rather than against whatever space the brand left over, so the middle of the nav is the middle of the window whatever the wordmark and the actions happen to measure. `start` is the opt-out, for a header whose navigation trails the brand. */
   navAlign?: 'start'
 }
 

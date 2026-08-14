@@ -1,5 +1,5 @@
 /**
- * The verticals, in the order the company is organised. Design leads, because
+ * The verticals, in the order the company is organized. Design leads, because
  * it is the one with something to show.
  *
  * One list, read by the navigation, the landing page, and each vertical's own
@@ -18,7 +18,7 @@ export interface Vertical {
 
 export const VERTICALS: Vertical[] = [
   {
-    body: 'Helix is the design system: web components with a token layer that derives an accessible palette from a brand colour rather than from a spreadsheet of hexes. Components ship as custom elements, so the framework above them stays a choice.',
+    body: 'Helix is the design system: web components with a token layer that derives an accessible palette from a brand color rather than from a spreadsheet of hexes. Components ship as custom elements, so the framework above them stays a choice.',
     href: '/design',
     label: 'Design',
     name: 'Fusion Design',
