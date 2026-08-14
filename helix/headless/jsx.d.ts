@@ -16,6 +16,7 @@ import type {
   HelixBaseCard,
   HelixBaseCarousel,
   HelixBaseCheckbox,
+  HelixBaseCheckboxGroup,
   HelixBaseDivider,
   HelixBaseDrawer,
   HelixBaseEmptyState,
@@ -783,6 +784,45 @@ export type HelixBaseCarouselSolidJsProps = {
   "prop:interval"?: HelixBaseCarousel["interval"];
   /** Fired when the slide in view changes, with its index. */
   "on:helix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseCheckboxGroup` component event */
+export type HelixBaseCheckboxGroupElementEvent<E = Event> = TypedEvent<
+  HelixBaseCheckboxGroup,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseCheckboxGroupHelixChangeElementEvent =
+  HelixBaseCheckboxGroupElementEvent<HelixChangeEvent>;
+
+export type HelixBaseCheckboxGroupProps = {
+  /** Accessible name for the group. */
+  label?: HelixBaseCheckboxGroup["label"];
+  /** Name submitted with the form, given to every box that has none. */
+  name?: HelixBaseCheckboxGroup["name"];
+  /** The checked values, comma separated. */
+  value?: HelixBaseCheckboxGroup["value"];
+
+  /** Fired when any box changes, with the whole set. */
+  "onhelix-change"?: (e: HelixBaseCheckboxGroupHelixChangeElementEvent) => void;
+};
+
+export type HelixBaseCheckboxGroupSolidJsProps = {
+  /** Accessible name for the group. */
+  "prop:label"?: HelixBaseCheckboxGroup["label"];
+  /** Name submitted with the form, given to every box that has none. */
+  "prop:name"?: HelixBaseCheckboxGroup["name"];
+  /** The checked values, comma separated. */
+  "prop:value"?: HelixBaseCheckboxGroup["value"];
+  /** Fired when any box changes, with the whole set. */
+  "on:helix-change"?: (
+    e: HelixBaseCheckboxGroupHelixChangeElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2358,6 +2398,45 @@ export type CustomElements = {
    */
   "helix-base-carousel": Partial<
     HelixBaseCarouselProps & BaseProps<HelixBaseCarousel> & BaseEvents
+  >;
+
+  /**
+   * The host is the group, so `role="group"` sits on it through internals and
+   * `label` names it. A run of checkboxes with no name is announced as separate
+   * controls, which is what the grouping exists to say it is not.
+   *
+   * **Each checkbox still submits itself.** They are form-associated already and
+   * a native group is several inputs sharing a name, so this adds no form value
+   * of its own: it would submit the same answers twice. What it adds is the
+   * grouping, a shared `name` so it is written once, and one place to read and
+   * write the whole set.
+   *
+   * `value` is the checked values, comma separated, in the order the boxes are
+   * written. Setting it ticks exactly those and unticks the rest.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the group.
+   * - `name`: Name submitted with the form, given to every box that has none.
+   * - `value`: The checked values, comma separated.
+   * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when any box changes, with the whole set.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The checkboxes.
+   */
+  "helix-base-checkbox-group": Partial<
+    HelixBaseCheckboxGroupProps & BaseProps<HelixBaseCheckboxGroup> & BaseEvents
   >;
 
   /**
@@ -4200,6 +4279,48 @@ export type CustomElementsSolidJs = {
     HelixBaseCarouselProps &
       HelixBaseCarouselSolidJsProps &
       BaseProps<HelixBaseCarousel> &
+      BaseEvents
+  >;
+
+  /**
+   * The host is the group, so `role="group"` sits on it through internals and
+   * `label` names it. A run of checkboxes with no name is announced as separate
+   * controls, which is what the grouping exists to say it is not.
+   *
+   * **Each checkbox still submits itself.** They are form-associated already and
+   * a native group is several inputs sharing a name, so this adds no form value
+   * of its own: it would submit the same answers twice. What it adds is the
+   * grouping, a shared `name` so it is written once, and one place to read and
+   * write the whole set.
+   *
+   * `value` is the checked values, comma separated, in the order the boxes are
+   * written. Setting it ticks exactly those and unticks the rest.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the group.
+   * - `name`: Name submitted with the form, given to every box that has none.
+   * - `value`: The checked values, comma separated.
+   * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when any box changes, with the whole set.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The checkboxes.
+   */
+  "helix-base-checkbox-group": Partial<
+    HelixBaseCheckboxGroupProps &
+      HelixBaseCheckboxGroupSolidJsProps &
+      BaseProps<HelixBaseCheckboxGroup> &
       BaseEvents
   >;
 

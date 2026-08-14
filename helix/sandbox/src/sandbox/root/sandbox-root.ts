@@ -3,6 +3,7 @@ import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixSandboxPreview } from '../preview/sandbox-preview.js'
+import { HelixSandboxSource } from '../source/sandbox-source.js'
 import { styles } from './sandbox-root.css.js'
 
 /** How far one arrow press moves the split, in percent. */
@@ -60,7 +61,18 @@ export class HelixSandbox extends HelixElement {
   @state()
   private dragging = false
 
+  /**
+   * Takes a change from one of this sandbox's own source panes.
+   *
+   * The target is checked, and has to be. `helix-change` bubbles and composes,
+   * so every form control rendered *inside* a preview sends one up here too: a
+   * checkbox group in an example replaced the example's own markup with its
+   * selected values. A sandbox hears a great deal that is not its source.
+   */
   private readonly handleSourceChange = (event: Event): void => {
+    if (!(event.target instanceof HelixSandboxSource)) {
+      return
+    }
     const { name, value } = (event as HelixChangeEvent).detail
     for (const preview of this.previews) {
       if (name === 'css') {

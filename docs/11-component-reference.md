@@ -760,31 +760,73 @@ the browser's own and the control stays a control for anything reading the page.
 
 ### Root
 
-Description
+Groups related checkboxes, and reports them as one set.
+
+The host is the group: `role="group"` sits on it through internals and `label`
+names it. A run of checkboxes with no name is announced as separate controls,
+which is what the grouping exists to say it is not.
+
+**Each checkbox still submits itself.** They are form-associated already, and a
+native group is several inputs sharing a name, so this adds no form value of its
+own: it would submit the same answers twice. What it adds is the grouping, a
+shared `name` so it is written once, and one place to read and write the set.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type     | Default | Inherited From | Description                                      |
+| -------- | --------- | -------- | ------- | -------------- | ------------------------------------------------ |
+| `label`  | `label`   | `string` | `''`    | -              | Accessible name for the group.                   |
+| `name`   | `name`    | `string` | `''`    | -              | Name given to every box that has none.           |
+| `value`  | `value`   | `string` | `''`    | -              | The checked values, comma separated.             |
+
+`value` is in the order the boxes are written, not the order they were ticked.
+Setting it ticks exactly those and unticks the rest.
+
+`name` is pushed down as a **property**, not written as an attribute: an
+attribute on a box is a change to markup the consumer rendered, which a React
+consumer's hydration reports. A box that names itself keeps its own.
+
+#### Getters
+
+| Getter  | Type                  | Description                        |
+| ------- | --------------------- | ---------------------------------- |
+| `boxes` | `HelixBaseCheckbox[]` | The boxes, in light-DOM order.     |
 
 #### Events
 
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+| Event          | Type               | Description                                    |
+| -------------- | ------------------ | ---------------------------------------------- |
+| `helix-change` | `HelixChangeEvent` | Fired when any box changes, with the whole set. |
+
+**One event per change, and it carries the set.** A box's own `helix-change`
+stops at the group with `stopImmediatePropagation`, because a consumer of a
+group puts their listener on the group and would otherwise get the box's lone
+boolean alongside the set.
+
+The group reads the requested state out of the box's event rather than off the
+box. Driving the boxes from `value` makes them controlled, so a controlled box
+applies nothing itself and reports what it was asked for; reading `isChecked`
+would read the state it still holds and nothing would ever move.
+
+Its own listener sits on the host it dispatches from, so it checks the event's
+target and ignores anything that is not one of its boxes. Without that it hears
+itself and answers until the stack gives out.
 
 #### Slots
 
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
+| Slot        | Description     |
+| ----------- | --------------- |
+| _(default)_ | The checkboxes. |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+None. The host is the box.
+
+### Styled
+
+A column by default, which is what a list of choices wants: the eye scans one
+line per answer rather than hunting along a row. `orientation="horizontal"`
+runs them across instead.
 
 ## BaseChip(Tag)
 

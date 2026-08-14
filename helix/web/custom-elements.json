@@ -5153,6 +5153,332 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/checkbox-group/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/checkbox-group/root/checkbox-group-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/checkbox-group/root/checkbox-group-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/checkbox-group/root/checkbox-group-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/checkbox-group/root/checkbox-group-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A column by default, which is what a list of choices wants: the eye scans one\nline per answer rather than hunting along a row.",
+          "name": "HelixCheckboxGroup",
+          "cssProperties": [
+            {
+              "description": "Space between the boxes.",
+              "name": "--checkbox-group-gap"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | undefined"
+              },
+              "description": "Which way the boxes run.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the group.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form, given to every box that has none.",
+              "attribute": "name",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The checked values, comma separated.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "boxes",
+              "type": {
+                "text": "HelixBaseCheckbox[]"
+              },
+              "description": "The boxes, in light-DOM order. Client only: the server has no tree.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "sync",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Pushes the group's name and value onto the boxes.\n\nAs properties rather than attributes. A `name` written onto a box is a\nchange to markup the consumer rendered, which a React consumer's hydration\nreports and does not patch up. A box that names itself keeps its own.",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Reads a box's requested change into `value`, and says so once.\n\nThe box is found from the event's target, which does two things. It tells\nthe group which box asked, where the detail carries only the shared name.\nAnd it ignores the group's own dispatch, which lands on this same listener\nbecause the group is what it is dispatched from: without the guard the\ngroup answers itself until the stack gives out.\n\nThe requested state comes from the event rather than from the box. Driving\nthe boxes from `value` makes them controlled, so a controlled box applies\nnothing on its own and reports what it was asked for. Reading `isChecked`\nhere would read the state it still holds and nothing would ever change.",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | undefined"
+              },
+              "description": "Which way the boxes run.",
+              "fieldName": "orientation"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the group.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form, given to every box that has none.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The checked values, comma separated.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseCheckboxGroup",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Groups related checkboxes, and reports them as one set.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/checkbox-group",
+            "aliases": [
+              "Checkbox list",
+              "Multi-select"
+            ],
+            "tier": "styled",
+            "group": "CheckboxGroup",
+            "part": "Root"
+          },
+          "tagName": "helix-checkbox-group",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The checkboxes.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired when any box changes, with the whole set.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/checkbox-group/root/checkbox-group-root.ts",
+          "definitionPath": "src/checkbox-group/root/checkbox-group-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCheckboxGroup",
+          "declaration": {
+            "name": "HelixCheckboxGroup",
+            "module": "src/checkbox-group/root/checkbox-group-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-checkbox-group",
+          "declaration": {
+            "name": "HelixCheckboxGroup",
+            "module": "src/checkbox-group/root/checkbox-group-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/checkbox/index.ts",
       "declarations": [],
       "exports": [
@@ -8091,6 +8417,14 @@
           "declaration": {
             "name": "*",
             "module": "src/checkbox/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/checkbox-group/index.js"
           }
         },
         {

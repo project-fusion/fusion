@@ -17,6 +17,7 @@ import type {
   HelixCarousel,
   HelixChangeEvent,
   HelixCheckbox,
+  HelixCheckboxGroup,
   HelixCloseEvent,
   HelixDismissEvent,
   HelixDivider,
@@ -868,6 +869,47 @@ case is the absent attribute, and the styles read it that way. */
   "prop:interval"?: HelixCarousel["interval"];
   /** Fired when the slide in view changes, with its index. */
   "on:helix-select"?: (e: HelixCarouselHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixCheckboxGroup` component event */
+export type HelixCheckboxGroupElementEvent<E = Event> = TypedEvent<
+  HelixCheckboxGroup,
+  E
+>;
+/** `helix-change` event type */
+export type HelixCheckboxGroupHelixChangeElementEvent =
+  HelixCheckboxGroupElementEvent<HelixChangeEvent>;
+
+export type HelixCheckboxGroupProps = {
+  /** Which way the boxes run. */
+  orientation?: HelixCheckboxGroup["orientation"];
+  /** Accessible name for the group. */
+  label?: HelixCheckboxGroup["label"];
+  /** Name submitted with the form, given to every box that has none. */
+  name?: HelixCheckboxGroup["name"];
+  /** The checked values, comma separated. */
+  value?: HelixCheckboxGroup["value"];
+
+  /** Fired when any box changes, with the whole set. */
+  "onhelix-change"?: (e: HelixCheckboxGroupHelixChangeElementEvent) => void;
+};
+
+export type HelixCheckboxGroupSolidJsProps = {
+  /** Which way the boxes run. */
+  "prop:orientation"?: HelixCheckboxGroup["orientation"];
+  /** Accessible name for the group. */
+  "prop:label"?: HelixCheckboxGroup["label"];
+  /** Name submitted with the form, given to every box that has none. */
+  "prop:name"?: HelixCheckboxGroup["name"];
+  /** The checked values, comma separated. */
+  "prop:value"?: HelixCheckboxGroup["value"];
+  /** Fired when any box changes, with the whole set. */
+  "on:helix-change"?: (e: HelixCheckboxGroupHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2646,6 +2688,42 @@ export type CustomElements = {
    */
   "helix-carousel": Partial<
     HelixCarouselProps & BaseProps<HelixCarousel> & BaseEvents
+  >;
+
+  /**
+   * A column by default, which is what a list of choices wants: the eye scans one
+   * line per answer rather than hunting along a row.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way the boxes run.
+   * - `label`: Accessible name for the group.
+   * - `name`: Name submitted with the form, given to every box that has none.
+   * - `value`: The checked values, comma separated.
+   * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when any box changes, with the whole set.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The checkboxes.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--checkbox-group-gap`: Space between the boxes. (default: `undefined`)
+   */
+  "helix-checkbox-group": Partial<
+    HelixCheckboxGroupProps & BaseProps<HelixCheckboxGroup> & BaseEvents
   >;
 
   /**
@@ -4665,6 +4743,45 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * A column by default, which is what a list of choices wants: the eye scans one
+   * line per answer rather than hunting along a row.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way the boxes run.
+   * - `label`: Accessible name for the group.
+   * - `name`: Name submitted with the form, given to every box that has none.
+   * - `value`: The checked values, comma separated.
+   * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when any box changes, with the whole set.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The checkboxes.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--checkbox-group-gap`: Space between the boxes. (default: `undefined`)
+   */
+  "helix-checkbox-group": Partial<
+    HelixCheckboxGroupProps &
+      HelixCheckboxGroupSolidJsProps &
+      BaseProps<HelixCheckboxGroup> &
+      BaseEvents
+  >;
+
+  /**
    * The box is the native input, restyled rather than replaced, so the tick and
    * the indeterminate dash are the browser's own and the control stays a control
    * for anything reading the page.
@@ -6064,6 +6181,8 @@ export type CustomCssProperties = {
   "--card-radii"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
+  /** Space between the boxes. */
+  "--checkbox-group-gap"?: string;
   /** Width and height of the box. */
   "--checkbox-size"?: string;
   /** Fill of a ticked box. */

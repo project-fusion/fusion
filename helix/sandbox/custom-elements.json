@@ -297,7 +297,8 @@
               "kind": "field",
               "name": "handleSourceChange",
               "privacy": "private",
-              "readonly": true
+              "readonly": true,
+              "description": "Takes a change from one of this sandbox's own source panes.\n\nThe target is checked, and has to be. `helix-change` bubbles and composes,\nso every form control rendered *inside* a preview sends one up here too: a\ncheckbox group in an example replaced the example's own markup with its\nselected values. A sandbox hears a great deal that is not its source."
             },
             {
               "kind": "field",
