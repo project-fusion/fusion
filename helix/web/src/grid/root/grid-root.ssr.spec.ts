@@ -4,9 +4,8 @@ import { html } from 'lit'
 import '../index.js'
 
 describe('grid server output', () => {
-  // The regression this exists for: the track list used to be rendered into a
-  // `<style>` element, and Lit rejects expressions inside one. It threw during
-  // server rendering, and nothing caught it because layout had no SSR spec.
+  // Lit rejects an expression inside a `<style>` element, and the throw comes
+  // at server render time only, so a track list built that way needs this.
   test('renders without throwing', () => {
     expect(() => ssr(html`<helix-grid min="18rem">x</helix-grid>`)).not.toThrow()
     expect(() => ssr(html`<helix-grid columns={3}>x</helix-grid>`)).not.toThrow()

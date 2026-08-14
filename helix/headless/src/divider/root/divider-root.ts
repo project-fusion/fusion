@@ -37,12 +37,11 @@ export class HelixBaseDivider extends HelixElement {
    * had already closed, and announcing every one as a separator is noise a
    * screen-reader user has to walk past.
    *
-   * Stated this way round rather than as `decorative`, which is how the
-   * reference implementation has it, because a boolean attribute cannot be
-   * turned off: `decorative="false"` is still `true` to the parser, so the
-   * quiet default would have been unreachable from HTML and settable only as a
-   * property. An opt-in has no such problem, and it is absent by default, which
-   * is what every reflected property here has to be.
+   * An opt-in, not a `decorative` opt-out, because a boolean attribute cannot
+   * be turned off: `decorative="false"` parses as `true`, which would put the
+   * quiet default out of reach from HTML and leave it settable only as a
+   * property. An opt-in is absent by default, which every reflected property
+   * here has to be.
    */
   @property({ reflect: true, type: Boolean })
   announced = false

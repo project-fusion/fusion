@@ -8,11 +8,9 @@ import { property } from 'lit/decorators.js'
  * @description
  * Renders a `<button role="radio">`. This is a form control and nothing else.
  *
- * It used to serve navigation too, behind a `nav` attribute on the group, and
- * that was two components wearing one name. Navigation is links marked with
- * `aria-current`, styled by the `data-nav-item` recipe in the base layer; it
- * only ever borrowed this component's *look*. Borrowing radio semantics for it
- * would have announced a set of destinations as a set of choices.
+ * Navigation is not this. It is links marked with `aria-current` and styled by
+ * the `data-nav-item` recipe in the base layer, which carries the same look
+ * without radio semantics announcing destinations as choices.
  *
  * @since 0.1.0
  * @status experimental

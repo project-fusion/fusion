@@ -135,10 +135,10 @@ for (const [group, parts] of [...groups].sort(([a], [b]) => a.localeCompare(b)))
     body.push(` */`)
     // React's own `HTMLAttributes` already declares some of the props an event
     // derives: `helix-select` becomes `onSelect`, which React types as a
-    // `ReactEventHandler`. Ours carries a Helix event and is not assignable to
+    // `ReactEventHandler`. A handler carrying a Helix event is not assignable to
     // that, so extending `BaseProps` unmodified is a type error. Omitting the
-    // ones we generate lets our typed handler win, which is what a consumer
-    // wants: our `onSelect` fires for `helix-select`, not for text selection.
+    // generated ones lets the Helix signature win, and `onSelect` on a Helix
+    // component fires for `helix-select`, not for text selection.
     const eventProps = events.map(
       (event) => event.reactProp ?? `on${kebabToCamel(`-${event.name}`)}`,
     )

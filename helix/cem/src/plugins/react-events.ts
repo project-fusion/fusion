@@ -11,9 +11,9 @@ import { eachComponent } from '../types.js'
  * The wrapper attaches a real listener for the derived name rather than relying
  * on React to bind it. React reserves every prop matching `on[A-Z]` for its own
  * synthetic system and silently drops the ones it does not recognise, so
- * `onOpen` on a custom element reaches nothing on its own. Measured: only
- * `change`, `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`,
- * `focus` and `blur` are bound by React itself.
+ * `onOpen` on a custom element reaches nothing on its own. Only `change`,
+ * `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`, `focus` and
+ * `blur` are bound by React itself.
  */
 export const toReactProp = (eventName: string): string => {
   const verb = eventName.replace(/^helix-/, '')

@@ -133,19 +133,16 @@ body {
 
 /* Link variants, as recipes rather than as a component.
  *
- * The rule above already covers a plain anchor, and these are the deliberate
- * departures from it. They are selectable without a component so that a link
- * something else renders gets the same treatment as one we render: a framework
- * router's anchor cannot be produced inside our shadow root, and wrapping it in
- * an element that renders its own anchor nests one inside the other.
+ * The rule above already covers a plain anchor, and these are the departures
+ * from it. Selectable without a component, so a link a router renders is styled
+ * the same as any other: a router's anchor cannot be produced inside a shadow
+ * root, and an element wrapping one nests an anchor inside an anchor.
  *
  * Attribute selectors rather than `:where()`, so a variant beats the base rule
  * while still losing to anything a consumer writes with a class.
  *
- * `rel` is not here, because it is behavior rather than presentation. The
- * component defaulted it at runtime; Biome's `noBlankTarget` is on under the
- * recommended preset and fails the build instead, which catches the mistake
- * before it ships rather than papering over it after.
+ * `rel` is not here, because it is behavior rather than presentation. Biome's
+ * `noBlankTarget` fails the build on a missing one.
  */
 
 /* Reads as body text until hovered, for a link among prose that should not
@@ -334,10 +331,10 @@ helix-text[tone="danger"] {
  * rules, so this is the single definition and `button-root.css` keeps only what
  * cannot be reached from outside.
  *
- * It exists because `Button` no longer renders an anchor, for the same reason
- * `Link` stopped existing: a router renders its own `<a>` and cannot render it
- * inside a shadow root. A link that looks like a button is styling, so it is
- * styling. `<Link data-button="primary">` is the same control.
+ * A link that looks like a button is styling, and this is where that styling
+ * lives: `Button` renders no anchor, because a router renders its own `<a>` and
+ * cannot render it inside a shadow root. `<Link data-button="primary">` is the
+ * same control.
  */
 [data-button],
 helix-button::part(button) {
@@ -483,12 +480,10 @@ helix-toggle[disabled]::part(item) {
 
 /* The nav item.
  *
- * A recipe rather than an element, and for the same reason `Link` is not a
- * component: navigation is links, a router renders its own anchor, and anything
- * we wrap around it either nests an anchor or loses the cascade to the outer
- * tree. There is no `NavBar` either. The landmark is the `<nav>` the header
- * already renders, and a component whose whole job is to be a container for
- * links is a container for links.
+ * A recipe, not an element: navigation is links, a router renders its own
+ * anchor, and an element wrapping one either nests an anchor inside an anchor
+ * or loses the cascade to the outer tree. The landmark is the `<nav>` the
+ * header renders.
  *
  * The current item is marked by `aria-current="page"`, which is what navigation
  * actually uses, rather than by a `selected` attribute mirroring it. That makes

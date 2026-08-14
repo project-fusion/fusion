@@ -14,7 +14,7 @@ import { join } from 'node:path'
  * to be available before it.
  *
  * CSS has no way to select "any custom element", and a bare `:not(:defined)`
- * rule would also catch elements we do not own, including Next's own dev
+ * rule also catches elements this package does not own, including Next's dev
  * overlay. So the tags are enumerated.
  */
 const TAG = /@customElement\(\s*['"]([a-z][a-z0-9]*(?:-[a-z0-9]+)+)['"]\s*\)/g

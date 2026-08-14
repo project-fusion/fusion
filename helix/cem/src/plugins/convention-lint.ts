@@ -23,10 +23,11 @@ const RELAYED_NATIVE = new Set(['blur', 'change', 'error', 'focus', 'input', 'in
 /**
  * Verbs React's synthetic system claims on a custom element.
  *
- * Measured rather than assumed: a probe dispatched each name from a custom
- * element and recorded which fired the matching React prop. `select`, `close`,
- * `toggle`, `open`, `dismiss`, `navigate` and `remove` are all free, which is
- * what lets the verb-only form work.
+ * React binds each of these itself, so a `helix-` name stripping onto one lands
+ * on a prop it has already wired. `select`, `close`, `toggle`, `open`,
+ * `dismiss`, `navigate` and `remove` are free, which is what lets the verb-only
+ * form work. Re-check by dispatching each name from a custom element and
+ * watching whether the matching React prop fires.
  */
 const REACT_CLAIMED = new Set([
   'blur',
@@ -166,8 +167,7 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
           // Verbs React has already claimed cannot be used, because stripping
           // the prefix lands on a prop its synthetic system owns: a
           // `helix-change` becomes `onChange`, which React has wired to the
-          // native `change`, so ours would never fire. Measured in a browser,
-          // not assumed.
+          // native `change`, so the Helix event would never fire.
           //
           // A relayed native is exempt, and has to be: landing on the prop
           // React already wired to that event is precisely what relaying is

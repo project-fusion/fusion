@@ -41,13 +41,9 @@ export class HelixBaseCard extends HelixElement {
   protected override render(): TemplateResult {
     // Bare slots, with no wrapper element around any of them. A `<slot>` is
     // `display: contents` in the UA stylesheet, so an unassigned one generates
-    // no box at all: no grid row, no gap, nothing. A wrapper would generate one
-    // whether or not anything was slotted into it, which is what made an
-    // omitted region paint an empty inset band and forced the component to
-    // detect its own emptiness.
-    //
-    // Measured, same content: wrappers present but empty rendered 85px against
-    // an ideal of 53px, and bare slots rendered 53px with no hiding logic.
+    // no box at all: no grid row, no gap, nothing. A wrapper generates one
+    // whether or not anything is slotted into it, so an omitted region would
+    // paint an empty inset band.
     //
     // It has to be layout rather than detection, because the detection does not
     // exist. `:host(:has([slot='header']))` is invalid CSS, so the whole rule is

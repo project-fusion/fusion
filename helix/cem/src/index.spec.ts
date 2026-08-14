@@ -173,7 +173,7 @@ describe('conventionLint', () => {
   })
 
   // Stripping the prefix lands on a prop React's synthetic system already owns,
-  // so ours would never fire. Measured in a browser rather than assumed.
+  // which it has wired to the native event, so the Helix one would never fire.
   test('rejects a verb React has already claimed', () => {
     expect(lintOf({ events: [{ description: 'x', name: 'helix-change' }] })).toThrow(
       /claimed-events/,

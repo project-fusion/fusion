@@ -23,7 +23,7 @@
  *
  * The name also decides the framework prop, because the manifest derives one
  * from the other by stripping `helix-` and camel-casing: `helix-open` is
- * `onOpen`. Two consequences, both measured in a browser rather than assumed:
+ * `onOpen`. Two consequences:
  *
  * 1. **A verb React has claimed cannot be used.** React's synthetic system owns
  *    `change`, `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`,
@@ -104,9 +104,7 @@ export interface DismissDetail {
  * `preventDefault()` is a refusal.
  *
  * One verb for both shapes. A tag leaving a list and a banner closing itself
- * are the same act from the element's side, and splitting them into `remove`
- * and `dismiss` would have meant two names for one thing that a consumer has to
- * learn separately.
+ * are the same act from the element's side.
  */
 export class HelixDismissEvent extends CustomEvent<DismissDetail> {
   static readonly eventName = 'helix-dismiss'

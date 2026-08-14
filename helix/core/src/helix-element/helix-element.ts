@@ -34,15 +34,14 @@ export class HelixElement extends LitElement {
   /**
    * The element's semantics, set without touching the DOM.
    *
-   * Every component that is a landmark, a list item, or a cell used to write
-   * `role` onto its own host in `willUpdate`. That is an attribute the element
-   * adds to itself after it upgrades, so a React consumer's server markup never
-   * has it and hydration reports a mismatch on every one of them.
-   * `ElementInternals` exists for exactly this: it sets the implicit role an
-   * author's `role` attribute still overrides, and it writes nothing.
+   * `ElementInternals` sets the implicit role, which an author's own `role`
+   * attribute still overrides, and it writes no attribute. Setting `role` on the
+   * host directly would: that is an attribute the element gives itself after it
+   * upgrades, which a React consumer's server markup never had, and hydration
+   * reports it as a mismatch.
    *
-   * Available during server rendering: Lit's shim implements
-   * `attachInternals`, verified, so nothing here needs a guard.
+   * Available during server rendering. Lit's shim implements `attachInternals`,
+   * so nothing here needs a guard.
    */
   protected readonly internals: ElementInternals
 
