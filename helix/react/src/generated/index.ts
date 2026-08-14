@@ -9,6 +9,7 @@ export {
 export { AppHeader, type AppHeaderProps, AppHeaderRoot } from './app-header.js'
 export { Avatar, type AvatarProps, AvatarRoot } from './avatar.js'
 export { Badge, type BadgeProps, BadgeRoot } from './badge.js'
+export { Banner, type BannerProps, BannerRoot } from './banner.js'
 export {
   BaseAccordion,
   BaseAccordionItem,
@@ -19,6 +20,7 @@ export {
 export { BaseAppHeader, type BaseAppHeaderProps, BaseAppHeaderRoot } from './base-app-header.js'
 export { BaseAvatar, type BaseAvatarProps, BaseAvatarRoot } from './base-avatar.js'
 export { BaseBadge, type BaseBadgeProps, BaseBadgeRoot } from './base-badge.js'
+export { BaseBanner, type BaseBannerProps, BaseBannerRoot } from './base-banner.js'
 export { BaseBlockquote, type BaseBlockquoteProps, BaseBlockquoteRoot } from './base-blockquote.js'
 export {
   BaseBreadcrumbs,

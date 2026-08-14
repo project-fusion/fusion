@@ -58,3 +58,12 @@ slot[name="icon"]::slotted(*) {
   line-height: var(--helix-leading-normal);
   min-inline-size: 0;
 }
+
+/* The title, when there is one. A bare slot, so an omitted one generates no box
+   and the content sits where it would have anyway. */
+slot[name="title"]::slotted(*) {
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-semibold);
+  margin: var(--helix-space-none);
+}

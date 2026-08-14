@@ -1,15 +1,16 @@
 export {
+  type DismissDetail,
+  HelixDismissEvent,
   HelixOpenEvent,
-  HelixRemoveEvent,
   HelixSelectEvent,
   type OpenDetail,
-  type RemoveDetail,
   type SelectDetail,
 } from '@helix-io/core'
 export * from './accordion/index.js'
 export * from './app-header/index.js'
 export * from './avatar/index.js'
 export * from './badge/index.js'
+export * from './banner/index.js'
 export * from './blockquote/index.js'
 export * from './breadcrumbs/index.js'
 export * from './button/index.js'

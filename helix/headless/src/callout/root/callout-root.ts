@@ -26,13 +26,19 @@ const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
  * slotting their own and the default disappears with no emptiness check. That
  * is what slot fallback is for.
  *
+ * Not a `Banner`, which is the other thing this could be mistaken for. A
+ * callout interrupts a document to set a passage apart and is read where it
+ * sits; a banner is page-level chrome above the masthead, announces itself as a
+ * live region, and can be dismissed. Neither is a variant of the other.
+ *
  * @since 0.1.0
  * @status experimental
- * @aliases Alert, Banner, Admonition, Notice
+ * @aliases Admonition, Notice, Note
  * @documentation https://helix.fusion.dev/components/callout
  *
  * @slot - The callout's content.
  * @slot icon - Replaces the icon chosen by `severity`.
+ * @slot title - A heading above the content.
  *
  * @csspart icon - The icon region.
  * @csspart content - The content region.
@@ -60,7 +66,10 @@ export class HelixBaseCallout extends HelixElement {
           </svg>
         </slot>
       </span>
-      <div part="content"><slot></slot></div>`
+      <div part="content">
+        <slot name="title"></slot>
+        <slot></slot>
+      </div>`
   }
 }
 

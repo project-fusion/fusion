@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixRemoveEvent } from '@helix-io/core'
+import { customElement, HelixDismissEvent, HelixElement } from '@helix-io/core'
 import { x } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -26,7 +26,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @csspart remove - The remove button, when `removable`.
  *
- * @event {HelixRemoveEvent} helix-remove - Fired when the reader asks to remove the tag.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  */
 @customElement('helix-base-tag')
 export class HelixBaseTag extends HelixElement {
@@ -50,7 +50,7 @@ export class HelixBaseTag extends HelixElement {
 
   private readonly handleRemove = (): void => {
     // Reading text is safe here: a click only ever happens in a browser.
-    this.dispatchEvent(new HelixRemoveEvent({ label: this.textContent?.trim() ?? '' }))
+    this.dispatchEvent(new HelixDismissEvent({ label: this.textContent?.trim() ?? '' }))
   }
 
   protected override render(): TemplateResult {

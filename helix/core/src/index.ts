@@ -4,13 +4,13 @@ export {
 } from './controllers/dismiss-controller/dismiss-controller.js'
 export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {
+  type DismissDetail,
   HelixCloseEvent,
+  HelixDismissEvent,
   HelixOpenEvent,
-  HelixRemoveEvent,
   HelixSelectEvent,
   HelixValueChangeEvent,
   type OpenDetail,
-  type RemoveDetail,
   type SelectDetail,
   type ValueChangeDetail,
 } from './events/events.js'

@@ -1,0 +1,79 @@
+:host {
+  --_banner-color: var(--helix-color-foreground-muted);
+
+  align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  /* Beneath only. A band across the top of the page is bounded by the page's
+     own edges on three sides already. */
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  color: var(--helix-color-foreground);
+  display: flex;
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-md);
+  inline-size: 100%;
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--banner-inset, var(--helix-space-lg));
+}
+
+:host([severity="info"]) {
+  --_banner-color: var(--helix-color-info);
+}
+
+:host([severity="success"]) {
+  --_banner-color: var(--helix-color-success);
+}
+
+:host([severity="warning"]) {
+  --_banner-color: var(--helix-color-warning);
+}
+
+:host([severity="danger"]) {
+  --_banner-color: var(--helix-color-danger);
+}
+
+/* The severity tints the band rather than coloring the text, which has to stay
+   readable at body size across the full width. */
+:host([severity]) {
+  background-color: color-mix(in oklab, var(--_banner-color) 12%, transparent);
+  border-block-end-color: color-mix(in oklab, var(--_banner-color) 40%, transparent);
+}
+
+[part="content"] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+[part="actions"] {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--helix-space-xs);
+}
+
+[part="dismiss"] {
+  all: unset;
+  block-size: var(--helix-size-control-dense);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-control-dense);
+  place-content: center;
+  place-items: center;
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="dismiss"] svg {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+[part="dismiss"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="dismiss"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}

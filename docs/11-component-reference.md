@@ -229,31 +229,53 @@ No `root`: the host is the box.
 
 ### Root
 
-Description
+A page-level message above the masthead, which can be dismissed. Chrome rather
+than content: a banner speaks for the whole page, where a `Callout` interrupts a
+document to set a passage apart and is read where it sits. Neither is a variant
+of the other.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property       | Attribute        | Type                                                | Default     | Inherited From | Description                          |
+| -------------- | ---------------- | --------------------------------------------------- | ----------- | -------------- | ------------------------------------ |
+| `dismissible`  | `dismissible`    | `boolean`                                            | `false`     | -              | Whether the reader can close it.     |
+| `dismissLabel` | `dismiss-label`  | `string`                                             | `'Dismiss'` | -              | Accessible name for the control.     |
+| `severity`     | `severity`       | `"info" \| "success" \| "warning" \| "danger"`    | -           | -              | What kind of attention it needs.     |
+
+**Always a polite live region**, and deliberately not configurable.
+`role="alert"` is assertive and interrupts whatever is being read, which is
+right for something appearing mid-session and wrong for something in the served
+HTML: an assertive banner cuts across a screen-reader user on every page load,
+before they have read anything. The severity does not change that, because an
+error that was always there is still not an interruption.
 
 #### Events
 
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+| Event           | Type                | Description                              |
+| --------------- | ------------------- | ---------------------------------------- |
+| `helix-dismiss` | `HelixDismissEvent` | The reader asked to close it. Cancelable. |
+
+A request, not a notification. The banner does not remove itself, because the
+consumer owns the markup and taking the node out from under them would put their
+state and the document out of step. `preventDefault()` is a refusal.
 
 #### Slots
 
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
+| Slot        | Description                                      |
+| ----------- | ------------------------------------------------ |
+| _(default)_ | The message.                                      |
+| `actions`   | What to do about it, usually a link or a button.  |
+| `icon`      | Replaces the glyph inside the dismiss control.    |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+| Part      | Description                     |
+| --------- | ------------------------------- |
+| `content` | The message region.             |
+| `actions` | The trailing action region.     |
+| `dismiss` | The control that asks to close. |
+
+No `root`: the host is the band.
 
 ## BaseBreadcrumbs
 
