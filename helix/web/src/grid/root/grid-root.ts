@@ -61,6 +61,13 @@ export class HelixGrid extends HelixElement {
    * rather than at build time. Hence a static, empty element in the template
    * and its `textContent` set here.
    *
+   * It sets a custom property rather than the track list itself. A shadow
+   * root's adopted stylesheets cascade *after* its own `<style>` elements, and
+   * `static styles` is adopted, so a `grid-template-columns` here lost to the
+   * one in the stylesheet and every `min` grid came out a single column. The
+   * stylesheet only ever reads `--_grid-template`, so there is nothing to
+   * lose against.
+   *
    * The consequence is that a server-rendered grid falls back to the
    * stylesheet's single column until it upgrades. That is why `columns` is also
    * expressed as plain CSS below: the fixed-count case, which can be enumerated,
@@ -72,7 +79,7 @@ export class HelixGrid extends HelixElement {
       return
     }
     sheet.textContent = this.min
-      ? `:host { grid-template-columns: repeat(auto-fit, minmax(min(${this.min}, 100%), 1fr)); }`
+      ? `:host { --_grid-template: repeat(auto-fit, minmax(min(${this.min}, 100%), 1fr)); }`
       : ''
   }
 

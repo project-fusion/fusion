@@ -7,19 +7,21 @@
   display: grid;
   min-block-size: var(--sandbox-min-block-size, 20rem);
   overflow: hidden;
-
-  /* Matches the property's own default, so server-rendered markup and the
-     upgraded element agree until a consumer changes it. */
-  --_sandbox-split: 45%;
 }
 
+/* The fallback is the split's own default, so the served markup and the
+   upgraded element agree until someone drags the divider. It has to be a
+   fallback rather than a declaration: `applySplit` sets the property from a
+   `<style>` in this shadow root, and a shadow root's adopted stylesheets
+   cascade after its own `<style>` elements, so declaring it here would win and
+   the divider would move nothing. */
 :host(:not([orientation])),
 :host([orientation="horizontal"]) {
-  grid-template-columns: var(--_sandbox-split) auto minmax(0, 1fr);
+  grid-template-columns: var(--_sandbox-split, 45%) auto minmax(0, 1fr);
 }
 
 :host([orientation="vertical"]) {
-  grid-template-rows: var(--_sandbox-split) auto minmax(0, 1fr);
+  grid-template-rows: var(--_sandbox-split, 45%) auto minmax(0, 1fr);
 }
 
 /* Both panes must be allowed to shrink below their content, or a wide preview
@@ -66,7 +68,12 @@
   user-select: none;
 }
 
+/* The preview carries its own background and foreground, because it can be set
+   to a different colour mode than the page around it. Without them, a light
+   preview would be light-mode text on the page's dark surface. */
 ::slotted(helix-sandbox-preview) {
+  background-color: var(--helix-color-background);
+  color: var(--helix-color-foreground);
   display: block;
   padding: var(--helix-space-md);
 }

@@ -197,60 +197,6 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
-export type HelixSandboxPreviewProps = {
-  /** Markup to render. */
-  source?: HelixSandboxPreview["source"];
-  /** Stylesheet applied to the preview.
-
-Scoped by being written into the preview's own subtree rather than the
-document, so an example that restyles `helix-card` restyles the one being
-previewed and not the sandbox around it. */
-  styles?: HelixSandboxPreview["styles"];
-};
-
-export type HelixSandboxPreviewSolidJsProps = {
-  /** Markup to render. */
-  "prop:source"?: HelixSandboxPreview["source"];
-  /** Stylesheet applied to the preview.
-
-Scoped by being written into the preview's own subtree rather than the
-document, so an example that restyles `helix-card` restyles the one being
-previewed and not the sandbox around it. */
-  "prop:styles"?: HelixSandboxPreview["styles"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixSandboxProps = {
-  /** Whether the panes sit side by side or stacked. */
-  orientation?: HelixSandbox["orientation"];
-  /** Percentage of the sandbox given to the source pane. */
-  split?: HelixSandbox["split"];
-  /** Accessible name for the divider. */
-  "separator-label"?: HelixSandbox["separatorLabel"];
-  /** Accessible name for the divider. */
-  separatorLabel?: HelixSandbox["separatorLabel"];
-};
-
-export type HelixSandboxSolidJsProps = {
-  /** Whether the panes sit side by side or stacked. */
-  "prop:orientation"?: HelixSandbox["orientation"];
-  /** Percentage of the sandbox given to the source pane. */
-  "prop:split"?: HelixSandbox["split"];
-  /** Accessible name for the divider. */
-  "attr:separator-label"?: HelixSandbox["separatorLabel"];
-  /** Accessible name for the divider. */
-  "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 /** `HelixSandboxSource` component event */
 export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
   HelixSandboxSource,
@@ -310,7 +256,108 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   textContent?: string | number;
 };
 
+export type HelixSandboxPreviewProps = {
+  /** Markup to render. */
+  source?: HelixSandboxPreview["source"];
+  /** Stylesheet applied to the preview.
+
+Scoped by being written into the preview's own subtree rather than the
+document, so an example that restyles `helix-card` restyles the one being
+previewed and not the sandbox around it. */
+  styles?: HelixSandboxPreview["styles"];
+};
+
+export type HelixSandboxPreviewSolidJsProps = {
+  /** Markup to render. */
+  "prop:source"?: HelixSandboxPreview["source"];
+  /** Stylesheet applied to the preview.
+
+Scoped by being written into the preview's own subtree rather than the
+document, so an example that restyles `helix-card` restyles the one being
+previewed and not the sandbox around it. */
+  "prop:styles"?: HelixSandboxPreview["styles"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixSandboxProps = {
+  /** Whether the panes sit side by side or stacked. */
+  orientation?: HelixSandbox["orientation"];
+  /** Percentage of the sandbox given to the source pane. */
+  split?: HelixSandbox["split"];
+  /** Accessible name for the divider. */
+  "separator-label"?: HelixSandbox["separatorLabel"];
+  /** Accessible name for the divider. */
+  separatorLabel?: HelixSandbox["separatorLabel"];
+};
+
+export type HelixSandboxSolidJsProps = {
+  /** Whether the panes sit side by side or stacked. */
+  "prop:orientation"?: HelixSandbox["orientation"];
+  /** Percentage of the sandbox given to the source pane. */
+  "prop:split"?: HelixSandbox["split"];
+  /** Accessible name for the divider. */
+  "attr:separator-label"?: HelixSandbox["separatorLabel"];
+  /** Accessible name for the divider. */
+  "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type CustomElements = {
+  /**
+   * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
+   * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
+   * reader support all come from the platform, and every one of them is
+   * expensive to rebuild and easy to get subtly wrong.
+   *
+   * Tab inserts two spaces rather than leaving the field, because a code pane
+   * that cannot indent is not one. Escape then Tab still moves focus out, which
+   * is the documented escape hatch for exactly this trade.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   *
+   * `html` and `css` are what the sandbox root routes on; any other name is
+   * passed through untouched for a consumer wiring their own panes.
+   *
+   * Not reflected: nothing selects on it, so it keeps a real default instead.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `SourceChange`: Fired when the source is edited.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
+   * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `source`: The editable region.
+   */
+  "helix-sandbox-source": Partial<
+    HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
+  >;
+
   /**
    * Renders into the light DOM rather than a shadow root, which is the whole
    * reason this is an element and not a `<div>` someone sets `innerHTML` on.
@@ -384,7 +431,9 @@ export type CustomElements = {
   "helix-sandbox": Partial<
     HelixSandboxProps & BaseProps<HelixSandbox> & BaseEvents
   >;
+};
 
+export type CustomElementsSolidJs = {
   /**
    * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
    * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
@@ -429,11 +478,12 @@ export type CustomElements = {
    * - `source`: The editable region.
    */
   "helix-sandbox-source": Partial<
-    HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
+    HelixSandboxSourceProps &
+      HelixSandboxSourceSolidJsProps &
+      BaseProps<HelixSandboxSource> &
+      BaseEvents
   >;
-};
 
-export type CustomElementsSolidJs = {
   /**
    * Renders into the light DOM rather than a shadow root, which is the whole
    * reason this is an element and not a `<div>` someone sets `innerHTML` on.
@@ -513,67 +563,17 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixSandbox> &
       BaseEvents
   >;
-
-  /**
-   * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
-   * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
-   * reader support all come from the platform, and every one of them is
-   * expensive to rebuild and easy to get subtly wrong.
-   *
-   * Tab inserts two spaces rather than leaving the field, because a code pane
-   * that cannot indent is not one. Escape then Tab still moves focus out, which
-   * is the documented escape hatch for exactly this trade.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
-   *
-   * `html` and `css` are what the sandbox root routes on; any other name is
-   * passed through untouched for a consumer wiring their own panes.
-   *
-   * Not reflected: nothing selects on it, so it keeps a real default instead.
-   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
-   * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `SourceChange`: Fired when the source is edited.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
-   * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `source`: The editable region.
-   */
-  "helix-sandbox-source": Partial<
-    HelixSandboxSourceProps &
-      HelixSandboxSourceSolidJsProps &
-      BaseProps<HelixSandboxSource> &
-      BaseEvents
-  >;
 };
 
 export type CustomCssProperties = {
-  /** Minimum height of the sandbox. */
-  "--sandbox-min-block-size"?: string;
-  /** Colour of the divider. */
-  "--sandbox-separator-color"?: string;
   /** Fill behind the source. */
   "--sandbox-source-background"?: string;
   /** Minimum height of the pane. */
   "--sandbox-source-min-block-size"?: string;
+  /** Minimum height of the sandbox. */
+  "--sandbox-min-block-size"?: string;
+  /** Colour of the divider. */
+  "--sandbox-separator-color"?: string;
 };
 
 declare module "react" {

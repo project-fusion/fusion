@@ -1,6 +1,17 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
 export interface DismissOptions {
+  /**
+   * The element a press must land inside to count as interacting rather than
+   * leaving. Defaults to the host.
+   *
+   * It has to be overridable because an overlay's own scrim is usually inside
+   * its shadow root, and a press on the scrim is exactly what "outside" means
+   * to a reader. Measured against the host, that press is inside the composed
+   * path and the overlay never closes. A drawer points this at its panel.
+   */
+  boundary?: () => Element | null | undefined
+
   /** Called when the reader asks to close. */
   onDismiss: () => void
 }
@@ -18,11 +29,13 @@ export interface DismissOptions {
  */
 export class DismissController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
+  private readonly boundary: (() => Element | null | undefined) | undefined
   private readonly onDismiss: () => void
   private active = false
 
-  constructor(host: ReactiveControllerHost & HTMLElement, { onDismiss }: DismissOptions) {
+  constructor(host: ReactiveControllerHost & HTMLElement, { boundary, onDismiss }: DismissOptions) {
     this.host = host
+    this.boundary = boundary
     this.onDismiss = onDismiss
     host.addController(this)
   }
@@ -39,7 +52,8 @@ export class DismissController implements ReactiveController {
   private readonly handlePointerDown = (event: PointerEvent): void => {
     // `composedPath` rather than `target`, so a press inside the overlay's own
     // shadow root is still recognised as inside it.
-    if (!event.composedPath().includes(this.host)) {
+    const inside = this.boundary?.() ?? this.host
+    if (!event.composedPath().includes(inside)) {
       this.onDismiss()
     }
   }

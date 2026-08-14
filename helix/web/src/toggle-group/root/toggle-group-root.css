@@ -13,7 +13,7 @@
 :host([appearance="filled"]) {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-full);
   padding: var(--helix-space-2xs);
 }
 
@@ -26,12 +26,15 @@
    written onto this element, because labels differ in length and no fraction of
    the group is right for all of them.
 
-   Its radius matches an item's rather than the wrapper's, so the marker sits
-   concentrically inside the group instead of reading as a second shape. */
+   Fully round. A fixed corner radius has to be chosen against the control's
+   height to read as anything, and at 32px tall neither 4px nor 8px did: both
+   still scanned as a rectangle. A pill is the shape regardless of height, which
+   is the property that matters for a marker that has to read as one travelling
+   object. */
 [part="indicator"] {
   background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
   block-size: var(--_toggle-height);
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--helix-radii-full);
   inline-size: var(--_indicator-w, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;

@@ -555,6 +555,16 @@
             },
             {
               "kind": "field",
+              "name": "boundary",
+              "type": {
+                "text": "(() => Element | null | undefined) | undefined"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "boundary"
+            },
+            {
+              "kind": "field",
               "name": "onDismiss",
               "type": {
                 "text": "() => void"

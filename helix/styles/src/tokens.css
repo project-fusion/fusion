@@ -27,32 +27,46 @@
  */
 
 :root {
+  /* One declaration per token, both modes inside it. Which half resolves is
+     decided by `color-scheme` and nothing else, so the colour mode is a single
+     attribute on the root and no token has to be restated to honour it.
+
+     This replaced three hand-maintained lists: light defaults, an OS-preference
+     block, and one block per explicit mode. They drifted, exactly as duplicated
+     lists do. Five tokens appeared in the OS block and in neither explicit one,
+     so choosing a mode by hand left `surface-sunken`, `overlay`,
+     `foreground-subtle` and both material tokens at the other mode's values:
+     a segmented control kept its light grey track on a dark page. */
   color-scheme: light dark;
 
   /* ======================================================== color ======= */
   /* Surfaces, from furthest back to nearest front. */
-  --helix-color-background: var(--_helix-neutral-50);
-  --helix-color-surface: var(--_helix-neutral-0);
-  --helix-color-surface-raised: var(--_helix-neutral-0);
-  --helix-color-surface-sunken: var(--_helix-neutral-100);
-  --helix-color-overlay: color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent);
+  --helix-color-background: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-950));
+  --helix-color-surface: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900));
+  --helix-color-surface-raised: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800));
+  --helix-color-surface-sunken: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-950));
+  --helix-color-overlay: color-mix(
+    in oklab,
+    var(--_helix-neutral-950) light-dark(40%, 64%),
+    transparent
+  );
 
   /* Text and icons, by prominence. */
-  --helix-color-foreground: var(--_helix-neutral-900);
-  --helix-color-foreground-muted: var(--_helix-neutral-600);
-  --helix-color-foreground-subtle: var(--_helix-neutral-500);
+  --helix-color-foreground: light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100));
+  --helix-color-foreground-muted: light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400));
+  --helix-color-foreground-subtle: light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500));
   --helix-color-foreground-on-accent: var(--_helix-neutral-0);
 
   /* Lines. */
-  --helix-color-border: var(--_helix-neutral-200);
-  --helix-color-border-strong: var(--_helix-neutral-300);
+  --helix-color-border: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-800));
+  --helix-color-border-strong: light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700));
   --helix-color-border-accent: var(--_helix-brand-500);
 
   /* Interaction. */
-  --helix-color-primary: var(--_helix-brand-500);
+  --helix-color-primary: light-dark(var(--_helix-brand-500), var(--_helix-brand-400));
   --helix-color-primary-hover: var(--_helix-brand-600);
   --helix-color-primary-active: var(--_helix-brand-700);
-  --helix-color-primary-subtle: var(--_helix-brand-50);
+  --helix-color-primary-subtle: light-dark(var(--_helix-brand-50), var(--_helix-brand-900));
   --helix-color-focus-ring: var(--_helix-brand-500);
 
   /* Status. */
@@ -125,13 +139,21 @@
   --helix-material-blur-sm: 8px;
   --helix-material-blur-md: 16px;
   --helix-material-blur-lg: 32px;
-  --helix-material-translucent: color-mix(in oklab, var(--_helix-neutral-0) 72%, transparent);
-  --helix-material-translucent-strong: color-mix(
+  --helix-material-translucent: color-mix(
     in oklab,
-    var(--_helix-neutral-0) 88%,
+    light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%,
     transparent
   );
-  --helix-material-border: color-mix(in oklab, var(--_helix-neutral-0) 40%, transparent);
+  --helix-material-translucent-strong: color-mix(
+    in oklab,
+    light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%,
+    transparent
+  );
+  --helix-material-border: color-mix(
+    in oklab,
+    var(--_helix-neutral-0) light-dark(40%, 12%),
+    transparent
+  );
 
   /* ======================================================== motion ====== */
   --helix-duration-instant: 0ms;
@@ -185,58 +207,17 @@
   --helix-layer-toast: 1200;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --helix-color-background: var(--_helix-neutral-950);
-    --helix-color-surface: var(--_helix-neutral-900);
-    --helix-color-surface-raised: var(--_helix-neutral-800);
-    --helix-color-surface-sunken: var(--_helix-neutral-950);
-    --helix-color-overlay: color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent);
+/* The colour mode, and the only thing that decides it. Absent follows the
+   operating system, which is what `color-scheme: light dark` above means.
 
-    --helix-color-foreground: var(--_helix-neutral-100);
-    --helix-color-foreground-muted: var(--_helix-neutral-400);
-    --helix-color-foreground-subtle: var(--_helix-neutral-500);
-
-    --helix-color-border: var(--_helix-neutral-800);
-    --helix-color-border-strong: var(--_helix-neutral-700);
-
-    --helix-color-primary: var(--_helix-brand-400);
-    --helix-color-primary-subtle: var(--_helix-brand-900);
-
-    --helix-material-translucent: color-mix(in oklab, var(--_helix-neutral-900) 72%, transparent);
-    --helix-material-translucent-strong: color-mix(
-      in oklab,
-      var(--_helix-neutral-900) 88%,
-      transparent
-    );
-    --helix-material-border: color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent);
-  }
+   Not scoped to `:root`. `color-scheme` inherits, and every token above is
+   resolved by it, so putting this attribute on any element themes that subtree
+   and nothing else. The sandbox needs exactly that: a light preview inside a
+   dark page, which the old root-only rule could not express. */
+[data-color-mode="light"] {
+  color-scheme: light;
 }
 
-/* The theme toggle stamps data-theme on the root and must win over the media
-   query in both directions. */
-:root[data-theme="light"] {
-  --helix-color-background: var(--_helix-neutral-50);
-  --helix-color-surface: var(--_helix-neutral-0);
-  --helix-color-surface-raised: var(--_helix-neutral-0);
-  --helix-color-foreground: var(--_helix-neutral-900);
-  --helix-color-foreground-muted: var(--_helix-neutral-600);
-  --helix-color-border: var(--_helix-neutral-200);
-  --helix-color-border-strong: var(--_helix-neutral-300);
-  --helix-color-primary: var(--_helix-brand-500);
-  --helix-color-primary-subtle: var(--_helix-brand-50);
-  --helix-material-translucent: color-mix(in oklab, var(--_helix-neutral-0) 72%, transparent);
-}
-
-:root[data-theme="dark"] {
-  --helix-color-background: var(--_helix-neutral-950);
-  --helix-color-surface: var(--_helix-neutral-900);
-  --helix-color-surface-raised: var(--_helix-neutral-800);
-  --helix-color-foreground: var(--_helix-neutral-100);
-  --helix-color-foreground-muted: var(--_helix-neutral-400);
-  --helix-color-border: var(--_helix-neutral-800);
-  --helix-color-border-strong: var(--_helix-neutral-700);
-  --helix-color-primary: var(--_helix-brand-400);
-  --helix-color-primary-subtle: var(--_helix-brand-900);
-  --helix-material-translucent: color-mix(in oklab, var(--_helix-neutral-900) 72%, transparent);
+[data-color-mode="dark"] {
+  color-scheme: dark;
 }

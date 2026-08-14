@@ -68,6 +68,10 @@ export class HelixBaseDrawer extends WithOpen(HelixElement) {
   private readonly trap = new FocusTrapController(this)
 
   private readonly dismisser = new DismissController(this, {
+    // The panel, not the host. The scrim is in this shadow root, so a press on
+    // it is inside the host's composed path: measured against the host, the one
+    // gesture that most obviously means "close" never closed anything.
+    boundary: () => this.renderRoot.querySelector('[part="panel"]'),
     onDismiss: () => {
       if (this.isOpen) {
         this.setOpen(false)

@@ -91,23 +91,37 @@ body {
    boundary and no behavior; styling the element instead also covers links the
    design system never renders.
 
-   The underline is a shadow rather than a text decoration, because a decoration
-   cannot move. Thickness, distance and strength are all animatable here, so the
-   line thickens and settles a little further from the text on hover instead of
-   switching on. The cost is that it does not skip descenders the way
-   `text-decoration-skip-ink` does, which is a fair trade at this weight. */
+   The underline moves on hover: it drops away from the text and strengthens in
+   colour. Both of those are the decoration's own properties rather than a box
+   shadow, because a shadow is drawn on the border box, and an anchor is not
+   always an inline box the width of its text. A flex item is blockified, so any
+   link inside a `column` flex container stretches, and the shadow ran the full
+   width of the container instead of underlining the words.
+
+   All three change, but only two of them move. Measured in Chrome:
+   `text-underline-offset` and `text-decoration-color` animate, while
+   `text-decoration-thickness` snaps straight to its target. A one-pixel snap is
+   imperceptible next to the offset travelling, so thickness is still worth
+   changing; it is listed in the transition anyway, in case it becomes
+   animatable. */
 :where(a) {
-  box-shadow: 0 1px 0 color-mix(in oklab, currentColor 35%, transparent);
   color: var(--helix-color-primary);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
   transition:
-    box-shadow var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
+    color var(--helix-duration-fast) var(--helix-easing-standard),
+    text-decoration-color var(--helix-duration-fast) var(--helix-easing-standard),
+    text-decoration-thickness var(--helix-duration-fast) var(--helix-easing-standard),
+    text-underline-offset var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 :where(a):hover {
-  box-shadow: 0 3px 0 color-mix(in oklab, currentColor 70%, transparent);
   color: var(--helix-color-primary-hover);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.28em;
 }
 
 /* A link opening a new context says so, rather than surprising the reader. */
@@ -147,22 +161,22 @@ body {
 }
 
 [data-link="quiet"] {
-  box-shadow: none;
+  text-decoration: none;
 }
 
 /* Quiet is for navigation, where a line under every row would be noise, so it
    stays underline-free on hover and moves in colour instead. */
 [data-link="quiet"]:hover {
-  box-shadow: none;
   color: var(--helix-color-foreground);
+  text-decoration: none;
 }
 
 [data-link-underline="hover"] {
-  box-shadow: none;
+  text-decoration: none;
 }
 
 [data-link-underline="hover"]:hover {
-  box-shadow: 0 3px 0 color-mix(in oklab, currentColor 70%, transparent);
+  text-decoration: underline;
 }
 
 /* `md` is absent, because it is what the surrounding text already is. */

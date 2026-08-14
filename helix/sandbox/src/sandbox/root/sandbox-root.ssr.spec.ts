@@ -32,9 +32,10 @@ describe('sandbox server output', () => {
   })
 
   test('the served split matches the property default, so nothing shifts', () => {
-    // The split cannot be an inline style on the server: the element shim has
-    // no `style`, and Lit rejects expressions inside a `<style>` element. The
-    // stylesheet therefore carries the same 45% the property defaults to.
-    expect(markup).toContain('--_sandbox-split: 45%')
+    // The split cannot be an inline style: that is an attribute the element
+    // would give itself on upgrade, which a React consumer's markup never has.
+    // It is set from a `<style>` in the shadow root instead, and the stylesheet
+    // carries the same 45% as a fallback so the served markup already agrees.
+    expect(markup).toContain('var(--_sandbox-split, 45%)')
   })
 })
