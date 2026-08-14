@@ -23,18 +23,17 @@
   /* The intent inputs. `@helix-io/theme` derives everything below from
      these, guaranteeing contrast by construction rather than by audit. */
   --_helix-seed-brand: oklch(0.58 0.19 258);
-  /* The neutrals carry the brand hue, which is deliberate: a grey with a trace
-     of the brand in it belongs to the palette in a way a dead grey does not.
-     The amount is the thing to get right, and 0.008 was too much.
-
-     Chroma in OKLCH is perceptually even, but *saturation* is chroma against
-     lightness, so one figure across the ramp is not one tint across the ramp: a
-     dark surface at 0.29 reads roughly three times as coloured as a light one
-     at 0.985 for the same number. Every large flat area in a dark interface is
-     therefore where the tint shows, and at 0.008 the backgrounds read navy
-     rather than grey. Halved, the hue is still there and stops announcing
-     itself. */
-  --_helix-seed-neutral-chroma: 0.004;
+  /* Zero, and the ramp is grey.
+     
+     The idea was that a grey with a trace of the brand in it belongs to the
+     palette in a way a dead grey does not, and the trace kept being visible: at
+     0.008 the dark backgrounds read navy, and halving it to 0.004 moved the
+     complaint from "too blue" to "still blue" rather than answering it. Chroma
+     in OKLCH is perceptually even but *saturation* is chroma against lightness,
+     so a fixed figure is a rising tint as the surface darkens, and a dark
+     interface is mostly large flat surfaces. The brand carries the hue; the
+     greys hold everything else up. */
+  --_helix-seed-neutral-chroma: 0;
   --_helix-seed-neutral-hue: 258;
   --_helix-seed-density: 1;
   --_helix-seed-radii: 0.5rem;

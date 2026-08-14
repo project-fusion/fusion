@@ -197,6 +197,23 @@ tokens are the scale and never move; the unsuffixed ones are the current step.
 `data-link-size` stays. A text link has no control height: its size is
 typography, and it follows the text around it.
 
+**`all: unset` takes `box-sizing` with it.** Shadow roots get `border-box` from
+`HelixElement.finalizeStyles`, and a rule that unsets everything outranks it, so
+the element silently reverts to `content-box`. Restore it in the same rule:
+
+```css
+[part="trigger"] {
+  all: unset;
+  box-sizing: border-box;
+}
+```
+
+There is nowhere later to put it, because any `*` rule loses to the one that did
+the unsetting. Four components were missing it, and the accordion's trigger,
+being `inline-size: 100%` with horizontal padding, overflowed its own item by
+exactly that padding: measured, 32px past the right edge, which read in the
+sandbox as a preview with no padding on one side.
+
 ## Tokens
 
 Two layers. Components see only the second.

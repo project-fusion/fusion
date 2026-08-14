@@ -4,6 +4,11 @@
 
 [part="trigger"] {
   all: unset;
+  /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
+     `border-box` every shadow root is given comes from a rule this one
+     outranks. Restored at each site because there is nowhere later to put
+     it: any `*` rule loses to the one that did the unsetting. */
+  box-sizing: border-box;
   align-items: center;
   color: var(--helix-color-foreground);
   cursor: pointer;
@@ -22,13 +27,21 @@
 }
 
 /* Rotation rather than a swapped glyph: opening is a short movement, not a
-   substitution. The surface stays flat and the motion carries the change. */
+   substitution. The surface stays flat and the motion carries the change.
+
+   Down when shut and up when open, through a half turn. It pointed along the
+   inline axis before, which is a tree's idiom rather than an accordion's and
+   was wrong in the one place the difference shows: a chevron that means "along
+   the line" has to know which way the line runs, and this one did not, so in
+   right-to-left it went on pointing at the text it had just come from. The
+   vertical pair has no side to be on. It is also the truer picture of what the
+   control does, since what opens is underneath and not beside. */
 [part="chevron"] {
   block-size: 1em;
   color: var(--helix-color-foreground-subtle);
   flex: 0 0 auto;
   inline-size: 1em;
-  transform: rotate(-90deg);
+  transform: rotate(0deg);
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -37,7 +50,7 @@
 }
 
 :host([data-open]) [part="chevron"] {
-  transform: rotate(0deg);
+  transform: rotate(180deg);
 }
 
 @media (prefers-reduced-motion: reduce) {

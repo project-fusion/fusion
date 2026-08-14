@@ -38,20 +38,19 @@
 }
 
 /* A header, not a row in the list. The way back is not one of the things on
-   this page, so an arrow press should not land on it as though it were.
-
-   `border-strong`, not `border`. This surface is `surface-raised`, and in dark
-   mode that token and `--helix-color-border` are the same neutral: a rule drawn
-   in it on this surface is the surface. Measured, both this and the slotted
-   divider below were painting themselves invisible. Anything drawing a line on
-   a raised surface wants the stronger step. */
+   this page, so an arrow press should not land on it as though it were. */
 [part="header"] {
   align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border-strong);
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
   gap: var(--helix-space-2xs);
   margin-block-end: var(--helix-space-2xs);
-  padding: var(--helix-space-none) var(--helix-space-xs) var(--helix-space-2xs);
+  /* No padding above, one step below, which is what centres it. The surface
+     already lays a step of its own block padding over the top of this row, so
+     matching it here would be two; the row's own space has to make up the
+     difference underneath instead. It was half that, so the title sat high in
+     its own header. */
+  padding: var(--helix-space-none) var(--helix-space-xs) var(--helix-space-xs);
 }
 
 [part="back"] {
@@ -96,9 +95,11 @@
 /* A rule between the pages and the switches. Slotted, because where one belongs
    is the consumer's arrangement, and `helix-divider` already knows how to be a
    separator a reader is told about. */
+/* Plain `border` again. These two lines were drawn in `border-strong` because
+   `border` and `surface-raised` were the same neutral in dark mode and a rule
+   in it on this surface was invisible; the ramp puts a step between them now,
+   so the workaround is the thing that would be wrong. */
 ::slotted(helix-divider) {
-  --divider-color: var(--helix-color-border-strong);
-
   margin-block: var(--helix-space-2xs);
 }
 

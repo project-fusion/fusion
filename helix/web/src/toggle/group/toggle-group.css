@@ -16,6 +16,8 @@
   block-size: var(--helix-size-control);
 
   --_toggle-height: 100%;
+  /* No track, so nothing to be concentric with. */
+  --_toggle-radius: var(--helix-radii-sm);
 }
 
 /* A framed track, and it is what makes the whole control read. Without it the
@@ -28,6 +30,14 @@
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-md);
   padding: var(--helix-space-2xs);
+
+  /* Concentric, which is the outer radius less everything between the two
+     curves: the border and the padding. Both were tokens picked to look right,
+     eight outside and four in, and the gap between them is five, so the inner
+     curve was a pixel too round and the space between the thumb and the track
+     opened up at the corners while staying even down the sides. Derived instead
+     of chosen, so changing the padding cannot put them out of step again. */
+  --_toggle-radius: calc(var(--helix-radii-md) - var(--helix-border-thin) - var(--helix-space-2xs));
 }
 
 /* Equal segments, which is what a segmented control is. Without this the items
@@ -55,7 +65,7 @@
 [part="indicator"] {
   background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
   block-size: var(--_indicator-h, 0);
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--_toggle-radius, var(--helix-radii-sm));
   box-shadow: var(--helix-shadow-sm);
   inline-size: var(--_indicator-w, 0);
   inset-block-start: 0;

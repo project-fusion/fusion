@@ -513,7 +513,8 @@ helix-toggle::part(item) {
      inherit and should size to what it holds. */
   block-size: var(--_toggle-height, 100%);
   border: none;
-  border-radius: var(--helix-radii-sm);
+  /* The group's, so the item and the thumb behind it draw the same curve. */
+  border-radius: var(--_toggle-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;

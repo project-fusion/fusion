@@ -31,6 +31,11 @@
 [part="previous"],
 [part="next"] {
   all: unset;
+  /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
+     `border-box` every shadow root is given comes from a rule this one
+     outranks. Restored at each site because there is nowhere later to put
+     it: any `*` rule loses to the one that did the unsetting. */
+  box-sizing: border-box;
   align-items: center;
   block-size: var(--_calendar-day);
   border-radius: var(--helix-radii-sm);

@@ -180,7 +180,7 @@
      than inside the panel, so the tab strip and whatever is under it are one
      surface: the terminal painted itself and the tabs above it did not, so the
      region was two colours with a seam across it. */
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(--helix-color-surface);
   block-size: var(--_sandbox-panel, var(--sandbox-panel-size, 12rem));
   min-block-size: 0;
 }
