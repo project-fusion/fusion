@@ -1995,7 +1995,8 @@ export type CustomElements = {
    * - `grid`: The grid of days.
    * - `weekday`: A column header naming a day of the week.
    * - `week`: One row of days.
-   * - `day`: One day.
+   * - `cell`: One column of a row, which is what a range paints.
+   * - `day`: The shape inside a cell, which is what a single date paints.
    */
   "helix-base-calendar": Partial<
     HelixBaseCalendarProps & BaseProps<HelixBaseCalendar> & BaseEvents
@@ -3588,7 +3589,8 @@ export type CustomElementsSolidJs = {
    * - `grid`: The grid of days.
    * - `weekday`: A column header naming a day of the week.
    * - `week`: One row of days.
-   * - `day`: One day.
+   * - `cell`: One column of a row, which is what a range paints.
+   * - `day`: The shape inside a cell, which is what a single date paints.
    */
   "helix-base-calendar": Partial<
     HelixBaseCalendarProps &

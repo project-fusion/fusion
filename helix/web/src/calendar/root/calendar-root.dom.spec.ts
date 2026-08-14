@@ -17,12 +17,13 @@ type Calendar = HTMLElement & {
 const calendar = async (attrs = 'month="2026-08" value="2026-08-14"'): Promise<Calendar> =>
   (await mount(`<helix-calendar label="Choose a date" ${attrs}></helix-calendar>`)) as Calendar
 
+/** The cells, which is what carries a day's role, state, and tab stop. */
 const days = (cal: Calendar): HTMLElement[] => [
-  ...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part="day"]') ?? []),
+  ...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part="cell"]') ?? []),
 ]
 
 const stop = (cal: Calendar): string | null =>
-  cal.shadowRoot?.querySelector('[part="day"][tabindex="0"]')?.getAttribute('aria-label') ?? null
+  cal.shadowRoot?.querySelector('[part="cell"][tabindex="0"]')?.getAttribute('aria-label') ?? null
 
 const press = async (cal: Calendar, key: string, shiftKey = false): Promise<void> => {
   cal.dispatchEvent(

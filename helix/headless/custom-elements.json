@@ -2498,7 +2498,11 @@
               "name": "week"
             },
             {
-              "description": "One day.",
+              "description": "One column of a row, which is what a range paints.",
+              "name": "cell"
+            },
+            {
+              "description": "The shape inside a cell, which is what a single date paints.",
               "name": "day"
             }
           ],

@@ -107,7 +107,8 @@ const addMonths = (date: Date, months: number): Date => {
  * @csspart grid - The grid of days.
  * @csspart weekday - A column header naming a day of the week.
  * @csspart week - One row of days.
- * @csspart day - One day.
+ * @csspart cell - One column of a row, which is what a range paints.
+ * @csspart day - The shape inside a cell, which is what a single date paints.
  */
 @customElement('helix-base-calendar')
 export class HelixBaseCalendar extends HelixElement {
@@ -257,7 +258,7 @@ export class HelixBaseCalendar extends HelixElement {
     this.focused = toIso(date)
     this.show(date)
     this.updateComplete.then(() => {
-      this.renderRoot.querySelector<HTMLElement>('[part="day"][tabindex="0"]')?.focus()
+      this.renderRoot.querySelector<HTMLElement>('[part="cell"][tabindex="0"]')?.focus()
     })
   }
 
@@ -398,18 +399,22 @@ export class HelixBaseCalendar extends HelixElement {
               const iso = toIso(date)
               const disabled = this.disabled(date)
               const selected = this.isSelected(iso)
+              // The cell is the column track and the day is the shape centred
+              // in it. A range paints the track, so it runs continuously
+              // between days and stops at the ends of a row on its own.
               return html`<span
-                part="day"
+                part="cell"
                 role="gridcell"
                 aria-disabled=${disabled ? 'true' : nothing}
                 aria-label=${full.format(date)}
                 aria-selected=${selected ? 'true' : nothing}
                 data-outside=${sameMonth(date, month) ? nothing : ''}
                 data-range-end=${range && iso === range[1] ? '' : nothing}
+                data-range-middle=${range && iso > range[0] && iso < range[1] ? '' : nothing}
                 data-range-start=${range && iso === range[0] ? '' : nothing}
                 tabindex=${iso === anchor ? '0' : '-1'}
                 @click=${() => this.select(date)}
-                >${date.getUTCDate()}</span
+                ><span part="day">${date.getUTCDate()}</span></span
               >`
             })}
           </div>`,

@@ -3330,7 +3330,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Six week rows always, so the grid keeps one height and a month change does\nnot move whatever sits beneath it.\n\nDays from the neighbouring months stay in place and stay selectable, marked\nquieter rather than hidden, so the first and last weeks are whole and the\ngrid reads as a continuous run of dates.",
+          "description": "Six week rows always, so the grid keeps one height and a month change does\nnot move whatever sits beneath it.\n\nThe column track is wider than the day, and the day is centred in it. The\ndifference is the space between days, which belongs to the track rather than\nto a `gap`, so a range can paint across the whole track and stay continuous.\n\nDays from the neighbouring months stay in place and stay selectable, marked\nquieter rather than hidden, so the first and last weeks are whole and the\ngrid reads as a continuous run of dates.",
           "name": "HelixCalendar",
           "cssProperties": [
             {
@@ -3338,8 +3338,16 @@
               "name": "--calendar-day-size"
             },
             {
-              "description": "Fill behind the selected day.",
+              "description": "Width of a column, which is what sets the space between days.",
+              "name": "--calendar-track-size"
+            },
+            {
+              "description": "Fill behind a selected day.",
               "name": "--calendar-selected-color"
+            },
+            {
+              "description": "Band behind the days in a range.",
+              "name": "--calendar-range-color"
             }
           ],
           "members": [
@@ -3918,7 +3926,15 @@
               }
             },
             {
-              "description": "One day.",
+              "description": "One column of a row, which is what a range paints.",
+              "name": "cell",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "The shape inside a cell, which is what a single date paints.",
               "name": "day",
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
