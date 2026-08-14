@@ -1,5 +1,6 @@
 export {
   type DismissDetail,
+  HelixCloseEvent,
   HelixDismissEvent,
   HelixOpenEvent,
   HelixSelectEvent,
