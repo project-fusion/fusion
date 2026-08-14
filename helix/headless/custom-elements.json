@@ -2458,9 +2458,17 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A grid of days, per the APG date grid: the whole grid is one tab stop, arrows\nmove by day and week, `PageUp` and `PageDown` move by month, and `Home` and\n`End` go to the ends of the week. Only the focused cell is in the tab\nsequence.\n\nRoving `tabindex` is written on the cells, which is free here because they\nare rendered into this shadow root rather than being markup a consumer wrote.\n\nDates are `YYYY-MM-DD` strings and every calculation is in UTC. A local-time\n`Date` shifts across a timezone or a daylight-saving boundary, so the string\nis what the component holds and the arithmetic never leaves UTC.\n\n`month` is what the grid shows, separately from `value`, so paging through\nmonths does not select anything and a consumer can drive the view. Left\nunset, it follows the selected date, and then the current month.",
+          "description": "A grid of days, per the APG date grid: the whole grid is one tab stop, arrows\nmove by day and week, `PageUp` and `PageDown` move by month, and `Home` and\n`End` go to the ends of the week. Only the focused cell is in the tab\nsequence.\n\nRoving `tabindex` is written on the cells, which is free here because they\nare rendered into this shadow root rather than being markup a consumer wrote.\n\nDates are `YYYY-MM-DD` strings and every calculation is in UTC. A local-time\n`Date` shifts across a timezone or a daylight-saving boundary, so the string\nis what the component holds and the arithmetic never leaves UTC.\n\n`month` is what the grid shows, separately from `value`, so paging through\nmonths does not select anything and a consumer can drive the view. Left\nunset, it follows the first selected date, and then the current month.\n\n`mode` decides how many dates are held. Absent takes one. `range` takes two\nand marks everything between them, starting over on the third click rather\nthan replacing an end at random. `multiple` toggles, so clicking a chosen\ndate takes it out. All three read and write the same comma-separated\n`value`.\n\n`locale` is worth setting where the output is compared across environments.\nLeft unset, month and day names come from the runtime's own locale, and a\nserver and a browser need not agree on what that is.",
           "name": "HelixBaseCalendar",
           "cssParts": [
+            {
+              "description": "The run of months.",
+              "name": "months"
+            },
+            {
+              "description": "One month, its header and its grid.",
+              "name": "month"
+            },
             {
               "description": "The month name and its controls.",
               "name": "header"
@@ -2502,8 +2510,69 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The selected date, as `YYYY-MM-DD`.",
+              "description": "The selected dates, comma separated, as `YYYY-MM-DD`.\n\nOne date in `single`. Two in `range`, the earlier first. Any number in\n`multiple`. One attribute across all three, so a consumer reads and writes\nthe same thing whatever the mode is.",
               "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.",
+              "attribute": "mode",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months to show, side by side.",
+              "attribute": "months"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for month and day names. Absent uses the runtime's own.",
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "disableDates",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.",
+              "attribute": "disable-dates"
+            },
+            {
+              "kind": "field",
+              "name": "disableDays",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Days of the week that cannot be chosen, comma separated, `0` to `6`.",
+              "attribute": "disable-days"
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the current selection fails validation.",
+              "attribute": "invalid",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -2547,13 +2616,13 @@
             },
             {
               "kind": "field",
-              "name": "firstDay",
+              "name": "firstDayOfWeek",
               "type": {
                 "text": "number"
               },
               "default": "0",
               "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
-              "attribute": "first-day"
+              "attribute": "first-day-of-week"
             },
             {
               "kind": "field",
@@ -2564,6 +2633,44 @@
               "privacy": "private",
               "default": "''",
               "description": "The date the grid's tab stop is on. Absent until the grid is used."
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The selected dates, in order.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "range",
+              "type": {
+                "text": "[string, string] | null"
+              },
+              "privacy": "private",
+              "description": "The range's ends, when there are two and the mode asks for them.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "isSelected",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "iso",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
             },
             {
               "kind": "field",
@@ -2586,18 +2693,27 @@
               "readonly": true
             },
             {
-              "kind": "field",
-              "name": "weeks",
-              "type": {
-                "text": "Date[][]"
-              },
+              "kind": "method",
+              "name": "weeksOf",
               "privacy": "private",
-              "description": "Six weeks of dates, so the grid does not change height between months.",
-              "readonly": true
+              "return": {
+                "type": {
+                  "text": "Date[][]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "month",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "description": "Six weeks of dates, so a grid does not change height between months."
             },
             {
               "kind": "method",
-              "name": "outOfRange",
+              "name": "disabled",
               "privacy": "private",
               "return": {
                 "type": {
@@ -2611,7 +2727,8 @@
                     "text": "Date"
                   }
                 }
-              ]
+              ],
+              "description": "Whether a date is barred, by bound, by weekday, or by name."
             },
             {
               "kind": "method",
@@ -2665,13 +2782,38 @@
                     "text": "Date"
                   }
                 }
-              ]
+              ],
+              "description": "Adds a date to the selection, as the mode allows.\n\n`range` starts over once it holds two, so a third click begins a new range\nrather than extending or replacing an end at random. `multiple` toggles, so\nclicking a chosen date takes it out."
             },
             {
               "kind": "field",
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "renderMonth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "month",
+                  "type": {
+                    "text": "Date"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
             },
             {
               "kind": "field",
@@ -2760,8 +2902,61 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The selected date, as `YYYY-MM-DD`.",
+              "description": "The selected dates, comma separated, as `YYYY-MM-DD`.\n\nOne date in `single`. Two in `range`, the earlier first. Any number in\n`multiple`. One attribute across all three, so a consumer reads and writes\nthe same thing whatever the mode is.",
               "fieldName": "value"
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.",
+              "fieldName": "mode"
+            },
+            {
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months to show, side by side.",
+              "fieldName": "months"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for month and day names. Absent uses the runtime's own.",
+              "fieldName": "locale"
+            },
+            {
+              "name": "disable-dates",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.",
+              "fieldName": "disableDates"
+            },
+            {
+              "name": "disable-days",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Days of the week that cannot be chosen, comma separated, `0` to `6`.",
+              "fieldName": "disableDays"
+            },
+            {
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the current selection fails validation.",
+              "fieldName": "invalid"
             },
             {
               "name": "month",
@@ -2800,13 +2995,13 @@
               "fieldName": "label"
             },
             {
-              "name": "first-day",
+              "name": "first-day-of-week",
               "type": {
                 "text": "number"
               },
               "default": "0",
               "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
-              "fieldName": "firstDay"
+              "fieldName": "firstDayOfWeek"
             }
           ],
           "superclass": {

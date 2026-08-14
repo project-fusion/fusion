@@ -6,7 +6,13 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Calendar = HTMLElement & { month: string; value: string; min: string; max: string }
+type Calendar = HTMLElement & {
+  month: string
+  value: string
+  min: string
+  max: string
+  mode?: string
+}
 
 const calendar = async (attrs = 'month="2026-08" value="2026-08-14"'): Promise<Calendar> =>
   (await mount(`<helix-calendar label="Choose a date" ${attrs}></helix-calendar>`)) as Calendar
@@ -114,6 +120,54 @@ describe('calendar', () => {
       ?.click()
     expect(seen).toBe('2026-08-20')
     expect(cal.value).toBe('2026-08-20')
+  })
+
+  test('shows as many months as asked, with one set of controls', async () => {
+    // A pair of controls per month offers several ways to make the same move
+    // and leaves the reader to work out which.
+    const cal = await calendar('month="2026-08" months="2"')
+    expect(cal.shadowRoot?.querySelectorAll('[part="month"]')).toHaveLength(2)
+    expect(cal.shadowRoot?.querySelectorAll('[part="previous"]')).toHaveLength(1)
+    expect(cal.shadowRoot?.querySelectorAll('[part="next"]')).toHaveLength(1)
+  })
+
+  test('a range marks its ends and everything between them', async () => {
+    const cal = await calendar('mode="range" month="2026-08" value="2026-08-11,2026-08-14"')
+    expect(days(cal).filter((day) => day.hasAttribute('aria-selected'))).toHaveLength(4)
+    expect(days(cal).filter((day) => day.hasAttribute('data-range-start'))).toHaveLength(1)
+    expect(days(cal).filter((day) => day.hasAttribute('data-range-end'))).toHaveLength(1)
+  })
+
+  test('a range starts over on the third date', async () => {
+    // Rather than extending, or replacing whichever end is nearer, which is a
+    // guess at which one was meant.
+    const cal = await calendar('mode="range" month="2026-08" value="2026-08-11,2026-08-14"')
+    days(cal)
+      .find((day) => day.getAttribute('aria-label')?.includes('August 20'))
+      ?.click()
+    expect(cal.value).toBe('2026-08-20')
+  })
+
+  test('multiple toggles, so a chosen date comes back out', async () => {
+    const cal = await calendar('mode="multiple" month="2026-08" value="2026-08-05,2026-08-06"')
+    days(cal)
+      .find((day) => day.getAttribute('aria-label')?.includes('August 6'))
+      ?.click()
+    expect(cal.value).toBe('2026-08-05')
+  })
+
+  test('a weekday can be barred without naming every date', async () => {
+    const cal = await calendar('month="2026-08" disable-days="0,6"')
+    const saturday = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 15'))
+    const wednesday = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 12'))
+    expect(saturday?.getAttribute('aria-disabled')).toBe('true')
+    expect(wednesday?.hasAttribute('aria-disabled')).toBe(false)
+  })
+
+  test('a single date can be barred by name', async () => {
+    const cal = await calendar('month="2026-08" disable-dates="2026-08-17"')
+    const holiday = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 17'))
+    expect(holiday?.getAttribute('aria-disabled')).toBe('true')
   })
 
   test('a date outside the range stays in the grid and refuses selection', async () => {

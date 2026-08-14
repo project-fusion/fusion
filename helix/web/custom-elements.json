@@ -3350,8 +3350,93 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The selected date, as `YYYY-MM-DD`.",
+              "description": "The selected dates, comma separated, as `YYYY-MM-DD`.\n\nOne date in `single`. Two in `range`, the earlier first. Any number in\n`multiple`. One attribute across all three, so a consumer reads and writes\nthe same thing whatever the mode is.",
               "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.",
+              "attribute": "mode",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months to show, side by side.",
+              "attribute": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for month and day names. Absent uses the runtime's own.",
+              "attribute": "locale",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disableDates",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.",
+              "attribute": "disable-dates",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disableDays",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Days of the week that cannot be chosen, comma separated, `0` to `6`.",
+              "attribute": "disable-days",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the current selection fails validation.",
+              "attribute": "invalid",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -3415,13 +3500,13 @@
             },
             {
               "kind": "field",
-              "name": "firstDay",
+              "name": "firstDayOfWeek",
               "type": {
                 "text": "number"
               },
               "default": "0",
               "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
-              "attribute": "first-day",
+              "attribute": "first-day-of-week",
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -3436,6 +3521,56 @@
               "privacy": "private",
               "default": "''",
               "description": "The date the grid's tab stop is on. Absent until the grid is used.",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The selected dates, in order.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "range",
+              "type": {
+                "text": "[string, string] | null"
+              },
+              "privacy": "private",
+              "description": "The range's ends, when there are two and the mode asks for them.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "isSelected",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "iso",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -3470,14 +3605,23 @@
               }
             },
             {
-              "kind": "field",
-              "name": "weeks",
-              "type": {
-                "text": "Date[][]"
-              },
+              "kind": "method",
+              "name": "weeksOf",
               "privacy": "private",
-              "description": "Six weeks of dates, so the grid does not change height between months.",
-              "readonly": true,
+              "return": {
+                "type": {
+                  "text": "Date[][]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "month",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "description": "Six weeks of dates, so a grid does not change height between months.",
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -3485,7 +3629,7 @@
             },
             {
               "kind": "method",
-              "name": "outOfRange",
+              "name": "disabled",
               "privacy": "private",
               "return": {
                 "type": {
@@ -3500,6 +3644,7 @@
                   }
                 }
               ],
+              "description": "Whether a date is barred, by bound, by weekday, or by name.",
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -3566,6 +3711,7 @@
                   }
                 }
               ],
+              "description": "Adds a date to the selection, as the mode allows.\n\n`range` starts over once it holds two, so a third click begins a new range\nrather than extending or replacing an end at random. `multiple` toggles, so\nclicking a chosen date takes it out.",
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -3576,6 +3722,34 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderMonth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "month",
+                  "type": {
+                    "text": "Date"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -3672,6 +3846,22 @@
           "customElement": true,
           "cssParts": [
             {
+              "description": "The run of months.",
+              "name": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "description": "One month, its header and its grid.",
+              "name": "month",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
               "description": "The month name and its controls.",
               "name": "header",
               "inheritedFrom": {
@@ -3743,8 +3933,85 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The selected date, as `YYYY-MM-DD`.",
+              "description": "The selected dates, comma separated, as `YYYY-MM-DD`.\n\nOne date in `single`. Two in `range`, the earlier first. Any number in\n`multiple`. One attribute across all three, so a consumer reads and writes\nthe same thing whatever the mode is.",
               "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.",
+              "fieldName": "mode",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months to show, side by side.",
+              "fieldName": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for month and day names. Absent uses the runtime's own.",
+              "fieldName": "locale",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "disable-dates",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.",
+              "fieldName": "disableDates",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "disable-days",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Days of the week that cannot be chosen, comma separated, `0` to `6`.",
+              "fieldName": "disableDays",
+              "inheritedFrom": {
+                "name": "HelixBaseCalendar",
+                "module": "src/calendar/root/calendar-root.ts"
+              }
+            },
+            {
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the current selection fails validation.",
+              "fieldName": "invalid",
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"
@@ -3803,13 +4070,13 @@
               }
             },
             {
-              "name": "first-day",
+              "name": "first-day-of-week",
               "type": {
                 "text": "number"
               },
               "default": "0",
               "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
-              "fieldName": "firstDay",
+              "fieldName": "firstDayOfWeek",
               "inheritedFrom": {
                 "name": "HelixBaseCalendar",
                 "module": "src/calendar/root/calendar-root.ts"

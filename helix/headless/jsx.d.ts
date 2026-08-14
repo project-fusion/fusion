@@ -633,8 +633,28 @@ export type HelixBaseCalendarHelixSelectElementEvent =
   HelixBaseCalendarElementEvent<HelixSelectEvent>;
 
 export type HelixBaseCalendarProps = {
-  /** The selected date, as `YYYY-MM-DD`. */
+  /** The selected dates, comma separated, as `YYYY-MM-DD`.
+
+One date in `single`. Two in `range`, the earlier first. Any number in
+`multiple`. One attribute across all three, so a consumer reads and writes
+the same thing whatever the mode is. */
   value?: HelixBaseCalendar["value"];
+  /** How many dates can be held at once. */
+  mode?: HelixBaseCalendar["mode"];
+  /** How many months to show, side by side. */
+  months?: HelixBaseCalendar["months"];
+  /** Locale for month and day names. Absent uses the runtime's own. */
+  locale?: HelixBaseCalendar["locale"];
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  "disable-dates"?: HelixBaseCalendar["disableDates"];
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  disableDates?: HelixBaseCalendar["disableDates"];
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  "disable-days"?: HelixBaseCalendar["disableDays"];
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  disableDays?: HelixBaseCalendar["disableDays"];
+  /** Whether the current selection fails validation. */
+  invalid?: HelixBaseCalendar["invalid"];
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
   month?: HelixBaseCalendar["month"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
@@ -644,17 +664,37 @@ export type HelixBaseCalendarProps = {
   /** Accessible name for the grid. */
   label?: HelixBaseCalendar["label"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "first-day"?: HelixBaseCalendar["firstDay"];
+  "first-day-of-week"?: HelixBaseCalendar["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  firstDay?: HelixBaseCalendar["firstDay"];
+  firstDayOfWeek?: HelixBaseCalendar["firstDayOfWeek"];
 
   /** Fired when a date is chosen, with the ISO date. */
   "onhelix-select"?: (e: HelixBaseCalendarHelixSelectElementEvent) => void;
 };
 
 export type HelixBaseCalendarSolidJsProps = {
-  /** The selected date, as `YYYY-MM-DD`. */
+  /** The selected dates, comma separated, as `YYYY-MM-DD`.
+
+One date in `single`. Two in `range`, the earlier first. Any number in
+`multiple`. One attribute across all three, so a consumer reads and writes
+the same thing whatever the mode is. */
   "prop:value"?: HelixBaseCalendar["value"];
+  /** How many dates can be held at once. */
+  "prop:mode"?: HelixBaseCalendar["mode"];
+  /** How many months to show, side by side. */
+  "prop:months"?: HelixBaseCalendar["months"];
+  /** Locale for month and day names. Absent uses the runtime's own. */
+  "prop:locale"?: HelixBaseCalendar["locale"];
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  "attr:disable-dates"?: HelixBaseCalendar["disableDates"];
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  "prop:disableDates"?: HelixBaseCalendar["disableDates"];
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  "attr:disable-days"?: HelixBaseCalendar["disableDays"];
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  "prop:disableDays"?: HelixBaseCalendar["disableDays"];
+  /** Whether the current selection fails validation. */
+  "prop:invalid"?: HelixBaseCalendar["invalid"];
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
   "prop:month"?: HelixBaseCalendar["month"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
@@ -664,9 +704,9 @@ export type HelixBaseCalendarSolidJsProps = {
   /** Accessible name for the grid. */
   "prop:label"?: HelixBaseCalendar["label"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "attr:first-day"?: HelixBaseCalendar["firstDay"];
+  "attr:first-day-of-week"?: HelixBaseCalendar["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "prop:firstDay"?: HelixBaseCalendar["firstDay"];
+  "prop:firstDayOfWeek"?: HelixBaseCalendar["firstDayOfWeek"];
   /** Fired when a date is chosen, with the ISO date. */
   "on:helix-select"?: (e: HelixBaseCalendarHelixSelectElementEvent) => void;
 
@@ -1903,18 +1943,38 @@ export type CustomElements = {
    *
    * `month` is what the grid shows, separately from `value`, so paging through
    * months does not select anything and a consumer can drive the view. Left
-   * unset, it follows the selected date, and then the current month.
+   * unset, it follows the first selected date, and then the current month.
+   *
+   * `mode` decides how many dates are held. Absent takes one. `range` takes two
+   * and marks everything between them, starting over on the third click rather
+   * than replacing an end at random. `multiple` toggles, so clicking a chosen
+   * date takes it out. All three read and write the same comma-separated
+   * `value`.
+   *
+   * `locale` is worth setting where the output is compared across environments.
+   * Left unset, month and day names come from the runtime's own locale, and a
+   * server and a browser need not agree on what that is.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The selected date, as `YYYY-MM-DD`.
+   * - `value`: The selected dates, comma separated, as `YYYY-MM-DD`.
+   *
+   * One date in `single`. Two in `range`, the earlier first. Any number in
+   * `multiple`. One attribute across all three, so a consumer reads and writes
+   * the same thing whatever the mode is.
+   * - `mode`: How many dates can be held at once.
+   * - `months`: How many months to show, side by side.
+   * - `locale`: Locale for month and day names. Absent uses the runtime's own.
+   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
+   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
+   * - `invalid`: Whether the current selection fails validation.
    * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
-   * - `first-day`/`firstDay`: First column of the week, `0` for Sunday through `6` for Saturday.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
    *
    * ## Events
    *
@@ -1926,6 +1986,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `months`: The run of months.
+   * - `month`: One month, its header and its grid.
    * - `header`: The month name and its controls.
    * - `previous`: The control that moves to the previous month.
    * - `next`: The control that moves to the next month.
@@ -3474,18 +3536,38 @@ export type CustomElementsSolidJs = {
    *
    * `month` is what the grid shows, separately from `value`, so paging through
    * months does not select anything and a consumer can drive the view. Left
-   * unset, it follows the selected date, and then the current month.
+   * unset, it follows the first selected date, and then the current month.
+   *
+   * `mode` decides how many dates are held. Absent takes one. `range` takes two
+   * and marks everything between them, starting over on the third click rather
+   * than replacing an end at random. `multiple` toggles, so clicking a chosen
+   * date takes it out. All three read and write the same comma-separated
+   * `value`.
+   *
+   * `locale` is worth setting where the output is compared across environments.
+   * Left unset, month and day names come from the runtime's own locale, and a
+   * server and a browser need not agree on what that is.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The selected date, as `YYYY-MM-DD`.
+   * - `value`: The selected dates, comma separated, as `YYYY-MM-DD`.
+   *
+   * One date in `single`. Two in `range`, the earlier first. Any number in
+   * `multiple`. One attribute across all three, so a consumer reads and writes
+   * the same thing whatever the mode is.
+   * - `mode`: How many dates can be held at once.
+   * - `months`: How many months to show, side by side.
+   * - `locale`: Locale for month and day names. Absent uses the runtime's own.
+   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
+   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
+   * - `invalid`: Whether the current selection fails validation.
    * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
-   * - `first-day`/`firstDay`: First column of the week, `0` for Sunday through `6` for Saturday.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
    *
    * ## Events
    *
@@ -3497,6 +3579,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `months`: The run of months.
+   * - `month`: One month, its header and its grid.
    * - `header`: The month name and its controls.
    * - `previous`: The control that moves to the previous month.
    * - `next`: The control that moves to the next month.
