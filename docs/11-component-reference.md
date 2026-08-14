@@ -582,31 +582,87 @@ Description
 
 ### Root
 
-Description
+Shows one slide of several, with controls to move between them.
+
+The track is a scroller with scroll snapping, so a drag, a trackpad swipe, and
+the browser's own momentum all work without being reimplemented. The controls
+scroll it; they do not drive a transform.
+
+The host is announced as a carousel through `aria-roledescription`, so a reader
+meeting the controls knows what they are for rather than hearing "group".
+
+**Slides are the consumer's own elements.** Each is given `role="group"`,
+`aria-roledescription="slide"`, and a name reading its position in the set. A
+slide that carries its own `aria-label` keeps it.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property   | Attribute  | Type      | Default      | Inherited From | Description                                     |
+| ---------- | ---------- | --------- | ------------ | -------------- | ----------------------------------------------- |
+| `autoplay` | `autoplay` | `boolean` | `false`      | -              | Whether the carousel advances on its own.       |
+| `index`    | `index`    | `number`  | `0`          | -              | The slide in view, counted from zero.           |
+| `interval` | `interval` | `number`  | `5000`       | -              | How long each slide is held, in milliseconds.   |
+| `label`    | `label`    | `string`  | `'Carousel'` | -              | Accessible name for the carousel.               |
+| `loop`     | `loop`     | `boolean` | `false`      | -              | Whether moving past either end wraps.           |
+
+#### Methods
+
+| Method            | Description                                              |
+| ----------------- | -------------------------------------------------------- |
+| `goTo(index)`     | Moves to a slide, wrapping only where `loop` says to.     |
+
+#### Getters
+
+| Getter   | Type            | Description                        |
+| -------- | --------------- | ---------------------------------- |
+| `slides` | `HTMLElement[]` | The slides, in light-DOM order.    |
 
 #### Events
 
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+| Event          | Type               | Description                                          |
+| -------------- | ------------------ | ---------------------------------------------------- |
+| `helix-select` | `HelixSelectEvent` | Fired when the slide in view changes, with its index. |
+
+Dispatched for a scroll as well as for a control, so a drag that settles on
+another slide reports it.
+
+#### Rotation
+
+`autoplay` adds a control that stops and starts rotation, and it is first in
+the tab order: it is the way out of a moving carousel, so it cannot sit behind
+the slides a reader is trying to escape. Its name states the action it
+performs.
+
+**Rotation stops on hover and on focus, and once stopped it stays stopped.**
+The APG is explicit that it must not resume unless the reader asks, so moving
+the pointer away does not start it again. Only the control does.
 
 #### Slots
 
 | Slot        | Description |
 | ----------- | ----------- |
-| _(default)_ |             |
+| _(default)_ | The slides. |
 
 #### CSS Parts
 
-| Part | Description |
-| ---- | ----------- |
-|      |             |
+| Part       | Description                                     |
+| ---------- | ----------------------------------------------- |
+| `controls` | The row of controls.                            |
+| `rotation` | The control that stops and starts rotation.     |
+| `previous` | The control that moves to the previous slide.   |
+| `next`     | The control that moves to the next slide.       |
+| `track`    | The scroller the slides sit in.                 |
+
+### Styled
+
+Adds `per-view`, how many slides fit across the track, which a run of cards
+wants where a run of full-width panels does not. It has no default value: a
+reflected property with one writes its attribute on upgrade, and the host would
+then carry something the consumer's markup never had. One across is the absent
+attribute.
+
+Each slide takes a share of the track less its share of the gaps, sized from
+the track rather than on the slide, which is the consumer's element.
 
 ## BaseCheckbox
 

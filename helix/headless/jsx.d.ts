@@ -14,6 +14,7 @@ import type {
   HelixBaseCalendar,
   HelixBaseCallout,
   HelixBaseCard,
+  HelixBaseCarousel,
   HelixBaseDivider,
   HelixBaseDrawer,
   HelixBaseEmptyState,
@@ -734,6 +735,51 @@ export type HelixBaseCalloutSolidJsProps = {
 export type HelixBaseCardProps = {};
 
 export type HelixBaseCardSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseCarousel` component event */
+export type HelixBaseCarouselElementEvent<E = Event> = TypedEvent<
+  HelixBaseCarousel,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseCarouselHelixSelectElementEvent =
+  HelixBaseCarouselElementEvent<HelixSelectEvent>;
+
+export type HelixBaseCarouselProps = {
+  /** Accessible name for the carousel. */
+  label?: HelixBaseCarousel["label"];
+  /** The slide in view, counted from zero. */
+  index?: HelixBaseCarousel["index"];
+  /** Whether moving past either end wraps to the other. */
+  loop?: HelixBaseCarousel["loop"];
+  /** Whether the carousel advances on its own. */
+  autoplay?: HelixBaseCarousel["autoplay"];
+  /** How long each slide is held, in milliseconds. */
+  interval?: HelixBaseCarousel["interval"];
+
+  /** Fired when the slide in view changes, with its index. */
+  "onhelix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
+};
+
+export type HelixBaseCarouselSolidJsProps = {
+  /** Accessible name for the carousel. */
+  "prop:label"?: HelixBaseCarousel["label"];
+  /** The slide in view, counted from zero. */
+  "prop:index"?: HelixBaseCarousel["index"];
+  /** Whether moving past either end wraps to the other. */
+  "prop:loop"?: HelixBaseCarousel["loop"];
+  /** Whether the carousel advances on its own. */
+  "prop:autoplay"?: HelixBaseCarousel["autoplay"];
+  /** How long each slide is held, in milliseconds. */
+  "prop:interval"?: HelixBaseCarousel["interval"];
+  /** Fired when the slide in view changes, with its index. */
+  "on:helix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -2069,6 +2115,64 @@ export type CustomElements = {
    */
   "helix-base-card": Partial<
     HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
+  >;
+
+  /**
+   * The track is a scroller with scroll snapping, so a drag, a trackpad swipe,
+   * and the browser's own momentum all work without being reimplemented. The
+   * controls scroll it; they do not drive a transform.
+   *
+   * Slides are the consumer's own elements. Each is given
+   * `aria-roledescription="slide"` and a name reading its position in the set,
+   * which is what a screen-reader user needs to know where they are. Where a
+   * slide carries its own `aria-label`, that one is left alone.
+   *
+   * **Rotation stops on focus and on hover, and once stopped it stays stopped.**
+   * The APG is explicit: rotation must not resume unless the reader asks for it,
+   * so hovering away does not start it again. The control names the action it
+   * performs, and it is first in the tab order.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the carousel.
+   * - `index`: The slide in view, counted from zero.
+   * - `loop`: Whether moving past either end wraps to the other.
+   * - `autoplay`: Whether the carousel advances on its own.
+   * - `interval`: How long each slide is held, in milliseconds.
+   * - `slides`: The slides, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the slide in view changes, with its index.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The slides.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `goTo(index: number) => void`: Moves to a slide, wrapping only where `loop` says to.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `controls`: The row of controls.
+   * - `rotation`: The control that stops and starts rotation.
+   * - `previous`: The control that moves to the previous slide.
+   * - `next`: The control that moves to the next slide.
+   * - `track`: The scroller the slides sit in.
+   */
+  "helix-base-carousel": Partial<
+    HelixBaseCarouselProps & BaseProps<HelixBaseCarousel> & BaseEvents
   >;
 
   /**
@@ -3671,6 +3775,67 @@ export type CustomElementsSolidJs = {
     HelixBaseCardProps &
       HelixBaseCardSolidJsProps &
       BaseProps<HelixBaseCard> &
+      BaseEvents
+  >;
+
+  /**
+   * The track is a scroller with scroll snapping, so a drag, a trackpad swipe,
+   * and the browser's own momentum all work without being reimplemented. The
+   * controls scroll it; they do not drive a transform.
+   *
+   * Slides are the consumer's own elements. Each is given
+   * `aria-roledescription="slide"` and a name reading its position in the set,
+   * which is what a screen-reader user needs to know where they are. Where a
+   * slide carries its own `aria-label`, that one is left alone.
+   *
+   * **Rotation stops on focus and on hover, and once stopped it stays stopped.**
+   * The APG is explicit: rotation must not resume unless the reader asks for it,
+   * so hovering away does not start it again. The control names the action it
+   * performs, and it is first in the tab order.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the carousel.
+   * - `index`: The slide in view, counted from zero.
+   * - `loop`: Whether moving past either end wraps to the other.
+   * - `autoplay`: Whether the carousel advances on its own.
+   * - `interval`: How long each slide is held, in milliseconds.
+   * - `slides`: The slides, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the slide in view changes, with its index.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The slides.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `goTo(index: number) => void`: Moves to a slide, wrapping only where `loop` says to.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `controls`: The row of controls.
+   * - `rotation`: The control that stops and starts rotation.
+   * - `previous`: The control that moves to the previous slide.
+   * - `next`: The control that moves to the next slide.
+   * - `track`: The scroller the slides sit in.
+   */
+  "helix-base-carousel": Partial<
+    HelixBaseCarouselProps &
+      HelixBaseCarouselSolidJsProps &
+      BaseProps<HelixBaseCarousel> &
       BaseEvents
   >;
 

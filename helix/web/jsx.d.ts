@@ -14,6 +14,7 @@ import type {
   HelixCalendar,
   HelixCallout,
   HelixCard,
+  HelixCarousel,
   HelixDismissEvent,
   HelixDivider,
   HelixDrawer,
@@ -793,6 +794,76 @@ export type HelixCardSolidJsProps = {
   "prop:dense"?: HelixCard["dense"];
   /** Whether media sits above the content stack or beside it. */
   "prop:orientation"?: HelixCard["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixCarousel` component event */
+export type HelixCarouselElementEvent<E = Event> = TypedEvent<HelixCarousel, E>;
+/** `helix-select` event type */
+export type HelixCarouselHelixSelectElementEvent =
+  HelixCarouselElementEvent<HelixSelectEvent>;
+
+export type HelixCarouselProps = {
+  /** How many slides are shown across the track at once. Absent shows one.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  "per-view"?: HelixCarousel["perView"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  perView?: HelixCarousel["perView"];
+  /** Accessible name for the carousel. */
+  label?: HelixCarousel["label"];
+  /** The slide in view, counted from zero. */
+  index?: HelixCarousel["index"];
+  /** Whether moving past either end wraps to the other. */
+  loop?: HelixCarousel["loop"];
+  /** Whether the carousel advances on its own. */
+  autoplay?: HelixCarousel["autoplay"];
+  /** How long each slide is held, in milliseconds. */
+  interval?: HelixCarousel["interval"];
+
+  /** Fired when the slide in view changes, with its index. */
+  "onhelix-select"?: (e: HelixCarouselHelixSelectElementEvent) => void;
+};
+
+export type HelixCarouselSolidJsProps = {
+  /** How many slides are shown across the track at once. Absent shows one.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  "attr:per-view"?: HelixCarousel["perView"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  "prop:perView"?: HelixCarousel["perView"];
+  /** Accessible name for the carousel. */
+  "prop:label"?: HelixCarousel["label"];
+  /** The slide in view, counted from zero. */
+  "prop:index"?: HelixCarousel["index"];
+  /** Whether moving past either end wraps to the other. */
+  "prop:loop"?: HelixCarousel["loop"];
+  /** Whether the carousel advances on its own. */
+  "prop:autoplay"?: HelixCarousel["autoplay"];
+  /** How long each slide is held, in milliseconds. */
+  "prop:interval"?: HelixCarousel["interval"];
+  /** Fired when the slide in view changes, with its index. */
+  "on:helix-select"?: (e: HelixCarouselHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2331,6 +2402,68 @@ export type CustomElements = {
    * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
    */
   "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents>;
+
+  /**
+   * The track scroll-snaps, so a drag and a trackpad swipe move it with the
+   * browser's own momentum and the controls only have to scroll.
+   *
+   * Slides take the full track by default. `per-view` fits more than one across,
+   * which is what a run of cards wants rather than a run of full-width panels.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
+   *
+   * No default, because it reflects. A reflected property with a value writes
+   * its attribute on upgrade, and the host then carries something a consumer's
+   * server markup never had, which React reports as a mismatch. The one-across
+   * case is the absent attribute, and the styles read it that way.
+   * - `label`: Accessible name for the carousel.
+   * - `index`: The slide in view, counted from zero.
+   * - `loop`: Whether moving past either end wraps to the other.
+   * - `autoplay`: Whether the carousel advances on its own.
+   * - `interval`: How long each slide is held, in milliseconds.
+   * - `slides`: The slides, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the slide in view changes, with its index.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The slides.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `goTo(index: number) => void`: Moves to a slide, wrapping only where `loop` says to.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--carousel-gap`: Space between slides. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `controls`: The row of controls.
+   * - `rotation`: The control that stops and starts rotation.
+   * - `previous`: The control that moves to the previous slide.
+   * - `next`: The control that moves to the next slide.
+   * - `track`: The scroller the slides sit in.
+   */
+  "helix-carousel": Partial<
+    HelixCarouselProps & BaseProps<HelixCarousel> & BaseEvents
+  >;
 
   /**
    * A one-pixel rule in the border color, running the full inline size by
@@ -4119,6 +4252,71 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The track scroll-snaps, so a drag and a trackpad swipe move it with the
+   * browser's own momentum and the controls only have to scroll.
+   *
+   * Slides take the full track by default. `per-view` fits more than one across,
+   * which is what a run of cards wants rather than a run of full-width panels.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
+   *
+   * No default, because it reflects. A reflected property with a value writes
+   * its attribute on upgrade, and the host then carries something a consumer's
+   * server markup never had, which React reports as a mismatch. The one-across
+   * case is the absent attribute, and the styles read it that way.
+   * - `label`: Accessible name for the carousel.
+   * - `index`: The slide in view, counted from zero.
+   * - `loop`: Whether moving past either end wraps to the other.
+   * - `autoplay`: Whether the carousel advances on its own.
+   * - `interval`: How long each slide is held, in milliseconds.
+   * - `slides`: The slides, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the slide in view changes, with its index.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The slides.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `goTo(index: number) => void`: Moves to a slide, wrapping only where `loop` says to.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--carousel-gap`: Space between slides. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `controls`: The row of controls.
+   * - `rotation`: The control that stops and starts rotation.
+   * - `previous`: The control that moves to the previous slide.
+   * - `next`: The control that moves to the next slide.
+   * - `track`: The scroller the slides sit in.
+   */
+  "helix-carousel": Partial<
+    HelixCarouselProps &
+      HelixCarouselSolidJsProps &
+      BaseProps<HelixCarousel> &
+      BaseEvents
+  >;
+
+  /**
    * A one-pixel rule in the border color, running the full inline size by
    * default. A vertical divider stretches to its flex parent instead of setting
    * its own height, so it matches whatever it sits beside without being told how
@@ -5345,6 +5543,8 @@ export type CustomCssProperties = {
   "--card-padding"?: string;
   /** Corner radius of the surface. */
   "--card-radii"?: string;
+  /** Space between slides. */
+  "--carousel-gap"?: string;
   /** Color of the rule. */
   "--divider-color"?: string;
   /** Thickness of the rule. */
