@@ -1,4 +1,4 @@
-import { customElement, HelixFormElement } from '@helix-io/core'
+import { customElement, HelixFormElement, MixinField } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseToggle } from '../root/toggle-root.js'
@@ -50,7 +50,7 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here.
  */
 @customElement('helix-base-toggle-group')
-export class HelixBaseToggleGroup extends HelixFormElement {
+export class HelixBaseToggleGroup extends MixinField(HelixFormElement) {
   /**
    * The value the markup declared, which is the one a reset returns to.
    *
@@ -60,10 +60,6 @@ export class HelixBaseToggleGroup extends HelixFormElement {
    */
   @property({ attribute: 'default-value' })
   defaultValue = ''
-
-  /** Accessible name for the group. */
-  @property()
-  label = 'Options'
 
   /** Name the group reports under when its form is submitted. */
   @property()
@@ -126,8 +122,12 @@ export class HelixBaseToggleGroup extends HelixFormElement {
     if (!active) {
       return
     }
+    const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
+    if (!track) {
+      return
+    }
     const box = active.getBoundingClientRect()
-    const own = this.getBoundingClientRect()
+    const own = track.getBoundingClientRect()
     if (box.width === 0) {
       return
     }
@@ -163,13 +163,13 @@ export class HelixBaseToggleGroup extends HelixFormElement {
      * right sends the thumb the wrong way and doubles its own offset getting
      * there. So the distance is taken from whichever edge the inset resolves
      * to, and the translate is signed to point inwards from it. */
-    const style = getComputedStyle(this)
+    const style = getComputedStyle(track)
     const rtl = style.direction === 'rtl'
     const borderStart = Number.parseFloat(rtl ? style.borderRightWidth : style.borderLeftWidth)
     const inline = rtl ? own.right - box.right - borderStart : box.left - own.left - borderStart
 
     indicator.style.setProperty('--_indicator-x', `${rtl ? -inline : inline}px`)
-    indicator.style.setProperty('--_indicator-y', `${box.top - own.top - this.clientTop}px`)
+    indicator.style.setProperty('--_indicator-y', `${box.top - own.top - track.clientTop}px`)
     indicator.style.setProperty('--_indicator-w', `${box.width}px`)
     indicator.style.setProperty('--_indicator-h', `${box.height}px`)
     indicator.toggleAttribute('data-placed', true)
@@ -229,6 +229,10 @@ export class HelixBaseToggleGroup extends HelixFormElement {
     if (changed.has('value')) {
       this.place()
     }
+    /* Every update, because the label and the message come and go with the
+       properties behind them, and an element reference to a node that has been
+       re-rendered is a reference to nothing. */
+    this.linkHost()
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -237,7 +241,10 @@ export class HelixBaseToggleGroup extends HelixFormElement {
     // renders a real `<nav>` in the shadow root and takes its semantics from
     // that, so the host stays neutral.
     this.internals.role = 'radiogroup'
-    this.internals.ariaLabel = this.label
+    /* A string as well as the element reference `linkHost` sets, because this
+       is the half a server can write. The reference wins on the client, which
+       is what lets a consumer slot a label richer than a string. */
+    this.internals.ariaLabel = this.label === '' ? null : this.label
     // Once, before anything has been chosen. `default-value` is what the markup
     // asked for, so it is the starting selection as well as the one a reset
     // comes back to; after that it is history and `value` is the answer.
@@ -251,13 +258,22 @@ export class HelixBaseToggleGroup extends HelixFormElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="indicator" aria-hidden="true"></div>
-      <slot
-        @slotchange=${() => {
-          this.watch()
-          this.place()
-        }}
-      ></slot>`
+    /* The track is an element now, where it used to be the host itself.
+       It has to be: the label, the hint and the message are the host's children
+       too, and with the track on the host they were flex items in the same row
+       as the segments. The track also owns the box the indicator is measured
+       against, which is why `place` reads it rather than `this`. */
+    return html`${this.renderGroupLabel()}
+      <div part="track">
+        <div part="indicator" aria-hidden="true"></div>
+        <slot
+          @slotchange=${() => {
+            this.watch()
+            this.place()
+          }}
+        ></slot>
+      </div>
+      ${this.renderHint()}${this.renderFeedback()}`
   }
 }
 

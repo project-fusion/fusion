@@ -1759,12 +1759,22 @@ Separate from `value` for the reason `defaultChecked` is separate from
 `checked`: `value` is where the control is now, and a reset needs to know
 where it started, which is gone the moment anything is chosen. */
   defaultValue?: HelixBaseToggleGroup["defaultValue"];
-  /** Accessible name for the group. */
-  label?: HelixBaseToggleGroup["label"];
   /** Name the group reports under when its form is submitted. */
   name?: HelixBaseToggleGroup["name"];
   /** Value of the selected item. */
   value?: HelixBaseToggleGroup["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseToggleGroup["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseToggleGroup["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixBaseToggleGroup["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixBaseToggleGroup["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseToggleGroup["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseToggleGroup["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1789,12 +1799,22 @@ Separate from `value` for the reason `defaultChecked` is separate from
 `checked`: `value` is where the control is now, and a reset needs to know
 where it started, which is gone the moment anything is chosen. */
   "prop:defaultValue"?: HelixBaseToggleGroup["defaultValue"];
-  /** Accessible name for the group. */
-  "prop:label"?: HelixBaseToggleGroup["label"];
   /** Name the group reports under when its form is submitted. */
   "prop:name"?: HelixBaseToggleGroup["name"];
   /** Value of the selected item. */
   "prop:value"?: HelixBaseToggleGroup["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseToggleGroup["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseToggleGroup["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixBaseToggleGroup["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixBaseToggleGroup["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseToggleGroup["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseToggleGroup["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3904,14 +3924,24 @@ export type CustomElements = {
    * Separate from `value` for the reason `defaultChecked` is separate from
    * `checked`: `value` is where the control is now, and a reset needs to know
    * where it started, which is gone the moment anything is chosen.
-   * - `label`: Accessible name for the group.
    * - `name`: Name the group reports under when its form is submitted.
    * - `value`: Value of the selected item.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -6176,14 +6206,24 @@ export type CustomElementsSolidJs = {
    * Separate from `value` for the reason `defaultChecked` is separate from
    * `checked`: `value` is where the control is now, and a reset needs to know
    * where it started, which is gone the moment anything is chosen.
-   * - `label`: Accessible name for the group.
    * - `name`: Name the group reports under when its form is submitted.
    * - `value`: Value of the selected item.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *

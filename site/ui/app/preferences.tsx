@@ -82,19 +82,22 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           Preferences
         </helix-text>
 
-        <helix-flex direction="column" gap="xs">
-          <helix-text appearance="label" tone="subtle">
-            Color mode
-          </helix-text>
-          <helix-toggle-group label="Color mode" ref={modes} value={mode}>
-            <helix-toggle value="system">System</helix-toggle>
-            <helix-toggle value="light">Light</helix-toggle>
-            <helix-toggle value="dark">Dark</helix-toggle>
-          </helix-toggle-group>
-          <helix-text appearance="caption" tone="subtle">
-            System follows your operating system, and keeps following it.
-          </helix-text>
-        </helix-flex>
+        {/* The label and the line under it are the control's own now. They were
+            two `Text` elements hand-placed around it, which is exactly the
+            arrangement `MixinField` exists to stop being hand-placed: the
+            spacing was this file's guess at what every other field does, and
+            the group was named twice, once visibly and once through
+            `aria-label`. */}
+        <helix-toggle-group
+          hint="System follows your operating system, and keeps following it."
+          label="Color mode"
+          ref={modes}
+          value={mode}
+        >
+          <helix-toggle value="system">System</helix-toggle>
+          <helix-toggle value="light">Light</helix-toggle>
+          <helix-toggle value="dark">Dark</helix-toggle>
+        </helix-toggle-group>
       </helix-flex>
     </helix-drawer>
   )

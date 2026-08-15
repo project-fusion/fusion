@@ -61,18 +61,22 @@ export declare class MixinFieldInterface {
   label: string
 
   /**
-   * Points the host at its own description nodes, for a group.
+   * Points the host at its own label and description nodes, for a group.
    *
-   * Client only. A group's name can be served; its description cannot, because
-   * element references need the nodes to exist.
+   * Client only, and an enhancement rather than the whole story: a group's name
+   * is also set as a plain string so the server can serve one, and this
+   * overrides it where a consumer slotted something richer than a string.
    */
-  protected describeHost(): void
+  protected linkHost(): void
 
   /** Help under the control, unless something has gone wrong. */
   protected renderHint(): TemplateResult | typeof nothing
 
   /** The validation message, in the hint's place. */
   protected renderFeedback(): TemplateResult | typeof nothing
+
+  /** A label over a set, for a group, which has nothing to point `for` at. */
+  protected renderGroupLabel(): TemplateResult | typeof nothing
 
   /** A label above the control, pointing at it with a real `for`. */
   protected renderLabel(): TemplateResult | typeof nothing
@@ -212,6 +216,20 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
     }
 
     /**
+     * A label over a set rather than beside a control.
+     *
+     * A plain element and not a `<label for>`, because a group is not a single
+     * control and there is nothing for `for` to point at. What names the group
+     * is `linkHost`, pointing the host's internals at this element.
+     */
+    protected renderGroupLabel(): TemplateResult | typeof nothing {
+      if (this.label === '') {
+        return nothing
+      }
+      return html`<span part="label"><slot name="label">${this.label}</slot></span>`
+    }
+
+    /**
      * A label above the control, pointing at it.
      *
      * A real `<label for>`, so pressing the words focuses the field and the
@@ -268,14 +286,26 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
     }
 
     /**
-     * Points the host at its own description nodes, for a group.
+     * Points the host at its own label and description nodes, for a group.
      *
-     * Client only, and deliberately: `ElementInternals` element references need
-     * the nodes to exist, and on the server they do not. A group's accessible
-     * description is therefore an enhancement, while its name is not, because
-     * that is an attribute the server can write.
+     * A control's `<input>` and its hint are both in the shadow root, so a
+     * plain `aria-describedby` resolves between them. A group's host is in the
+     * light DOM and its hint is not, so the IDREF cannot reach and
+     * `element.ariaDescribedByElements` drops the reference outright. Only the
+     * `ElementInternals` form keeps it, measured in Chrome 148: two of two
+     * kept through internals, zero of one through the element.
+     *
+     * Client only, and deliberately, because element references need the nodes
+     * to exist and on the server they do not. The name is therefore also set as
+     * a plain string by the component, which a server can write, and the
+     * reference here overrides it wherever a consumer slotted something richer
+     * than a string. A group with only a property for a label reads the same
+     * either way.
      */
-    protected describeHost(): void {
+    protected linkHost(): void {
+      const label = this.renderRoot.querySelector('[part="label"]')
+      this.internals.ariaLabelledByElements = label ? [label] : null
+
       const described = [HINT_ID, FEEDBACK_ID]
         .map((id) => this.renderRoot.querySelector(`#${id}`))
         .filter((node): node is Element => node !== null)

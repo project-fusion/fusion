@@ -212,7 +212,11 @@ if (hasLayout()) {
       group.value = 'system'
       await settle(group)
 
-      const track = group.getBoundingClientRect()
+      /* The track, not the host. The host is the whole stack now, a label and a
+         hint included, so its box has not been the groove's box since the field
+         parts landed. Measured against the host this asserted the inset from
+         the top of a label, which is not a fact about anything. */
+      const track = (part(group, 'track') as HTMLElement).getBoundingClientRect()
       expect(track.width).toBeGreaterThan(0)
       const marker = (part(group, 'indicator') as HTMLElement).getBoundingClientRect()
       const above = marker.top - track.top

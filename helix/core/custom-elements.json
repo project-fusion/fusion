@@ -1523,14 +1523,14 @@
             },
             {
               "kind": "method",
-              "name": "describeHost",
+              "name": "linkHost",
               "privacy": "protected",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Points the host at its own description nodes, for a group.\n\nClient only. A group's name can be served; its description cannot, because\nelement references need the nodes to exist."
+              "description": "Points the host at its own label and description nodes, for a group.\n\nClient only, and an enhancement rather than the whole story: a group's name\nis also set as a plain string so the server can serve one, and this\noverrides it where a consumer slotted something richer than a string."
             },
             {
               "kind": "method",
@@ -1553,6 +1553,17 @@
                 }
               },
               "description": "The validation message, in the hint's place."
+            },
+            {
+              "kind": "method",
+              "name": "renderGroupLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A label over a set, for a group, which has nothing to point `for` at."
             },
             {
               "kind": "method",
@@ -1683,6 +1694,17 @@
             },
             {
               "kind": "method",
+              "name": "renderGroupLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A label over a set rather than beside a control.\n\nA plain element and not a `<label for>`, because a group is not a single\ncontrol and there is nothing for `for` to point at. What names the group\nis `linkHost`, pointing the host's internals at this element."
+            },
+            {
+              "kind": "method",
               "name": "renderLabel",
               "privacy": "protected",
               "return": {
@@ -1716,14 +1738,14 @@
             },
             {
               "kind": "method",
-              "name": "describeHost",
+              "name": "linkHost",
               "privacy": "protected",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Points the host at its own description nodes, for a group.\n\nClient only, and deliberately: `ElementInternals` element references need\nthe nodes to exist, and on the server they do not. A group's accessible\ndescription is therefore an enhancement, while its name is not, because\nthat is an attribute the server can write."
+              "description": "Points the host at its own label and description nodes, for a group.\n\nA control's `<input>` and its hint are both in the shadow root, so a\nplain `aria-describedby` resolves between them. A group's host is in the\nlight DOM and its hint is not, so the IDREF cannot reach and\n`element.ariaDescribedByElements` drops the reference outright. Only the\n`ElementInternals` form keeps it, measured in Chrome 148: two of two\nkept through internals, zero of one through the element.\n\nClient only, and deliberately, because element references need the nodes\nto exist and on the server they do not. The name is therefore also set as\na plain string by the component, which a server can write, and the\nreference here overrides it wherever a consumer slotted something richer\nthan a string. A group with only a property for a label reads the same\neither way."
             },
             {
               "kind": "field",

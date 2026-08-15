@@ -2006,6 +2006,18 @@ export type HelixToggleGroupHelixSelectElementEvent =
 export type HelixToggleGroupProps = {
   /** How much chrome the group carries around its items. */
   appearance?: HelixToggleGroup["appearance"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixToggleGroup["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixToggleGroup["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixToggleGroup["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixToggleGroup["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixToggleGroup["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixToggleGroup["required"];
   /** The value the markup declared, which is the one a reset returns to.
 
 Separate from `value` for the reason `defaultChecked` is separate from
@@ -2018,8 +2030,6 @@ Separate from `value` for the reason `defaultChecked` is separate from
 `checked`: `value` is where the control is now, and a reset needs to know
 where it started, which is gone the moment anything is chosen. */
   defaultValue?: HelixToggleGroup["defaultValue"];
-  /** Accessible name for the group. */
-  label?: HelixToggleGroup["label"];
   /** Name the group reports under when its form is submitted. */
   name?: HelixToggleGroup["name"];
   /** Value of the selected item. */
@@ -2038,6 +2048,18 @@ tree, so a screen reader can still announce that the control exists. */
 export type HelixToggleGroupSolidJsProps = {
   /** How much chrome the group carries around its items. */
   "prop:appearance"?: HelixToggleGroup["appearance"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixToggleGroup["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixToggleGroup["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixToggleGroup["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixToggleGroup["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixToggleGroup["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixToggleGroup["required"];
   /** The value the markup declared, which is the one a reset returns to.
 
 Separate from `value` for the reason `defaultChecked` is separate from
@@ -2050,8 +2072,6 @@ Separate from `value` for the reason `defaultChecked` is separate from
 `checked`: `value` is where the control is now, and a reset needs to know
 where it started, which is gone the moment anything is chosen. */
   "prop:defaultValue"?: HelixToggleGroup["defaultValue"];
-  /** Accessible name for the group. */
-  "prop:label"?: HelixToggleGroup["label"];
   /** Name the group reports under when its form is submitted. */
   "prop:name"?: HelixToggleGroup["name"];
   /** Value of the selected item. */
@@ -4291,12 +4311,16 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much chrome the group carries around its items.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is the one a reset returns to.
    *
    * Separate from `value` for the reason `defaultChecked` is separate from
    * `checked`: `value` is where the control is now, and a reset needs to know
    * where it started, which is gone the moment anything is chosen.
-   * - `label`: Accessible name for the group.
    * - `name`: Name the group reports under when its form is submitted.
    * - `value`: Value of the selected item.
    * - `disabled`: Whether the control is non-interactive.
@@ -4304,6 +4328,12 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -6710,12 +6740,16 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much chrome the group carries around its items.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is the one a reset returns to.
    *
    * Separate from `value` for the reason `defaultChecked` is separate from
    * `checked`: `value` is where the control is now, and a reset needs to know
    * where it started, which is gone the moment anything is chosen.
-   * - `label`: Accessible name for the group.
    * - `name`: Name the group reports under when its form is submitted.
    * - `value`: Value of the selected item.
    * - `disabled`: Whether the control is non-interactive.
@@ -6723,6 +6757,12 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
