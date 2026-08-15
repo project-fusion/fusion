@@ -11553,11 +11553,33 @@
               }
             },
             {
+              "kind": "method",
+              "name": "reveal",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "HelixBaseMenuItem | undefined"
+                  }
+                }
+              ],
+              "description": "Focuses an item and brings it into the surface, which is not the same act.\n\nA menu long enough to scroll had the tree's problem: the arrow keys moved\nfocus past the bottom of the panel and the panel stayed where it was.\nScrolled here rather than by the browser, because `scrollIntoView` would\ntake the page behind the menu with it.",
+              "inheritedFrom": {
+                "name": "HelixBaseMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true,
-              "description": "Moves over the page, in the direction the key points.\n\nThe arrows wrap, because a menu is a ring rather than a list with ends:\npressing down on the last item to reach the first is what every menu on\nevery platform does.",
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -19033,6 +19055,81 @@
           "members": [
             {
               "kind": "field",
+              "name": "onActiveChange",
+              "type": {
+                "text": "((value: string) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the change is applied.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which item is current, by its `value`.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestActive",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a new current item, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Unlike a native control, nothing has moved\nby the time this runs, so refusing is simply not writing: there is\nnothing to put back.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              },
+              "type": {
+                "text": "requestActive(next: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveActive",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Item | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "items",
+                  "type": {
+                    "text": "Item[]"
+                  }
+                }
+              ],
+              "description": "Which item is current, given what there is to choose from.\n\nThe first enabled one when `value` names nothing, which is a set before\nits consumer has chosen and a set whose current item has just been\nremoved. Disabled items are skipped in the fallback but not in the match:\na consumer who names a disabled item meant it, and quietly moving to\nanother would be the component overruling them.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "chevron",
               "type": {
                 "text": "'end' | undefined"
@@ -19054,20 +19151,6 @@
               "default": "'Tree'",
               "description": "Accessible name for the tree.",
               "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the selected item, kept in step with the items themselves.",
-              "attribute": "value",
               "inheritedFrom": {
                 "name": "HelixBaseTree",
                 "module": "src/tree/root/tree-root.ts"
@@ -19291,6 +19374,19 @@
           "customElement": true,
           "attributes": [
             {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which item is current, by its `value`.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
               "name": "chevron",
               "type": {
                 "text": "'end' | undefined"
@@ -19310,19 +19406,6 @@
               "default": "'Tree'",
               "description": "Accessible name for the tree.",
               "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the selected item, kept in step with the items themselves.",
-              "fieldName": "value",
               "inheritedFrom": {
                 "name": "HelixBaseTree",
                 "module": "src/tree/root/tree-root.ts"

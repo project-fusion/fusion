@@ -1,17 +1,13 @@
 import { property } from 'lit/decorators.js'
 import { HelixChangeEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import {
+  type ActivatableItem,
+  resolveActiveItem,
+} from '../../utils/resolve-active-item/resolve-active-item.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
-
-/** The least a thing must be for this to pick one of them. */
-export interface ActivatableItem {
-  /** Whether it can be the current one. A disabled item is skipped. */
-  disabled?: boolean
-  /** What identifies it, and what `value` is compared against. */
-  value: string
-}
 
 /**
  * The public surface `MixinControllerActive` adds.
@@ -109,7 +105,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * another would be the component overruling them.
      */
     protected resolveActive<Item extends ActivatableItem>(items: Item[]): Item | undefined {
-      return items.find((item) => item.value === this.value) ?? items.find((item) => !item.disabled)
+      return resolveActiveItem(this.value, items)
     }
   }
 

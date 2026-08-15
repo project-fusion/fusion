@@ -6,6 +6,7 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
+  resolveActiveItem,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -108,7 +109,12 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
     const items = this.items
     // See the radio group's note: the one property with two sources.
     inheritDisabled(this.disabled, items)
-    const active = items.find((item) => item.value === this.value) ?? items[0]
+    /* The shared resolver rather than the line it replaces, which took the
+       first item whatever it was: a group opening on a disabled segment marked
+       it as chosen. Not through `MixinControllerActive`, because this value is
+       submitted and so belongs to `MixinControllerValue`, and a set cannot take
+       both without two properties called `value`. */
+    const active = resolveActiveItem(this.value, items)
     for (const item of items) {
       item.selected = item === active
     }

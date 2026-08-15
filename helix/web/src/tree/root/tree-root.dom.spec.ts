@@ -52,3 +52,29 @@ describe('tree', () => {
     expect(seen).toBe('cortex')
   })
 })
+
+describe('tree selection can be refused', () => {
+  test('a listener that refuses keeps the selection where it was', async () => {
+    /* It could not be refused before: the value was written straight from the
+       item's event, so `helix-change` was an announcement nobody could answer.
+       Tabs had the same hole and both are closed by the same mixin. */
+    const host = (await mount(markup)) as Updatable & { value: string }
+    await host.updateComplete
+    const started = host.value
+
+    host.addEventListener('helix-change', (event) => event.preventDefault())
+    const other = [...host.querySelectorAll('helix-tree-item')].find(
+      (item) => item.getAttribute('value') !== started && item.getAttribute('value'),
+    ) as HTMLElement
+    other.dispatchEvent(
+      new CustomEvent('helix-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value: other.getAttribute('value') },
+      }),
+    )
+    await host.updateComplete
+
+    expect(host.value).toBe(started)
+  })
+})

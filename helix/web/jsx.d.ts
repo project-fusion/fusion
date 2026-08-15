@@ -2434,6 +2434,8 @@ export type HelixTreeHelixSelectElementEvent =
   HelixTreeElementEvent<HelixSelectEvent>;
 
 export type HelixTreeProps = {
+  /** Which item is current, by its `value`. */
+  value?: HelixTree["value"];
   /** Which end of a row the chevron sits at.
 
 Unset is the start, which is what a tree of folders looks like. `end` puts
@@ -2446,14 +2448,16 @@ somewhere different from its siblings' would be a mistake, not a choice. */
   chevron?: HelixTree["chevron"];
   /** Accessible name for the tree. */
   label?: HelixTree["label"];
-  /** Value of the selected item, kept in step with the items themselves. */
-  value?: HelixTree["value"];
+  /** The consumer's callback, invoked after the change is applied. */
+  onActiveChange?: HelixTree["onActiveChange"];
 
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "onhelix-select"?: (e: HelixTreeHelixSelectElementEvent) => void;
 };
 
 export type HelixTreeSolidJsProps = {
+  /** Which item is current, by its `value`. */
+  "prop:value"?: HelixTree["value"];
   /** Which end of a row the chevron sits at.
 
 Unset is the start, which is what a tree of folders looks like. `end` puts
@@ -2466,8 +2470,8 @@ somewhere different from its siblings' would be a mistake, not a choice. */
   "prop:chevron"?: HelixTree["chevron"];
   /** Accessible name for the tree. */
   "prop:label"?: HelixTree["label"];
-  /** Value of the selected item, kept in step with the items themselves. */
-  "prop:value"?: HelixTree["value"];
+  /** The consumer's callback, invoked after the change is applied. */
+  "prop:onActiveChange"?: HelixTree["onActiveChange"];
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "on:helix-select"?: (e: HelixTreeHelixSelectElementEvent) => void;
 
@@ -4912,6 +4916,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `value`: Which item is current, by its `value`.
    * - `chevron`: Which end of a row the chevron sits at.
    *
    * Unset is the start, which is what a tree of folders looks like. `end` puts
@@ -4922,7 +4927,7 @@ export type CustomElements = {
    * On the tree rather than on each item, because a row whose chevron sat
    * somewhere different from its siblings' would be a mistake, not a choice.
    * - `label`: Accessible name for the tree.
-   * - `value`: Value of the selected item, kept in step with the items themselves.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -4935,6 +4940,17 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The tree's items.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    *
    * ## CSS Custom Properties
    *
@@ -7538,6 +7554,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `value`: Which item is current, by its `value`.
    * - `chevron`: Which end of a row the chevron sits at.
    *
    * Unset is the start, which is what a tree of folders looks like. `end` puts
@@ -7548,7 +7565,7 @@ export type CustomElementsSolidJs = {
    * On the tree rather than on each item, because a row whose chevron sat
    * somewhere different from its siblings' would be a mistake, not a choice.
    * - `label`: Accessible name for the tree.
-   * - `value`: Value of the selected item, kept in step with the items themselves.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -7561,6 +7578,17 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The tree's items.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    *
    * ## CSS Custom Properties
    *

@@ -31,7 +31,6 @@ export {
 export { HelixElement } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
 export {
-  type ActivatableItem,
   MixinControllerActive,
   type MixinControllerActiveInterface,
 } from './mixins/mixin-controller-active/mixin-controller-active.js'
@@ -64,6 +63,10 @@ export {
   type ControlledChangeOptions,
   requestControlledChange,
 } from './utils/request-controlled-change/request-controlled-change.js'
+export {
+  type ActivatableItem,
+  resolveActiveItem,
+} from './utils/resolve-active-item/resolve-active-item.js'
 export {
   type ScrollItemOptions,
   scrollItemIntoView,

@@ -1,4 +1,9 @@
-import { customElement, HelixElement, scrollItemIntoView } from '@helix-io/core'
+import {
+  customElement,
+  HelixElement,
+  MixinControllerActive,
+  scrollItemIntoView,
+} from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseTreeItem } from '../item/tree-item.js'
@@ -39,7 +44,7 @@ const KEYS = new Set([
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
  */
 @customElement('helix-base-tree')
-export class HelixBaseTree extends HelixElement {
+export class HelixBaseTree extends MixinControllerActive(HelixElement) {
   /**
    * Which end of a row the chevron sits at.
    *
@@ -57,10 +62,6 @@ export class HelixBaseTree extends HelixElement {
   /** Accessible name for the tree. */
   @property()
   label = 'Tree'
-
-  /** Value of the selected item, kept in step with the items themselves. */
-  @property()
-  value = ''
 
   /** Every item, in the order a reader moving down would meet them. */
   private get items(): HelixBaseTreeItem[] {
@@ -83,8 +84,11 @@ export class HelixBaseTree extends HelixElement {
     })
   }
 
+  /* Through the mixin, so a consumer can refuse the change. It was written
+     straight from the event, the same way Tabs did, which made `helix-change`
+     an announcement nobody could answer. */
   private readonly handleSelection = (event: Event): void => {
-    this.value = (event as CustomEvent<{ value: string }>).detail.value
+    this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
     this.syncItems()
   }
 
@@ -97,7 +101,10 @@ export class HelixBaseTree extends HelixElement {
    */
   private syncItems(): void {
     const visible = this.visibleItems
-    const active = visible.find((item) => item.value === this.value) ?? visible[0]
+    /* Through the mixin, which skips a disabled item in the fallback. The
+       hand-written version took the first whatever it was, so a tree opening on
+       a disabled item made it the tab stop. */
+    const active = this.resolveActive(visible)
 
     for (const item of this.items) {
       item.selected = item.value !== '' && item.value === this.value

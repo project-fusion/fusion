@@ -5,6 +5,7 @@ import {
   HelixElement,
   MixinControllerOpen,
   type Placement,
+  scrollItemIntoView,
 } from '@helix-io/core'
 import { caretLeft } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -217,6 +218,23 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
    * pressing down on the last item to reach the first is what every menu on
    * every platform does.
    */
+  /**
+   * Focuses an item and brings it into the surface, which is not the same act.
+   *
+   * A menu long enough to scroll had the tree's problem: the arrow keys moved
+   * focus past the bottom of the panel and the panel stayed where it was.
+   * Scrolled here rather than by the browser, because `scrollIntoView` would
+   * take the page behind the menu with it.
+   */
+  private reveal(item: HelixBaseMenuItem | undefined): void {
+    if (!item) {
+      return
+    }
+    item.focus()
+    const surface = this.renderRoot.querySelector<HTMLElement>('[part="surface"]')
+    scrollItemIntoView(item, { padding: 4, ...(surface ? { scroller: surface } : {}) })
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const items = this.items
     const at = items.indexOf(document.activeElement as HelixBaseMenuItem)
@@ -225,9 +243,9 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
       event.stopPropagation()
       this.leave()
     } else if (event.key === 'ArrowDown') {
-      items[(at + 1) % items.length]?.focus()
+      this.reveal(items[(at + 1) % items.length])
     } else if (event.key === 'ArrowUp') {
-      items[(at - 1 + items.length) % items.length]?.focus()
+      this.reveal(items[(at - 1 + items.length) % items.length])
     } else if (event.key === 'Home') {
       items[0]?.focus()
     } else if (event.key === 'End') {

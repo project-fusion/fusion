@@ -1029,14 +1029,6 @@
         },
         {
           "kind": "js",
-          "name": "ActivatableItem",
-          "declaration": {
-            "name": "ActivatableItem",
-            "module": "./mixins/mixin-controller-active/mixin-controller-active.js"
-          }
-        },
-        {
-          "kind": "js",
           "name": "MixinControllerActive",
           "declaration": {
             "name": "MixinControllerActive",
@@ -1201,6 +1193,22 @@
           "declaration": {
             "name": "requestControlledChange",
             "module": "./utils/request-controlled-change/request-controlled-change.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ActivatableItem",
+          "declaration": {
+            "name": "ActivatableItem",
+            "module": "./utils/resolve-active-item/resolve-active-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "resolveActiveItem",
+          "declaration": {
+            "name": "resolveActiveItem",
+            "module": "./utils/resolve-active-item/resolve-active-item.js"
           }
         },
         {
@@ -2645,6 +2653,46 @@
           "declaration": {
             "name": "requestControlledChange",
             "module": "src/utils/request-controlled-change/request-controlled-change.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/resolve-active-item/resolve-active-item.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "resolveActiveItem",
+          "return": {
+            "type": {
+              "text": "Item | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "items",
+              "type": {
+                "text": "Item[]"
+              }
+            }
+          ],
+          "description": "Which item a value names, or the first that could stand in for it.\n\n`items.find(match) ?? items[0]` was written by hand in four components and it\nis not the obvious line it looks like. It is what makes a set whose `value`\nnames nothing still show something, which is every set before its consumer\nhas chosen and every set whose current item has just been removed.\n\nThe fallback skips disabled items and the match does not. A consumer who\nnames a disabled item meant it, and quietly moving to another would be the\ncomponent overruling them; but falling back *onto* a disabled item is the\ncomponent choosing, and it should not choose something out of play. Every\nhand-written copy took `items[0]` either way, so a set opening on a disabled\nfirst item showed it as current.\n\nA plain function rather than only a method on `MixinControllerActive`,\nbecause the components that need it are split across two mixins: a set whose\nvalue is submitted takes `MixinControllerValue` and cannot also take the\nactive one without two properties called `value`."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "resolveActiveItem",
+          "declaration": {
+            "name": "resolveActiveItem",
+            "module": "src/utils/resolve-active-item/resolve-active-item.ts"
           }
         }
       ]

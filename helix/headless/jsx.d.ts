@@ -2196,8 +2196,10 @@ somewhere different from its siblings' would be a mistake, not a choice. */
   chevron?: HelixBaseTree["chevron"];
   /** Accessible name for the tree. */
   label?: HelixBaseTree["label"];
-  /** Value of the selected item, kept in step with the items themselves. */
+  /** Which item is current, by its `value`. */
   value?: HelixBaseTree["value"];
+  /** The consumer's callback, invoked after the change is applied. */
+  onActiveChange?: HelixBaseTree["onActiveChange"];
 
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "onhelix-select"?: (e: HelixBaseTreeHelixSelectElementEvent) => void;
@@ -2216,8 +2218,10 @@ somewhere different from its siblings' would be a mistake, not a choice. */
   "prop:chevron"?: HelixBaseTree["chevron"];
   /** Accessible name for the tree. */
   "prop:label"?: HelixBaseTree["label"];
-  /** Value of the selected item, kept in step with the items themselves. */
+  /** Which item is current, by its `value`. */
   "prop:value"?: HelixBaseTree["value"];
+  /** The consumer's callback, invoked after the change is applied. */
+  "prop:onActiveChange"?: HelixBaseTree["onActiveChange"];
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "on:helix-select"?: (e: HelixBaseTreeHelixSelectElementEvent) => void;
 
@@ -4547,7 +4551,8 @@ export type CustomElements = {
    * On the tree rather than on each item, because a row whose chevron sat
    * somewhere different from its siblings' would be a mistake, not a choice.
    * - `label`: Accessible name for the tree.
-   * - `value`: Value of the selected item, kept in step with the items themselves.
+   * - `value`: Which item is current, by its `value`.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -4560,6 +4565,17 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The tree's items.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    *
    * ## CSS Parts
    *
@@ -7033,7 +7049,8 @@ export type CustomElementsSolidJs = {
    * On the tree rather than on each item, because a row whose chevron sat
    * somewhere different from its siblings' would be a mistake, not a choice.
    * - `label`: Accessible name for the tree.
-   * - `value`: Value of the selected item, kept in step with the items themselves.
+   * - `value`: Which item is current, by its `value`.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -7046,6 +7063,17 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The tree's items.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    *
    * ## CSS Parts
    *
