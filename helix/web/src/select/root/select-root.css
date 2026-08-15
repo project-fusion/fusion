@@ -121,18 +121,25 @@
  * the list open under it. The mark says which way the panel is going, and a
  * mark that never moves says nothing at all.
  *
- * `::slotted` because the mark is the consumer's own element, and `rotate`
- * rather than `transform`, so a consumer who wants to translate or scale it can
- * do that without the two fighting over one property.
+ * A flip across the x-axis rather than a rotation. The two end in the same
+ * place for a symmetric caret and take different routes to get there: a
+ * rotation carries the mark sideways through ninety degrees, where a chevron
+ * spends the middle of the movement pointing at nothing. A flip stays on its
+ * own axis, reads as the same mark turning over, and is what the shape is
+ * already symmetric about.
+ *
+ * `::slotted` because the mark is the consumer's own element, and `scale`
+ * rather than `transform: scaleY`, so a consumer who wants to translate or
+ * rotate it can do that without the two fighting over one property.
  *
  * `data-open` and not `[open]`: the resolved state, so a controlled select
  * whose consumer has not applied the change yet does not turn early. */
 ::slotted([slot="indicator"]) {
-  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 :host([data-open]) ::slotted([slot="indicator"]) {
-  rotate: 180deg;
+  scale: 1 -1;
 }
 
 @media (prefers-reduced-motion: reduce) {

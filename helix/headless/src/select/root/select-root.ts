@@ -96,6 +96,12 @@ export class HelixBaseSelect extends MixinControllerOpen(
   protected readonly floating = new FloatingController(this, {
     anchor: () => this.renderRoot.querySelector<HTMLElement>('[part="trigger"]'),
     floating: () => this.renderRoot.querySelector<HTMLElement>('[part="surface"]'),
+    /* Held off the trigger by the controller rather than by a margin on the
+       panel. A margin is inside the box the controller measures, so it would be
+       counted once in the placement and again in the layout, and the gap would
+       change as the panel flipped above the trigger for want of room. The same
+       four pixels the menu holds its surface off its own trigger. */
+    offset: () => 4,
     placement: 'bottom-start',
   })
 
