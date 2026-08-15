@@ -28,6 +28,16 @@ import { chromium } from 'playwright'
 
 const root = resolve(import.meta.dirname, '../..')
 const specs = join(root, 'site/ui/public/specs')
+/* The sandbox's stylesheet, which is the base layer and every token in it.
+   Without it a component's own shadow styles still arrive, because those come
+   with the definition, but every `var(--helix-...)` in them resolves to nothing:
+   a checkbox whose size is a token comes out zero by zero. The first run of this
+   script reported four failures that were all this and none of which said
+   anything about the components, including one that read "expected 0 to be
+   greater than 0" on a box that had simply never been given a size. The sandbox
+   loads it, so a spec runner that does not is not running what the sandbox
+   runs. */
+const base = join(root, 'site/ui/public/sandbox/frame.css')
 
 const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' }
 
@@ -37,11 +47,14 @@ const server = createServer(async (request, response) => {
   const path = (request.url ?? '/').split('?')[0]
   if (path === '/') {
     response.writeHead(200, { 'content-type': 'text/html' })
-    response.end('<!doctype html><meta charset="utf-8"><title>specs</title>')
+    response.end(
+      '<!doctype html><meta charset="utf-8"><title>specs</title>' +
+        '<link rel="stylesheet" href="/base.css">',
+    )
     return
   }
   try {
-    const body = await readFile(join(specs, path.replace(/^\/+/, '')))
+    const body = await readFile(path === '/base.css' ? base : join(specs, path.replace(/^\/+/, '')))
     response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'text/plain' })
     response.end(body)
   } catch {
@@ -69,7 +82,7 @@ const browser = await chromium.launch()
 const page = await browser.newPage()
 const crashes = []
 page.on('pageerror', (error) => crashes.push(String(error)))
-await page.goto(origin)
+await page.goto(origin, { waitUntil: 'load' })
 
 let passed = 0
 const failures = []
