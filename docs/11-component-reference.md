@@ -75,6 +75,46 @@ Neither bubbles nor is composed.
 | `content`       | The region whose height animates. |
 | `content-inner` | Padding wrapper inside it.        |
 
+## BaseAnnouncement
+
+### Root
+
+A page-level message, dismissible, announced as a polite live region.
+
+#### Properties
+
+| Property       | Attribute       | Type                                             | Default     | Inherited From | Description                      |
+| -------------- | --------------- | ------------------------------------------------ | ----------- | -------------- | -------------------------------- |
+| `dismissible`  | `dismissible`   | `boolean`                                        | `false`     | -              | Whether the reader can close it. |
+| `dismissLabel` | `dismiss-label` | `string`                                         | `'Dismiss'` | -              | Accessible name for the control. |
+| `severity`     | `severity`      | `"info" \| "success" \| "warning" \| "danger"` | -           | -              | What kind of attention it needs. |
+
+The live region is always polite and is not configurable.
+
+#### Events
+
+| Event           | Type                | Description                               |
+| --------------- | ------------------- | ----------------------------------------- |
+| `helix-dismiss` | `HelixDismissEvent` | The reader asked to close it. Cancelable. |
+
+The announcement does not remove itself. `preventDefault()` refuses the request.
+
+#### Slots
+
+| Slot        | Description                                     |
+| ----------- | ----------------------------------------------- |
+| _(default)_ | The message.                                     |
+| `actions`   | What to do about it, usually a link or a button. |
+| `icon`      | Replaces the glyph inside the dismiss control.   |
+
+#### CSS Parts
+
+| Part      | Description                     |
+| --------- | ------------------------------- |
+| `content` | The message region.             |
+| `actions` | The trailing action region.     |
+| `dismiss` | The control that asks to close. |
+
 ## BaseAppHeader
 
 ### Root
@@ -198,46 +238,6 @@ it disappear between frames.
 | Part        | Description       |
 | ----------- | ----------------- |
 | `indicator` | The count or dot. |
-
-## BaseBanner
-
-### Root
-
-A page-level message, dismissible, announced as a polite live region.
-
-#### Properties
-
-| Property       | Attribute       | Type                                             | Default     | Inherited From | Description                      |
-| -------------- | --------------- | ------------------------------------------------ | ----------- | -------------- | -------------------------------- |
-| `dismissible`  | `dismissible`   | `boolean`                                        | `false`     | -              | Whether the reader can close it. |
-| `dismissLabel` | `dismiss-label` | `string`                                         | `'Dismiss'` | -              | Accessible name for the control. |
-| `severity`     | `severity`      | `"info" \| "success" \| "warning" \| "danger"` | -           | -              | What kind of attention it needs. |
-
-The live region is always polite and is not configurable.
-
-#### Events
-
-| Event           | Type                | Description                               |
-| --------------- | ------------------- | ----------------------------------------- |
-| `helix-dismiss` | `HelixDismissEvent` | The reader asked to close it. Cancelable. |
-
-The banner does not remove itself. `preventDefault()` refuses the request.
-
-#### Slots
-
-| Slot        | Description                                     |
-| ----------- | ----------------------------------------------- |
-| _(default)_ | The message.                                     |
-| `actions`   | What to do about it, usually a link or a button. |
-| `icon`      | Replaces the glyph inside the dismiss control.   |
-
-#### CSS Parts
-
-| Part      | Description                     |
-| --------- | ------------------------------- |
-| `content` | The message region.             |
-| `actions` | The trailing action region.     |
-| `dismiss` | The control that asks to close. |
 
 ## BaseBreadcrumbs
 
@@ -2442,6 +2442,18 @@ A single expandable section.
 | ---- | ----------- |
 |      |             |
 
+## Announcement
+
+### Root
+
+Description
+
+#### Properties
+
+| Property | Attribute | Type | Default | Inherited From | Description |
+| -------- | --------- | ---- | ------- | -------------- | ----------- |
+|          |           |      |         | -              |             |
+
 ## AppHeader
 
 ### Root
@@ -2485,18 +2497,6 @@ Description
 |          |           |      |         | -              |             |
 
 ## Badge
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## Banner
 
 ### Root
 

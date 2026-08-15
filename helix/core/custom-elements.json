@@ -414,7 +414,7 @@
         },
         {
           "kind": "class",
-          "description": "Fired when an element asks to be taken away.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the markup it is in and removing the node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\nOne verb for both shapes. A tag leaving a list and a banner closing itself\nare the same act from the element's side.",
+          "description": "Fired when an element asks to be taken away.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the markup it is in and removing the node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\nOne verb for both shapes. A tag leaving a list and an announcement closing\nitself are the same act from the element's side.",
           "name": "HelixDismissEvent",
           "members": [
             {

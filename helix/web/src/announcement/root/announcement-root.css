@@ -2,7 +2,7 @@
   /* A compact strip, said once, so its actions need not each be told. */
   --helix-size-control: var(--helix-size-control-sm);
 
-  --_banner-color: var(--helix-color-foreground-muted);
+  --_announcement-color: var(--helix-color-foreground-muted);
 
   align-items: center;
   background-color: var(--helix-color-surface-sunken);
@@ -15,30 +15,30 @@
   gap: var(--helix-space-md);
   inline-size: 100%;
   padding-block: var(--helix-space-xs);
-  padding-inline: var(--banner-inset, var(--helix-space-lg));
+  padding-inline: var(--announcement-inset, var(--helix-space-lg));
 }
 
 :host([severity="info"]) {
-  --_banner-color: var(--helix-color-info);
+  --_announcement-color: var(--helix-color-info);
 }
 
 :host([severity="success"]) {
-  --_banner-color: var(--helix-color-success);
+  --_announcement-color: var(--helix-color-success);
 }
 
 :host([severity="warning"]) {
-  --_banner-color: var(--helix-color-warning);
+  --_announcement-color: var(--helix-color-warning);
 }
 
 :host([severity="danger"]) {
-  --_banner-color: var(--helix-color-danger);
+  --_announcement-color: var(--helix-color-danger);
 }
 
 /* The severity tints the band rather than coloring the text, which has to stay
    readable at body size across the full width. */
 :host([severity]) {
-  background-color: color-mix(in oklab, var(--_banner-color) 12%, transparent);
-  border-block-end-color: color-mix(in oklab, var(--_banner-color) 40%, transparent);
+  background-color: color-mix(in oklab, var(--_announcement-color) 12%, transparent);
+  border-block-end-color: color-mix(in oklab, var(--_announcement-color) 40%, transparent);
 }
 
 [part="content"] {

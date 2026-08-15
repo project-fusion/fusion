@@ -68,6 +68,18 @@ helix-app-header {
   --app-header-max-inline-size: none;
 }
 
+/* Every drawer here runs under that header. A drawer is `position: fixed` with
+   `inset-block: 0`, so it spans the strip the header occupies and its first
+   line of content would land behind one.
+
+   Stated here rather than defaulted in the component, because whether there is
+   a masthead and how tall it is are facts about this page. The drawer's own
+   default is a plain inset, which is what an app with no header wants and what
+   the component's examples render with. */
+helix-drawer {
+  --drawer-inset-block-start: calc(var(--helix-size-header) + var(--helix-space-md));
+}
+
 /* ============================================================ hero ======= */
 
 /* Tall enough that the claim is the only thing on screen. Not a full viewport:
@@ -212,7 +224,7 @@ helix-app-header {
   min-inline-size: 0;
 }
 
-/* Sticky under the banner, and no taller than what is left of the viewport, so
+/* Sticky under the header, and no taller than what is left of the viewport, so
    a long list scrolls inside the rail instead of pushing the page. */
 .docsNav,
 .docsRail {

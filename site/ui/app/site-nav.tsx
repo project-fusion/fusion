@@ -10,7 +10,7 @@ import { VERTICALS } from './verticals'
 import { Wordmark } from './wordmark'
 
 /**
- * Site navigation: the verticals, centered in the banner.
+ * Site navigation: the verticals, centered in the masthead.
  *
  * Plain links inside a `NavBar`, marked with `aria-current` and styled by the
  * `` recipe. Not tabs, because a tab controls a panel and

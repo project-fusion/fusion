@@ -2,10 +2,10 @@ import type {
   Helix,
   HelixAccordion,
   HelixAccordionItem,
+  HelixAnnouncement,
   HelixAppHeader,
   HelixAvatar,
   HelixBadge,
-  HelixBanner,
   HelixBlockquote,
   HelixBreadcrumb,
   HelixBreadcrumbs,
@@ -383,6 +383,47 @@ A union rather than a mode plus a `collapsible` boolean, which would make
   textContent?: string | number;
 };
 
+/** `HelixAnnouncement` component event */
+export type HelixAnnouncementElementEvent<E = Event> = TypedEvent<
+  HelixAnnouncement,
+  E
+>;
+/** `helix-dismiss` event type */
+export type HelixAnnouncementHelixDismissElementEvent =
+  HelixAnnouncementElementEvent<HelixDismissEvent>;
+
+export type HelixAnnouncementProps = {
+  /** What kind of attention the message needs. */
+  severity?: HelixAnnouncement["severity"];
+  /** Whether the reader can close it. */
+  dismissible?: HelixAnnouncement["dismissible"];
+  /** Accessible name for the dismiss control. */
+  "dismiss-label"?: HelixAnnouncement["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  dismissLabel?: HelixAnnouncement["dismissLabel"];
+
+  /** Fired when the reader asks to close it. */
+  "onhelix-dismiss"?: (e: HelixAnnouncementHelixDismissElementEvent) => void;
+};
+
+export type HelixAnnouncementSolidJsProps = {
+  /** What kind of attention the message needs. */
+  "prop:severity"?: HelixAnnouncement["severity"];
+  /** Whether the reader can close it. */
+  "prop:dismissible"?: HelixAnnouncement["dismissible"];
+  /** Accessible name for the dismiss control. */
+  "attr:dismiss-label"?: HelixAnnouncement["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  "prop:dismissLabel"?: HelixAnnouncement["dismissLabel"];
+  /** Fired when the reader asks to close it. */
+  "on:helix-dismiss"?: (e: HelixAnnouncementHelixDismissElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixAppHeaderProps = {
   /** Whether the banner is flat or a pane of material.
 
@@ -517,44 +558,6 @@ export type HelixBadgeSolidJsProps = {
   "prop:max"?: HelixBadge["max"];
   /** Accessible name. Required for a dot, which has no text to read. */
   "prop:label"?: HelixBadge["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-/** `HelixBanner` component event */
-export type HelixBannerElementEvent<E = Event> = TypedEvent<HelixBanner, E>;
-/** `helix-dismiss` event type */
-export type HelixBannerHelixDismissElementEvent =
-  HelixBannerElementEvent<HelixDismissEvent>;
-
-export type HelixBannerProps = {
-  /** What kind of attention the message needs. */
-  severity?: HelixBanner["severity"];
-  /** Whether the reader can close it. */
-  dismissible?: HelixBanner["dismissible"];
-  /** Accessible name for the dismiss control. */
-  "dismiss-label"?: HelixBanner["dismissLabel"];
-  /** Accessible name for the dismiss control. */
-  dismissLabel?: HelixBanner["dismissLabel"];
-
-  /** Fired when the reader asks to close it. */
-  "onhelix-dismiss"?: (e: HelixBannerHelixDismissElementEvent) => void;
-};
-
-export type HelixBannerSolidJsProps = {
-  /** What kind of attention the message needs. */
-  "prop:severity"?: HelixBanner["severity"];
-  /** Whether the reader can close it. */
-  "prop:dismissible"?: HelixBanner["dismissible"];
-  /** Accessible name for the dismiss control. */
-  "attr:dismiss-label"?: HelixBanner["dismissLabel"];
-  /** Accessible name for the dismiss control. */
-  "prop:dismissLabel"?: HelixBanner["dismissLabel"];
-  /** Fired when the reader asks to close it. */
-  "on:helix-dismiss"?: (e: HelixBannerHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3220,6 +3223,51 @@ export type CustomElements = {
   >;
 
   /**
+   * Full width and flat, with the severity carried by a tinted fill and a
+   * hairline beneath rather than by a border on four sides: an announcement is a
+   * band across the top of the page, not a box that happens to be wide.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the message needs.
+   * - `dismissible`: Whether the reader can close it.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-dismiss`: Fired when the reader asks to close it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The message.
+   * - `actions`: What to do about it, usually a link or a button.
+   * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--announcement-inset`: Inline padding, matched to the page. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `content`: The message region.
+   * - `actions`: The trailing action region.
+   * - `dismiss`: The control that asks to close.
+   */
+  "helix-announcement": Partial<
+    HelixAnnouncementProps & BaseProps<HelixAnnouncement> & BaseEvents
+  >;
+
+  /**
    * Sticky and translucent, drawn on the material tokens so the page content
    * blurs behind it rather than being hidden by an opaque bar. The separating
    * rule and shadow appear only once the page has scrolled, which keeps the bar
@@ -3364,51 +3412,6 @@ export type CustomElements = {
    * - `indicator`: The count, or the dot when there is no value.
    */
   "helix-badge": Partial<HelixBadgeProps & BaseProps<HelixBadge> & BaseEvents>;
-
-  /**
-   * Full width and flat, with the severity carried by a tinted fill and a hairline
-   * beneath rather than by a border on four sides: a banner is a band across the
-   * top of the page, not a box that happens to be wide.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `severity`: What kind of attention the message needs.
-   * - `dismissible`: Whether the reader can close it.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-dismiss`: Fired when the reader asks to close it.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The message.
-   * - `actions`: What to do about it, usually a link or a button.
-   * - `icon`: Replaces the glyph inside the dismiss control.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--banner-inset`: Inline padding, usually matched to the page. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `content`: The message region.
-   * - `actions`: The trailing action region.
-   * - `dismiss`: The control that asks to close.
-   */
-  "helix-banner": Partial<
-    HelixBannerProps & BaseProps<HelixBanner> & BaseEvents
-  >;
 
   /**
    * Set larger than body text on the display face, because a pulled quotation is
@@ -6254,6 +6257,54 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Full width and flat, with the severity carried by a tinted fill and a
+   * hairline beneath rather than by a border on four sides: an announcement is a
+   * band across the top of the page, not a box that happens to be wide.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the message needs.
+   * - `dismissible`: Whether the reader can close it.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-dismiss`: Fired when the reader asks to close it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The message.
+   * - `actions`: What to do about it, usually a link or a button.
+   * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--announcement-inset`: Inline padding, matched to the page. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `content`: The message region.
+   * - `actions`: The trailing action region.
+   * - `dismiss`: The control that asks to close.
+   */
+  "helix-announcement": Partial<
+    HelixAnnouncementProps &
+      HelixAnnouncementSolidJsProps &
+      BaseProps<HelixAnnouncement> &
+      BaseEvents
+  >;
+
+  /**
    * Sticky and translucent, drawn on the material tokens so the page content
    * blurs behind it rather than being hidden by an opaque bar. The separating
    * rule and shadow appear only once the page has scrolled, which keeps the bar
@@ -6407,54 +6458,6 @@ export type CustomElementsSolidJs = {
     HelixBadgeProps &
       HelixBadgeSolidJsProps &
       BaseProps<HelixBadge> &
-      BaseEvents
-  >;
-
-  /**
-   * Full width and flat, with the severity carried by a tinted fill and a hairline
-   * beneath rather than by a border on four sides: a banner is a band across the
-   * top of the page, not a box that happens to be wide.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `severity`: What kind of attention the message needs.
-   * - `dismissible`: Whether the reader can close it.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-dismiss`: Fired when the reader asks to close it.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The message.
-   * - `actions`: What to do about it, usually a link or a button.
-   * - `icon`: Replaces the glyph inside the dismiss control.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--banner-inset`: Inline padding, usually matched to the page. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `content`: The message region.
-   * - `actions`: The trailing action region.
-   * - `dismiss`: The control that asks to close.
-   */
-  "helix-banner": Partial<
-    HelixBannerProps &
-      HelixBannerSolidJsProps &
-      BaseProps<HelixBanner> &
       BaseEvents
   >;
 
@@ -9331,6 +9334,8 @@ export type CustomCssProperties = {
   "--accordion-border-color"?: string;
   /** Corner radius of the stack. */
   "--accordion-radii"?: string;
+  /** Inline padding, matched to the page. */
+  "--announcement-inset"?: string;
   /** Fill behind the banner. */
   "--app-header-background"?: string;
   /** Height of the banner. */
@@ -9349,8 +9354,6 @@ export type CustomCssProperties = {
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
-  /** Inline padding, usually matched to the page. */
-  "--banner-inset"?: string;
   /** Size of the quoted passage. */
   "--blockquote-size"?: string;
   /** Color of the chevron. */

@@ -186,7 +186,7 @@ to get wrong, and one question to ask per region rather than one per element.
 - **`data-density` on any container**, `sm` / `md` / `lg`. `md` is the default
   and is never written.
 - **Containers that are dense by nature declare it themselves**: app header,
-  toolbar and banner do, so a control put in one is already right.
+  toolbar and announcement do, so a control put in one is already right.
 - **`size` survives only on avatar and spinner**, which are pictures.
 
 It works through custom properties (`--helix-size-control`,

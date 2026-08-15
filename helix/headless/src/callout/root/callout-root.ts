@@ -26,10 +26,11 @@ const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
  * slotting their own and the default disappears with no emptiness check. That
  * is what slot fallback is for.
  *
- * Not a `Banner`, which is the other thing this could be mistaken for. A
- * callout interrupts a document to set a passage apart and is read where it
- * sits; a banner is page-level chrome above the masthead, announces itself as a
- * live region, and can be dismissed. Neither is a variant of the other.
+ * Not an `Announcement`, which is the other thing this could be mistaken for.
+ * A callout interrupts a document to set a passage apart and is read where it
+ * sits; an announcement is page-level chrome above the masthead, announces
+ * itself as a live region, and can be dismissed. Neither is a variant of the
+ * other.
  *
  * @since 0.1.0
  * @status experimental

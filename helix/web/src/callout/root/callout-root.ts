@@ -16,7 +16,7 @@ import { styles } from './callout-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @aliases Alert, Banner, Admonition, Notice
+ * @aliases Alert, Admonition, Notice
  * @documentation https://helix.fusion.dev/components/callout
  *
  * @slot - The callout's content.

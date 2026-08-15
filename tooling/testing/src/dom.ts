@@ -147,9 +147,9 @@ export const mount = async (markup: string): Promise<HTMLElement> => {
  * The role a screen reader sees on the host.
  *
  * Components set their semantics through `ElementInternals`, which writes no
- * attribute at all, so `getAttribute('role')` reports nothing on a banner. An
- * author's `role` attribute still wins, which is the platform's own precedence
- * and the reason this checks the attribute first.
+ * attribute at all, so `getAttribute('role')` reports nothing on an
+ * announcement. An author's `role` attribute still wins, which is the
+ * platform's own precedence and the reason this checks the attribute first.
  */
 export const role = (host: HTMLElement): string | null =>
   host.getAttribute('role') ??

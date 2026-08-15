@@ -2,10 +2,10 @@ import type {
   Helix,
   HelixBaseAccordion,
   HelixBaseAccordionItem,
+  HelixBaseAnnouncement,
   HelixBaseAppHeader,
   HelixBaseAvatar,
   HelixBaseBadge,
-  HelixBaseBanner,
   HelixBaseBlockquote,
   HelixBaseBreadcrumb,
   HelixBaseBreadcrumbs,
@@ -372,6 +372,51 @@ A union rather than a mode plus a `collapsible` boolean, which would make
   textContent?: string | number;
 };
 
+/** `HelixBaseAnnouncement` component event */
+export type HelixBaseAnnouncementElementEvent<E = Event> = TypedEvent<
+  HelixBaseAnnouncement,
+  E
+>;
+/** `helix-dismiss` event type */
+export type HelixBaseAnnouncementHelixDismissElementEvent =
+  HelixBaseAnnouncementElementEvent<HelixDismissEvent>;
+
+export type HelixBaseAnnouncementProps = {
+  /** What kind of attention the message needs. */
+  severity?: HelixBaseAnnouncement["severity"];
+  /** Whether the reader can close it. */
+  dismissible?: HelixBaseAnnouncement["dismissible"];
+  /** Accessible name for the dismiss control. */
+  "dismiss-label"?: HelixBaseAnnouncement["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  dismissLabel?: HelixBaseAnnouncement["dismissLabel"];
+
+  /** Fired when the reader asks to close it. */
+  "onhelix-dismiss"?: (
+    e: HelixBaseAnnouncementHelixDismissElementEvent,
+  ) => void;
+};
+
+export type HelixBaseAnnouncementSolidJsProps = {
+  /** What kind of attention the message needs. */
+  "prop:severity"?: HelixBaseAnnouncement["severity"];
+  /** Whether the reader can close it. */
+  "prop:dismissible"?: HelixBaseAnnouncement["dismissible"];
+  /** Accessible name for the dismiss control. */
+  "attr:dismiss-label"?: HelixBaseAnnouncement["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  "prop:dismissLabel"?: HelixBaseAnnouncement["dismissLabel"];
+  /** Fired when the reader asks to close it. */
+  "on:helix-dismiss"?: (
+    e: HelixBaseAnnouncementHelixDismissElementEvent,
+  ) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixBaseAppHeaderProps = {
   /** Where the navigation sits in the bar.
 
@@ -473,47 +518,6 @@ export type HelixBaseBadgeSolidJsProps = {
   "prop:max"?: HelixBaseBadge["max"];
   /** Accessible name. Required for a dot, which has no text to read. */
   "prop:label"?: HelixBaseBadge["label"];
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-/** `HelixBaseBanner` component event */
-export type HelixBaseBannerElementEvent<E = Event> = TypedEvent<
-  HelixBaseBanner,
-  E
->;
-/** `helix-dismiss` event type */
-export type HelixBaseBannerHelixDismissElementEvent =
-  HelixBaseBannerElementEvent<HelixDismissEvent>;
-
-export type HelixBaseBannerProps = {
-  /** What kind of attention the message needs. */
-  severity?: HelixBaseBanner["severity"];
-  /** Whether the reader can close it. */
-  dismissible?: HelixBaseBanner["dismissible"];
-  /** Accessible name for the dismiss control. */
-  "dismiss-label"?: HelixBaseBanner["dismissLabel"];
-  /** Accessible name for the dismiss control. */
-  dismissLabel?: HelixBaseBanner["dismissLabel"];
-
-  /** Fired when the reader asks to close it. */
-  "onhelix-dismiss"?: (e: HelixBaseBannerHelixDismissElementEvent) => void;
-};
-
-export type HelixBaseBannerSolidJsProps = {
-  /** What kind of attention the message needs. */
-  "prop:severity"?: HelixBaseBanner["severity"];
-  /** Whether the reader can close it. */
-  "prop:dismissible"?: HelixBaseBanner["dismissible"];
-  /** Accessible name for the dismiss control. */
-  "attr:dismiss-label"?: HelixBaseBanner["dismissLabel"];
-  /** Accessible name for the dismiss control. */
-  "prop:dismissLabel"?: HelixBaseBanner["dismissLabel"];
-  /** Fired when the reader asks to close it. */
-  "on:helix-dismiss"?: (e: HelixBaseBannerHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2982,6 +2986,60 @@ export type CustomElements = {
   >;
 
   /**
+   * Chrome rather than content. An announcement sits above the header and speaks
+   * for the whole page: a trial ending, a service degraded, a change of terms. A
+   * passage that interrupts a document to set itself apart is a `Callout`, which
+   * is read where it sits and cannot be dismissed. Neither is a variant of the
+   * other.
+   *
+   * **Always a polite live region.** `role="alert"` is assertive and interrupts
+   * whatever is being read, which is right for something that appears mid-session
+   * and wrong for something that was in the served HTML: an assertive
+   * announcement would cut across a screen-reader user on every page load, before
+   * they had read anything. Politeness costs a moment and is never wrong; the severity
+   * does not change that, because an error that was always there is still not an
+   * interruption.
+   *
+   * Dismissing is a request. The announcement does not remove itself, because the
+   * consumer owns the markup and taking the node out from under them would put
+   * their state and the document out of step. `preventDefault()` on the
+   * `helix-dismiss` is a refusal.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the message needs.
+   * - `dismissible`: Whether the reader can close it.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-dismiss`: Fired when the reader asks to close it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The message.
+   * - `actions`: What to do about it, usually a link or a button.
+   * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `content`: The message region.
+   * - `actions`: The trailing action region.
+   * - `dismiss`: The control that asks to close.
+   */
+  "helix-base-announcement": Partial<
+    HelixBaseAnnouncementProps & BaseProps<HelixBaseAnnouncement> & BaseEvents
+  >;
+
+  /**
    * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
    * the styled tier can lift the bar off the page without a scroll handler of its
    * own. Scroll position is the one piece of state the server genuinely cannot
@@ -3121,59 +3179,6 @@ export type CustomElements = {
    */
   "helix-base-badge": Partial<
     HelixBaseBadgeProps & BaseProps<HelixBaseBadge> & BaseEvents
-  >;
-
-  /**
-   * Chrome rather than content. A banner sits above the header and speaks for the
-   * whole page: a trial ending, a service degraded, a change of terms. A passage
-   * that interrupts a document to set itself apart is a `Callout`, which is read
-   * where it sits and cannot be dismissed. Neither is a variant of the other.
-   *
-   * **Always a polite live region.** `role="alert"` is assertive and interrupts
-   * whatever is being read, which is right for something that appears mid-session
-   * and wrong for something that was in the served HTML: an assertive banner
-   * would cut across a screen-reader user on every page load, before they had
-   * read anything. Politeness costs a moment and is never wrong; the severity
-   * does not change that, because an error that was always there is still not an
-   * interruption.
-   *
-   * Dismissing is a request. The banner does not remove itself, because the
-   * consumer owns the markup and taking the node out from under them would put
-   * their state and the document out of step. `preventDefault()` on the
-   * `helix-dismiss` is a refusal.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `severity`: What kind of attention the message needs.
-   * - `dismissible`: Whether the reader can close it.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-dismiss`: Fired when the reader asks to close it.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The message.
-   * - `actions`: What to do about it, usually a link or a button.
-   * - `icon`: Replaces the glyph inside the dismiss control.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `content`: The message region.
-   * - `actions`: The trailing action region.
-   * - `dismiss`: The control that asks to close.
-   */
-  "helix-base-banner": Partial<
-    HelixBaseBannerProps & BaseProps<HelixBaseBanner> & BaseEvents
   >;
 
   /**
@@ -3458,10 +3463,11 @@ export type CustomElements = {
    * slotting their own and the default disappears with no emptiness check. That
    * is what slot fallback is for.
    *
-   * Not a `Banner`, which is the other thing this could be mistaken for. A
-   * callout interrupts a document to set a passage apart and is read where it
-   * sits; a banner is page-level chrome above the masthead, announces itself as a
-   * live region, and can be dismissed. Neither is a variant of the other.
+   * Not an `Announcement`, which is the other thing this could be mistaken for.
+   * A callout interrupts a document to set a passage apart and is read where it
+   * sits; an announcement is page-level chrome above the masthead, announces
+   * itself as a live region, and can be dismissed. Neither is a variant of the
+   * other.
    *
    * ## Attributes & Properties
    *
@@ -5927,6 +5933,63 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Chrome rather than content. An announcement sits above the header and speaks
+   * for the whole page: a trial ending, a service degraded, a change of terms. A
+   * passage that interrupts a document to set itself apart is a `Callout`, which
+   * is read where it sits and cannot be dismissed. Neither is a variant of the
+   * other.
+   *
+   * **Always a polite live region.** `role="alert"` is assertive and interrupts
+   * whatever is being read, which is right for something that appears mid-session
+   * and wrong for something that was in the served HTML: an assertive
+   * announcement would cut across a screen-reader user on every page load, before
+   * they had read anything. Politeness costs a moment and is never wrong; the severity
+   * does not change that, because an error that was always there is still not an
+   * interruption.
+   *
+   * Dismissing is a request. The announcement does not remove itself, because the
+   * consumer owns the markup and taking the node out from under them would put
+   * their state and the document out of step. `preventDefault()` on the
+   * `helix-dismiss` is a refusal.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `severity`: What kind of attention the message needs.
+   * - `dismissible`: Whether the reader can close it.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-dismiss`: Fired when the reader asks to close it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The message.
+   * - `actions`: What to do about it, usually a link or a button.
+   * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `content`: The message region.
+   * - `actions`: The trailing action region.
+   * - `dismiss`: The control that asks to close.
+   */
+  "helix-base-announcement": Partial<
+    HelixBaseAnnouncementProps &
+      HelixBaseAnnouncementSolidJsProps &
+      BaseProps<HelixBaseAnnouncement> &
+      BaseEvents
+  >;
+
+  /**
    * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
    * the styled tier can lift the bar off the page without a scroll handler of its
    * own. Scroll position is the one piece of state the server genuinely cannot
@@ -6074,62 +6137,6 @@ export type CustomElementsSolidJs = {
     HelixBaseBadgeProps &
       HelixBaseBadgeSolidJsProps &
       BaseProps<HelixBaseBadge> &
-      BaseEvents
-  >;
-
-  /**
-   * Chrome rather than content. A banner sits above the header and speaks for the
-   * whole page: a trial ending, a service degraded, a change of terms. A passage
-   * that interrupts a document to set itself apart is a `Callout`, which is read
-   * where it sits and cannot be dismissed. Neither is a variant of the other.
-   *
-   * **Always a polite live region.** `role="alert"` is assertive and interrupts
-   * whatever is being read, which is right for something that appears mid-session
-   * and wrong for something that was in the served HTML: an assertive banner
-   * would cut across a screen-reader user on every page load, before they had
-   * read anything. Politeness costs a moment and is never wrong; the severity
-   * does not change that, because an error that was always there is still not an
-   * interruption.
-   *
-   * Dismissing is a request. The banner does not remove itself, because the
-   * consumer owns the markup and taking the node out from under them would put
-   * their state and the document out of step. `preventDefault()` on the
-   * `helix-dismiss` is a refusal.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `severity`: What kind of attention the message needs.
-   * - `dismissible`: Whether the reader can close it.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-dismiss`: Fired when the reader asks to close it.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: The message.
-   * - `actions`: What to do about it, usually a link or a button.
-   * - `icon`: Replaces the glyph inside the dismiss control.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `content`: The message region.
-   * - `actions`: The trailing action region.
-   * - `dismiss`: The control that asks to close.
-   */
-  "helix-base-banner": Partial<
-    HelixBaseBannerProps &
-      HelixBaseBannerSolidJsProps &
-      BaseProps<HelixBaseBanner> &
       BaseEvents
   >;
 
@@ -6433,10 +6440,11 @@ export type CustomElementsSolidJs = {
    * slotting their own and the default disappears with no emptiness check. That
    * is what slot fallback is for.
    *
-   * Not a `Banner`, which is the other thing this could be mistaken for. A
-   * callout interrupts a document to set a passage apart and is read where it
-   * sits; a banner is page-level chrome above the masthead, announces itself as a
-   * live region, and can be dismissed. Neither is a variant of the other.
+   * Not an `Announcement`, which is the other thing this could be mistaken for.
+   * A callout interrupts a document to set a passage apart and is read where it
+   * sits; an announcement is page-level chrome above the masthead, announces
+   * itself as a live region, and can be dismissed. Neither is a variant of the
+   * other.
    *
    * ## Attributes & Properties
    *

@@ -51,19 +51,21 @@
  * already surrounds the panel on the sides that need it. */
 [part="panel"] {
   background-color: var(--helix-color-surface);
-  /* Clear of the header, which the panel runs underneath rather than beside: a
-     drawer is `position: fixed` with `inset-block: 0`, so it spans the whole
-     viewport including the strip a sticky header occupies, and its first line
-     of content lands behind one.
- 
-     Derived rather than chosen, which is why it is a `calc` and not the seventy
-     two pixels it comes to. A header's height is a token and can move; a number
-     copied from today's would be right until it did. The gap after it is the
-     one the rest of the page uses. */
-  padding-block-start: var(
-    --drawer-inset-block-start,
-    calc(var(--helix-size-header) + var(--helix-space-md))
-  );
+  /* A drawer's own inset, and nothing about anyone's header.
+
+     This used to be `calc(var(--helix-size-header) + var(--helix-space-md))`,
+     because a drawer is `position: fixed` with `inset-block: 0` and so spans
+     the strip a sticky header occupies, putting its first line of content
+     behind one. The clearance was real. It was in the wrong place: whether a
+     header is there, and how tall it is, is a fact about the page rather than
+     about the drawer, and every app without one paid seventy two pixels of
+     empty panel for a header it did not have. Visible in our own examples,
+     which render with no header at all.
+
+     So the default is a plain inset and `--drawer-inset-block-start` is what a
+     page with a masthead sets, which is the direction the knowledge actually
+     travels. The site sets it. */
+  padding-block-start: var(--drawer-inset-block-start, var(--helix-space-2xl));
   display: flex;
   flex-direction: column;
   outline: none;

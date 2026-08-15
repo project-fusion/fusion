@@ -753,6 +753,328 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/announcement/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/announcement/root/announcement-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/announcement/root/announcement-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/announcement/root/announcement-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/announcement/root/announcement-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Full width and flat, with the severity carried by a tinted fill and a\nhairline beneath rather than by a border on four sides: an announcement is a\nband across the top of the page, not a box that happens to be wide.",
+          "name": "HelixAnnouncement",
+          "cssProperties": [
+            {
+              "description": "Inline padding, matched to the page.",
+              "name": "--announcement-inset"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the message needs.",
+              "attribute": "severity",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader can close it.",
+              "attribute": "dismissible",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dismissLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "attribute": "dismiss-label",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleDismiss",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseAnnouncement",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A page-level message above the masthead, which can be dismissed.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/announcement",
+            "aliases": [
+              "Banner",
+              "Notification bar",
+              "Alert bar"
+            ],
+            "tier": "styled",
+            "group": "Announcement",
+            "part": "Root"
+          },
+          "tagName": "helix-announcement",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The message.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "description": "What to do about it, usually a link or a button.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "description": "Replaces the glyph inside the dismiss control.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The message region.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "description": "The trailing action region.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "description": "The control that asks to close.",
+              "name": "dismiss",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the message needs.",
+              "fieldName": "severity",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader can close it.",
+              "fieldName": "dismissible",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "name": "dismiss-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "fieldName": "dismissLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixDismissEvent"
+              },
+              "description": "Fired when the reader asks to close it.",
+              "name": "helix-dismiss",
+              "reactProp": "onhelix-dismiss",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/announcement/root/announcement-root.ts",
+          "definitionPath": "src/announcement/root/announcement-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixAnnouncement",
+          "declaration": {
+            "name": "HelixAnnouncement",
+            "module": "src/announcement/root/announcement-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-announcement",
+          "declaration": {
+            "name": "HelixAnnouncement",
+            "module": "src/announcement/root/announcement-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/app-header/index.ts",
       "declarations": [],
       "exports": [
@@ -1738,328 +2060,6 @@
           "declaration": {
             "name": "HelixBadge",
             "module": "src/badge/root/badge-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/banner/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/banner/root/banner-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/banner/root/banner-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/banner/root/banner-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/banner/root/banner-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Full width and flat, with the severity carried by a tinted fill and a hairline\nbeneath rather than by a border on four sides: a banner is a band across the\ntop of the page, not a box that happens to be wide.",
-          "name": "HelixBanner",
-          "cssProperties": [
-            {
-              "description": "Inline padding, usually matched to the page.",
-              "name": "--banner-inset"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "severity",
-              "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
-              },
-              "description": "What kind of attention the message needs.",
-              "attribute": "severity",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "dismissible",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the reader can close it.",
-              "attribute": "dismissible",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "dismissLabel",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Dismiss'",
-              "description": "Accessible name for the dismiss control.",
-              "attribute": "dismiss-label",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleDismiss",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseBanner",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A page-level message above the masthead, which can be dismissed.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/banner",
-            "aliases": [
-              "Announcement",
-              "Notification bar",
-              "Alert bar"
-            ],
-            "tier": "styled",
-            "group": "Banner",
-            "part": "Root"
-          },
-          "tagName": "helix-banner",
-          "customElement": true,
-          "slots": [
-            {
-              "description": "The message.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "description": "What to do about it, usually a link or a button.",
-              "name": "actions",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "description": "Replaces the glyph inside the dismiss control.",
-              "name": "icon",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The message region.",
-              "name": "content",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "description": "The trailing action region.",
-              "name": "actions",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "description": "The control that asks to close.",
-              "name": "dismiss",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "severity",
-              "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
-              },
-              "description": "What kind of attention the message needs.",
-              "fieldName": "severity",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "name": "dismissible",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the reader can close it.",
-              "fieldName": "dismissible",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            },
-            {
-              "name": "dismiss-label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Dismiss'",
-              "description": "Accessible name for the dismiss control.",
-              "fieldName": "dismissLabel",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixDismissEvent"
-              },
-              "description": "Fired when the reader asks to close it.",
-              "name": "helix-dismiss",
-              "reactProp": "onhelix-dismiss",
-              "inheritedFrom": {
-                "name": "HelixBaseBanner",
-                "module": "src/banner/root/banner-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/banner/root/banner-root.ts",
-          "definitionPath": "src/banner/root/banner-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBanner",
-          "declaration": {
-            "name": "HelixBanner",
-            "module": "src/banner/root/banner-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-banner",
-          "declaration": {
-            "name": "HelixBanner",
-            "module": "src/banner/root/banner-root.ts"
           }
         }
       ]
@@ -4315,7 +4315,6 @@
             "documentation": "https://helix.fusion.dev/components/callout",
             "aliases": [
               "Alert",
-              "Banner",
               "Admonition",
               "Notice"
             ],
@@ -8921,6 +8920,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/announcement/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/app-header/index.js"
           }
         },
@@ -8938,14 +8945,6 @@
           "declaration": {
             "name": "*",
             "module": "src/badge/index.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/banner/index.js"
           }
         },
         {

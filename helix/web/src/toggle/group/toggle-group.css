@@ -28,6 +28,15 @@
   --_toggle-height: 100%;
   /* No track, so nothing to be concentric with. */
   --_toggle-radius: var(--helix-radii-sm);
+  /* And no groove either, which decides the thumb's colour. Without a track the
+     marker is a pill lying *on* whatever surface the group was put on, so it
+     has to be darker than it: that is `raised`. The grooved appearances below
+     take `overlay` instead, because a thumb in a groove has to be lighter than
+     the groove, and on a white page those are opposite directions. Reported as
+     a selected file tab that had gone too light, which is this case exactly:
+     the sandbox's tabs are `plain` and sit on a white toolbar, so a white thumb
+     on them is the shadow and nothing else. */
+  --_indicator-surface: var(--helix-color-surface-raised);
 }
 
 /* A framed track, and it is what makes the whole control read. Without it the
@@ -52,6 +61,8 @@
      between them was even the whole way round. A larger outer radius leaves the
      inner one enough to be a curve. */
   --_toggle-radius: calc(var(--helix-radii-lg) - var(--helix-border-thin) - var(--helix-space-2xs));
+  /* A groove, so the thumb is over it rather than on it. */
+  --_indicator-surface: var(--helix-color-surface-overlay);
 }
 
 /* The segments share what is left over, and each label keeps the same space
@@ -83,17 +94,10 @@
    color, which stays reserved for state. One step rounder than nothing and one
    step tighter than the track it sits in, so the two are concentric. */
 [part="indicator"] {
-  /* `overlay` rather than `raised`, and this is what let the groove get lighter.
-     The two tokens mean different things and `raised` was doing both jobs: a
-     hovered row lying *on* a white page has to be darker than it, while a thumb
-     sitting *in* a groove has to be lighter than the groove. On white those pull
-     opposite ways, and with the groove lightened the raised thumb was two
-     hundredths away from it and on the wrong side.
-  
-     `overlay` is the one for something over the page rather than on it, which is
-     what a thumb with a shadow under it is. White on a light groove in light,
-     and a step up from the groove in dark, so it reads the same way in both. */
-  background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-overlay));
+  /* Whichever the appearance declared, because the two look different for a
+     reason: the token is decided by what is behind the thumb, and `plain` has
+     no track behind it. See `:host` above. */
+  background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
   block-size: var(--_indicator-h, 0);
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
   box-shadow: var(--helix-shadow-sm);

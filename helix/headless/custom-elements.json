@@ -579,6 +579,246 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/announcement/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/announcement/root/announcement-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/announcement/root/announcement-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Chrome rather than content. An announcement sits above the header and speaks\nfor the whole page: a trial ending, a service degraded, a change of terms. A\npassage that interrupts a document to set itself apart is a `Callout`, which\nis read where it sits and cannot be dismissed. Neither is a variant of the\nother.\n\n**Always a polite live region.** `role=\"alert\"` is assertive and interrupts\nwhatever is being read, which is right for something that appears mid-session\nand wrong for something that was in the served HTML: an assertive\nannouncement would cut across a screen-reader user on every page load, before\nthey had read anything. Politeness costs a moment and is never wrong; the severity\ndoes not change that, because an error that was always there is still not an\ninterruption.\n\nDismissing is a request. The announcement does not remove itself, because the\nconsumer owns the markup and taking the node out from under them would put\ntheir state and the document out of step. `preventDefault()` on the\n`helix-dismiss` is a refusal.",
+          "name": "HelixBaseAnnouncement",
+          "cssParts": [
+            {
+              "description": "The message region.",
+              "name": "content"
+            },
+            {
+              "description": "The trailing action region.",
+              "name": "actions"
+            },
+            {
+              "description": "The control that asks to close.",
+              "name": "dismiss"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The message.",
+              "name": ""
+            },
+            {
+              "description": "What to do about it, usually a link or a button.",
+              "name": "actions"
+            },
+            {
+              "description": "Replaces the glyph inside the dismiss control.",
+              "name": "icon"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the message needs.",
+              "attribute": "severity",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader can close it.",
+              "attribute": "dismissible",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "dismissLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "attribute": "dismiss-label"
+            },
+            {
+              "kind": "field",
+              "name": "handleDismiss",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixDismissEvent"
+              },
+              "description": "Fired when the reader asks to close it.",
+              "name": "helix-dismiss",
+              "reactProp": "onhelix-dismiss"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the message needs.",
+              "fieldName": "severity"
+            },
+            {
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader can close it.",
+              "fieldName": "dismissible"
+            },
+            {
+              "name": "dismiss-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "fieldName": "dismissLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A page-level message above the masthead, which can be dismissed.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/announcement",
+            "aliases": [
+              "Banner",
+              "Notification bar",
+              "Alert bar"
+            ],
+            "tier": "headless",
+            "group": "BaseAnnouncement",
+            "part": "Root"
+          },
+          "tagName": "helix-base-announcement",
+          "customElement": true,
+          "modulePath": "src/announcement/root/announcement-root.ts",
+          "definitionPath": "src/announcement/root/announcement-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseAnnouncement",
+          "declaration": {
+            "name": "HelixBaseAnnouncement",
+            "module": "src/announcement/root/announcement-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-announcement",
+          "declaration": {
+            "name": "HelixBaseAnnouncement",
+            "module": "src/announcement/root/announcement-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/app-header/index.ts",
       "declarations": [],
       "exports": [
@@ -1252,246 +1492,6 @@
           "declaration": {
             "name": "HelixBaseBadge",
             "module": "src/badge/root/badge-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/banner/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/banner/root/banner-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/banner/root/banner-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Chrome rather than content. A banner sits above the header and speaks for the\nwhole page: a trial ending, a service degraded, a change of terms. A passage\nthat interrupts a document to set itself apart is a `Callout`, which is read\nwhere it sits and cannot be dismissed. Neither is a variant of the other.\n\n**Always a polite live region.** `role=\"alert\"` is assertive and interrupts\nwhatever is being read, which is right for something that appears mid-session\nand wrong for something that was in the served HTML: an assertive banner\nwould cut across a screen-reader user on every page load, before they had\nread anything. Politeness costs a moment and is never wrong; the severity\ndoes not change that, because an error that was always there is still not an\ninterruption.\n\nDismissing is a request. The banner does not remove itself, because the\nconsumer owns the markup and taking the node out from under them would put\ntheir state and the document out of step. `preventDefault()` on the\n`helix-dismiss` is a refusal.",
-          "name": "HelixBaseBanner",
-          "cssParts": [
-            {
-              "description": "The message region.",
-              "name": "content"
-            },
-            {
-              "description": "The trailing action region.",
-              "name": "actions"
-            },
-            {
-              "description": "The control that asks to close.",
-              "name": "dismiss"
-            }
-          ],
-          "slots": [
-            {
-              "description": "The message.",
-              "name": ""
-            },
-            {
-              "description": "What to do about it, usually a link or a button.",
-              "name": "actions"
-            },
-            {
-              "description": "Replaces the glyph inside the dismiss control.",
-              "name": "icon"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "severity",
-              "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
-              },
-              "description": "What kind of attention the message needs.",
-              "attribute": "severity",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "dismissible",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the reader can close it.",
-              "attribute": "dismissible",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "dismissLabel",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Dismiss'",
-              "description": "Accessible name for the dismiss control.",
-              "attribute": "dismiss-label"
-            },
-            {
-              "kind": "field",
-              "name": "handleDismiss",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixDismissEvent"
-              },
-              "description": "Fired when the reader asks to close it.",
-              "name": "helix-dismiss",
-              "reactProp": "onhelix-dismiss"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "severity",
-              "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
-              },
-              "description": "What kind of attention the message needs.",
-              "fieldName": "severity"
-            },
-            {
-              "name": "dismissible",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the reader can close it.",
-              "fieldName": "dismissible"
-            },
-            {
-              "name": "dismiss-label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Dismiss'",
-              "description": "Accessible name for the dismiss control.",
-              "fieldName": "dismissLabel"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "A page-level message above the masthead, which can be dismissed.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/banner",
-            "aliases": [
-              "Announcement",
-              "Notification bar",
-              "Alert bar"
-            ],
-            "tier": "headless",
-            "group": "BaseBanner",
-            "part": "Root"
-          },
-          "tagName": "helix-base-banner",
-          "customElement": true,
-          "modulePath": "src/banner/root/banner-root.ts",
-          "definitionPath": "src/banner/root/banner-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseBanner",
-          "declaration": {
-            "name": "HelixBaseBanner",
-            "module": "src/banner/root/banner-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-banner",
-          "declaration": {
-            "name": "HelixBaseBanner",
-            "module": "src/banner/root/banner-root.ts"
           }
         }
       ]
@@ -3071,7 +3071,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "`severity` lives on the headless tier rather than being an `appearance` on the\nstyled one, because it is meaning and not decoration. It picks the icon and\nthat icon's accessible name, so a reader who cannot see that the box is red\nstill hears \"Error\". A callout whose severity existed only as a color would\nsay nothing to them at all.\n\nThe icon is the fallback content of a slot, so a consumer replaces it by\nslotting their own and the default disappears with no emptiness check. That\nis what slot fallback is for.\n\nNot a `Banner`, which is the other thing this could be mistaken for. A\ncallout interrupts a document to set a passage apart and is read where it\nsits; a banner is page-level chrome above the masthead, announces itself as a\nlive region, and can be dismissed. Neither is a variant of the other.",
+          "description": "`severity` lives on the headless tier rather than being an `appearance` on the\nstyled one, because it is meaning and not decoration. It picks the icon and\nthat icon's accessible name, so a reader who cannot see that the box is red\nstill hears \"Error\". A callout whose severity existed only as a color would\nsay nothing to them at all.\n\nThe icon is the fallback content of a slot, so a consumer replaces it by\nslotting their own and the default disappears with no emptiness check. That\nis what slot fallback is for.\n\nNot an `Announcement`, which is the other thing this could be mistaken for.\nA callout interrupts a document to set a passage apart and is read where it\nsits; an announcement is page-level chrome above the masthead, announces\nitself as a live region, and can be dismissed. Neither is a variant of the\nother.",
           "name": "HelixBaseCallout",
           "cssParts": [
             {
@@ -6147,6 +6147,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/announcement/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/app-header/index.js"
           }
         },
@@ -6164,14 +6172,6 @@
           "declaration": {
             "name": "*",
             "module": "src/badge/index.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/banner/index.js"
           }
         },
         {
