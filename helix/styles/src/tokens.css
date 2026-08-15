@@ -50,8 +50,21 @@
    *
    * It was not. Moving the page to the ends of the ramp left `background`,
    * `surface` and `surface-raised` all sitting on `neutral-0` in light mode:
-   * three tokens, one colour, and a card on a page with nothing between them. */
-  --helix-color-background: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000));
+   * three tokens, one colour, and a card on a page with nothing between them.
+   *
+   * **The dark page is near-black, not black, and has to be.** `sunken` is the
+   * bottom of the ramp, so a page at the bottom of it leaves nothing below the
+   * page: every sunken thing lying directly on it is painted the page's own
+   * colour and disappears. Measured on the breadcrumb's hover, which was the
+   * report, and it was never only the breadcrumb: the banner, the nav bar's
+   * marker, a `<kbd>` and an input's fill are all sunken and all sit on the
+   * page. This is the second time these two have collided, the first being when
+   * `sunken` was the one at neutral-950 beside a background already there.
+   *
+   * The 0.06 between the page and `surface` that this leaves is deliberate and
+   * is what a dark surface is worth: lifted a little and told apart mostly by
+   * its border, which is how every dark interface that does not glow does it. */
+  --helix-color-background: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-950));
   --helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
   /* Two kinds of "above", and they want opposite fills in light mode.
    *
@@ -71,11 +84,6 @@
    * with it for as long as it did. */
   --helix-color-surface-raised: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800));
   --helix-color-surface-overlay: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800));
-  /* Sunken is a step *lighter* than the page in dark mode, not darker. There is
-     nowhere below near-black to go, so a groove reads by being nearer the
-     viewer's eye rather than further from it. It was neutral-950, identical to
-     the background, which meant every sunken surface was invisible: a segmented
-     control's track vanished and its thumb floated as a loose grey rectangle. */
   /* All the way down to the page. A well cut through a surface exposes what is
      under it, and what is under everything is the page.
 

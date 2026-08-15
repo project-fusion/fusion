@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useHelixEvent } from '../lib/use-helix-event'
-import { FusionLogo } from './fusion-logo'
 import { PreferencesDrawer } from './preferences'
 import { VERTICALS } from './verticals'
+import { Wordmark } from './wordmark'
 
 /**
  * Site navigation: the verticals, centered in the banner.
@@ -68,12 +68,7 @@ export function SiteNav() {
     <>
       <helix-app-header sticky>
         <a data-link="quiet" href="/" slot="start">
-          <helix-flex align="center" gap="xs" inline>
-            <FusionLogo size="1.5rem" />
-            <helix-text appearance="body-strong" class="wordmark">
-              Fusion
-            </helix-text>
-          </helix-flex>
+          <Wordmark />
         </a>
 
         {!narrow && (

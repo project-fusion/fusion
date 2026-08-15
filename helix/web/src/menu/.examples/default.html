@@ -2,21 +2,21 @@
      that changes what it holds needs no diagonal path for a pointer to
      travel, does not run off a narrow window, and works on a screen with no
      hover at all. -->
-<helix-menu label="View">
-  <helix-button slot="trigger">View</helix-button>
+<helix-menu label="Menu">
+  <helix-button slot="trigger">Menu</helix-button>
 
-  <helix-menu-item value="layout">
-    Layout
-    <helix-menu-item checkable checked slot="submenu" value="padded">
-      Padded
+  <helix-menu-item value="one">
+    Item One
+    <helix-menu-item checkable checked slot="submenu" value="one-a">
+      Option One
     </helix-menu-item>
-    <helix-menu-item checkable slot="submenu" value="centered">
-      Centered
+    <helix-menu-item checkable slot="submenu" value="one-b">
+      Option Two
     </helix-menu-item>
   </helix-menu-item>
 
   <helix-divider announced></helix-divider>
 
-  <helix-menu-item checkable checked value="panel">Panel</helix-menu-item>
-  <helix-menu-item checkable value="status">Status bar</helix-menu-item>
+  <helix-menu-item checkable checked value="two">Item Two</helix-menu-item>
+  <helix-menu-item checkable value="three">Item Three</helix-menu-item>
 </helix-menu>

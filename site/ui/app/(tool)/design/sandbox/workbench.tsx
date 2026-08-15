@@ -23,8 +23,8 @@ import type {
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
 import { useHelixEvent } from '../../../../lib/use-helix-event'
-import { FusionLogo } from '../../../fusion-logo'
 import { PreferencesDrawer } from '../../../preferences'
+import { Wordmark } from '../../../wordmark'
 import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state'
 
 /**
@@ -561,16 +561,7 @@ export function SandboxWorkbench({ families }: Props) {
             The name is the accessible one, so the mark beside it is decoration
             rather than a second reading of the same word. */}
         <a data-link="quiet" href="/design" slot="start">
-          <helix-flex align="center" gap="2xs" inline>
-            <FusionLogo size="1.25rem" title="" />
-            {/* The same lockup the site's own header wears. The wordmark is the
-                one piece of text on the page that is a thing rather than a
-                label, which is what the display face is for, and setting the
-                same word two ways in two headers is two brands. */}
-            <helix-text appearance="body-strong" class="wordmark">
-              Fusion
-            </helix-text>
-          </helix-flex>
+          <Wordmark />
         </a>
 
         {/* What is about the site rather than the sandbox: how the whole thing
