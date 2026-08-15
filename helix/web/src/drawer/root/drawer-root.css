@@ -51,6 +51,19 @@
  * already surrounds the panel on the sides that need it. */
 [part="panel"] {
   background-color: var(--helix-color-surface);
+  /* Clear of the header, which the panel runs underneath rather than beside: a
+     drawer is `position: fixed` with `inset-block: 0`, so it spans the whole
+     viewport including the strip a sticky header occupies, and its first line
+     of content lands behind one.
+ 
+     Derived rather than chosen, which is why it is a `calc` and not the seventy
+     two pixels it comes to. A header's height is a token and can move; a number
+     copied from today's would be right until it did. The gap after it is the
+     one the rest of the page uses. */
+  padding-block-start: var(
+    --drawer-inset-block-start,
+    calc(var(--helix-size-header) + var(--helix-space-md))
+  );
   display: flex;
   flex-direction: column;
   outline: none;

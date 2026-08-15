@@ -63,7 +63,14 @@
 /* Travelling rather than appearing, which is the whole of what a switch says:
    the same thing moved rather than a different thing shown. */
 [part="thumb"] {
-  background-color: var(--helix-color-background);
+  /* Lifted off the groove, which is what `raised` means and is the same token
+     the segmented control's thumb takes for the same reason.
+ 
+     It was `background`, the page's own colour, which works in light and
+     disappears in dark: the page is black and the groove is a step up from it,
+     so the thumb came out darker than the track it sits in and read as a hole
+     punched through rather than a thing lying on top. */
+  background-color: var(--switch-thumb-color, var(--helix-color-surface-raised));
   block-size: calc(var(--_switch-height) - var(--helix-space-2xs));
   border-radius: var(--helix-radii-full);
   box-shadow: var(--helix-shadow-sm);
@@ -77,6 +84,10 @@
 }
 
 :host([data-checked]) [part="thumb"] {
+  /* On the accent now rather than on the groove, so it takes the colour meant
+     to sit on it. `raised` against the brand is a dark thumb on a mid blue in
+     dark mode, which is the same disappearing act the other way round. */
+  background-color: var(--switch-thumb-color, var(--helix-color-foreground-on-accent));
   /* The track less the thumb and the inset at both ends, so the gap either side
      is the same however wide the track is made. */
   translate: calc(var(--_switch-width) - var(--_switch-height)) -50%;
