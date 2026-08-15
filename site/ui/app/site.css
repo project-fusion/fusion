@@ -410,7 +410,7 @@ helix-app-header {
   block-size: var(--helix-size-control-lg);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   padding-block: var(--helix-space-none);
-  padding-inline: var(--helix-space-sm);
+  padding-inline: var(--helix-space-md);
 }
 
 /* The panel is a bar and a console, and the two take opposite sides of a line.
@@ -443,7 +443,7 @@ helix-sandbox [slot="panel"]::part(tabs) {
   block-size: var(--helix-size-control-lg);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   padding-block: var(--helix-space-none);
-  padding-inline: var(--helix-space-sm);
+  padding-inline: var(--helix-space-md);
 }
 
 helix-sandbox [slot="panel"]::part(panels) {

@@ -18,7 +18,9 @@
   display: flex;
   min-block-size: 0;
   padding-block: var(--helix-space-none);
-  padding-inline: var(--helix-space-sm);
+  /* The same inset the page's own header takes, so the two line up down the
+     leading edge rather than starting a step apart. */
+  padding-inline: var(--helix-space-md);
 }
 
 /* Each region is a flex row of its own, which is what lets the gap live inside
