@@ -305,9 +305,15 @@
   --helix-size-tag-lg: calc(1.75rem * var(--_helix-seed-density));
   --helix-size-tag-md: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-tag-sm: calc(1.25rem * var(--_helix-seed-density));
+  /* Sixteen, twenty, twenty-four: an even four pixels a step.
+     `md` was eighteen and `lg` twenty-two, which made the top step two pixels
+     while the bottom one was four. Moving `md` up to twenty is what was asked
+     for and is what makes that uneven, so `lg` moves with it: a scale whose
+     gaps disagree is not a scale, and nothing between twenty and twenty-two is
+     a decision anyone would make on purpose. */
   --helix-size-checkbox: var(--helix-size-checkbox-md);
-  --helix-size-checkbox-lg: calc(1.375rem * var(--_helix-seed-density));
-  --helix-size-checkbox-md: calc(1.125rem * var(--_helix-seed-density));
+  --helix-size-checkbox-lg: calc(1.5rem * var(--_helix-seed-density));
+  --helix-size-checkbox-md: calc(1.25rem * var(--_helix-seed-density));
   --helix-size-checkbox-sm: calc(1rem * var(--_helix-seed-density));
   --helix-size-spinner-md: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-spinner-sm: calc(1rem * var(--_helix-seed-density));
