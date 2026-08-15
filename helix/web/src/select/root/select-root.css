@@ -62,6 +62,12 @@
 /* Over the page rather than on it, which is what `overlay` means and what its
    shadow says: the panel is not a sunken part of the field it came out of. */
 [part="surface"] {
+  /* Square rows, because they run the full width of the panel. A radius is for
+     a row inset from its container, where the corners have space to sit in; on
+     a band that reaches both edges it rounds against nothing and reads as a
+     rectangle with the corners nibbled. */
+  --option-radius: var(--helix-radii-none);
+
   background-color: var(--helix-color-surface-overlay);
   /* No border. A panel over the page is told apart by its shadow and by the
      content it covers, which is what `overlay` means, and a line around it as
@@ -90,7 +96,7 @@
      rather than a pill inset from its edges: the highlight lines up with the
      edge the eye is already following down the list. The block padding stays,
      because the first and last rows still want air above and below them. */
-  padding-block: var(--helix-space-2xs);
+  padding-block: var(--helix-space-sm);
   padding-inline: var(--helix-space-none);
   position: absolute;
   z-index: var(--helix-layer-overlay);

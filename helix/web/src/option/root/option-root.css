@@ -8,7 +8,11 @@
 
 [part="item"] {
   align-items: center;
-  border-radius: var(--helix-radii-sm);
+  /* From the container, because the container decides whether this row is
+     inset or full-bleed and only a row with space around it has corners worth
+     rounding. A listbox on its own insets its rows and keeps the radius; the
+     select's panel runs them edge to edge and sets this to none. */
+  border-radius: var(--option-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: flex;
@@ -36,13 +40,6 @@
 :host([data-active]) [part="item"],
 :host(:not([disabled])) [part="item"]:hover {
   background-color: var(--option-active-color, var(--helix-color-surface-raised));
-}
-
-/* Chosen, which is a fact about the value and survives the keyboard moving
-   away. Said with weight rather than with colour, so it still reads when the
-   active wash is over it. */
-:host([selected]) [part="label"] {
-  font-weight: var(--helix-weight-medium);
 }
 
 :host([disabled]) [part="item"] {
