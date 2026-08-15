@@ -283,6 +283,27 @@ if (hasLayout()) {
       expect(outer.left - inner.left).toBeLessThan(1)
     })
 
+    test('an error is one edge, not a red border inside a blue ring', async () => {
+      /* Only a browser can answer this: it is entirely a question of which rule
+         wins, and happy-dom resolves no cascade for `:focus-within`.
+
+         Both faults it covers are specificity. `[data-invalid]` unnamed by
+         hover is (0,3,0) against hover's (0,4,0), so pointing at a field with
+         an error in it put the grey border back. And the focus rule owns the
+         `outline`, so a focused error came out red inside blue, which is the
+         double-struck look the focus rule exists to prevent arriving by another
+         route. The two are one edge, so they have to agree. */
+      const host = await mount('<helix-input label="A" feedback="Wrong"></helix-input>')
+      const field = part(host, 'field') as HTMLElement
+      host.focus()
+
+      const style = getComputedStyle(field)
+      expect(host.hasAttribute('data-invalid')).toBe(true)
+      expect(field.matches(':focus-within')).toBe(true)
+      expect(style.outlineStyle).not.toBe('none')
+      expect(style.outlineColor).toBe(style.borderTopColor)
+    })
+
     test('a field with every part is taller than one with none, by all of them', async () => {
       const bare = await heightOf('<helix-input placeholder="P"></helix-input>')
       const full = await heightOf('<helix-input label="L" hint="C" feedback="F"></helix-input>')
