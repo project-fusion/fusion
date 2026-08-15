@@ -99,9 +99,55 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
    * exactly as it moves through a flat one.
    */
   get options(): HelixBaseOption[] {
-    return [...this.querySelectorAll('*')].filter(
-      (node): node is HelixBaseOption => node instanceof HelixBaseOption,
-    )
+    return this.collect(this.children)
+  }
+
+  /**
+   * Walks the tree, and walks *through* a slot when it meets one.
+   *
+   * Descendants rather than children, because a group puts a level between the
+   * list and its options and the keyboard has to move through a grouped list
+   * exactly as it moves through a flat one.
+   *
+   * Through a slot because that is how this gets composed. `Select` renders a
+   * listbox in its own shadow root with a slot inside it, so the options are
+   * the *select's* light DOM and the listbox's only child is the slot: a plain
+   * `querySelectorAll` finds the slot and no options at all, and the whole
+   * component comes up empty. Found the first time the two were put together,
+   * which is the argument for building the pieces separately rather than
+   * discovering it inside a finished Select.
+   */
+  private collect(nodes: Iterable<Element>): HelixBaseOption[] {
+    const found: HelixBaseOption[] = []
+    for (const node of nodes) {
+      if (node instanceof HelixBaseOption) {
+        found.push(node)
+      } else if (node instanceof HTMLSlotElement) {
+        found.push(...this.collect(node.assignedElements({ flatten: true })))
+      } else {
+        found.push(...this.collect(node.children))
+      }
+    }
+    return found
+  }
+
+  /** The groups, found the same way and for the same reason. */
+  private get groups(): HelixBaseOptionGroup[] {
+    const found: HelixBaseOptionGroup[] = []
+    const walk = (nodes: Iterable<Element>): void => {
+      for (const node of nodes) {
+        if (node instanceof HelixBaseOptionGroup) {
+          found.push(node)
+        }
+        if (node instanceof HTMLSlotElement) {
+          walk(node.assignedElements({ flatten: true }))
+        } else {
+          walk(node.children)
+        }
+      }
+    }
+    walk(this.children)
+    return found
   }
 
   /** The options a filter has left showing. */
@@ -208,13 +254,9 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
        The listbox can, because it is the thing that did the hiding and already
        knows which. Left showing, the picture was a heading over nothing, which
        reads as a group whose contents failed to render. */
-    for (const group of this.querySelectorAll('*')) {
-      if (group instanceof HelixBaseOptionGroup) {
-        const inside = [...group.querySelectorAll('*')].filter(
-          (node): node is HelixBaseOption => node instanceof HelixBaseOption,
-        )
-        group.hidden = inside.length > 0 && inside.every((option) => option.hidden)
-      }
+    for (const group of this.groups) {
+      const inside = this.collect(group.children)
+      group.hidden = inside.length > 0 && inside.every((option) => option.hidden)
     }
 
     /* The keyboard cannot sit on something the filter has hidden, so it moves

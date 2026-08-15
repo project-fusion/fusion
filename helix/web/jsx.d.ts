@@ -42,6 +42,7 @@ import type {
   HelixQuote,
   HelixRadio,
   HelixRadioGroup,
+  HelixSelect,
   HelixSelectEvent,
   HelixSkeleton,
   HelixSlider,
@@ -1959,6 +1960,132 @@ export type HelixRadioSolidJsProps = {
   "prop:value"?: HelixRadio["value"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixRadioHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixSelect` component event */
+export type HelixSelectElementEvent<E = Event> = TypedEvent<HelixSelect, E>;
+/** `helix-change` event type */
+export type HelixSelectHelixChangeElementEvent =
+  HelixSelectElementEvent<HelixChangeEvent>;
+/** `helix-open` event type */
+export type HelixSelectHelixOpenElementEvent =
+  HelixSelectElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixSelectHelixCloseElementEvent =
+  HelixSelectElementEvent<HelixCloseEvent>;
+
+export type HelixSelectProps = {
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixSelect["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixSelect["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixSelect["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixSelect["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixSelect["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  value?: HelixSelect["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixSelect["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixSelect["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixSelect["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixSelect["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixSelect["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixSelect["required"];
+  /** Whether the list can be narrowed by typing. */
+  filterable?: HelixSelect["filterable"];
+  /** Whether more than one option can be the answer. */
+  multiple?: HelixSelect["multiple"];
+  /** Name the control reports under when its form is submitted. */
+  name?: HelixSelect["name"];
+  /** Shown on the trigger while nothing is chosen. */
+  placeholder?: HelixSelect["placeholder"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixSelect["disabled"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixSelect["onOpenChange"];
+
+  /** Relayed from the listbox when the answer changes. */
+  "onhelix-change"?: (e: HelixSelectHelixChangeElementEvent) => void;
+  /** Fired when the list opens. */
+  "onhelix-open"?: (e: HelixSelectHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "onhelix-close"?: (e: HelixSelectHelixCloseElementEvent) => void;
+};
+
+export type HelixSelectSolidJsProps = {
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixSelect["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixSelect["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixSelect["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixSelect["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixSelect["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  "prop:value"?: HelixSelect["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixSelect["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixSelect["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixSelect["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixSelect["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixSelect["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixSelect["required"];
+  /** Whether the list can be narrowed by typing. */
+  "prop:filterable"?: HelixSelect["filterable"];
+  /** Whether more than one option can be the answer. */
+  "prop:multiple"?: HelixSelect["multiple"];
+  /** Name the control reports under when its form is submitted. */
+  "prop:name"?: HelixSelect["name"];
+  /** Shown on the trigger while nothing is chosen. */
+  "prop:placeholder"?: HelixSelect["placeholder"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixSelect["disabled"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixSelect["onOpenChange"];
+  /** Relayed from the listbox when the answer changes. */
+  "on:helix-change"?: (e: HelixSelectHelixChangeElementEvent) => void;
+  /** Fired when the list opens. */
+  "on:helix-open"?: (e: HelixSelectHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "on:helix-close"?: (e: HelixSelectHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4849,6 +4976,110 @@ export type CustomElements = {
    * - `label`: The words beside it.
    */
   "helix-radio": Partial<HelixRadioProps & BaseProps<HelixRadio> & BaseEvents>;
+
+  /**
+   * The trigger wears the same frame as an `Input`, because in a form it stands
+   * in a row with them and a control that looks like a button among fields reads
+   * as an action rather than an answer.
+   *
+   * The panel is an overlay surface rather than a sunken one: it sits over the
+   * page instead of on it, which is what its shadow says and what tells it apart
+   * from the field it came out of.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `filterable`: Whether the list can be narrowed by typing.
+   * - `multiple`: Whether more than one option can be the answer.
+   * - `name`: Name the control reports under when its form is submitted.
+   * - `placeholder`: Shown on the trigger while nothing is chosen.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Relayed from the listbox when the answer changes.
+   * - `helix-open`: Fired when the list opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options, and any groups of them.
+   * - `indicator`: The mark on the trigger saying this opens, usually a caret.
+   * - `label`: Richer than a string.
+   * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--select-surface-max-block-size`: How tall the panel gets. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The question, over the trigger.
+   * - `trigger`: The closed control, which says what is chosen.
+   * - `surface`: The floating panel.
+   * - `listbox`: The list inside it.
+   * - `hint`: Help under the trigger.
+   * - `feedback`: What is wrong with it.
+   */
+  "helix-select": Partial<
+    HelixSelectProps & BaseProps<HelixSelect> & BaseEvents
+  >;
 
   /**
    * A sweep rather than a pulse. A block fading in and out reads as something
@@ -7887,6 +8118,113 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The trigger wears the same frame as an `Input`, because in a form it stands
+   * in a row with them and a control that looks like a button among fields reads
+   * as an action rather than an answer.
+   *
+   * The panel is an overlay surface rather than a sunken one: it sits over the
+   * page instead of on it, which is what its shadow says and what tells it apart
+   * from the field it came out of.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `filterable`: Whether the list can be narrowed by typing.
+   * - `multiple`: Whether more than one option can be the answer.
+   * - `name`: Name the control reports under when its form is submitted.
+   * - `placeholder`: Shown on the trigger while nothing is chosen.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Relayed from the listbox when the answer changes.
+   * - `helix-open`: Fired when the list opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options, and any groups of them.
+   * - `indicator`: The mark on the trigger saying this opens, usually a caret.
+   * - `label`: Richer than a string.
+   * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--select-surface-max-block-size`: How tall the panel gets. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The question, over the trigger.
+   * - `trigger`: The closed control, which says what is chosen.
+   * - `surface`: The floating panel.
+   * - `listbox`: The list inside it.
+   * - `hint`: Help under the trigger.
+   * - `feedback`: What is wrong with it.
+   */
+  "helix-select": Partial<
+    HelixSelectProps &
+      HelixSelectSolidJsProps &
+      BaseProps<HelixSelect> &
+      BaseEvents
+  >;
+
+  /**
    * A sweep rather than a pulse. A block fading in and out reads as something
    * broken; a highlight travelling across it reads as work in progress, and it is
    * the same one property animating either way.
@@ -9107,6 +9445,8 @@ export type CustomCssProperties = {
   "--radio-size"?: string;
   /** Colour of the dot. */
   "--radio-mark-color"?: string;
+  /** How tall the panel gets. */
+  "--select-surface-max-block-size"?: string;
   /** Diameter of the circle shape. */
   "--skeleton-size"?: string;
   /** The part not yet chosen. */

@@ -6363,6 +6363,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/select/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/skeleton/index.js"
           }
         },
@@ -7846,6 +7854,35 @@
                 "text": "HelixBaseOption[]"
               },
               "description": "Every option, in the order a reader meets them.\n\nDescendants rather than children, because a group puts a level between the\nlist and its options and the keyboard has to move through a grouped list\nexactly as it moves through a flat one.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "collect",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HelixBaseOption[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nodes",
+                  "type": {
+                    "text": "Iterable<Element>"
+                  }
+                }
+              ],
+              "description": "Walks the tree, and walks *through* a slot when it meets one.\n\nDescendants rather than children, because a group puts a level between the\nlist and its options and the keyboard has to move through a grouped list\nexactly as it moves through a flat one.\n\nThrough a slot because that is how this gets composed. `Select` renders a\nlistbox in its own shadow root with a slot inside it, so the options are\nthe *select's* light DOM and the listbox's only child is the slot: a plain\n`querySelectorAll` finds the slot and no options at all, and the whole\ncomponent comes up empty. Found the first time the two were put together,\nwhich is the argument for building the pieces separately rather than\ndiscovering it inside a finished Select."
+            },
+            {
+              "kind": "field",
+              "name": "groups",
+              "type": {
+                "text": "HelixBaseOptionGroup[]"
+              },
+              "privacy": "private",
+              "description": "The groups, found the same way and for the same reason.",
               "readonly": true
             },
             {
@@ -11248,6 +11285,983 @@
           "declaration": {
             "name": "HelixBaseRadio",
             "module": "src/radio/root/radio-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/select/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/select/root/select-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/select/root/select-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**A trigger and a `Listbox`, not a listbox reimplemented behind a button.**\nThe list this opens is the same element a consumer can use on its own, with\nthe same keyboard, the same filtering and the same multi-select rules. What\nSelect adds is the closing: a trigger that says what is chosen, a surface\nthat floats, and somewhere for focus to go back to.\n\nThe options are the consumer's, in the consumer's light DOM, slotted through\ninto the listbox. That is why the listbox walks through slots to find them:\nfrom its point of view the options belong to something else.\n\n**What it does not do is duplicate the value.** `Select` owns it, hands it\ndown, and takes changes back; the listbox is the thing being operated and not\na second place the answer lives.",
+          "name": "HelixBaseSelect",
+          "cssParts": [
+            {
+              "description": "The question, over the trigger.",
+              "name": "label"
+            },
+            {
+              "description": "The closed control, which says what is chosen.",
+              "name": "trigger"
+            },
+            {
+              "description": "The floating panel.",
+              "name": "surface"
+            },
+            {
+              "description": "The list inside it.",
+              "name": "listbox"
+            },
+            {
+              "description": "Help under the trigger.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The options, and any groups of them.",
+              "name": ""
+            },
+            {
+              "description": "The mark on the trigger saying this opens, usually a caret.",
+              "name": "indicator"
+            },
+            {
+              "description": "Richer than a string.",
+              "name": "label"
+            },
+            {
+              "description": "Richer than a string.",
+              "name": "hint"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "filterable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the list can be narrowed by typing.",
+              "attribute": "filterable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "multiple",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether more than one option can be the answer.",
+              "attribute": "multiple",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name the control reports under when its form is submitted.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Choose'",
+              "description": "Shown on the trigger while nothing is chosen.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "listbox",
+              "type": {
+                "text": "HelixBaseListbox | null"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "floating",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new FloatingController(this, { anchor: () => this.renderRoot.querySelector<HTMLElement>('[part=\"trigger\"]'), floating: () => this.renderRoot.querySelector<HTMLElement>('[part=\"surface\"]'), placement: 'bottom-start', })"
+            },
+            {
+              "kind": "field",
+              "name": "dismisser",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new DismissController(this, { boundary: () => this.renderRoot.querySelector<HTMLElement>('[part=\"surface\"]'), onDismiss: () => this.close(), })"
+            },
+            {
+              "kind": "field",
+              "name": "display",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What the trigger says: the chosen options' words, or the placeholder.\n\nRead off the options rather than stored, because the words are the\nconsumer's content and storing a copy is storing something that goes stale\nthe moment they change it.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Closes the list and puts focus back where it came from."
+            },
+            {
+              "kind": "field",
+              "name": "handleChange",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleTriggerKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "sync",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reports the answer and the verdict on it."
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "default": "undefined",
+              "description": "Whether the element is open. Setting this enters controlled mode.",
+              "attribute": "open",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state for uncontrolled use. Ignored once `open` is set.",
+              "attribute": "default-open",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internalOpen",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The resolved open state, whichever mode the element is in.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onOpenChange",
+              "type": {
+                "text": "((open: boolean) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. In uncontrolled mode the\nelement then updates itself; in controlled mode it applies nothing and\nwaits for the consumer to pass a new `open`, which is what \"controlled\"\nmeans.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              },
+              "type": {
+                "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              },
+              "type": {
+                "text": "toggleOpen() => boolean"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hint",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "attribute": "hint",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "attribute": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hideLabel",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the label names the control without being shown.",
+              "attribute": "hide-label",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The accessible name, and the fallback for the `label` slot.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "touched",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "validates",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolvedFeedback",
+              "type": {
+                "text": "string"
+              },
+              "description": "The message actually shown: the consumer's, or the platform's, or none.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "describedBy",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderGroupLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A label over a set rather than beside a control.\n\nA plain element and not a `<label for>`, because a group is not a single\ncontrol and there is nothing for `for` to point at. What names the group\nis `linkHost`, pointing the host's internals at this element.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.\n\n**Nothing at all when there is no label**, which is the same rule the\nhint and the feedback follow: none of the three is always used, and an\nelement rendered empty is not free. It still generates a box, so it still\ntakes a row of the grid and a gap on either side of it, which is a field\nthat has moved down the page for a label nobody wrote. `nothing` leaves\ncomment markers rather than a node, so the gap has nothing to sit between.\n\nNaming a control without showing the label is `hide-label`, not an empty\none: an unnamed field is a field a screen reader announces as \"edit text\".",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderHint",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "Help under the control, unless something has gone wrong.\n\nThe two share a place rather than stacking, so a field is one line of\nsmall text either way and nothing below it moves when the message\nchanges. What the reader needs at that moment is what is wrong, and a\nhint that survives the error it describes is a second line to read before\ngetting to the one that matters.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The validation message, in the hint's place.\n\n`role=\"alert\"` rather than a live region on the whole field, so what is\nannounced is the message and not the label and help along with it.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "linkHost",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Points the host at its own label and description nodes, for a group.\n\nA control's `<input>` and its hint are both in the shadow root, so a\nplain `aria-describedby` resolves between them. A group's host is in the\nlight DOM and its hint is not, so the IDREF cannot reach and\n`element.ariaDescribedByElements` drops the reference outright. Only the\n`ElementInternals` form keeps it, measured in Chrome 148: two of two\nkept through internals, zero of one through the element.\n\nClient only, and deliberately, because element references need the nodes\nto exist and on the server they do not. The name is therefore also set as\na plain string by the component, which a server can write, and the\nreference here overrides it wherever a consumer slotted something richer\nthan a string. A group with only a property for a label reads the same\neither way.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shownFeedback",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What the last render put on screen, so a change can be noticed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refreshFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-reads the platform's verdict, for a control that has just reported one.\n\nValidity changes through `ElementInternals` rather than through a\nproperty, so nothing schedules an update for it. Worse, the order is\nagainst us: this mixin sits above the control in the prototype chain, so\nits `updated` runs before the control's own, which is where `setValidity`\nis called. Reading the verdict here would always read the previous one,\nwhich is what left a corrected field still showing the error it had\nbefore. So the control says when it has reported, and this schedules the\none further update that needs. It converges because the second pass finds\nnothing changed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Relayed from the listbox when the answer changes.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            },
+            {
+              "type": {
+                "text": "HelixOpenEvent"
+              },
+              "description": "Fired when the list opens.",
+              "name": "helix-open",
+              "reactProp": "onhelix-open"
+            },
+            {
+              "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired when it closes.",
+              "name": "helix-close",
+              "reactProp": "onhelix-close"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "filterable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the list can be narrowed by typing.",
+              "fieldName": "filterable"
+            },
+            {
+              "name": "multiple",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether more than one option can be the answer.",
+              "fieldName": "multiple"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name the control reports under when its form is submitted.",
+              "fieldName": "name"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Choose'",
+              "description": "Shown on the trigger while nothing is chosen.",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "default": "undefined",
+              "description": "Whether the element is open. Setting this enters controlled mode.",
+              "fieldName": "open",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "name": "default-open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state for uncontrolled use. Ignored once `open` is set.",
+              "fieldName": "defaultOpen",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "hint",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "fieldName": "hint",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "fieldName": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "hide-label",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the label names the control without being shown.",
+              "fieldName": "hideLabel",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The accessible name, and the fallback for the `label` slot.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "fieldName": "required",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinControllerOpen",
+              "package": "@helix-io/core"
+            },
+            {
+              "name": "MixinControllerValue",
+              "package": "@helix-io/core"
+            },
+            {
+              "name": "MixinField",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixFormElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A closed list that opens to be chosen from.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/select",
+            "aliases": [
+              "Dropdown",
+              "Picker"
+            ],
+            "tier": "headless",
+            "group": "BaseSelect",
+            "part": "Root"
+          },
+          "tagName": "helix-base-select",
+          "customElement": true,
+          "modulePath": "src/select/root/select-root.ts",
+          "definitionPath": "src/select/root/select-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseSelect",
+          "declaration": {
+            "name": "HelixBaseSelect",
+            "module": "src/select/root/select-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-select",
+          "declaration": {
+            "name": "HelixBaseSelect",
+            "module": "src/select/root/select-root.ts"
           }
         }
       ]

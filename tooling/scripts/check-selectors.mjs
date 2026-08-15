@@ -124,9 +124,15 @@ for (const tier of TIERS) {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '')
     for (const [, name, base] of text.matchAll(
-      /export class (\w+)(?:\s+extends\s+([\w<>(), ]+?))?\s*\{/g,
+      /export class (\w+)(?:\s+extends\s+([\w<>(),\s]+?))?\s*\{/g,
     )) {
-      /* Every name in the clause, not just the innermost. A styled control
+      /* Newlines allowed in the clause, which is not a detail. A chain long
+         enough to wrap, as `Select`'s is at three mixins, does not match a
+         class excluding them, so the scanner saw no bases at all and reported
+         every inherited part as dead. It read as five faults in a new component
+         and was one in the regex here.
+ 
+         Every name in the clause, not just the innermost. A styled control
          extends something like `MixinControllerChecked(MixinField(HelixFormElement))`
          and each of those three renders part of the markup, so reading only the
          base left everything a mixin renders looking dead. Found by the check
