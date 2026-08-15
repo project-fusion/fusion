@@ -52,6 +52,7 @@ import type {
   HelixTabsTab,
   HelixTag,
   HelixText,
+  HelixTextarea,
   HelixToggle,
   HelixToggleGroup,
   HelixToolbar,
@@ -2135,6 +2136,108 @@ export type HelixTextSolidJsProps = {
   "prop:appearance"?: HelixText["appearance"];
   /** Color role. Separate from `appearance`, because color carries state. */
   "prop:tone"?: HelixText["tone"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixTextarea` component event */
+export type HelixTextareaElementEvent<E = Event> = TypedEvent<HelixTextarea, E>;
+/** `helix-change` event type */
+export type HelixTextareaHelixChangeElementEvent =
+  HelixTextareaElementEvent<HelixChangeEvent>;
+
+export type HelixTextareaProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixTextarea["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixTextarea["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  value?: HelixTextarea["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixTextarea["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixTextarea["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixTextarea["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixTextarea["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixTextarea["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixTextarea["required"];
+  /** Whether the box follows its own content rather than scrolling. */
+  "auto-grow"?: HelixTextarea["autoGrow"];
+  /** Whether the box follows its own content rather than scrolling. */
+  autoGrow?: HelixTextarea["autoGrow"];
+  /** Name submitted with the form. */
+  name?: HelixTextarea["name"];
+  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  placeholder?: HelixTextarea["placeholder"];
+  /** Whether the field refuses input while still submitting its value. */
+  "read-only"?: HelixTextarea["readOnly"];
+  /** Whether the field refuses input while still submitting its value. */
+  readOnly?: HelixTextarea["readOnly"];
+  /** How many lines the box is before anything is typed. */
+  rows?: HelixTextarea["rows"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixTextarea["disabled"];
+
+  /** Fired as the text changes, and cancelable. */
+  "onhelix-change"?: (e: HelixTextareaHelixChangeElementEvent) => void;
+  /** Relayed from the textarea once the reader has finished. */
+  onchange?: (e: HelixTextareaElementEvent) => void;
+};
+
+export type HelixTextareaSolidJsProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixTextarea["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixTextarea["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  "prop:value"?: HelixTextarea["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixTextarea["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixTextarea["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixTextarea["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixTextarea["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixTextarea["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixTextarea["required"];
+  /** Whether the box follows its own content rather than scrolling. */
+  "bool:auto-grow"?: HelixTextarea["autoGrow"];
+  /** Whether the box follows its own content rather than scrolling. */
+  "prop:autoGrow"?: HelixTextarea["autoGrow"];
+  /** Name submitted with the form. */
+  "prop:name"?: HelixTextarea["name"];
+  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  "prop:placeholder"?: HelixTextarea["placeholder"];
+  /** Whether the field refuses input while still submitting its value. */
+  "bool:read-only"?: HelixTextarea["readOnly"];
+  /** Whether the field refuses input while still submitting its value. */
+  "prop:readOnly"?: HelixTextarea["readOnly"];
+  /** How many lines the box is before anything is typed. */
+  "prop:rows"?: HelixTextarea["rows"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixTextarea["disabled"];
+  /** Fired as the text changes, and cancelable. */
+  "on:helix-change"?: (e: HelixTextareaHelixChangeElementEvent) => void;
+  /** Relayed from the textarea once the reader has finished. */
+  "on:change"?: (e: HelixTextareaElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4604,6 +4707,78 @@ export type CustomElements = {
    * - `text`: The rendered element.
    */
   "helix-text": Partial<HelixTextProps & BaseProps<HelixText> & BaseEvents>;
+
+  /**
+   * The same frame an `Input` wears, so a form of mixed fields reads as one set
+   * rather than as two kinds of box. What differs is the resize handle, which is
+   * the platform's and is left alone on the block axis only: a field that can be
+   * dragged wider than the form holding it is a field that breaks the layout.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
+   * - `name`: Name submitted with the form.
+   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `rows`: How many lines the box is before anything is typed.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired as the text changes, and cancelable.
+   * - `change`: Relayed from the textarea once the reader has finished.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--textarea-background-color`: Fill behind the text. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding the control.
+   * - `control`: The textarea itself.
+   */
+  "helix-textarea": Partial<
+    HelixTextareaProps & BaseProps<HelixTextarea> & BaseEvents
+  >;
 
   /**
    * The indicator travels between items rather than the fill swapping. A fill
@@ -7229,6 +7404,81 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The same frame an `Input` wears, so a form of mixed fields reads as one set
+   * rather than as two kinds of box. What differs is the resize handle, which is
+   * the platform's and is left alone on the block axis only: a field that can be
+   * dragged wider than the form holding it is a field that breaks the layout.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
+   * - `name`: Name submitted with the form.
+   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `rows`: How many lines the box is before anything is typed.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired as the text changes, and cancelable.
+   * - `change`: Relayed from the textarea once the reader has finished.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--textarea-background-color`: Fill behind the text. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding the control.
+   * - `control`: The textarea itself.
+   */
+  "helix-textarea": Partial<
+    HelixTextareaProps &
+      HelixTextareaSolidJsProps &
+      BaseProps<HelixTextarea> &
+      BaseEvents
+  >;
+
+  /**
    * The indicator travels between items rather than the fill swapping. A fill
    * that appears on one item as it disappears from another is two changes at once
    * and reads as a flicker; one object moving is something the eye follows, and
@@ -7744,6 +7994,8 @@ export type CustomCssProperties = {
   "--tag-foreground-color"?: string;
   /** Corner radius of the tag. */
   "--tag-radii"?: string;
+  /** Fill behind the text. */
+  "--textarea-background-color"?: string;
   /** Fill of the moving marker. */
   "--toggle-group-indicator-color"?: string;
   /** Space between controls. */
