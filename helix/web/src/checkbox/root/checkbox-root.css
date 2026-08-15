@@ -99,6 +99,23 @@
   background-color: var(--checkbox-mark-color, var(--helix-color-foreground));
   block-size: var(--_checkbox-size);
   inline-size: var(--_checkbox-size);
+  /* The tick by default, and not only when the box is ticked, which is what
+     stops the mark flashing on the way out.
+ 
+     `mask-image` does not animate, so it snapped the instant `data-checked`
+     went, while `scale` still had a transition to run. Measured mid-uncheck:
+     mask none, scale 1, background white. For the length of that transition the
+     mark was an unmasked white square at full size, shrinking to nothing, which
+     is the flash. Left on the base rule, the stencil is still there while the
+     mark scales away under it.
+
+     One thing this does not fix, and cannot: leaving indeterminate, the dash
+     becomes a tick as it shrinks, because the rule that chose the dash stops
+     matching the moment the attribute goes. Holding it with a delayed
+     `mask-image` transition was tried and does nothing, discrete property or
+     not: Chrome 148 swaps it regardless. It is a shape changing inside a mark
+     that is on its way out rather than a flash of anything, so it is left. */
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: 100%;
@@ -113,10 +130,6 @@
 :host([data-checked]) [part="mark"],
 :host([indeterminate]) [part="mark"] {
   scale: 1;
-}
-
-:host([data-checked]) [part="mark"] {
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
 }
 
 /* Indeterminate wins where both are set, because a box that is both is showing

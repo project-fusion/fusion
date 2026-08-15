@@ -248,6 +248,27 @@ if (hasLayout()) {
       expect(box.outlineStyle).toBe('none')
     })
 
+    test('the mark keeps its stencil the whole way out', async () => {
+      /* The flash. `mask-image` does not animate, so it snapped to `none` the
+         instant `data-checked` went, while `scale` still had its transition to
+         run: for that whole duration the mark was an unmasked white square at
+         full size, shrinking to nothing. Measured mid-uncheck, which is the
+         only moment it exists, and is why nothing else caught it.
+
+         Asserted at the moment of leaving rather than at either end, because
+         both ends were always right. */
+      const host = (await mount(
+        '<helix-checkbox label="A" default-checked></helix-checkbox>',
+      )) as Updatable & { checked: boolean }
+      const mark = part(host, 'mark') as HTMLElement
+      expect(getComputedStyle(mark).maskImage).not.toBe('none')
+
+      host.checked = false
+      await host.updateComplete
+      expect(getComputedStyle(mark).scale).toBe('1')
+      expect(getComputedStyle(mark).maskImage).not.toBe('none')
+    })
+
     test('the mark scales in and out rather than appearing', async () => {
       /* Finished rather than awaited, for the reason the toggle group's specs
          finish theirs: a transition in a document the browser is not painting
