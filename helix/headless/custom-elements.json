@@ -4005,12 +4005,20 @@
           "name": "HelixBaseCheckbox",
           "cssParts": [
             {
+              "description": "The frame the input is painted as, and the mark sits over.",
+              "name": "box"
+            },
+            {
               "description": "The input.",
               "name": "control"
             },
             {
               "description": "The label beside it.",
               "name": "label"
+            },
+            {
+              "description": "The tick, or the dash when the box is indeterminate.",
+              "name": "mark"
             }
           ],
           "slots": [

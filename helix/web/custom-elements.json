@@ -6307,6 +6307,14 @@
           ],
           "cssParts": [
             {
+              "description": "The frame the input is painted as, and the mark sits over.",
+              "name": "box",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
               "description": "The input.",
               "name": "control",
               "inheritedFrom": {
@@ -6317,6 +6325,14 @@
             {
               "description": "The label beside it.",
               "name": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "description": "The tick, or the dash when the box is indeterminate.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseCheckbox",
                 "module": "src/checkbox/root/checkbox-root.ts"

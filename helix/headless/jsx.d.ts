@@ -2919,8 +2919,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `box`: The frame the input is painted as, and the mark sits over.
    * - `control`: The input.
    * - `label`: The label beside it.
+   * - `mark`: The tick, or the dash when the box is indeterminate.
    */
   "helix-base-checkbox": Partial<
     HelixBaseCheckboxProps & BaseProps<HelixBaseCheckbox> & BaseEvents
@@ -5117,8 +5119,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `box`: The frame the input is painted as, and the mark sits over.
    * - `control`: The input.
    * - `label`: The label beside it.
+   * - `mark`: The tick, or the dash when the box is indeterminate.
    */
   "helix-base-checkbox": Partial<
     HelixBaseCheckboxProps &

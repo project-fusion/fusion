@@ -228,10 +228,12 @@ if (hasLayout()) {
       expect(getComputedStyle(part(host, 'label') as HTMLElement).display).not.toBe('none')
     })
 
-    test('an invalid box is ringed in the danger colour', async () => {
-      /* The focused-and-invalid ring cannot be asserted here: `:focus-visible`
-         needs genuine keyboard focus, which no script can grant. What is
-         checked is the resting ring and that its colour is the message's. */
+    test('an invalid box is wrong at its own edge, not ringed outside it', async () => {
+      /* It was a ring, offset outside the box, and the picture was a red square
+         with a rounded grey box sitting inside it: a box inside a box rather
+         than a box that is wrong. A ring is right where a component has no edge
+         of its own to colour, which stopped being true when this stopped
+         letting the browser paint it. */
       const host = (await mount(
         '<helix-checkbox label="Accept" name="t" required></helix-checkbox>',
       )) as Updatable
@@ -239,10 +241,40 @@ if (hasLayout()) {
       while ((await host.updateComplete) === false) {
         // Validity moves outside the property system, so this takes two passes.
       }
-      const ring = getComputedStyle(part(host, 'control') as HTMLElement)
+      const box = getComputedStyle(part(host, 'control') as HTMLElement)
       const message = getComputedStyle(part(host, 'feedback') as HTMLElement)
-      expect(ring.outlineStyle).toBe('solid')
-      expect(ring.outlineColor).toBe(message.color)
+
+      expect(box.borderTopColor).toBe(message.color)
+      expect(box.outlineStyle).toBe('none')
+    })
+
+    test('the mark scales in and out rather than appearing', async () => {
+      /* Finished rather than awaited, for the reason the toggle group's specs
+         finish theirs: a transition in a document the browser is not painting
+         is started and never advanced, so waiting on it hangs. What is asserted
+         is that a transition exists on the way in and on the way out, and where
+         it ends up, which is the whole of the behaviour. */
+      const host = (await mount('<helix-checkbox label="A"></helix-checkbox>')) as Updatable & {
+        checked: boolean
+      }
+      const mark = part(host, 'mark') as HTMLElement
+      expect(getComputedStyle(mark).scale).toBe('0')
+
+      host.checked = true
+      await host.updateComplete
+      expect(mark.getAnimations().map((a) => a.transitionProperty)).toContain('scale')
+      for (const moving of mark.getAnimations()) {
+        moving.finish()
+      }
+      expect(getComputedStyle(mark).scale).toBe('1')
+
+      host.checked = false
+      await host.updateComplete
+      expect(mark.getAnimations().map((a) => a.transitionProperty)).toContain('scale')
+      for (const moving of mark.getAnimations()) {
+        moving.finish()
+      }
+      expect(getComputedStyle(mark).scale).toBe('0')
     })
   })
 }

@@ -34,8 +34,10 @@ import { property } from 'lit/decorators.js'
  * @event {HelixChangeEvent} helix-change - Fired before the state changes, and cancelable.
  * @event {Event} change - Relayed from the input once the state has changed.
  *
+ * @csspart box - The frame the input is painted as, and the mark sits over.
  * @csspart control - The input.
  * @csspart label - The label beside it.
+ * @csspart mark - The tick, or the dash when the box is indeterminate.
  */
 @customElement('helix-base-checkbox')
 export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
@@ -164,16 +166,19 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
        The one line of description goes under that row, which is where a field
        puts it too. */
     return html`<label part="field">
-      <input
-        part="control"
-        type="checkbox"
-        .checked=${this.isChecked}
-        .indeterminate=${this.indeterminate}
-        ?disabled=${this.disabled}
-        ?required=${this.required}
-        aria-describedby=${this.describedBy ?? nothing}
-        @change=${this.handleChange}
-      />
+      <span part="box">
+        <input
+          part="control"
+          type="checkbox"
+          .checked=${this.isChecked}
+          .indeterminate=${this.indeterminate}
+          ?disabled=${this.disabled}
+          ?required=${this.required}
+          aria-describedby=${this.describedBy ?? nothing}
+          @change=${this.handleChange}
+        />
+        <span part="mark" aria-hidden="true"></span>
+      </span>
       <span part="label"><slot @slotchange=${this.handleLabelChange}>${this.label}</slot></span>
     </label>
     ${this.renderHint()}${this.renderFeedback()}`

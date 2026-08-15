@@ -25,52 +25,132 @@
   opacity: 0.5;
 }
 
-/* The native input, restyled rather than replaced: the tick and the
-   indeterminate dash are the browser's own, drawn with `accent-color`, so the
-   control stays a control for anything reading the page. */
-[part="control"] {
-  accent-color: var(--checkbox-checked-color, var(--helix-color-primary));
-  block-size: var(--_checkbox-size);
-  cursor: inherit;
+/* Drawn here rather than by the browser, and the trade is worth naming.
+ *
+ * It was `appearance` left alone with `accent-color` set, so the box, the tick
+ * and the dash were all the platform's. That is the better default and it ran
+ * out: the tick and the dash come at the browser's own weight, which is heavy
+ * beside this type, there is nothing to animate because the mark has no element
+ * of its own, and an error had nowhere to go but a second ring outside the box,
+ * which read as a box inside a box rather than as a box that is wrong.
+ *
+ * `appearance: none` on a real `<input type="checkbox">` changes the painting
+ * and nothing else. It is still the control the form submits, still what a
+ * screen reader announces, still what a label forwards a press to. What is
+ * given up is the platform's drawing, and it is given up deliberately, once,
+ * here.
+ *
+ * The mark is a sibling rather than a pseudo-element because an `<input>` is a
+ * replaced element and generates none: `input::before` renders nothing in
+ * Chrome whatever `appearance` says. */
+[part="box"] {
+  display: grid;
   flex: 0 0 auto;
-  inline-size: var(--_checkbox-size);
-  margin: var(--helix-space-none);
+  /* One cell, both children in it, so the mark is centred over the input with
+     no offsets to keep in step with the box's size. */
+  place-items: center;
 }
 
-/* Offset here, unlike the input's, and the difference is the reason the input's
-   is not. A ring is drawn against the thing it surrounds when that thing is
-   changing colour at the same moment, which is true of a field's border and not
-   of this: the box is the browser's own, drawn with `accent-color`, and nothing
-   here recolours its edge. So the ring surrounds it rather than replacing it. */
+[part="box"] > * {
+  grid-area: 1 / 1;
+}
+
+[part="control"] {
+  appearance: none;
+  background-color: var(--checkbox-background-color, var(--helix-color-surface-sunken));
+  block-size: var(--_checkbox-size);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  cursor: inherit;
+  inline-size: var(--_checkbox-size);
+  margin: var(--helix-space-none);
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:not([disabled])) [part="field"]:hover [part="control"] {
+  border-color: var(--helix-color-border-strong);
+}
+
+/* Filled once there is anything to say, which is either state that draws a
+   mark. Indeterminate is not a third look: it is the same filled box with a
+   different mark in it, because it means "some", not "neither". */
+:host([data-checked]) [part="control"],
+:host([indeterminate]) [part="control"] {
+  background-color: var(--checkbox-checked-color, var(--helix-color-primary));
+  border-color: var(--checkbox-checked-color, var(--helix-color-primary));
+}
+
+/* The tick and the dash, as masks rather than glyphs, so their weight is ours.
+   Two and a half units in a twenty-four unit box, which is roughly two thirds
+   of what the platform draws and is what the report was about.
+
+   `mask` rather than a background image, because the shape is then a stencil
+   and the colour is a token like every other colour here. A data URI cannot
+   carry `var()`. */
+[part="mark"] {
+  background-color: var(--checkbox-mark-color, var(--helix-color-foreground-on-accent));
+  block-size: var(--_checkbox-size);
+  inline-size: var(--_checkbox-size);
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: 100%;
+  pointer-events: none;
+  /* Nothing to see until there is something to say. Scaled from the centre
+     rather than faded, so the mark arrives with the weight of a thing being
+     put there. */
+  scale: 0;
+  transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+:host([data-checked]) [part="mark"],
+:host([indeterminate]) [part="mark"] {
+  scale: 1;
+}
+
+:host([data-checked]) [part="mark"] {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
+}
+
+/* Indeterminate wins where both are set, because a box that is both is showing
+   a mixed set and the dash is what says so. */
+:host([indeterminate]) [part="mark"] {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 12h10'/%3E%3C/svg%3E");
+}
+
+/* Offset, because the ring surrounds a box whose own edge is not moving. */
 [part="control"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Wrong, and the reader knows it.
+/* Wrong, and the reader knows it: the box's own edge, not a ring around it.
  *
- * The ring is the only edge this component owns: a native checkbox draws its
- * own box, so unlike the input there is no border here to recolour, and colour
- * on `accent-color` would say nothing at all because a box that fails a
- * `required` check is a box with no tick in it.
+ * It was a ring, offset outside the box, and the picture was a red square with
+ * a rounded grey box sitting inside it. A ring is right where a component has
+ * no edge of its own to colour, which was true while the browser drew this one
+ * and stopped being true the moment we did.
  *
- * So one ring carries both states. Its colour says what is wrong and its width
- * says where focus is, which is what stops this becoming the two rings the
- * input had: a red edge inside a blue one.
- *
- * The three rules are ordered by specificity rather than by source, which is
- * what makes them compose: focused-and-invalid (0,4,0) outranks invalid
- * (0,3,0), which outranks focused (0,2,0). Written the obvious way round, the
- * resting invalid ring would have won while the field was focused and the ring
- * would have thinned under the caret. */
-:host([data-invalid]) [part="control"] {
-  outline: var(--helix-border-thin) solid var(--helix-color-danger);
-  outline-offset: var(--helix-size-focus-offset);
+ * The focus ring still outranks it, so a focused invalid box shows the red edge
+ * with the accent ring around it. Those are two different facts, in two
+ * different places, which is the arrangement the input has as well. */
+:host([data-invalid]) [part="control"],
+:host([data-invalid]) [part="field"]:hover [part="control"] {
+  border-color: var(--helix-color-danger);
 }
 
-:host([data-invalid]) [part="control"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
-  outline-offset: var(--helix-size-focus-offset);
+:host([data-invalid][data-checked]) [part="control"],
+:host([data-invalid][indeterminate]) [part="control"] {
+  background-color: var(--helix-color-danger);
+  border-color: var(--helix-color-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="mark"],
+  [part="control"] {
+    transition: none;
+  }
 }
 
 /* Nothing to read, so nothing to space away from the box.
