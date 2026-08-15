@@ -58,8 +58,8 @@ describe('input server output', () => {
     expect(withoutStyles(markup)).toContain('Search')
   })
 
-  test('a caption reaches the markup and the control points at it', () => {
-    const markup = ssr(html`<helix-input label="A" caption="Help text"></helix-input>`)
+  test('a hint reaches the markup and the control points at it', () => {
+    const markup = ssr(html`<helix-input label="A" hint="Help text"></helix-input>`)
     expect(withoutStyles(markup)).toContain('Help text')
     expect(partTag(markup, 'control')).toContain('aria-describedby')
   })
@@ -68,7 +68,7 @@ describe('input server output', () => {
     // An `aria-describedby` pointing at an id that renders nothing is a field
     // whose description a screen reader cannot find.
     const markup = ssr(html`<helix-input label="A"></helix-input>`)
-    expect(hasPart(markup, 'caption')).toBe(false)
+    expect(hasPart(markup, 'hint')).toBe(false)
     expect(partTag(markup, 'control')).not.toContain('aria-describedby')
   })
 })

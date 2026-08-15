@@ -6,7 +6,7 @@ import type { HelixFormElement } from '../../helix-form-element/helix-form-eleme
 type Constructor<T> = new (...args: any[]) => T
 
 /** Fixed ids, scoped to the shadow root that holds them. See the mixin's note. */
-const CAPTION_ID = 'helix-caption'
+const HINT_ID = 'helix-hint'
 const FEEDBACK_ID = 'helix-feedback'
 
 /**
@@ -18,11 +18,11 @@ const FEEDBACK_ID = 'helix-feedback'
  */
 export declare class MixinFieldInterface {
   /**
-   * Help that stays whether or not the field is valid.
+   * Help under the control, shown while there is nothing wrong.
    *
-   * Fallback content for the `caption` slot, so anything richer replaces it.
+   * Fallback content for the `hint` slot, so anything richer replaces it.
    */
-  caption: string
+  hint: string
 
   /**
    * Ids of the description nodes, for `aria-describedby` on the control.
@@ -36,7 +36,8 @@ export declare class MixinFieldInterface {
    * What is wrong, in the reader's words rather than the browser's.
    *
    * Overrides the platform's message. Left empty, the platform's own is shown
-   * once the reader has had a go at the field, never before.
+   * once the reader has had a go at the field, never before. Either way it
+   * takes the hint's place rather than appearing under it.
    */
   feedback: string
 
@@ -67,10 +68,10 @@ export declare class MixinFieldInterface {
    */
   protected describeHost(): void
 
-  /** Help under the control. Renders nothing when there is none. */
-  protected renderCaption(): TemplateResult | typeof nothing
+  /** Help under the control, unless something has gone wrong. */
+  protected renderHint(): TemplateResult | typeof nothing
 
-  /** The validation message, under the caption rather than instead of it. */
+  /** The validation message, in the hint's place. */
   protected renderFeedback(): TemplateResult | typeof nothing
 
   /** A label above the control, pointing at it with a real `for`. */
@@ -116,14 +117,14 @@ export declare class MixinFieldInterface {
  * than ours, and the same is already true of every slot fallback here.
  *
  * **The ids are fixed rather than generated.** IDREFs resolve within the tree
- * that holds them, so two controls on a page each carrying `helix-caption` in
+ * that holds them, so two controls on a page each carrying `helix-hint` in
  * their own shadow root do not collide. That also removes the usual hydration
  * hazard, since there is no generated value for a server and a client to
  * disagree about.
  *
- * **A group has to say it differently.** A control's `<input>` and its caption
+ * **A group has to say it differently.** A control's `<input>` and its hint
  * are both in the shadow root, so a plain `aria-describedby` resolves. A
- * group's host is in the light DOM and its caption is not, so the IDREF cannot
+ * group's host is in the light DOM and its hint is not, so the IDREF cannot
  * reach and `element.ariaDescribedByElements` drops the reference. Only
  * `internals.ariaDescribedByElements` keeps it, which is what `describeHost`
  * uses. Measured the same way, and the failure is silent either way: the
@@ -134,9 +135,9 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
   // what TypeScript consumers see; this class is what the manifest analyzer
   // reads when resolving inherited members into dependent packages.
   class FieldElement extends Base {
-    /** Help that stays whether or not the field is valid. */
+    /** Help under the control, shown while there is nothing wrong. */
     @property()
-    caption = ''
+    hint = ''
 
     /** What is wrong, in the reader's words rather than the browser's. */
     @property()
@@ -172,16 +173,18 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
       return this.userInvalid ? this.internals.validationMessage : ''
     }
 
-    /** Ids of the description nodes, for `aria-describedby` on the control. */
+    /**
+     * Id of the description node, for `aria-describedby` on the control.
+     *
+     * One at a time, because only one of the two is ever rendered. Naming both
+     * would point a screen reader at an id that resolves to nothing, which it
+     * reads as a description it cannot find.
+     */
     get describedBy(): string | undefined {
-      const parts = []
-      if (this.caption !== '') {
-        parts.push(CAPTION_ID)
-      }
       if (this.resolvedFeedback !== '') {
-        parts.push(FEEDBACK_ID)
+        return FEEDBACK_ID
       }
-      return parts.length > 0 ? parts.join(' ') : undefined
+      return this.hint === '' ? undefined : HINT_ID
     }
 
     /**
@@ -192,7 +195,7 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
      * same tree, and the control it names is in this shadow root.
      *
      * **Nothing at all when there is no label**, which is the same rule the
-     * caption and the feedback follow: none of the three is always used, and an
+     * hint and the feedback follow: none of the three is always used, and an
      * element rendered empty is not free. It still generates a box, so it still
      * takes a row of the grid and a gap on either side of it, which is a field
      * that has moved down the page for a label nobody wrote. `nothing` leaves
@@ -208,21 +211,24 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
       return html`<label part="label" for="control"><slot name="label">${this.label}</slot></label>`
     }
 
-    /** Help under the control. Renders nothing when there is none. */
-    protected renderCaption(): TemplateResult | typeof nothing {
-      if (this.caption === '') {
+    /**
+     * Help under the control, unless something has gone wrong.
+     *
+     * The two share a place rather than stacking, so a field is one line of
+     * small text either way and nothing below it moves when the message
+     * changes. What the reader needs at that moment is what is wrong, and a
+     * hint that survives the error it describes is a second line to read before
+     * getting to the one that matters.
+     */
+    protected renderHint(): TemplateResult | typeof nothing {
+      if (this.hint === '' || this.resolvedFeedback !== '') {
         return nothing
       }
-      return html`<p part="caption" id=${CAPTION_ID}>
-        <slot name="caption">${this.caption}</slot>
-      </p>`
+      return html`<p part="hint" id=${HINT_ID}><slot name="hint">${this.hint}</slot></p>`
     }
 
     /**
-     * The validation message, under the caption rather than instead of it.
-     *
-     * Both show. The caption usually states the rule the feedback says was
-     * broken, so hiding it exactly when the reader breaks it is backwards.
+     * The validation message, in the hint's place.
      *
      * `role="alert"` rather than a live region on the whole field, so what is
      * announced is the message and not the label and help along with it.
@@ -246,7 +252,7 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
      * that is an attribute the server can write.
      */
     protected describeHost(): void {
-      const described = [CAPTION_ID, FEEDBACK_ID]
+      const described = [HINT_ID, FEEDBACK_ID]
         .map((id) => this.renderRoot.querySelector(`#${id}`))
         .filter((node): node is Element => node !== null)
       this.internals.ariaDescribedByElements = described.length > 0 ? described : null

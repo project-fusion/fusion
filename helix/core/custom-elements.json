@@ -1482,11 +1482,11 @@
           "members": [
             {
               "kind": "field",
-              "name": "caption",
+              "name": "hint",
               "type": {
                 "text": "string"
               },
-              "description": "Help that stays whether or not the field is valid.\n\nFallback content for the `caption` slot, so anything richer replaces it."
+              "description": "Help under the control, shown while there is nothing wrong.\n\nFallback content for the `hint` slot, so anything richer replaces it."
             },
             {
               "kind": "field",
@@ -1503,7 +1503,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "What is wrong, in the reader's words rather than the browser's.\n\nOverrides the platform's message. Left empty, the platform's own is shown\nonce the reader has had a go at the field, never before."
+              "description": "What is wrong, in the reader's words rather than the browser's.\n\nOverrides the platform's message. Left empty, the platform's own is shown\nonce the reader has had a go at the field, never before. Either way it\ntakes the hint's place rather than appearing under it."
             },
             {
               "kind": "field",
@@ -1534,14 +1534,14 @@
             },
             {
               "kind": "method",
-              "name": "renderCaption",
+              "name": "renderHint",
               "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult | typeof nothing"
                 }
               },
-              "description": "Help under the control. Renders nothing when there is none."
+              "description": "Help under the control, unless something has gone wrong."
             },
             {
               "kind": "method",
@@ -1552,7 +1552,7 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               },
-              "description": "The validation message, under the caption rather than instead of it."
+              "description": "The validation message, in the hint's place."
             },
             {
               "kind": "method",
@@ -1587,18 +1587,18 @@
         },
         {
           "kind": "mixin",
-          "description": "Grafts a label, help text, and a validation message onto a form control.\n\nEvery form control wants the same three things around it and wants them in a\ndifferent arrangement: a label above an input, beside a checkbox, and over a\ngroup. So this owns the properties, the parts, and the wiring, and each\ncontrol places the nodes where its own geometry needs them. Same part names\neither way, so one stylesheet in the styled tier dresses all of them.\n\n**Not a wrapping `Field` component, and that is not a style preference.** A\nwrapper cannot name what it wraps. Its label would live in its own shadow\nroot and the control in another, and measured in Chrome 148: an\n`aria-labelledby` IDREF cannot see across, and\n`control.ariaLabelledByElements = [labelInTheWrapper]` reads back as zero\nelements, the reference dropped. The same assignment with a label in the\ncontrol's own tree is kept. That pattern works in React libraries because\nthey have no shadow boundary; bringing it here brings the ergonomics and none\nof the conditions that made it work.\n\n**A control whose label is its content renders its own.** A checkbox is named\nby the words beside it, inside the `<label>` that forwards the press, so it\nuses its default slot and nesting `renderLabel`'s `<label>` in there would be\ninvalid markup. `label` is that slot's fallback either way.\n\nWorth knowing, because it costs a label and gives no warning: **a\nwhitespace-only text node is assigned to the default slot and defeats its\nfallback.** Measured in Chrome 148, and a newline between the tags is enough,\nso `<helix-checkbox label=\"Accept\">` closed on the next line renders no label\nat all. A named slot does not have this problem, because `slot=\"label\"` is an\nattribute and a text node has none. It is the platform's behaviour rather\nthan ours, and the same is already true of every slot fallback here.\n\n**The ids are fixed rather than generated.** IDREFs resolve within the tree\nthat holds them, so two controls on a page each carrying `helix-caption` in\ntheir own shadow root do not collide. That also removes the usual hydration\nhazard, since there is no generated value for a server and a client to\ndisagree about.\n\n**A group has to say it differently.** A control's `<input>` and its caption\nare both in the shadow root, so a plain `aria-describedby` resolves. A\ngroup's host is in the light DOM and its caption is not, so the IDREF cannot\nreach and `element.ariaDescribedByElements` drops the reference. Only\n`internals.ariaDescribedByElements` keeps it, which is what `describeHost`\nuses. Measured the same way, and the failure is silent either way: the\ndescription simply never reaches the accessibility tree.",
+          "description": "Grafts a label, help text, and a validation message onto a form control.\n\nEvery form control wants the same three things around it and wants them in a\ndifferent arrangement: a label above an input, beside a checkbox, and over a\ngroup. So this owns the properties, the parts, and the wiring, and each\ncontrol places the nodes where its own geometry needs them. Same part names\neither way, so one stylesheet in the styled tier dresses all of them.\n\n**Not a wrapping `Field` component, and that is not a style preference.** A\nwrapper cannot name what it wraps. Its label would live in its own shadow\nroot and the control in another, and measured in Chrome 148: an\n`aria-labelledby` IDREF cannot see across, and\n`control.ariaLabelledByElements = [labelInTheWrapper]` reads back as zero\nelements, the reference dropped. The same assignment with a label in the\ncontrol's own tree is kept. That pattern works in React libraries because\nthey have no shadow boundary; bringing it here brings the ergonomics and none\nof the conditions that made it work.\n\n**A control whose label is its content renders its own.** A checkbox is named\nby the words beside it, inside the `<label>` that forwards the press, so it\nuses its default slot and nesting `renderLabel`'s `<label>` in there would be\ninvalid markup. `label` is that slot's fallback either way.\n\nWorth knowing, because it costs a label and gives no warning: **a\nwhitespace-only text node is assigned to the default slot and defeats its\nfallback.** Measured in Chrome 148, and a newline between the tags is enough,\nso `<helix-checkbox label=\"Accept\">` closed on the next line renders no label\nat all. A named slot does not have this problem, because `slot=\"label\"` is an\nattribute and a text node has none. It is the platform's behaviour rather\nthan ours, and the same is already true of every slot fallback here.\n\n**The ids are fixed rather than generated.** IDREFs resolve within the tree\nthat holds them, so two controls on a page each carrying `helix-hint` in\ntheir own shadow root do not collide. That also removes the usual hydration\nhazard, since there is no generated value for a server and a client to\ndisagree about.\n\n**A group has to say it differently.** A control's `<input>` and its hint\nare both in the shadow root, so a plain `aria-describedby` resolves. A\ngroup's host is in the light DOM and its hint is not, so the IDREF cannot\nreach and `element.ariaDescribedByElements` drops the reference. Only\n`internals.ariaDescribedByElements` keeps it, which is what `describeHost`\nuses. Measured the same way, and the failure is silent either way: the\ndescription simply never reaches the accessibility tree.",
           "name": "MixinField",
           "members": [
             {
               "kind": "field",
-              "name": "caption",
+              "name": "hint",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "Help that stays whether or not the field is valid.",
-              "attribute": "caption"
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "attribute": "hint"
             },
             {
               "kind": "field",
@@ -1667,7 +1667,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Ids of the description nodes, for `aria-describedby` on the control.",
+              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true
             },
             {
@@ -1679,18 +1679,18 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               },
-              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.\n\n**Nothing at all when there is no label**, which is the same rule the\ncaption and the feedback follow: none of the three is always used, and an\nelement rendered empty is not free. It still generates a box, so it still\ntakes a row of the grid and a gap on either side of it, which is a field\nthat has moved down the page for a label nobody wrote. `nothing` leaves\ncomment markers rather than a node, so the gap has nothing to sit between.\n\nNaming a control without showing the label is `hide-label`, not an empty\none: an unnamed field is a field a screen reader announces as \"edit text\"."
+              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.\n\n**Nothing at all when there is no label**, which is the same rule the\nhint and the feedback follow: none of the three is always used, and an\nelement rendered empty is not free. It still generates a box, so it still\ntakes a row of the grid and a gap on either side of it, which is a field\nthat has moved down the page for a label nobody wrote. `nothing` leaves\ncomment markers rather than a node, so the gap has nothing to sit between.\n\nNaming a control without showing the label is `hide-label`, not an empty\none: an unnamed field is a field a screen reader announces as \"edit text\"."
             },
             {
               "kind": "method",
-              "name": "renderCaption",
+              "name": "renderHint",
               "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult | typeof nothing"
                 }
               },
-              "description": "Help under the control. Renders nothing when there is none."
+              "description": "Help under the control, unless something has gone wrong.\n\nThe two share a place rather than stacking, so a field is one line of\nsmall text either way and nothing below it moves when the message\nchanges. What the reader needs at that moment is what is wrong, and a\nhint that survives the error it describes is a second line to read before\ngetting to the one that matters."
             },
             {
               "kind": "method",
@@ -1701,7 +1701,7 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               },
-              "description": "The validation message, under the caption rather than instead of it.\n\nBoth show. The caption usually states the rule the feedback says was\nbroken, so hiding it exactly when the reader breaks it is backwards.\n\n`role=\"alert\"` rather than a live region on the whole field, so what is\nannounced is the message and not the label and help along with it."
+              "description": "The validation message, in the hint's place.\n\n`role=\"alert\"` rather than a live region on the whole field, so what is\nannounced is the message and not the label and help along with it."
             },
             {
               "kind": "method",
@@ -1717,13 +1717,13 @@
           ],
           "attributes": [
             {
-              "name": "caption",
+              "name": "hint",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "Help that stays whether or not the field is valid.",
-              "fieldName": "caption"
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "fieldName": "hint"
             },
             {
               "name": "feedback",

@@ -858,8 +858,8 @@ Presentation only. It never submits, and the first change resolves it. */
   "default-checked"?: HelixBaseCheckbox["defaultChecked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   defaultChecked?: HelixBaseCheckbox["defaultChecked"];
-  /** Help that stays whether or not the field is valid. */
-  caption?: HelixBaseCheckbox["caption"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseCheckbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixBaseCheckbox["feedback"];
   /** Whether the label names the control without being shown. */
@@ -905,8 +905,8 @@ Presentation only. It never submits, and the first change resolves it. */
   "bool:default-checked"?: HelixBaseCheckbox["defaultChecked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   "prop:defaultChecked"?: HelixBaseCheckbox["defaultChecked"];
-  /** Help that stays whether or not the field is valid. */
-  "prop:caption"?: HelixBaseCheckbox["caption"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseCheckbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixBaseCheckbox["feedback"];
   /** Whether the label names the control without being shown. */
@@ -1149,8 +1149,8 @@ Separate from `value`, which is where the field is now. */
   type?: HelixBaseInput["type"];
   /** The text in the field. */
   value?: HelixBaseInput["value"];
-  /** Help that stays whether or not the field is valid. */
-  caption?: HelixBaseInput["caption"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixBaseInput["feedback"];
   /** Whether the label names the control without being shown. */
@@ -1195,8 +1195,8 @@ Separate from `value`, which is where the field is now. */
   "prop:type"?: HelixBaseInput["type"];
   /** The text in the field. */
   "prop:value"?: HelixBaseInput["value"];
-  /** Help that stays whether or not the field is valid. */
-  "prop:caption"?: HelixBaseInput["caption"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixBaseInput["feedback"];
   /** Whether the label names the control without being shown. */
@@ -2855,7 +2855,7 @@ export type CustomElements = {
    * Presentation only. It never submits, and the first change resolves it.
    * - `checked`: Whether the control is checked. Setting this enters controlled mode.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
-   * - `caption`: Help that stays whether or not the field is valid.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -2873,7 +2873,11 @@ export type CustomElements = {
    * what it does not recognise; the generated wrapper listens for the event
    * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Ids of the description nodes, for `aria-describedby` on the control. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -3152,7 +3156,7 @@ export type CustomElements = {
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    * - `value`: The text in the field.
-   * - `caption`: Help that stays whether or not the field is valid.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -3163,7 +3167,11 @@ export type CustomElements = {
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Ids of the description nodes, for `aria-describedby` on the control. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -5045,7 +5053,7 @@ export type CustomElementsSolidJs = {
    * Presentation only. It never submits, and the first change resolves it.
    * - `checked`: Whether the control is checked. Setting this enters controlled mode.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
-   * - `caption`: Help that stays whether or not the field is valid.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -5063,7 +5071,11 @@ export type CustomElementsSolidJs = {
    * what it does not recognise; the generated wrapper listens for the event
    * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Ids of the description nodes, for `aria-describedby` on the control. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -5357,7 +5369,7 @@ export type CustomElementsSolidJs = {
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    * - `value`: The text in the field.
-   * - `caption`: Help that stays whether or not the field is valid.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -5368,7 +5380,11 @@ export type CustomElementsSolidJs = {
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Ids of the description nodes, for `aria-describedby` on the control. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *

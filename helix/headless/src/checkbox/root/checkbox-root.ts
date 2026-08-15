@@ -120,10 +120,8 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
        it. The browser handles the forwarding, so there is no click handler to
        write and none to get wrong.
  
-       Both descriptions go under that row, unlike a field where the caption
-       goes above the control. There is no above here: the box and the words
-       naming it are one line, so a caption between them would come between a
-       label and the thing it labels. */
+       The one line of description goes under that row, which is where a field
+       puts it too. */
     return html`<label part="field">
       <input
         part="control"
@@ -137,7 +135,7 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
       />
       <span part="label"><slot>${this.label}</slot></span>
     </label>
-    ${this.renderCaption()}${this.renderFeedback()}`
+    ${this.renderHint()}${this.renderFeedback()}`
   }
 }
 

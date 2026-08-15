@@ -127,37 +127,44 @@ describe('input in a form', () => {
 })
 
 describe('input descriptions', () => {
-  test('a caption is described, not just shown', async () => {
-    const host = await mount('<helix-input label="A" caption="Help text"></helix-input>')
-    const caption = part(host, 'caption') as HTMLElement
-    expect(caption.textContent?.trim()).toBe('Help text')
-    expect(control(host)?.getAttribute('aria-describedby')).toContain(caption.id)
+  test('a hint is described, not just shown', async () => {
+    const host = await mount('<helix-input label="A" hint="Help text"></helix-input>')
+    const hint = part(host, 'hint') as HTMLElement
+    expect(hint.textContent?.trim()).toBe('Help text')
+    expect(control(host)?.getAttribute('aria-describedby')).toContain(hint.id)
   })
 
-  test('feedback shows under the caption rather than instead of it', async () => {
-    /* Both, and in that order. The caption usually states the rule the feedback
-       says was broken, so hiding it exactly when the reader breaks it is
-       backwards. */
+  test("feedback takes the hint's place rather than stacking under it", async () => {
+    /* One line under the field either way, so nothing below it moves when the
+       message arrives, and what the reader is given at that moment is what is
+       wrong rather than a hint to read first. */
     const host = await mount(
-      '<helix-input label="A" caption="At least 12 characters" feedback="Too short"></helix-input>',
+      '<helix-input label="A" hint="At least 12 characters" feedback="Too short"></helix-input>',
     )
-    const caption = part(host, 'caption') as HTMLElement
+    expect(part(host, 'hint')).toBeNull()
     const feedback = part(host, 'feedback') as HTMLElement
-    expect(caption).not.toBeNull()
     expect(feedback.textContent?.trim()).toBe('Too short')
-    expect(
-      caption.compareDocumentPosition(feedback) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeGreaterThan(0)
 
-    const described = control(host)?.getAttribute('aria-describedby') ?? ''
-    expect(described.split(' ')).toEqual([caption.id, feedback.id])
+    // And the control names only what is actually there. Pointing at both would
+    // name an id that resolves to nothing.
+    expect(control(host)?.getAttribute('aria-describedby')).toBe(feedback.id)
+  })
+
+  test('the hint comes back when there is nothing wrong', async () => {
+    const host = (await mount(
+      '<helix-input label="A" hint="At least 12 characters" feedback="Too short"></helix-input>',
+    )) as Updatable & { feedback: string }
+    host.feedback = ''
+    await host.updateComplete
+    expect((part(host, 'hint') as HTMLElement).textContent?.trim()).toBe('At least 12 characters')
+    expect(part(host, 'feedback')).toBeNull()
   })
 
   test('nothing to say means no description at all', async () => {
     // Rather than an `aria-describedby` pointing at an id that renders nothing,
     // which a screen reader reads as a field with a description it cannot find.
     const host = await mount('<helix-input label="A"></helix-input>')
-    expect(part(host, 'caption')).toBeNull()
+    expect(part(host, 'hint')).toBeNull()
     expect(part(host, 'feedback')).toBeNull()
     expect(control(host)?.hasAttribute('aria-describedby')).toBe(false)
   })
@@ -208,18 +215,21 @@ describe('input parts that are not always used', () => {
     expect(label.getAttribute('for')).toBe(control(host)?.id)
   })
 
-  test('the caption is read before typing and the feedback after', async () => {
-    /* Order, which is the whole of what distinguishes the two. A caption is a
-       condition on what to type, so it goes above the control; feedback is a
-       verdict on what was typed, so it goes below. A hint under the box is a
-       hint arriving after the moment it was for. */
-    const host = await mount(
-      '<helix-input label="A" caption="Hint" feedback="Wrong"></helix-input>',
-    )
-    const order = [...(host.shadowRoot as ShadowRoot).children].map((node) =>
-      node.getAttribute('part'),
-    )
-    expect(order).toEqual(['label', 'caption', 'field', 'feedback'])
+  test('the description sits under the control, whichever of the two it is', async () => {
+    const order = async (markup: string): Promise<(string | null)[]> => {
+      const host = await mount(markup)
+      return [...(host.shadowRoot as ShadowRoot).children].map((node) => node.getAttribute('part'))
+    }
+    expect(await order('<helix-input label="A" hint="H"></helix-input>')).toEqual([
+      'label',
+      'field',
+      'hint',
+    ])
+    expect(await order('<helix-input label="A" hint="H" feedback="F"></helix-input>')).toEqual([
+      'label',
+      'field',
+      'feedback',
+    ])
   })
 })
 
@@ -275,7 +285,7 @@ if (hasLayout()) {
 
     test('a field with every part is taller than one with none, by all of them', async () => {
       const bare = await heightOf('<helix-input placeholder="P"></helix-input>')
-      const full = await heightOf('<helix-input label="L" caption="C" feedback="F"></helix-input>')
+      const full = await heightOf('<helix-input label="L" hint="C" feedback="F"></helix-input>')
       const labelOnly = await heightOf('<helix-input label="L"></helix-input>')
 
       expect(full).toBeGreaterThan(labelOnly)

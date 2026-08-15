@@ -94,14 +94,14 @@ describe('checkbox descriptions', () => {
     expect(label.textContent?.trim()).toBe('Accept')
   })
 
-  test('a caption sits outside that label, so pressing it does not toggle', async () => {
+  test('a hint sits outside that label, so pressing it does not toggle', async () => {
     // Help text is not the control's name and must not be its hit target.
-    const host = await mount('<helix-checkbox label="Accept" caption="Help"></helix-checkbox>')
+    const host = await mount('<helix-checkbox label="Accept" hint="Help"></helix-checkbox>')
     const field = part(host, 'field') as HTMLElement
-    const caption = part(host, 'caption') as HTMLElement
-    expect(field.contains(caption)).toBe(false)
+    const hint = part(host, 'hint') as HTMLElement
+    expect(field.contains(hint)).toBe(false)
     expect((part(host, 'control') as HTMLInputElement).getAttribute('aria-describedby')).toContain(
-      caption.id,
+      hint.id,
     )
   })
 })
