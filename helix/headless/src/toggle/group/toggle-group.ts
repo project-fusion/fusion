@@ -155,7 +155,20 @@ export class HelixBaseToggleGroup extends HelixFormElement {
      * `clientTop` and `clientLeft` are the border widths, which is exactly the
      * difference between the two origins.
      */
-    indicator.style.setProperty('--_indicator-x', `${box.left - own.left - this.clientLeft}px`)
+    /* Measured along the inline axis, not along the page's left.
+     *
+     * The indicator is pinned with `inset-inline-start`, which is the right
+     * edge in a right-to-left group, and moved with `translate`, which is
+     * always physical. A distance taken from the left and applied from the
+     * right sends the thumb the wrong way and doubles its own offset getting
+     * there. So the distance is taken from whichever edge the inset resolves
+     * to, and the translate is signed to point inwards from it. */
+    const style = getComputedStyle(this)
+    const rtl = style.direction === 'rtl'
+    const borderStart = Number.parseFloat(rtl ? style.borderRightWidth : style.borderLeftWidth)
+    const inline = rtl ? own.right - box.right - borderStart : box.left - own.left - borderStart
+
+    indicator.style.setProperty('--_indicator-x', `${rtl ? -inline : inline}px`)
     indicator.style.setProperty('--_indicator-y', `${box.top - own.top - this.clientTop}px`)
     indicator.style.setProperty('--_indicator-w', `${box.width}px`)
     indicator.style.setProperty('--_indicator-h', `${box.height}px`)

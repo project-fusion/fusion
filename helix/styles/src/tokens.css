@@ -86,7 +86,7 @@
      them while the thumb stays lifted above the surface they are both on. In
      light there is no room below white, so it takes the step a raised surface
      takes and the two are told apart by shadow rather than by fill. */
-  --helix-color-surface-sunken: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-1000));
+  --helix-color-surface-sunken: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-1000));
   --helix-color-overlay: color-mix(
     in oklab,
     var(--_helix-neutral-950) light-dark(40%, 64%),
@@ -109,10 +109,11 @@
   --helix-color-foreground-inverse: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
 
   /* Lines. */
-  /* Clear of `surface-raised`, which took the step these used to be on. A rule
-     the same colour as the surface it is drawn on is not a rule. */
-  --helix-color-border: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-700));
-  --helix-color-border-strong: light-dark(var(--_helix-neutral-300), var(--_helix-neutral-600));
+  /* Clear of every surface, which is what a rule has to be to be a rule. The
+     light pair moved a step out when `surface-sunken` took `neutral-200`: a
+     track drawn in the same neutral as its own border has no border. */
+  --helix-color-border: light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700));
+  --helix-color-border-strong: light-dark(var(--_helix-neutral-400), var(--_helix-neutral-600));
   --helix-color-border-accent: var(--_helix-brand-500);
 
   /* Interaction. */

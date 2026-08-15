@@ -16,6 +16,11 @@
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
+  /* The UA gives a button its own font, so this one was drawing at 13.33px
+     while everything around it followed the scale. It shows on nothing today,
+     the content being an icon sized by its own token, and it shows on the first
+     thing that is not. */
+  font: inherit;
   inline-size: var(--_icon-button-size);
   justify-content: center;
   padding: var(--helix-space-none);
