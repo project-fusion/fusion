@@ -6,6 +6,10 @@
 
   --_switch-height: var(--helix-size-checkbox);
   --_switch-width: var(--switch-width, calc(var(--helix-size-checkbox) * 1.75));
+  /* The gap around the thumb, named once because three things are derived from
+     it and they have to agree: the thumb's size, where it rests, and how far it
+     travels. */
+  --_switch-inset: calc(var(--helix-space-2xs) / 2);
 }
 
 [part="field"] {
@@ -85,12 +89,23 @@
      so the thumb came out darker than the track it sits in and read as a hole
      punched through rather than a thing lying on top. */
   background-color: var(--switch-thumb-color, var(--helix-color-surface-raised));
-  block-size: calc(var(--_switch-height) - var(--helix-space-2xs));
+  block-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-full);
-  inline-size: calc(var(--_switch-height) - var(--helix-space-2xs));
+  inline-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   inset-block-start: 50%;
-  inset-inline-start: calc(var(--helix-space-2xs) / 2);
+  /* Less the border, because the two boxes are not the same box. An absolutely
+     positioned element is placed against its containing block's *padding* box,
+     which starts one border in, so an inset written as the gap it should leave
+     lands a border-width late: measured, three pixels at rest on the left
+     against two above and below, and one pixel at the far end where the travel
+     had already been reckoned from the outside. The thumb read as overshooting
+     its own track.
+ 
+     The vertical does not need this because it is centred rather than inset,
+     and centring is symmetric whichever box it is done in. This is the same
+     arithmetic the segmented control's indicator does with `clientTop`. */
+  inset-inline-start: calc(var(--_switch-inset) - var(--helix-border-thin));
   pointer-events: none;
   position: absolute;
   translate: 0 -50%;
@@ -102,8 +117,8 @@
      to sit on it. `raised` against the brand is a dark thumb on a mid blue in
      dark mode, which is the same disappearing act the other way round. */
   background-color: var(--switch-thumb-color, var(--helix-color-foreground-on-accent));
-  /* The track less the thumb and the inset at both ends, so the gap either side
-     is the same however wide the track is made. */
+  /* The track, less the thumb and the gap at both ends, so the space either
+     side is the same however wide the track is made. */
   translate: calc(var(--_switch-width) - var(--_switch-height)) -50%;
 }
 
