@@ -299,23 +299,20 @@ helix-app-header {
  * and neither right here: a tool runs to the window, and nothing under this
  * header scrolls the document, so the border would never arrive. Set from the
  * outer tree on the host, which the cascade lets win in both scroll states. */
-/* The mark takes the foreground, so it is black on a white page and white on a
- * black one.
+/* The mark takes the brand.
  *
  * Its gradients were declared against `--logo-color-*` with grey literals as
  * fallbacks, exactly so a theme could retint it without the SVG being touched.
- * It was the brand blue for a while, and the mark is the one thing on the page
- * that does not need colour to be recognised: shape is what a mark is for, and
- * next to a wordmark set in the foreground, a blue one read as a picture beside
- * the name rather than as part of it.
+ * `primary` is the brand blue and follows the colour mode on its own.
  *
- * One token for all three stops rather than three. The highlight gradient fades
- * its own stop to 0.2 alpha, so the mark keeps its modelling without needing
- * two colours to do it, and there is nothing left that can drift. */
+ * It was briefly the foreground, on a misreading: the mark is not what needed
+ * to change colour, the wordmark beside it was. The mark is the one thing here
+ * that carries the brand without words, so it is the one thing that keeps the
+ * brand's colour. */
 .fusionLogo {
-  --logo-color-from: var(--helix-color-foreground);
-  --logo-color-mid: var(--helix-color-foreground);
-  --logo-color-to: var(--helix-color-foreground);
+  --logo-color-from: var(--helix-color-primary);
+  --logo-color-mid: var(--helix-color-primary-hover);
+  --logo-color-to: var(--helix-color-primary-active);
 }
 
 .workbenchHeader {
@@ -532,6 +529,13 @@ helix-sandbox [slot="panel"]::part(panels) {
  * should not be: this is a brand lockup rather than a size in the type scale,
  * and a `heading` that happened to match would be coupled to it by accident. */
 .wordmark::part(text) {
+  /* Full strength, black on a white page and white on a black one.
+     The lockup sits inside `<a data-link="quiet">`, which paints navigation in
+     the muted foreground so that a column of rows does not shout, and the
+     wordmark was inheriting it: measured at oklch(0.5), a mid grey, in both
+     modes. Right for a nav row and wrong for the brand's own name, which is
+     the one piece of text on the page that is a thing rather than a label. */
+  color: var(--helix-color-foreground);
   font-family: var(--helix-font-display);
   font-size: var(--site-text-wordmark);
   font-weight: var(--helix-weight-semibold);
