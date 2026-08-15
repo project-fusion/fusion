@@ -24,6 +24,7 @@ import type { Family } from '../../../../lib/catalog'
 import { useHelixEvent } from '../../../../lib/use-helix-event'
 import { FusionLogo } from '../../../fusion-logo'
 import { PreferencesDrawer } from '../../../preferences'
+import { readUrlState, type Section, writeUrlState } from './url-state'
 
 /**
  * The sandbox workbench: source files, a live preview, and the example tree.
@@ -128,7 +129,19 @@ export function SandboxWorkbench({ families }: Props) {
   const [exampleSlug, setExampleSlug] = useState<string | null>(null)
   const [pane, setPane] = useState<Pane>('source')
   const [syntax, setSyntax] = useState<Syntax>('html')
+  /* The text as it is on screen, in whichever syntax is showing, and not a
+     canonical form the editor is a rendering of. It was HTML, and the JSX view
+     was `htmlToJsx` of it while every keystroke was `jsxToHtml` back: a round
+     trip through two converters on every character, which never reproduces
+     half-typed markup, so the editor was handed a different document than the
+     one being typed into and replaced it. Held as-is, what the editor emits is
+     exactly what comes back, and the conversion happens where it is actually
+     needed. */
+  /* What is in the editor now, and in which language, so the effect below can
+     tell "a new example arrived" from "the same one, asked for differently". */
+  const seeded = useRef<{ example: string; syntax: Syntax } | null>(null)
   const [markup, setMarkup] = useState('')
+  const [css, setCss] = useState(CSS_START)
   // Unset means the preview follows the page. A reader who has chosen a mode
   // for the site has said how they want to look at things, and a preview that
   // ignored it would be the one part of the page that did.
@@ -148,13 +161,22 @@ export function SandboxWorkbench({ families }: Props) {
   // disagree with the address bar. The stored arrangement is read here for the
   // same reason.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    setFamilySlug(params.get('family'))
-    setExampleSlug(params.get('example'))
+    const url = readUrlState(window.location.search)
+    setFamilySlug(url.family)
+    setExampleSlug(url.example)
+    setLayout(url.layout)
+    setDirection(url.direction)
+    setSyntax(url.syntax)
+    setPreviewTheme(url.colorMode)
+    setShowEditor(!url.hidden.includes('editor'))
+    setShowPanel(!url.hidden.includes('panel'))
+    setShowStatus(!url.hidden.includes('status'))
     setSiteTheme(document.documentElement.dataset.colorMode === 'light' ? 'light' : 'dark')
 
     const stored = readArrangement()
-    if (stored.syntax) {
+    // Only when the address did not say. A link that names a language is a
+    // statement about what to show; what this browser last chose is not.
+    if (stored.syntax && !new URLSearchParams(window.location.search).has('x')) {
       setSyntax(stored.syntax)
     }
     if (sandbox.current) {
@@ -217,11 +239,6 @@ export function SandboxWorkbench({ families }: Props) {
     setFamilySlug(nextFamily)
     setExampleSlug(nextExample)
     setRailOpen(false)
-    window.history.replaceState(
-      null,
-      '',
-      `${window.location.pathname}?family=${nextFamily}&example=${nextExample}`,
-    )
   }, [])
 
   // Bound through an effect, not an `onhelix-select` prop. React does not
@@ -230,13 +247,13 @@ export function SandboxWorkbench({ families }: Props) {
   useHelixEvent(files, 'helix-select', (event) => {
     setPane(event.detail.value as Pane)
   })
-  // The JSX view is a rendering of the markup, so it follows what is typed
-  // rather than what the example shipped with.
+  // Verbatim. What is typed is what is held and what is handed back.
   useHelixEvent(sandbox, 'helix-change', (event) => {
-    if (event.detail.name !== 'source') {
-      return
+    if (event.detail.name === 'source') {
+      setMarkup(event.detail.value)
+    } else if (event.detail.name === 'css') {
+      setCss(event.detail.value)
     }
-    setMarkup(syntax === 'html' ? event.detail.value : jsxToHtml(event.detail.value))
   })
   // One listener for the whole menu: the value says which setting and, where
   // it drilled down, which option.
@@ -279,17 +296,79 @@ export function SandboxWorkbench({ families }: Props) {
     setRailOpen(true)
   })
 
+  /* The address follows the sandbox, in one place rather than at each of the
+     handlers that can change it. `replaceState`, not `pushState`: turning the
+     panel off is not somewhere to go Back to, and a settings menu that filled
+     the history would make the browser's own Back button useless for leaving.
+
+     Guarded on `familySlug`, which is null until the first effect has read the
+     address: writing before then would replace a real query with an empty one
+     and lose whatever the link said. */
   useEffect(() => {
-    if (example) {
-      setMarkup(example.html)
+    if (!familySlug) {
+      return
     }
-    if (preview.current) {
-      preview.current.styles = ''
+    const hidden: Section[] = []
+    if (!showEditor) {
+      hidden.push('editor')
     }
-    // Output belongs to the example that wrote it. Carrying it across reads as
-    // the new example having produced warnings it never produced.
-    terminal.current?.clear()
-  }, [example])
+    if (!showPanel) {
+      hidden.push('panel')
+    }
+    if (!showStatus) {
+      hidden.push('status')
+    }
+    const query = writeUrlState({
+      colorMode: previewTheme,
+      direction,
+      example: exampleSlug,
+      family: familySlug,
+      hidden,
+      layout,
+      syntax,
+    })
+    window.history.replaceState(null, '', `${window.location.pathname}${query}`)
+  }, [
+    direction,
+    exampleSlug,
+    familySlug,
+    layout,
+    previewTheme,
+    showEditor,
+    showPanel,
+    showStatus,
+    syntax,
+  ])
+
+  /* Seeding and converting are one effect, because they are the same question
+     asked of two inputs: what should be in the editor for this example in this
+     language. Split across an effect and a menu handler they disagreed on
+     mount, where an address naming `x=tsx` sets the syntax in a state update
+     the seeding effect's closure cannot see yet, so the example was seeded as
+     HTML and then shown under a TSX tab. Comparing against what was last put
+     there settles it on the following render instead of needing the two to be
+     ordered. */
+  useEffect(() => {
+    if (!example) {
+      return
+    }
+    const address = `${family.slug}/${example.slug}`
+    const last = seeded.current
+    if (!last || last.example !== address) {
+      setMarkup(syntax === 'html' ? example.html : htmlToJsx(example.html))
+      setCss(CSS_START)
+      if (preview.current) {
+        preview.current.styles = ''
+      }
+      // Output belongs to the example that wrote it. Carrying it across reads
+      // as the new example having produced warnings it never produced.
+      terminal.current?.clear()
+    } else if (last.syntax !== syntax) {
+      // The same text in the other language, so edits survive the switch.
+      setMarkup((current) => (syntax === 'html' ? jsxToHtml(current) : htmlToJsx(current)))
+    }
+    seeded.current = { example: address, syntax }
+  }, [example, family, syntax])
 
   // The preview follows the markup, and the site is what puts it there. The
   // sandbox forwards a pane it can render, which is one named `html`; this one
@@ -298,9 +377,10 @@ export function SandboxWorkbench({ families }: Props) {
   // component has to guess at.
   useEffect(() => {
     if (preview.current) {
-      preview.current.source = markup
+      preview.current.source = syntax === 'html' ? markup : jsxToHtml(markup)
+      preview.current.styles = css
     }
-  }, [markup])
+  }, [css, markup, syntax])
 
   // Switching files moves focus into the file switched to. It is what you were
   // going to do anyway, and it is also what corrects the status bar: the editor
@@ -623,7 +703,7 @@ export function SandboxWorkbench({ families }: Props) {
                 ref={(node: HelixSandboxEditor | null) => {
                   editors.current.source = node
                 }}
-                value={syntax === 'html' ? markup : htmlToJsx(markup)}
+                value={markup}
               ></helix-sandbox-editor>
             </div>
 
@@ -636,7 +716,7 @@ export function SandboxWorkbench({ families }: Props) {
                 ref={(node: HelixSandboxEditor | null) => {
                   editors.current.css = node
                 }}
-                value={CSS_START}
+                value={css}
               ></helix-sandbox-editor>
             </div>
           </div>

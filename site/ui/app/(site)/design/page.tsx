@@ -75,7 +75,7 @@ export default function Page() {
                 {family.examples.length > 0 && (
                   <Link
                     data-button="subtle"
-                    href={`/design/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
+                    href={`/design/sandbox?e=${family.slug}.${family.examples[0]?.slug}`}
                   >
                     Sandbox
                   </Link>

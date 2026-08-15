@@ -53,7 +53,15 @@
    * three tokens, one colour, and a card on a page with nothing between them. */
   --helix-color-background: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000));
   --helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
-  --helix-color-surface-raised: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800));
+  /* White in light mode, and lifted by its shadow rather than by its fill.
+     Everything that takes this floats: a menu, a tooltip, the thumb of a
+     segmented control. On a white page there is nothing above white to go to,
+     so a raised surface painted a step darker reads as a grey card lying on the
+     page rather than as something over it, which is what a dropdown looked
+     like. Sharing a value with `background` is the point here and not a
+     collision: these never sit flat against the page, so the shadow is what
+     separates them, and in a groove a white thumb is exactly right. */
+  --helix-color-surface-raised: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800));
   /* Sunken is a step *lighter* than the page in dark mode, not darker. There is
      nowhere below near-black to go, so a groove reads by being nearer the
      viewer's eye rather than further from it. It was neutral-950, identical to

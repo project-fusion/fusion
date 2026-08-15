@@ -95,21 +95,32 @@
      palette with the brand color would make every theme a new language to
      learn. These are GitHub's, which is the set most engineers already read
      without thinking about it, and the pair below is light then dark. */
-  --_helix-syntax-comment-light: #6e7781;
+  /* GitHub's palette, with the light half lifted to an even lightness.
+   *
+   * Theirs runs from 0.31 to 0.55 in OKLCH lightness, and the bottom of that is
+   * where the complaint came from: a string at #0a3069 is near enough black
+   * that it reads as uncoloured text rather than as a dark blue, and a tag at
+   * #116329 is not far behind. Every one of them was in fact being coloured;
+   * several were just too dark to look it.
+   *
+   * The hue and the chroma are theirs and only the lightness is set, so the
+   * palette is still the one most engineers already read. Comments stay the
+   * quietest of the set, which is the one place dark is doing a job. */
+  --_helix-syntax-comment-light: oklch(from #6e7781 0.58 c h);
   --_helix-syntax-comment-dark: #8b949e;
-  --_helix-syntax-keyword-light: #cf222e;
+  --_helix-syntax-keyword-light: oklch(from #cf222e 0.58 c h);
   --_helix-syntax-keyword-dark: #ff7b72;
-  --_helix-syntax-string-light: #0a3069;
+  --_helix-syntax-string-light: oklch(from #0a3069 0.5 c h);
   --_helix-syntax-string-dark: #a5d6ff;
-  --_helix-syntax-tag-light: #116329;
+  --_helix-syntax-tag-light: oklch(from #116329 0.54 c h);
   --_helix-syntax-tag-dark: #7ee787;
-  --_helix-syntax-name-light: #0550ae;
+  --_helix-syntax-name-light: oklch(from #0550ae 0.55 c h);
   --_helix-syntax-name-dark: #79c0ff;
-  --_helix-syntax-callable-light: #8250df;
+  --_helix-syntax-callable-light: oklch(from #8250df 0.58 c h);
   --_helix-syntax-callable-dark: #d2a8ff;
-  --_helix-syntax-constant-light: #953800;
+  --_helix-syntax-constant-light: oklch(from #953800 0.56 c h);
   --_helix-syntax-constant-dark: #ffa657;
-  --_helix-syntax-invalid-light: #82071e;
+  --_helix-syntax-invalid-light: oklch(from #82071e 0.5 c h);
   --_helix-syntax-invalid-dark: #ffa198;
 
   /* ------------------------------------------------------- scale ------- */

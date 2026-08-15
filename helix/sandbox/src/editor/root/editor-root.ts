@@ -201,9 +201,17 @@ export class HelixSandboxEditor extends HelixElement {
 
     // Only when it differs, or an edit would be dispatched back into the
     // document that produced it and the cursor would jump to the end.
+    /* A value set from outside replaces the document, and the caret stays where
+       it was rather than going to the top. A replacement carries no selection
+       of its own, so CodeMirror falls back to the start: every such write moved
+       the cursor to character zero, which is unusable if anything is echoing
+       what was typed back into the element. Clamped, because the new text can
+       be shorter than the old position. */
     if (changed.has('value') && this.value !== view.state.doc.toString()) {
+      const head = view.state.selection.main.head
       view.dispatch({
         changes: { from: 0, insert: this.value, to: view.state.doc.length },
+        selection: { anchor: Math.min(head, this.value.length) },
       })
     }
   }

@@ -101,7 +101,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             <helix-flex data-density="sm">
               <Link
                 data-button="subtle"
-                href={`/design/sandbox?family=${family.slug}&example=${family.examples[0]?.slug}`}
+                href={`/design/sandbox?e=${family.slug}.${family.examples[0]?.slug}`}
               >
                 Open in the sandbox
               </Link>
