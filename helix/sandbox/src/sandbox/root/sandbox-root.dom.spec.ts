@@ -296,6 +296,25 @@ describe('sandbox divider', () => {
     expect(sizes()).toContain('--_sandbox-split: 30%')
   })
 
+  test('a pane at nothing says so, for the divider beside it', async () => {
+    /* A boundary needs two sides. With a pane at zero its divider is a rule at
+       the edge of the sandbox with empty space behind it, which reads as the
+       border of a pane that is no longer there, so the styling turns it off and
+       needs to know. The line itself cannot be asserted here: happy-dom has no
+       layout and no cascade to speak of, so this covers the flag and a browser
+       covers the paint. */
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    expect(sandbox.dataset.collapsed).toBeUndefined()
+
+    sandbox.split = 0
+    await sandbox.updateComplete
+    expect(sandbox.dataset.collapsed).toBe('inline')
+
+    sandbox.split = 40
+    await sandbox.updateComplete
+    expect(sandbox.dataset.collapsed).toBeUndefined()
+  })
+
   test('an unrelated key is left alone', async () => {
     const sandbox = await mount(wired)
     expect(press(sandbox, 'PageDown').defaultPrevented).toBe(false)

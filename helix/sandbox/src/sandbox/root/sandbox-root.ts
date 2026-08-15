@@ -533,6 +533,22 @@ export class HelixSandbox extends HelixElement {
     const across = Number.isFinite(split) ? split : DEFAULT_SPLIT
     const down = Number.isFinite(panel) ? panel : DEFAULT_PANEL
     sheet.textContent = `:host { --_sandbox-split: ${across}%; --_sandbox-panel: ${down}px; }`
+
+    /* Which panes are shut, for the dividers beside them. A boundary needs two
+       sides, and once a pane is at nothing its divider is a line at the edge of
+       the sandbox with nothing behind it: it reads as the border of a pane that
+       is not there any more.
+
+       Written here rather than in `updated`, because a drag moves the
+       stylesheet without touching the properties until it ends, and a line that
+       waited for the release would still be drawn while the pane it belongs to
+       was being closed. */
+    const shut = [across <= 0 ? 'inline' : '', down <= 0 ? 'block' : ''].filter(Boolean).join(' ')
+    if (shut) {
+      this.dataset.collapsed = shut
+    } else {
+      delete this.dataset.collapsed
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
