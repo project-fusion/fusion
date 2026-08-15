@@ -7,6 +7,10 @@ export {
   type DismissOptions,
 } from './controllers/dismiss-controller/dismiss-controller.js'
 export {
+  DrilldownController,
+  type DrilldownOptions,
+} from './controllers/drilldown-controller/drilldown-controller.js'
+export {
   FloatingController,
   type FloatingOptions,
   type Placement,

@@ -192,6 +192,190 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/drilldown-controller/drilldown-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "One page of a nested set showing at a time, with a way back.\n\nA drill-down replaces the panel rather than opening a second one beside it.\nThat is the right shape wherever there is no room for two: on a phone there\nis no second column, and on a touch screen there is no hover to open one\nwith. What a reader gets instead is one panel, a title saying where they are,\nand a way back.\n\n**Extracted from `Menu`, which had all of this and did not say so.** The menu\nheld a `page`, derived the rows on it, read a title off the row that opened\nit, and reset on close; the sandbox's settings dropdown has been a drill-down\nfor as long as it has existed. None of that is about menus. Taking it out is\nwhat lets a settings panel, a filter stack or a navigation tree have the same\nbehaviour without one of them being a menu that is pretending.\n\n**The tree is the state.** A row's page is its own children, assigned to a\nslot, so the controller holds one reference, the row currently drilled into,\nand derives everything else from the DOM. The alternative, an id per page and\na map beside it, is a second copy of the structure that a consumer can put\nout of step with the first.\n\n**A stack, not a pointer.** `back()` returns to the page above rather than to\nthe root, because a reader three levels down pressed one control and expects\none level. The stack is rebuilt from the DOM by walking up from the current\nrow, so it cannot disagree with the tree: a page removed while it was showing\ntakes its ancestors with it, and `atRoot` becomes true rather than the\ncontroller holding a reference to something detached.\n\nNothing here decides what a row *is*, what it renders, or what happens when\none is chosen. It answers where the reader is and what is on this page.",
+          "name": "DrilldownController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "host",
+              "type": {
+                "text": "ReactiveControllerHost"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "host"
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "DrilldownOptions"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "options"
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "Row | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The row whose page is showing, or nothing at the top."
+            },
+            {
+              "kind": "field",
+              "name": "page",
+              "type": {
+                "text": "Row | null"
+              },
+              "description": "The row whose page is showing, or `null` at the top.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "atRoot",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the top page is the one showing.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "depth",
+              "type": {
+                "text": "number"
+              },
+              "description": "How deep the reader is, with the top page at zero.\n\nCounted by walking up rather than by keeping a number, for the reason the\nstack is: a count can be wrong about a tree, and the tree is what renders.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the page showing is called.\n\nThe row's own text and not its subtree, because a row that opens a page\ncontains that page's rows: `textContent` would read back the whole thing.\nEmpty at the top, where the panel's own label is the name of the place.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "The rows on the page showing, which is what the keyboard moves over.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "hasPage",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "Element"
+                  }
+                }
+              ],
+              "description": "Whether a row has a page to drill into."
+            },
+            {
+              "kind": "method",
+              "name": "enter",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "Row"
+                  }
+                }
+              ],
+              "description": "Shows a row's page in place of the one showing.\n\nRefuses a row with no page rather than drilling into an empty one, which\nwould leave a reader on a blank panel with a back control as its only\ncontent and nothing saying why."
+            },
+            {
+              "kind": "method",
+              "name": "back",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Returns to the page above, and reports whether there was one."
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns to the top page.\n\nFor closing rather than for navigating: a panel that reopens where it was\nleft is showing a reader a place they have no memory of choosing."
+            },
+            {
+              "kind": "method",
+              "name": "parentOf",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Row | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "Row"
+                  }
+                }
+              ],
+              "description": "The row that opened the page this row is on.\n\nWalks up two steps, because a row sits inside the row that opened it: its\nparent element *is* that row. Read from the DOM each time rather than\nstored, so a tree the consumer has changed cannot leave this pointing at\nsomething no longer in it."
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Back to the top when the host goes away, so it reopens where it opened."
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DrilldownController",
+          "declaration": {
+            "name": "DrilldownController",
+            "module": "src/controllers/drilldown-controller/drilldown-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/controllers/floating-controller/floating-controller.ts",
       "declarations": [
         {
@@ -942,6 +1126,22 @@
           "declaration": {
             "name": "DismissOptions",
             "module": "./controllers/dismiss-controller/dismiss-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "DrilldownController",
+          "declaration": {
+            "name": "DrilldownController",
+            "module": "./controllers/drilldown-controller/drilldown-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "DrilldownOptions",
+          "declaration": {
+            "name": "DrilldownOptions",
+            "module": "./controllers/drilldown-controller/drilldown-controller.js"
           }
         },
         {

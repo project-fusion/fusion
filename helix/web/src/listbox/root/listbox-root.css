@@ -13,7 +13,22 @@
    active option into this box, which is why the cap is on the same element the
    scroll happens in. */
 [part="items"] {
-  background-color: var(--helix-color-surface-sunken);
+  /* Square rows, for the reason the select's panel gives: they run the full
+     width of this box, and a radius on a band that reaches both edges rounds
+     against nothing. */
+  --option-radius: var(--helix-radii-none);
+
+  /* `surface`, not `surface-sunken`, and the rows are what decides it. A row
+     hovers and selects at `raised`, which on a white page is a step *darker*
+     than the page: on a sunken fill it came out two hundredths lighter than the
+     list it sits in, so hovering made a row brighter by an amount nobody can
+     see, and the whole list read as a grey slab besides.
+
+     A field is sunken because it is a well you put a value into. This is not
+     that: it is a surface with rows on it, and what it has to do is sit far
+     enough from its own rows for them to read. On `surface` the hover is darker
+     in light and lighter in dark, which is the right direction in both. */
+  background-color: var(--helix-color-surface);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   display: flex;
@@ -21,7 +36,13 @@
   gap: var(--helix-space-none);
   max-block-size: var(--listbox-max-block-size, 14rem);
   overflow-y: auto;
-  padding: var(--helix-space-2xs);
+  /* Block only. The rows bring their own inline padding and run edge to edge,
+     so a hovered row is a band across the list rather than a pill inset from
+     it, and the highlight lines up with the edge the eye follows down. The
+     block padding stays, holding the first and last rows clear of the frame's
+     rounded corners. */
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-none);
 }
 
 [part="items"]:focus-visible {
