@@ -29,6 +29,8 @@ import type {
   HelixBaseMenuItem,
   HelixBaseNavBar,
   HelixBaseQuote,
+  HelixBaseRadio,
+  HelixBaseRadioGroup,
   HelixBaseSkeleton,
   HelixBaseSpinner,
   HelixBaseStat,
@@ -1467,6 +1469,124 @@ export type HelixBaseQuoteProps = {
 export type HelixBaseQuoteSolidJsProps = {
   /** URL identifying where the quotation came from. */
   "prop:cite"?: HelixBaseQuote["cite"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseRadioGroup` component event */
+export type HelixBaseRadioGroupElementEvent<E = Event> = TypedEvent<
+  HelixBaseRadioGroup,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseRadioGroupHelixChangeElementEvent =
+  HelixBaseRadioGroupElementEvent<HelixChangeEvent>;
+
+export type HelixBaseRadioGroupProps = {
+  /** The answer the markup declared, which is the one a reset returns to. */
+  "default-value"?: HelixBaseRadioGroup["defaultValue"];
+  /** The answer the markup declared, which is the one a reset returns to. */
+  defaultValue?: HelixBaseRadioGroup["defaultValue"];
+  /** Name the group reports under when its form is submitted. */
+  name?: HelixBaseRadioGroup["name"];
+  /** Which way the choices run. A column reads one line per answer. */
+  orientation?: HelixBaseRadioGroup["orientation"];
+  /** Value of the chosen item, and what the form submits. */
+  value?: HelixBaseRadioGroup["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseRadioGroup["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseRadioGroup["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixBaseRadioGroup["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixBaseRadioGroup["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseRadioGroup["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseRadioGroup["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixBaseRadioGroup["disabled"];
+
+  /** Fired when the answer changes, and cancelable. */
+  "onhelix-change"?: (e: HelixBaseRadioGroupHelixChangeElementEvent) => void;
+};
+
+export type HelixBaseRadioGroupSolidJsProps = {
+  /** The answer the markup declared, which is the one a reset returns to. */
+  "attr:default-value"?: HelixBaseRadioGroup["defaultValue"];
+  /** The answer the markup declared, which is the one a reset returns to. */
+  "prop:defaultValue"?: HelixBaseRadioGroup["defaultValue"];
+  /** Name the group reports under when its form is submitted. */
+  "prop:name"?: HelixBaseRadioGroup["name"];
+  /** Which way the choices run. A column reads one line per answer. */
+  "prop:orientation"?: HelixBaseRadioGroup["orientation"];
+  /** Value of the chosen item, and what the form submits. */
+  "prop:value"?: HelixBaseRadioGroup["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseRadioGroup["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseRadioGroup["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixBaseRadioGroup["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixBaseRadioGroup["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseRadioGroup["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseRadioGroup["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixBaseRadioGroup["disabled"];
+  /** Fired when the answer changes, and cancelable. */
+  "on:helix-change"?: (e: HelixBaseRadioGroupHelixChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseRadio` component event */
+export type HelixBaseRadioElementEvent<E = Event> = TypedEvent<
+  HelixBaseRadio,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseRadioHelixSelectElementEvent =
+  HelixBaseRadioElementEvent<HelixSelectEvent>;
+
+export type HelixBaseRadioProps = {
+  /** Whether this choice can be made. */
+  disabled?: HelixBaseRadio["disabled"];
+  /** Whether this is the current choice. Written by the group. */
+  selected?: HelixBaseRadio["selected"];
+  /** Identifies this choice to the group, and is what the form submits. */
+  value?: HelixBaseRadio["value"];
+
+  /** Fired when this choice is made. */
+  "onhelix-select"?: (e: HelixBaseRadioHelixSelectElementEvent) => void;
+};
+
+export type HelixBaseRadioSolidJsProps = {
+  /** Whether this choice can be made. */
+  "prop:disabled"?: HelixBaseRadio["disabled"];
+  /** Whether this is the current choice. Written by the group. */
+  "prop:selected"?: HelixBaseRadio["selected"];
+  /** Identifies this choice to the group, and is what the form submits. */
+  "prop:value"?: HelixBaseRadio["value"];
+  /** Fired when this choice is made. */
+  "on:helix-select"?: (e: HelixBaseRadioHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3574,6 +3694,144 @@ export type CustomElements = {
    */
   "helix-base-quote": Partial<
     HelixBaseQuoteProps & BaseProps<HelixBaseQuote> & BaseEvents
+  >;
+
+  /**
+   * **The group is the control, and the radios are its options.** This is the
+   * asymmetry with checkboxes and it comes from what a form submits: a set of
+   * checkboxes is several answers and each box submits its own, while a set of
+   * radios is one answer, so the group owns the `name`, the `value` and the
+   * validity, and a lone radio outside a group is not a control at all.
+   *
+   * Which is also why `MixinField` lands here and not on `Radio`: the label, the
+   * hint and the message are about the question, and the question is the set.
+   *
+   * Selection travels up and state travels down. An item announces that it was
+   * chosen, the group decides whether that stands, and the group writes
+   * `selected` onto every item. Nothing sets itself, so there is one answer to
+   * "which one is on" rather than one per item.
+   *
+   * `value` and `defaultValue` are separate for the reason `checked` and
+   * `defaultChecked` are: `value` is the answer now, `defaultValue` is what the
+   * markup asked for, which is where a reset returns and is gone the moment
+   * anything is chosen.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The answer the markup declared, which is the one a reset returns to.
+   * - `name`: Name the group reports under when its form is submitted.
+   * - `orientation`: Which way the choices run. A column reads one line per answer.
+   * - `value`: Value of the chosen item, and what the form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the answer changes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The radios.
+   * - `label`: Richer than a string, where the question is more than one.
+   * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the group to the answer its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the answer when the browser brings a form back.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The question, over the set.
+   * - `items`: The choices, which is what `orientation` lays out.
+   * - `hint`: Help under the set.
+   * - `feedback`: What is wrong with it.
+   */
+  "helix-base-radio-group": Partial<
+    HelixBaseRadioGroupProps & BaseProps<HelixBaseRadioGroup> & BaseEvents
+  >;
+
+  /**
+   * Renders a `<button role="radio">`, not an `<input type="radio">`, and the
+   * reason is the shadow boundary rather than preference: native radios group by
+   * sharing a `name` within a form, and a radio inside a shadow root cannot join
+   * a group on the other side of it. The group is the form control here, so the
+   * option only has to say what it is and announce when it is chosen.
+   *
+   * **It carries no label of its own.** A radio is named by the words beside it,
+   * which is its own content, and the label, hint and message of the *set* belong
+   * to the group. This is the one control in the family that takes nothing from
+   * `MixinField`, because a lone radio is not a control: it is an answer to one.
+   *
+   * Selection is announced rather than applied. The item dispatches, the group
+   * decides, and the group writes `selected` back. An item that set itself would
+   * be a second source of truth for which one is on.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether this choice can be made.
+   * - `selected`: Whether this is the current choice. Written by the group.
+   * - `value`: Identifies this choice to the group, and is what the form submits.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when this choice is made.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this choice.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus to this choice, for the group's arrow keys.
+   * - `select() => void`: Makes this choice and announces it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The button, which is the whole row.
+   * - `box`: The circle.
+   * - `mark`: The dot inside it.
+   * - `label`: The words beside it.
+   */
+  "helix-base-radio": Partial<
+    HelixBaseRadioProps & BaseProps<HelixBaseRadio> & BaseEvents
   >;
 
   /**
@@ -5843,6 +6101,150 @@ export type CustomElementsSolidJs = {
     HelixBaseQuoteProps &
       HelixBaseQuoteSolidJsProps &
       BaseProps<HelixBaseQuote> &
+      BaseEvents
+  >;
+
+  /**
+   * **The group is the control, and the radios are its options.** This is the
+   * asymmetry with checkboxes and it comes from what a form submits: a set of
+   * checkboxes is several answers and each box submits its own, while a set of
+   * radios is one answer, so the group owns the `name`, the `value` and the
+   * validity, and a lone radio outside a group is not a control at all.
+   *
+   * Which is also why `MixinField` lands here and not on `Radio`: the label, the
+   * hint and the message are about the question, and the question is the set.
+   *
+   * Selection travels up and state travels down. An item announces that it was
+   * chosen, the group decides whether that stands, and the group writes
+   * `selected` onto every item. Nothing sets itself, so there is one answer to
+   * "which one is on" rather than one per item.
+   *
+   * `value` and `defaultValue` are separate for the reason `checked` and
+   * `defaultChecked` are: `value` is the answer now, `defaultValue` is what the
+   * markup asked for, which is where a reset returns and is gone the moment
+   * anything is chosen.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The answer the markup declared, which is the one a reset returns to.
+   * - `name`: Name the group reports under when its form is submitted.
+   * - `orientation`: Which way the choices run. A column reads one line per answer.
+   * - `value`: Value of the chosen item, and what the form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the answer changes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The radios.
+   * - `label`: Richer than a string, where the question is more than one.
+   * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the group to the answer its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the answer when the browser brings a form back.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The question, over the set.
+   * - `items`: The choices, which is what `orientation` lays out.
+   * - `hint`: Help under the set.
+   * - `feedback`: What is wrong with it.
+   */
+  "helix-base-radio-group": Partial<
+    HelixBaseRadioGroupProps &
+      HelixBaseRadioGroupSolidJsProps &
+      BaseProps<HelixBaseRadioGroup> &
+      BaseEvents
+  >;
+
+  /**
+   * Renders a `<button role="radio">`, not an `<input type="radio">`, and the
+   * reason is the shadow boundary rather than preference: native radios group by
+   * sharing a `name` within a form, and a radio inside a shadow root cannot join
+   * a group on the other side of it. The group is the form control here, so the
+   * option only has to say what it is and announce when it is chosen.
+   *
+   * **It carries no label of its own.** A radio is named by the words beside it,
+   * which is its own content, and the label, hint and message of the *set* belong
+   * to the group. This is the one control in the family that takes nothing from
+   * `MixinField`, because a lone radio is not a control: it is an answer to one.
+   *
+   * Selection is announced rather than applied. The item dispatches, the group
+   * decides, and the group writes `selected` back. An item that set itself would
+   * be a second source of truth for which one is on.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether this choice can be made.
+   * - `selected`: Whether this is the current choice. Written by the group.
+   * - `value`: Identifies this choice to the group, and is what the form submits.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when this choice is made.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this choice.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus to this choice, for the group's arrow keys.
+   * - `select() => void`: Makes this choice and announces it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The button, which is the whole row.
+   * - `box`: The circle.
+   * - `mark`: The dot inside it.
+   * - `label`: The words beside it.
+   */
+  "helix-base-radio": Partial<
+    HelixBaseRadioProps &
+      HelixBaseRadioSolidJsProps &
+      BaseProps<HelixBaseRadio> &
       BaseEvents
   >;
 

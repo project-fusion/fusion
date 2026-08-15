@@ -1,0 +1,89 @@
+:host {
+  display: block;
+
+  --_radio-size: var(--radio-size, var(--helix-size-checkbox));
+}
+
+/* The row is the button, so the whole of it is the target, which is what the
+   checkbox gets from wrapping itself in a `<label>`. A button gives it here
+   without a label to forward through, because the option is not a form control
+   of its own: the group is. */
+[part="item"] {
+  all: unset;
+  align-items: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--helix-space-xs);
+}
+
+:host([disabled]) [part="item"] {
+  cursor: default;
+}
+
+:host([disabled]) {
+  opacity: 0.5;
+}
+
+/* One cell, both children in it, so the dot is centred in the circle with no
+   offsets to keep in step with the size. */
+[part="box"] {
+  background-color: var(--radio-background-color, var(--helix-color-surface-sunken));
+  block-size: var(--_radio-size);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  /* The one thing that makes this a radio and not a checkbox. */
+  border-radius: var(--helix-radii-full);
+  display: grid;
+  flex: 0 0 auto;
+  inline-size: var(--_radio-size);
+  place-items: center;
+  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:not([disabled])) [part="item"]:hover [part="box"] {
+  border-color: var(--helix-color-border-strong);
+}
+
+/* The edge firms up and takes no colour, which is the checkbox's rule: colour
+   is reserved for state, and being chosen is an answer rather than a state. */
+:host([selected]) [part="box"] {
+  border-color: var(--helix-color-border-strong);
+}
+
+/* A dot rather than a mask, because a circle is a border radius and needs no
+   stencil. Sized as a fraction of the circle so the two stay in proportion at
+   any `--radio-size`. */
+[part="mark"] {
+  background-color: var(--radio-mark-color, var(--helix-color-foreground));
+  block-size: calc(var(--_radio-size) * 0.5);
+  border-radius: var(--helix-radii-full);
+  inline-size: calc(var(--_radio-size) * 0.5);
+  /* Nothing to see until this is the answer. Scaled from the centre rather than
+     faded, so the dot arrives with the weight of a thing being put there. */
+  scale: 0;
+  transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+:host([selected]) [part="mark"] {
+  scale: 1;
+}
+
+/* Offset, because the ring surrounds a circle whose own edge is not moving. */
+[part="item"]:focus-visible [part="box"] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="label"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-tight);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="mark"],
+  [part="box"] {
+    transition: none;
+  }
+}
