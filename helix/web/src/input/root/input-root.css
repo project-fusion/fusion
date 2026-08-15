@@ -24,11 +24,20 @@
 }
 
 /* On the box, because `delegatesFocus` puts focus on the input inside it and a
-   ring around that would sit within the frame rather than around it. */
+ * ring around that would sit within the frame rather than around it.
+ *
+ * One edge, too, not two rings with a gap down the middle.
+ *
+ * The border turns accent and the ring is drawn against it rather than offset
+ * from it, so the two read as a single thicker edge. Offset, they were a blue
+ * line, a dark gap, and a second blue line: the field looked double-struck
+ * rather than focused. The offset is right where a ring surrounds something
+ * that is not itself changing colour, which is most controls, and wrong here
+ * because the border is doing the same job at the same moment. */
 :host(:focus-within) [part="field"] {
   border-color: var(--helix-color-border-accent);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: 0;
 }
 
 :host(:not([disabled])) [part="field"]:hover {

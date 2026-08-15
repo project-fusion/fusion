@@ -2,8 +2,12 @@
   display: block;
 }
 
+/* A hair between rows. They are targets with their own hover and selected
+   surfaces, and stacked flush those surfaces meet and read as one block rather
+   than as a list of things. */
 [part="item"] {
   border-radius: var(--helix-radii-sm);
+  margin-block-end: var(--tree-gap, var(--helix-space-2xs));
   outline: none;
 }
 

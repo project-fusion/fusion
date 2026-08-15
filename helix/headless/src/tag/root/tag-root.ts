@@ -63,7 +63,9 @@ export class HelixBaseTag extends HelixElement {
             aria-label=${this.dismissLabel}
             @click=${this.handleDismiss}
           >
-            <svg viewBox=${x.viewBox} aria-hidden="true">${unsafeSVG(x.content)}</svg>
+            <svg fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">
+              ${unsafeSVG(x.content)}
+            </svg>
           </button>`
           : nothing
       }`

@@ -4,7 +4,6 @@
 # time, regular weight first and then fill, so adding an icon is adding a line
 # rather than finding and pasting an SVG. A name the package does not have is
 # read from raw/, which is where marks that are not Phosphor live.
-
 arrow-left
 arrow-right
 arrow-square-out
@@ -30,6 +29,7 @@ envelope
 eye
 eye-slash
 flask
+folder-open
 funnel-simple
 fusion
 gear
@@ -65,6 +65,9 @@ stop
 strategy
 sun
 tag-simple
+text-b
+text-italic
+trash
 user
 user-circle
 users

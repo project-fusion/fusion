@@ -5,7 +5,15 @@
 /* In the top layer through `popover`, so there is no `z-index` here and nothing
    above it can clip it. `margin: 0` because the UA gives a popover its own, and
    the position written by the controller is measured from the border box. */
+/* A row, so anything slotted in sits on the middle line rather than on the
+   baseline of a text run it is not part of. A plain string is one anonymous
+   item and centres against itself, which is where it already was; an icon
+   beside a word, or a heading over a line of detail, is what moves. */
 [part="tooltip"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-2xs);
+
   background-color: var(--tooltip-background-color, var(--helix-color-surface-inverse));
   border: none;
   border-radius: var(--helix-radii-sm);

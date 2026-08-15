@@ -14,7 +14,15 @@ slot[name="label"]::slotted(*) {
   letter-spacing: var(--helix-tracking-wide);
 }
 
-slot:not([name])::slotted(*) {
+/* The inherited half on the slot, the rest on what was slotted.
+ *
+ * `::slotted()` matches elements and nothing else, so a value written as bare
+ * text between the tags got none of this. Inherited properties set on a slot
+ * reach its assigned nodes through the flattened tree, text nodes included;
+ * anything that is not inherited has to stay on the element, because a text
+ * node has no box to put it on. The blockquote had the same fault and it is
+ * the same fix. */
+slot:not([name]) {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-display);
   font-size: var(--stat-value-size, var(--helix-text-3xl));
@@ -22,7 +30,6 @@ slot:not([name])::slotted(*) {
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
 }
-
 /* On the value's baseline rather than centered against it, so the unit reads as
    part of the figure instead of floating beside it. */
 slot[name="unit"]::slotted(*) {
