@@ -343,10 +343,12 @@ helix-app-header {
 }
 
 /* The panel's tab strip is a bar of the sandbox like the toolbar above it, so
-   it is inset the same amount. Left to the component it had none, and the first
-   tab sat against the window edge while every other bar in the tool started a
-   step in. */
+   it is inset the same amount, on both axes. Left to the component it had
+   neither: the first tab sat against the window edge while every other bar in
+   the tool started a step in, and the row sat hard against the divider above it
+   with its tabs touching the line. */
 helix-sandbox [slot="panel"]::part(tabs) {
+  padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-sm);
 }
 

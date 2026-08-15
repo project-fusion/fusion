@@ -1486,7 +1486,7 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'primary' | 'neutral' | undefined"
+                "text": "'danger' | 'neutral' | undefined"
               },
               "description": "How much attention the mark asks for.",
               "attribute": "appearance",
@@ -1635,7 +1635,7 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'primary' | 'neutral' | undefined"
+                "text": "'danger' | 'neutral' | undefined"
               },
               "description": "How much attention the mark asks for.",
               "fieldName": "appearance"

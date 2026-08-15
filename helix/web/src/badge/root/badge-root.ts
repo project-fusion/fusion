@@ -25,7 +25,7 @@ import { styles } from './badge-root.css.js'
 export class HelixBadge extends HelixBaseBadge {
   /** How much attention the mark asks for. */
   @property({ reflect: true })
-  appearance?: 'primary' | 'neutral'
+  appearance?: 'danger' | 'neutral'
 
   static override styles: CSSResultGroup = styles
 }

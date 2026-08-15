@@ -16,7 +16,7 @@
 
 [part="indicator"] {
   align-items: center;
-  background-color: var(--badge-background-color, var(--helix-color-danger));
+  background-color: var(--badge-background-color, var(--helix-color-primary));
   block-size: var(--_badge-size);
   border-radius: var(--helix-radii-full);
   /* A ring in the page's own color, so the mark stays separate from whatever it
@@ -26,11 +26,16 @@
   display: inline-flex;
   font-size: var(--_badge-text);
   font-weight: var(--helix-weight-semibold);
-  /* Pinned to the corner, then pulled back along both axes. The mark's centre
-     sits on the corner by default, which is right for a square icon and wrong
-     for a circle, where the corner of the box is outside the shape. */
-  inset-block-start: var(--badge-offset, 0px);
-  inset-inline-end: var(--badge-offset, 0px);
+  /* Pinned to the corner, then pulled back along both axes.
+   *
+   * The pullback is the default rather than something to reach for. At zero the
+   * mark's centre sits on the corner of the box, which is only right when the
+   * thing being marked fills its box: on a circle, which is most of what
+   * carries a badge, the corner is outside the shape and the mark floats off
+   * it. There was an example whose whole subject was setting this by hand; it
+   * is gone, because the value it demonstrated is now what you get. */
+  inset-block-start: var(--badge-offset, 9px);
+  inset-inline-end: var(--badge-offset, 9px);
   justify-content: center;
   line-height: 1;
   /* Square at minimum, so a single digit is a circle rather than a sliver. */
@@ -89,8 +94,12 @@
   }
 }
 
-:host([appearance="primary"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-primary));
+/* The alarming one, which is the exception rather than the default. A badge is
+   usually a count of things waiting, and a count is news rather than a warning:
+   red on everything that has unread anything is a page that is always shouting.
+   `primary` is gone, having become the default and so a second name for it. */
+:host([appearance="danger"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-danger));
 }
 
 :host([appearance="neutral"]) [part="indicator"] {
