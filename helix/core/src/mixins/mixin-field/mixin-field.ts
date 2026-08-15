@@ -1,6 +1,6 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
+import type { HelixElement } from '../../helix-element/helix-element.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -98,7 +98,16 @@ export declare class MixinFieldInterface {
 }
 
 /**
- * Grafts a label, help text, and a validation message onto a form control.
+ * Grafts a label, help text, and a validation message onto a control.
+ *
+ * **Over `HelixElement` rather than `HelixFormElement`, because not every
+ * control that wants a label is form-associated.** A checkbox group is the
+ * case: each box in it submits itself already, so the group deliberately
+ * reports no value of its own, and every form-related member of
+ * `ElementInternals` throws `NotSupportedError` on an element that is not
+ * form-associated. Measured, and the ARIA members are fine on the same
+ * element, which is why the naming and describing work there and only the
+ * validity has to ask first.
  *
  * Every form control wants the same three things around it and wants them in a
  * different arrangement: a label above an input, beside a checkbox, and over a
@@ -143,7 +152,7 @@ export declare class MixinFieldInterface {
  * uses. Measured the same way, and the failure is silent either way: the
  * description simply never reaches the accessibility tree.
  */
-export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => {
+export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinFieldInterface deliberately. The interface is
   // what TypeScript consumers see; this class is what the manifest analyzer
   // reads when resolving inherited members into dependent packages.
@@ -190,12 +199,25 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
     @state()
     private touched = false
 
+    /**
+     * Whether this element may be asked about its own validity at all.
+     *
+     * Reading the static the platform itself reads to decide, rather than
+     * probing: `validity` and `validationMessage` throw `NotSupportedError` on
+     * an element that is not form-associated, and a group whose members each
+     * submit themselves is not. Such a control still shows a message, it just
+     * has to be given one.
+     */
+    private get validates(): boolean {
+      return (this.constructor as { formAssociated?: boolean }).formAssociated === true
+    }
+
     /** The message actually shown: the consumer's, or the platform's, or none. */
     get resolvedFeedback(): string {
       if (this.feedback !== '') {
         return this.feedback
       }
-      if (!this.touched || this.internals.validity.valid) {
+      if (!this.validates || !this.touched || this.internals.validity.valid) {
         return ''
       }
       return this.internals.validationMessage

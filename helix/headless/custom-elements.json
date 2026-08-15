@@ -3765,23 +3765,39 @@
           "kind": "class",
           "description": "The host is the group, so `role=\"group\"` sits on it through internals and\n`label` names it. A run of checkboxes with no name is announced as separate\ncontrols, which is what the grouping exists to say it is not.\n\n**Each checkbox still submits itself.** They are form-associated already and\na native group is several inputs sharing a name, so this adds no form value\nof its own: it would submit the same answers twice. What it adds is the\ngrouping, a shared `name` so it is written once, and one place to read and\nwrite the whole set.\n\n`value` is the checked values, comma separated, in the order the boxes are\nwritten. Setting it ticks exactly those and unticks the rest.",
           "name": "HelixBaseCheckboxGroup",
+          "cssParts": [
+            {
+              "description": "The group's name, over the set.",
+              "name": "label"
+            },
+            {
+              "description": "The list itself, which is what `orientation` lays out.",
+              "name": "items"
+            },
+            {
+              "description": "Help under the set.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
+            }
+          ],
           "slots": [
             {
               "description": "The checkboxes.",
               "name": ""
+            },
+            {
+              "description": "Richer than a string, where the label is more than one.",
+              "name": "label"
+            },
+            {
+              "description": "Richer than a string.",
+              "name": "hint"
             }
           ],
           "members": [
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name for the group.",
-              "attribute": "label"
-            },
             {
               "kind": "field",
               "name": "name",
@@ -3828,6 +3844,236 @@
               "privacy": "private",
               "readonly": true,
               "description": "Reads a box's requested change into `value`, and says so once.\n\nThe box is found from the event's target, which does two things. It tells\nthe group which box asked, where the detail carries only the shared name.\nAnd it ignores the group's own dispatch, which lands on this same listener\nbecause the group is what it is dispatched from: without the guard the\ngroup answers itself until the stack gives out.\n\nThe requested state comes from the event rather than from the box. Driving\nthe boxes from `value` makes them controlled, so a controlled box applies\nnothing on its own and reports what it was asked for. Reading `isChecked`\nhere would read the state it still holds and nothing would ever change."
+            },
+            {
+              "kind": "field",
+              "name": "hint",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "attribute": "hint",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "attribute": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hideLabel",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the label names the control without being shown.",
+              "attribute": "hide-label",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The accessible name, and the fallback for the `label` slot.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "touched",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "validates",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolvedFeedback",
+              "type": {
+                "text": "string"
+              },
+              "description": "The message actually shown: the consumer's, or the platform's, or none.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "describedBy",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderGroupLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A label over a set rather than beside a control.\n\nA plain element and not a `<label for>`, because a group is not a single\ncontrol and there is nothing for `for` to point at. What names the group\nis `linkHost`, pointing the host's internals at this element.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.\n\n**Nothing at all when there is no label**, which is the same rule the\nhint and the feedback follow: none of the three is always used, and an\nelement rendered empty is not free. It still generates a box, so it still\ntakes a row of the grid and a gap on either side of it, which is a field\nthat has moved down the page for a label nobody wrote. `nothing` leaves\ncomment markers rather than a node, so the gap has nothing to sit between.\n\nNaming a control without showing the label is `hide-label`, not an empty\none: an unnamed field is a field a screen reader announces as \"edit text\".",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderHint",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "Help under the control, unless something has gone wrong.\n\nThe two share a place rather than stacking, so a field is one line of\nsmall text either way and nothing below it moves when the message\nchanges. What the reader needs at that moment is what is wrong, and a\nhint that survives the error it describes is a second line to read before\ngetting to the one that matters.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The validation message, in the hint's place.\n\n`role=\"alert\"` rather than a live region on the whole field, so what is\nannounced is the message and not the label and help along with it.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "linkHost",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Points the host at its own label and description nodes, for a group.\n\nA control's `<input>` and its hint are both in the shadow root, so a\nplain `aria-describedby` resolves between them. A group's host is in the\nlight DOM and its hint is not, so the IDREF cannot reach and\n`element.ariaDescribedByElements` drops the reference outright. Only the\n`ElementInternals` form keeps it, measured in Chrome 148: two of two\nkept through internals, zero of one through the element.\n\nClient only, and deliberately, because element references need the nodes\nto exist and on the server they do not. The name is therefore also set as\na plain string by the component, which a server can write, and the\nreference here overrides it wherever a consumer slotted something richer\nthan a string. A group with only a property for a label reads the same\neither way.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shownFeedback",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What the last render put on screen, so a change can be noticed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refreshFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-reads the platform's verdict, for a control that has just reported one.\n\nValidity changes through `ElementInternals` rather than through a\nproperty, so nothing schedules an update for it. Worse, the order is\nagainst us: this mixin sits above the control in the prototype chain, so\nits `updated` runs before the control's own, which is where `setValidity`\nis called. Reading the verdict here would always read the previous one,\nwhich is what left a corrected field still showing the error it had\nbefore. So the control says when it has reported, and this schedules the\none further update that needs. It converges because the second pass finds\nnothing changed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
             },
             {
               "kind": "field",
@@ -3911,15 +4157,6 @@
           ],
           "attributes": [
             {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Accessible name for the group.",
-              "fieldName": "label"
-            },
-            {
               "name": "name",
               "type": {
                 "text": "string"
@@ -3936,6 +4173,77 @@
               "default": "''",
               "description": "The checked values, comma separated.",
               "fieldName": "value"
+            },
+            {
+              "name": "hint",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "fieldName": "hint",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "fieldName": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "hide-label",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the label names the control without being shown.",
+              "fieldName": "hideLabel",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The accessible name, and the fallback for the `label` slot.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "fieldName": "required",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinField",
+              "package": "@helix-io/core"
             }
           ],
           "superclass": {
@@ -3946,7 +4254,7 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/checkbox-group",
+            "documentation": "https://helix.fusion.dev/components/checkbox-group\n\n**Its message is always given, never derived.** Every form-related member of\n`ElementInternals` throws on an element that is not form-associated, and this\none is not, on purpose: the boxes submit themselves. So `feedback` is what\nshows here, and the browser has nothing to say about a set it does not know\nis a set.",
             "aliases": [
               "Checkbox list",
               "Multi-select"
@@ -4360,6 +4668,20 @@
               "privacy": "private",
               "default": "false",
               "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "validates",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -6374,6 +6696,20 @@
               "privacy": "private",
               "default": "false",
               "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "validates",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -10791,6 +11127,20 @@
               "privacy": "private",
               "default": "false",
               "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "validates",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"

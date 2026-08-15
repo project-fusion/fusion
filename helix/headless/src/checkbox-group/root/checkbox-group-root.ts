@@ -1,4 +1,4 @@
-import { customElement, HelixChangeEvent, HelixElement } from '@helix-io/core'
+import { customElement, HelixChangeEvent, HelixElement, MixinField } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
@@ -25,16 +25,25 @@ import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @aliases Checkbox list, Multi-select
  * @documentation https://helix.fusion.dev/components/checkbox-group
  *
+ * **Its message is always given, never derived.** Every form-related member of
+ * `ElementInternals` throws on an element that is not form-associated, and this
+ * one is not, on purpose: the boxes submit themselves. So `feedback` is what
+ * shows here, and the browser has nothing to say about a set it does not know
+ * is a set.
+ *
  * @slot - The checkboxes.
+ * @slot label - Richer than a string, where the label is more than one.
+ * @slot hint - Richer than a string.
+ *
+ * @csspart label - The group's name, over the set.
+ * @csspart items - The list itself, which is what `orientation` lays out.
+ * @csspart hint - Help under the set.
+ * @csspart feedback - What is wrong with it.
  *
  * @event {HelixChangeEvent} helix-change - Fired when any box changes, with the whole set.
  */
 @customElement('helix-base-checkbox-group')
-export class HelixBaseCheckboxGroup extends HelixElement {
-  /** Accessible name for the group. */
-  @property()
-  label = ''
-
+export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
   /** Name submitted with the form, given to every box that has none. */
   @property()
   name = ''
@@ -121,16 +130,25 @@ export class HelixBaseCheckboxGroup extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.role = 'group'
+    /* A string as well as the element reference `linkHost` sets, because this
+       is the half a server can write. */
     this.internals.ariaLabel = this.label || null
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.sync()
+    this.linkHost()
   }
 
   protected override render(): TemplateResult {
-    return html`<slot></slot>`
+    /* The list is an element of its own, because the label and the hint are the
+       host's children too and `orientation` lays out whatever is in the flex
+       container. On the host, a horizontal group would have put its own label
+       in the row beside the first box. */
+    return html`${this.renderGroupLabel()}
+      <div part="items"><slot></slot></div>
+      ${this.renderHint()}${this.renderFeedback()}`
   }
 }
 

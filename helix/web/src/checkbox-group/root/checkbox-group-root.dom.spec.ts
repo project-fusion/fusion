@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role, slotted } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role, slotted } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -97,5 +97,54 @@ describe('checkbox group', () => {
 
   test('the boxes stay the elements the consumer wrote', async () => {
     expect(slotted(await group())).toHaveLength(3)
+  })
+})
+
+describe('checkbox group as a field', () => {
+  const settle = async (host: Updatable): Promise<void> => {
+    while ((await host.updateComplete) === false) {
+      // Another update was requested while the last one was finishing.
+    }
+  }
+
+  test('the group is named and described by its own nodes', async () => {
+    /* Through `ElementInternals`, which is the only form that works here: the
+       host is in the light DOM and its label is in the shadow root, so an IDREF
+       cannot reach and the plain element reflection drops the reference. */
+    const host = (await mount(
+      '<helix-checkbox-group label="Label" hint="Hint"><helix-checkbox value="a">A</helix-checkbox></helix-checkbox-group>',
+    )) as Updatable & { internals: ElementInternals }
+    await settle(host)
+
+    expect(host.internals.role).toBe('group')
+    expect(host.internals.ariaLabelledByElements?.[0]?.textContent?.trim()).toBe('Label')
+    expect(host.internals.ariaDescribedByElements?.[0]?.textContent?.trim()).toBe('Hint')
+  })
+
+  test('its message is given, never derived', async () => {
+    /* Every form-related member of `ElementInternals` throws
+       `NotSupportedError` on an element that is not form-associated, and this
+       group is not, on purpose: the boxes submit themselves. So asking it about
+       its own validity would throw rather than return nothing, which is why the
+       mixin asks whether the element is form-associated before it asks the
+       platform anything. */
+    const host = (await mount(
+      '<helix-checkbox-group label="L" hint="H" feedback="Pick at least one"><helix-checkbox value="a">A</helix-checkbox></helix-checkbox-group>',
+    )) as Updatable
+    await settle(host)
+
+    expect((part(host, 'feedback') as HTMLElement).textContent?.trim()).toBe('Pick at least one')
+    expect(part(host, 'hint')).toBeNull()
+  })
+
+  test('orientation lays out the boxes, not the field', async () => {
+    // On the host it laid out the label too, so a horizontal group put its own
+    // name in the row beside the first box.
+    const host = await mount(
+      '<helix-checkbox-group label="L" orientation="horizontal"><helix-checkbox value="a">A</helix-checkbox></helix-checkbox-group>',
+    )
+    const items = part(host, 'items') as HTMLElement
+    const label = part(host, 'label') as HTMLElement
+    expect(items.contains(label)).toBe(false)
   })
 })

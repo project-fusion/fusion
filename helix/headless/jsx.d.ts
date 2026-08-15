@@ -805,24 +805,44 @@ export type HelixBaseCheckboxGroupHelixChangeElementEvent =
   HelixBaseCheckboxGroupElementEvent<HelixChangeEvent>;
 
 export type HelixBaseCheckboxGroupProps = {
-  /** Accessible name for the group. */
-  label?: HelixBaseCheckboxGroup["label"];
   /** Name submitted with the form, given to every box that has none. */
   name?: HelixBaseCheckboxGroup["name"];
   /** The checked values, comma separated. */
   value?: HelixBaseCheckboxGroup["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseCheckboxGroup["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseCheckboxGroup["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixBaseCheckboxGroup["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixBaseCheckboxGroup["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseCheckboxGroup["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseCheckboxGroup["required"];
 
   /** Fired when any box changes, with the whole set. */
   "onhelix-change"?: (e: HelixBaseCheckboxGroupHelixChangeElementEvent) => void;
 };
 
 export type HelixBaseCheckboxGroupSolidJsProps = {
-  /** Accessible name for the group. */
-  "prop:label"?: HelixBaseCheckboxGroup["label"];
   /** Name submitted with the form, given to every box that has none. */
   "prop:name"?: HelixBaseCheckboxGroup["name"];
   /** The checked values, comma separated. */
   "prop:value"?: HelixBaseCheckboxGroup["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseCheckboxGroup["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseCheckboxGroup["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixBaseCheckboxGroup["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixBaseCheckboxGroup["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseCheckboxGroup["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseCheckboxGroup["required"];
   /** Fired when any box changes, with the whole set. */
   "on:helix-change"?: (
     e: HelixBaseCheckboxGroupHelixChangeElementEvent,
@@ -2824,10 +2844,20 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `label`: Accessible name for the group.
    * - `name`: Name submitted with the form, given to every box that has none.
    * - `value`: The checked values, comma separated.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    *
    * ## Events
    *
@@ -2840,6 +2870,17 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The checkboxes.
+   * - `label`: Richer than a string, where the label is more than one.
+   * - `hint`: Richer than a string.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The group's name, over the set.
+   * - `items`: The list itself, which is what `orientation` lays out.
+   * - `hint`: Help under the set.
+   * - `feedback`: What is wrong with it.
    */
   "helix-base-checkbox-group": Partial<
     HelixBaseCheckboxGroupProps & BaseProps<HelixBaseCheckboxGroup> & BaseEvents
@@ -5031,10 +5072,20 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `label`: Accessible name for the group.
    * - `name`: Name submitted with the form, given to every box that has none.
    * - `value`: The checked values, comma separated.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
    *
    * ## Events
    *
@@ -5047,6 +5098,17 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The checkboxes.
+   * - `label`: Richer than a string, where the label is more than one.
+   * - `hint`: Richer than a string.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The group's name, over the set.
+   * - `items`: The list itself, which is what `orientation` lays out.
+   * - `hint`: Help under the set.
+   * - `feedback`: What is wrong with it.
    */
   "helix-base-checkbox-group": Partial<
     HelixBaseCheckboxGroupProps &
