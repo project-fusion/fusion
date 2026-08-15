@@ -1,16 +1,19 @@
+/* On the host, which is the box. These named `[part="container"]`, a wrapper
+   this component does not render: its markup is a bare slot. So the accordion
+   had no border and no corner radius, and `appearance="plain"` did nothing,
+   which is the same fault the card had and neither showed up as anything but a
+   component quietly not looking like itself. Found by `check:selectors` on its
+   first run. */
 :host {
-  display: block;
-}
-
-[part="container"] {
   border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
   border-radius: var(--accordion-radii, var(--helix-radii-md));
+  display: block;
   /* Clips each item's square corners to the stack's radius, so no item needs
      to know whether it is first or last. */
   overflow: hidden;
 }
 
-:host([appearance="plain"]) [part="container"] {
+:host([appearance="plain"]) {
   border-color: transparent;
   border-radius: var(--helix-radii-none);
 }

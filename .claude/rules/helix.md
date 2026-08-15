@@ -197,6 +197,18 @@ tokens are the scale and never move; the unsuffixed ones are the current step.
 `data-link-size` stays. A text link has no control height: its size is
 typography, and it follows the text around it.
 
+**A `[part=]` selector for a part nothing renders fails silently.** It is valid
+CSS that matches nothing, so there is no error, no warning, and no clue beyond
+the feature quietly not happening. `bun run check:selectors` catches it, and it
+found two: Card's `orientation="horizontal"` had done nothing since the refactor
+that moved its container onto the host, and the Accordion had no border, no
+corner radius, and a dead `appearance="plain"` for the same reason.
+
+Parts resolve through `extends`, because a styled component usually renders none
+of its own. Comments are stripped from both the CSS and the source first: the
+base card's JSDoc quotes the very wrapper it does not render, and reading it in
+made the check pass on the bug it was written for.
+
 **`all: unset` takes `box-sizing` with it.** Shadow roots get `border-box` from
 `HelixElement.finalizeStyles`, and a rule that unsets everything outranks it, so
 the element silently reverts to `content-box`. Restore it in the same rule:
