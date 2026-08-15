@@ -3831,6 +3831,13 @@
             },
             {
               "kind": "field",
+              "name": "cascade",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new DisabledCascadeController(this, { items: () => this.boxes, })"
+            },
+            {
+              "kind": "field",
               "name": "boxes",
               "type": {
                 "text": "HelixBaseCheckbox[]"
@@ -7859,6 +7866,13 @@
             },
             {
               "kind": "field",
+              "name": "cascade",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new DisabledCascadeController(this, { items: () => this.options, })"
+            },
+            {
+              "kind": "field",
               "name": "options",
               "type": {
                 "text": "HelixBaseOption[]"
@@ -10383,6 +10397,13 @@
               "privacy": "protected",
               "readonly": true,
               "default": "new KeyboardNavigationController(this, { items: () => this.items })"
+            },
+            {
+              "kind": "field",
+              "name": "cascade",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new DisabledCascadeController(this, { items: () => this.items, })"
             },
             {
               "kind": "field",
@@ -16849,6 +16870,13 @@
               "privacy": "protected",
               "readonly": true,
               "default": "new KeyboardNavigationController(this, { items: () => this.items })"
+            },
+            {
+              "kind": "field",
+              "name": "cascade",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new DisabledCascadeController(this, { items: () => this.items, })"
             },
             {
               "kind": "field",

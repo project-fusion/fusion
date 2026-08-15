@@ -1,10 +1,10 @@
 import {
   customElement,
+  DisabledCascadeController,
   HelixChangeEvent,
   HelixFormElement,
   type HelixSelectEvent,
   hostAria,
-  inheritDisabled,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -71,6 +71,14 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
      a consumer would reach for it. */
   protected readonly keys = new KeyboardNavigationController(this, { items: () => this.items })
 
+  /* Stated once, and the group never thinks about it again. See the
+     controller: the cascade was four hand calls from four different
+     methods, so which paths reached it differed by component and a fifth
+     group would have got none at all. */
+  protected readonly cascade = new DisabledCascadeController(this, {
+    items: () => this.items,
+  })
+
   /** The radios, in light-DOM order. Client only: the server has no tree. */
   get items(): HelixBaseRadio[] {
     return [...this.children].filter(
@@ -100,11 +108,6 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
   /** Writes the answer onto the items, and nothing onto the host. */
   private place(): void {
     const items = this.items
-    /* A group out of play takes its choices with it, and gives them back when
-       it is not. `disabled` is the one property here with two sources, the
-       group and the item, so it is the one that has to remember which said
-       what. */
-    inheritDisabled(this.disabled, items)
     for (const item of items) {
       item.selected = item.value === this.value
     }

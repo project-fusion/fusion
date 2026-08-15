@@ -1,10 +1,10 @@
 import {
   customElement,
+  DisabledCascadeController,
   HelixChangeEvent,
   HelixFormElement,
   type HelixSelectEvent,
   hostAria,
-  inheritDisabled,
   MixinControllerValue,
   MixinField,
   scrollItemIntoView,
@@ -104,6 +104,14 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
    */
   @state()
   private hasMatches = true
+
+  /* Stated once, and the group never thinks about it again. See the
+     controller: the cascade was four hand calls from four different
+     methods, so which paths reached it differed by component and a fifth
+     group would have got none at all. */
+  protected readonly cascade = new DisabledCascadeController(this, {
+    items: () => this.options,
+  })
 
   /**
    * Every option, in the order a reader meets them.
@@ -260,7 +268,6 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
       option.hidden = needle !== '' && !option.text.toLowerCase().includes(needle)
       option.selected = chosen.has(option.value)
     }
-    inheritDisabled(this.disabled, this.options)
 
     /* A group whose options the filter has all hidden goes with them. CSS
        cannot do this: a heading and its options are siblings under the group,

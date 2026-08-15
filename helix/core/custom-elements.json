@@ -4,6 +4,83 @@
   "modules": [
     {
       "kind": "javascript-module",
+      "path": "src/controllers/disabled-cascade-controller/disabled-cascade-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Pushes a group's `disabled` onto its members, on every update, unasked.\n\n**The cascade itself is `inheritDisabled`, and this is what makes it\nautomatic.** Four groups called that function by hand from inside whichever\nmethod they happened to use for writing to their items: `place` in two of\nthem, `sync` in a third, `place` again in the fourth. That works, and it is\nthe wrong shape for three reasons.\n\nIt runs when that method runs. A group whose items changed without going\nthrough it left them holding the last answer, and which paths reach it is a\ndifferent set in each of the four.\n\nIt has to be remembered. A fifth group gets no cascade at all, and nothing\nsays so: the property exists, the attribute reflects, and the members simply\nignore it. That is the failure this exists to make impossible, because it is\ninvisible in review and only shows up when someone disables a set.\n\nAnd it adds no API. A group already has `disabled`, from `HelixFormElement`\nor from the consumer; nothing here introduces a property or a method for\nanyone to call. By this repo's own rule that makes it a controller and not a\nmixin: it reacts to a lifecycle and nothing else.\n\nSo a group states its members once, at construction, and never thinks about\nit again:\n\n    new DisabledCascadeController(this, { items: () => this.items })\n\n**Runs after every render, and on every `slotchange`.** The second half is\nnot an extra: a member arriving in the light DOM changes no property, so Lit\nschedules nothing, and a render-only cascade leaves a member slotted into an\nalready-disabled group enabled. Measured before it was added, on a radio\ngroup holding two disabled members with a third inserted: `110`, and the\nthird was live in a set nobody could use.\n\nThe listener is on the render root rather than on the host, because\n`slotchange` bubbles but is not composed: it reaches the shadow root that\nowns the slot and stops there. On the host it would never fire at all.\n\nAfter render rather than before, because the items are read from the DOM and\na newly slotted member is not there until the render that assigns it.\n\nIdempotent, so running on every update costs a comparison per member and\nnothing else: `inheritDisabled` writes only where the answer changed and\nremembers what each member said for itself, which is what lets a group be\nre-enabled without freeing a member that was disabled on its own.",
+          "name": "DisabledCascadeController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "host",
+              "type": {
+                "text": "DisableableHost"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "host"
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "() => DisableableItem[]"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "items"
+            },
+            {
+              "kind": "field",
+              "name": "cascade",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "hostConnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostUpdated",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DisabledCascadeController",
+          "declaration": {
+            "name": "DisabledCascadeController",
+            "module": "src/controllers/disabled-cascade-controller/disabled-cascade-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/controllers/dismiss-controller/dismiss-controller.ts",
       "declarations": [
         {
@@ -835,6 +912,22 @@
       "path": "src/index.ts",
       "declarations": [],
       "exports": [
+        {
+          "kind": "js",
+          "name": "DisabledCascadeController",
+          "declaration": {
+            "name": "DisabledCascadeController",
+            "module": "./controllers/disabled-cascade-controller/disabled-cascade-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "DisabledCascadeOptions",
+          "declaration": {
+            "name": "DisabledCascadeOptions",
+            "module": "./controllers/disabled-cascade-controller/disabled-cascade-controller.js"
+          }
+        },
         {
           "kind": "js",
           "name": "DismissController",

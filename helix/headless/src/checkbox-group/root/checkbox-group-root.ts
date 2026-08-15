@@ -1,9 +1,9 @@
 import {
   customElement,
+  DisabledCascadeController,
   HelixChangeEvent,
   HelixElement,
   hostAria,
-  inheritDisabled,
   MixinField,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -70,6 +70,14 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
   @property()
   value = ''
 
+  /* Stated once, and the group never thinks about it again. See the
+     controller: the cascade was four hand calls from four different
+     methods, so which paths reached it differed by component and a fifth
+     group would have got none at all. */
+  protected readonly cascade = new DisabledCascadeController(this, {
+    items: () => this.boxes,
+  })
+
   /** The boxes, in light-DOM order. Client only: the server has no tree. */
   get boxes(): HelixBaseCheckbox[] {
     return [...this.children].filter(
@@ -85,8 +93,6 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
    * reports and does not patch up. A box that names itself keeps its own.
    */
   private sync(): void {
-    // See the radio group's note: the one property with two sources.
-    inheritDisabled(this.disabled, this.boxes)
     const wanted = new Set(
       this.value
         .split(',')

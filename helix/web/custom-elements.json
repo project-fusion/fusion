@@ -5467,6 +5467,17 @@
             },
             {
               "kind": "field",
+              "name": "cascade",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new DisabledCascadeController(this, { items: () => this.boxes, })",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "boxes",
               "type": {
                 "text": "HelixBaseCheckbox[]"
@@ -11280,6 +11291,17 @@
             },
             {
               "kind": "field",
+              "name": "cascade",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new DisabledCascadeController(this, { items: () => this.options, })",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "options",
               "type": {
                 "text": "HelixBaseOption[]"
@@ -14428,6 +14450,17 @@
               "privacy": "protected",
               "readonly": true,
               "default": "new KeyboardNavigationController(this, { items: () => this.items })",
+              "inheritedFrom": {
+                "name": "HelixBaseRadioGroup",
+                "module": "src/radio/group/radio-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "cascade",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new DisabledCascadeController(this, { items: () => this.items, })",
               "inheritedFrom": {
                 "name": "HelixBaseRadioGroup",
                 "module": "src/radio/group/radio-group.ts"
@@ -22348,6 +22381,17 @@
               "privacy": "protected",
               "readonly": true,
               "default": "new KeyboardNavigationController(this, { items: () => this.items })",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "cascade",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new DisabledCascadeController(this, { items: () => this.items, })",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"

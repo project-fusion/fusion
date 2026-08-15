@@ -1,8 +1,8 @@
 import {
   customElement,
+  DisabledCascadeController,
   HelixFormElement,
   hostAria,
-  inheritDisabled,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -73,6 +73,14 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
      a consumer would reach for it. */
   protected readonly keys = new KeyboardNavigationController(this, { items: () => this.items })
 
+  /* Stated once, and the group never thinks about it again. See the
+     controller: the cascade was four hand calls from four different
+     methods, so which paths reached it differed by component and a fifth
+     group would have got none at all. */
+  protected readonly cascade = new DisabledCascadeController(this, {
+    items: () => this.items,
+  })
+
   private get items(): HelixBaseToggle[] {
     return [...this.children].filter(
       (child): child is HelixBaseToggle => child instanceof HelixBaseToggle,
@@ -107,8 +115,6 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
    */
   private place(): void {
     const items = this.items
-    // See the radio group's note: the one property with two sources.
-    inheritDisabled(this.disabled, items)
     /* The shared resolver rather than the line it replaces, which took the
        first item whatever it was: a group opening on a disabled segment marked
        it as chosen. Not through `MixinControllerActive`, because this value is

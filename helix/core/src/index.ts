@@ -1,4 +1,8 @@
 export {
+  DisabledCascadeController,
+  type DisabledCascadeOptions,
+} from './controllers/disabled-cascade-controller/disabled-cascade-controller.js'
+export {
   DismissController,
   type DismissOptions,
 } from './controllers/dismiss-controller/dismiss-controller.js'
