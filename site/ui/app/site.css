@@ -342,14 +342,29 @@ helix-app-header {
   padding-inline: var(--helix-space-sm);
 }
 
-/* The panel's tab strip is a bar of the sandbox like the toolbar above it, so
-   it is inset the same amount, on both axes. Left to the component it had
-   neither: the first tab sat against the window edge while every other bar in
-   the tool started a step in, and the row sat hard against the divider above it
-   with its tabs touching the line. */
+/* The panel is a bar and a console, and the two take opposite sides of a line.
+ *
+ * The strip is chrome like the toolbar above it: the page's own colour, inset
+ * the same amount on both axes, with a rule under it marking where the chrome
+ * stops. Tabs draw no rule by default, which is right for a tab set in a page
+ * and wrong for one that is the header of a region.
+ *
+ * The console is the only part of the sandbox that is not the page. That is
+ * what makes it read as output rather than as another pane, and it is why the
+ * fill sits here rather than on the slot: a fill on the slot took the strip
+ * with it. */
 helix-sandbox [slot="panel"]::part(tabs) {
+  /* Said, not left to show through. Transparent looks the same here because the
+     sandbox behind it is the page, and it would stop looking the same the
+     moment anything were put between them. */
+  background-color: var(--helix-color-background);
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-sm);
+}
+
+helix-sandbox [slot="panel"]::part(panels) {
+  background-color: var(--helix-color-surface);
 }
 
 .examplesScroll {
