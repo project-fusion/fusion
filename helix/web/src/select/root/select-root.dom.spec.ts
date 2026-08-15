@@ -30,6 +30,17 @@ const select = async (extra = ''): Promise<Updatable> => {
   return host
 }
 
+/* The panel is positioned in a microtask after the render that reveals it, so
+   a spec that reads straight after `updateComplete` sees the stylesheet's
+   position and not the controller's. Waiting on the flag rather than on a timer
+   keeps it honest: if placement never happens this hangs and is reported,
+   rather than passing because a guessed delay happened to be long enough. */
+const placed = async (surface: HTMLElement): Promise<void> => {
+  for (let attempt = 0; attempt < 50 && !surface.hasAttribute('data-placed'); attempt += 1) {
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+  }
+}
+
 const trigger = (host: Updatable): HTMLElement =>
   part(host as HTMLElement, 'trigger') as HTMLElement
 const shown = (host: Updatable): string =>
@@ -100,7 +111,10 @@ if (hasLayout()) {
     // it ran is `position: fixed`, which the controller writes inline and the
     // stylesheet does not: the sheet says `absolute`.
     const host = (await select('open')) as unknown as HTMLElement
-    expect((part(host, 'surface') as HTMLElement).style.position).toBe('fixed')
+    const surface = part(host, 'surface') as HTMLElement
+    // Placement is async, so this waits for the flag rather than for a render.
+    await placed(surface)
+    expect(surface.style.position).toBe('fixed')
   })
 
   test('the panel takes the trigger"s width, and the content is its floor', async () => {
@@ -110,6 +124,7 @@ if (hasLayout()) {
     const host = (await select('open')) as unknown as HTMLElement
     const surface = part(host, 'surface') as HTMLElement
     const trigger = part(host, 'trigger') as HTMLElement
+    await placed(surface)
     const style = getComputedStyle(surface)
     expect(style.minInlineSize).toBe('max-content')
     expect(style.paddingInline).toBe('0px')
@@ -124,6 +139,7 @@ if (hasLayout()) {
     // the anchor's width and the stylesheet reads that instead.
     const host = (await select('open')) as unknown as HTMLElement
     const surface = part(host, 'surface') as HTMLElement
+    await placed(surface)
     expect(surface.style.getPropertyValue('--floating-anchor-width')).toMatch(/^\d+px$/)
   })
 

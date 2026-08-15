@@ -96,6 +96,18 @@
   z-index: var(--helix-layer-overlay);
 }
 
+/* Shown and placed are two different moments, and this waits for the second.
+   The controller positions asynchronously, so a panel revealed by the render
+   sits at its stylesheet's position for one frame first. Opacity rather than
+   `visibility`, so the panel still has a box for the controller to measure. */
+[part="surface"] {
+  opacity: 0;
+}
+
+[part="surface"][data-placed] {
+  opacity: 1;
+}
+
 [part="surface"][hidden] {
   display: none;
 }

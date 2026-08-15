@@ -115,6 +115,9 @@ const same = (a: unknown, b: unknown): boolean => {
 
 interface Matchers {
   toBe: (expected: unknown) => void
+  toBeDefined: () => void
+  toBeTruthy: () => void
+  toBeUndefined: () => void
   toBeGreaterThan: (expected: number) => void
   toBeGreaterThanOrEqual: (expected: number) => void
   toBeLessThan: (expected: number) => void
@@ -123,6 +126,7 @@ interface Matchers {
   toContain: (expected: unknown) => void
   toEqual: (expected: unknown) => void
   toHaveLength: (expected: number) => void
+  toMatch: (expected: RegExp | string) => void
 }
 
 const build = (actual: unknown, negated: boolean): Matchers => {
@@ -135,6 +139,12 @@ const build = (actual: unknown, negated: boolean): Matchers => {
   }
   /* The comparisons exist for geometry, which is the one thing only this
      harness can answer, and every one of them is a fact about a measurement.
+
+     The rest of the list is whatever the specs use, and it is not guesswork:
+     `bun:test` has every matcher, so a spec written against it type-checks and
+     passes under happy-dom, then dies here on a name this object never had.
+     Three of the six failures in the first browser run were exactly that, and
+     said nothing at all about the components under test.
      `actual` is cast rather than checked: a spec comparing something that is not
      a number has a bug the assertion should not be papering over, and `NaN`
      fails every comparison, which is the right answer for a rectangle that was
@@ -142,11 +152,14 @@ const build = (actual: unknown, negated: boolean): Matchers => {
   const number = actual as number
   return {
     toBe: (expected) => check(Object.is(actual, expected), `to be ${show(expected)}`),
+    toBeDefined: () => check(actual !== undefined, 'to be defined'),
     toBeGreaterThan: (expected) => check(number > expected, `to be greater than ${expected}`),
     toBeGreaterThanOrEqual: (expected) => check(number >= expected, `to be at least ${expected}`),
     toBeLessThan: (expected) => check(number < expected, `to be less than ${expected}`),
     toBeLessThanOrEqual: (expected) => check(number <= expected, `to be at most ${expected}`),
     toBeNull: () => check(actual === null, 'to be null'),
+    toBeTruthy: () => check(Boolean(actual), 'to be truthy'),
+    toBeUndefined: () => check(actual === undefined, 'to be undefined'),
     toContain: (expected) => {
       const held =
         typeof actual === 'string'
@@ -158,6 +171,10 @@ const build = (actual: unknown, negated: boolean): Matchers => {
     toHaveLength: (expected) => {
       const length = (actual as { length?: number } | null)?.length
       check(length === expected, `to have length ${expected}, and it has ${show(length)}`)
+    },
+    toMatch: (expected) => {
+      const pattern = typeof expected === 'string' ? new RegExp(expected) : expected
+      check(typeof actual === 'string' && pattern.test(actual), `to match ${show(expected)}`)
     },
   }
 }

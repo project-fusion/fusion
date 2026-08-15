@@ -4,6 +4,17 @@ import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './select-root.css.js'
+/* Side-effect imports, because this renders `<helix-listbox>` in its own shadow
+   root and a custom element registers on import. Without them a consumer who
+   imported `@helix-io/web/select` and nothing else got a select whose panel
+   never upgraded: an unknown element with unstyled options inside it, and no
+   error anywhere, because an unknown element is legal HTML.
+ 
+   The same rule the React wrappers follow, for the same reason. It surfaced
+   first as a spec that passed in the suite and failed alone, which is what a
+   missing registration looks like when some other file happens to supply it. */
+import '../../listbox/index.js'
+import '../../option/index.js'
 
 /**
  * @summary A closed list that opens to be chosen from.

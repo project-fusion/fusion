@@ -58,3 +58,27 @@ jobs:
       # "never writes" rule checkable instead of stated.
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
+
+  # A separate job, because it needs a browser and `verify` deliberately does
+  # not: everything in `verify` runs anywhere bun runs. These are the specs
+  # behind `hasLayout()`, which happy-dom skips because it has no boxes, and
+  # they are the ones worth most: a component can render perfect markup in the
+  # wrong place and no DOM without layout will ever say so.
+  browser-specs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+
+      - run: bun install --frozen-lockfile
+
+      # `--with-deps` installs the shared libraries as well as the browser. A
+      # headless browser in CI fails on a missing `libnss3` far more often than
+      # on anything to do with the tests.
+      - run: bunx playwright install --with-deps chromium
+
+      - run: bun run specs:browser

@@ -113,6 +113,7 @@ export class FloatingController implements ReactiveController {
   stop(): void {
     this.cleanup?.()
     this.cleanup = undefined
+    this.options.floating()?.removeAttribute('data-placed')
   }
 
   /** Measures both elements and writes the position. */
@@ -187,6 +188,19 @@ export class FloatingController implements ReactiveController {
         transform: `translate(${Math.round(x)}px, ${Math.round(y)}px)`,
       })
       floating.setAttribute('data-placement', placement)
+      /* Placed, and it is a separate fact from shown. `computePosition` is
+         async, so between the render that reveals a panel and the microtask
+         that positions it there is a frame where the panel is visible at
+         whatever its stylesheet said, which for an absolutely positioned one
+         with no offsets is its host's top-left. Measured on the select: the
+         panel appeared 24px up and to the left of the trigger for one frame on
+         the first open, and looked correct on every open after, because the
+         inline styles from last time were still on it.
+
+         A panel that wants to fade in on placement selects on this. Nothing has
+         to: `data-placement` has been written here all along and this is its
+         pair, so a component that ignores both is exactly as it was. */
+      floating.setAttribute('data-placed', '')
 
       const point = middlewareData.arrow
       if (pointer && point) {
