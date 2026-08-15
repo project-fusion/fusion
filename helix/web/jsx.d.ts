@@ -24,6 +24,7 @@ import type {
   HelixDrawer,
   HelixEmptyState,
   HelixFlex,
+  HelixFormElement,
   HelixGrid,
   HelixIcon,
   HelixIconButton,
@@ -901,6 +902,13 @@ export type HelixCheckboxGroupProps = {
   label?: HelixCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixCheckboxGroup["required"];
+  /** Whether the whole set is out of play.
+
+Its own property rather than an inherited one, because this group is not
+form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+are each form-associated and have their own, which is exactly why the two
+have to be reconciled rather than simply written over. */
+  disabled?: HelixCheckboxGroup["disabled"];
   /** Name submitted with the form, given to every box that has none. */
   name?: HelixCheckboxGroup["name"];
   /** The checked values, comma separated. */
@@ -925,6 +933,13 @@ export type HelixCheckboxGroupSolidJsProps = {
   "prop:label"?: HelixCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixCheckboxGroup["required"];
+  /** Whether the whole set is out of play.
+
+Its own property rather than an inherited one, because this group is not
+form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+are each form-associated and have their own, which is exactly why the two
+have to be reconciled rather than simply written over. */
+  "prop:disabled"?: HelixCheckboxGroup["disabled"];
   /** Name submitted with the form, given to every box that has none. */
   "prop:name"?: HelixCheckboxGroup["name"];
   /** The checked values, comma separated. */
@@ -3199,6 +3214,12 @@ export type CustomElements = {
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the whole set is out of play.
+   *
+   * Its own property rather than an inherited one, because this group is not
+   * form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+   * are each form-associated and have their own, which is exactly why the two
+   * have to be reconciled rather than simply written over.
    * - `name`: Name submitted with the form, given to every box that has none.
    * - `value`: The checked values, comma separated.
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
@@ -5713,6 +5734,12 @@ export type CustomElementsSolidJs = {
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the whole set is out of play.
+   *
+   * Its own property rather than an inherited one, because this group is not
+   * form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+   * are each form-associated and have their own, which is exactly why the two
+   * have to be reconciled rather than simply written over.
    * - `name`: Name submitted with the form, given to every box that has none.
    * - `value`: The checked values, comma separated.
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)

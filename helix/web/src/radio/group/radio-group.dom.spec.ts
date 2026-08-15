@@ -141,3 +141,55 @@ describe('radio group as a field', () => {
     expect(items.contains(part(host, 'label') as HTMLElement)).toBe(false)
   })
 })
+
+describe('radio group disabled cascades', () => {
+  const withDisabled = async (): Promise<Updatable> => {
+    document.body.innerHTML = `<helix-radio-group label="L" name="c">
+      <helix-radio value="one">One</helix-radio>
+      <helix-radio disabled value="two">Two</helix-radio>
+    </helix-radio-group>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    return host
+  }
+
+  test('a disabled group takes every choice with it', async () => {
+    const host = (await withDisabled()) as Updatable & { disabled: boolean }
+    host.disabled = true
+    await settle(host)
+    expect(
+      options(host).map((item) => (item as unknown as { disabled: boolean }).disabled),
+    ).toEqual([true, true])
+  })
+
+  test('enabling it gives each choice back its own answer', async () => {
+    /* The latch, and the reason this is a util rather than a line.
+       `item.disabled = group || item.disabled` writes `true` onto every item on
+       the first pass, reads its own writing back as the item's own answer on
+       the next, and leaves the whole set disabled for good. Nothing shows it
+       until something re-enables a group, which is rare enough to ship. */
+    const host = (await withDisabled()) as Updatable & { disabled: boolean }
+    host.disabled = true
+    await settle(host)
+    host.disabled = false
+    await settle(host)
+
+    const state = options(host).map((item) => (item as unknown as { disabled: boolean }).disabled)
+    expect(state).toEqual([false, true])
+  })
+
+  test('a choice disabled by the consumer afterwards stays its own', async () => {
+    // Once the group has let go it stops holding a record, so a later change is
+    // the consumer's and is left alone.
+    const host = (await withDisabled()) as Updatable & { disabled: boolean }
+    host.disabled = true
+    await settle(host)
+    host.disabled = false
+    await settle(host)
+
+    const [first] = options(host) as unknown as { disabled: boolean }[]
+    first.disabled = true
+    await settle(host)
+    expect(first.disabled).toBe(true)
+  })
+})

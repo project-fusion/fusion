@@ -56,6 +56,11 @@ export {
 } from './utils/focusable-elements/focusable-elements.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export {
+  type DisableableItem,
+  forgetDisabled,
+  inheritDisabled,
+} from './utils/inherit-disabled/inherit-disabled.js'
+export {
   type ControlledChangeOptions,
   requestControlledChange,
 } from './utils/request-controlled-change/request-controlled-change.js'

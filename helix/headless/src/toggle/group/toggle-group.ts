@@ -2,6 +2,7 @@ import {
   customElement,
   HelixFormElement,
   hostAria,
+  inheritDisabled,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -105,6 +106,8 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
    */
   private place(): void {
     const items = this.items
+    // See the radio group's note: the one property with two sources.
+    inheritDisabled(this.disabled, items)
     const active = items.find((item) => item.value === this.value) ?? items[0]
     for (const item of items) {
       item.selected = item === active

@@ -807,6 +807,13 @@ export type HelixBaseCheckboxGroupHelixChangeElementEvent =
   HelixBaseCheckboxGroupElementEvent<HelixChangeEvent>;
 
 export type HelixBaseCheckboxGroupProps = {
+  /** Whether the whole set is out of play.
+
+Its own property rather than an inherited one, because this group is not
+form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+are each form-associated and have their own, which is exactly why the two
+have to be reconciled rather than simply written over. */
+  disabled?: HelixBaseCheckboxGroup["disabled"];
   /** Name submitted with the form, given to every box that has none. */
   name?: HelixBaseCheckboxGroup["name"];
   /** The checked values, comma separated. */
@@ -829,6 +836,13 @@ export type HelixBaseCheckboxGroupProps = {
 };
 
 export type HelixBaseCheckboxGroupSolidJsProps = {
+  /** Whether the whole set is out of play.
+
+Its own property rather than an inherited one, because this group is not
+form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+are each form-associated and have their own, which is exactly why the two
+have to be reconciled rather than simply written over. */
+  "prop:disabled"?: HelixBaseCheckboxGroup["disabled"];
   /** Name submitted with the form, given to every box that has none. */
   "prop:name"?: HelixBaseCheckboxGroup["name"];
   /** The checked values, comma separated. */
@@ -2944,6 +2958,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `disabled`: Whether the whole set is out of play.
+   *
+   * Its own property rather than an inherited one, because this group is not
+   * form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+   * are each form-associated and have their own, which is exactly why the two
+   * have to be reconciled rather than simply written over.
    * - `name`: Name submitted with the form, given to every box that has none.
    * - `value`: The checked values, comma separated.
    * - `hint`: Help under the control, shown while there is nothing wrong.
@@ -5328,6 +5348,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `disabled`: Whether the whole set is out of play.
+   *
+   * Its own property rather than an inherited one, because this group is not
+   * form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+   * are each form-associated and have their own, which is exactly why the two
+   * have to be reconciled rather than simply written over.
    * - `name`: Name submitted with the form, given to every box that has none.
    * - `value`: The checked values, comma separated.
    * - `hint`: Help under the control, shown while there is nothing wrong.

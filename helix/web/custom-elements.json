@@ -5425,6 +5425,21 @@
             },
             {
               "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the whole set is out of play.\n\nIts own property rather than an inherited one, because this group is not\nform-associated and `disabled` arrives with `HelixFormElement`. The boxes\nare each form-associated and have their own, which is exactly why the two\nhave to be reconciled rather than simply written over.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "name",
               "type": {
                 "text": "string"
@@ -5632,6 +5647,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the whole set is out of play.\n\nIts own property rather than an inherited one, because this group is not\nform-associated and `disabled` arrives with `HelixFormElement`. The boxes\nare each form-associated and have their own, which is exactly why the two\nhave to be reconciled rather than simply written over.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
               }
             },
             {

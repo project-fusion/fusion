@@ -4,6 +4,7 @@ import {
   HelixFormElement,
   type HelixSelectEvent,
   hostAria,
+  inheritDisabled,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -99,6 +100,11 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
   /** Writes the answer onto the items, and nothing onto the host. */
   private place(): void {
     const items = this.items
+    /* A group out of play takes its choices with it, and gives them back when
+       it is not. `disabled` is the one property here with two sources, the
+       group and the item, so it is the one that has to remember which said
+       what. */
+    inheritDisabled(this.disabled, items)
     for (const item of items) {
       item.selected = item.value === this.value
     }

@@ -1,4 +1,11 @@
-import { customElement, HelixChangeEvent, HelixElement, hostAria, MixinField } from '@helix-io/core'
+import {
+  customElement,
+  HelixChangeEvent,
+  HelixElement,
+  hostAria,
+  inheritDisabled,
+  MixinField,
+} from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
@@ -44,6 +51,17 @@ import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
  */
 @customElement('helix-base-checkbox-group')
 export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
+  /**
+   * Whether the whole set is out of play.
+   *
+   * Its own property rather than an inherited one, because this group is not
+   * form-associated and `disabled` arrives with `HelixFormElement`. The boxes
+   * are each form-associated and have their own, which is exactly why the two
+   * have to be reconciled rather than simply written over.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
   /** Name submitted with the form, given to every box that has none. */
   @property()
   name = ''
@@ -67,6 +85,8 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
    * reports and does not patch up. A box that names itself keeps its own.
    */
   private sync(): void {
+    // See the radio group's note: the one property with two sources.
+    inheritDisabled(this.disabled, this.boxes)
     const wanted = new Set(
       this.value
         .split(',')

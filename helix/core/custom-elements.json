@@ -1165,6 +1165,30 @@
         },
         {
           "kind": "js",
+          "name": "DisableableItem",
+          "declaration": {
+            "name": "DisableableItem",
+            "module": "./utils/inherit-disabled/inherit-disabled.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "forgetDisabled",
+          "declaration": {
+            "name": "forgetDisabled",
+            "module": "./utils/inherit-disabled/inherit-disabled.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "inheritDisabled",
+          "declaration": {
+            "name": "inheritDisabled",
+            "module": "./utils/inherit-disabled/inherit-disabled.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "ControlledChangeOptions",
           "declaration": {
             "name": "ControlledChangeOptions",
@@ -2521,6 +2545,72 @@
           "declaration": {
             "name": "hostAria",
             "module": "src/utils/host-aria/host-aria.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/inherit-disabled/inherit-disabled.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "inheritDisabled",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              }
+            },
+            {
+              "name": "items",
+              "type": {
+                "text": "DisableableItem[]"
+              }
+            }
+          ],
+          "description": "Disables a group's members without forgetting what they said themselves.\n\nA group and its members are two sources for one fact: a member is out of play\nif either says so. Written the obvious way that is\n`item.disabled = group || item.disabled`, and it latches. The first pass with\nthe group disabled writes `true` onto every member; the next pass reads its\nown writing back as the member's own answer; and enabling the group leaves\nevery member disabled for good. Nothing about it is visible until something\nre-enables a group, which is rare enough to ship and miserable to find.\n\nSo what a member said itself is recorded before it is first overridden, and\ngiven back when the group lets go. Restoring is the half that matters: a\nversion that only recorded would read the overridden value as the member's\nown the moment the group was enabled, which is the same latch by a longer\nroute.\n\nOnce given back, the record is dropped, so a consumer disabling a member\nafterwards is its own answer again and is left alone."
+        },
+        {
+          "kind": "function",
+          "name": "forgetDisabled",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "item",
+              "type": {
+                "text": "Element"
+              }
+            }
+          ],
+          "description": "Forgets what a group recorded about an item.\n\nFor an item leaving a group, which would otherwise carry the group's last\nword into wherever it goes next."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "inheritDisabled",
+          "declaration": {
+            "name": "inheritDisabled",
+            "module": "src/utils/inherit-disabled/inherit-disabled.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "forgetDisabled",
+          "declaration": {
+            "name": "forgetDisabled",
+            "module": "src/utils/inherit-disabled/inherit-disabled.ts"
           }
         }
       ]
