@@ -79,6 +79,12 @@ jobs:
       # `--with-deps` installs the shared libraries as well as the browser. A
       # headless browser in CI fails on a missing `libnss3` far more often than
       # on anything to do with the tests.
+      # Built first. `specs` bundles from source, and source imports the
+      # generated `.css.ts` files and the other packages' `dist`, neither of
+      # which is tracked. Locally this is invisible because nobody bundles specs
+      # on a tree they have not built.
+      - run: bun run build
+
       - run: bunx playwright install --with-deps chromium
 
       - run: bun run specs:browser
