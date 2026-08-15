@@ -114,6 +114,33 @@
   opacity: 1;
 }
 
+/* The indicator turns over as the panel opens.
+ *
+ * Nothing rotated it before, which is why nothing transitioned: the slot was
+ * rendered and left alone, so a caret pointing down stayed pointing down with
+ * the list open under it. The mark says which way the panel is going, and a
+ * mark that never moves says nothing at all.
+ *
+ * `::slotted` because the mark is the consumer's own element, and `rotate`
+ * rather than `transform`, so a consumer who wants to translate or scale it can
+ * do that without the two fighting over one property.
+ *
+ * `data-open` and not `[open]`: the resolved state, so a controlled select
+ * whose consumer has not applied the change yet does not turn early. */
+::slotted([slot="indicator"]) {
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host([data-open]) ::slotted([slot="indicator"]) {
+  rotate: 180deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::slotted([slot="indicator"]) {
+    transition: none;
+  }
+}
+
 [part="surface"][hidden] {
   display: none;
 }
@@ -123,6 +150,13 @@
 [part="listbox"]::part(items) {
   background-color: transparent;
   border: none;
+  /* And no radius, which is the one this block kept and should not have. The
+     list scrolls, so it clips what is inside it: a four pixel radius on the
+     scroller rounds the first row's top corners and the last row's bottom ones,
+     which reads as the option having a radius when the option has none. That is
+     what it was reported as, and looking at the option was looking at the wrong
+     element. The panel's own radius is the frame; this is inside it. */
+  border-radius: var(--helix-radii-none);
   max-block-size: var(--select-surface-max-block-size, 14rem);
   padding: var(--helix-space-none);
 }

@@ -19,6 +19,14 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   gap: var(--helix-space-xs);
+  /* A stated height rather than one that falls out of the padding, so every
+     row in a list is the same height whatever is slotted into it: a row with an
+     icon in it was taller than the one above it, and a list whose rows differ by
+     two pixels reads as a list nobody measured. `control-sm` because a row in a
+     panel is a small control, and it is the token that moves with density
+     rather than a number that does not. */
+  block-size: var(--helix-size-control-sm);
+  box-sizing: border-box;
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-xs);
 }
