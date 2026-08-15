@@ -1,10 +1,13 @@
-import { customElement, HelixFormElement, MixinField } from '@helix-io/core'
+import {
+  customElement,
+  HelixFormElement,
+  KeyboardNavigationController,
+  MixinControllerValue,
+  MixinField,
+} from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseToggle } from '../root/toggle-root.js'
-
-/** Keys the group handles, per the APG radio-group pattern. */
-const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'])
 
 /**
  * @summary A row of options with the selection marked by a moving indicator.
@@ -50,26 +53,22 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here.
  */
 @customElement('helix-base-toggle-group')
-export class HelixBaseToggleGroup extends MixinField(HelixFormElement) {
-  /**
-   * The value the markup declared, which is the one a reset returns to.
-   *
-   * Separate from `value` for the reason `defaultChecked` is separate from
-   * `checked`: `value` is where the control is now, and a reset needs to know
-   * where it started, which is gone the moment anything is chosen.
-   */
-  @property({ attribute: 'default-value' })
-  defaultValue = ''
-
+export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Name the group reports under when its form is submitted. */
   @property()
   name = ''
 
-  /** Value of the selected item. */
-  @property()
-  value = ''
-
   private observer: ResizeObserver | undefined
+
+  /* Moving and choosing are one act, which is the radio group pattern this
+     control also follows, and is what the controller exists to stop being
+     written per component. */
+  /* Registered rather than held. A controller adds itself to the host, so there
+     is no reference to keep: nothing here talks to it after construction, which
+     is why it is `protected` and not `private`. A private field nothing reads
+     is an unused one, and the honest reading is that the subclass tier is where
+     a consumer would reach for it. */
+  protected readonly keys = new KeyboardNavigationController(this, { items: () => this.items })
 
   private get items(): HelixBaseToggle[] {
     return [...this.children].filter(
@@ -95,16 +94,6 @@ export class HelixBaseToggleGroup extends MixinField(HelixFormElement) {
 
   private readonly handleSelection = (event: Event): void => {
     this.value = (event as CustomEvent<{ value: string }>).detail.value
-  }
-
-  /** Returns the group to the choice its markup declared. */
-  formResetCallback(): void {
-    this.value = this.defaultValue
-  }
-
-  /** Restores the choice when the browser brings a form back. */
-  formStateRestoreCallback(state: string | null): void {
-    this.value = state ?? this.defaultValue
   }
 
   /**
@@ -175,43 +164,14 @@ export class HelixBaseToggleGroup extends MixinField(HelixFormElement) {
     indicator.toggleAttribute('data-placed', true)
   }
 
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!KEYS.has(event.key)) {
-      return
-    }
-    const items = this.items.filter((item) => !item.disabled)
-    const current = items.findIndex((item) => item.selected)
-    if (current === -1) {
-      return
-    }
-
-    let next = current
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-      next = (current + 1) % items.length
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      next = (current - 1 + items.length) % items.length
-    } else if (event.key === 'Home') {
-      next = 0
-    } else {
-      next = items.length - 1
-    }
-
-    event.preventDefault()
-    const target = items[next]
-    target?.focusItem()
-    target?.select()
-  }
-
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
-    this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
-    this.removeEventListener('keydown', this.handleKeydown)
     this.observer?.disconnect()
   }
 
@@ -229,6 +189,7 @@ export class HelixBaseToggleGroup extends MixinField(HelixFormElement) {
     if (changed.has('value')) {
       this.place()
     }
+    this.validate()
     /* Every update, because the label and the message come and go with the
        properties behind them, and an element reference to a node that has been
        re-rendered is a reference to nothing. */
@@ -245,16 +206,37 @@ export class HelixBaseToggleGroup extends MixinField(HelixFormElement) {
        is the half a server can write. The reference wins on the client, which
        is what lets a consumer slot a label richer than a string. */
     this.internals.ariaLabel = this.label === '' ? null : this.label
-    // Once, before anything has been chosen. `default-value` is what the markup
-    // asked for, so it is the starting selection as well as the one a reset
-    // comes back to; after that it is history and `value` is the answer.
-    if (!this.hasUpdated && this.value === '' && this.defaultValue !== '') {
-      this.value = this.defaultValue
-    }
     // `null` rather than an empty string when nothing is chosen, which is the
     // difference between a control that submits nothing and one that submits a
     // blank.
     this.internals.setFormValue(this.value === '' ? null : this.value)
+  }
+
+  /**
+   * The verdict on the answer, which `required` had been asking for and not
+   * getting.
+   *
+   * `required` arrived with `MixinField` and nothing enforced it: the attribute
+   * reflected, the marker rendered beside the label, and a form with an
+   * unanswered group submitted anyway. An API that exists and does nothing is
+   * worse than one that is missing, because the marker is a promise to the
+   * reader that something will stop them.
+   *
+   * The anchor is the track rather than the host, so the browser's own bubble
+   * points at the control rather than at a box with nothing in it.
+   */
+  private validate(): void {
+    if (this.required && this.value === '') {
+      this.internals.setValidity(
+        { valueMissing: true },
+        'Choose one to continue.',
+        this.renderRoot.querySelector<HTMLElement>('[part="track"]') ?? undefined,
+      )
+    } else {
+      this.internals.setValidity({})
+    }
+    // Straight after, because validity moved without any property moving.
+    this.refreshFeedback()
   }
 
   protected override render(): TemplateResult {

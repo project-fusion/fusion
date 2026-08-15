@@ -288,6 +288,84 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/keyboard-navigation-controller/keyboard-navigation-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Moves through a set of items with the arrow keys, and chooses as it goes.\n\n**Moving and choosing are one act here, not two.** That is the radio group\npattern and it is the difference from a listbox: moving focus without\nchoosing leaves a keyboard reader sitting on an item they have not selected,\nwith nothing on screen saying which of the two is true. A pointer user\nchooses by arriving, so a keyboard user does too.\n\n**Both axes, always.** A vertical set still answers left and right, and a\nhorizontal one still answers up and down. Binding only the axis the items\nhappen to be laid out on means a reader who guesses wrong gets nothing, and\n`orientation` is presentation: the same set of choices reads the same way\nwhichever direction it runs.\n\nDisabled items are skipped rather than stopped at, so a set with a gap in it\nstill moves in one press.\n\nWritten because `Radio.Group` and `Toggle.Group` had this twice, identically,\ndown to the order of the branches. The second copy is what makes it a\ncontroller: one is a component's own business, two is a pattern, and the two\nhad not diverged only because nothing had touched them yet.",
+          "name": "KeyboardNavigationController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "host",
+              "type": {
+                "text": "ReactiveControllerHost & HTMLElement"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "host"
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "() => NavigableItem[]"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "items"
+            },
+            {
+              "kind": "field",
+              "name": "wrap",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "wrap"
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "hostConnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "KeyboardNavigationController",
+          "declaration": {
+            "name": "KeyboardNavigationController",
+            "module": "src/controllers/keyboard-navigation-controller/keyboard-navigation-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/events/events.ts",
       "declarations": [
         {
@@ -807,6 +885,30 @@
         },
         {
           "kind": "js",
+          "name": "KeyboardNavigationController",
+          "declaration": {
+            "name": "KeyboardNavigationController",
+            "module": "./controllers/keyboard-navigation-controller/keyboard-navigation-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "KeyboardNavigationOptions",
+          "declaration": {
+            "name": "KeyboardNavigationOptions",
+            "module": "./controllers/keyboard-navigation-controller/keyboard-navigation-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NavigableItem",
+          "declaration": {
+            "name": "NavigableItem",
+            "module": "./controllers/keyboard-navigation-controller/keyboard-navigation-controller.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "CaretDetail",
           "declaration": {
             "name": "CaretDetail",
@@ -955,6 +1057,22 @@
           "declaration": {
             "name": "MixinControllerOpenInterface",
             "module": "./mixins/mixin-controller-open/mixin-controller-open.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControllerValue",
+          "declaration": {
+            "name": "MixinControllerValue",
+            "module": "./mixins/mixin-controller-value/mixin-controller-value.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControllerValueInterface",
+          "declaration": {
+            "name": "MixinControllerValueInterface",
+            "module": "./mixins/mixin-controller-value/mixin-controller-value.js"
           }
         },
         {
@@ -1467,6 +1585,165 @@
           "declaration": {
             "name": "MixinControllerOpen",
             "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/mixins/mixin-controller-value/mixin-controller-value.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The public surface `MixinControllerValue` adds.\n\nDeclared separately because TypeScript cannot emit declarations for an\nanonymous class that has private members (TS4094).",
+          "name": "MixinControllerValueInterface",
+          "members": [
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "description": "The value the markup declared, which is where a reset returns to.\n\nSeparate from `value`, which is where the control is now, and gone from the\nreader's view the moment they change anything."
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the control holds now, and what its form submits."
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared."
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back."
+            }
+          ],
+          "helix": {}
+        },
+        {
+          "kind": "mixin",
+          "description": "Grafts `value`, `defaultValue`, and the two callbacks that answer a form.\n\nEvery control with a value had written this, and by the third it was three\ncopies of the same four members and the same seeding rule: `Input`, then\n`Toggle.Group`, then `Radio.Group`. The copies had not diverged, which is the\nargument for the mixin rather than against it, because the next one would\nhave.\n\n**Seeded in `willUpdate`, not `connectedCallback`.** SSR never calls the\nlatter, so a control with a `default-value` would serve empty and fill itself\nat hydration, which is a flash for a reader and a mismatch for React. Seeding\nonce, before the first render, is what makes the server and the client agree.\n\n**What it does not own is reporting.** `setFormValue` stays with the\ncomponent, because what an empty value means is the component's business: a\ntext field submits its emptiness, since `\"\"` is an answer and the field was\non the form, while a group with nothing chosen submits nothing at all. One\nmixin cannot hold both without a flag, and a flag would be this rule written\ndown twice.\n\n`Checkbox` deliberately does not take this. Its `value` is what it submits\n*when it is on* rather than what it holds, so it is configuration rather than\nstate, and the state it does have is `checked`, which is\n`MixinControllerChecked`'s.",
+          "name": "MixinControllerValue",
+          "members": [
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "attribute": "value"
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared."
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "fieldName": "value"
+            }
+          ],
+          "parameters": [
+            {
+              "name": "Base",
+              "type": {
+                "text": "T"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "MixinControllerValueInterface",
+          "declaration": {
+            "name": "MixinControllerValueInterface",
+            "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControllerValue",
+          "declaration": {
+            "name": "MixinControllerValue",
+            "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
           }
         }
       ]

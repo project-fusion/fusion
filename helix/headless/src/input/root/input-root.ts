@@ -1,4 +1,10 @@
-import { customElement, HelixChangeEvent, HelixFormElement, MixinField } from '@helix-io/core'
+import {
+  customElement,
+  HelixChangeEvent,
+  HelixFormElement,
+  MixinControllerValue,
+  MixinField,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -45,15 +51,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart control - The input itself.
  */
 @customElement('helix-base-input')
-export class HelixBaseInput extends MixinField(HelixFormElement) {
-  /**
-   * The text the markup declared, which is what a reset returns to.
-   *
-   * Separate from `value`, which is where the field is now.
-   */
-  @property({ attribute: 'default-value' })
-  defaultValue = ''
-
+export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Name submitted with the form. */
   @property()
   name = ''
@@ -69,10 +67,6 @@ export class HelixBaseInput extends MixinField(HelixFormElement) {
   /** What the field accepts, which decides the keyboard and the validation. */
   @property({ reflect: true })
   type: InputType = 'text'
-
-  /** The text in the field. */
-  @property()
-  value = ''
 
   /** Focus is delegated to the input, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
@@ -127,16 +121,6 @@ export class HelixBaseInput extends MixinField(HelixFormElement) {
     this.refreshFeedback()
   }
 
-  /** Returns the field to the text its markup declared. */
-  formResetCallback(): void {
-    this.value = this.defaultValue
-  }
-
-  /** Restores the text when the browser brings a form back. */
-  formStateRestoreCallback(state: string | null): void {
-    this.value = state ?? this.defaultValue
-  }
-
   /** Puts the caret in the field, the way a label pointing at one would. */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
@@ -145,15 +129,6 @@ export class HelixBaseInput extends MixinField(HelixFormElement) {
   /** Selects everything in the field. */
   select(): void {
     this.control?.select()
-  }
-
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    // Once, before anything is typed. `default-value` is what the markup asked
-    // for, so it is the starting text as well as the text a reset comes back to.
-    if (!this.hasUpdated && this.value === '' && this.defaultValue !== '') {
-      this.value = this.defaultValue
-    }
   }
 
   protected override updated(changed: PropertyValues): void {

@@ -3,14 +3,13 @@ import {
   HelixChangeEvent,
   HelixFormElement,
   type HelixSelectEvent,
+  KeyboardNavigationController,
+  MixinControllerValue,
   MixinField,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseRadio } from '../root/radio-root.js'
-
-/** The keys that move within a group, which is every key that moves at all. */
-const KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'])
 
 /**
  * @summary A set of choices where exactly one is the answer.
@@ -52,11 +51,7 @@ const KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 
  * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-base-radio-group')
-export class HelixBaseRadioGroup extends MixinField(HelixFormElement) {
-  /** The answer the markup declared, which is the one a reset returns to. */
-  @property({ attribute: 'default-value' })
-  defaultValue = ''
-
+export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Name the group reports under when its form is submitted. */
   @property()
   name = ''
@@ -65,9 +60,14 @@ export class HelixBaseRadioGroup extends MixinField(HelixFormElement) {
   @property({ reflect: true })
   orientation: 'horizontal' | 'vertical' = 'vertical'
 
-  /** Value of the chosen item, and what the form submits. */
-  @property()
-  value = ''
+  /* Moving and choosing are one act, which is the radio group pattern and is
+     what this controller exists to stop being written per component. */
+  /* Registered rather than held. A controller adds itself to the host, so there
+     is no reference to keep: nothing here talks to it after construction, which
+     is why it is `protected` and not `private`. A private field nothing reads
+     is an unused one, and the honest reading is that the subclass tier is where
+     a consumer would reach for it. */
+  protected readonly keys = new KeyboardNavigationController(this, { items: () => this.items })
 
   /** The radios, in light-DOM order. Client only: the server has no tree. */
   get items(): HelixBaseRadio[] {
@@ -93,39 +93,6 @@ export class HelixBaseRadioGroup extends MixinField(HelixFormElement) {
       return
     }
     this.value = next
-  }
-
-  /**
-   * Arrow keys move and choose in one go, which is what a radio group does.
-   *
-   * Moving focus without choosing is the listbox pattern, and it leaves a
-   * keyboard reader on an item they have not selected with nothing saying so.
-   */
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!KEYS.has(event.key)) {
-      return
-    }
-    const items = this.items.filter((item) => !item.disabled)
-    if (items.length === 0) {
-      return
-    }
-    const current = items.findIndex((item) => item.selected)
-
-    let next = current
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-      next = (current + 1) % items.length
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      next = (current - 1 + items.length) % items.length
-    } else if (event.key === 'Home') {
-      next = 0
-    } else {
-      next = items.length - 1
-    }
-
-    event.preventDefault()
-    const target = items[next]
-    target?.focusItem()
-    target?.select()
   }
 
   /** Writes the answer onto the items, and nothing onto the host. */
@@ -157,26 +124,14 @@ export class HelixBaseRadioGroup extends MixinField(HelixFormElement) {
     this.refreshFeedback()
   }
 
-  /** Returns the group to the answer its markup declared. */
-  formResetCallback(): void {
-    this.value = this.defaultValue
-  }
-
-  /** Restores the answer when the browser brings a form back. */
-  formStateRestoreCallback(state: string | null): void {
-    this.value = state ?? this.defaultValue
-  }
-
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection as EventListener)
-    this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
-    this.removeEventListener('keydown', this.handleKeydown)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -187,11 +142,6 @@ export class HelixBaseRadioGroup extends MixinField(HelixFormElement) {
     /* A string as well as the element reference `linkHost` sets, because this
        is the half a server can write. */
     this.internals.ariaLabel = this.label === '' ? null : this.label
-    // Once, before anything has been chosen. Seeded here rather than in
-    // `connectedCallback`, which SSR never calls.
-    if (!this.hasUpdated && this.value === '' && this.defaultValue !== '') {
-      this.value = this.defaultValue
-    }
   }
 
   protected override updated(changed: PropertyValues): void {

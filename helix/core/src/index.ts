@@ -9,6 +9,11 @@ export {
 } from './controllers/floating-controller/floating-controller.js'
 export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {
+  KeyboardNavigationController,
+  type KeyboardNavigationOptions,
+  type NavigableItem,
+} from './controllers/keyboard-navigation-controller/keyboard-navigation-controller.js'
+export {
   type CaretDetail,
   type ChangeDetail,
   type ConsoleDetail,
@@ -33,6 +38,10 @@ export {
   MixinControllerOpen,
   type MixinControllerOpenInterface,
 } from './mixins/mixin-controller-open/mixin-controller-open.js'
+export {
+  MixinControllerValue,
+  type MixinControllerValueInterface,
+} from './mixins/mixin-controller-value/mixin-controller-value.js'
 export { MixinField, type MixinFieldInterface } from './mixins/mixin-field/mixin-field.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export { customElement } from './utils/custom-element/custom-element.js'

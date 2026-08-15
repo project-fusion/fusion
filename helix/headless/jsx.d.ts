@@ -1151,14 +1151,6 @@ export type HelixBaseInputHelixChangeElementEvent =
   HelixBaseInputElementEvent<HelixChangeEvent>;
 
 export type HelixBaseInputProps = {
-  /** The text the markup declared, which is what a reset returns to.
-
-Separate from `value`, which is where the field is now. */
-  "default-value"?: HelixBaseInput["defaultValue"];
-  /** The text the markup declared, which is what a reset returns to.
-
-Separate from `value`, which is where the field is now. */
-  defaultValue?: HelixBaseInput["defaultValue"];
   /** Name submitted with the form. */
   name?: HelixBaseInput["name"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
@@ -1169,7 +1161,11 @@ Separate from `value`, which is where the field is now. */
   readOnly?: HelixBaseInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation. */
   type?: HelixBaseInput["type"];
-  /** The text in the field. */
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseInput["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseInput["defaultValue"];
+  /** What the control holds now, and what its form submits. */
   value?: HelixBaseInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixBaseInput["hint"];
@@ -1197,14 +1193,6 @@ tree, so a screen reader can still announce that the control exists. */
 };
 
 export type HelixBaseInputSolidJsProps = {
-  /** The text the markup declared, which is what a reset returns to.
-
-Separate from `value`, which is where the field is now. */
-  "attr:default-value"?: HelixBaseInput["defaultValue"];
-  /** The text the markup declared, which is what a reset returns to.
-
-Separate from `value`, which is where the field is now. */
-  "prop:defaultValue"?: HelixBaseInput["defaultValue"];
   /** Name submitted with the form. */
   "prop:name"?: HelixBaseInput["name"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
@@ -1215,7 +1203,11 @@ Separate from `value`, which is where the field is now. */
   "prop:readOnly"?: HelixBaseInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation. */
   "prop:type"?: HelixBaseInput["type"];
-  /** The text in the field. */
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseInput["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseInput["defaultValue"];
+  /** What the control holds now, and what its form submits. */
   "prop:value"?: HelixBaseInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixBaseInput["hint"];
@@ -1486,15 +1478,15 @@ export type HelixBaseRadioGroupHelixChangeElementEvent =
   HelixBaseRadioGroupElementEvent<HelixChangeEvent>;
 
 export type HelixBaseRadioGroupProps = {
-  /** The answer the markup declared, which is the one a reset returns to. */
-  "default-value"?: HelixBaseRadioGroup["defaultValue"];
-  /** The answer the markup declared, which is the one a reset returns to. */
-  defaultValue?: HelixBaseRadioGroup["defaultValue"];
   /** Name the group reports under when its form is submitted. */
   name?: HelixBaseRadioGroup["name"];
   /** Which way the choices run. A column reads one line per answer. */
   orientation?: HelixBaseRadioGroup["orientation"];
-  /** Value of the chosen item, and what the form submits. */
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseRadioGroup["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseRadioGroup["defaultValue"];
+  /** What the control holds now, and what its form submits. */
   value?: HelixBaseRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixBaseRadioGroup["hint"];
@@ -1520,15 +1512,15 @@ tree, so a screen reader can still announce that the control exists. */
 };
 
 export type HelixBaseRadioGroupSolidJsProps = {
-  /** The answer the markup declared, which is the one a reset returns to. */
-  "attr:default-value"?: HelixBaseRadioGroup["defaultValue"];
-  /** The answer the markup declared, which is the one a reset returns to. */
-  "prop:defaultValue"?: HelixBaseRadioGroup["defaultValue"];
   /** Name the group reports under when its form is submitted. */
   "prop:name"?: HelixBaseRadioGroup["name"];
   /** Which way the choices run. A column reads one line per answer. */
   "prop:orientation"?: HelixBaseRadioGroup["orientation"];
-  /** Value of the chosen item, and what the form submits. */
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseRadioGroup["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseRadioGroup["defaultValue"];
+  /** What the control holds now, and what its form submits. */
   "prop:value"?: HelixBaseRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixBaseRadioGroup["hint"];
@@ -1887,21 +1879,13 @@ export type HelixBaseToggleGroupHelixSelectElementEvent =
   HelixBaseToggleGroupElementEvent<HelixSelectEvent>;
 
 export type HelixBaseToggleGroupProps = {
-  /** The value the markup declared, which is the one a reset returns to.
-
-Separate from `value` for the reason `defaultChecked` is separate from
-`checked`: `value` is where the control is now, and a reset needs to know
-where it started, which is gone the moment anything is chosen. */
-  "default-value"?: HelixBaseToggleGroup["defaultValue"];
-  /** The value the markup declared, which is the one a reset returns to.
-
-Separate from `value` for the reason `defaultChecked` is separate from
-`checked`: `value` is where the control is now, and a reset needs to know
-where it started, which is gone the moment anything is chosen. */
-  defaultValue?: HelixBaseToggleGroup["defaultValue"];
   /** Name the group reports under when its form is submitted. */
   name?: HelixBaseToggleGroup["name"];
-  /** Value of the selected item. */
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseToggleGroup["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseToggleGroup["defaultValue"];
+  /** What the control holds now, and what its form submits. */
   value?: HelixBaseToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixBaseToggleGroup["hint"];
@@ -1927,21 +1911,13 @@ tree, so a screen reader can still announce that the control exists. */
 };
 
 export type HelixBaseToggleGroupSolidJsProps = {
-  /** The value the markup declared, which is the one a reset returns to.
-
-Separate from `value` for the reason `defaultChecked` is separate from
-`checked`: `value` is where the control is now, and a reset needs to know
-where it started, which is gone the moment anything is chosen. */
-  "attr:default-value"?: HelixBaseToggleGroup["defaultValue"];
-  /** The value the markup declared, which is the one a reset returns to.
-
-Separate from `value` for the reason `defaultChecked` is separate from
-`checked`: `value` is where the control is now, and a reset needs to know
-where it started, which is gone the moment anything is chosen. */
-  "prop:defaultValue"?: HelixBaseToggleGroup["defaultValue"];
   /** Name the group reports under when its form is submitted. */
   "prop:name"?: HelixBaseToggleGroup["name"];
-  /** Value of the selected item. */
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseToggleGroup["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseToggleGroup["defaultValue"];
+  /** What the control holds now, and what its form submits. */
   "prop:value"?: HelixBaseToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixBaseToggleGroup["hint"];
@@ -3331,14 +3307,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `default-value`/`defaultValue`: The text the markup declared, which is what a reset returns to.
-   *
-   * Separate from `value`, which is where the field is now.
    * - `name`: Name submitted with the form.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
-   * - `value`: The text in the field.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
@@ -3376,10 +3350,14 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `formResetCallback() => void`: Returns the field to the text its markup declared.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the text when the browser brings a form back.
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `select() => void`: Selects everything in the field.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
    *
    * ## CSS Parts
    *
@@ -3720,10 +3698,10 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `default-value`/`defaultValue`: The answer the markup declared, which is the one a reset returns to.
    * - `name`: Name the group reports under when its form is submitted.
    * - `orientation`: Which way the choices run. A column reads one line per answer.
-   * - `value`: Value of the chosen item, and what the form submits.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
@@ -3762,8 +3740,12 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `formResetCallback() => void`: Returns the group to the answer its markup declared.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the answer when the browser brings a form back.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
    *
    * ## CSS Parts
    *
@@ -4218,13 +4200,9 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `default-value`/`defaultValue`: The value the markup declared, which is the one a reset returns to.
-   *
-   * Separate from `value` for the reason `defaultChecked` is separate from
-   * `checked`: `value` is where the control is now, and a reset needs to know
-   * where it started, which is gone the moment anything is chosen.
    * - `name`: Name the group reports under when its form is submitted.
-   * - `value`: Value of the selected item.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
@@ -4260,8 +4238,12 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `formResetCallback() => void`: Returns the group to the choice its markup declared.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the choice when the browser brings a form back.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
    *
    * ## CSS Parts
    *
@@ -5715,14 +5697,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `default-value`/`defaultValue`: The text the markup declared, which is what a reset returns to.
-   *
-   * Separate from `value`, which is where the field is now.
    * - `name`: Name submitted with the form.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
-   * - `value`: The text in the field.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
@@ -5760,10 +5740,14 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `formResetCallback() => void`: Returns the field to the text its markup declared.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the text when the browser brings a form back.
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `select() => void`: Selects everything in the field.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
    *
    * ## CSS Parts
    *
@@ -6128,10 +6112,10 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `default-value`/`defaultValue`: The answer the markup declared, which is the one a reset returns to.
    * - `name`: Name the group reports under when its form is submitted.
    * - `orientation`: Which way the choices run. A column reads one line per answer.
-   * - `value`: Value of the chosen item, and what the form submits.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
@@ -6170,8 +6154,12 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `formResetCallback() => void`: Returns the group to the answer its markup declared.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the answer when the browser brings a form back.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
    *
    * ## CSS Parts
    *
@@ -6665,13 +6653,9 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `default-value`/`defaultValue`: The value the markup declared, which is the one a reset returns to.
-   *
-   * Separate from `value` for the reason `defaultChecked` is separate from
-   * `checked`: `value` is where the control is now, and a reset needs to know
-   * where it started, which is gone the moment anything is chosen.
    * - `name`: Name the group reports under when its form is submitted.
-   * - `value`: Value of the selected item.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
@@ -6707,8 +6691,12 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `formResetCallback() => void`: Returns the group to the choice its markup declared.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the choice when the browser brings a form back.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
    *
    * ## CSS Parts
    *

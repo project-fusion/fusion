@@ -9258,6 +9258,76 @@
           "members": [
             {
               "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "field",
               "name": "hint",
               "type": {
                 "text": "string"
@@ -9488,20 +9558,6 @@
             },
             {
               "kind": "field",
-              "name": "defaultValue",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The text the markup declared, which is what a reset returns to.\n\nSeparate from `value`, which is where the field is now.",
-              "attribute": "default-value",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "name",
               "type": {
                 "text": "string"
@@ -9553,20 +9609,6 @@
               "description": "What the field accepts, which decides the keyboard and the validation.",
               "attribute": "type",
               "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The text in the field.",
-              "attribute": "value",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -9631,48 +9673,6 @@
                 }
               },
               "description": "Reports the value and the validity the host stands behind.",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formResetCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Returns the field to the text its markup declared.",
-              "type": {
-                "text": "formResetCallback() => void"
-              },
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formStateRestoreCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "state",
-                  "type": {
-                    "text": "string | null"
-                  }
-                }
-              ],
-              "description": "Restores the text when the browser brings a form back.",
-              "type": {
-                "text": "formStateRestoreCallback(state: string | null) => void"
-              },
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -9869,6 +9869,32 @@
           "customElement": true,
           "attributes": [
             {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
               "name": "hint",
               "type": {
                 "text": "string"
@@ -9934,19 +9960,6 @@
               }
             },
             {
-              "name": "default-value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The text the markup declared, which is what a reset returns to.\n\nSeparate from `value`, which is where the field is now.",
-              "fieldName": "defaultValue",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
               "name": "name",
               "type": {
                 "text": "string"
@@ -9993,19 +10006,6 @@
               "default": "'text'",
               "description": "What the field accepts, which decides the keyboard and the validation.",
               "fieldName": "type",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The text in the field.",
-              "fieldName": "value",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -12367,6 +12367,76 @@
           "members": [
             {
               "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "field",
               "name": "hint",
               "type": {
                 "text": "string"
@@ -12597,20 +12667,6 @@
             },
             {
               "kind": "field",
-              "name": "defaultValue",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The answer the markup declared, which is the one a reset returns to.",
-              "attribute": "default-value",
-              "inheritedFrom": {
-                "name": "HelixBaseRadioGroup",
-                "module": "src/radio/group/radio-group.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "name",
               "type": {
                 "text": "string"
@@ -12640,13 +12696,10 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the chosen item, and what the form submits.",
-              "attribute": "value",
+              "name": "keys",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new KeyboardNavigationController(this, { items: () => this.items })",
               "inheritedFrom": {
                 "name": "HelixBaseRadioGroup",
                 "module": "src/radio/group/radio-group.ts"
@@ -12677,17 +12730,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true,
-              "description": "Arrow keys move and choose in one go, which is what a radio group does.\n\nMoving focus without choosing is the listbox pattern, and it leaves a\nkeyboard reader on an item they have not selected with nothing saying so.",
-              "inheritedFrom": {
-                "name": "HelixBaseRadioGroup",
-                "module": "src/radio/group/radio-group.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "place",
               "privacy": "private",
@@ -12712,48 +12754,6 @@
                 }
               },
               "description": "Reports the answer and the verdict on it.",
-              "inheritedFrom": {
-                "name": "HelixBaseRadioGroup",
-                "module": "src/radio/group/radio-group.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formResetCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Returns the group to the answer its markup declared.",
-              "type": {
-                "text": "formResetCallback() => void"
-              },
-              "inheritedFrom": {
-                "name": "HelixBaseRadioGroup",
-                "module": "src/radio/group/radio-group.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formStateRestoreCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "state",
-                  "type": {
-                    "text": "string | null"
-                  }
-                }
-              ],
-              "description": "Restores the answer when the browser brings a form back.",
-              "type": {
-                "text": "formStateRestoreCallback(state: string | null) => void"
-              },
               "inheritedFrom": {
                 "name": "HelixBaseRadioGroup",
                 "module": "src/radio/group/radio-group.ts"
@@ -12906,6 +12906,32 @@
           "customElement": true,
           "attributes": [
             {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
               "name": "hint",
               "type": {
                 "text": "string"
@@ -12971,19 +12997,6 @@
               }
             },
             {
-              "name": "default-value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The answer the markup declared, which is the one a reset returns to.",
-              "fieldName": "defaultValue",
-              "inheritedFrom": {
-                "name": "HelixBaseRadioGroup",
-                "module": "src/radio/group/radio-group.ts"
-              }
-            },
-            {
               "name": "name",
               "type": {
                 "text": "string"
@@ -13004,19 +13017,6 @@
               "default": "'vertical'",
               "description": "Which way the choices run. A column reads one line per answer.",
               "fieldName": "orientation",
-              "inheritedFrom": {
-                "name": "HelixBaseRadioGroup",
-                "module": "src/radio/group/radio-group.ts"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the chosen item, and what the form submits.",
-              "fieldName": "value",
               "inheritedFrom": {
                 "name": "HelixBaseRadioGroup",
                 "module": "src/radio/group/radio-group.ts"
@@ -16389,6 +16389,76 @@
             },
             {
               "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "field",
               "name": "hint",
               "type": {
                 "text": "string"
@@ -16619,20 +16689,6 @@
             },
             {
               "kind": "field",
-              "name": "defaultValue",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The value the markup declared, which is the one a reset returns to.\n\nSeparate from `value` for the reason `defaultChecked` is separate from\n`checked`: `value` is where the control is now, and a reset needs to know\nwhere it started, which is gone the moment anything is chosen.",
-              "attribute": "default-value",
-              "inheritedFrom": {
-                "name": "HelixBaseToggleGroup",
-                "module": "src/toggle/group/toggle-group.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "name",
               "type": {
                 "text": "string"
@@ -16647,13 +16703,11 @@
             },
             {
               "kind": "field",
-              "name": "value",
+              "name": "observer",
               "type": {
-                "text": "string"
+                "text": "ResizeObserver | undefined"
               },
-              "default": "''",
-              "description": "Value of the selected item.",
-              "attribute": "value",
+              "privacy": "private",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
@@ -16661,11 +16715,10 @@
             },
             {
               "kind": "field",
-              "name": "observer",
-              "type": {
-                "text": "ResizeObserver | undefined"
-              },
-              "privacy": "private",
+              "name": "keys",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new KeyboardNavigationController(this, { items: () => this.items })",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
@@ -16711,48 +16764,6 @@
             },
             {
               "kind": "method",
-              "name": "formResetCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Returns the group to the choice its markup declared.",
-              "type": {
-                "text": "formResetCallback() => void"
-              },
-              "inheritedFrom": {
-                "name": "HelixBaseToggleGroup",
-                "module": "src/toggle/group/toggle-group.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formStateRestoreCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "state",
-                  "type": {
-                    "text": "string | null"
-                  }
-                }
-              ],
-              "description": "Restores the choice when the browser brings a form back.",
-              "type": {
-                "text": "formStateRestoreCallback(state: string | null) => void"
-              },
-              "inheritedFrom": {
-                "name": "HelixBaseToggleGroup",
-                "module": "src/toggle/group/toggle-group.ts"
-              }
-            },
-            {
-              "kind": "method",
               "name": "place",
               "privacy": "private",
               "return": {
@@ -16767,10 +16778,15 @@
               }
             },
             {
-              "kind": "field",
-              "name": "handleKeydown",
+              "kind": "method",
+              "name": "validate",
               "privacy": "private",
-              "readonly": true,
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The verdict on the answer, which `required` had been asking for and not\ngetting.\n\n`required` arrived with `MixinField` and nothing enforced it: the attribute\nreflected, the marker rendered beside the label, and a form with an\nunanswered group submitted anyway. An API that exists and does nothing is\nworse than one that is missing, because the marker is a promise to the\nreader that something will stop them.\n\nThe anchor is the track rather than the host, so the browser's own bubble\npoints at the control rather than at a box with nothing in it.",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
@@ -16912,6 +16928,32 @@
               "fieldName": "appearance"
             },
             {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
               "name": "hint",
               "type": {
                 "text": "string"
@@ -16977,19 +17019,6 @@
               }
             },
             {
-              "name": "default-value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The value the markup declared, which is the one a reset returns to.\n\nSeparate from `value` for the reason `defaultChecked` is separate from\n`checked`: `value` is where the control is now, and a reset needs to know\nwhere it started, which is gone the moment anything is chosen.",
-              "fieldName": "defaultValue",
-              "inheritedFrom": {
-                "name": "HelixBaseToggleGroup",
-                "module": "src/toggle/group/toggle-group.ts"
-              }
-            },
-            {
               "name": "name",
               "type": {
                 "text": "string"
@@ -16997,19 +17026,6 @@
               "default": "''",
               "description": "Name the group reports under when its form is submitted.",
               "fieldName": "name",
-              "inheritedFrom": {
-                "name": "HelixBaseToggleGroup",
-                "module": "src/toggle/group/toggle-group.ts"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the selected item.",
-              "fieldName": "value",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
