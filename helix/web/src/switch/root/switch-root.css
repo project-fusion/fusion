@@ -81,14 +81,18 @@
    this size the shadow was only ever doing the separating a border does
    honestly. */
 [part="thumb"] {
-  /* Lifted off the groove, which is what `raised` means and is the same token
-     the segmented control's thumb takes for the same reason.
- 
+  /* Over the groove rather than on it, which is `overlay` and is the same token
+     the segmented control's thumb takes for the same reason. `raised` is the
+     one for a surface lying on the page, and a thumb is not lying on the page:
+     it is over a groove cut into it, so it has to be lighter than the groove in
+     light and a step up from it in dark, which is what `overlay` does and what
+     `raised` on a white page cannot.
+
      It was `background`, the page's own colour, which works in light and
      disappears in dark: the page is black and the groove is a step up from it,
      so the thumb came out darker than the track it sits in and read as a hole
      punched through rather than a thing lying on top. */
-  background-color: var(--switch-thumb-color, var(--helix-color-surface-raised));
+  background-color: var(--switch-thumb-color, var(--helix-color-surface-overlay));
   block-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-full);

@@ -36,16 +36,7 @@
    thumb sitting in a groove, which is the thing a segmented control is. */
 :host(:not([appearance])) [part="track"],
 :host([appearance="filled"]) [part="track"] {
-  /* `surface` rather than `surface-sunken`, for the reason the fields changed:
-     sunken is deep enough to read as a grey slab on a white page. The track
-     keeps its border, which is what frames it, and the thumb keeps `raised`.
- 
-     That leaves the thumb and the track closer together in light than they were
-     and further apart in dark, because `raised` goes down the ramp on a white
-     page and up on a black one. The shadow under the thumb is carrying the
-     difference in light now rather than the fill, which is the same way a card
-     on a white page is told from the page. */
-  background-color: var(--helix-color-surface);
+  background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-lg);
   padding: var(--helix-space-2xs);
@@ -92,7 +83,17 @@
    color, which stays reserved for state. One step rounder than nothing and one
    step tighter than the track it sits in, so the two are concentric. */
 [part="indicator"] {
-  background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-raised));
+  /* `overlay` rather than `raised`, and this is what let the groove get lighter.
+     The two tokens mean different things and `raised` was doing both jobs: a
+     hovered row lying *on* a white page has to be darker than it, while a thumb
+     sitting *in* a groove has to be lighter than the groove. On white those pull
+     opposite ways, and with the groove lightened the raised thumb was two
+     hundredths away from it and on the wrong side.
+  
+     `overlay` is the one for something over the page rather than on it, which is
+     what a thumb with a shadow under it is. White on a light groove in light,
+     and a step up from the groove in dark, so it reads the same way in both. */
+  background-color: var(--toggle-group-indicator-color, var(--helix-color-surface-overlay));
   block-size: var(--_indicator-h, 0);
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
   box-shadow: var(--helix-shadow-sm);

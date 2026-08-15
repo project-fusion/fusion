@@ -57,12 +57,7 @@
 
 [part="control"] {
   appearance: none;
-  /* `surface` rather than `surface-sunken`, which is what a field's box uses. A
-     field is a large area and can carry a deep fill; a twenty pixel box filled
-     the same way reads as a heavy grey chip with a mark in it, and the mark is
-     supposed to be the thing you see. This is one step off the page in both
-     modes rather than two. */
-  background-color: var(--checkbox-background-color, var(--helix-color-surface));
+  background-color: var(--checkbox-background-color, var(--helix-color-surface-sunken));
   block-size: var(--_checkbox-size);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);

@@ -2,16 +2,22 @@
   /* The default look, and where every variant starts from: a raised pill on
      the selected tab and nothing at all behind the row.
 
-     A raised surface with a hairline of shadow under it, rather than a fill,
-     because a fill has no colour that works in both modes. `surface-raised` is
-     the same white as `surface` in light and a step lighter in dark, and
-     `surface-sunken` is the reverse, so either one is invisible half the time.
-     What reads in both is the lift. */
+     A lifted surface with a hairline of shadow under it, rather than a fill,
+     because a fill has no colour that works in both modes. What reads in both
+     is the lift.
+
+     `overlay` is the token for that, and this said `raised` while the comment
+     under it said "the same white as `surface` in light", which `raised` had
+     stopped being: it is a step down the ramp on a white page, so the pill was
+     a grey chip rather than a lifted one and was reported as too dark. The two
+     tokens agree in dark, which is how the wrong one went unnoticed. The
+     segmented control's thumb is the same shape of thing and takes the same
+     token. */
   --_tabs-rule: none;
   --_tab-radius: var(--helix-radii-sm);
   --_tab-selected-rule: transparent;
   --_tab-selected-shadow: var(--helix-shadow-sm);
-  --_tab-selected-surface: var(--helix-color-surface-raised);
+  --_tab-selected-surface: var(--helix-color-surface-overlay);
 
   display: grid;
   /* The tab strip takes what it needs, the panels take the rest. `minmax(0,

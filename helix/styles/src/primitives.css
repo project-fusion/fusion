@@ -52,8 +52,19 @@
   --_helix-neutral-100: oklch(
     0.96 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
+  /* 0.94, not 0.91. The light end of this ramp is where every surface lives,
+     and it was accelerating through the range they need: .015 from white to 50,
+     .025 to 100, then .05 to 200. That last step is twice the one before it and
+     it is the one `surface-sunken` sits on, so every control filled with it came
+     out as a grey slab on a white page. Reported on the checkbox, the input, the
+     textarea, the segmented control and a selected tab, which is five symptoms
+     of one number.
+ 
+     Only `surface-sunken` reads this step in light, so moving it moves that and
+     nothing else. Below here the ramp can accelerate as much as it likes: 300
+     onwards are borders and text, where the eye wants the gaps to open up. */
   --_helix-neutral-200: oklch(
-    0.91 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+    0.94 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
   --_helix-neutral-300: oklch(
     0.84 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)

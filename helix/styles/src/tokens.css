@@ -80,8 +80,21 @@
   /* Down in light, up in dark, because "recessed" is a direction and only one
      of the two modes has room in it.
 
-     In light a well cut through a surface exposes what is under it, and it goes
-     a step past `raised` so a groove and a thumb sitting in it are told apart.
+     In light a well cut through a surface exposes what is under it, so it is
+     the deepest of the four and stays a step past `raised`.
+
+     How deep is the part that took a second pass. It sat on neutral-200 at
+     0.91, which is the step where the ramp starts opening up, and everything
+     filled with it came out as a grey slab on a white page: the checkbox, the
+     input, the textarea, the segmented control's track, a selected tab. Five
+     reports, one number. Each was patched at the component for a day, which is
+     five edits saying the same thing and the clue that none of them was the
+     fix. The step moved to 0.94 instead and the patches came out.
+
+     What made the room for that is that a thumb is `overlay` now rather than
+     `raised`. `raised` had been asked to be darker than a white page and
+     lighter than a groove at once, which on white are opposite directions, and
+     it is what pinned this token down at a depth nothing else wanted.
 
      In dark there is nothing under black. It was at neutral-1000 with the page
      there too, which is the same colour: every sunken thing lying on the page
