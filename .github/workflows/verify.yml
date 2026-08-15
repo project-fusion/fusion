@@ -1,0 +1,60 @@
+# One job that runs `bun run verify`, which is the same command the repo tells
+# a person to run. Not a matrix of steps mirroring what `verify` already does:
+# that is a second definition of "correct" to keep in step with the first, and
+# the two drift the first time someone adds a check to one of them.
+#
+# `verify` never writes, which is what makes it safe here. It runs `biome ci`
+# rather than `biome check --write`, so a formatting fault fails the run instead
+# of being silently corrected into a green one.
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same branch cancels the first. A run against a commit
+# nobody will merge is compute spent to learn nothing.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pinned to the version in `packageManager`. A lockfile pins every
+      # dependency and nothing pinned the runtime resolving it.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+
+      # `--frozen-lockfile` so a lockfile that does not match `package.json`
+      # fails here rather than being quietly updated in CI and not on the
+      # machine that pushed.
+      - run: bun install --frozen-lockfile
+
+      # From the toolchain file if there is one, else the version the workspace
+      # declares. `clippy` because `verify` runs it; `rustfmt` is not needed,
+      # since `cargo fmt` writes and `verify` does not call it.
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - run: bun run verify
+
+      # `verify` is meant not to write, and `analyze` is the one step that can:
+      # it regenerates the manifests. A tracked manifest that no longer matches
+      # its source is a real fault and an invisible one, because everything
+      # downstream reads the file rather than the code. This is what makes the
+      # "never writes" rule checkable instead of stated.
+      - name: The tree is unchanged by verifying it
+        run: git diff --exit-code

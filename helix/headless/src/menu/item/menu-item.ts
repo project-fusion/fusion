@@ -90,9 +90,23 @@ export class HelixBaseMenuItem extends HelixElement {
   /** Marks this as a row a menu should count. Cheaper than an instanceof. */
   readonly isMenuItem = true
 
-  /** Whether anything was slotted into `submenu`. Client only. */
+  /**
+   * Whether anything was slotted into `submenu`.
+   *
+   * Client only, and the `?? []` is what makes that true rather than merely
+   * documented. Lit's element shim carries attributes but not a tree, so
+   * `children` is undefined on the server, and this getter is read during
+   * `render`: spreading it threw, and a menu row could not be served at all.
+   * Found by writing this component's SSR spec, which is the only place it
+   * could have been found, because every other path runs in a browser.
+   *
+   * False on the server is also the right answer rather than a safe one: the
+   * server cannot know whether a submenu was slotted, and a row that served a
+   * `aria-haspopup` it might not have would be a promise made to a screen
+   * reader on the strength of a guess.
+   */
   get hasSubmenu(): boolean {
-    return [...this.children].some((child) => child.slot === 'submenu')
+    return [...(this.children ?? [])].some((child) => child.slot === 'submenu')
   }
 
   /**

@@ -4259,7 +4259,19 @@ export type CustomElements = {
    * nowhere to be assigned and are never laid out. The element that holds the
    * page has to keep the slot even when it shows no row of its own. (property only)
    * - `isMenuItem`: Marks this as a row a menu should count. Cheaper than an instanceof. (property only) (readonly)
-   * - `hasSubmenu`: Whether anything was slotted into `submenu`. Client only. (property only) (readonly)
+   * - `hasSubmenu`: Whether anything was slotted into `submenu`.
+   *
+   * Client only, and the `?? []` is what makes that true rather than merely
+   * documented. Lit's element shim carries attributes but not a tree, so
+   * `children` is undefined on the server, and this getter is read during
+   * `render`: spreading it threw, and a menu row could not be served at all.
+   * Found by writing this component's SSR spec, which is the only place it
+   * could have been found, because every other path runs in a browser.
+   *
+   * False on the server is also the right answer rather than a safe one: the
+   * server cannot know whether a submenu was slotted, and a row that served a
+   * `aria-haspopup` it might not have would be a promise made to a screen
+   * reader on the strength of a guess. (property only) (readonly)
    *
    * ## Events
    *
@@ -7278,7 +7290,19 @@ export type CustomElementsSolidJs = {
    * nowhere to be assigned and are never laid out. The element that holds the
    * page has to keep the slot even when it shows no row of its own. (property only)
    * - `isMenuItem`: Marks this as a row a menu should count. Cheaper than an instanceof. (property only) (readonly)
-   * - `hasSubmenu`: Whether anything was slotted into `submenu`. Client only. (property only) (readonly)
+   * - `hasSubmenu`: Whether anything was slotted into `submenu`.
+   *
+   * Client only, and the `?? []` is what makes that true rather than merely
+   * documented. Lit's element shim carries attributes but not a tree, so
+   * `children` is undefined on the server, and this getter is read during
+   * `render`: spreading it threw, and a menu row could not be served at all.
+   * Found by writing this component's SSR spec, which is the only place it
+   * could have been found, because every other path runs in a browser.
+   *
+   * False on the server is also the right answer rather than a safe one: the
+   * server cannot know whether a submenu was slotted, and a row that served a
+   * `aria-haspopup` it might not have would be a promise made to a screen
+   * reader on the strength of a guess. (property only) (readonly)
    *
    * ## Events
    *

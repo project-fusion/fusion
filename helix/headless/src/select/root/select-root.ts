@@ -72,8 +72,22 @@ export class HelixBaseSelect extends MixinControllerOpen(
   @property()
   placeholder = 'Choose'
 
+  /**
+   * The list inside the surface, or nothing where there is no DOM to hold one.
+   *
+   * The optional chain is the server. `renderRoot` is a property Lit's element
+   * shim does not carry, and this getter is reached from `display`, which is
+   * read during `render`: without it the select threw on every server render
+   * and could not be served at all. Found by writing its SSR spec, which is
+   * the only thing that would have found it, because the client is where every
+   * other path runs and the client always has a root.
+   *
+   * The other reads of `renderRoot` here are inside callbacks the controllers
+   * invoke, and a controller only runs on a connected element, so they cannot
+   * be reached from the server and are left plain.
+   */
   private get listbox(): HelixBaseListbox | null {
-    return this.renderRoot.querySelector<HelixBaseListbox>('[part="listbox"]')
+    return this.renderRoot?.querySelector<HelixBaseListbox>('[part="listbox"]') ?? null
   }
 
   /* The surface floats, so it is placed against the trigger rather than laid

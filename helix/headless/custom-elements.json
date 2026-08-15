@@ -8741,7 +8741,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether anything was slotted into `submenu`. Client only.",
+              "description": "Whether anything was slotted into `submenu`.\n\nClient only, and the `?? []` is what makes that true rather than merely\ndocumented. Lit's element shim carries attributes but not a tree, so\n`children` is undefined on the server, and this getter is read during\n`render`: spreading it threw, and a menu row could not be served at all.\nFound by writing this component's SSR spec, which is the only place it\ncould have been found, because every other path runs in a browser.\n\nFalse on the server is also the right answer rather than a safe one: the\nserver cannot know whether a submenu was slotted, and a row that served a\n`aria-haspopup` it might not have would be a promise made to a screen\nreader on the strength of a guess.",
               "readonly": true
             },
             {
@@ -11437,6 +11437,7 @@
                 "text": "HelixBaseListbox | null"
               },
               "privacy": "private",
+              "description": "The list inside the surface, or nothing where there is no DOM to hold one.\n\nThe optional chain is the server. `renderRoot` is a property Lit's element\nshim does not carry, and this getter is reached from `display`, which is\nread during `render`: without it the select threw on every server render\nand could not be served at all. Found by writing its SSR spec, which is\nthe only thing that would have found it, because the client is where every\nother path runs and the client always has a root.\n\nThe other reads of `renderRoot` here are inside callbacks the controllers\ninvoke, and a controller only runs on a connected element, so they cannot\nbe reached from the server and are left plain.",
               "readonly": true
             },
             {
