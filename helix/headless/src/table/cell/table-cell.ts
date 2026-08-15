@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -30,7 +30,7 @@ export class HelixBaseTableCell extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // In `willUpdate`, which the server does call, unlike `connectedCallback`.
-    this.internals.role = this.header ? 'columnheader' : 'cell'
+    hostAria(this.internals, { role: this.header ? 'columnheader' : 'cell' })
   }
 
   protected override render(): TemplateResult {

@@ -1,6 +1,7 @@
 import {
   customElement,
   HelixFormElement,
+  hostAria,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -201,11 +202,11 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
     // Through internals, so nothing lands on the host as an attribute. A nav
     // renders a real `<nav>` in the shadow root and takes its semantics from
     // that, so the host stays neutral.
-    this.internals.role = 'radiogroup'
-    /* A string as well as the element reference `linkHost` sets, because this
-       is the half a server can write. The reference wins on the client, which
-       is what lets a consumer slot a label richer than a string. */
-    this.internals.ariaLabel = this.label === '' ? null : this.label
+    /* The label goes on as a string as well as the element reference
+       `linkHost` sets, because this is the half a server can write. The
+       reference wins on the client, which is what lets a consumer slot a label
+       richer than a string. */
+    hostAria(this.internals, { label: this.label, role: 'radiogroup' })
     // `null` rather than an empty string when nothing is chosen, which is the
     // difference between a control that submits nothing and one that submits a
     // blank.

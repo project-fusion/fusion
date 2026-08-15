@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
+import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@helix-io/core'
 import { caretLeft, caretRight, play, stop } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -152,8 +152,7 @@ export class HelixBaseCarousel extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.role = 'group'
-    this.internals.ariaLabel = this.label
+    hostAria(this.internals, { label: this.label, role: 'group' })
     // Announced as a carousel rather than as a bare group, so a reader knows
     // what the controls beside it are for.
     this.internals.ariaRoleDescription = 'carousel'

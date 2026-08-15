@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -43,7 +43,7 @@ export class HelixBaseEmptyState extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.role = this.noAnnounce ? null : 'status'
+    hostAria(this.internals, { role: this.noAnnounce ? '' : 'status' })
     this.internals.ariaLive = this.noAnnounce ? null : 'polite'
   }
 

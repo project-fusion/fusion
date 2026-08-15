@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { caretRight } from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -44,7 +44,7 @@ export class HelixBaseBreadcrumb extends HelixElement {
     // On the host, because the item is an `<ol>` child in the flat tree and the
     // role has to be there for the list to have items. In `willUpdate` rather
     // than `connectedCallback`, which the server never calls.
-    this.internals.role = 'listitem'
+    hostAria(this.internals, { role: 'listitem' })
     this.internals.ariaCurrent = this.current ? 'page' : null
   }
 

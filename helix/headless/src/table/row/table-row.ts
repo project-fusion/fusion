@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 
 /**
@@ -26,7 +26,7 @@ export class HelixBaseTableRow extends HelixElement {
     // and no rows, which is a broken table rather than a plain one.
     //
     // Set in `willUpdate`, which the server does call, unlike `connectedCallback`.
-    this.internals.role = 'row'
+    hostAria(this.internals, { role: 'row' })
   }
 
   protected override render(): TemplateResult {

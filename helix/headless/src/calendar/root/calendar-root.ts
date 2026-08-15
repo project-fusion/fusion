@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
+import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@helix-io/core'
 import { caretLeft, caretRight } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -331,8 +331,7 @@ export class HelixBaseCalendar extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.role = 'group'
-    this.internals.ariaLabel = this.label
+    hostAria(this.internals, { label: this.label, role: 'group' })
     this.internals.ariaInvalid = this.invalid ? 'true' : null
   }
 

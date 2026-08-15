@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 
 /**
@@ -33,7 +33,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 export class HelixBaseListItem extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.role = 'listitem'
+    hostAria(this.internals, { role: 'listitem' })
   }
 
   protected override render(): TemplateResult {

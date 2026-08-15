@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { checkCircle, type HelixIcon, info, warning, xCircleFill } from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -48,7 +48,7 @@ export class HelixBaseCallout extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the box.
-    this.internals.role = 'note'
+    hostAria(this.internals, { role: 'note' })
   }
 
   /** What kind of attention the passage needs. */

@@ -106,3 +106,18 @@ describe('carousel', () => {
     expect(buttons[0]?.getAttribute('part')).toBe('rotation')
   })
 })
+
+describe('carousel naming', () => {
+  test('an emptied label leaves the host unnamed, not named with nothing', async () => {
+    /* The distinction `hostAria` exists for. `ariaLabel = ''` is a name of no
+       characters, which a screen reader announces as an unnamed control while
+       every check for "is it labelled" passes. This component assigned the
+       property straight through, so a consumer emptying it on purpose, which is
+       what you do when a wrapper already names the thing, got the broken half
+       of that rather than the honest one. */
+    const host = (await mount('<helix-carousel label=""></helix-carousel>')) as Updatable & {
+      internals: ElementInternals
+    }
+    expect(host.internals.ariaLabel).toBeNull()
+  })
+})

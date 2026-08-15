@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 
 /**
@@ -31,7 +31,7 @@ export class HelixBaseBreadcrumbs extends HelixElement {
     super.willUpdate(changed)
     // On the host through internals, so the landmark is the element itself and
     // an author's `aria-label` names it without anything being copied inward.
-    this.internals.role = 'navigation'
+    hostAria(this.internals, { role: 'navigation' })
   }
 
   protected override render(): TemplateResult {

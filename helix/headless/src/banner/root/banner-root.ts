@@ -1,4 +1,4 @@
-import { customElement, HelixDismissEvent, HelixElement } from '@helix-io/core'
+import { customElement, HelixDismissEvent, HelixElement, hostAria } from '@helix-io/core'
 import { x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -62,7 +62,7 @@ export class HelixBaseBanner extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, and always polite. See the note above on `role="alert"`.
-    this.internals.role = 'status'
+    hostAria(this.internals, { role: 'status' })
     this.internals.ariaLive = 'polite'
   }
 

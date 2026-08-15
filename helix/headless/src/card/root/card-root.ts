@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 
 /**
@@ -35,7 +35,7 @@ export class HelixBaseCard extends HelixElement {
     super.willUpdate(changed)
     // On the host, since the host is the box. Set here rather than in
     // `connectedCallback`, which the server never calls.
-    this.internals.role = 'group'
+    hostAria(this.internals, { role: 'group' })
   }
 
   protected override render(): TemplateResult {

@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -66,8 +66,7 @@ export class HelixBaseAvatar extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.role = 'img'
-    this.internals.ariaLabel = this.name || null
+    hostAria(this.internals, { label: this.name, role: 'img' })
   }
 
   protected override render(): TemplateResult {

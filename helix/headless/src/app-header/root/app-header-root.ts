@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -66,7 +66,7 @@ export class HelixBaseAppHeader extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the banner.
-    this.internals.role = 'banner'
+    hostAria(this.internals, { role: 'banner' })
   }
 
   override connectedCallback(): void {
