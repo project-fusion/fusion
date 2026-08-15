@@ -36,6 +36,8 @@ import type {
   HelixMenuItem,
   HelixNavBar,
   HelixOpenEvent,
+  HelixOption,
+  HelixOptionGroup,
   HelixQuote,
   HelixRadio,
   HelixRadioGroup,
@@ -1679,6 +1681,63 @@ export type HelixNavBarProps = {
 export type HelixNavBarSolidJsProps = {
   /** Accessible name for the landmark. */
   "prop:label"?: HelixNavBar["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixOptionGroupProps = {
+  /** The heading over the run. */
+  label?: HelixOptionGroup["label"];
+};
+
+export type HelixOptionGroupSolidJsProps = {
+  /** The heading over the run. */
+  "prop:label"?: HelixOptionGroup["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixOption` component event */
+export type HelixOptionElementEvent<E = Event> = TypedEvent<HelixOption, E>;
+/** `helix-select` event type */
+export type HelixOptionHelixSelectElementEvent =
+  HelixOptionElementEvent<HelixSelectEvent>;
+
+export type HelixOptionProps = {
+  /** Whether this choice can be made. */
+  disabled?: HelixOption["disabled"];
+  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  "data-active"?: HelixOption["active"];
+  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  active?: HelixOption["active"];
+  /** Whether this choice is currently chosen. Written by the listbox. */
+  selected?: HelixOption["selected"];
+  /** Identifies this choice, and is what a form submits. */
+  value?: HelixOption["value"];
+
+  /** Fired when this choice is made. */
+  "onhelix-select"?: (e: HelixOptionHelixSelectElementEvent) => void;
+};
+
+export type HelixOptionSolidJsProps = {
+  /** Whether this choice can be made. */
+  "prop:disabled"?: HelixOption["disabled"];
+  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  "bool:data-active"?: HelixOption["active"];
+  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  "prop:active"?: HelixOption["active"];
+  /** Whether this choice is currently chosen. Written by the listbox. */
+  "prop:selected"?: HelixOption["selected"];
+  /** Identifies this choice, and is what a form submits. */
+  "prop:value"?: HelixOption["value"];
+  /** Fired when this choice is made. */
+  "on:helix-select"?: (e: HelixOptionHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4360,6 +4419,92 @@ export type CustomElements = {
    */
   "helix-nav-bar": Partial<
     HelixNavBarProps & BaseProps<HelixNavBar> & BaseEvents
+  >;
+
+  /**
+   * The heading is set small and quiet, because it is a divider that happens to
+   * have words on it: a run of options is read as a list and the heading is what
+   * tells you which list, not something to read on its own.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: The heading over the run.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options in this run.
+   * - `label`: Richer than a string.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The heading.
+   * - `items`: The run itself.
+   */
+  "helix-option-group": Partial<
+    HelixOptionGroupProps & BaseProps<HelixOptionGroup> & BaseEvents
+  >;
+
+  /**
+   * Two states that look different on purpose: chosen, which is a fact about the
+   * value, and active, which is where the keyboard is. A list that draws them the
+   * same way leaves a reader arrowing through it unable to tell what they have
+   * picked from what they are looking at.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether this choice can be made.
+   * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
+   * - `selected`: Whether this choice is currently chosen. Written by the listbox.
+   * - `value`: Identifies this choice, and is what a form submits.
+   * - `text`: The words, for a listbox that has to match text against them.
+   *
+   * Read from the rendered content rather than required as a property, because
+   * the content is where a consumer naturally puts it and asking for both is
+   * asking for two things to disagree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when this choice is made.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this choice.
+   * - `start`: Before the words, for an icon or an avatar.
+   * - `end`: After them, for a shortcut or a count.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `select() => void`: Makes this choice and announces it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row.
+   * - `label`: The words.
+   */
+  "helix-option": Partial<
+    HelixOptionProps & BaseProps<HelixOption> & BaseEvents
   >;
 
   /**
@@ -7202,6 +7347,98 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The heading is set small and quiet, because it is a divider that happens to
+   * have words on it: a run of options is read as a list and the heading is what
+   * tells you which list, not something to read on its own.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: The heading over the run.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options in this run.
+   * - `label`: Richer than a string.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The heading.
+   * - `items`: The run itself.
+   */
+  "helix-option-group": Partial<
+    HelixOptionGroupProps &
+      HelixOptionGroupSolidJsProps &
+      BaseProps<HelixOptionGroup> &
+      BaseEvents
+  >;
+
+  /**
+   * Two states that look different on purpose: chosen, which is a fact about the
+   * value, and active, which is where the keyboard is. A list that draws them the
+   * same way leaves a reader arrowing through it unable to tell what they have
+   * picked from what they are looking at.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether this choice can be made.
+   * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
+   * - `selected`: Whether this choice is currently chosen. Written by the listbox.
+   * - `value`: Identifies this choice, and is what a form submits.
+   * - `text`: The words, for a listbox that has to match text against them.
+   *
+   * Read from the rendered content rather than required as a property, because
+   * the content is where a consumer naturally puts it and asking for both is
+   * asking for two things to disagree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when this choice is made.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this choice.
+   * - `start`: Before the words, for an icon or an avatar.
+   * - `end`: After them, for a shortcut or a count.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `select() => void`: Makes this choice and announces it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row.
+   * - `label`: The words.
+   */
+  "helix-option": Partial<
+    HelixOptionProps &
+      HelixOptionSolidJsProps &
+      BaseProps<HelixOption> &
+      BaseEvents
+  >;
+
+  /**
    * Takes the surrounding type rather than a size of its own, because a quotation
    * inside a paragraph is that paragraph's text with marks around it.
    *
@@ -8586,6 +8823,8 @@ export type CustomCssProperties = {
   "--nav-bar-indicator-color"?: string;
   /** Space between destinations. */
   "--nav-bar-gap"?: string;
+  /** Wash behind the option the keyboard is on. */
+  "--option-active-color"?: string;
   /** Color of the quoted text. */
   "--quote-color"?: string;
   /** Space between the choices. */

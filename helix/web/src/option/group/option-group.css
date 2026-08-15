@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+/* Small and quiet, because it is a divider that happens to have words on it. */
+[part="label"] {
+  color: var(--helix-color-foreground-subtle);
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+}

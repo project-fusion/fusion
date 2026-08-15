@@ -6331,6 +6331,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/option/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/quote/index.js"
           }
         },
@@ -8813,6 +8821,449 @@
           "declaration": {
             "name": "HelixBaseNavBar",
             "module": "src/nav-bar/root/nav-bar-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/option/group/option-group.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A heading over a set, and nothing else: it holds no selection and no value,\nbecause grouping is presentation over a list whose owner is the listbox. Its\noptions are still the listbox's options, which is what keeps the keyboard\nmoving through a grouped list exactly as it moves through a flat one.\n\n`role=\"group\"` named by the heading, so a screen reader announces which run\nan option is in without the heading becoming something to land on.",
+          "name": "HelixBaseOptionGroup",
+          "cssParts": [
+            {
+              "description": "The heading.",
+              "name": "label"
+            },
+            {
+              "description": "The run itself.",
+              "name": "items"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The options in this run.",
+              "name": ""
+            },
+            {
+              "description": "Richer than a string.",
+              "name": "label"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The heading over the run.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The heading over the run.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A named run of options inside a listbox.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/option-group",
+            "aliases": [
+              "OptGroup",
+              "Section"
+            ],
+            "tier": "headless",
+            "group": "BaseOption",
+            "part": "Group"
+          },
+          "tagName": "helix-base-option-group",
+          "customElement": true,
+          "modulePath": "src/option/group/option-group.ts",
+          "definitionPath": "src/option/group/option-group.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseOptionGroup",
+          "declaration": {
+            "name": "HelixBaseOptionGroup",
+            "module": "src/option/group/option-group.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-option-group",
+          "declaration": {
+            "name": "HelixBaseOptionGroup",
+            "module": "src/option/group/option-group.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/option/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/option/group/option-group.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/option/root/option-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/option/root/option-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**Its own family rather than a part of Select, and the reason is what it\nbelongs to.** `role=\"option\"` requires an owning `role=\"listbox\"`, which is\nthe ARIA contract: an option cannot stand alone. But a Select is *a listbox\nwith a trigger*, a Combobox is *a listbox with a text input*, and a command\npalette is the same listbox again. The thing an option belongs to is the\nlistbox, not any one control that happens to contain one.\n\nThat is the difference from `Radio`, which is a part of its group: a radio\nhas exactly one kind of owner, and an option has several.\n\nSelection is announced rather than applied, the way a radio's is. The option\nsays it was chosen, the listbox decides whether that stands, and the listbox\nwrites `selected` back. An option that selected itself would be a second\nanswer to which one is chosen.\n\n**Nothing here knows about filtering.** A hidden option is hidden by whatever\nowns it, through `hidden`, because what counts as a match is the listbox's\nquestion and differs between a select and a command palette.",
+          "name": "HelixBaseOption",
+          "cssParts": [
+            {
+              "description": "The row.",
+              "name": "item"
+            },
+            {
+              "description": "The words.",
+              "name": "label"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The words naming this choice.",
+              "name": ""
+            },
+            {
+              "description": "Before the words, for an icon or an avatar.",
+              "name": "start"
+            },
+            {
+              "description": "After them, for a shortcut or a count.",
+              "name": "end"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this choice can be made.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "active",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the option the keyboard is on. Written by the listbox.",
+              "attribute": "data-active",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this choice is currently chosen. Written by the listbox.",
+              "attribute": "selected",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies this choice, and is what a form submits.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "text",
+              "type": {
+                "text": "string"
+              },
+              "description": "The words, for a listbox that has to match text against them.\n\nRead from the rendered content rather than required as a property, because\nthe content is where a consumer naturally puts it and asking for both is\nasking for two things to disagree.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Makes this choice and announces it.",
+              "type": {
+                "text": "select() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when this choice is made.",
+              "name": "helix-select",
+              "reactProp": "onhelix-select"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this choice can be made.",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "data-active",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the option the keyboard is on. Written by the listbox.",
+              "fieldName": "active"
+            },
+            {
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this choice is currently chosen. Written by the listbox.",
+              "fieldName": "selected"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies this choice, and is what a form submits.",
+              "fieldName": "value"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One choice in a listbox.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/option",
+            "aliases": [
+              "Item",
+              "Choice"
+            ],
+            "tier": "headless",
+            "group": "BaseOption",
+            "part": "Root"
+          },
+          "tagName": "helix-base-option",
+          "customElement": true,
+          "modulePath": "src/option/root/option-root.ts",
+          "definitionPath": "src/option/root/option-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseOption",
+          "declaration": {
+            "name": "HelixBaseOption",
+            "module": "src/option/root/option-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-option",
+          "declaration": {
+            "name": "HelixBaseOption",
+            "module": "src/option/root/option-root.ts"
           }
         }
       ]

@@ -28,6 +28,8 @@ import type {
   HelixBaseMenu,
   HelixBaseMenuItem,
   HelixBaseNavBar,
+  HelixBaseOption,
+  HelixBaseOptionGroup,
   HelixBaseQuote,
   HelixBaseRadio,
   HelixBaseRadioGroup,
@@ -1463,6 +1465,66 @@ export type HelixBaseNavBarProps = {
 export type HelixBaseNavBarSolidJsProps = {
   /** Accessible name for the landmark. */
   "prop:label"?: HelixBaseNavBar["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseOptionGroupProps = {
+  /** The heading over the run. */
+  label?: HelixBaseOptionGroup["label"];
+};
+
+export type HelixBaseOptionGroupSolidJsProps = {
+  /** The heading over the run. */
+  "prop:label"?: HelixBaseOptionGroup["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseOption` component event */
+export type HelixBaseOptionElementEvent<E = Event> = TypedEvent<
+  HelixBaseOption,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseOptionHelixSelectElementEvent =
+  HelixBaseOptionElementEvent<HelixSelectEvent>;
+
+export type HelixBaseOptionProps = {
+  /** Whether this choice can be made. */
+  disabled?: HelixBaseOption["disabled"];
+  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  "data-active"?: HelixBaseOption["active"];
+  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  active?: HelixBaseOption["active"];
+  /** Whether this choice is currently chosen. Written by the listbox. */
+  selected?: HelixBaseOption["selected"];
+  /** Identifies this choice, and is what a form submits. */
+  value?: HelixBaseOption["value"];
+
+  /** Fired when this choice is made. */
+  "onhelix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
+};
+
+export type HelixBaseOptionSolidJsProps = {
+  /** Whether this choice can be made. */
+  "prop:disabled"?: HelixBaseOption["disabled"];
+  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  "bool:data-active"?: HelixBaseOption["active"];
+  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  "prop:active"?: HelixBaseOption["active"];
+  /** Whether this choice is currently chosen. Written by the listbox. */
+  "prop:selected"?: HelixBaseOption["selected"];
+  /** Identifies this choice, and is what a form submits. */
+  "prop:value"?: HelixBaseOption["value"];
+  /** Fired when this choice is made. */
+  "on:helix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4013,6 +4075,104 @@ export type CustomElements = {
    */
   "helix-base-nav-bar": Partial<
     HelixBaseNavBarProps & BaseProps<HelixBaseNavBar> & BaseEvents
+  >;
+
+  /**
+   * A heading over a set, and nothing else: it holds no selection and no value,
+   * because grouping is presentation over a list whose owner is the listbox. Its
+   * options are still the listbox's options, which is what keeps the keyboard
+   * moving through a grouped list exactly as it moves through a flat one.
+   *
+   * `role="group"` named by the heading, so a screen reader announces which run
+   * an option is in without the heading becoming something to land on.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: The heading over the run.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options in this run.
+   * - `label`: Richer than a string.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The heading.
+   * - `items`: The run itself.
+   */
+  "helix-base-option-group": Partial<
+    HelixBaseOptionGroupProps & BaseProps<HelixBaseOptionGroup> & BaseEvents
+  >;
+
+  /**
+   * **Its own family rather than a part of Select, and the reason is what it
+   * belongs to.** `role="option"` requires an owning `role="listbox"`, which is
+   * the ARIA contract: an option cannot stand alone. But a Select is *a listbox
+   * with a trigger*, a Combobox is *a listbox with a text input*, and a command
+   * palette is the same listbox again. The thing an option belongs to is the
+   * listbox, not any one control that happens to contain one.
+   *
+   * That is the difference from `Radio`, which is a part of its group: a radio
+   * has exactly one kind of owner, and an option has several.
+   *
+   * Selection is announced rather than applied, the way a radio's is. The option
+   * says it was chosen, the listbox decides whether that stands, and the listbox
+   * writes `selected` back. An option that selected itself would be a second
+   * answer to which one is chosen.
+   *
+   * **Nothing here knows about filtering.** A hidden option is hidden by whatever
+   * owns it, through `hidden`, because what counts as a match is the listbox's
+   * question and differs between a select and a command palette.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether this choice can be made.
+   * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
+   * - `selected`: Whether this choice is currently chosen. Written by the listbox.
+   * - `value`: Identifies this choice, and is what a form submits.
+   * - `text`: The words, for a listbox that has to match text against them.
+   *
+   * Read from the rendered content rather than required as a property, because
+   * the content is where a consumer naturally puts it and asking for both is
+   * asking for two things to disagree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when this choice is made.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this choice.
+   * - `start`: Before the words, for an icon or an avatar.
+   * - `end`: After them, for a shortcut or a count.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `select() => void`: Makes this choice and announces it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row.
+   * - `label`: The words.
+   */
+  "helix-base-option": Partial<
+    HelixBaseOptionProps & BaseProps<HelixBaseOption> & BaseEvents
   >;
 
   /**
@@ -6727,6 +6887,110 @@ export type CustomElementsSolidJs = {
     HelixBaseNavBarProps &
       HelixBaseNavBarSolidJsProps &
       BaseProps<HelixBaseNavBar> &
+      BaseEvents
+  >;
+
+  /**
+   * A heading over a set, and nothing else: it holds no selection and no value,
+   * because grouping is presentation over a list whose owner is the listbox. Its
+   * options are still the listbox's options, which is what keeps the keyboard
+   * moving through a grouped list exactly as it moves through a flat one.
+   *
+   * `role="group"` named by the heading, so a screen reader announces which run
+   * an option is in without the heading becoming something to land on.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: The heading over the run.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options in this run.
+   * - `label`: Richer than a string.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The heading.
+   * - `items`: The run itself.
+   */
+  "helix-base-option-group": Partial<
+    HelixBaseOptionGroupProps &
+      HelixBaseOptionGroupSolidJsProps &
+      BaseProps<HelixBaseOptionGroup> &
+      BaseEvents
+  >;
+
+  /**
+   * **Its own family rather than a part of Select, and the reason is what it
+   * belongs to.** `role="option"` requires an owning `role="listbox"`, which is
+   * the ARIA contract: an option cannot stand alone. But a Select is *a listbox
+   * with a trigger*, a Combobox is *a listbox with a text input*, and a command
+   * palette is the same listbox again. The thing an option belongs to is the
+   * listbox, not any one control that happens to contain one.
+   *
+   * That is the difference from `Radio`, which is a part of its group: a radio
+   * has exactly one kind of owner, and an option has several.
+   *
+   * Selection is announced rather than applied, the way a radio's is. The option
+   * says it was chosen, the listbox decides whether that stands, and the listbox
+   * writes `selected` back. An option that selected itself would be a second
+   * answer to which one is chosen.
+   *
+   * **Nothing here knows about filtering.** A hidden option is hidden by whatever
+   * owns it, through `hidden`, because what counts as a match is the listbox's
+   * question and differs between a select and a command palette.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether this choice can be made.
+   * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
+   * - `selected`: Whether this choice is currently chosen. Written by the listbox.
+   * - `value`: Identifies this choice, and is what a form submits.
+   * - `text`: The words, for a listbox that has to match text against them.
+   *
+   * Read from the rendered content rather than required as a property, because
+   * the content is where a consumer naturally puts it and asking for both is
+   * asking for two things to disagree. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when this choice is made.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this choice.
+   * - `start`: Before the words, for an icon or an avatar.
+   * - `end`: After them, for a shortcut or a count.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `select() => void`: Makes this choice and announces it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row.
+   * - `label`: The words.
+   */
+  "helix-base-option": Partial<
+    HelixBaseOptionProps &
+      HelixBaseOptionSolidJsProps &
+      BaseProps<HelixBaseOption> &
       BaseEvents
   >;
 
