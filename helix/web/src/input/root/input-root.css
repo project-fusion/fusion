@@ -34,14 +34,20 @@
  * rather than focused. The offset is right where a ring surrounds something
  * that is not itself changing colour, which is most controls, and wrong here
  * because the border is doing the same job at the same moment. */
-:host(:focus-within) [part="field"] {
+:host(:not([disabled])) [part="field"]:hover {
+  border-color: var(--helix-color-border-strong);
+}
+
+/* Named with `:hover` as well, which is the whole reason this reads right.
+   Hover is a more specific selector than focus here, four to three, so a
+   focused field under the pointer took the hover border back: a grey edge
+   inside a blue ring, which is the two-ring look this was meant to end. Being
+   focused outranks being pointed at, so it has to say so. */
+:host(:focus-within) [part="field"],
+:host(:focus-within) [part="field"]:hover {
   border-color: var(--helix-color-border-accent);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
-}
-
-:host(:not([disabled])) [part="field"]:hover {
-  border-color: var(--helix-color-border-strong);
 }
 
 /* The platform's verdict, which the host copies from the input, so this follows
