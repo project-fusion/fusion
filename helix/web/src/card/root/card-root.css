@@ -19,6 +19,10 @@
 
   /* One inset for every region, so dense narrows them together. */
   --_card-inset: var(--card-padding, var(--helix-space-md));
+  /* How wide the media column is when the card lays out sideways. Named once:
+     it is both the media's own width and the room the content is pushed clear
+     by, and two copies of a default drift. */
+  --_card-media: var(--card-media-size, 12rem);
 }
 
 :host([dense]) {
@@ -58,32 +62,34 @@ slot[name="footer"]::slotted(*) {
   justify-self: end;
 }
 
-/* On the host, which is the grid. These named `[part="container"]`, a wrapper
-   this component deliberately does not render: the comment at the top of the
-   file says so, and the rule above it was a verbatim copy of `:host` left
-   behind by the same refactor. Both matched nothing, so `orientation` did
-   nothing at all and a horizontal card laid out as a stack.
-
-   The media column is sized by the media rather than declared ahead of it, so a
-   card with an empty media slot has no column instead of twelve rems of
-   nothing: an unassigned `<slot>` generates no box, so an `auto` track with
-   nothing placed in it collapses. */
+/* Sideways is the same stack with the media taken out of flow beside it.
+ *
+ * It was a second grid column, and that cannot work here, for two reasons that
+ * compound. The regions are bare slots, so `::slotted(*)` is the only way to
+ * place them and it reaches elements only: a body written as text between the
+ * tags is an anonymous item that auto-places wherever it likes. And `grid-row:
+ * 1 / -1` spans to the last *explicit* line, of which a grid with no row
+ * template has none, so the media covered one row rather than all of them.
+ *
+ * Measured on the component's own example: the body landed in column one, row
+ * two, which then sized that column to four hundred and two pixels around a
+ * media meant to be two hundred and eight, and the text ran out under the card.
+ *
+ * Out of flow, none of that arises. The stack stays exactly the stack it is
+ * vertically, so text nodes and elements behave the same as they always did,
+ * and the media fills the height because it is pinned to both edges rather than
+ * because it was asked to span rows nobody declared. The inset on the leading
+ * side is what keeps the content clear of it. */
 :host([orientation="horizontal"]) {
-  grid-template-columns: auto minmax(0, 1fr);
+  padding-inline-start: calc(var(--_card-media) + var(--_card-inset));
+  position: relative;
 }
 
-/* Beside the stack, media occupies its own column for the full height of the
-   card, so it spans every row the other regions produce. */
 :host([orientation="horizontal"]) slot[name="media"]::slotted(*) {
-  block-size: calc(100% + var(--_card-inset) * 2);
-  grid-column: 1;
-  grid-row: 1 / -1;
-  inline-size: calc(var(--card-media-size, 12rem) + var(--_card-inset));
-  margin-inline-end: 0;
-}
-
-:host([orientation="horizontal"]) slot[name="header"]::slotted(*),
-:host([orientation="horizontal"]) slot[name="footer"]::slotted(*),
-:host([orientation="horizontal"]) slot:not([name])::slotted(*) {
-  grid-column: 2;
+  block-size: 100%;
+  inline-size: var(--_card-media);
+  inset-block: 0;
+  inset-inline-start: 0;
+  margin: var(--helix-space-none);
+  position: absolute;
 }

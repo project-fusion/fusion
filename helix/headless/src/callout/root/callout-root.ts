@@ -61,7 +61,7 @@ export class HelixBaseCallout extends HelixElement {
 
     return html`<span part="icon">
         <slot name="icon">
-          <svg viewBox=${icon.viewBox} role="img" aria-label=${label}>
+          <svg fill="currentColor" viewBox=${icon.viewBox} role="img" aria-label=${label}>
             ${unsafeSVG(icon.content)}
           </svg>
         </slot>

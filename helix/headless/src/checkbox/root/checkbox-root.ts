@@ -114,7 +114,17 @@ export class HelixBaseCheckbox extends MixinControllerChecked(HelixFormElement) 
   }
 
   protected override render(): TemplateResult {
-    return html`<input
+    /* A real `<label>` around both, which is the whole of what makes the text a
+       target. It was a `<span>` beside the input, so pressing the words did
+       nothing: the styled tier's own description claimed the pair behaved like
+       a native label wrapping a checkbox, and nothing was doing that work.
+
+       Labelling is behaviour, which is what earns an element here rather than a
+       bare slot: the wrapper is not decoration and there is no other way to get
+       it. The browser handles the forwarding, so there is no click handler to
+       write and none to get wrong. */
+    return html`<label part="field">
+      <input
         part="control"
         type="checkbox"
         .checked=${this.isChecked}
@@ -124,7 +134,8 @@ export class HelixBaseCheckbox extends MixinControllerChecked(HelixFormElement) 
         aria-describedby=${nothing}
         @change=${this.handleChange}
       />
-      <span part="label"><slot></slot></span>`
+      <span part="label"><slot></slot></span>
+    </label>`
   }
 }
 

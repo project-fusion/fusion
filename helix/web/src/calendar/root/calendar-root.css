@@ -115,10 +115,21 @@
   background-color: var(--helix-color-surface-sunken);
 }
 
-/* The band, on the cell. The ends round off so the run has a shape, and a lone
-   selected date is both ends at once and so rounds on both sides. */
-[part="cell"][aria-selected] {
+/* The band, on the cell, and only where there is a run to band.
+ *
+ * A lone selected date used to take it too, and a cell is wider than it is tall
+ * — forty by thirty-six — so rounding both ends of one drew an oval around a
+ * circular day. The mark for a single date is a ring on the day itself, which
+ * is round because the day is square, and the gap between the two sizes is
+ * exactly what the ring is. */
+[part="cell"][aria-selected]:is([data-range-start], [data-range-middle], [data-range-end]) {
   background-color: var(--calendar-range-color, var(--helix-color-primary-subtle));
+}
+
+[part="cell"][aria-selected]:not([data-range-start]):not([data-range-middle]):not([data-range-end])
+  [part="day"] {
+  box-shadow: 0 0 0 calc((var(--_calendar-row) - var(--_calendar-day)) / 2)
+    var(--calendar-range-color, var(--helix-color-primary-subtle));
 }
 
 [part="cell"][data-range-start],

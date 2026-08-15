@@ -1,14 +1,24 @@
 :host {
-  align-items: center;
-  cursor: pointer;
   display: inline-flex;
-  gap: var(--helix-space-xs);
 
   --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox));
 }
 
-:host([disabled]) {
+/* The row is the label, so the whole of it is the target the browser forwards
+   to the box. It was the host, with the input and the text as siblings, and a
+   press on the text did nothing at all. */
+[part="field"] {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--helix-space-xs);
+}
+
+:host([disabled]) [part="field"] {
   cursor: default;
+}
+
+:host([disabled]) {
   opacity: 0.5;
 }
 
