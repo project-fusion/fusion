@@ -342,6 +342,14 @@ helix-app-header {
   padding-inline: var(--helix-space-sm);
 }
 
+/* The panel's tab strip is a bar of the sandbox like the toolbar above it, so
+   it is inset the same amount. Left to the component it had none, and the first
+   tab sat against the window edge while every other bar in the tool started a
+   step in. */
+helix-sandbox [slot="panel"]::part(tabs) {
+  padding-inline: var(--helix-space-sm);
+}
+
 .examplesScroll {
   min-block-size: 0;
   overflow-y: auto;

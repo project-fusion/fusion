@@ -25,12 +25,12 @@
    the divider would move nothing. */
 :host(:not([orientation])),
 :host([orientation="horizontal"]) {
-  grid-template-columns: var(--_sandbox-split, 45%) auto minmax(0, 1fr);
+  grid-template-columns: var(--_sandbox-split, 50%) auto minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto auto auto;
 }
 
 :host([orientation="vertical"]) {
-  grid-template-rows: auto var(--_sandbox-split, 45%) auto minmax(0, 1fr) auto auto auto;
+  grid-template-rows: auto var(--_sandbox-split, 50%) auto minmax(0, 1fr) auto auto auto;
 }
 
 /* The panes and the divider between them sit in the row under the toolbar, and

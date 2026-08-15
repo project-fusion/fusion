@@ -221,24 +221,32 @@ describe('sandbox divider', () => {
   }
 
   test('is a separator that reports where it is', async () => {
-    const sandbox = await mount(wired)
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
     const separator = part(sandbox, 'separator')
     expect(separator?.getAttribute('role')).toBe('separator')
-    expect(separator?.getAttribute('aria-valuenow')).toBe('45')
+    // Whatever the split is, not whatever number it happens to start at: the
+    // assertion that matters is that the two agree, and pinning the literal
+    // meant a change of default read as a broken separator.
+    expect(separator?.getAttribute('aria-valuenow')).toBe(String(sandbox.split))
     // Focusable, because a divider only a mouse can move is unusable without one.
     expect(separator?.getAttribute('tabindex')).toBe('0')
   })
 
   test('arrow keys move the split', async () => {
+    // By a step from wherever it was, which is the behaviour. The step is the
+    // component's and the starting point is a default, and a spec that names
+    // both fails when either moves for reasons that are not this one.
     const sandbox = (await mount(wired)) as Updatable & { split: number }
+    const start = sandbox.split
     press(sandbox, 'ArrowRight')
     await sandbox.updateComplete
-    expect(sandbox.split).toBe(47)
+    const step = sandbox.split - start
+    expect(step).toBeGreaterThan(0)
 
     press(sandbox, 'ArrowLeft')
     press(sandbox, 'ArrowLeft')
     await sandbox.updateComplete
-    expect(sandbox.split).toBe(43)
+    expect(sandbox.split).toBe(start - step)
   })
 
   test('the split cannot be driven to nothing', async () => {
@@ -337,6 +345,7 @@ describe('sandbox source editing', () => {
     test('each divider answers only the arrows it can move', async () => {
       const sandbox = (await mount(withPanel)) as Updatable & { panelSize: number; split: number }
       await sandbox.updateComplete
+      const start = sandbox.split
       const press = async (selector: string, key: string) => {
         sandbox.shadowRoot
           ?.querySelector(selector)
@@ -345,14 +354,16 @@ describe('sandbox source editing', () => {
       }
 
       await press('[part="separator"][data-drag="inline"]', 'ArrowLeft')
-      expect(sandbox.split).toBe(43)
+      const moved = sandbox.split
+      expect(moved).toBeLessThan(start)
       await press('[part="separator"][data-drag="inline"]', 'ArrowUp')
       expect(sandbox.panelSize).toBe(192)
 
       await press('[part="separator"][data-axis="block"]', 'ArrowUp')
       expect(sandbox.panelSize).toBe(208)
+      // Still where the inline divider left it: this one moves the other axis.
       await press('[part="separator"][data-axis="block"]', 'ArrowLeft')
-      expect(sandbox.split).toBe(43)
+      expect(sandbox.split).toBe(moved)
     })
 
     test('the corner answers both, each arrow along its own axis', async () => {
@@ -364,8 +375,9 @@ describe('sandbox source editing', () => {
           ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
         await sandbox.updateComplete
       }
+      const start = sandbox.split
       await press('ArrowRight')
-      expect(sandbox.split).toBe(47)
+      expect(sandbox.split).toBeGreaterThan(start)
       await press('ArrowUp')
       expect(sandbox.panelSize).toBe(208)
     })

@@ -916,7 +916,7 @@
               "type": {
                 "text": "number"
               },
-              "default": "45",
+              "default": "50",
               "description": "Percentage of the sandbox given to the source pane.",
               "attribute": "split"
             },
@@ -1335,7 +1335,7 @@
               "type": {
                 "text": "number"
               },
-              "default": "45",
+              "default": "50",
               "description": "Percentage of the sandbox given to the source pane.",
               "fieldName": "split"
             },

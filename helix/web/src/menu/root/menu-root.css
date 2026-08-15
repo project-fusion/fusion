@@ -10,7 +10,7 @@
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
 
-  background-color: var(--menu-background-color, var(--helix-color-surface-raised));
+  background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
      `border: solid`, so dropping the declaration leaves a three-pixel medium
      border rather than none at all. Measured, that is exactly what happened.

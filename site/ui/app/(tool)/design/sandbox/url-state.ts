@@ -13,10 +13,17 @@
  * message, and it makes the query legible: what is in it is what was changed.
  *
  * **Keys are one letter where the value says what it is.** `l=centered` needs
- * no help; `hide=panel,status` does, so that one is a word. The example is `e`
+ * no help; `panes=editor,panel` does, so that one is a word. The example is `e`
  * and joins its two parts with a dot, `e=accordion.preview`, because they are
  * one address rather than two settings and a reader should be able to edit it
  * by hand.
+ *
+ * `panes` lists what is rendered rather than what is not. Naming the absences
+ * reads better right up until a region is off by default, and the status bar
+ * is: "hidden" would then have to carry the status bar in the common case and
+ * omitting it would mean showing it, which is a parameter that means the
+ * opposite of what it says. Listing what is there has one sense whatever the
+ * defaults are.
  *
  * The site's own colour mode is deliberately not here. It is a preference about
  * how someone reads, held in `localStorage` and applying to every page, and
@@ -46,8 +53,8 @@ export type SandboxUrlState = {
   example: string | null
   /** The family's slug. */
   family: string | null
-  /** Regions that are turned off. */
-  hidden: Section[]
+  /** Regions that are rendered. */
+  panes: Section[]
   /** How the preview lays the example out. */
   layout: Layout
   /** Which file the editor is showing. */
@@ -60,8 +67,11 @@ export const DEFAULTS: SandboxUrlState = {
   direction: 'ltr',
   example: null,
   family: null,
-  hidden: [],
   layout: 'padded',
+  /* The status bar is off. It reports the caret and the language, which is
+     worth having while typing and is noise the rest of the time, so it is
+     something to turn on rather than something to dismiss. */
+  panes: ['editor', 'panel'],
   syntax: 'html',
 }
 
@@ -91,18 +101,21 @@ export const readUrlState = (search: string): SandboxUrlState => {
   const address = params.get('e')
   const [family, example] = address ? address.split('.') : []
 
-  const hidden = (params.get('hide') ?? '')
-    .split(',')
-    .map((part) => part.trim())
-    .filter((part): part is Section => SECTIONS.includes(part as Section))
+  const listed = params.get('panes')
+  const panes = listed
+    ? listed
+        .split(',')
+        .map((part) => part.trim())
+        .filter((part): part is Section => SECTIONS.includes(part as Section))
+    : DEFAULTS.panes
 
   return {
     colorMode: oneOf(params.get('c'), ['dark', 'light'] as const, null as never) || null,
     direction: oneOf(params.get('d'), DIRECTIONS, DEFAULTS.direction),
     example: example || null,
     family: family || null,
-    hidden,
     layout: oneOf(params.get('l'), LAYOUTS, DEFAULTS.layout),
+    panes,
     syntax: oneOf(params.get('x'), SYNTAXES, DEFAULTS.syntax),
   }
 }
@@ -133,9 +146,11 @@ export const writeUrlState = (state: SandboxUrlState): string => {
   if (state.colorMode) {
     params.set('c', state.colorMode)
   }
-  if (state.hidden.length > 0) {
-    // In the order the regions appear, not the order they were switched off.
-    params.set('hide', SECTIONS.filter((section) => state.hidden.includes(section)).join(','))
+  // In the order the regions appear, not the order they were switched on, and
+  // only when the set differs from the one a fresh sandbox has.
+  const panes = SECTIONS.filter((section) => state.panes.includes(section))
+  if (panes.join(',') !== DEFAULTS.panes.join(',')) {
+    params.set('panes', panes.join(','))
   }
 
   const query = params.toString()

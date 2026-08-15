@@ -64,8 +64,14 @@
   }
 }
 
-[part="trigger"]:hover {
-  background-color: var(--helix-color-primary-subtle);
+/* No fill on hover. An accordion row runs the width of its container, so a
+   background under it is a band across the page rather than a hint at a target.
+   The chevron answers instead, coming up to full strength from the subtle it
+   sits at: it is the part of the row that means "this opens", so it is the part
+   worth lighting. Setting the row's own colour would say nothing, the trigger
+   already being at full strength. */
+[part="trigger"]:hover [part="chevron"] {
+  color: var(--helix-color-foreground);
 }
 
 /* Inset, because the trigger runs to the item's edge and an outset ring would

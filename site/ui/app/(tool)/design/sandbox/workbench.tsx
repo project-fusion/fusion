@@ -24,7 +24,7 @@ import type { Family } from '../../../../lib/catalog'
 import { useHelixEvent } from '../../../../lib/use-helix-event'
 import { FusionLogo } from '../../../fusion-logo'
 import { PreferencesDrawer } from '../../../preferences'
-import { readUrlState, type Section, writeUrlState } from './url-state'
+import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state'
 
 /**
  * The sandbox workbench: source files, a live preview, and the example tree.
@@ -122,7 +122,9 @@ export function SandboxWorkbench({ families }: Props) {
   const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
   const [showEditor, setShowEditor] = useState(true)
   const [showPanel, setShowPanel] = useState(true)
-  const [showStatus, setShowStatus] = useState(true)
+  // Off. It reports the caret and the language, which is worth having while
+  // typing and is noise the rest of the time.
+  const [showStatus, setShowStatus] = useState(DEFAULTS.panes.includes('status'))
   const terminal = useRef<HelixSandboxTerminal>(null)
   const editors = useRef<Record<string, HelixSandboxEditor | null>>({})
   const [familySlug, setFamilySlug] = useState<string | null>(null)
@@ -168,9 +170,9 @@ export function SandboxWorkbench({ families }: Props) {
     setDirection(url.direction)
     setSyntax(url.syntax)
     setPreviewTheme(url.colorMode)
-    setShowEditor(!url.hidden.includes('editor'))
-    setShowPanel(!url.hidden.includes('panel'))
-    setShowStatus(!url.hidden.includes('status'))
+    setShowEditor(url.panes.includes('editor'))
+    setShowPanel(url.panes.includes('panel'))
+    setShowStatus(url.panes.includes('status'))
     setSiteTheme(document.documentElement.dataset.colorMode === 'light' ? 'light' : 'dark')
 
     const stored = readArrangement()
@@ -308,23 +310,23 @@ export function SandboxWorkbench({ families }: Props) {
     if (!familySlug) {
       return
     }
-    const hidden: Section[] = []
-    if (!showEditor) {
-      hidden.push('editor')
+    const panes: Section[] = []
+    if (showEditor) {
+      panes.push('editor')
     }
-    if (!showPanel) {
-      hidden.push('panel')
+    if (showPanel) {
+      panes.push('panel')
     }
-    if (!showStatus) {
-      hidden.push('status')
+    if (showStatus) {
+      panes.push('status')
     }
     const query = writeUrlState({
       colorMode: previewTheme,
       direction,
       example: exampleSlug,
       family: familySlug,
-      hidden,
       layout,
+      panes,
       syntax,
     })
     window.history.replaceState(null, '', `${window.location.pathname}${query}`)

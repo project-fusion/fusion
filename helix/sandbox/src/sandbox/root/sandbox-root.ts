@@ -86,7 +86,7 @@ export class HelixSandbox extends HelixElement {
 
   /** Percentage of the sandbox given to the source pane. */
   @property({ attribute: 'split', type: Number })
-  split = 45
+  split = 50
 
   /** Height of the panel, in pixels. */
   @property({ attribute: 'panel-size', type: Number })

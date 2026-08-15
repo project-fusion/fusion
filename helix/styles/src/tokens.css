@@ -53,15 +53,24 @@
    * three tokens, one colour, and a card on a page with nothing between them. */
   --helix-color-background: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000));
   --helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
-  /* White in light mode, and lifted by its shadow rather than by its fill.
-     Everything that takes this floats: a menu, a tooltip, the thumb of a
-     segmented control. On a white page there is nothing above white to go to,
-     so a raised surface painted a step darker reads as a grey card lying on the
-     page rather than as something over it, which is what a dropdown looked
-     like. Sharing a value with `background` is the point here and not a
-     collision: these never sit flat against the page, so the shadow is what
-     separates them, and in a groove a white thumb is exactly right. */
-  --helix-color-surface-raised: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800));
+  /* Two kinds of "above", and they want opposite fills in light mode.
+   *
+   * `raised` is for something lifted while still lying on the page: a tab's
+   * selected pill, a segmented control's thumb, a hovered row. It has the page
+   * on all sides, so it is told apart by its fill, which on white has to be a
+   * step darker.
+   *
+   * `overlay` is for something over the page rather than on it: a menu, a
+   * popover, a dialog. It is told apart by its shadow and by the content it
+   * covers, so on white it is white, which is what a dropdown should look like
+   * and what every desktop menu does.
+   *
+   * One token tried to be both. Painting it white made the dropdown right and
+   * took every pill and thumb with it: white on a white page, which is nothing
+   * at all. In dark they land on the same step, which is why one token got away
+   * with it for as long as it did. */
+  --helix-color-surface-raised: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800));
+  --helix-color-surface-overlay: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800));
   /* Sunken is a step *lighter* than the page in dark mode, not darker. There is
      nowhere below near-black to go, so a groove reads by being nearer the
      viewer's eye rather than further from it. It was neutral-950, identical to
@@ -85,7 +94,11 @@
   );
 
   /* Text and icons, by prominence. */
-  --helix-color-foreground: light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100));
+  /* The ends of the ramp, matching the page. An icon takes `currentColor` and
+     inherits, so this is what a bare one is: black on white and white on black,
+     rather than the dark grey and off-white a step in from each. Everything
+     that wants to be quieter asks for `-muted` or `-subtle` by name. */
+  --helix-color-foreground: light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0));
   --helix-color-foreground-muted: light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400));
   --helix-color-foreground-subtle: light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500));
   --helix-color-foreground-on-accent: var(--_helix-neutral-0);
