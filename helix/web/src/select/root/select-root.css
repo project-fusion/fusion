@@ -63,11 +63,20 @@
    shadow says: the panel is not a sunken part of the field it came out of. */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  /* No border. A panel over the page is told apart by its shadow and by the
+     content it covers, which is what `overlay` means, and a line around it as
+     well reads as a box drawn around something already separate. The shadow is
+     `lg` here rather than `sm` for that reason: it is carrying the separation
+     on its own. */
   border-radius: var(--helix-radii-md);
   box-shadow: var(--helix-shadow-lg);
   inline-size: max-content;
-  min-inline-size: 100%;
+  /* At least as wide as the trigger, from the controller rather than from a
+     percentage: the panel is positioned `fixed`, so `100%` would be the
+     viewport. The fallback is for the moment before the first measurement. */
+  min-inline-size: var(--floating-anchor-width, 100%);
+  /* Never taller than the room under the trigger, for the same reason. */
+  max-block-size: var(--floating-available-height, none);
   padding: var(--helix-space-2xs);
   position: absolute;
   z-index: var(--helix-layer-overlay);

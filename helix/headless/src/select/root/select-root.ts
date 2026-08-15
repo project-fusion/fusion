@@ -176,11 +176,19 @@ export class HelixBaseSelect extends MixinControllerOpen(
     this.sync()
     this.linkHost()
     if (this.isOpen) {
+      /* Started here, and it was not started at all: the controller was
+         constructed and nothing ever ran it. Without it the surface keeps the
+         `position: absolute` its stylesheet declares and no offsets, so it
+         lands at the host's own top-left, which is over the label and above the
+         trigger rather than under it. The menu and the tooltip both start
+         theirs; this one was the odd one out. */
+      this.floating.start()
       this.dismisser.activate()
       // Into the list, which is where the keyboard has to be for the arrows to
       // mean anything.
       this.renderRoot.querySelector<HTMLElement>('[part="listbox"]')?.focus()
     } else {
+      this.floating.stop()
       this.dismisser.deactivate()
     }
   }
@@ -208,6 +216,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
           exportparts="items, empty"
           .value=${this.value}
           ?multiple=${this.multiple}
+          hide-label
           label=${this.label || nothing}
           @helix-change=${this.handleChange}
         >

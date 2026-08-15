@@ -140,7 +140,7 @@ export class FloatingController implements ReactiveController {
     if (this.options.resize !== false) {
       middleware.push(
         size({
-          apply: ({ availableHeight, availableWidth, elements }) => {
+          apply: ({ availableHeight, availableWidth, elements, rects }) => {
             elements.floating.style.setProperty(
               '--floating-available-height',
               `${Math.round(availableHeight)}px`,
@@ -148,6 +148,17 @@ export class FloatingController implements ReactiveController {
             elements.floating.style.setProperty(
               '--floating-available-width',
               `${Math.round(availableWidth)}px`,
+            )
+            /* The anchor's width, which a panel that has to match the control
+               it hangs off cannot get any other way. `min-inline-size: 100%`
+               reads the containing block, and this positions with
+               `position: fixed`, so that percentage is the viewport: a select's
+               list came out the full width of the window, flush to its left
+               edge. It looked like a positioning fault and was a percentage
+               resolving against something the CSS could not see. */
+            elements.floating.style.setProperty(
+              '--floating-anchor-width',
+              `${Math.round(rects.reference.width)}px`,
             )
           },
           padding: 8,

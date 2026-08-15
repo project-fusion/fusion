@@ -79,9 +79,39 @@ describe('select', () => {
       'Choose one to continue.',
     )
   })
+
+  test('the inner list is named by the label, not labelled with it', async () => {
+    /* The select already shows the words above its trigger, so the listbox
+       inside the panel rendering them again put a heading in the dropdown.
+       It still needs the name, which is why this is `hide-label` and not a
+       dropped attribute: clipped, still read, still the list's own name. */
+    const host = (await select()) as unknown as HTMLElement
+    const listbox = part(host, 'listbox')
+    expect(listbox?.getAttribute('label')).toBe('L')
+    expect(listbox?.hasAttribute('hide-label')).toBe(true)
+  })
 })
 
 if (hasLayout()) {
+  test('the panel is placed rather than left where the stylesheet put it', async () => {
+    // The controller was constructed and never started, which is invisible in
+    // review: the field renders, the list opens, and the panel simply sits at
+    // the host's own top-left, over the label and above the trigger. What says
+    // it ran is `position: fixed`, which the controller writes inline and the
+    // stylesheet does not: the sheet says `absolute`.
+    const host = (await select('open')) as unknown as HTMLElement
+    expect((part(host, 'surface') as HTMLElement).style.position).toBe('fixed')
+  })
+
+  test('the panel is told how wide its trigger is, because CSS cannot ask', async () => {
+    // `min-inline-size: 100%` on a `position: fixed` panel is the viewport, so
+    // the list came out the full width of the window. The controller publishes
+    // the anchor's width and the stylesheet reads that instead.
+    const host = (await select('open')) as unknown as HTMLElement
+    const surface = part(host, 'surface') as HTMLElement
+    expect(surface.style.getPropertyValue('--floating-anchor-width')).toMatch(/^\d+px$/)
+  })
+
   describe('select trigger text', () => {
     /* Only in a browser, and not for layout: what these need is slot
        flattening across two roots. The options are the select's light DOM,
