@@ -1541,6 +1541,19 @@ export type HelixListboxProps = {
   required?: HelixListbox["required"];
   /** Text the options are matched against. Empty shows them all. */
   filter?: HelixListbox["filter"];
+  /** Whether the list renders a field for narrowing itself.
+
+The field lives here rather than in whatever frames the list, because the
+filtering already does: `filter`, the empty state and the keyboard are all
+this component's. A select that drew its own search box above a listbox
+would be writing the same field again, and so would a combobox, and so
+would a command palette, which is the fault the three-family split exists
+to prevent. */
+  filterable?: HelixListbox["filterable"];
+  /** Placeholder for the field that narrows the list. */
+  "filter-label"?: HelixListbox["filterLabel"];
+  /** Placeholder for the field that narrows the list. */
+  filterLabel?: HelixListbox["filterLabel"];
   /** Whether more than one option can be the answer. */
   multiple?: HelixListbox["multiple"];
   /** Name the list reports under when its form is submitted. */
@@ -1581,6 +1594,19 @@ export type HelixListboxSolidJsProps = {
   "prop:required"?: HelixListbox["required"];
   /** Text the options are matched against. Empty shows them all. */
   "prop:filter"?: HelixListbox["filter"];
+  /** Whether the list renders a field for narrowing itself.
+
+The field lives here rather than in whatever frames the list, because the
+filtering already does: `filter`, the empty state and the keyboard are all
+this component's. A select that drew its own search box above a listbox
+would be writing the same field again, and so would a combobox, and so
+would a command palette, which is the fault the three-family split exists
+to prevent. */
+  "prop:filterable"?: HelixListbox["filterable"];
+  /** Placeholder for the field that narrows the list. */
+  "attr:filter-label"?: HelixListbox["filterLabel"];
+  /** Placeholder for the field that narrows the list. */
+  "prop:filterLabel"?: HelixListbox["filterLabel"];
   /** Whether more than one option can be the answer. */
   "prop:multiple"?: HelixListbox["multiple"];
   /** Name the list reports under when its form is submitted. */
@@ -2007,7 +2033,13 @@ export type HelixSelectProps = {
   label?: HelixSelect["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixSelect["required"];
-  /** Whether the list can be narrowed by typing. */
+  /** Whether the list can be narrowed by typing.
+
+Passed to the listbox rather than acted on here, because the listbox owns
+the filtering, the empty state and the keyboard. This property existed and
+was never read: it reflected, it type-checked, and nothing anywhere
+rendered a field. API that does nothing is worse than API that is missing,
+because a consumer sets it and believes it. */
   filterable?: HelixSelect["filterable"];
   /** Whether more than one option can be the answer. */
   multiple?: HelixSelect["multiple"];
@@ -2062,7 +2094,13 @@ export type HelixSelectSolidJsProps = {
   "prop:label"?: HelixSelect["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixSelect["required"];
-  /** Whether the list can be narrowed by typing. */
+  /** Whether the list can be narrowed by typing.
+
+Passed to the listbox rather than acted on here, because the listbox owns
+the filtering, the empty state and the keyboard. This property existed and
+was never read: it reflected, it type-checked, and nothing anywhere
+rendered a field. API that does nothing is worse than API that is missing,
+because a consumer sets it and believes it. */
   "prop:filterable"?: HelixSelect["filterable"];
   /** Whether more than one option can be the answer. */
   "prop:multiple"?: HelixSelect["multiple"];
@@ -4479,6 +4517,15 @@ export type CustomElements = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `filter`: Text the options are matched against. Empty shows them all.
+   * - `filterable`: Whether the list renders a field for narrowing itself.
+   *
+   * The field lives here rather than in whatever frames the list, because the
+   * filtering already does: `filter`, the empty state and the keyboard are all
+   * this component's. A select that drew its own search box above a listbox
+   * would be writing the same field again, and so would a combobox, and so
+   * would a command palette, which is the fault the three-family split exists
+   * to prevent.
+   * - `filter-label`/`filterLabel`: Placeholder for the field that narrows the list.
    * - `multiple`: Whether more than one option can be the answer.
    * - `name`: Name the list reports under when its form is submitted.
    * - `empty-text`/`emptyText`: What is shown when a filter has hidden every option.
@@ -4540,6 +4587,8 @@ export type CustomElements = {
    * - `label`: The question, over the list.
    * - `items`: The list itself.
    * - `empty`: Shown when a filter has hidden everything.
+   * - `search`: The region holding the field that narrows the list.
+   * - `search-field`: The field itself.
    * - `hint`: Help under the list.
    * - `feedback`: What is wrong with it.
    */
@@ -5015,6 +5064,12 @@ export type CustomElements = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `filterable`: Whether the list can be narrowed by typing.
+   *
+   * Passed to the listbox rather than acted on here, because the listbox owns
+   * the filtering, the empty state and the keyboard. This property existed and
+   * was never read: it reflected, it type-checked, and nothing anywhere
+   * rendered a field. API that does nothing is worse than API that is missing,
+   * because a consumer sets it and believes it.
    * - `multiple`: Whether more than one option can be the answer.
    * - `name`: Name the control reports under when its form is submitted.
    * - `placeholder`: Shown on the trigger while nothing is chosen.
@@ -7610,6 +7665,15 @@ export type CustomElementsSolidJs = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `filter`: Text the options are matched against. Empty shows them all.
+   * - `filterable`: Whether the list renders a field for narrowing itself.
+   *
+   * The field lives here rather than in whatever frames the list, because the
+   * filtering already does: `filter`, the empty state and the keyboard are all
+   * this component's. A select that drew its own search box above a listbox
+   * would be writing the same field again, and so would a combobox, and so
+   * would a command palette, which is the fault the three-family split exists
+   * to prevent.
+   * - `filter-label`/`filterLabel`: Placeholder for the field that narrows the list.
    * - `multiple`: Whether more than one option can be the answer.
    * - `name`: Name the list reports under when its form is submitted.
    * - `empty-text`/`emptyText`: What is shown when a filter has hidden every option.
@@ -7671,6 +7735,8 @@ export type CustomElementsSolidJs = {
    * - `label`: The question, over the list.
    * - `items`: The list itself.
    * - `empty`: Shown when a filter has hidden everything.
+   * - `search`: The region holding the field that narrows the list.
+   * - `search-field`: The field itself.
    * - `hint`: Help under the list.
    * - `feedback`: What is wrong with it.
    */
@@ -8176,6 +8242,12 @@ export type CustomElementsSolidJs = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `filterable`: Whether the list can be narrowed by typing.
+   *
+   * Passed to the listbox rather than acted on here, because the listbox owns
+   * the filtering, the empty state and the keyboard. This property existed and
+   * was never read: it reflected, it type-checked, and nothing anywhere
+   * rendered a field. API that does nothing is worse than API that is missing,
+   * because a consumer sets it and believes it.
    * - `multiple`: Whether more than one option can be the answer.
    * - `name`: Name the control reports under when its form is submitted.
    * - `placeholder`: Shown on the trigger while nothing is chosen.

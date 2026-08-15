@@ -55,3 +55,41 @@
   padding-inline: var(--helix-space-xs);
   text-align: center;
 }
+
+/* The field that narrows the list.
+ *
+ * Above the options and outside the scroller, so it stays put while the list
+ * moves under it: a filter that scrolled away with its own results is a filter
+ * you cannot see to clear.
+ *
+ * A rule under it rather than a box around it, because it is part of the same
+ * surface as the rows rather than a control sitting on one. The panel that
+ * frames the list is already the frame. */
+[part="search"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  padding: var(--helix-space-2xs);
+}
+
+[part="search-field"] {
+  appearance: none;
+  background-color: transparent;
+  block-size: var(--helix-size-control-sm);
+  border: none;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inline-size: 100%;
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="search-field"]::placeholder {
+  color: var(--helix-color-foreground-subtle);
+}
+
+/* No ring. The field is the only thing in this region that takes focus, and a
+   ring drawn inside a panel that is itself the focused thing reads as a box in
+   a box. The caret says where the typing goes. */
+[part="search-field"]:focus-visible {
+  outline: none;
+}

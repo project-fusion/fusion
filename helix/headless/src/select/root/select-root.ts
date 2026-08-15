@@ -56,7 +56,15 @@ import '../../listbox/index.js'
 export class HelixBaseSelect extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
-  /** Whether the list can be narrowed by typing. */
+  /**
+   * Whether the list can be narrowed by typing.
+   *
+   * Passed to the listbox rather than acted on here, because the listbox owns
+   * the filtering, the empty state and the keyboard. This property existed and
+   * was never read: it reflected, it type-checked, and nothing anywhere
+   * rendered a field. API that does nothing is worse than API that is missing,
+   * because a consumer sets it and believes it.
+   */
   @property({ reflect: true, type: Boolean })
   filterable = false
 
@@ -223,6 +231,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
           .value=${this.value}
           ?multiple=${this.multiple}
           hide-label
+          ?filterable=${this.filterable}
           label=${this.label || nothing}
           @helix-change=${this.handleChange}
         >

@@ -66,6 +66,8 @@ const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
  * @csspart label - The question, over the list.
  * @csspart items - The list itself.
  * @csspart empty - Shown when a filter has hidden everything.
+ * @csspart search - The region holding the field that narrows the list.
+ * @csspart search-field - The field itself.
  * @csspart hint - Help under the list.
  * @csspart feedback - What is wrong with it.
  */
@@ -74,6 +76,23 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
   /** Text the options are matched against. Empty shows them all. */
   @property()
   filter = ''
+
+  /**
+   * Whether the list renders a field for narrowing itself.
+   *
+   * The field lives here rather than in whatever frames the list, because the
+   * filtering already does: `filter`, the empty state and the keyboard are all
+   * this component's. A select that drew its own search box above a listbox
+   * would be writing the same field again, and so would a combobox, and so
+   * would a command palette, which is the fault the three-family split exists
+   * to prevent.
+   */
+  @property({ attribute: 'filterable', reflect: true, type: Boolean })
+  filterable = false
+
+  /** Placeholder for the field that narrows the list. */
+  @property({ attribute: 'filter-label' })
+  filterLabel = 'Filter'
 
   /** Whether more than one option can be the answer. */
   @property({ reflect: true, type: Boolean })
@@ -230,7 +249,10 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
       }
       return
     }
-    if (!MOVES.has(event.key)) {
+    /* The list's own movement keys, plus Enter, which is choosing rather than
+       moving and is still the list's: a reader who has narrowed to one option
+       expects Enter to take it without leaving the field first. */
+    if (!MOVES.has(event.key) && event.key !== 'Enter') {
       return
     }
     event.preventDefault()
@@ -344,12 +366,67 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     this.linkHost()
   }
 
+  /** Narrows the list as the reader types. */
+  private readonly handleFilter = (event: Event): void => {
+    this.filter = (event.target as HTMLInputElement).value
+  }
+
+  /**
+   * Sends the keys that belong to the list to the list.
+   *
+   * A reader filtering is still choosing: they type two letters and press Down
+   * to reach what is left, and the field would otherwise swallow it because the
+   * arrows move a caret. Typing keys stay with the field, which is what makes
+   * this different from forwarding everything.
+   *
+   * Escape clears rather than closing. What frames the list may close on Escape
+   * too, so this stops the event when there is something to clear: one press
+   * empties the filter, a second reaches whatever is above and closes it. A
+   * filter that closed the panel would lose the reader's place for a keystroke
+   * they meant as an undo.
+   */
+  private readonly handleFilterKeydown = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape' && this.filter !== '') {
+      event.stopPropagation()
+      event.preventDefault()
+      this.filter = ''
+      return
+    }
+    if (!MOVES.has(event.key)) {
+      return
+    }
+    event.preventDefault()
+    this.renderRoot.querySelector<HTMLElement>('[part="items"]')?.focus()
+    this.renderRoot
+      .querySelector<HTMLElement>('[part="items"]')
+      ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: event.key }))
+  }
+
   protected override render(): TemplateResult {
     /* One tab stop for the whole list, which is what a listbox is in the tab
        order: the arrows move within it. `tabindex` on the wrapper rather than
        the host so the host stays as the consumer wrote it. */
     return html`${this.renderGroupLabel()}
-      <div part="items" tabindex=${this.disabled ? -1 : 0}>
+      ${
+        this.filterable
+          ? html`<div part="search">
+              <input
+                part="search-field"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                .value=${this.filter}
+                placeholder=${this.filterLabel}
+                aria-label=${this.filterLabel}
+                aria-controls="items"
+                ?disabled=${this.disabled}
+                @input=${this.handleFilter}
+                @keydown=${this.handleFilterKeydown}
+              />
+            </div>`
+          : ''
+      }
+      <div part="items" id="items" tabindex=${this.disabled ? -1 : 0}>
         <slot @slotchange=${() => this.place()}></slot>
         ${this.filter !== '' && !this.hasMatches ? html`<p part="empty">${this.emptyText}</p>` : ''}
       </div>

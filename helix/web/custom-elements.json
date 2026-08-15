@@ -11220,6 +11220,35 @@
             },
             {
               "kind": "field",
+              "name": "filterable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the list renders a field for narrowing itself.\n\nThe field lives here rather than in whatever frames the list, because the\nfiltering already does: `filter`, the empty state and the keyboard are all\nthis component's. A select that drew its own search box above a listbox\nwould be writing the same field again, and so would a combobox, and so\nwould a command palette, which is the fault the three-family split exists\nto prevent.",
+              "attribute": "filterable",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "filterLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Filter'",
+              "description": "Placeholder for the field that narrows the list.",
+              "attribute": "filter-label",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "multiple",
               "type": {
                 "text": "boolean"
@@ -11446,6 +11475,28 @@
                 }
               },
               "description": "Reports the answer and the verdict on it.",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFilter",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Narrows the list as the reader types.",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFilterKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Sends the keys that belong to the list to the list.\n\nA reader filtering is still choosing: they type two letters and press Down\nto reach what is left, and the field would otherwise swallow it because the\narrows move a caret. Typing keys stay with the field, which is what makes\nthis different from forwarding everything.\n\nEscape clears rather than closing. What frames the list may close on Escape\ntoo, so this stops the event when there is something to clear: one press\nempties the filter, a second reaches whatever is above and closes it. A\nfilter that closed the panel would lose the reader's place for a keystroke\nthey meant as an undo.",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -11702,6 +11753,32 @@
               }
             },
             {
+              "name": "filterable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the list renders a field for narrowing itself.\n\nThe field lives here rather than in whatever frames the list, because the\nfiltering already does: `filter`, the empty state and the keyboard are all\nthis component's. A select that drew its own search box above a listbox\nwould be writing the same field again, and so would a combobox, and so\nwould a command palette, which is the fault the three-family split exists\nto prevent.",
+              "fieldName": "filterable",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "name": "filter-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Filter'",
+              "description": "Placeholder for the field that narrows the list.",
+              "fieldName": "filterLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
               "name": "multiple",
               "type": {
                 "text": "boolean"
@@ -11800,6 +11877,22 @@
             {
               "description": "Shown when a filter has hidden everything.",
               "name": "empty",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "search",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "search-field",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -15726,7 +15819,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the list can be narrowed by typing.",
+              "description": "Whether the list can be narrowed by typing.\n\nPassed to the listbox rather than acted on here, because the listbox owns\nthe filtering, the empty state and the keyboard. This property existed and\nwas never read: it reflected, it type-checked, and nothing anywhere\nrendered a field. API that does nothing is worse than API that is missing,\nbecause a consumer sets it and believes it.",
               "attribute": "filterable",
               "reflects": true,
               "inheritedFrom": {
@@ -16146,7 +16239,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the list can be narrowed by typing.",
+              "description": "Whether the list can be narrowed by typing.\n\nPassed to the listbox rather than acted on here, because the listbox owns\nthe filtering, the empty state and the keyboard. This property existed and\nwas never read: it reflected, it type-checked, and nothing anywhere\nrendered a field. API that does nothing is worse than API that is missing,\nbecause a consumer sets it and believes it.",
               "fieldName": "filterable",
               "inheritedFrom": {
                 "name": "HelixBaseSelect",
