@@ -52,12 +52,14 @@
 
 /* A dot rather than a mask, because a circle is a border radius and needs no
    stencil. Sized as a fraction of the circle so the two stay in proportion at
-   any `--radio-size`. */
+   any `--radio-size`, and the fraction is under half: at half, the dot and the
+   ring around it were near enough the same weight that the pair read as a
+   target rather than as a mark sitting in a circle. */
 [part="mark"] {
   background-color: var(--radio-mark-color, var(--helix-color-foreground));
-  block-size: calc(var(--_radio-size) * 0.5);
+  block-size: calc(var(--_radio-size) * 0.4);
   border-radius: var(--helix-radii-full);
-  inline-size: calc(var(--_radio-size) * 0.5);
+  inline-size: calc(var(--_radio-size) * 0.4);
   /* Nothing to see until this is the answer. Scaled from the centre rather than
      faded, so the dot arrives with the weight of a thing being put there. */
   scale: 0;

@@ -1,0 +1,15 @@
+<!-- A disabled choice stays in the set rather than being dropped from it, so
+     the question still reads as the same question and the arrow keys simply
+     pass over it. -->
+<helix-flex direction="column" gap="lg">
+  <helix-radio-group label="Label" name="a" value="one">
+    <helix-radio value="one">Chosen</helix-radio>
+    <helix-radio value="two">Not chosen</helix-radio>
+    <helix-radio disabled value="three">Disabled</helix-radio>
+  </helix-radio-group>
+
+  <helix-radio-group label="Label" name="b" value="two">
+    <helix-radio value="one">Not chosen</helix-radio>
+    <helix-radio disabled value="two">Chosen and disabled</helix-radio>
+  </helix-radio-group>
+</helix-flex>
