@@ -40,7 +40,15 @@
 }
 
 /* Transform and opacity only. The surface at rest is flat; the movement is
-   what says something happened. */
+   what says something happened.
+ *
+ * No border on any edge. Each placement used to draw one on the side facing the
+ * page, which is defensible on its own and was not what shipped: a panel pinned
+ * to an edge has its other three sides on the viewport's, so in any frame the
+ * drawer read as boxed on every side, and one hairline plus the header's rule
+ * plus the frame's own edges is three different lines claiming to be the same
+ * boundary. The shadow is what separates a surface lying over the page, and it
+ * already surrounds the panel on the sides that need it. */
 [part="panel"] {
   background-color: var(--helix-color-surface);
   display: flex;
@@ -58,7 +66,6 @@
 :host(:not([placement])) [part="panel"],
 :host([placement="end"]) [part="panel"] {
   block-size: 100%;
-  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
   inline-size: min(var(--_drawer-size), 100%);
   inset-block: 0;
   inset-inline-end: 0;
@@ -67,7 +74,6 @@
 
 :host([placement="start"]) [part="panel"] {
   block-size: 100%;
-  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
   inline-size: min(var(--_drawer-size), 100%);
   inset-block: 0;
   inset-inline-start: 0;
@@ -76,7 +82,6 @@
 
 :host([placement="bottom"]) [part="panel"] {
   block-size: min(var(--_drawer-size), 100%);
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   inset-block-end: 0;
   inset-inline: 0;
   transform: translateY(100%);
@@ -84,7 +89,6 @@
 
 :host([placement="top"]) [part="panel"] {
   block-size: min(var(--_drawer-size), 100%);
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   inset-block-start: 0;
   inset-inline: 0;
   transform: translateY(-100%);
@@ -95,13 +99,17 @@
   transform: translate(0, 0);
 }
 
+/* No rule under it either, and the reason is the one written down in the area
+   rules: `:has()` is not allowed inside the functional `:host()`, so the
+   `:host(:not(:has([slot="header"])))` that used to hide this was dropped at
+   parse time and never hid anything. Measured: with no header slotted the
+   wrapper still came out `display: block` with a one pixel bottom border, so
+   every drawer painted a hairline across its top with nothing above it. That
+   line, plus the panel's own edge border, is what read as a drawer boxed in on
+   several sides. A region cannot detect its own emptiness here, so the answer
+   is not to draw anything that depends on it being filled. */
 [part="header"] {
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   flex: 0 0 auto;
-}
-
-:host(:not(:has([slot="header"]))) [part="header"] {
-  display: none;
 }
 
 [part="content"] {

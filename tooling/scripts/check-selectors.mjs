@@ -43,6 +43,18 @@
  * reach assigned text through the flattened tree, and everything else left on
  * the element, which is the only thing that can carry it.
  *
+ * **`:has()` inside `:host()`.** Not allowed, so the whole rule is dropped when
+ * the sheet is parsed. `CSS.supports('selector(:host(:has(*)))')` reports false
+ * in Chrome 148, and `:not(:has(...))` inside it is refused for the same
+ * reason, which is the form that actually shipped.
+ *
+ * This one is written down in the area rules and shipped anyway. The drawer
+ * hid its header with `:host(:not(:has([slot="header"])))`, the rule did
+ * nothing, and every drawer with no header painted a hairline across its top
+ * with nothing above it. There is no fix at the selector level, because the
+ * detection does not exist: a region that cannot know whether it was filled
+ * must not draw anything that depends on it being filled.
+ *
  * Run with `bun run check:selectors` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -204,6 +216,22 @@ for (const tier of TIERS) {
   }
 }
 
+/* The third rule. Comments are already gone from `css`, but this scans the
+   files again rather than folding into the loop above, which only visits sheets
+   that name a part. */
+for (const tier of TIERS) {
+  for (const sheet of stylesheets(tier)) {
+    const css = readFileSync(sheet, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    for (const [match] of css.matchAll(/:host\([^{]*:has\(/g)) {
+      problems.push(
+        `${sheet}: \`${match.trim()}…\` is dropped when the sheet is parsed. ` +
+          '`:has()` is not allowed inside the functional `:host()`, in any form, ' +
+          'so this rule has never matched. A region cannot detect its own emptiness.',
+      )
+    }
+  }
+}
+
 if (problems.length > 0) {
   console.error(`Selectors that match nothing (${problems.length}):\n`)
   for (const problem of problems) {
@@ -211,4 +239,6 @@ if (problems.length > 0) {
   }
   process.exit(1)
 }
-console.log(`selectors: ${checked} stylesheets, every part accounted for and no slotted-only type`)
+console.log(
+  `selectors: ${checked} stylesheets, every part accounted for, no slotted-only type, no :has() in :host()`,
+)

@@ -299,24 +299,23 @@ helix-app-header {
  * and neither right here: a tool runs to the window, and nothing under this
  * header scrolls the document, so the border would never arrive. Set from the
  * outer tree on the host, which the cascade lets win in both scroll states. */
-/* The mark takes the brand.
+/* The mark takes the foreground, so it is black on a white page and white on a
+ * black one.
  *
  * Its gradients were declared against `--logo-color-*` with grey literals as
- * fallbacks, exactly so a theme could retint it without the SVG being touched,
- * and nothing had ever taken them up. `primary` is the brand blue and follows
- * the colour mode on its own; the light stop is derived from it rather than
- * picked, so the two ends of the gradient cannot drift apart when the seed
- * moves. */
+ * fallbacks, exactly so a theme could retint it without the SVG being touched.
+ * It was the brand blue for a while, and the mark is the one thing on the page
+ * that does not need colour to be recognised: shape is what a mark is for, and
+ * next to a wordmark set in the foreground, a blue one read as a picture beside
+ * the name rather than as part of it.
+ *
+ * One token for all three stops rather than three. The highlight gradient fades
+ * its own stop to 0.2 alpha, so the mark keeps its modelling without needing
+ * two colours to do it, and there is nothing left that can drift. */
 .fusionLogo {
-  /* Every stop one step down the brand, so the mark is blue throughout rather
-     than a blue that fades to almost nothing. `from` was `primary-subtle`,
-     which is a tint of the brand near enough white to read as unpainted, and it
-     is the stop the bar and the highlight both start from: most of the mark was
-     that colour. It takes the brand itself now, and the two that were the brand
-     take the steps below it. */
-  --logo-color-from: var(--helix-color-primary);
-  --logo-color-mid: var(--helix-color-primary-hover);
-  --logo-color-to: var(--helix-color-primary-active);
+  --logo-color-from: var(--helix-color-foreground);
+  --logo-color-mid: var(--helix-color-foreground);
+  --logo-color-to: var(--helix-color-foreground);
 }
 
 .workbenchHeader {
