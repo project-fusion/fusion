@@ -563,7 +563,13 @@ export function SandboxWorkbench({ families }: Props) {
         <a data-link="quiet" href="/design" slot="start">
           <helix-flex align="center" gap="2xs" inline>
             <FusionLogo size="1.25rem" title="" />
-            <helix-text appearance="body-strong">Fusion</helix-text>
+            {/* The same lockup the site's own header wears. The wordmark is the
+                one piece of text on the page that is a thing rather than a
+                label, which is what the display face is for, and setting the
+                same word two ways in two headers is two brands. */}
+            <helix-text appearance="body-strong" class="wordmark">
+              Fusion
+            </helix-text>
           </helix-flex>
         </a>
 
