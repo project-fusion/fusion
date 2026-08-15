@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, role, type Updatable } from '@fusion-io/testing/dom'
+import {
+  formValue,
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  role,
+  type Updatable,
+} from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -133,3 +141,86 @@ describe('toggle group in a form', () => {
     expect((group as Updatable & { form: HTMLFormElement | null }).form).toBe(form)
   })
 })
+
+/* Geometry, which only a browser can answer.
+ *
+ * Guarded rather than written for happy-dom, where every rectangle is zero and
+ * an assertion about where the thumb sits would pass against nothing at all.
+ * These run in the sandbox's Specs panel, against the same file `bun test`
+ * runs, which is the only place the answers mean anything.
+ *
+ * The fault they hold is a real one and was invisible for three attempts: the
+ * offsets were measured from the group's border box, with
+ * `getBoundingClientRect`, and applied from its padding box, which is where an
+ * absolutely positioned element is placed. A border's width late on both axes,
+ * which in a forty pixel track holding a thirty pixel thumb is six above it and
+ * four below.
+ */
+if (hasLayout()) {
+  describe('toggle group geometry', () => {
+    /* The indicator is placed from a measurement and slides there, so the box it
+       reports mid-flight is not the box it rests at.
+ 
+       Ended rather than waited out. A sleep long enough to be safe went over the
+       runner's two second budget, and one short enough to fit would pass only on
+       a fast machine. Awaiting `finished` was worse in a way worth writing down:
+       a transition in a document the browser is not painting is started and then
+       never advanced, so the promise never settles and both specs hung. That is
+       every backgrounded tab, not a quirk of one. `finish()` puts the transition
+       at its end state synchronously and asks nothing of the timeline, so this
+       reads the same geometry whether or not anyone is looking at it. */
+    const settle = async (group: Updatable): Promise<void> => {
+      await group.updateComplete
+      for (const moving of (part(group, 'indicator') as HTMLElement).getAnimations()) {
+        moving.finish()
+      }
+    }
+
+    test('the thumb sits exactly on the segment it marks', async () => {
+      const group = (await mount(markup)) as Updatable & { value: string }
+      await settle(group)
+
+      for (const value of ['system', 'light', 'dark']) {
+        group.value = value
+        await settle(group)
+
+        const indicator = part(group, 'indicator') as HTMLElement
+        const segment = group.querySelector(`helix-toggle[value="${value}"]`) as HTMLElement
+        const marker = indicator.getBoundingClientRect()
+        const target = segment.getBoundingClientRect()
+
+        /* Before anything is compared, because every one of these compares two
+           measurements and zero equals zero. An unlaid-out runner would pass all
+           four while measuring nothing at all, which it did: this suite was
+           green against a known misplacement until the frame was moved
+           somewhere it gets laid out. */
+        expect(target.width).toBeGreaterThan(0)
+        expect(marker.width).toBeGreaterThan(0)
+
+        expect(Math.abs(marker.left - target.left)).toBeLessThan(1)
+        expect(Math.abs(marker.top - target.top)).toBeLessThan(1)
+        expect(Math.abs(marker.width - target.width)).toBeLessThan(1)
+        expect(Math.abs(marker.height - target.height)).toBeLessThan(1)
+      }
+    })
+
+    test('the thumb is inset evenly on every side of the track', async () => {
+      // Even gaps are the whole job of a thing sitting in a groove, and the
+      // asymmetry this catches reads as "the spacing is off" rather than as a
+      // misplacement, which is why it survived being looked at.
+      const group = (await mount(markup)) as Updatable & { value: string }
+      group.value = 'system'
+      await settle(group)
+
+      const track = group.getBoundingClientRect()
+      expect(track.width).toBeGreaterThan(0)
+      const marker = (part(group, 'indicator') as HTMLElement).getBoundingClientRect()
+      const above = marker.top - track.top
+      const below = track.bottom - marker.bottom
+      const before = marker.left - track.left
+
+      expect(Math.abs(above - below)).toBeLessThan(1)
+      expect(Math.abs(above - before)).toBeLessThan(1)
+    })
+  })
+}

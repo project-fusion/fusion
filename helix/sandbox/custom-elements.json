@@ -1734,7 +1734,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The specs are not rewritten for this. The same `*.dom.spec.ts` files that run\nin CI are bundled for the browser with `bun:test` and the DOM helpers pointed\nat a browser harness, so a spec deleted in the morning stops being reported\nin the afternoon and there is no second suite to keep in step.\n\n**A browser is the stricter environment, not the looser one.** The node\nharness runs against happy-dom, which does not implement `attachInternals` at\nall and has to be handed an inert stub, reports `:popover-open` as unmatched\nfor a popover that is open, and returns nothing from `assignedNodes({ flatten:\ntrue })` where a browser returns the fallback. Each of those has already\nproduced a spec that passed while asserting the opposite of what ships. Here\nthey are the platform's own.\n\nThey run in a frame of their own rather than the preview's, because `mount`\nreplaces the document body for every test and would take the example with it.",
+          "description": "The specs are not rewritten for this. The same `*.dom.spec.ts` files that run\nin CI are bundled for the browser with `bun:test` and the DOM helpers pointed\nat a browser harness, so a spec deleted in the morning stops being reported\nin the afternoon and there is no second suite to keep in step.\n\n**A browser is the stricter environment, not the looser one.** The node\nharness runs against happy-dom, which does not implement `attachInternals` at\nall and has to be handed an inert stub, reports `:popover-open` as unmatched\nfor a popover that is open, and returns nothing from `assignedNodes({ flatten:\ntrue })` where a browser returns the fallback. Each of those has already\nproduced a spec that passed while asserting the opposite of what ships. Here\nthey are the platform's own.\n\nThey run in a frame of their own rather than the preview's, because `mount`\nreplaces the document body for every test and would take the example with it.\n\n**That frame is parked at the document root, not in this shadow root.** It is\na worker rather than anything to look at, and where it sits in the tree\ndecides whether it is laid out at all: inside the panel it was a descendant of\nan inactive tab, so on any tab but this one it had `display: none` above it\nand every rectangle inside it was zero. Specs that read geometry then passed\nagainst nothing, which is the failure that looks most like success. Found by\nputting a known misplacement back and watching the specs stay green.",
           "name": "HelixSandboxSpecs",
           "cssProperties": [
             {
@@ -1747,10 +1747,6 @@
             }
           ],
           "cssParts": [
-            {
-              "description": "The document the specs run in.",
-              "name": "frame"
-            },
             {
               "description": "The counts, and how long the run took.",
               "name": "summary"
@@ -1874,7 +1870,17 @@
                 "text": "HTMLIFrameElement | null"
               },
               "privacy": "private",
-              "readonly": true
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "makeFrame",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "field",

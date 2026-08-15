@@ -47,12 +47,19 @@ interface ResultsMessage {
  * They run in a frame of their own rather than the preview's, because `mount`
  * replaces the document body for every test and would take the example with it.
  *
+ * **That frame is parked at the document root, not in this shadow root.** It is
+ * a worker rather than anything to look at, and where it sits in the tree
+ * decides whether it is laid out at all: inside the panel it was a descendant of
+ * an inactive tab, so on any tab but this one it had `display: none` above it
+ * and every rectangle inside it was zero. Specs that read geometry then passed
+ * against nothing, which is the failure that looks most like success. Found by
+ * putting a known misplacement back and watching the specs stay green.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases Tests, Suite
  * @documentation https://helix.fusion.dev/sandbox/specs
  *
- * @csspart frame - The document the specs run in.
  * @csspart summary - The counts, and how long the run took.
  * @csspart results - The scrolling list.
  * @csspart suite - A describe block's heading.
@@ -96,8 +103,29 @@ export class HelixSandboxSpecs extends HelixElement {
   /** Asked for before the frame was ready, and sent the moment it is. */
   private pending = ''
 
-  private get frame(): HTMLIFrameElement | null {
-    return this.renderRoot.querySelector('iframe')
+  /* Styled here rather than in the stylesheet beside this file, because it is
+     not in this shadow root and nothing in there can reach it. Hidden by being
+     transparent and behind everything, and never by `display: none`,
+     `visibility: hidden` or a zero-sized box: each of those takes the layout
+     away again, and a browser is entitled to stop running
+     `requestAnimationFrame` for a frame it is not painting, which turns a spec
+     awaiting a frame into one that hangs. Sized like a small laptop, so what a
+     spec measures is a layout a reader could actually be looking at. */
+  private frame: HTMLIFrameElement | null = null
+
+  private makeFrame(): void {
+    if (this.frame) {
+      return
+    }
+    const frame = document.createElement('iframe')
+    frame.title = this.label
+    frame.setAttribute('aria-hidden', 'true')
+    frame.style.cssText =
+      'position:fixed;inset-block-start:0;inset-inline-start:0;inline-size:1024px;' +
+      'block-size:768px;border:0;opacity:0;pointer-events:none;z-index:-1'
+    frame.src = this.src
+    document.body.append(frame)
+    this.frame = frame
   }
 
   /**
@@ -176,10 +204,22 @@ export class HelixSandboxSpecs extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     window.removeEventListener('message', this.handleMessage)
+    this.frame?.remove()
+    this.frame = null
+    this.ready = false
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.makeFrame()
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('src') && this.frame && this.frame.src !== this.src) {
+      this.ready = false
+      this.frame.src = this.src
+    }
     if (changed.has('family')) {
       this.run()
     }
@@ -220,8 +260,7 @@ export class HelixSandboxSpecs extends HelixElement {
   protected override render(): TemplateResult {
     const nothingYet = !this.running && this.failure === '' && this.results.length === 0
 
-    return html`<iframe part="frame" src=${this.src || nothing} title=${this.label} aria-hidden="true"></iframe>
-      ${this.summary()}
+    return html`${this.summary()}
       <div part="results" role="status" aria-label=${this.label} tabindex="0">
         ${
           nothingYet

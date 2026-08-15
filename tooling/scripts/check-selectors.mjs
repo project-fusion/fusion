@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 /**
- * Checks that every `[part=]` a stylesheet selects on is a part something
- * renders.
+ * Checks for CSS that cannot match what it is aimed at.
+ *
+ * Two rules, both of the same family: a selector that is valid, compiles, ships,
+ * and quietly styles nothing.
+ *
+ * **A `[part=]` for a part nothing renders.**
  *
  * A shadow part is a contract between a component's markup and its own CSS, and
  * nothing enforces it: a selector naming a part that no longer exists is valid
@@ -20,6 +24,24 @@
  * markup for it lives in `HelixBaseButton`, in another tier and another family.
  * Checking a component against only its own file reports every one of those as
  * dead.
+ *
+ * **An inherited property on the default slot's `::slotted()`.** `::slotted()`
+ * matches elements and nothing else, so a component whose content may be
+ * written as bare text between its tags gets none of it. The type simply does
+ * not apply, and the component renders at whatever the page hands it.
+ *
+ * Found in five: the blockquote set a passage in display type that only reached
+ * a quote wrapped in a paragraph, and the stat's value was `text-3xl` for
+ * anyone who wrapped it and body text for anyone who did not. Both look like a
+ * component that was never styled rather than one whose rule missed.
+ *
+ * Only the default slot. A named slot can hold nothing but elements, because
+ * `slot="…"` is an attribute and a text node has none, so `::slotted()` there
+ * reaches everything that can be there.
+ *
+ * The fix is to split the rule: inherited properties onto the slot, where they
+ * reach assigned text through the flattened tree, and everything else left on
+ * the element, which is the only thing that can carry it.
  *
  * Run with `bun run check:selectors` (also part of `bun run verify`).
  */
@@ -108,6 +130,26 @@ const partsOf = (name, seen = new Set()) => {
   return new Set([...own, ...partsOf(bases.get(name), seen)])
 }
 
+/* Properties that reach a text node by inheriting. Anything outside this set
+   has to stay on `::slotted()`, because a text node has no box to put it on. */
+const INHERITED = new Set([
+  'color',
+  'font',
+  'font-family',
+  'font-size',
+  'font-style',
+  'font-variant',
+  'font-weight',
+  'letter-spacing',
+  'line-height',
+  'text-align',
+  'text-indent',
+  'text-transform',
+  'white-space',
+  'word-break',
+  'word-spacing',
+])
+
 const problems = []
 let checked = 0
 
@@ -141,11 +183,32 @@ for (const tier of TIERS) {
   }
 }
 
+/* The second rule, over every stylesheet rather than only those naming a part,
+   and read with comments already stripped for the same reason as above. */
+for (const tier of TIERS) {
+  for (const sheet of stylesheets(tier)) {
+    const css = readFileSync(sheet, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    for (const [, body] of css.matchAll(
+      /slot:not\(\[name\]\)::slotted\([^)]*\)[^{]*\{([^}]*)\}/g,
+    )) {
+      const missed = [...body.matchAll(/([a-z-]+)\s*:/g)]
+        .map(([, name]) => name)
+        .filter((name) => INHERITED.has(name))
+      if (missed.length > 0) {
+        problems.push(
+          `${sheet}: the default slot's ::slotted() sets ${[...new Set(missed)].sort().join(', ')}, ` +
+            'which a value written as bare text never receives. Move those onto the slot itself.',
+        )
+      }
+    }
+  }
+}
+
 if (problems.length > 0) {
-  console.error(`Dead part selectors (${problems.length}):\n`)
+  console.error(`Selectors that match nothing (${problems.length}):\n`)
   for (const problem of problems) {
     console.error(`  ${problem}`)
   }
   process.exit(1)
 }
-console.log(`selectors: ${checked} stylesheets, every part accounted for`)
+console.log(`selectors: ${checked} stylesheets, every part accounted for and no slotted-only type`)

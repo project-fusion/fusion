@@ -784,6 +784,14 @@ export type CustomElements = {
    * They run in a frame of their own rather than the preview's, because `mount`
    * replaces the document body for every test and would take the example with it.
    *
+   * **That frame is parked at the document root, not in this shadow root.** It is
+   * a worker rather than anything to look at, and where it sits in the tree
+   * decides whether it is laid out at all: inside the panel it was a descendant of
+   * an inactive tab, so on any tab but this one it had `display: none` above it
+   * and every rectangle inside it was zero. Specs that read geometry then passed
+   * against nothing, which is the failure that looks most like success. Found by
+   * putting a known misplacement back and watching the specs stay green.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -809,7 +817,6 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `frame`: The document the specs run in.
    * - `summary`: The counts, and how long the run took.
    * - `results`: The scrolling list.
    * - `suite`: A describe block's heading.
@@ -1206,6 +1213,14 @@ export type CustomElementsSolidJs = {
    * They run in a frame of their own rather than the preview's, because `mount`
    * replaces the document body for every test and would take the example with it.
    *
+   * **That frame is parked at the document root, not in this shadow root.** It is
+   * a worker rather than anything to look at, and where it sits in the tree
+   * decides whether it is laid out at all: inside the panel it was a descendant of
+   * an inactive tab, so on any tab but this one it had `display: none` above it
+   * and every rectangle inside it was zero. Specs that read geometry then passed
+   * against nothing, which is the failure that looks most like success. Found by
+   * putting a known misplacement back and watching the specs stay green.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -1231,7 +1246,6 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `frame`: The document the specs run in.
    * - `summary`: The counts, and how long the run took.
    * - `results`: The scrolling list.
    * - `suite`: A describe block's heading.

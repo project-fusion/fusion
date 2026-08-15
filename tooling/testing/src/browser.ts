@@ -115,6 +115,10 @@ const same = (a: unknown, b: unknown): boolean => {
 
 interface Matchers {
   toBe: (expected: unknown) => void
+  toBeGreaterThan: (expected: number) => void
+  toBeGreaterThanOrEqual: (expected: number) => void
+  toBeLessThan: (expected: number) => void
+  toBeLessThanOrEqual: (expected: number) => void
   toBeNull: () => void
   toContain: (expected: unknown) => void
   toEqual: (expected: unknown) => void
@@ -129,8 +133,19 @@ const build = (actual: unknown, negated: boolean): Matchers => {
       )
     }
   }
+  /* The comparisons exist for geometry, which is the one thing only this
+     harness can answer, and every one of them is a fact about a measurement.
+     `actual` is cast rather than checked: a spec comparing something that is not
+     a number has a bug the assertion should not be papering over, and `NaN`
+     fails every comparison, which is the right answer for a rectangle that was
+     never laid out. */
+  const number = actual as number
   return {
     toBe: (expected) => check(Object.is(actual, expected), `to be ${show(expected)}`),
+    toBeGreaterThan: (expected) => check(number > expected, `to be greater than ${expected}`),
+    toBeGreaterThanOrEqual: (expected) => check(number >= expected, `to be at least ${expected}`),
+    toBeLessThan: (expected) => check(number < expected, `to be less than ${expected}`),
+    toBeLessThanOrEqual: (expected) => check(number <= expected, `to be at most ${expected}`),
     toBeNull: () => check(actual === null, 'to be null'),
     toContain: (expected) => {
       const held =
@@ -226,7 +241,53 @@ const runThese = async (
    parts that only existed to paper over happy-dom. */
 
 /** Nothing to install: this is a browser, and it brought its own DOM. */
-export const registerDom = (): void => undefined
+/** What a control may report: a field's value, a set of them, or nothing. */
+type FormValue = File | FormData | string | null
+
+const reported = new WeakMap<HTMLElement, FormValue>()
+
+/**
+ * Nothing to register, but `setFormValue` is watched on the way past.
+ *
+ * The node harness shims `attachInternals` because happy-dom has none. Here it
+ * is the platform's, so the call is made for real and only recorded: the value
+ * genuinely reaches the form, and the spec can still read what was sent. That
+ * makes the browser the stronger of the two environments for this as well,
+ * which is the point of running the same file in both.
+ *
+ * Patched here rather than at module load because the specs import their
+ * components after calling this, so nothing has constructed yet and no element
+ * gets the unpatched version.
+ */
+export const registerDom = (): void => {
+  const proto = HTMLElement.prototype as HTMLElement & {
+    attachInternals: () => ElementInternals
+    __helixWatched?: boolean
+  }
+  if (proto.__helixWatched) {
+    return
+  }
+  proto.__helixWatched = true
+  const original = proto.attachInternals
+  proto.attachInternals = function attachInternals(this: HTMLElement): ElementInternals {
+    const internals = original.call(this)
+    const send = internals.setFormValue.bind(internals)
+    internals.setFormValue = (value: FormValue, state?: FormValue): void => {
+      reported.set(this, value)
+      send(value as Parameters<typeof send>[0], state as Parameters<typeof send>[1])
+    }
+    return internals
+  }
+}
+
+/**
+ * The value a control last reported to its form.
+ *
+ * `undefined` means it never reported at all, which is a different failure from
+ * reporting `null`: the first is a control not wired to a form, the second one
+ * that is wired and has nothing to submit.
+ */
+export const formValue = (host: HTMLElement): FormValue | undefined => reported.get(host)
 
 /** An element with Lit's update barrier. */
 export type Updatable = HTMLElement & { updateComplete?: Promise<unknown> }
@@ -255,3 +316,20 @@ export const slotted = (host: HTMLElement, name?: string): Element[] => {
   const slot = host.shadowRoot?.querySelector(selector) as HTMLSlotElement | null
   return (slot?.assignedElements?.() ?? []) as Element[]
 }
+
+/**
+ * Whether this environment lays anything out.
+ *
+ * happy-dom has no layout engine, so every rectangle in it is zero and every
+ * computed length is whatever was written rather than what resolved. An
+ * assertion about where something sits does not fail there, which is worse: it
+ * passes against nothing, and a spec that cannot fail is a spec that is lying.
+ *
+ * Guard a geometry block with it and the same file says something true in both
+ * places: measured for real in the browser, and honestly absent under `bun
+ * test` rather than quietly green.
+ *
+ * See the note in the node harness for why this is a constant rather than a
+ * measurement.
+ */
+export const hasLayout = (): boolean => true

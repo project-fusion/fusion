@@ -137,3 +137,25 @@ export const slotted = (host: HTMLElement, name?: string): Element[] => {
   const slot = host.shadowRoot?.querySelector(selector) as HTMLSlotElement | null
   return (slot?.assignedElements?.() ?? []) as Element[]
 }
+
+/**
+ * Whether this environment lays anything out.
+ *
+ * happy-dom has no layout engine, so every rectangle in it is zero and every
+ * computed length is whatever was written rather than what resolved. An
+ * assertion about where something sits does not fail there, which is worse: it
+ * passes against nothing, and a spec that cannot fail is a spec that is lying.
+ *
+ * Guard a geometry block with it and the same file says something true in both
+ * places: measured for real in the browser, and honestly absent under `bun
+ * test` rather than quietly green.
+ *
+ * A constant, not a probe. It was a probe once, appending a sized div and
+ * asking how wide it came out, which is the more careful looking of the two and
+ * was wrong: the runner's frame had not had its first layout when the module
+ * evaluated, the probe measured zero in a real browser, and every geometry
+ * block was skipped in silence. A skip that reports nothing is the failure this
+ * was written to prevent, so the answer is the one thing that cannot race.
+ * There is a harness per environment; the file you imported already knows.
+ */
+export const hasLayout = (): boolean => false

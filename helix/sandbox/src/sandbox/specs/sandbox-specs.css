@@ -9,25 +9,6 @@
   min-block-size: 0;
 }
 
-/* The runner is a document, not a picture: there is nothing in it to look at.
-
-   Hidden by being transparent and out of the way, and never by `display: none`,
-   `visibility: hidden` or a zero-sized box. A browser is entitled to stop
-   running `requestAnimationFrame` for a frame it is not painting, and specs
-   await a frame to let a component settle: one that never arrives is a test
-   that hangs rather than one that fails. A pixel it does paint costs nothing
-   and keeps the callback coming. */
-[part="frame"] {
-  block-size: 1px;
-  border: none;
-  inline-size: 1px;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
-
 [part="summary"] {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   color: var(--helix-color-foreground-muted);
