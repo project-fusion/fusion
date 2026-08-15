@@ -39,6 +39,13 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* No hairline once it is on: the thumb is white on the accent, which separates
+   it further than a border would, and a border there reads as an outline drawn
+   around something already distinct. */
+:host([data-checked]) [part="thumb"] {
+  border-color: transparent;
+}
+
 /* Colour, and this is the one control that needs it. A checkbox says "on" with
    a tick, which is legible without colour; a switch has no mark at all, so the
    fill is the whole difference between the two states. */
@@ -61,7 +68,14 @@
 }
 
 /* Travelling rather than appearing, which is the whole of what a switch says:
-   the same thing moved rather than a different thing shown. */
+   the same thing moved rather than a different thing shown.
+ 
+   A hairline rather than a shadow, and the reason is that a shadow is not
+   symmetric. `shadow-sm` is offset a pixel downward, which fills the gap under
+   the thumb and leaves the one above it empty: measured, the thumb is centred
+   to the pixel, two above and two below, and it still read as sitting high. At
+   this size the shadow was only ever doing the separating a border does
+   honestly. */
 [part="thumb"] {
   /* Lifted off the groove, which is what `raised` means and is the same token
      the segmented control's thumb takes for the same reason.
@@ -72,8 +86,8 @@
      punched through rather than a thing lying on top. */
   background-color: var(--switch-thumb-color, var(--helix-color-surface-raised));
   block-size: calc(var(--_switch-height) - var(--helix-space-2xs));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-sm);
   inline-size: calc(var(--_switch-height) - var(--helix-space-2xs));
   inset-block-start: 50%;
   inset-inline-start: calc(var(--helix-space-2xs) / 2);
