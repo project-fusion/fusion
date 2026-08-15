@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, MixinControllerActive } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseTabsPanel } from '../panel/tabs-panel.js'
@@ -34,7 +34,7 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'Home', 'End'])
  * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
  */
 @customElement('helix-base-tabs')
-export class HelixBaseTabs extends HelixElement {
+export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
   /**
    * How the row reads.
    *
@@ -53,10 +53,6 @@ export class HelixBaseTabs extends HelixElement {
   /** Accessible name for the tab list. */
   @property()
   label = 'Tabs'
-
-  /** Value of the selected tab. */
-  @property()
-  value = ''
 
   /**
    * Whether arrowing to a tab also selects it.
@@ -80,14 +76,20 @@ export class HelixBaseTabs extends HelixElement {
     )
   }
 
+  /* Through the mixin, so a consumer can refuse the change. It was written
+     straight from the event, which meant `helix-change` was an announcement
+     nobody could answer, while `Radio.Group` two folders away could be. */
   private readonly handleSelection = (event: Event): void => {
-    this.value = (event as CustomEvent<{ value: string }>).detail.value
+    this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }
 
   /** Pushes the current value down to whichever tab and panel own it. */
   private sync(): void {
     const tabs = this.tabs
-    const value = this.value || tabs[0]?.value || ''
+    /* Through the mixin, which also skips a disabled first tab. The
+       hand-written fallback did not, so a set opening on a disabled tab showed
+       it as current and its panel with it. */
+    const value = this.resolveActive(tabs)?.value ?? ''
     for (const tab of tabs) {
       tab.selected = tab.value === value
     }

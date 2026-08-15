@@ -112,3 +112,50 @@ describe('tabs keyboard', () => {
     expect(press(host, 'PageDown').defaultPrevented).toBe(false)
   })
 })
+
+describe('tabs selection can be refused', () => {
+  test('a listener that refuses keeps the tab where it was', async () => {
+    /* It could not be refused before: the value was written straight from the
+       item's event, so `helix-change` was an announcement nobody could answer,
+       while `Radio.Group` two folders away could be. Whether a selection can be
+       refused should not depend on which component is being looked at. */
+    const host = (await mount(markup)) as Updatable & { value: string }
+    await host.updateComplete
+    const started = host.value
+
+    host.addEventListener('helix-change', (event) => event.preventDefault())
+    const other = [...host.querySelectorAll('helix-tabs-tab')].find(
+      (tab) => tab.getAttribute('value') !== started,
+    ) as HTMLElement
+    other.dispatchEvent(
+      new CustomEvent('helix-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value: other.getAttribute('value') },
+      }),
+    )
+    await host.updateComplete
+
+    expect(host.value).toBe(started)
+  })
+
+  test('a disabled first tab is not made current by default', async () => {
+    // The hand-written fallback was `?? tabs[0]`, which took whatever was
+    // first, so a set opening on a disabled tab showed it as current and
+    // brought its panel with it.
+    document.body.innerHTML = `<helix-tabs label="Set">
+      <helix-tabs-tab disabled value="a">A</helix-tabs-tab>
+      <helix-tabs-tab value="b">B</helix-tabs-tab>
+      <helix-tabs-panel slot="panels" value="a">A</helix-tabs-panel>
+      <helix-tabs-panel slot="panels" value="b">B</helix-tabs-panel>
+    </helix-tabs>`
+    const host = document.body.firstElementChild as Updatable
+    await host.updateComplete
+
+    const tabs = [...host.querySelectorAll('helix-tabs-tab')] as (HTMLElement & {
+      selected: boolean
+    })[]
+    expect(tabs[0]?.selected).toBe(false)
+    expect(tabs[1]?.selected).toBe(true)
+  })
+})

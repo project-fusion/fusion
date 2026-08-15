@@ -1939,6 +1939,8 @@ export type HelixTabsHelixSelectElementEvent =
   HelixTabsElementEvent<HelixSelectEvent>;
 
 export type HelixTabsProps = {
+  /** Which item is current, by its `value`. */
+  value?: HelixTabs["value"];
   /** How the row reads.
 
 Unset is a raised pill on the selected tab with nothing behind the row,
@@ -1952,20 +1954,22 @@ consumer's server markup does not already have. */
   appearance?: HelixTabs["appearance"];
   /** Accessible name for the tab list. */
   label?: HelixTabs["label"];
-  /** Value of the selected tab. */
-  value?: HelixTabs["value"];
   /** Whether arrowing to a tab also selects it.
 
 Automatic is the default because showing a panel is usually cheap. Set this
 where it is not, so a reader arrowing past four tabs does not load four
 panels on the way. */
   manual?: HelixTabs["manual"];
+  /** The consumer's callback, invoked after the change is applied. */
+  onActiveChange?: HelixTabs["onActiveChange"];
 
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "onhelix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
 };
 
 export type HelixTabsSolidJsProps = {
+  /** Which item is current, by its `value`. */
+  "prop:value"?: HelixTabs["value"];
   /** How the row reads.
 
 Unset is a raised pill on the selected tab with nothing behind the row,
@@ -1979,14 +1983,14 @@ consumer's server markup does not already have. */
   "prop:appearance"?: HelixTabs["appearance"];
   /** Accessible name for the tab list. */
   "prop:label"?: HelixTabs["label"];
-  /** Value of the selected tab. */
-  "prop:value"?: HelixTabs["value"];
   /** Whether arrowing to a tab also selects it.
 
 Automatic is the default because showing a panel is usually cheap. Set this
 where it is not, so a reader arrowing past four tabs does not load four
 panels on the way. */
   "prop:manual"?: HelixTabs["manual"];
+  /** The consumer's callback, invoked after the change is applied. */
+  "prop:onActiveChange"?: HelixTabs["onActiveChange"];
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "on:helix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
 
@@ -4383,6 +4387,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `value`: Which item is current, by its `value`.
    * - `appearance`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -4394,12 +4399,12 @@ export type CustomElements = {
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
    * - `label`: Accessible name for the tab list.
-   * - `value`: Value of the selected tab.
    * - `manual`: Whether arrowing to a tab also selects it.
    *
    * Automatic is the default because showing a panel is usually cheap. Set this
    * where it is not, so a reader arrowing past four tabs does not load four
    * panels on the way.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -4413,6 +4418,17 @@ export type CustomElements = {
    *
    * - `(default)`: The tabs.
    * - `panels`: The panels.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    *
    * ## CSS Parts
    *
@@ -6967,6 +6983,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `value`: Which item is current, by its `value`.
    * - `appearance`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -6978,12 +6995,12 @@ export type CustomElementsSolidJs = {
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
    * - `label`: Accessible name for the tab list.
-   * - `value`: Value of the selected tab.
    * - `manual`: Whether arrowing to a tab also selects it.
    *
    * Automatic is the default because showing a panel is usually cheap. Set this
    * where it is not, so a reader arrowing past four tabs does not load four
    * panels on the way.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -6997,6 +7014,17 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The tabs.
    * - `panels`: The panels.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    *
    * ## CSS Parts
    *

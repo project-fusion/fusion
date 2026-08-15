@@ -31,6 +31,11 @@ export {
 export { HelixElement } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
 export {
+  type ActivatableItem,
+  MixinControllerActive,
+  type MixinControllerActiveInterface,
+} from './mixins/mixin-controller-active/mixin-controller-active.js'
+export {
   MixinControllerChecked,
   type MixinControllerCheckedInterface,
 } from './mixins/mixin-controller-checked/mixin-controller-checked.js'
@@ -53,3 +58,7 @@ export {
   type ControlledChangeOptions,
   requestControlledChange,
 } from './utils/request-controlled-change/request-controlled-change.js'
+export {
+  type ScrollItemOptions,
+  scrollItemIntoView,
+} from './utils/scroll-item-into-view/scroll-item-into-view.js'

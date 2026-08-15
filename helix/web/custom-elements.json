@@ -15223,6 +15223,81 @@
           "members": [
             {
               "kind": "field",
+              "name": "onActiveChange",
+              "type": {
+                "text": "((value: string) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the change is applied.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which item is current, by its `value`.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestActive",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a new current item, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Unlike a native control, nothing has moved\nby the time this runs, so refusing is simply not writing: there is\nnothing to put back.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              },
+              "type": {
+                "text": "requestActive(next: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveActive",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Item | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "items",
+                  "type": {
+                    "text": "Item[]"
+                  }
+                }
+              ],
+              "description": "Which item is current, given what there is to choose from.\n\nThe first enabled one when `value` names nothing, which is a set before\nits consumer has chosen and a set whose current item has just been\nremoved. Disabled items are skipped in the fallback but not in the match:\na consumer who names a disabled item meant it, and quietly moving to\nanother would be the component overruling them.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "appearance",
               "type": {
                 "text": "'toggle' | 'underline' | undefined"
@@ -15244,20 +15319,6 @@
               "default": "'Tabs'",
               "description": "Accessible name for the tab list.",
               "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseTabs",
-                "module": "src/tabs/root/tabs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the selected tab.",
-              "attribute": "value",
               "inheritedFrom": {
                 "name": "HelixBaseTabs",
                 "module": "src/tabs/root/tabs-root.ts"
@@ -15426,6 +15487,19 @@
           "customElement": true,
           "attributes": [
             {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which item is current, by its `value`.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
               "name": "appearance",
               "type": {
                 "text": "'toggle' | 'underline' | undefined"
@@ -15445,19 +15519,6 @@
               "default": "'Tabs'",
               "description": "Accessible name for the tab list.",
               "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseTabs",
-                "module": "src/tabs/root/tabs-root.ts"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Value of the selected tab.",
-              "fieldName": "value",
               "inheritedFrom": {
                 "name": "HelixBaseTabs",
                 "module": "src/tabs/root/tabs-root.ts"

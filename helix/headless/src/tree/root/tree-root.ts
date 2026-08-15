@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, scrollItemIntoView } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseTreeItem } from '../item/tree-item.js'
@@ -129,6 +129,15 @@ export class HelixBaseTree extends HelixElement {
       entry.focusable = entry === item
     }
     item.focusItem()
+    /* And bring it into view, which arrow keys through a long tree did not do
+       at all: focus moved to an item below the fold and the tree stayed where
+       it was, so a reader navigating a sidebar of forty items was moving
+       something they could not see.
+ 
+       Not `scrollIntoView`, which scrolls every scrollable ancestor including
+       the page. A reader who pressed Down in a sidebar did not ask the document
+       to move. */
+    scrollItemIntoView(item, { padding: 4 })
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {

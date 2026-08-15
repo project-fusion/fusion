@@ -1029,6 +1029,30 @@
         },
         {
           "kind": "js",
+          "name": "ActivatableItem",
+          "declaration": {
+            "name": "ActivatableItem",
+            "module": "./mixins/mixin-controller-active/mixin-controller-active.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControllerActive",
+          "declaration": {
+            "name": "MixinControllerActive",
+            "module": "./mixins/mixin-controller-active/mixin-controller-active.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControllerActiveInterface",
+          "declaration": {
+            "name": "MixinControllerActiveInterface",
+            "module": "./mixins/mixin-controller-active/mixin-controller-active.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "MixinControllerChecked",
           "declaration": {
             "name": "MixinControllerChecked",
@@ -1137,6 +1161,196 @@
           "declaration": {
             "name": "requestControlledChange",
             "module": "./utils/request-controlled-change/request-controlled-change.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ScrollItemOptions",
+          "declaration": {
+            "name": "ScrollItemOptions",
+            "module": "./utils/scroll-item-into-view/scroll-item-into-view.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "scrollItemIntoView",
+          "declaration": {
+            "name": "scrollItemIntoView",
+            "module": "./utils/scroll-item-into-view/scroll-item-into-view.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/mixins/mixin-controller-active/mixin-controller-active.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The public surface `MixinControllerActive` adds.\n\nDeclared separately because TypeScript cannot emit declarations for an\nanonymous class that has private members (TS4094).",
+          "name": "MixinControllerActiveInterface",
+          "members": [
+            {
+              "kind": "field",
+              "name": "onActiveChange",
+              "type": {
+                "text": "((value: string) => void) | undefined"
+              },
+              "description": "The consumer's callback, invoked after the change is applied.\n\nNot reachable from React's JSX, which reserves every `on[A-Z]` prop for its\nown event system; the generated wrapper listens for the event instead."
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "Which item is current, by its `value`."
+            },
+            {
+              "kind": "method",
+              "name": "requestActive",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a new current item, and reports whether the request stood."
+            },
+            {
+              "kind": "method",
+              "name": "resolveActive",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Item | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "items",
+                  "type": {
+                    "text": "Item[]"
+                  }
+                }
+              ],
+              "description": "Which item is current, given what there is to choose from.\n\nThe first enabled one when `value` names nothing, which is a set before its\nconsumer has chosen and a set whose current item has just been removed."
+            }
+          ],
+          "helix": {}
+        },
+        {
+          "kind": "mixin",
+          "description": "Grafts \"which one of these is the current one\" onto a container.\n\nFor a set where one member is current and the set is not a form control:\ntabs, a tree, a nav bar, a carousel. Where it *is* a form control the value\nis submitted and belongs to `MixinControllerValue`, which is why these are\ntwo mixins and not one with a flag.\n\n**Announcing before applying is the part worth sharing.** `Tabs` and `Tree`\nboth wrote the current value straight from the item's event, so a consumer\nhad no way to refuse a change, while `Radio.Group` announced first. Neither\nwas wrong on its own and the two together are: whether a selection can be\nrefused should not depend on which component a reader is looking at.\n\n**The fallback is the other half.** Four components had written\n`items.find(match) ?? items[0]`, and it is not the obvious line it looks\nlike: it is what makes a set with a `value` naming nothing still show\nsomething, which is every set before its consumer has set one and every set\nwhose current item has just been removed. `resolveActive` also skips disabled\nitems, which the hand-written copies did not, so a set opening on a disabled\nfirst item showed it as current.",
+          "name": "MixinControllerActive",
+          "members": [
+            {
+              "kind": "field",
+              "name": "onActiveChange",
+              "type": {
+                "text": "((value: string) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the change is applied."
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which item is current, by its `value`.",
+              "attribute": "value"
+            },
+            {
+              "kind": "method",
+              "name": "requestActive",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a new current item, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Unlike a native control, nothing has moved\nby the time this runs, so refusing is simply not writing: there is\nnothing to put back."
+            },
+            {
+              "kind": "method",
+              "name": "resolveActive",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Item | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "items",
+                  "type": {
+                    "text": "Item[]"
+                  }
+                }
+              ],
+              "description": "Which item is current, given what there is to choose from.\n\nThe first enabled one when `value` names nothing, which is a set before\nits consumer has chosen and a set whose current item has just been\nremoved. Disabled items are skipped in the fallback but not in the match:\na consumer who names a disabled item meant it, and quietly moving to\nanother would be the component overruling them."
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which item is current, by its `value`.",
+              "fieldName": "value"
+            }
+          ],
+          "parameters": [
+            {
+              "name": "Base",
+              "type": {
+                "text": "T"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "MixinControllerActiveInterface",
+          "declaration": {
+            "name": "MixinControllerActiveInterface",
+            "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControllerActive",
+          "declaration": {
+            "name": "MixinControllerActive",
+            "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
           }
         }
       ]
@@ -2285,6 +2499,47 @@
           "declaration": {
             "name": "requestControlledChange",
             "module": "src/utils/request-controlled-change/request-controlled-change.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/scroll-item-into-view/scroll-item-into-view.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "scrollItemIntoView",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "item",
+              "type": {
+                "text": "HTMLElement"
+              }
+            },
+            {
+              "name": "options",
+              "default": "{}",
+              "type": {
+                "text": "ScrollItemOptions"
+              }
+            }
+          ],
+          "description": "Brings an item into view inside its own scroller, and moves nothing else.\n\n**Not `Element.scrollIntoView`, and the difference is the whole reason this\nexists.** That method walks every scrollable ancestor and scrolls all of\nthem, so bringing the current item into a tree also scrolls the page the tree\nsits on, and on a phone it takes the address bar with it. A reader who\npressed Down in a sidebar did not ask the document to move.\n\nIt also does nothing when the item is already visible, where `scrollIntoView`\nwith `block: 'nearest'` still nudges. Nudging on every keypress is what makes\na long list feel like it is fighting the reader.\n\nBoth axes, because the components that need this do not agree on one: a\ncarousel scrolls sideways and a tree scrolls down, and a menu that has run\nout of room does both.\n\n`smooth` is a request rather than an instruction. Animating a scroll the\nreader triggered by pressing a key means the list is still moving when the\nnext press arrives, so this follows `prefers-reduced-motion` and is off by\ndefault for exactly that case."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "scrollItemIntoView",
+          "declaration": {
+            "name": "scrollItemIntoView",
+            "module": "src/utils/scroll-item-into-view/scroll-item-into-view.ts"
           }
         }
       ]
