@@ -32,7 +32,13 @@
    drawn once around the whole thing. */
 [part="field"] {
   align-items: center;
-  background-color: var(--input-background-color, var(--helix-color-surface-sunken));
+  /* `surface` rather than `surface-sunken`. Sunken is deliberately deep, because
+     its job is to be a groove a raised thumb sits in, and at that depth a field
+     filled with it reads as a grey slab on a white page. A field is not a groove:
+     it is a place to put something, one step off the page rather than two. The
+     tracks that really are grooves, the switch's and the segmented control's,
+     keep sunken and keep their contrast with the thumb. */
+  background-color: var(--input-background-color, var(--helix-color-surface));
   block-size: var(--_input-size);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);

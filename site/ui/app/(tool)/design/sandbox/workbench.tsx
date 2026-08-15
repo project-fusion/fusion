@@ -599,7 +599,13 @@ export function SandboxWorkbench({ families }: Props) {
                 IDREF cannot leave the tab's shadow root to reach it: the
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
-            <helix-toggle-group appearance="plain" label="Files" ref={files} value={pane}>
+            <helix-toggle-group
+              appearance="plain"
+              hide-label
+              label="Files"
+              ref={files}
+              value={pane}
+            >
               <helix-toggle value="source">{current.file}</helix-toggle>
               <helix-toggle value="css">styles.css</helix-toggle>
             </helix-toggle-group>

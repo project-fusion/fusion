@@ -36,7 +36,16 @@
    thumb sitting in a groove, which is the thing a segmented control is. */
 :host(:not([appearance])) [part="track"],
 :host([appearance="filled"]) [part="track"] {
-  background-color: var(--helix-color-surface-sunken);
+  /* `surface` rather than `surface-sunken`, for the reason the fields changed:
+     sunken is deep enough to read as a grey slab on a white page. The track
+     keeps its border, which is what frames it, and the thumb keeps `raised`.
+ 
+     That leaves the thumb and the track closer together in light than they were
+     and further apart in dark, because `raised` goes down the ramp on a white
+     page and up on a black one. The shadow under the thumb is carrying the
+     difference in light now rather than the fill, which is the same way a card
+     on a white page is told from the page. */
+  background-color: var(--helix-color-surface);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-lg);
   padding: var(--helix-space-2xs);
