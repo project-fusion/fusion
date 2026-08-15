@@ -1122,7 +1122,7 @@
                   }
                 }
               ],
-              "description": "The split a drag has reached, closed at either end.\n\nBetween the bounds it follows the pointer. Past them by half the remaining\ndistance it goes to nothing or to everything, so a pane can be put away and\nbrought back with the same gesture."
+              "description": "The split a drag has reached, held inside the sandbox.\n\nIt follows the pointer the whole way and stops at the edges, so closing a\npane is the end of the movement rather than a separate thing that happens\nto it."
             },
             {
               "kind": "method",
@@ -1147,7 +1147,7 @@
                   }
                 }
               ],
-              "description": "Keeps the panel between a usable floor and a ceiling that leaves panes.\n\nThe ceiling is skipped when the height is zero, which means the sandbox has\nnot been laid out: multiplying that by a ratio gives zero, and clamping to\nit would close the panel rather than bound it."
+              "description": "Keeps the panel between the floor its consumer set and a ceiling that\nleaves the panes above it.\n\nThe floor is `panelCollapsedSize`, which is nothing unless someone says\notherwise: a panel whose tabs are the way to open it again wants a line of\nitself left behind, and only whoever put the tabs there knows how much. It\nis a floor the drag arrives at rather than a value it is thrown to, which\nis the difference between a pane being put away and a drag being dropped.\n\nThe ceiling is skipped when the height is zero, which means the sandbox has\nnot been laid out: multiplying that by a ratio gives zero, and clamping to\nit would close the panel rather than bound it."
             },
             {
               "kind": "field",

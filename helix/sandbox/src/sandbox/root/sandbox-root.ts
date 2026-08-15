@@ -29,23 +29,28 @@ const STEP = 2
 const DEFAULT_SPLIT = 50
 const DEFAULT_PANEL = 192
 
-const MIN = 15
-const MAX = 85
+/* A divider goes where it is put, all the way to either end.
+ *
+ * There were floors here, fifteen per cent and eighty-five, with a snap past
+ * half of each: inside the floor the drag stuck, and only well past it did the
+ * pane close. Two rules over one gesture, and the seam between them is a jump.
+ * Measured on a 1166px area, the editor held at 175px and then went to nothing
+ * in one frame, which reads as the drag having been dropped rather than as a
+ * pane being put away.
+ *
+ * A floor is protection against leaving a pane too narrow to use, and it is not
+ * worth what it costs: the divider stays in the grid at either extreme, so a
+ * pane taken to nothing comes back with the same gesture that closed it, and a
+ * pane left at 3% is a thing someone did on purpose. Closed is now somewhere a
+ * drag can arrive at rather than somewhere it is thrown. */
+const MIN = 0
+const MAX = 100
 
 /** How far one arrow press moves the panel, in pixels. */
 const PANEL_STEP = 16
 
-/** Panel bounds. The floor leaves a line of output; the ceiling leaves panes. */
-const PANEL_MIN = 64
+/** The most of the sandbox the panel may take, leaving the panes above it. */
 const PANEL_MAX = 0.8
-
-/**
- * How far past a floor a drag has to go before the pane closes.
- *
- * Half of it. Nearer the floor than to nothing reads as aiming for the floor,
- * and nearer nothing reads as putting the pane away.
- */
-const CLOSE_AT = 0.5
 
 /**
  * @summary Pairs an editable source pane with a live preview.
@@ -273,38 +278,32 @@ export class HelixSandbox extends HelixElement {
   }
 
   /**
-   * The split a drag has reached, closed at either end.
+   * The split a drag has reached, held inside the sandbox.
    *
-   * Between the bounds it follows the pointer. Past them by half the remaining
-   * distance it goes to nothing or to everything, so a pane can be put away and
-   * brought back with the same gesture.
+   * It follows the pointer the whole way and stops at the edges, so closing a
+   * pane is the end of the movement rather than a separate thing that happens
+   * to it.
    */
   private clamp(next: number): number {
-    if (next < MIN * CLOSE_AT) {
-      return 0
-    }
-    if (next > 100 - (100 - MAX) * CLOSE_AT) {
-      return 100
-    }
     return Math.min(MAX, Math.max(MIN, next))
   }
 
   /**
-   * Keeps the panel between a usable floor and a ceiling that leaves panes.
+   * Keeps the panel between the floor its consumer set and a ceiling that
+   * leaves the panes above it.
+   *
+   * The floor is `panelCollapsedSize`, which is nothing unless someone says
+   * otherwise: a panel whose tabs are the way to open it again wants a line of
+   * itself left behind, and only whoever put the tabs there knows how much. It
+   * is a floor the drag arrives at rather than a value it is thrown to, which
+   * is the difference between a pane being put away and a drag being dropped.
    *
    * The ceiling is skipped when the height is zero, which means the sandbox has
    * not been laid out: multiplying that by a ratio gives zero, and clamping to
    * it would close the panel rather than bound it.
    */
   private clampPanel(next: number, height: number): number {
-    // Below half the floor the panel closes, to whatever `panelCollapsedSize`
-    // says closed is. A panel holding tabs is not closed at nothing: the tabs
-    // are how it is opened again, so the consumer that put them there says how
-    // much to leave.
-    if (next < PANEL_MIN * CLOSE_AT) {
-      return this.panelCollapsedSize
-    }
-    const floored = Math.max(PANEL_MIN, next)
+    const floored = Math.max(this.panelCollapsedSize, next)
     return height > 0 ? Math.min(height * PANEL_MAX, floored) : floored
   }
 
@@ -347,7 +346,7 @@ export class HelixSandbox extends HelixElement {
       }
       if (block && !inline) {
         this.panelSize = this.clampPanel(
-          event.key === 'Home' ? PANEL_MIN : height * PANEL_MAX,
+          event.key === 'Home' ? this.panelCollapsedSize : height * PANEL_MAX,
           height,
         )
       }

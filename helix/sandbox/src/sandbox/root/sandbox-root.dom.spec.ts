@@ -249,15 +249,25 @@ describe('sandbox divider', () => {
     expect(sandbox.split).toBe(start - step)
   })
 
-  test('the split cannot be driven to nothing', async () => {
+  test('the split reaches both ends and stops there', async () => {
+    /* It used to stop short, at fifteen and eighty-five, with a snap to nothing
+       once a drag went half as far again. Two rules over one gesture, and the
+       seam between them was a jump: the pane held at a floor and then vanished
+       in a frame. It goes where it is put now, and the ends are ends rather
+       than places to be thrown from. */
     const sandbox = (await mount(wired)) as Updatable & { split: number }
     press(sandbox, 'Home')
     await sandbox.updateComplete
-    expect(sandbox.split).toBe(15)
+    expect(sandbox.split).toBe(0)
 
     press(sandbox, 'End')
     await sandbox.updateComplete
-    expect(sandbox.split).toBe(85)
+    expect(sandbox.split).toBe(100)
+
+    // And no further, in either direction.
+    press(sandbox, 'ArrowRight')
+    await sandbox.updateComplete
+    expect(sandbox.split).toBe(100)
   })
 
   test('a size that is not a number does not take the grid with it', async () => {
