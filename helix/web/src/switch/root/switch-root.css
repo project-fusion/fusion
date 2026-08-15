@@ -176,6 +176,19 @@
   margin-inline-start: var(--helix-space-2xs);
 }
 
+/* Lined up under the text rather than under the track, because the track is the
+   control and the description is about what the words say. The same rule the
+   checkbox and the radio carry, with the track's width in place of the box's:
+   the label starts one control and one gap in, so the line under it does too.
+
+   It was missing here, so a hint sat at the host's own edge while its label
+   started fifteen pixels further along, and the two read as unrelated lines
+   rather than as a label and its description. */
+[part="hint"],
+[part="feedback"] {
+  padding-inline-start: calc(var(--_switch-width) + var(--helix-space-xs));
+}
+
 [part="hint"],
 [part="feedback"] {
   font-family: var(--helix-font-sans);
