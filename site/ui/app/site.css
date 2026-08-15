@@ -301,9 +301,15 @@ helix-app-header {
  * picked, so the two ends of the gradient cannot drift apart when the seed
  * moves. */
 .fusionLogo {
-  --logo-color-from: var(--helix-color-primary-subtle);
-  --logo-color-mid: var(--helix-color-primary);
-  --logo-color-to: var(--helix-color-primary-hover);
+  /* Every stop one step down the brand, so the mark is blue throughout rather
+     than a blue that fades to almost nothing. `from` was `primary-subtle`,
+     which is a tint of the brand near enough white to read as unpainted, and it
+     is the stop the bar and the highlight both start from: most of the mark was
+     that colour. It takes the brand itself now, and the two that were the brand
+     take the steps below it. */
+  --logo-color-from: var(--helix-color-primary);
+  --logo-color-mid: var(--helix-color-primary-hover);
+  --logo-color-to: var(--helix-color-primary-active);
 }
 
 .workbenchHeader {
