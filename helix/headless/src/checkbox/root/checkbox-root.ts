@@ -109,6 +109,45 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.sync()
+    this.syncLabelPresence()
+  }
+
+  /**
+   * Whether there is a label to leave room for, written to the host.
+   *
+   * The row is a flex line with a gap in it, so a label span rendered empty is
+   * still a box and still takes that gap: an unlabelled box came out with eight
+   * pixels of nothing after it. The input answers this by not rendering the
+   * element, which cannot work here, because a checkbox is named by its own
+   * content and the property is only that slot's fallback. Gating on the
+   * property would unlabel every `<helix-checkbox>Text</helix-checkbox>` ever
+   * written.
+   *
+   * So the slot is asked instead, the same way `Tooltip` asks its own: with
+   * `flatten`, because here the fallback counts, being where the property
+   * renders. Client only, so a server-rendered unlabelled checkbox carries the
+   * gap for one frame. That is a control with no accessible name, which has a
+   * worse problem than its spacing.
+   */
+  private readonly handleLabelChange = (): void => {
+    this.syncLabelPresence()
+  }
+
+  /**
+   * Asks the slot, and says the answer on the host.
+   *
+   * Called on `slotchange` and after every update, and the second is not
+   * belt-and-braces: **`slotchange` does not fire when nothing is assigned.**
+   * So a checkbox labelled only by its property, which is most of them, never
+   * heard about its own label and rendered without one. Caught by the spec that
+   * asks a labelled row to be wider than a bare one.
+   */
+  private syncLabelPresence(): void {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('[part="label"] slot')
+    const filled = (slot?.assignedNodes({ flatten: true }) ?? []).some(
+      (node) => node.textContent?.trim() !== '' || node.nodeType === Node.ELEMENT_NODE,
+    )
+    this.toggleAttribute('data-has-label', filled)
   }
 
   protected override render(): TemplateResult {
@@ -135,7 +174,7 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
         aria-describedby=${this.describedBy ?? nothing}
         @change=${this.handleChange}
       />
-      <span part="label"><slot>${this.label}</slot></span>
+      <span part="label"><slot @slotchange=${this.handleLabelChange}>${this.label}</slot></span>
     </label>
     ${this.renderHint()}${this.renderFeedback()}`
   }

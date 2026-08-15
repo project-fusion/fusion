@@ -37,21 +37,55 @@
   margin: var(--helix-space-none);
 }
 
+/* Offset here, unlike the input's, and the difference is the reason the input's
+   is not. A ring is drawn against the thing it surrounds when that thing is
+   changing colour at the same moment, which is true of a field's border and not
+   of this: the box is the browser's own, drawn with `accent-color`, and nothing
+   here recolours its edge. So the ring surrounds it rather than replacing it. */
 [part="control"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
-[part="label"] {
-  color: var(--helix-color-foreground);
-  font-size: var(--helix-text-sm);
-  line-height: var(--helix-leading-tight);
+/* Wrong, and the reader knows it.
+ *
+ * The ring is the only edge this component owns: a native checkbox draws its
+ * own box, so unlike the input there is no border here to recolour, and colour
+ * on `accent-color` would say nothing at all because a box that fails a
+ * `required` check is a box with no tick in it.
+ *
+ * So one ring carries both states. Its colour says what is wrong and its width
+ * says where focus is, which is what stops this becoming the two rings the
+ * input had: a red edge inside a blue one.
+ *
+ * The three rules are ordered by specificity rather than by source, which is
+ * what makes them compose: focused-and-invalid (0,4,0) outranks invalid
+ * (0,3,0), which outranks focused (0,2,0). Written the obvious way round, the
+ * resting invalid ring would have won while the field was focused and the ring
+ * would have thinned under the caret. */
+:host([data-invalid]) [part="control"] {
+  outline: var(--helix-border-thin) solid var(--helix-color-danger);
+  outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Nothing to read, so nothing to space away from the box. */
-[part="label"]:not(:has(slot)),
-slot:not([name]):empty {
-  display: contents;
+:host([data-invalid]) [part="control"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Nothing to read, so nothing to space away from the box.
+ *
+ * `data-has-label` rather than a selector, because there is no selector for
+ * this. `[part="label"]:has(slot:empty)` looks like the answer and is not: a
+ * slot's children are its fallback, and assigned nodes are not children, so
+ * `slot:empty` is true whenever the property is empty whether or not the
+ * consumer slotted anything. The component asks the slot in script and says so
+ * on the host.
+ *
+ * `display: none` rather than a zero width, because the gap is the cost here
+ * and only a box that is not generated has no gap beside it. */
+:host(:not([data-has-label])) [part="label"] {
+  display: none;
 }
 
 /* ------------------------------------------------------------ field ----- */

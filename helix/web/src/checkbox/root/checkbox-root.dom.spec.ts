@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -188,3 +188,61 @@ describe('checkbox validation message', () => {
     expect(host.hasAttribute('data-invalid')).toBe(false)
   })
 })
+
+if (hasLayout()) {
+  describe('checkbox geometry', () => {
+    test('an unlabelled box carries no gap after it', async () => {
+      /* The row is a flex line with a gap in it, so a label span rendered empty
+         is still a box and still takes that gap. Measured at eight pixels of
+         nothing after the box, which is what this is for.
+
+         Only a browser can answer it: `slotchange` is what decides, and it does
+         not fire without a real slot assignment. */
+      /* Both in one mount, because `mount` replaces the body: measured
+         separately, the first was detached by the time it was read, and a
+         detached element reports zero for everything. Which the spec caught,
+         by asking the box to be wider than nothing before comparing it. */
+      const bare = (await mount(
+        '<helix-checkbox></helix-checkbox><helix-checkbox label="Accept"></helix-checkbox>',
+      )) as HTMLElement
+      const labelled = bare.nextElementSibling as HTMLElement
+      await (labelled as Updatable).updateComplete
+
+      const rowOf = (host: HTMLElement): number =>
+        (part(host, 'field') as HTMLElement).getBoundingClientRect().width
+      const boxOf = (host: HTMLElement): number =>
+        (part(host, 'control') as HTMLElement).getBoundingClientRect().width
+
+      expect(boxOf(bare)).toBeGreaterThan(0)
+      // The row is the box and nothing else, to within a subpixel.
+      expect(Math.abs(rowOf(bare) - boxOf(bare))).toBeLessThan(1)
+      // And a labelled one is wider, so the collapse is not hiding real labels.
+      expect(rowOf(labelled)).toBeGreaterThan(rowOf(bare))
+    })
+
+    test('slotted words keep the room, with no property set', async () => {
+      // The case gating on the property would have broken: a checkbox named by
+      // its own content, which is how every checkbox was written before `label`.
+      const host = await mount('<helix-checkbox>Accept</helix-checkbox>')
+      expect(host.hasAttribute('data-has-label')).toBe(true)
+      expect(getComputedStyle(part(host, 'label') as HTMLElement).display).not.toBe('none')
+    })
+
+    test('an invalid box is ringed in the danger colour', async () => {
+      /* The focused-and-invalid ring cannot be asserted here: `:focus-visible`
+         needs genuine keyboard focus, which no script can grant. What is
+         checked is the resting ring and that its colour is the message's. */
+      const host = (await mount(
+        '<helix-checkbox label="Accept" name="t" required></helix-checkbox>',
+      )) as Updatable
+      host.dispatchEvent(new Event('invalid'))
+      while ((await host.updateComplete) === false) {
+        // Validity moves outside the property system, so this takes two passes.
+      }
+      const ring = getComputedStyle(part(host, 'control') as HTMLElement)
+      const message = getComputedStyle(part(host, 'feedback') as HTMLElement)
+      expect(ring.outlineStyle).toBe('solid')
+      expect(ring.outlineColor).toBe(message.color)
+    })
+  })
+}

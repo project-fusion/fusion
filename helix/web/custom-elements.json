@@ -5981,6 +5981,32 @@
             },
             {
               "kind": "field",
+              "name": "handleLabelChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Whether there is a label to leave room for, written to the host.\n\nThe row is a flex line with a gap in it, so a label span rendered empty is\nstill a box and still takes that gap: an unlabelled box came out with eight\npixels of nothing after it. The input answers this by not rendering the\nelement, which cannot work here, because a checkbox is named by its own\ncontent and the property is only that slot's fallback. Gating on the\nproperty would unlabel every `<helix-checkbox>Text</helix-checkbox>` ever\nwritten.\n\nSo the slot is asked instead, the same way `Tooltip` asks its own: with\n`flatten`, because here the fallback counts, being where the property\nrenders. Client only, so a server-rendered unlabelled checkbox carries the\ngap for one frame. That is a control with no accessible name, which has a\nworse problem than its spacing.",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "syncLabelPresence",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Asks the slot, and says the answer on the host.\n\nCalled on `slotchange` and after every update, and the second is not\nbelt-and-braces: **`slotchange` does not fire when nothing is assigned.**\nSo a checkbox labelled only by its property, which is most of them, never\nheard about its own label and rendered without one. Caught by the spec that\nasks a labelled row to be wider than a bare one.",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "formAssociated",
               "type": {
                 "text": "boolean"
