@@ -303,18 +303,24 @@ helix-app-header {
 /* Editor and preview take what is left; the examples keep a fixed rail on the
    right, which is where they were asked for and where a list you scan while
    working belongs. */
+/* The rail closes by its own track narrowing, which is the accordion's trick
+   turned on its side: a grid track can be interpolated where the presence of a
+   track cannot. This dropped to one column before, and two tracks to one is not
+   a change any browser can animate, so the rail vanished between frames. Two
+   tracks always, and the second one goes to nothing. */
 .workbenchBody {
+  --rail-open: 17rem;
+  --rail-size: var(--rail-open);
+
   display: grid;
   flex: 1 1 auto;
-  grid-template-columns: minmax(0, 1fr) 17rem;
+  grid-template-columns: minmax(0, 1fr) var(--rail-size);
   min-block-size: 0;
+  transition: grid-template-columns var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
-/* With the rail switched off there is one column, and the sandbox takes the
-   window. The track has to go rather than the element inside it: a `17rem`
-   column with nothing in it is seventeen rems of nothing. */
 .workbenchBody[data-rail="hidden"] {
-  grid-template-columns: minmax(0, 1fr);
+  --rail-size: 0rem;
 }
 
 /* Mirrored, because the glyph draws its panel against the leading edge and the
@@ -342,6 +348,32 @@ helix-app-header {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   min-block-size: 0;
+  /* What makes the narrowing a reveal rather than a squeeze. */
+  overflow: hidden;
+  transition: border-inline-start-width var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+/* The rule goes with it. A zero-width element still draws its border, so
+   closing the rail left a hairline standing at the window edge with nothing
+   behind it. */
+.workbenchBody[data-rail="hidden"] .examplesRail {
+  border-inline-start-width: 0;
+}
+
+/* The contents hold the width the rail has when it is open, so the column
+   closes over them and clips. Left to fill the track they would reflow the
+   whole way: the filter field shrinking, every label rewrapping, the tree
+   reflowing on each frame. That is the accordion's lesson, which is that
+   whatever is inside a box being animated has to hold still. */
+.examplesRail > * {
+  inline-size: calc(var(--rail-open) - var(--helix-border-thin));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workbenchBody,
+  .examplesRail {
+    transition: none;
+  }
 }
 
 /* The same figure the sandbox toolbar takes, because these two bars sit either

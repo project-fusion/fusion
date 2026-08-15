@@ -806,7 +806,14 @@ export function SandboxWorkbench({ families }: Props) {
             {tree}
           </helix-drawer>
         ) : (
-          showRail && <aside className="examplesRail">{tree}</aside>
+          /* Always rendered, because a region that unmounts cannot animate out.
+             `inert` while it is shut, so what a reader cannot see is also
+             something the keyboard cannot reach and a screen reader does not
+             read: `overflow: hidden` on a zero-width column takes it off the
+             screen and leaves it in the page. */
+          <aside className="examplesRail" inert={!showRail}>
+            {tree}
+          </aside>
         )}
       </div>
     </>
