@@ -142,6 +142,12 @@ export function SandboxWorkbench({ families }: Props) {
   /* What is in the editor now, and in which language, so the effect below can
      tell "a new example arrived" from "the same one, asked for differently". */
   const seeded = useRef<{ example: string; syntax: Syntax } | null>(null)
+  /* Where the divider is, held here rather than left on the element. Hiding the
+     editor drives the split to zero, so showing it again has to put a number
+     back, and the number it has to put back is the one it had. This was
+     `undefined` meaning "the default", which is not a size: it reached the
+     stylesheet as `undefined%` and cost the sandbox its entire grid template. */
+  const [split, setSplit] = useState(50)
   const [markup, setMarkup] = useState('')
   const [css, setCss] = useState(CSS_START)
   // Unset means the preview follows the page. A reader who has chosen a mode
@@ -185,13 +191,11 @@ export function SandboxWorkbench({ families }: Props) {
     if (stored.syntax && !new URLSearchParams(window.location.search).has('x')) {
       setSyntax(stored.syntax)
     }
-    if (sandbox.current) {
-      if (typeof stored.split === 'number') {
-        sandbox.current.split = stored.split
-      }
-      if (typeof stored.panelSize === 'number') {
-        sandbox.current.panelSize = stored.panelSize
-      }
+    if (typeof stored.split === 'number') {
+      setSplit(stored.split)
+    }
+    if (sandbox.current && typeof stored.panelSize === 'number') {
+      sandbox.current.panelSize = stored.panelSize
     }
   }, [])
 
@@ -204,6 +208,15 @@ export function SandboxWorkbench({ families }: Props) {
     const element = sandbox.current
     if (!element) {
       return
+    }
+    /* Back into state as well as into storage. The split is a prop now, so a
+       drag that moved the element without telling React would be undone by the
+       next render putting the old number back. Only where the editor is
+       showing: with it off the split is being held at zero deliberately, and
+       taking that as the new resting place would lose the size to come back
+       to. */
+    if (showEditor) {
+      setSplit(element.split)
     }
     window.localStorage.setItem(
       ARRANGEMENT,
@@ -569,7 +582,7 @@ export function SandboxWorkbench({ families }: Props) {
         <helix-sandbox
           orientation={narrow ? 'vertical' : 'horizontal'}
           ref={sandbox}
-          split={showEditor ? undefined : 0}
+          split={showEditor ? split : 0}
         >
           {/* One declaration for the region, rather than `size="sm"` on each
               control in it. Nothing inside can be missed, and adding a control

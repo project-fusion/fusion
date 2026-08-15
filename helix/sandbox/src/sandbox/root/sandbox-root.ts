@@ -23,6 +23,12 @@ const STEP = 2
  * A divider that stops dead at fifteen percent gives a reader no way to put a
  * pane away, and inching one down to a sliver is nobody's intent.
  */
+/** Where the divider sits, and how tall the panel is, before anyone moves them.
+    Named because `applySizes` falls back to them and the properties default to
+    them, and two copies of a default drift. */
+const DEFAULT_SPLIT = 50
+const DEFAULT_PANEL = 192
+
 const MIN = 15
 const MAX = 85
 
@@ -86,11 +92,11 @@ export class HelixSandbox extends HelixElement {
 
   /** Percentage of the sandbox given to the source pane. */
   @property({ attribute: 'split', type: Number })
-  split = 50
+  split = DEFAULT_SPLIT
 
   /** Height of the panel, in pixels. */
   @property({ attribute: 'panel-size', type: Number })
-  panelSize = 192
+  panelSize = DEFAULT_PANEL
 
   /**
    * What the panel's height becomes when it is closed.
@@ -510,9 +516,24 @@ export class HelixSandbox extends HelixElement {
    */
   private applySizes(split = this.split, panel = this.panelSize): void {
     const sheet = this.renderRoot.querySelector<HTMLStyleElement>('#sizes')
-    if (sheet) {
-      sheet.textContent = `:host { --_sandbox-split: ${split}%; --_sandbox-panel: ${panel}px; }`
+    if (!sheet) {
+      return
     }
+    /* Guarded, and this is worth more than it looks. These go into custom
+       properties, which accept nearly anything at parse time and only fail
+       where they are used: substituted into `grid-template-columns`, a value
+       that is not a length makes that declaration invalid at computed-value
+       time, and an invalid `grid-template-columns` falls back to its initial
+       value of `none`. The grid then auto-places, so one bad number does not
+       misplace one track, it throws the whole template away.
+
+       Measured, a consumer passing `undefined` for `split` to mean "whatever
+       the default is" wrote `undefined%` and turned three columns of 50/2/rest
+       into 719/75/373. Falling back to the property's own default keeps a
+       mistake local to the thing that was wrong. */
+    const across = Number.isFinite(split) ? split : DEFAULT_SPLIT
+    const down = Number.isFinite(panel) ? panel : DEFAULT_PANEL
+    sheet.textContent = `:host { --_sandbox-split: ${across}%; --_sandbox-panel: ${down}px; }`
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

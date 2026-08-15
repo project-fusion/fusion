@@ -913,22 +913,22 @@
             {
               "kind": "field",
               "name": "split",
-              "type": {
-                "text": "number"
-              },
               "default": "50",
               "description": "Percentage of the sandbox given to the source pane.",
-              "attribute": "split"
+              "attribute": "split",
+              "type": {
+                "text": "number"
+              }
             },
             {
               "kind": "field",
               "name": "panelSize",
-              "type": {
-                "text": "number"
-              },
               "default": "192",
               "description": "Height of the panel, in pixels.",
-              "attribute": "panel-size"
+              "attribute": "panel-size",
+              "type": {
+                "text": "number"
+              }
             },
             {
               "kind": "field",
@@ -1332,19 +1332,13 @@
             },
             {
               "name": "split",
-              "type": {
-                "text": "number"
-              },
-              "default": "50",
+              "default": "DEFAULT_SPLIT",
               "description": "Percentage of the sandbox given to the source pane.",
               "fieldName": "split"
             },
             {
               "name": "panel-size",
-              "type": {
-                "text": "number"
-              },
-              "default": "192",
+              "default": "DEFAULT_PANEL",
               "description": "Height of the panel, in pixels.",
               "fieldName": "panelSize"
             },

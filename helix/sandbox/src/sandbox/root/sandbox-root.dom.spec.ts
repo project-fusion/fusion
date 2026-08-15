@@ -260,6 +260,32 @@ describe('sandbox divider', () => {
     expect(sandbox.split).toBe(85)
   })
 
+  test('a size that is not a number does not take the grid with it', async () => {
+    /* These go into custom properties and are substituted into
+       `grid-template-columns`. A custom property holds nearly anything at parse
+       time and fails only where it is used, and an invalid template falls back
+       to `none`, so the grid stops being three columns and auto-places instead:
+       one bad number cost the whole layout rather than one track. A consumer
+       setting `split` to `undefined` to mean "the default" is what found it. */
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    const sizes = () => sandbox.shadowRoot?.querySelector('#sizes')?.textContent ?? ''
+
+    sandbox.split = undefined as unknown as number
+    await sandbox.updateComplete
+    expect(sizes()).not.toContain('undefined')
+    expect(sizes()).toContain('--_sandbox-split: 50%')
+
+    sandbox.split = Number.NaN
+    await sandbox.updateComplete
+    expect(sizes()).not.toContain('NaN')
+    expect(sizes()).toContain('--_sandbox-split: 50%')
+
+    // And a real one still gets through.
+    sandbox.split = 30
+    await sandbox.updateComplete
+    expect(sizes()).toContain('--_sandbox-split: 30%')
+  })
+
   test('an unrelated key is left alone', async () => {
     const sandbox = await mount(wired)
     expect(press(sandbox, 'PageDown').defaultPrevented).toBe(false)
