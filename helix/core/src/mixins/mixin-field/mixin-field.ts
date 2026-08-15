@@ -80,6 +80,15 @@ export declare class MixinFieldInterface {
   /** Whether the form refuses to submit without it. */
   required: boolean
 
+  /**
+   * Re-reads the platform's verdict, for a control that has just reported one.
+   *
+   * Call it straight after `setValidity`. Nothing else can: validity changes
+   * through `ElementInternals` rather than through a property, so no update is
+   * scheduled for it and the message on screen would be the one from before.
+   */
+  protected refreshFeedback(): void
+
   /** The message actually shown: the consumer's, or the platform's, or none. */
   readonly resolvedFeedback: string
 }
@@ -156,21 +165,36 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
     required = false
 
     /**
-     * Whether the reader has been given a chance to get it wrong.
+     * Whether the reader has had a go at the field yet.
      *
-     * `:user-invalid` is the platform's answer to "is this field wrong *yet*",
-     * and it is the whole reason an empty required field is not shouted at
-     * before anyone has reached it.
+     * This was `:user-invalid`, which is the platform's own answer to "is this
+     * field wrong *yet*" and is the right idea. It does not work here, and the
+     * reason is structural rather than a browser bug: `:user-invalid` tracks
+     * interaction with the element it is on, and nobody interacts with this
+     * element. The reader types into an `<input>` inside its shadow root, so
+     * the host's interaction flag is never set and the selector never matches.
+     * Measured after submitting an invalid required field and again after
+     * editing one and leaving it: false both times, while `:invalid` matched
+     * both times.
+     *
+     * So the moments are listened for instead, and both of them demonstrably
+     * reach the host: `invalid` when a form is submitted with this control
+     * failing, and `change` when the reader has edited and committed. Focus
+     * alone is deliberately not one of them. Tabbing past an empty required
+     * field should not be answered with an error.
      */
     @state()
-    private userInvalid = false
+    private touched = false
 
     /** The message actually shown: the consumer's, or the platform's, or none. */
     get resolvedFeedback(): string {
       if (this.feedback !== '') {
         return this.feedback
       }
-      return this.userInvalid ? this.internals.validationMessage : ''
+      if (!this.touched || this.internals.validity.valid) {
+        return ''
+      }
+      return this.internals.validationMessage
     }
 
     /**
@@ -258,33 +282,59 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
       this.internals.ariaDescribedByElements = described.length > 0 ? described : null
     }
 
+    /** What the last render put on screen, so a change can be noticed. */
+    private shownFeedback = ''
+
     /**
-     * Re-reads the platform's verdict after every update.
+     * Re-reads the platform's verdict, for a control that has just reported one.
      *
-     * `:user-invalid` changes without anything here changing: the reader blurs
-     * a bad field, or submits and the form marks every control at once. Read in
-     * `updated` and written to state, so a change schedules exactly one more
-     * update and settles, rather than looping.
+     * Validity changes through `ElementInternals` rather than through a
+     * property, so nothing schedules an update for it. Worse, the order is
+     * against us: this mixin sits above the control in the prototype chain, so
+     * its `updated` runs before the control's own, which is where `setValidity`
+     * is called. Reading the verdict here would always read the previous one,
+     * which is what left a corrected field still showing the error it had
+     * before. So the control says when it has reported, and this schedules the
+     * one further update that needs. It converges because the second pass finds
+     * nothing changed.
      */
-    protected override updated(changed: PropertyValues): void {
-      super.updated(changed)
-      const invalid = this.matches(':user-invalid')
-      if (invalid !== this.userInvalid) {
-        this.userInvalid = invalid
+    protected refreshFeedback(): void {
+      const next = this.resolvedFeedback
+      if (next !== this.shownFeedback) {
+        this.shownFeedback = next
+        this.requestUpdate()
       }
     }
 
     /**
-     * The moments the platform decides, which no property change announces.
+     * Mirrors "wrong, and the reader knows it" onto the host as `data-invalid`.
      *
-     * `invalid` fires at submission for every control that fails. `blur` is
-     * when a field the reader has left becomes `:user-invalid`. In
-     * `firstUpdated` rather than `connectedCallback`, which SSR never calls.
+     * The styled tier selects on this rather than on `:host(:user-invalid)`,
+     * which cannot match for the reason above, so the invalid border never
+     * arrived either. One state, and the message and the border agree by
+     * construction.
+     *
+     * In `willUpdate` rather than `connectedCallback`, which SSR never calls.
+     */
+    protected override willUpdate(changed: PropertyValues): void {
+      super.willUpdate(changed)
+      this.shownFeedback = this.resolvedFeedback
+      this.toggleAttribute('data-invalid', this.shownFeedback !== '')
+    }
+
+    /**
+     * The two moments a field becomes wrong, neither of which is a property
+     * change, so nothing else would schedule an update for them.
+     *
+     * In `firstUpdated` rather than `connectedCallback`, which SSR never calls.
      */
     protected override firstUpdated(changed: PropertyValues): void {
       super.firstUpdated(changed)
-      this.addEventListener('invalid', () => this.requestUpdate())
-      this.addEventListener('blur', () => this.requestUpdate())
+      const touch = (): void => {
+        this.touched = true
+      }
+      this.addEventListener('invalid', touch)
+      this.addEventListener('change', touch)
     }
   }
 

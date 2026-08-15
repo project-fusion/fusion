@@ -124,3 +124,67 @@ describe('checkbox label fallback', () => {
     expect(slot.textContent?.trim()).toBe('Accept')
   })
 })
+
+describe('checkbox validation message', () => {
+  /* Awaited until it stops, not once. Validity moves through
+     `ElementInternals` rather than through a property, so the control reports
+     it after rendering and the mixin schedules one further update to show what
+     changed. Lit's `updateComplete` resolves `false` when that happens, which
+     is the platform telling you there is more; a single await reads the state
+     from before the message cleared. */
+  const settle = async (host: Updatable): Promise<void> => {
+    while ((await host.updateComplete) === false) {
+      // Another update was requested while the last one was finishing.
+    }
+  }
+
+  const required = async (): Promise<Updatable> => {
+    document.body.innerHTML =
+      '<form><helix-checkbox label="Accept" hint="Hint" name="terms" required></helix-checkbox></form>'
+    const host = (document.body.firstElementChild as HTMLElement).firstElementChild as Updatable
+    await host.updateComplete
+    return host
+  }
+
+  test('says nothing before the reader has had a go at it', async () => {
+    /* A required box that starts unticked is not wrong yet, it is unanswered.
+       Shouting at a reader who has not reached the control is the failure mode
+       this whole state exists to avoid. */
+    const host = await required()
+    expect(part(host, 'feedback')).toBeNull()
+    expect((part(host, 'hint') as HTMLElement).textContent?.trim()).toBe('Hint')
+    expect(host.hasAttribute('data-invalid')).toBe(false)
+  })
+
+  test("a failed submission puts the message in the hint's place", async () => {
+    /* `invalid` is what the browser fires at every control that fails when a
+       form is submitted, and it reaches the host. `:user-invalid` would be the
+       natural thing to read instead and cannot work: it tracks interaction with
+       the element it is on, and the reader interacts with an `<input>` inside
+       the shadow root, so the host's flag is never set. Measured false after a
+       real submission of an invalid required field. */
+    const host = await required()
+    host.dispatchEvent(new Event('invalid'))
+    await settle(host)
+
+    expect(part(host, 'hint')).toBeNull()
+    expect((part(host, 'feedback') as HTMLElement).textContent?.trim()).toBe(
+      'Tick this box to continue.',
+    )
+    expect(host.hasAttribute('data-invalid')).toBe(true)
+  })
+
+  test('answering it takes the message away again', async () => {
+    // And the styled tier follows the same attribute, so the border and the
+    // message cannot disagree about whether the field is wrong.
+    const host = await required()
+    host.dispatchEvent(new Event('invalid'))
+    await settle(host)
+    ;(host as Updatable & { checked: boolean }).checked = true
+    await settle(host)
+
+    expect(part(host, 'feedback')).toBeNull()
+    expect((part(host, 'hint') as HTMLElement).textContent?.trim()).toBe('Hint')
+    expect(host.hasAttribute('data-invalid')).toBe(false)
+  })
+})

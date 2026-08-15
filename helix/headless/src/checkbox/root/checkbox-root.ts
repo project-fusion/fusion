@@ -85,6 +85,8 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
     } else {
       this.internals.setValidity({})
     }
+    // Straight after, because validity moved without any property moving.
+    this.refreshFeedback()
   }
 
   /** Returns the box to the state its markup declared. */

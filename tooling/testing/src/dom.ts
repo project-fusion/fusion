@@ -43,8 +43,16 @@ export const registerDom = (): void => {
  * the right moment, and that is what the recording proves. A spec that needs
  * the whole path from a press to a submitted field wants a real browser.
  *
- * Everything else is inert, so a test that starts depending on validity will
- * read as obviously empty rather than quietly passing against a stub.
+ * `setValidity` is modelled too, for the same reason `setFormValue` is: a
+ * control reads its own verdict back to decide whether to show a message, so a
+ * `setValidity` that records nothing leaves `internals.validity` undefined and
+ * the component throws rather than the spec failing. What is modelled is the
+ * bookkeeping and nothing more: the flags given are the flags returned, and
+ * `valid` is true when none of them is set. Deciding what counts as a valid
+ * email is the platform's job and is not attempted here.
+ *
+ * Everything else is inert, so a test that starts depending on it will read as
+ * obviously empty rather than quietly passing against a stub.
  */
 /** What a control may report: a field's value, a set of them, or nothing. */
 type FormValue = File | FormData | string | null
@@ -75,6 +83,8 @@ const shimElementInternals = (): void => {
 
   proto.attachInternals = function attachInternals(this: HTMLElement): ElementInternals {
     const host = this
+    let validity: ValidityState = { valid: true } as ValidityState
+    let validationMessage = ''
     return {
       ariaCurrent: null,
       // Declared, not merely assignable: a component that guards on
@@ -93,12 +103,25 @@ const shimElementInternals = (): void => {
       get labels(): NodeList {
         return document.querySelectorAll(host.id ? `label[for="${host.id}"]` : 'nothing-matches')
       },
-      reportValidity: () => true,
+      reportValidity: () => validity.valid,
       role: null,
       setFormValue: (value: unknown) => {
         reported.set(host, value as FormValue)
       },
-      setValidity: () => undefined,
+      setValidity: (flags: ValidityStateFlags = {}, message = '') => {
+        const failed = Object.entries(flags).filter(([, set]) => set === true)
+        validity = { ...flags, valid: failed.length === 0 } as ValidityState
+        validationMessage = failed.length === 0 ? '' : message
+      },
+      get validationMessage(): string {
+        return validationMessage
+      },
+      get validity(): ValidityState {
+        return validity
+      },
+      get willValidate(): boolean {
+        return true
+      },
     } as unknown as ElementInternals
   }
 }

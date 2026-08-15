@@ -123,6 +123,8 @@ export class HelixBaseInput extends MixinField(HelixFormElement) {
        without it the validity bubble points at the host, which is a box with no
        text in it. */
     this.internals.setValidity(control.validity, control.validationMessage, control)
+    // Straight after, because validity moved without any property moving.
+    this.refreshFeedback()
   }
 
   /** Returns the field to the text its markup declared. */

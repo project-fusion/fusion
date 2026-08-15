@@ -73,9 +73,17 @@
 }
 
 /* The platform's verdict, which the host copies from the input, so this follows
-   whatever the browser decided rather than a second opinion. `user-invalid`
-   rather than `invalid`: a field is not wrong before it has been filled in. */
-:host(:user-invalid) [part="field"] {
+   whatever the browser decided rather than a second opinion.
+
+   `data-invalid` rather than `:user-invalid`. The idea is the same, that a
+   field is not wrong before anyone has had a go at it, but the selector cannot
+   match: `:user-invalid` tracks interaction with the element it is on, and
+   nobody interacts with this one. The reader types into an `<input>` in the
+   shadow root, so the host's flag is never set. Measured false after submitting
+   an invalid required field, which is exactly when the border should be there.
+   The attribute is written from the same state that decides the message, so the
+   two cannot disagree. */
+:host([data-invalid]) [part="field"] {
   border-color: var(--helix-color-danger);
 }
 

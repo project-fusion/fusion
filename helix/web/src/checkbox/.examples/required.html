@@ -1,0 +1,9 @@
+<!-- Press Submit without ticking. The box writes its own message, because a
+     browser has nothing useful to say about a checkbox beyond that it is
+     required. -->
+<form onsubmit="event.preventDefault()">
+  <helix-flex direction="column" gap="sm">
+    <helix-checkbox hint="Hint" label="Label" name="option" required value="accepted"></helix-checkbox>
+    <helix-button appearance="primary" type="submit">Submit</helix-button>
+  </helix-flex>
+</form>
