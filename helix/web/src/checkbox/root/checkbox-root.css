@@ -1,5 +1,6 @@
 :host {
-  display: inline-flex;
+  display: inline-grid;
+  gap: var(--helix-space-2xs);
 
   --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox));
 }
@@ -49,4 +50,56 @@
 [part="label"]:not(:has(slot)),
 slot:not([name]):empty {
   display: contents;
+}
+
+/* ------------------------------------------------------------ field ----- */
+
+/* The three nodes the field mixin renders. Same parts on every control, so this
+   block is the same block everywhere and only the placement above it differs. */
+
+[part="label"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-tight);
+}
+
+/* Marked on the label rather than in it, so the mark is not part of the
+   accessible name. */
+:host([required]) [part="label"]::after {
+  color: var(--helix-color-danger);
+  content: "*";
+  margin-inline-start: var(--helix-space-2xs);
+}
+
+/* Lined up under the text rather than under the box, because the box is the
+   control and the description is about what the words say. */
+[part="caption"],
+[part="feedback"] {
+  padding-inline-start: calc(var(--_checkbox-size) + var(--helix-space-xs));
+}
+
+[part="caption"],
+[part="feedback"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-normal);
+  margin: var(--helix-space-none);
+}
+
+[part="caption"] {
+  color: var(--helix-color-foreground-subtle);
+}
+
+/* Both show, and the error is the one that changes colour. The caption usually
+   states the rule the feedback says was broken, so hiding it exactly when the
+   reader breaks it is backwards. */
+[part="feedback"] {
+  color: var(--helix-color-danger);
+}
+
+:host([disabled]) [part="label"],
+:host([disabled]) [part="caption"] {
+  opacity: 0.5;
 }

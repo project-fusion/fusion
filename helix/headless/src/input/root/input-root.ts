@@ -1,4 +1,4 @@
-import { customElement, HelixChangeEvent, HelixFormElement } from '@helix-io/core'
+import { customElement, HelixChangeEvent, HelixFormElement, MixinField } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -45,7 +45,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart control - The input itself.
  */
 @customElement('helix-base-input')
-export class HelixBaseInput extends HelixFormElement {
+export class HelixBaseInput extends MixinField(HelixFormElement) {
   /**
    * The text the markup declared, which is what a reset returns to.
    *
@@ -53,10 +53,6 @@ export class HelixBaseInput extends HelixFormElement {
    */
   @property({ attribute: 'default-value' })
   defaultValue = ''
-
-  /** Accessible name, for a field with no visible label beside it. */
-  @property()
-  label = ''
 
   /** Name submitted with the form. */
   @property()
@@ -69,10 +65,6 @@ export class HelixBaseInput extends HelixFormElement {
   /** Whether the field refuses input while still submitting its value. */
   @property({ attribute: 'read-only', reflect: true, type: Boolean })
   readOnly = false
-
-  /** Whether the form refuses to submit while the field is empty. */
-  @property({ reflect: true, type: Boolean })
-  required = false
 
   /** What the field accepts, which decides the keyboard and the validation. */
   @property({ reflect: true })
@@ -168,15 +160,17 @@ export class HelixBaseInput extends HelixFormElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="field">
+    return html`${this.renderLabel()}
+    <div part="field">
       <slot name="start"></slot>
       <input
         part="control"
+        id="control"
         .value=${this.value}
         type=${this.type}
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
-        aria-label=${this.label || nothing}
+        aria-describedby=${this.describedBy ?? nothing}
         ?disabled=${this.disabled}
         ?readonly=${this.readOnly}
         ?required=${this.required}
@@ -184,7 +178,8 @@ export class HelixBaseInput extends HelixFormElement {
         @change=${this.handleChange}
       />
       <slot name="end"></slot>
-    </div>`
+    </div>
+    ${this.renderCaption()}${this.renderFeedback()}`
   }
 }
 

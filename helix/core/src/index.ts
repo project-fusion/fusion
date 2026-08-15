@@ -33,6 +33,7 @@ export {
   MixinControllerOpen,
   type MixinControllerOpenInterface,
 } from './mixins/mixin-controller-open/mixin-controller-open.js'
+export { MixinField, type MixinFieldInterface } from './mixins/mixin-field/mixin-field.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export { customElement } from './utils/custom-element/custom-element.js'
 export {

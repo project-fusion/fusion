@@ -5656,6 +5656,163 @@
             },
             {
               "kind": "field",
+              "name": "caption",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help that stays whether or not the field is valid.",
+              "attribute": "caption",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "attribute": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The accessible name, and the fallback for the `label` slot.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "userInvalid",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the reader has been given a chance to get it wrong.\n\n`:user-invalid` is the platform's answer to \"is this field wrong *yet*\",\nand it is the whole reason an empty required field is not shouted at\nbefore anyone has reached it.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolvedFeedback",
+              "type": {
+                "text": "string"
+              },
+              "description": "The message actually shown: the consumer's, or the platform's, or none.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "describedBy",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Ids of the description nodes, for `aria-describedby` on the control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderCaption",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "Help under the control. Renders nothing when there is none.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The validation message, under the caption rather than instead of it.\n\nBoth show. The caption usually states the rule the feedback says was\nbroken, so hiding it exactly when the reader breaks it is backwards.\n\n`role=\"alert\"` rather than a live region on the whole field, so what is\nannounced is the message and not the label and help along with it.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "describeHost",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Points the host at its own description nodes, for a group.\n\nClient only, and deliberately: `ElementInternals` element references need\nthe nodes to exist, and on the server they do not. A group's accessible\ndescription is therefore an enhancement, while its name is not, because\nthat is an attribute the server can write.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "name",
               "type": {
                 "text": "string"
@@ -5677,21 +5834,6 @@
               "default": "'on'",
               "description": "Value submitted when the box is checked.",
               "attribute": "value",
-              "inheritedFrom": {
-                "name": "HelixBaseCheckbox",
-                "module": "src/checkbox/root/checkbox-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the form refuses to submit while the box is unchecked.",
-              "attribute": "required",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseCheckbox",
                 "module": "src/checkbox/root/checkbox-root.ts"
@@ -5966,6 +6108,58 @@
               }
             },
             {
+              "name": "caption",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help that stays whether or not the field is valid.",
+              "fieldName": "caption",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "fieldName": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The accessible name, and the fallback for the `label` slot.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "fieldName": "required",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
               "name": "name",
               "type": {
                 "text": "string"
@@ -5986,19 +6180,6 @@
               "default": "'on'",
               "description": "Value submitted when the box is checked.",
               "fieldName": "value",
-              "inheritedFrom": {
-                "name": "HelixBaseCheckbox",
-                "module": "src/checkbox/root/checkbox-root.ts"
-              }
-            },
-            {
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the form refuses to submit while the box is unchecked.",
-              "fieldName": "required",
               "inheritedFrom": {
                 "name": "HelixBaseCheckbox",
                 "module": "src/checkbox/root/checkbox-root.ts"
@@ -8623,16 +8804,30 @@
           "members": [
             {
               "kind": "field",
-              "name": "defaultValue",
+              "name": "caption",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "The text the markup declared, which is what a reset returns to.\n\nSeparate from `value`, which is where the field is now.",
-              "attribute": "default-value",
+              "description": "Help that stays whether or not the field is valid.",
+              "attribute": "caption",
               "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "attribute": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
               }
             },
             {
@@ -8642,8 +8837,137 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accessible name, for a field with no visible label beside it.",
+              "description": "The accessible name, and the fallback for the `label` slot.",
               "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "userInvalid",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the reader has been given a chance to get it wrong.\n\n`:user-invalid` is the platform's answer to \"is this field wrong *yet*\",\nand it is the whole reason an empty required field is not shouted at\nbefore anyone has reached it.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolvedFeedback",
+              "type": {
+                "text": "string"
+              },
+              "description": "The message actually shown: the consumer's, or the platform's, or none.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "describedBy",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Ids of the description nodes, for `aria-describedby` on the control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderCaption",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "Help under the control. Renders nothing when there is none.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The validation message, under the caption rather than instead of it.\n\nBoth show. The caption usually states the rule the feedback says was\nbroken, so hiding it exactly when the reader breaks it is backwards.\n\n`role=\"alert\"` rather than a live region on the whole field, so what is\nannounced is the message and not the label and help along with it.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "describeHost",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Points the host at its own description nodes, for a group.\n\nClient only, and deliberately: `ElementInternals` element references need\nthe nodes to exist, and on the server they do not. A group's accessible\ndescription is therefore an enhancement, while its name is not, because\nthat is an attribute the server can write.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The text the markup declared, which is what a reset returns to.\n\nSeparate from `value`, which is where the field is now.",
+              "attribute": "default-value",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -8686,21 +9010,6 @@
               "default": "false",
               "description": "Whether the field refuses input while still submitting its value.",
               "attribute": "read-only",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the form refuses to submit while the field is empty.",
-              "attribute": "required",
               "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseInput",
@@ -9031,54 +9340,31 @@
           },
           "tagName": "helix-input",
           "customElement": true,
-          "slots": [
-            {
-              "description": "Before the text, for an icon or a prefix.",
-              "name": "start",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
-              "description": "After the text, for an icon, a unit, or a clear button.",
-              "name": "end",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The box holding everything.",
-              "name": "field",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
-              "description": "The input itself.",
-              "name": "control",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            }
-          ],
           "attributes": [
             {
-              "name": "default-value",
+              "name": "caption",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "The text the markup declared, which is what a reset returns to.\n\nSeparate from `value`, which is where the field is now.",
-              "fieldName": "defaultValue",
+              "description": "Help that stays whether or not the field is valid.",
+              "fieldName": "caption",
               "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "fieldName": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
               }
             },
             {
@@ -9087,8 +9373,34 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accessible name, for a field with no visible label beside it.",
+              "description": "The accessible name, and the fallback for the `label` slot.",
               "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "fieldName": "required",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The text the markup declared, which is what a reset returns to.\n\nSeparate from `value`, which is where the field is now.",
+              "fieldName": "defaultValue",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -9134,19 +9446,6 @@
               }
             },
             {
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the form refuses to submit while the field is empty.",
-              "fieldName": "required",
-              "inheritedFrom": {
-                "name": "HelixBaseInput",
-                "module": "src/input/root/input-root.ts"
-              }
-            },
-            {
               "name": "type",
               "type": {
                 "text": "InputType"
@@ -9183,6 +9482,42 @@
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "Before the text, for an icon or a prefix.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "description": "After the text, for an icon, a unit, or a clear button.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The box holding everything.",
+              "name": "field",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "description": "The input itself.",
+              "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
               }
             }
           ],

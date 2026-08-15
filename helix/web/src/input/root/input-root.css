@@ -1,5 +1,10 @@
 :host {
-  display: block;
+  display: grid;
+  /* A column, so the label, the field, and whatever is under it stack without
+     any of them needing a margin. Gaps rather than margins because a caption
+     that is absent renders nothing at all, and a gap around nothing is nothing,
+     whereas a margin on the field would still be there. */
+  gap: var(--helix-space-2xs);
 
   --_input-size: var(--input-size, var(--helix-size-control));
 }
@@ -104,4 +109,51 @@ slot[name="end"]::slotted(*) {
   [part="field"] {
     transition: none;
   }
+}
+
+/* ------------------------------------------------------------ field ----- */
+
+/* The three nodes the field mixin renders. Same parts on every control, so this
+   block is the same block everywhere and only the placement above it differs. */
+
+[part="label"] {
+  color: var(--helix-color-foreground);
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-tight);
+}
+
+/* Marked on the label rather than in it, so the mark is not part of the
+   accessible name: a screen reader says "required" from the control's own
+   state, and hearing the word twice is worse than not seeing the asterisk. */
+:host([required]) [part="label"]::after {
+  color: var(--helix-color-danger);
+  content: "*";
+  margin-inline-start: var(--helix-space-2xs);
+}
+
+[part="caption"],
+[part="feedback"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-normal);
+  margin: var(--helix-space-none);
+}
+
+[part="caption"] {
+  color: var(--helix-color-foreground-subtle);
+}
+
+/* Both show, and the error is the one that changes colour. The caption usually
+   states the rule the feedback says was broken, so hiding it exactly when the
+   reader breaks it is backwards. */
+[part="feedback"] {
+  color: var(--helix-color-danger);
+}
+
+:host([disabled]) [part="label"],
+:host([disabled]) [part="caption"] {
+  opacity: 0.5;
 }

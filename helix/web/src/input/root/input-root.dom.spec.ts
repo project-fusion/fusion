@@ -23,9 +23,15 @@ describe('input', () => {
     expect(control(host)?.type).toBe('email')
   })
 
-  test('names itself for a screen reader when nothing else does', async () => {
+  test('names itself with a label the reader can press', async () => {
+    /* A real `<label for>` rather than `aria-label`, which named the field for a
+       screen reader and showed a sighted reader nothing at all. `for` resolves
+       because ids are scoped to the tree holding them, and both are in this
+       shadow root, so the browser does the focus forwarding with no handler. */
     const host = await mount('<helix-input label="Search"></helix-input>')
-    expect(control(host)?.getAttribute('aria-label')).toBe('Search')
+    const label = part(host, 'label') as HTMLLabelElement
+    expect(label.textContent?.trim()).toBe('Search')
+    expect(label.getAttribute('for')).toBe(control(host)?.id)
   })
 
   test('disabled and read-only reach the control, not just the host', async () => {
@@ -110,5 +116,69 @@ describe('input in a form', () => {
     // emptiness, because "" is an answer and the field was still on the form.
     const { host } = await inForm()
     expect(formValue(host)).toBe('')
+  })
+})
+
+describe('input descriptions', () => {
+  test('a caption is described, not just shown', async () => {
+    const host = await mount('<helix-input label="A" caption="Help text"></helix-input>')
+    const caption = part(host, 'caption') as HTMLElement
+    expect(caption.textContent?.trim()).toBe('Help text')
+    expect(control(host)?.getAttribute('aria-describedby')).toContain(caption.id)
+  })
+
+  test('feedback shows under the caption rather than instead of it', async () => {
+    /* Both, and in that order. The caption usually states the rule the feedback
+       says was broken, so hiding it exactly when the reader breaks it is
+       backwards. */
+    const host = await mount(
+      '<helix-input label="A" caption="At least 12 characters" feedback="Too short"></helix-input>',
+    )
+    const caption = part(host, 'caption') as HTMLElement
+    const feedback = part(host, 'feedback') as HTMLElement
+    expect(caption).not.toBeNull()
+    expect(feedback.textContent?.trim()).toBe('Too short')
+    expect(
+      caption.compareDocumentPosition(feedback) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeGreaterThan(0)
+
+    const described = control(host)?.getAttribute('aria-describedby') ?? ''
+    expect(described.split(' ')).toEqual([caption.id, feedback.id])
+  })
+
+  test('nothing to say means no description at all', async () => {
+    // Rather than an `aria-describedby` pointing at an id that renders nothing,
+    // which a screen reader reads as a field with a description it cannot find.
+    const host = await mount('<helix-input label="A"></helix-input>')
+    expect(part(host, 'caption')).toBeNull()
+    expect(part(host, 'feedback')).toBeNull()
+    expect(control(host)?.hasAttribute('aria-describedby')).toBe(false)
+  })
+
+  test('a consumer message wins over the platform', async () => {
+    const host = (await mount(
+      '<helix-input label="A" name="q" required feedback="We need this one"></helix-input>',
+    )) as Updatable
+    expect((part(host, 'feedback') as HTMLElement).textContent?.trim()).toBe('We need this one')
+  })
+
+  test('the label is content, so slotting replaces it rather than adding to it', async () => {
+    /* Asserted through the slot rather than through `textContent`, which walks
+       the DOM tree and so reports fallback content whether or not it renders.
+       What decides is assignment: anything assigned means the fallback is not
+       shown, which is the platform answering "was I given a label" with no
+       property, no attribute, and nothing for a server and a client to
+       disagree about. */
+    const given = await mount(
+      '<helix-input label="Ignored"><span slot="label">Slotted</span></helix-input>',
+    )
+    const slot = (part(given, 'label') as HTMLElement).querySelector('slot') as HTMLSlotElement
+    expect(slot.assignedElements().length).toBe(1)
+    expect(slot.assignedElements()[0]?.textContent).toBe('Slotted')
+
+    const bare = await mount('<helix-input label="Used"></helix-input>')
+    const empty = (part(bare, 'label') as HTMLElement).querySelector('slot') as HTMLSlotElement
+    expect(empty.assignedElements().length).toBe(0)
+    expect(empty.textContent?.trim()).toBe('Used')
   })
 })

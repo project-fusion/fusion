@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr } from '@fusion-io/testing/ssr'
+import { hasPart, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -47,5 +47,28 @@ describe('input server output', () => {
     // not: anything later would serve an empty field and fill it at hydration.
     const markup = ssr(html`<helix-input default-value="hello" name="q"></helix-input>`)
     expect(markup).toContain('hello')
+  })
+
+  test('the label is served, so the field is named before any script runs', () => {
+    /* The whole point of the label being markup rather than a property read at
+       upgrade. A reader on a slow connection sees a named field, and a screen
+       reader announces one. */
+    const markup = ssr(html`<helix-input label="Search"></helix-input>`)
+    expect(partTag(markup, 'label')).toMatch(/<label\s/)
+    expect(withoutStyles(markup)).toContain('Search')
+  })
+
+  test('a caption reaches the markup and the control points at it', () => {
+    const markup = ssr(html`<helix-input label="A" caption="Help text"></helix-input>`)
+    expect(withoutStyles(markup)).toContain('Help text')
+    expect(partTag(markup, 'control')).toContain('aria-describedby')
+  })
+
+  test('a field with nothing to describe serves no description', () => {
+    // An `aria-describedby` pointing at an id that renders nothing is a field
+    // whose description a screen reader cannot find.
+    const markup = ssr(html`<helix-input label="A"></helix-input>`)
+    expect(hasPart(markup, 'caption')).toBe(false)
+    expect(partTag(markup, 'control')).not.toContain('aria-describedby')
   })
 })

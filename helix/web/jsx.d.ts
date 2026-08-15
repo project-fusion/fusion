@@ -929,12 +929,18 @@ export type HelixCheckboxProps = {
   "default-checked"?: HelixCheckbox["defaultChecked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   defaultChecked?: HelixCheckbox["defaultChecked"];
+  /** Help that stays whether or not the field is valid. */
+  caption?: HelixCheckbox["caption"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixCheckbox["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixCheckbox["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixCheckbox["required"];
   /** Name submitted with the form. */
   name?: HelixCheckbox["name"];
   /** Value submitted when the box is checked. */
   value?: HelixCheckbox["value"];
-  /** Whether the form refuses to submit while the box is unchecked. */
-  required?: HelixCheckbox["required"];
   /** Whether the box shows as neither checked nor unchecked.
 
 Presentation only. It never submits, and the first change resolves it. */
@@ -966,12 +972,18 @@ export type HelixCheckboxSolidJsProps = {
   "bool:default-checked"?: HelixCheckbox["defaultChecked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   "prop:defaultChecked"?: HelixCheckbox["defaultChecked"];
+  /** Help that stays whether or not the field is valid. */
+  "prop:caption"?: HelixCheckbox["caption"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixCheckbox["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixCheckbox["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixCheckbox["required"];
   /** Name submitted with the form. */
   "prop:name"?: HelixCheckbox["name"];
   /** Value submitted when the box is checked. */
   "prop:value"?: HelixCheckbox["value"];
-  /** Whether the form refuses to submit while the box is unchecked. */
-  "prop:required"?: HelixCheckbox["required"];
   /** Whether the box shows as neither checked nor unchecked.
 
 Presentation only. It never submits, and the first change resolves it. */
@@ -1323,6 +1335,14 @@ export type HelixInputHelixChangeElementEvent =
   HelixInputElementEvent<HelixChangeEvent>;
 
 export type HelixInputProps = {
+  /** Help that stays whether or not the field is valid. */
+  caption?: HelixInput["caption"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixInput["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixInput["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixInput["required"];
   /** The text the markup declared, which is what a reset returns to.
 
 Separate from `value`, which is where the field is now. */
@@ -1331,8 +1351,6 @@ Separate from `value`, which is where the field is now. */
 
 Separate from `value`, which is where the field is now. */
   defaultValue?: HelixInput["defaultValue"];
-  /** Accessible name, for a field with no visible label beside it. */
-  label?: HelixInput["label"];
   /** Name submitted with the form. */
   name?: HelixInput["name"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
@@ -1341,8 +1359,6 @@ Separate from `value`, which is where the field is now. */
   "read-only"?: HelixInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   readOnly?: HelixInput["readOnly"];
-  /** Whether the form refuses to submit while the field is empty. */
-  required?: HelixInput["required"];
   /** What the field accepts, which decides the keyboard and the validation. */
   type?: HelixInput["type"];
   /** The text in the field. */
@@ -1361,6 +1377,14 @@ tree, so a screen reader can still announce that the control exists. */
 };
 
 export type HelixInputSolidJsProps = {
+  /** Help that stays whether or not the field is valid. */
+  "prop:caption"?: HelixInput["caption"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixInput["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixInput["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixInput["required"];
   /** The text the markup declared, which is what a reset returns to.
 
 Separate from `value`, which is where the field is now. */
@@ -1369,8 +1393,6 @@ Separate from `value`, which is where the field is now. */
 
 Separate from `value`, which is where the field is now. */
   "prop:defaultValue"?: HelixInput["defaultValue"];
-  /** Accessible name, for a field with no visible label beside it. */
-  "prop:label"?: HelixInput["label"];
   /** Name submitted with the form. */
   "prop:name"?: HelixInput["name"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
@@ -1379,8 +1401,6 @@ Separate from `value`, which is where the field is now. */
   "bool:read-only"?: HelixInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   "prop:readOnly"?: HelixInput["readOnly"];
-  /** Whether the form refuses to submit while the field is empty. */
-  "prop:required"?: HelixInput["required"];
   /** What the field accepts, which decides the keyboard and the validation. */
   "prop:type"?: HelixInput["type"];
   /** The text in the field. */
@@ -3062,9 +3082,12 @@ export type CustomElements = {
    *
    * - `checked`: Whether the control is checked. Setting this enters controlled mode.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `caption`: Help that stays whether or not the field is valid.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name submitted with the form.
    * - `value`: Value submitted when the box is checked.
-   * - `required`: Whether the form refuses to submit while the box is unchecked.
    * - `indeterminate`: Whether the box shows as neither checked nor unchecked.
    *
    * Presentation only. It never submits, and the first change resolves it.
@@ -3080,6 +3103,8 @@ export type CustomElements = {
    * which reserves every `on[A-Z]` prop for its own event system and drops
    * what it does not recognise; the generated wrapper listens for the event
    * instead. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Ids of the description nodes, for `aria-describedby` on the control. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -3464,14 +3489,16 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `caption`: Help that stays whether or not the field is valid.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `default-value`/`defaultValue`: The text the markup declared, which is what a reset returns to.
    *
    * Separate from `value`, which is where the field is now.
-   * - `label`: Accessible name, for a field with no visible label beside it.
    * - `name`: Name submitted with the form.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
-   * - `required`: Whether the form refuses to submit while the field is empty.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    * - `value`: The text in the field.
    * - `disabled`: Whether the control is non-interactive.
@@ -3479,6 +3506,8 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Ids of the description nodes, for `aria-describedby` on the control. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -5380,9 +5409,12 @@ export type CustomElementsSolidJs = {
    *
    * - `checked`: Whether the control is checked. Setting this enters controlled mode.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `caption`: Help that stays whether or not the field is valid.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name submitted with the form.
    * - `value`: Value submitted when the box is checked.
-   * - `required`: Whether the form refuses to submit while the box is unchecked.
    * - `indeterminate`: Whether the box shows as neither checked nor unchecked.
    *
    * Presentation only. It never submits, and the first change resolves it.
@@ -5398,6 +5430,8 @@ export type CustomElementsSolidJs = {
    * which reserves every `on[A-Z]` prop for its own event system and drops
    * what it does not recognise; the generated wrapper listens for the event
    * instead. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Ids of the description nodes, for `aria-describedby` on the control. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -5803,14 +5837,16 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `caption`: Help that stays whether or not the field is valid.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
    * - `default-value`/`defaultValue`: The text the markup declared, which is what a reset returns to.
    *
    * Separate from `value`, which is where the field is now.
-   * - `label`: Accessible name, for a field with no visible label beside it.
    * - `name`: Name submitted with the form.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
-   * - `required`: Whether the form refuses to submit while the field is empty.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    * - `value`: The text in the field.
    * - `disabled`: Whether the control is non-interactive.
@@ -5818,6 +5854,8 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Ids of the description nodes, for `aria-describedby` on the control. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *

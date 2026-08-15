@@ -79,3 +79,48 @@ describe('checkbox', () => {
     expect(box.getAttributeNames().includes('required')).toBe(true)
   })
 })
+
+describe('checkbox descriptions', () => {
+  test('the label stays inside the field, where pressing it toggles the box', async () => {
+    /* The one geometry that differs. A checkbox is named by the words beside it
+       and the `<label>` around both is what forwards the press, so the label
+       cannot be the standalone `<label for>` an input renders: nesting one in
+       the other is invalid markup and the inner one would swallow the press. */
+    const host = await mount('<helix-checkbox label="Accept"></helix-checkbox>')
+    const field = part(host, 'field') as HTMLElement
+    const label = part(host, 'label') as HTMLElement
+    expect(field.tagName).toBe('LABEL')
+    expect(field.contains(label)).toBe(true)
+    expect(label.textContent?.trim()).toBe('Accept')
+  })
+
+  test('a caption sits outside that label, so pressing it does not toggle', async () => {
+    // Help text is not the control's name and must not be its hit target.
+    const host = await mount('<helix-checkbox label="Accept" caption="Help"></helix-checkbox>')
+    const field = part(host, 'field') as HTMLElement
+    const caption = part(host, 'caption') as HTMLElement
+    expect(field.contains(caption)).toBe(false)
+    expect((part(host, 'control') as HTMLInputElement).getAttribute('aria-describedby')).toContain(
+      caption.id,
+    )
+  })
+})
+
+describe('checkbox label fallback', () => {
+  test('slotted words win over the property', async () => {
+    const host = await mount('<helix-checkbox label="Ignored">Slotted</helix-checkbox>')
+    const slot = (part(host, 'label') as HTMLElement).querySelector('slot') as HTMLSlotElement
+    expect(slot.assignedNodes()[0]?.textContent).toBe('Slotted')
+  })
+
+  test('the property is what shows when nothing is slotted', async () => {
+    /* Written closed on the same line, and that is the assertion as much as the
+       expectation is. A whitespace-only text node is assigned to the default
+       slot and defeats its fallback, so a newline between the tags costs the
+       label with nothing to say it did. */
+    const host = await mount('<helix-checkbox label="Accept"></helix-checkbox>')
+    const slot = (part(host, 'label') as HTMLElement).querySelector('slot') as HTMLSlotElement
+    expect(slot.assignedNodes().length).toBe(0)
+    expect(slot.textContent?.trim()).toBe('Accept')
+  })
+})

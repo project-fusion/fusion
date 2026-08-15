@@ -1,4 +1,4 @@
-import { customElement, HelixFormElement, MixinControllerChecked } from '@helix-io/core'
+import { customElement, HelixFormElement, MixinControllerChecked, MixinField } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -38,7 +38,7 @@ import { property } from 'lit/decorators.js'
  * @csspart label - The label beside it.
  */
 @customElement('helix-base-checkbox')
-export class HelixBaseCheckbox extends MixinControllerChecked(HelixFormElement) {
+export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
   /** Name submitted with the form. */
   @property()
   name = ''
@@ -46,10 +46,6 @@ export class HelixBaseCheckbox extends MixinControllerChecked(HelixFormElement) 
   /** Value submitted when the box is checked. */
   @property()
   value = 'on'
-
-  /** Whether the form refuses to submit while the box is unchecked. */
-  @property({ reflect: true, type: Boolean })
-  required = false
 
   /**
    * Whether the box shows as neither checked nor unchecked.
@@ -131,11 +127,12 @@ export class HelixBaseCheckbox extends MixinControllerChecked(HelixFormElement) 
         .indeterminate=${this.indeterminate}
         ?disabled=${this.disabled}
         ?required=${this.required}
-        aria-describedby=${nothing}
+        aria-describedby=${this.describedBy ?? nothing}
         @change=${this.handleChange}
       />
-      <span part="label"><slot></slot></span>
-    </label>`
+      <span part="label"><slot>${this.label}</slot></span>
+    </label>
+    ${this.renderCaption()}${this.renderFeedback()}`
   }
 }
 

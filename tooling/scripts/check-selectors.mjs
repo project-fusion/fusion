@@ -113,18 +113,30 @@ for (const tier of TIERS) {
     for (const [, name, base] of text.matchAll(
       /export class (\w+)(?:\s+extends\s+([\w<>(), ]+?))?\s*\{/g,
     )) {
-      // `MixinControllerOpen(HelixElement)` names its base inside the call.
-      const parent = base?.match(/(\w+)\s*\)?\s*$/)?.[1] ?? base?.trim()
-      if (parent) {
-        bases.set(name, parent)
+      /* Every name in the clause, not just the innermost. A styled control
+         extends something like `MixinControllerChecked(MixinField(HelixFormElement))`
+         and each of those three renders part of the markup, so reading only the
+         base left everything a mixin renders looking dead. Found by the check
+         itself the first time a mixin rendered a part: it reported five, and all
+         five existed. */
+      for (const parent of base?.match(/\w+/g) ?? []) {
+        if (parent !== name) {
+          bases.set(name, [...(bases.get(name) ?? []), parent])
+        }
       }
       renders.set(name, new Set())
       fileOf.set(name, file)
     }
-    // Parts belong to the last class declared in the file, which is the only
-    // class in every component file in this repo.
-    const last = [...text.matchAll(/export class (\w+)/g)].at(-1)?.[1]
+    /* Parts belong to the last thing declared in the file, which is the only
+       one in every component file in this repo. A mixin is a `const` rather than
+       a class, and its markup is as real as any component's. */
+    const declarations = [...text.matchAll(/export (?:class|const) (\w+)/g)].map(([, name]) => name)
+    const last = declarations.at(-1)
     if (last) {
+      if (!renders.has(last)) {
+        renders.set(last, new Set())
+        fileOf.set(last, file)
+      }
       for (const [, part] of text.matchAll(/part="([a-z-]+)"/g)) {
         renders.get(last)?.add(part)
       }
@@ -139,7 +151,8 @@ const partsOf = (name, seen = new Set()) => {
   }
   seen.add(name)
   const own = renders.get(name) ?? new Set()
-  return new Set([...own, ...partsOf(bases.get(name), seen)])
+  const inherited = (bases.get(name) ?? []).flatMap((parent) => [...partsOf(parent, seen)])
+  return new Set([...own, ...inherited])
 }
 
 /* Properties that reach a text node by inheriting. Anything outside this set

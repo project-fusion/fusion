@@ -1,1 +1,4 @@
-<helix-checkbox name="option" value="accepted">Label</helix-checkbox>
+<!-- Closed on the same line on purpose. A whitespace-only text node is
+     assigned to the default slot and defeats its fallback, so a newline here
+     costs the label. -->
+<helix-checkbox caption="Caption" label="Label" name="option" value="accepted"></helix-checkbox>
