@@ -28,16 +28,20 @@
 :host([appearance="filled"]) {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-lg);
   padding: var(--helix-space-2xs);
 
   /* Concentric, which is the outer radius less everything between the two
-     curves: the border and the padding. Both were tokens picked to look right,
-     eight outside and four in, and the gap between them is five, so the inner
-     curve was a pixel too round and the space between the thumb and the track
-     opened up at the corners while staying even down the sides. Derived instead
-     of chosen, so changing the padding cannot put them out of step again. */
-  --_toggle-radius: calc(var(--helix-radii-md) - var(--helix-border-thin) - var(--helix-space-2xs));
+     curves: the border and the padding. Derived rather than chosen, so changing
+     the padding cannot put the two out of step.
+
+     The outer one is `lg`. Being concentric turned out to be necessary and not
+     sufficient: at `md` the arithmetic left the thumb a three pixel corner,
+     which is square at that size, so a nearly rectangular thumb sat inside a
+     visibly rounded track and the two read as unrelated even though the gap
+     between them was even the whole way round. A larger outer radius leaves the
+     inner one enough to be a curve. */
+  --_toggle-radius: calc(var(--helix-radii-lg) - var(--helix-border-thin) - var(--helix-space-2xs));
 }
 
 /* Equal segments, which is what a segmented control is. Without this the items

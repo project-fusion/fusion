@@ -52,19 +52,23 @@
    * `surface` and `surface-raised` all sitting on `neutral-0` in light mode:
    * three tokens, one colour, and a card on a page with nothing between them. */
   --helix-color-background: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000));
-  --helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-950));
-  --helix-color-surface-raised: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-900));
+  --helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
+  --helix-color-surface-raised: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800));
   /* Sunken is a step *lighter* than the page in dark mode, not darker. There is
      nowhere below near-black to go, so a groove reads by being nearer the
      viewer's eye rather than further from it. It was neutral-950, identical to
      the background, which meant every sunken surface was invisible: a segmented
      control's track vanished and its thumb floated as a loose grey rectangle. */
-  /* A well goes down to the page. In dark that is the page's own colour, which
-     is exactly what a well cut through a surface exposes; in light there is no
-     room below white, so it takes the step a raised surface takes and the two
-     are told apart by shadow rather than by fill. It used to be `neutral-900`
-     in dark, the same value as `surface`, so a sunken field on a surface was
-     the surface: the toggle group's track only read because it was framed. */
+  /* All the way down to the page. A well cut through a surface exposes what is
+     under it, and what is under everything is the page.
+
+     One step short of that was tried and measured: with `surface` and
+     `surface-raised` where they now are, it left a groove and the thumb sitting
+     in it only 0.14 apart in lightness, which is subtle at the dark end of the
+     ramp and was the complaint. Taking the well the whole way puts 0.29 between
+     them while the thumb stays lifted above the surface they are both on. In
+     light there is no room below white, so it takes the step a raised surface
+     takes and the two are told apart by shadow rather than by fill. */
   --helix-color-surface-sunken: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-1000));
   --helix-color-overlay: color-mix(
     in oklab,
@@ -84,8 +88,10 @@
   --helix-color-foreground-inverse: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
 
   /* Lines. */
-  --helix-color-border: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-800));
-  --helix-color-border-strong: light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700));
+  /* Clear of `surface-raised`, which took the step these used to be on. A rule
+     the same colour as the surface it is drawn on is not a rule. */
+  --helix-color-border: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-700));
+  --helix-color-border-strong: light-dark(var(--_helix-neutral-300), var(--_helix-neutral-600));
   --helix-color-border-accent: var(--_helix-brand-500);
 
   /* Interaction. */

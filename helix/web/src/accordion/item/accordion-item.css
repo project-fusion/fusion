@@ -29,19 +29,24 @@
 /* Rotation rather than a swapped glyph: opening is a short movement, not a
    substitution. The surface stays flat and the motion carries the change.
 
-   Down when shut and up when open, through a half turn. It pointed along the
+   Down when shut and up when open, by a flip rather than a turn. It pointed along the
    inline axis before, which is a tree's idiom rather than an accordion's and
    was wrong in the one place the difference shows: a chevron that means "along
    the line" has to know which way the line runs, and this one did not, so in
    right-to-left it went on pointing at the text it had just come from. The
-   vertical pair has no side to be on. It is also the truer picture of what the
-   control does, since what opens is underneath and not beside. */
+   vertical pair has no side to be on.
+
+   Mirrored on the x axis rather than rotated. The two end in the same place and
+   what happens between them is the difference: a half turn sweeps the glyph
+   through the horizontal on the way round, which is the pointing-sideways state
+   this just stopped using, where a flip collapses it and opens it the other way
+   up. The movement says "this folds" rather than "this spins". */
 [part="chevron"] {
   block-size: 1em;
   color: var(--helix-color-foreground-subtle);
   flex: 0 0 auto;
   inline-size: 1em;
-  transform: rotate(0deg);
+  transform: scaleY(1);
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -50,7 +55,7 @@
 }
 
 :host([data-open]) [part="chevron"] {
-  transform: rotate(180deg);
+  transform: scaleY(-1);
 }
 
 @media (prefers-reduced-motion: reduce) {

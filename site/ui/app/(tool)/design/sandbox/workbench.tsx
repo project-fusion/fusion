@@ -116,7 +116,6 @@ export function SandboxWorkbench({ families }: Props) {
   const rail = useRef<HelixDrawer>(null)
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
-  const [panelClosed, setPanelClosed] = useState(0)
   const settings = useRef<HelixMenu>(null)
   const [layout, setLayout] = useState<'padded' | 'centered' | 'fullscreen'>('padded')
   const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
@@ -303,16 +302,6 @@ export function SandboxWorkbench({ families }: Props) {
     }
   }, [markup])
 
-  // Closed, for this panel, is the tab strip still showing: the tabs are how it
-  // is opened again. Only the thing that put them there knows how tall they are,
-  // so the sandbox takes the number rather than guessing at one.
-  useEffect(() => {
-    const strip = panelTabs.current?.shadowRoot?.querySelector('[part="tabs"]')
-    if (strip) {
-      setPanelClosed(Math.round(strip.getBoundingClientRect().height))
-    }
-  }, [])
-
   // Switching files moves focus into the file switched to. It is what you were
   // going to do anyway, and it is also what corrects the status bar: the editor
   // reports its cursor when it gains focus, so the position and the language
@@ -489,7 +478,6 @@ export function SandboxWorkbench({ families }: Props) {
       <div className="workbenchBody">
         <helix-sandbox
           orientation={narrow ? 'vertical' : 'horizontal'}
-          panel-collapsed-size={panelClosed}
           ref={sandbox}
           split={showEditor ? undefined : 0}
         >

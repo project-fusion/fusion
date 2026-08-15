@@ -1,8 +1,8 @@
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { css as cssLanguage } from '@codemirror/lang-css'
 import { html as htmlLanguage } from '@codemirror/lang-html'
 import { javascript as javascriptLanguage } from '@codemirror/lang-javascript'
-import { syntaxHighlighting } from '@codemirror/language'
+import { indentUnit, syntaxHighlighting } from '@codemirror/language'
 import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers } from '@codemirror/view'
 import {
@@ -125,7 +125,22 @@ export class HelixSandboxEditor extends HelixElement {
         extensions: [
           lineNumbers(),
           history(),
-          keymap.of([...defaultKeymap, ...historyKeymap]),
+          /* Two spaces, and Tab types them.
+           *
+           * Without `indentWithTab` the key does what it does everywhere else on
+           * a page and moves focus, which in a code editor is the one place it
+           * is not what anyone means. `indentUnit` is what the indent commands
+           * insert and `tabSize` is how wide an existing tab character draws, so
+           * both are set: a file that already contains tabs should line up with
+           * one that does not.
+           *
+           * It does trap the key, which is why it is last in the keymap and why
+           * `defaultKeymap` comes first: Escape then Tab still leaves the
+           * editor, which is the way out for anyone working without a pointer.
+           */
+          indentUnit.of('  '),
+          EditorState.tabSize.of(2),
+          keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
           syntaxHighlighting(highlightStyle, { fallback: true }),
           this.language$.of(LANGUAGES[this.language]()),
           this.readOnly$.of(EditorState.readOnly.of(this.readOnly)),
