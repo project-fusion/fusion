@@ -2018,7 +2018,7 @@ export type CustomElements = {
    * - `trigger`: The clickable summary row.
    * - `chevron`: The open and close indicator.
    * - `content`: The revealed region.
-   * - `content-inner`: Padding wrapper inside the animated region.
+   * - `content-inner`: The clipping box inside the animated region.
    */
   "helix-base-accordion-item": Partial<
     HelixBaseAccordionItemProps & BaseProps<HelixBaseAccordionItem> & BaseEvents
@@ -4071,7 +4071,7 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The clickable summary row.
    * - `chevron`: The open and close indicator.
    * - `content`: The revealed region.
-   * - `content-inner`: Padding wrapper inside the animated region.
+   * - `content-inner`: The clipping box inside the animated region.
    */
   "helix-base-accordion-item": Partial<
     HelixBaseAccordionItemProps &

@@ -90,8 +90,30 @@
   overflow: hidden;
 }
 
-:host([data-open]) [part="content-inner"] {
+/* The padding is here and not on the box above, and it is not conditional.
+ *
+ * Both of those were wrong together. The spacing and the line height applied
+ * only under `[data-open]`, so the moment a toggle began, the text lost its
+ * padding and changed leading in one frame and reflowed to a different shape
+ * while the row was still travelling: the content squashed and sprang rather
+ * than sliding. What is being animated is the row's height, so everything
+ * inside it has to hold still.
+ *
+ * They could not simply be made unconditional where they were. That element is
+ * the grid item, so its padding sits outside the clip and survives a zero
+ * track: measured, a closed region went from 0 to 12px, which is a shut
+ * accordion with a band of space under it. On the slot the padding is inside
+ * the box that clips, so it costs nothing closed and never changes. Measured
+ * again after moving it, the slot's own box is the same height open and shut.
+ *
+ * A bare `<slot>` is `display: contents` and generates no box to put padding
+ * on, so it is made a block. Inherited properties set here reach the slotted
+ * content through the flattened tree, which is why the colour and the leading
+ * can sit here too rather than needing `::slotted`.
+ */
+[part="content-inner"] > slot {
   color: var(--helix-color-foreground-muted);
+  display: block;
   line-height: var(--helix-leading-normal);
   padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
   padding-block-start: 0;

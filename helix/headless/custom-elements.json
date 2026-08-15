@@ -51,7 +51,7 @@
               "name": "content"
             },
             {
-              "description": "Padding wrapper inside the animated region.",
+              "description": "The clipping box inside the animated region.",
               "name": "content-inner"
             }
           ],

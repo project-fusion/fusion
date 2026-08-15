@@ -42,7 +42,7 @@ const TRIGGER_ID = 'trigger'
  * @csspart trigger - The clickable summary row.
  * @csspart chevron - The open and close indicator.
  * @csspart content - The revealed region.
- * @csspart content-inner - Padding wrapper inside the animated region.
+ * @csspart content-inner - The clipping box inside the animated region.
  *
  * @event {HelixOpenEvent} helix-open - Fired when the item opens or closes.
  */
