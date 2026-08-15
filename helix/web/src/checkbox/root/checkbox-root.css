@@ -73,13 +73,18 @@
   border-color: var(--helix-color-border-strong);
 }
 
-/* Filled once there is anything to say, which is either state that draws a
-   mark. Indeterminate is not a third look: it is the same filled box with a
-   different mark in it, because it means "some", not "neither". */
+/* No colour, which is the same rule the segmented control's thumb follows:
+   colour is reserved for state, and being ticked is not state, it is an answer.
+   The mark is what says so, and a mark is legible on its own. It was a solid
+   accent fill, which at the size a checkbox actually is is a small blue tile
+   with a shape punched out of it: the block of colour becomes the thing you
+   read and the mark stops being it. The edge only firms up.
+
+   Indeterminate is not a third look: the same box with a different mark in it,
+   because it means "some", not "neither". */
 :host([data-checked]) [part="control"],
 :host([indeterminate]) [part="control"] {
-  background-color: var(--checkbox-checked-color, var(--helix-color-primary));
-  border-color: var(--checkbox-checked-color, var(--helix-color-primary));
+  border-color: var(--checkbox-checked-color, var(--helix-color-border-strong));
 }
 
 /* The tick and the dash, as masks rather than glyphs, so their weight is ours.
@@ -90,7 +95,8 @@
    and the colour is a token like every other colour here. A data URI cannot
    carry `var()`. */
 [part="mark"] {
-  background-color: var(--checkbox-mark-color, var(--helix-color-foreground-on-accent));
+  /* The foreground, like any other mark made of ink. */
+  background-color: var(--checkbox-mark-color, var(--helix-color-foreground));
   block-size: var(--_checkbox-size);
   inline-size: var(--_checkbox-size);
   mask-position: center;
@@ -140,10 +146,16 @@
   border-color: var(--helix-color-danger);
 }
 
+/* Colour appears here and only here, because this is the one thing about a
+   checkbox that is state. A ticked box that is still wrong takes it too, edge
+   and mark together, rather than being half one thing and half the other. */
 :host([data-invalid][data-checked]) [part="control"],
 :host([data-invalid][indeterminate]) [part="control"] {
-  background-color: var(--helix-color-danger);
   border-color: var(--helix-color-danger);
+}
+
+:host([data-invalid]) [part="mark"] {
+  background-color: var(--helix-color-danger);
 }
 
 @media (prefers-reduced-motion: reduce) {
