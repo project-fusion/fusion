@@ -44,6 +44,7 @@ import type {
   HelixSpinner,
   HelixStat,
   HelixStatGroup,
+  HelixSwitch,
   HelixTable,
   HelixTableCell,
   HelixTableRow,
@@ -1874,6 +1875,102 @@ export type HelixStatGroupSolidJsProps = {
 export type HelixStatProps = {};
 
 export type HelixStatSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixSwitch` component event */
+export type HelixSwitchElementEvent<E = Event> = TypedEvent<HelixSwitch, E>;
+/** `helix-change` event type */
+export type HelixSwitchHelixChangeElementEvent =
+  HelixSwitchElementEvent<HelixChangeEvent>;
+
+export type HelixSwitchProps = {
+  /** Whether the control is checked. Setting this enters controlled mode. */
+  checked?: HelixSwitch["checked"];
+  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  "default-checked"?: HelixSwitch["defaultChecked"];
+  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  defaultChecked?: HelixSwitch["defaultChecked"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixSwitch["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixSwitch["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixSwitch["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixSwitch["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixSwitch["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixSwitch["required"];
+  /** Name submitted with the form. */
+  name?: HelixSwitch["name"];
+  /** Value submitted when the switch is on. */
+  value?: HelixSwitch["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixSwitch["disabled"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the event
+instead. */
+  onCheckedChange?: HelixSwitch["onCheckedChange"];
+
+  /** Fired before the state changes, and cancelable. */
+  "onhelix-change"?: (e: HelixSwitchHelixChangeElementEvent) => void;
+  /** Relayed from the input once the state has changed. */
+  onchange?: (e: HelixSwitchElementEvent) => void;
+};
+
+export type HelixSwitchSolidJsProps = {
+  /** Whether the control is checked. Setting this enters controlled mode. */
+  "prop:checked"?: HelixSwitch["checked"];
+  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  "bool:default-checked"?: HelixSwitch["defaultChecked"];
+  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  "prop:defaultChecked"?: HelixSwitch["defaultChecked"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixSwitch["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixSwitch["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixSwitch["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixSwitch["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixSwitch["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixSwitch["required"];
+  /** Name submitted with the form. */
+  "prop:name"?: HelixSwitch["name"];
+  /** Value submitted when the switch is on. */
+  "prop:value"?: HelixSwitch["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixSwitch["disabled"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the event
+instead. */
+  "prop:onCheckedChange"?: HelixSwitch["onCheckedChange"];
+  /** Fired before the state changes, and cancelable. */
+  "on:helix-change"?: (e: HelixSwitchHelixChangeElementEvent) => void;
+  /** Relayed from the input once the state has changed. */
+  "on:change"?: (e: HelixSwitchElementEvent) => void;
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -4406,6 +4503,104 @@ export type CustomElements = {
    * - `--stat-value-size`: Size of the figure. (default: `undefined`)
    */
   "helix-stat": Partial<HelixStatProps & BaseProps<HelixStat> & BaseEvents>;
+
+  /**
+   * A thumb travelling in a groove, which is the one place in the library colour
+   * is used to say "on". A checkbox does not, because a tick is legible on its
+   * own; a switch has no mark, so the fill is the whole of what distinguishes the
+   * two states and there is nothing else for it to be.
+   *
+   * The input itself is the hit target and is drawn as the track, stretched over
+   * it and invisible, so the press, the focus and the label forwarding are all
+   * the platform's while the picture is ours.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `checked`: Whether the control is checked. Setting this enters controlled mode.
+   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `name`: Name submitted with the form.
+   * - `value`: Value submitted when the switch is on.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `isChecked`: The resolved checked state, whichever mode the element is in. (property only) (readonly)
+   * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the event
+   * instead. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the state changes, and cancelable.
+   * - `change`: Relayed from the input once the state has changed.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming what this turns on.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the
+   * `helix-change` is a refusal and nothing moves. In uncontrolled mode
+   * the element then updates itself; in controlled mode it applies nothing
+   * and waits for the consumer to pass a new `checked`, which is what
+   * "controlled" means.
+   * - `toggleChecked() => boolean`: Requests the opposite of the current state.
+   * - `resetChecked() => void`: Drops the uncontrolled state, so the control reads `defaultChecked`
+   * again.
+   *
+   * A form reset has to return a control to what its markup declared, and
+   * clearing `checked` alone only leaves controlled mode. The value the
+   * element has been keeping lives here, so this is where it is dropped.
+   * - `formResetCallback() => void`: Returns the switch to the state its markup declared.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--switch-width`: Length of the track. (default: `undefined`)
+   * - `--switch-on-color`: Fill when it is on. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The row: the track and its label.
+   * - `track`: The groove the thumb travels in.
+   * - `control`: The input.
+   * - `thumb`: The part that moves.
+   * - `label`: The words beside it.
+   */
+  "helix-switch": Partial<
+    HelixSwitchProps & BaseProps<HelixSwitch> & BaseEvents
+  >;
 
   /**
    * Hairline rules between rows and no fill, per the rule that depth comes from a
@@ -7080,6 +7275,107 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * A thumb travelling in a groove, which is the one place in the library colour
+   * is used to say "on". A checkbox does not, because a tick is legible on its
+   * own; a switch has no mark, so the fill is the whole of what distinguishes the
+   * two states and there is nothing else for it to be.
+   *
+   * The input itself is the hit target and is drawn as the track, stretched over
+   * it and invisible, so the press, the focus and the label forwarding are all
+   * the platform's while the picture is ours.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `checked`: Whether the control is checked. Setting this enters controlled mode.
+   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `name`: Name submitted with the form.
+   * - `value`: Value submitted when the switch is on.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `isChecked`: The resolved checked state, whichever mode the element is in. (property only) (readonly)
+   * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the event
+   * instead. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the state changes, and cancelable.
+   * - `change`: Relayed from the input once the state has changed.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming what this turns on.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the
+   * `helix-change` is a refusal and nothing moves. In uncontrolled mode
+   * the element then updates itself; in controlled mode it applies nothing
+   * and waits for the consumer to pass a new `checked`, which is what
+   * "controlled" means.
+   * - `toggleChecked() => boolean`: Requests the opposite of the current state.
+   * - `resetChecked() => void`: Drops the uncontrolled state, so the control reads `defaultChecked`
+   * again.
+   *
+   * A form reset has to return a control to what its markup declared, and
+   * clearing `checked` alone only leaves controlled mode. The value the
+   * element has been keeping lives here, so this is where it is dropped.
+   * - `formResetCallback() => void`: Returns the switch to the state its markup declared.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--switch-width`: Length of the track. (default: `undefined`)
+   * - `--switch-on-color`: Fill when it is on. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The row: the track and its label.
+   * - `track`: The groove the thumb travels in.
+   * - `control`: The input.
+   * - `thumb`: The part that moves.
+   * - `label`: The words beside it.
+   */
+  "helix-switch": Partial<
+    HelixSwitchProps &
+      HelixSwitchSolidJsProps &
+      BaseProps<HelixSwitch> &
+      BaseEvents
+  >;
+
+  /**
    * Hairline rules between rows and no fill, per the rule that depth comes from a
    * single border rather than from elevation. A dense table earns its density by
    * decorating none of it.
@@ -7986,6 +8282,10 @@ export type CustomCssProperties = {
   "--stat-group-gap"?: string;
   /** Size of the figure. */
   "--stat-value-size"?: string;
+  /** Length of the track. */
+  "--switch-width"?: string;
+  /** Fill when it is on. */
+  "--switch-on-color"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
   /** Fill behind the tag. */
