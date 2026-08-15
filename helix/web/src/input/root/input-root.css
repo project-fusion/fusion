@@ -1,0 +1,92 @@
+:host {
+  display: block;
+
+  --_input-size: var(--input-size, var(--helix-size-control));
+}
+
+/* The box is the field, not the input. The input inside it has no border and no
+   background of its own, so an icon slotted at either end sits inside the same
+   frame as the text rather than beside a smaller box, and the focus ring is
+   drawn once around the whole thing. */
+[part="field"] {
+  align-items: center;
+  background-color: var(--input-background-color, var(--helix-color-surface-sunken));
+  block-size: var(--_input-size);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-subtle);
+  display: flex;
+  gap: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+  transition:
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* On the box, because `delegatesFocus` puts focus on the input inside it and a
+   ring around that would sit within the frame rather than around it. */
+:host(:focus-within) [part="field"] {
+  border-color: var(--helix-color-border-accent);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host(:not([disabled])) [part="field"]:hover {
+  border-color: var(--helix-color-border-strong);
+}
+
+/* The platform's verdict, which the host copies from the input, so this follows
+   whatever the browser decided rather than a second opinion. `user-invalid`
+   rather than `invalid`: a field is not wrong before it has been filled in. */
+:host(:user-invalid) [part="field"] {
+  border-color: var(--helix-color-danger);
+}
+
+[part="control"] {
+  all: unset;
+  /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
+     `border-box` every shadow root is given comes from a rule this one
+     outranks. */
+  box-sizing: border-box;
+  block-size: 100%;
+  color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  min-inline-size: 0;
+}
+
+[part="control"]::placeholder {
+  color: var(--helix-color-foreground-subtle);
+}
+
+/* The clear affordance a search field draws itself, which is a different shape
+   in every browser and none of them this one's. */
+[part="control"]::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+/* Whatever is at either end keeps its size, so the text is what gives way when
+   the field is narrow. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+}
+
+:host([disabled]) [part="field"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Still readable, and still submitted. A read-only field is not a disabled one:
+   it is a value the reader may take and may not change. */
+:host([read-only]) [part="field"] {
+  background-color: var(--helix-color-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="field"] {
+    transition: none;
+  }
+}

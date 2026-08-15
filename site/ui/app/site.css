@@ -436,46 +436,10 @@ helix-sandbox [slot="panel"]::part(panels) {
   padding: var(--helix-space-sm);
 }
 
-/* A field, hand built, because Helix has no input component yet. The moment it
-   does this becomes one element and these rules go. Keeping it here rather than
-   inventing a component in passing: a text field is form participation,
-   validity, and a label, and none of that gets designed properly while doing
-   something else. */
+/* The field takes the room and the button keeps its size. */
 .examplesFilter {
-  /* Inverted against the bar, which is now the page itself, so this goes the
-     other way: `surface` is one step up from `background` in both modes, lighter
-     in dark and lighter still in light. Not `surface-sunken`, the token whose
-     name says this and whose value cannot do it, being the same neutral as
-     `surface` in dark mode. */
-  background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  block-size: var(--helix-size-control);
-  color: var(--helix-color-foreground-subtle);
   flex: 1 1 auto;
   min-inline-size: 0;
-  padding-inline: var(--helix-space-xs);
-}
-
-.examplesFilter:focus-within {
-  border-color: var(--helix-color-border-accent);
-}
-
-.examplesFilter input {
-  background: none;
-  border: none;
-  color: var(--helix-color-foreground);
-  flex: 1 1 auto;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-  min-inline-size: 0;
-  outline: none;
-}
-
-/* The clear affordance a search field draws itself, which is a different shape
-   in every browser and none of them this one's. */
-.examplesFilter input::-webkit-search-cancel-button {
-  appearance: none;
 }
 
 /* The files share one cell, so the one that is hidden costs no height and the

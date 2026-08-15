@@ -21,6 +21,7 @@ import type {
   HelixBaseDrawer,
   HelixBaseEmptyState,
   HelixBaseIcon,
+  HelixBaseInput,
   HelixBaseKbd,
   HelixBaseList,
   HelixBaseListItem,
@@ -1091,6 +1092,95 @@ export type HelixBaseIconSolidJsProps = {
   "prop:name"?: HelixBaseIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixBaseIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseInput` component event */
+export type HelixBaseInputElementEvent<E = Event> = TypedEvent<
+  HelixBaseInput,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseInputHelixChangeElementEvent =
+  HelixBaseInputElementEvent<HelixChangeEvent>;
+
+export type HelixBaseInputProps = {
+  /** The text the markup declared, which is what a reset returns to.
+
+Separate from `value`, which is where the field is now. */
+  "default-value"?: HelixBaseInput["defaultValue"];
+  /** The text the markup declared, which is what a reset returns to.
+
+Separate from `value`, which is where the field is now. */
+  defaultValue?: HelixBaseInput["defaultValue"];
+  /** Accessible name, for a field with no visible label beside it. */
+  label?: HelixBaseInput["label"];
+  /** Name submitted with the form. */
+  name?: HelixBaseInput["name"];
+  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  placeholder?: HelixBaseInput["placeholder"];
+  /** Whether the field refuses input while still submitting its value. */
+  "read-only"?: HelixBaseInput["readOnly"];
+  /** Whether the field refuses input while still submitting its value. */
+  readOnly?: HelixBaseInput["readOnly"];
+  /** Whether the form refuses to submit while the field is empty. */
+  required?: HelixBaseInput["required"];
+  /** What the field accepts, which decides the keyboard and the validation. */
+  type?: HelixBaseInput["type"];
+  /** The text in the field. */
+  value?: HelixBaseInput["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixBaseInput["disabled"];
+
+  /** Fired as the text changes, and cancelable. */
+  "onhelix-change"?: (e: HelixBaseInputHelixChangeElementEvent) => void;
+  /** Relayed from the input once the reader has finished. */
+  onchange?: (e: HelixBaseInputElementEvent) => void;
+};
+
+export type HelixBaseInputSolidJsProps = {
+  /** The text the markup declared, which is what a reset returns to.
+
+Separate from `value`, which is where the field is now. */
+  "attr:default-value"?: HelixBaseInput["defaultValue"];
+  /** The text the markup declared, which is what a reset returns to.
+
+Separate from `value`, which is where the field is now. */
+  "prop:defaultValue"?: HelixBaseInput["defaultValue"];
+  /** Accessible name, for a field with no visible label beside it. */
+  "prop:label"?: HelixBaseInput["label"];
+  /** Name submitted with the form. */
+  "prop:name"?: HelixBaseInput["name"];
+  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  "prop:placeholder"?: HelixBaseInput["placeholder"];
+  /** Whether the field refuses input while still submitting its value. */
+  "bool:read-only"?: HelixBaseInput["readOnly"];
+  /** Whether the field refuses input while still submitting its value. */
+  "prop:readOnly"?: HelixBaseInput["readOnly"];
+  /** Whether the form refuses to submit while the field is empty. */
+  "prop:required"?: HelixBaseInput["required"];
+  /** What the field accepts, which decides the keyboard and the validation. */
+  "prop:type"?: HelixBaseInput["type"];
+  /** The text in the field. */
+  "prop:value"?: HelixBaseInput["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixBaseInput["disabled"];
+  /** Fired as the text changes, and cancelable. */
+  "on:helix-change"?: (e: HelixBaseInputHelixChangeElementEvent) => void;
+  /** Relayed from the input once the reader has finished. */
+  "on:change"?: (e: HelixBaseInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2984,6 +3074,84 @@ export type CustomElements = {
    */
   "helix-base-icon": Partial<
     HelixBaseIconProps & BaseProps<HelixBaseIcon> & BaseEvents
+  >;
+
+  /**
+   * Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the
+   * password manager, and the on-screen keyboard a phone chooses all come from the
+   * platform. `delegatesFocus` puts focus on it, and it serializes into the
+   * server's markup, so the field is usable before any script loads.
+   *
+   * **The input inside a shadow root submits nothing**, because the form is on the
+   * other side of the boundary. The host is form-associated instead and reports
+   * its own value through `ElementInternals`, which is also what carries validity
+   * and what answers a form reset.
+   *
+   * `value` and `defaultValue` are separate for the reason `checked` and
+   * `defaultChecked` are: `value` is what is in the field now and
+   * `defaultValue` is what the markup asked for, which is where a reset returns
+   * to and is gone the moment anyone types.
+   *
+   * **Validity is the platform's.** The type, `required`, `pattern`, `minlength`
+   * and the rest are set on the real input and its `validity` is copied onto the
+   * host, so an email field rejects what the browser says is not an email rather
+   * than what a regular expression here guesses. What this adds is the anchor, so
+   * `reportValidity` points the bubble at the input rather than at the host.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The text the markup declared, which is what a reset returns to.
+   *
+   * Separate from `value`, which is where the field is now.
+   * - `label`: Accessible name, for a field with no visible label beside it.
+   * - `name`: Name submitted with the form.
+   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `required`: Whether the form refuses to submit while the field is empty.
+   * - `type`: What the field accepts, which decides the keyboard and the validation.
+   * - `value`: The text in the field.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired as the text changes, and cancelable.
+   * - `change`: Relayed from the input once the reader has finished.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Before the text, for an icon or a prefix.
+   * - `end`: After the text, for an icon, a unit, or a clear button.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the field to the text its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the text when the browser brings a form back.
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `select() => void`: Selects everything in the field.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding everything.
+   * - `control`: The input itself.
+   */
+  "helix-base-input": Partial<
+    HelixBaseInputProps & BaseProps<HelixBaseInput> & BaseEvents
   >;
 
   /**
@@ -5099,6 +5267,87 @@ export type CustomElementsSolidJs = {
     HelixBaseIconProps &
       HelixBaseIconSolidJsProps &
       BaseProps<HelixBaseIcon> &
+      BaseEvents
+  >;
+
+  /**
+   * Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the
+   * password manager, and the on-screen keyboard a phone chooses all come from the
+   * platform. `delegatesFocus` puts focus on it, and it serializes into the
+   * server's markup, so the field is usable before any script loads.
+   *
+   * **The input inside a shadow root submits nothing**, because the form is on the
+   * other side of the boundary. The host is form-associated instead and reports
+   * its own value through `ElementInternals`, which is also what carries validity
+   * and what answers a form reset.
+   *
+   * `value` and `defaultValue` are separate for the reason `checked` and
+   * `defaultChecked` are: `value` is what is in the field now and
+   * `defaultValue` is what the markup asked for, which is where a reset returns
+   * to and is gone the moment anyone types.
+   *
+   * **Validity is the platform's.** The type, `required`, `pattern`, `minlength`
+   * and the rest are set on the real input and its `validity` is copied onto the
+   * host, so an email field rejects what the browser says is not an email rather
+   * than what a regular expression here guesses. What this adds is the anchor, so
+   * `reportValidity` points the bubble at the input rather than at the host.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The text the markup declared, which is what a reset returns to.
+   *
+   * Separate from `value`, which is where the field is now.
+   * - `label`: Accessible name, for a field with no visible label beside it.
+   * - `name`: Name submitted with the form.
+   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `required`: Whether the form refuses to submit while the field is empty.
+   * - `type`: What the field accepts, which decides the keyboard and the validation.
+   * - `value`: The text in the field.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired as the text changes, and cancelable.
+   * - `change`: Relayed from the input once the reader has finished.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Before the text, for an icon or a prefix.
+   * - `end`: After the text, for an icon, a unit, or a clear button.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the field to the text its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the text when the browser brings a form back.
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `select() => void`: Selects everything in the field.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding everything.
+   * - `control`: The input itself.
+   */
+  "helix-base-input": Partial<
+    HelixBaseInputProps &
+      HelixBaseInputSolidJsProps &
+      BaseProps<HelixBaseInput> &
       BaseEvents
   >;
 

@@ -8434,6 +8434,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/input/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/kbd/index.js"
           }
         },
@@ -8555,6 +8563,674 @@
           "declaration": {
             "name": "*",
             "module": "src/tree/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/input/root/input-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input/root/input-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/input/root/input-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input/root/input-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The frame is the field rather than the input, so anything slotted at either\nend sits inside the same box as the text and the focus ring is drawn once,\naround the whole control, instead of around a smaller box within it.\n\nThe input itself is the native one, stripped rather than replaced, so the\ncaret, the selection, the autofill, and the keyboard a phone chooses are all\nthe platform's.\n\nHeight comes from the region, like every other control: `data-density` on\nwhatever holds it, not a `size` here. Invalid styling waits for\n`:user-invalid`, because a field is not wrong before anyone has filled it in.",
+          "name": "HelixInput",
+          "cssProperties": [
+            {
+              "description": "Height of the field.",
+              "name": "--input-size"
+            },
+            {
+              "description": "Fill behind the text.",
+              "name": "--input-background-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The text the markup declared, which is what a reset returns to.\n\nSeparate from `value`, which is where the field is now.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, for a field with no visible label beside it.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.",
+              "attribute": "name",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Shown while the field is empty. Not a label: it goes when typing starts.",
+              "attribute": "placeholder",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readOnly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field refuses input while still submitting its value.",
+              "attribute": "read-only",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit while the field is empty.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "InputType"
+              },
+              "default": "'text'",
+              "description": "What the field accepts, which decides the keyboard and the validation.",
+              "attribute": "type",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The text in the field.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
+              "description": "Focus is delegated to the input, so the host is never the focus target.",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "control",
+              "type": {
+                "text": "HTMLInputElement | null"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleInput",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Every keystroke, cancelable, and put back where it is refused.\n\nThe input has already taken the character by the time this runs, so a\nconsumer that refuses the change has to see the field returned to what the\nelement still holds. Otherwise the text on screen and the value the form\nwould submit disagree, which is the one thing a controlled field must never\ndo.",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Relayed, because `change` does not cross a shadow boundary on its own.",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "sync",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reports the value and the validity the host stands behind.",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the field to the text its markup declared.",
+              "type": {
+                "text": "formResetCallback() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the text when the browser brings a form back.",
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ],
+              "description": "Puts the caret in the field, the way a label pointing at one would.",
+              "type": {
+                "text": "focus(options?: FocusOptions) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Selects everything in the field.",
+              "type": {
+                "text": "select() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseInput",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A single line of text a reader types into.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/input",
+            "aliases": [
+              "TextField",
+              "Field",
+              "TextInput"
+            ],
+            "tier": "styled",
+            "group": "Input",
+            "part": "Root"
+          },
+          "tagName": "helix-input",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "Before the text, for an icon or a prefix.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "description": "After the text, for an icon, a unit, or a clear button.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The box holding everything.",
+              "name": "field",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "description": "The input itself.",
+              "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The text the markup declared, which is what a reset returns to.\n\nSeparate from `value`, which is where the field is now.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, for a field with no visible label beside it.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Shown while the field is empty. Not a label: it goes when typing starts.",
+              "fieldName": "placeholder",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "read-only",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field refuses input while still submitting its value.",
+              "fieldName": "readOnly",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit while the field is empty.",
+              "fieldName": "required",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "InputType"
+              },
+              "default": "'text'",
+              "description": "What the field accepts, which decides the keyboard and the validation.",
+              "fieldName": "type",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The text in the field.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired as the text changes, and cancelable.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed from the input once the reader has finished.",
+              "name": "change",
+              "reactProp": "onchange",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/input/root/input-root.ts",
+          "definitionPath": "src/input/root/input-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixInput",
+          "declaration": {
+            "name": "HelixInput",
+            "module": "src/input/root/input-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-input",
+          "declaration": {
+            "name": "HelixInput",
+            "module": "src/input/root/input-root.ts"
           }
         }
       ]

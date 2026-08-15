@@ -13,6 +13,7 @@ import {
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
   HelixDrawer,
+  HelixInput,
   HelixMenu,
   HelixTabs,
   HelixToggleGroup,
@@ -472,16 +473,16 @@ export function SandboxWorkbench({ families }: Props) {
   const tree = (
     <>
       <helix-flex align="center" class="examplesHeader" data-density="sm" gap="2xs">
-        <helix-flex align="center" class="examplesFilter" gap="2xs">
-          <helix-icon name="funnel-simple"></helix-icon>
-          <input
-            aria-label="Filter examples"
-            onChange={(event) => setFilter(event.target.value)}
-            placeholder="Filter"
-            type="search"
-            value={filter}
-          />
-        </helix-flex>
+        <helix-input
+          class="examplesFilter"
+          label="Filter examples"
+          onInput={(event: Event) => setFilter((event.target as HelixInput).value)}
+          placeholder="Filter"
+          type="search"
+          value={filter}
+        >
+          <helix-icon name="funnel-simple" slot="start"></helix-icon>
+        </helix-input>
         {/* Filled, so it and the field beside it are one piece of chrome rather
             than a box with a button floating after it. The tooltip repeats the
             label rather than adding to it: a lone glyph is only guessable, and

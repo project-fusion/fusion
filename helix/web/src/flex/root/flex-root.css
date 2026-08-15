@@ -40,6 +40,22 @@
   gap: var(--helix-space-2xl);
 }
 
+/* `align` is a legacy HTML presentational attribute, and the browser applies it
+   to any element that carries one, including this one.
+ *
+ * `<helix-flex align="center">` therefore also set `text-align: center` on
+ * everything inside it, through a hint no rule here declares and none can see.
+ * Measured: an invented tag with `align="center"` computes centred text too, so
+ * it is nothing to do with being a known element. It centred the placeholder in
+ * every field put in a centred row.
+ *
+ * Restoring inheritance is enough to undo it: a presentational hint is ordered
+ * before every author rule, so anything at all wins. `inherit` and not a value,
+ * because what should happen is what would have happened without the hint. */
+:host([align]) {
+  text-align: inherit;
+}
+
 :host([align="start"]) {
   align-items: flex-start;
 }
