@@ -25,6 +25,7 @@ import type {
   HelixBaseKbd,
   HelixBaseList,
   HelixBaseListItem,
+  HelixBaseListbox,
   HelixBaseMenu,
   HelixBaseMenuItem,
   HelixBaseNavBar,
@@ -1283,6 +1284,99 @@ export type HelixBaseListProps = {
 export type HelixBaseListSolidJsProps = {
   /** Accessible name for the set. */
   "prop:label"?: HelixBaseList["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseListbox` component event */
+export type HelixBaseListboxElementEvent<E = Event> = TypedEvent<
+  HelixBaseListbox,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseListboxHelixChangeElementEvent =
+  HelixBaseListboxElementEvent<HelixChangeEvent>;
+
+export type HelixBaseListboxProps = {
+  /** Text the options are matched against. Empty shows them all. */
+  filter?: HelixBaseListbox["filter"];
+  /** Whether more than one option can be the answer. */
+  multiple?: HelixBaseListbox["multiple"];
+  /** Name the list reports under when its form is submitted. */
+  name?: HelixBaseListbox["name"];
+  /** What is shown when a filter has hidden every option. */
+  "empty-text"?: HelixBaseListbox["emptyText"];
+  /** What is shown when a filter has hidden every option. */
+  emptyText?: HelixBaseListbox["emptyText"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseListbox["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseListbox["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  value?: HelixBaseListbox["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseListbox["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseListbox["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixBaseListbox["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixBaseListbox["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseListbox["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseListbox["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixBaseListbox["disabled"];
+
+  /** Fired when the answer changes, and cancelable. */
+  "onhelix-change"?: (e: HelixBaseListboxHelixChangeElementEvent) => void;
+};
+
+export type HelixBaseListboxSolidJsProps = {
+  /** Text the options are matched against. Empty shows them all. */
+  "prop:filter"?: HelixBaseListbox["filter"];
+  /** Whether more than one option can be the answer. */
+  "prop:multiple"?: HelixBaseListbox["multiple"];
+  /** Name the list reports under when its form is submitted. */
+  "prop:name"?: HelixBaseListbox["name"];
+  /** What is shown when a filter has hidden every option. */
+  "attr:empty-text"?: HelixBaseListbox["emptyText"];
+  /** What is shown when a filter has hidden every option. */
+  "prop:emptyText"?: HelixBaseListbox["emptyText"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseListbox["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseListbox["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  "prop:value"?: HelixBaseListbox["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseListbox["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseListbox["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixBaseListbox["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixBaseListbox["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseListbox["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseListbox["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixBaseListbox["disabled"];
+  /** Fired when the answer changes, and cancelable. */
+  "on:helix-change"?: (e: HelixBaseListboxHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3876,6 +3970,112 @@ export type CustomElements = {
    */
   "helix-base-list": Partial<
     HelixBaseListProps & BaseProps<HelixBaseList> & BaseEvents
+  >;
+
+  /**
+   * **The listbox is the control and the options are its vocabulary.** A Select
+   * is this with a trigger in front of it, a Combobox is this with a text input,
+   * and a command palette is this again: they differ in what opens the list and
+   * what filters it, not in what the list is. Building it as its own family is
+   * what stops each of those reimplementing the keyboard and the filtering.
+   *
+   * **`value` is comma separated when `multiple` is set**, the way
+   * `Checkbox.Group`'s is. It stays a string because that is what a form submits
+   * and what `MixinControllerValue` holds; an array property would be a second
+   * shape for the same fact, and the two would disagree the first time one was
+   * set without the other.
+   *
+   * **Chosen and active are two different things.** Chosen is the answer; active
+   * is where the keyboard is. In a single-select list they move together, which
+   * is the radio group pattern and is what a reader expects from arrow keys. With
+   * `multiple` they come apart: the arrows move without choosing and Space
+   * chooses, because a reader passing over four options on the way to the fifth
+   * did not mean to pick all five.
+   *
+   * That is also why this does not use `KeyboardNavigationController`, which
+   * moves and chooses in one act by design. Half of this component needs that and
+   * half needs the opposite, and a flag on the controller would be this paragraph
+   * written twice.
+   *
+   * **Filtering hides rather than removes.** An option the filter has hidden is
+   * still the consumer's element in the consumer's order, so a filter that clears
+   * puts the list back exactly as it was with nothing re-rendered. What counts as
+   * a match is a plain case-insensitive substring, and a consumer wanting more
+   * hides options itself: `filter` is a convenience over the same `hidden` the
+   * component uses.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `filter`: Text the options are matched against. Empty shows them all.
+   * - `multiple`: Whether more than one option can be the answer.
+   * - `name`: Name the list reports under when its form is submitted.
+   * - `empty-text`/`emptyText`: What is shown when a filter has hidden every option.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `options`: Every option, in the order a reader meets them.
+   *
+   * Descendants rather than children, because a group puts a level between the
+   * list and its options and the keyboard has to move through a grouped list
+   * exactly as it moves through a flat one. (property only) (readonly)
+   * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the answer changes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options, and any groups of them.
+   * - `label`: Richer than a string.
+   * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The question, over the list.
+   * - `items`: The list itself.
+   * - `empty`: Shown when a filter has hidden everything.
+   * - `hint`: Help under the list.
+   * - `feedback`: What is wrong with it.
+   */
+  "helix-base-listbox": Partial<
+    HelixBaseListboxProps & BaseProps<HelixBaseListbox> & BaseEvents
   >;
 
   /**
@@ -6679,6 +6879,115 @@ export type CustomElementsSolidJs = {
     HelixBaseListProps &
       HelixBaseListSolidJsProps &
       BaseProps<HelixBaseList> &
+      BaseEvents
+  >;
+
+  /**
+   * **The listbox is the control and the options are its vocabulary.** A Select
+   * is this with a trigger in front of it, a Combobox is this with a text input,
+   * and a command palette is this again: they differ in what opens the list and
+   * what filters it, not in what the list is. Building it as its own family is
+   * what stops each of those reimplementing the keyboard and the filtering.
+   *
+   * **`value` is comma separated when `multiple` is set**, the way
+   * `Checkbox.Group`'s is. It stays a string because that is what a form submits
+   * and what `MixinControllerValue` holds; an array property would be a second
+   * shape for the same fact, and the two would disagree the first time one was
+   * set without the other.
+   *
+   * **Chosen and active are two different things.** Chosen is the answer; active
+   * is where the keyboard is. In a single-select list they move together, which
+   * is the radio group pattern and is what a reader expects from arrow keys. With
+   * `multiple` they come apart: the arrows move without choosing and Space
+   * chooses, because a reader passing over four options on the way to the fifth
+   * did not mean to pick all five.
+   *
+   * That is also why this does not use `KeyboardNavigationController`, which
+   * moves and chooses in one act by design. Half of this component needs that and
+   * half needs the opposite, and a flag on the controller would be this paragraph
+   * written twice.
+   *
+   * **Filtering hides rather than removes.** An option the filter has hidden is
+   * still the consumer's element in the consumer's order, so a filter that clears
+   * puts the list back exactly as it was with nothing re-rendered. What counts as
+   * a match is a plain case-insensitive substring, and a consumer wanting more
+   * hides options itself: `filter` is a convenience over the same `hidden` the
+   * component uses.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `filter`: Text the options are matched against. Empty shows them all.
+   * - `multiple`: Whether more than one option can be the answer.
+   * - `name`: Name the list reports under when its form is submitted.
+   * - `empty-text`/`emptyText`: What is shown when a filter has hidden every option.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `options`: Every option, in the order a reader meets them.
+   *
+   * Descendants rather than children, because a group puts a level between the
+   * list and its options and the keyboard has to move through a grouped list
+   * exactly as it moves through a flat one. (property only) (readonly)
+   * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the answer changes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options, and any groups of them.
+   * - `label`: Richer than a string.
+   * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The question, over the list.
+   * - `items`: The list itself.
+   * - `empty`: Shown when a filter has hidden everything.
+   * - `hint`: Help under the list.
+   * - `feedback`: What is wrong with it.
+   */
+  "helix-base-listbox": Partial<
+    HelixBaseListboxProps &
+      HelixBaseListboxSolidJsProps &
+      BaseProps<HelixBaseListbox> &
       BaseEvents
   >;
 

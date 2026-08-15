@@ -1,0 +1,10 @@
+<!-- With `multiple` the arrows move without choosing and Space chooses, because
+     a reader passing over four options on the way to the fifth did not mean to
+     pick all five. Without it, moving is choosing, which is what arrow keys do
+     in a radio group. -->
+<helix-listbox hint="Hint" label="Label" multiple name="choice" value="one,three">
+  <helix-option value="one">Option One</helix-option>
+  <helix-option value="two">Option Two</helix-option>
+  <helix-option value="three">Option Three</helix-option>
+  <helix-option value="four">Option Four</helix-option>
+</helix-listbox>

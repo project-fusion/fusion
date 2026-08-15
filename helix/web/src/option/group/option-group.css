@@ -2,6 +2,10 @@
   display: block;
 }
 
+:host([hidden]) {
+  display: none;
+}
+
 /* Small and quiet, because it is a divider that happens to have words on it. */
 [part="label"] {
   color: var(--helix-color-foreground-subtle);
