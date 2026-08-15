@@ -359,11 +359,47 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     this.internals.ariaMultiSelectable = this.multiple ? 'true' : null
   }
 
+  /**
+   * Points the focused list at the option the keyboard is on.
+   *
+   * **The gap this closes.** Focus stays on `[part="items"]` while a highlight
+   * moves between options, which is the half of the ARIA listbox pattern we
+   * had. The other half is saying *which* option, and nothing did: a screen
+   * reader heard the list and its selection and never heard the item being
+   * moved over. Neither `aria-activedescendant` nor a roving `tabindex` was
+   * wired, and the pattern requires one of the two.
+   *
+   * **An element reference and not an id, because an IDREF cannot do this.**
+   * The options are the consumer's light DOM and the element that takes focus
+   * is in this shadow root, so `aria-activedescendant="whatever"` resolves
+   * against the shadow tree, finds nothing, and is dropped in silence. Element
+   * references are the platform's answer to exactly that, and they resolve
+   * outward: a shadow-tree element may point at a light-DOM one, which is the
+   * direction this needs.
+   *
+   * Feature-tested rather than assumed, for the reason `hostAria` gives:
+   * assigning to a property an engine does not implement is a no-op rather than
+   * an error, so the guard is what makes the absence visible to anyone reading
+   * this. Where it is missing the list still works and still announces its
+   * selection; what is lost is the running commentary as the keys move.
+   */
+  private linkActive(): void {
+    const list = this.renderRoot.querySelector('[part="items"]')
+    if (!list || !('ariaActiveDescendantElement' in list)) {
+      return
+    }
+    const active = this.options.find((option) => option.value === this.activeValue)
+    ;(
+      list as Element & { ariaActiveDescendantElement: Element | null }
+    ).ariaActiveDescendantElement = active ?? null
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.place()
     this.sync()
     this.linkHost()
+    this.linkActive()
   }
 
   /** Narrows the list as the reader types. */

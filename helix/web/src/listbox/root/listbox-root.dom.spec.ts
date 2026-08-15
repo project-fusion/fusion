@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, type Updatable } from '@fusion-io/testing/dom'
+import {
+  formValue,
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  type Updatable,
+} from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -126,3 +133,59 @@ describe('listbox filtering', () => {
     expect((part(host, 'empty') as HTMLElement).textContent?.trim()).toBe('No matches')
   })
 })
+
+/* Only in a real engine. `ariaActiveDescendantElement` is an element reference,
+   which happy-dom does not implement, and the component feature-tests it: under
+   a shim the guard declines and there is nothing to assert. `hasLayout` stands
+   in for "a real browser", which is what is actually being asked for. */
+if (hasLayout()) {
+  describe('listbox active descendant', () => {
+    const listbox = async (): Promise<HTMLElement> => {
+      const host = (await mount(
+        `<helix-listbox label="Owner" value="a">
+          <helix-option value="a">Ross</helix-option>
+          <helix-option value="b">Sam</helix-option>
+          <helix-option value="c">Kit</helix-option>
+        </helix-listbox>`,
+      )) as HTMLElement
+      await settle(host as Updatable)
+      return host
+    }
+
+    const active = (host: HTMLElement): string => {
+      const list = part(host, 'items') as Element & {
+        ariaActiveDescendantElement?: (Element & { value?: string }) | null
+      }
+      return list.ariaActiveDescendantElement?.value ?? ''
+    }
+
+    const press = async (host: HTMLElement, key: string): Promise<void> => {
+      host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key }))
+      await settle(host as Updatable)
+    }
+
+    test('the focused list points at the option the keyboard is on', async () => {
+      /* An element reference and not an IDREF, which is the whole reason this
+         needs a browser to assert. The options are the consumer's light DOM and
+         the element that takes focus is in the shadow root, so an id would
+         resolve against the shadow tree, find nothing, and be dropped without a
+         word. The reference resolves outward instead. */
+      const host = await listbox()
+      expect(active(host)).toBe('a')
+      await press(host, 'ArrowDown')
+      expect(active(host)).toBe('b')
+      await press(host, 'ArrowDown')
+      expect(active(host)).toBe('c')
+      await press(host, 'Home')
+      expect(active(host)).toBe('a')
+    })
+
+    test('the reference reaches the light DOM, which an IDREF could not', async () => {
+      const host = await listbox()
+      const list = part(host, 'items') as Element & {
+        ariaActiveDescendantElement?: Element | null
+      }
+      expect(list.ariaActiveDescendantElement?.getRootNode()).toBe(document)
+    })
+  })
+}
