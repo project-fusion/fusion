@@ -58,7 +58,54 @@ const script = await built.outputs[0].text()
 await writeFile(join(out, 'frame.js'), script)
 
 const css = await Promise.all(layers.map((layer) => readFile(join(root, layer), 'utf8')))
-await writeFile(join(out, 'frame.css'), css.join('\n'))
+
+/* The brand faces, inlined.
+ *
+ * The frame is a sandboxed document with an opaque origin. A stylesheet and a
+ * classic script it can fetch, because neither is CORS-checked; a font is,
+ * because `@font-face` fetches in CORS mode, and a request from an opaque
+ * origin arrives as `Origin: null` with nothing on the other end configured to
+ * allow it. `next/font` is no help either: it emits URLs only the site's own
+ * build knows.
+ *
+ * So the same files the site loads go in as data URIs, which are not fetched at
+ * all and therefore have nothing to be refused. Eighty kilobytes for the three
+ * latin faces, against a frame that already carries the component library.
+ *
+ * Without this the preview rendered in the fallback stack while the site around
+ * it rendered in the brand's, so the one place a reader compares a component
+ * against the real thing was the one place the type was wrong.
+ */
+const faces = [
+  { file: 'geist-latin.woff2', name: 'Fusion Sans', weight: '100 900' },
+  { file: 'fira-code-latin.woff2', name: 'Fusion Mono', weight: '300 700' },
+  { file: 'funnel-display-latin.woff2', name: 'Fusion Display', weight: '300 800' },
+]
+
+const fonts = await Promise.all(
+  faces.map(async ({ file, name, weight }) => {
+    const data = await readFile(join(root, 'site/ui/app/fonts', file))
+    return `@font-face {
+  font-display: swap;
+  font-family: '${name}';
+  font-style: normal;
+  font-weight: ${weight};
+  src: url(data:font/woff2;base64,${data.toString('base64')}) format('woff2');
+}`
+  }),
+)
+
+/* After the layers, so these win. `primitives.css` sets the sans and mono
+   families to system stacks and leaves display unset, which is exactly right
+   for a consumer who brings their own and exactly wrong here, where the whole
+   point is to be the site. */
+const families = `:root {
+  --_helix-family-sans: 'Fusion Sans', ui-sans-serif, system-ui, sans-serif;
+  --_helix-family-mono: 'Fusion Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --_helix-family-display: 'Fusion Display', 'Fusion Sans', ui-sans-serif, sans-serif;
+}`
+
+await writeFile(join(out, 'frame.css'), [...css, ...fonts, families].join('\n'))
 
 /* `preview-root` carries the layout mode, and the example's markup replaces its
    contents. The script is deferred so the element exists before it runs. */
