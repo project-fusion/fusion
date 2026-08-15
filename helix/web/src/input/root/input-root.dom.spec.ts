@@ -250,6 +250,29 @@ if (hasLayout()) {
       expect(Math.abs(outer - inner)).toBeLessThan(1)
     })
 
+    test('the field never hangs past its own element', async () => {
+      /* A real `<input>` has a min-content width of about twenty characters, so
+         any layout that floors the field at its content makes the field wider
+         than the host holding it. It hung five pixels past, which ate the gap
+         after it and overlapped the control beside it by one. Nothing inside
+         the component looked wrong; what looked wrong was the spacing of the
+         thing next to it, which is why this is measured from the outside.
+
+         Narrower than the field wants to be, which is the only width that can
+         tell the two layouts apart. */
+      document.body.innerHTML =
+        '<div style="inline-size:120px"><helix-input label="L" placeholder="P"></helix-input></div>'
+      const host = document.body.firstElementChild?.firstElementChild as Updatable
+      await host.updateComplete
+      const field = part(host as HTMLElement, 'field') as HTMLElement
+
+      const outer = host.getBoundingClientRect()
+      const inner = field.getBoundingClientRect()
+      expect(outer.width).toBeGreaterThan(0)
+      expect(inner.right - outer.right).toBeLessThan(1)
+      expect(outer.left - inner.left).toBeLessThan(1)
+    })
+
     test('a field with every part is taller than one with none, by all of them', async () => {
       const bare = await heightOf('<helix-input placeholder="P"></helix-input>')
       const full = await heightOf('<helix-input label="L" caption="C" feedback="F"></helix-input>')

@@ -1,5 +1,7 @@
+/* Stacked the same way and for the same reason as the input. See its note. */
 :host {
-  display: inline-grid;
+  display: inline-flex;
+  flex-direction: column;
   gap: var(--helix-space-2xs);
 
   --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox));

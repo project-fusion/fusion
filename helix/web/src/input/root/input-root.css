@@ -1,9 +1,26 @@
+/* A column, so the label, the field, and whatever is under it stack without any
+ * of them needing a margin. Gaps rather than margins because a part that is
+ * absent renders nothing at all, and a gap around nothing is nothing, whereas a
+ * margin on the field would still be there.
+ *
+ * **Flex rather than grid, and the inline axis is why.** A grid's single auto
+ * column is floored at the min-content of what is in it, and what is in it is a
+ * real `<input>`, whose min-content is its default twenty-character width. So
+ * the track came out wider than the host and the field hung past its own
+ * element: measured at 208px inside a 203px host, which ate the gap after it
+ * and overlapped the control beside it by a pixel. `minmax(0, 1fr)` fixes that
+ * and breaks the other end, because an `fr` track contributes nothing
+ * intrinsically, so the host collapsed to zero the moment its width came from
+ * its content.
+ *
+ * In a column flex container the inline axis is the cross axis, where items
+ * stretch to the container rather than the container sizing to them. So the
+ * field is as wide as the host whatever the host is, and the host is still as
+ * wide as its content wants to be. A block box behaved this way all along,
+ * which is why none of this existed before there was anything to stack. */
 :host {
-  display: grid;
-  /* A column, so the label, the field, and whatever is under it stack without
-     any of them needing a margin. Gaps rather than margins because a caption
-     that is absent renders nothing at all, and a gap around nothing is nothing,
-     whereas a margin on the field would still be there. */
+  display: flex;
+  flex-direction: column;
   gap: var(--helix-space-2xs);
 
   --_input-size: var(--input-size, var(--helix-size-control));
