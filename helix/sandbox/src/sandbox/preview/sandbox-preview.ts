@@ -1,4 +1,14 @@
 import { customElement, HelixConsoleEvent, HelixElement } from '@helix-io/core'
+
+/**
+ * How long the source has to stop changing before the frame is asked to render,
+ * in milliseconds.
+ *
+ * Long enough that a run of keystrokes is one render, short enough that letting
+ * go of the keyboard and looking up finds the preview already there.
+ */
+const SETTLE = 120
+
 import type { CSSResultGroup } from 'lit'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -145,6 +155,27 @@ export class HelixSandboxPreview extends HelixElement {
   private static readonly target = '*'
 
   /** Sends the current source to the frame, once it is listening. */
+  /** Set while a coalesced send is waiting, so only one is ever queued. */
+  private pending: ReturnType<typeof setTimeout> | undefined
+
+  /**
+   * Sends once the typing stops, replacing anything already waiting.
+   *
+   * A frame was tried first and is the wrong unit. Keystrokes arrive fifty to a
+   * hundred and fifty milliseconds apart, so each one lands in a frame of its
+   * own and coalescing by frame coalesces nothing: the example was still being
+   * rebuilt per character. The delay has to be longer than the gap between
+   * keystrokes to catch a burst, and short enough to read as immediate when the
+   * typing stops.
+   */
+  private scheduleSend(): void {
+    clearTimeout(this.pending)
+    this.pending = setTimeout(() => {
+      this.pending = undefined
+      this.send()
+    }, SETTLE)
+  }
+
   private send(): void {
     if (!this.ready) {
       return
@@ -166,6 +197,8 @@ export class HelixSandboxPreview extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    clearTimeout(this.pending)
+    this.pending = undefined
     window.removeEventListener('message', this.handleMessage)
   }
 
@@ -174,6 +207,23 @@ export class HelixSandboxPreview extends HelixElement {
     // A new document has to say it is listening again before anything is sent.
     if (changed.has('src')) {
       this.ready = false
+      return
+    }
+    /* Typing is coalesced; a setting is not.
+     *
+     * The frame renders by assigning `innerHTML`, which throws away the example
+     * and builds it again, and every custom element in it disconnects and
+     * upgrades a second time. Sent on each update, that happened once per
+     * keystroke: an example of any size was being torn down and rebuilt for
+     * every character, and the work grows with the example while the typing
+     * does not.
+     *
+     * A frame is short enough to feel immediate and long enough that a burst of
+     * keystrokes is one render. Layout, direction and the colour mode go
+     * straight out: they arrive one at a time from a menu, there is nothing to
+     * coalesce, and a delay there is a delay a reader can see. */
+    if (changed.has('source') || changed.has('styles')) {
+      this.scheduleSend()
       return
     }
     this.send()

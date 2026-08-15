@@ -643,6 +643,26 @@
               "description": "Where messages to the frame are addressed.\n\n`'*'`, because there is nothing else to say: a sandboxed document has an\nopaque origin and `postMessage` has no target string that names one.\n\nIt costs nothing. What is sent is the example's own source and stylesheet,\nto the document that is about to render them, and that document is the one\nthing on the page already entitled to both."
             },
             {
+              "kind": "field",
+              "name": "pending",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private",
+              "description": "Set while a coalesced send is waiting, so only one is ever queued."
+            },
+            {
+              "kind": "method",
+              "name": "scheduleSend",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Sends once the typing stops, replacing anything already waiting.\n\nA frame was tried first and is the wrong unit. Keystrokes arrive fifty to a\nhundred and fifty milliseconds apart, so each one lands in a frame of its\nown and coalescing by frame coalesces nothing: the example was still being\nrebuilt per character. The delay has to be longer than the gap between\nkeystrokes to catch a burst, and short enough to read as immediate when the\ntyping stops."
+            },
+            {
               "kind": "method",
               "name": "send",
               "privacy": "private",
@@ -650,8 +670,7 @@
                 "type": {
                   "text": "void"
                 }
-              },
-              "description": "Sends the current source to the frame, once it is listening."
+              }
             },
             {
               "kind": "field",
