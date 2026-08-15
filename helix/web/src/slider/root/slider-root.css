@@ -14,6 +14,25 @@
   gap: var(--helix-space-sm);
 }
 
+/* One cell holding the control and the marks, and it has to be a grid rather
+   than a positioned pair: the control's width is what the flex row gives it, so
+   anything measured against the track has to be laid out by the same box. */
+:host([markers]) [part="field"] {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+:host([markers]) [part="control"],
+:host([markers]) [part="markers"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+:host([markers]) [part="output"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
 /* The native range, stripped to its track. The thumb is styled separately
    below, per engine, because the pseudo-elements that name it are not shared
    and a selector list containing an unknown one is dropped whole. */
@@ -23,6 +42,36 @@
   cursor: pointer;
   flex: 1 1 auto;
   min-inline-size: 0;
+}
+
+/* Over the track rather than behind it. Behind was the first attempt and the
+   marks did not appear at all: the native track paints an opaque background,
+   so anything under it is under it. `pointer-events: none` is what keeps the
+   drag the input's, since the marks now lie across the thing being dragged.
+ 
+   Inset by half a thumb at each end, because that is where the thumb's centre
+   can actually reach: a mark at the very edge of the track would be a mark the
+   thumb can never sit on, which is the one thing a mark must not be. */
+[part="markers"] {
+  align-self: center;
+  block-size: var(--_slider-track);
+  margin-inline: calc(var(--_slider-thumb) / 2);
+  pointer-events: none;
+  position: relative;
+  z-index: var(--helix-layer-raised);
+}
+
+[part="marker"] {
+  background-color: var(--slider-marker-color, var(--helix-color-background));
+  block-size: var(--_slider-track);
+  border-radius: var(--helix-radii-full);
+  inline-size: var(--helix-border-thick);
+  inset-block-start: 0;
+  /* Centred on its own position rather than starting at it, so the first and
+     last marks sit on the ends instead of hanging off them. */
+  inset-inline-start: var(--_marker-at, 0%);
+  position: absolute;
+  translate: -50% 0;
 }
 
 :host([disabled]) [part="control"] {

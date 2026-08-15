@@ -1870,6 +1870,12 @@ export type HelixSliderProps = {
   "show-value"?: HelixSlider["showValue"];
   /** Whether the chosen value is shown beside the track. */
   showValue?: HelixSlider["showValue"];
+  /** How many marks to draw along the track, evenly spaced, ends included.
+
+`0` or `1` draws none: one mark on a track says nothing about a range.
+They are decoration, so they are `aria-hidden`; what a reader can land on
+is `step`, which the input enforces regardless. */
+  markers?: HelixSlider["markers"];
   /** How far one press of an arrow key moves it. */
   step?: HelixSlider["step"];
   /** Whether the control is non-interactive.
@@ -1914,6 +1920,12 @@ export type HelixSliderSolidJsProps = {
   "bool:show-value"?: HelixSlider["showValue"];
   /** Whether the chosen value is shown beside the track. */
   "prop:showValue"?: HelixSlider["showValue"];
+  /** How many marks to draw along the track, evenly spaced, ends included.
+
+`0` or `1` draws none: one mark on a track says nothing about a range.
+They are decoration, so they are `aria-hidden`; what a reader can land on
+is `step`, which the input enforces regardless. */
+  "prop:markers"?: HelixSlider["markers"];
   /** How far one press of an arrow key moves it. */
   "prop:step"?: HelixSlider["step"];
   /** Whether the control is non-interactive.
@@ -4544,6 +4556,11 @@ export type CustomElements = {
    * - `min`: The smallest value the reader can choose.
    * - `name`: Name submitted with the form.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `markers`: How many marks to draw along the track, evenly spaced, ends included.
+   *
+   * `0` or `1` draws none: one mark on a track says nothing about a range.
+   * They are decoration, so they are `aria-hidden`; what a reader can land on
+   * is `step`, which the input enforces regardless.
    * - `step`: How far one press of an arrow key moves it.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -7385,6 +7402,11 @@ export type CustomElementsSolidJs = {
    * - `min`: The smallest value the reader can choose.
    * - `name`: Name submitted with the form.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `markers`: How many marks to draw along the track, evenly spaced, ends included.
+   *
+   * `0` or `1` draws none: one mark on a track says nothing about a range.
+   * They are decoration, so they are `aria-hidden`; what a reader can land on
+   * is `step`, which the input enforces regardless.
    * - `step`: How far one press of an arrow key moves it.
    * - `disabled`: Whether the control is non-interactive.
    *

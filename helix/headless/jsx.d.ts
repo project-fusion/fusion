@@ -1632,6 +1632,12 @@ export type HelixBaseSliderProps = {
   "show-value"?: HelixBaseSlider["showValue"];
   /** Whether the chosen value is shown beside the track. */
   showValue?: HelixBaseSlider["showValue"];
+  /** How many marks to draw along the track, evenly spaced, ends included.
+
+`0` or `1` draws none: one mark on a track says nothing about a range.
+They are decoration, so they are `aria-hidden`; what a reader can land on
+is `step`, which the input enforces regardless. */
+  markers?: HelixBaseSlider["markers"];
   /** How far one press of an arrow key moves it. */
   step?: HelixBaseSlider["step"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -1676,6 +1682,12 @@ export type HelixBaseSliderSolidJsProps = {
   "bool:show-value"?: HelixBaseSlider["showValue"];
   /** Whether the chosen value is shown beside the track. */
   "prop:showValue"?: HelixBaseSlider["showValue"];
+  /** How many marks to draw along the track, evenly spaced, ends included.
+
+`0` or `1` draws none: one mark on a track says nothing about a range.
+They are decoration, so they are `aria-hidden`; what a reader can land on
+is `step`, which the input enforces regardless. */
+  "prop:markers"?: HelixBaseSlider["markers"];
   /** How far one press of an arrow key moves it. */
   "prop:step"?: HelixBaseSlider["step"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -4183,8 +4195,18 @@ export type CustomElements = {
    * value rather than the value itself. `valueAsNumber` is there for anything
    * doing arithmetic on it.
    *
-   * Ticks are the platform's too, through `<datalist>`. A list of marks drawn
-   * here would be marks the input does not snap to.
+   * **Marks are drawn rather than left to `<datalist>`**, which was the first
+   * answer and is the wrong one. A datalist's ticks cannot be styled at all, and
+   * Firefox does not render them for a range at all, so the platform's version is
+   * a mark that looks like someone else's design where it appears and no mark
+   * where it does not. Drawing them costs the semantics nothing, because a mark
+   * is decoration: what a reader can actually land on is `step`, which the input
+   * enforces whether or not anything is drawn.
+   *
+   * `markers` is a count rather than a flag tied to `step`. A flag reads well
+   * until a slider from zero to a hundred stepping by one asks for a hundred and
+   * one ticks, and then it is either noise or a silent refusal to draw. A number
+   * is what the reader sees, so it cannot surprise anyone.
    *
    * ## Attributes & Properties
    *
@@ -4194,6 +4216,11 @@ export type CustomElements = {
    * - `min`: The smallest value the reader can choose.
    * - `name`: Name submitted with the form.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `markers`: How many marks to draw along the track, evenly spaced, ends included.
+   *
+   * `0` or `1` draws none: one mark on a track says nothing about a range.
+   * They are decoration, so they are `aria-hidden`; what a reader can land on
+   * is `step`, which the input enforces regardless.
    * - `step`: How far one press of an arrow key moves it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -6886,8 +6913,18 @@ export type CustomElementsSolidJs = {
    * value rather than the value itself. `valueAsNumber` is there for anything
    * doing arithmetic on it.
    *
-   * Ticks are the platform's too, through `<datalist>`. A list of marks drawn
-   * here would be marks the input does not snap to.
+   * **Marks are drawn rather than left to `<datalist>`**, which was the first
+   * answer and is the wrong one. A datalist's ticks cannot be styled at all, and
+   * Firefox does not render them for a range at all, so the platform's version is
+   * a mark that looks like someone else's design where it appears and no mark
+   * where it does not. Drawing them costs the semantics nothing, because a mark
+   * is decoration: what a reader can actually land on is `step`, which the input
+   * enforces whether or not anything is drawn.
+   *
+   * `markers` is a count rather than a flag tied to `step`. A flag reads well
+   * until a slider from zero to a hundred stepping by one asks for a hundred and
+   * one ticks, and then it is either noise or a silent refusal to draw. A number
+   * is what the reader sees, so it cannot surprise anyone.
    *
    * ## Attributes & Properties
    *
@@ -6897,6 +6934,11 @@ export type CustomElementsSolidJs = {
    * - `min`: The smallest value the reader can choose.
    * - `name`: Name submitted with the form.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `markers`: How many marks to draw along the track, evenly spaced, ends included.
+   *
+   * `0` or `1` draws none: one mark on a track says nothing about a range.
+   * They are decoration, so they are `aria-hidden`; what a reader can land on
+   * is `step`, which the input enforces regardless.
    * - `step`: How far one press of an arrow key moves it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.

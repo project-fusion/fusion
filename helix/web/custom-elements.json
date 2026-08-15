@@ -14164,6 +14164,20 @@
             },
             {
               "kind": "field",
+              "name": "markers",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many marks to draw along the track, evenly spaced, ends included.\n\n`0` or `1` draws none: one mark on a track says nothing about a range.\nThey are decoration, so they are `aria-hidden`; what a reader can land on\nis `step`, which the input enforces regardless.",
+              "attribute": "markers",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "step",
               "type": {
                 "text": "number"
@@ -14523,6 +14537,19 @@
               "default": "false",
               "description": "Whether the chosen value is shown beside the track.",
               "fieldName": "showValue",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "name": "markers",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many marks to draw along the track, evenly spaced, ends included.\n\n`0` or `1` draws none: one mark on a track says nothing about a range.\nThey are decoration, so they are `aria-hidden`; what a reader can land on\nis `step`, which the input enforces regardless.",
+              "fieldName": "markers",
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
                 "module": "src/slider/root/slider-root.ts"
