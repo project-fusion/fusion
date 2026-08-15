@@ -92,6 +92,20 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
   private activeValue = ''
 
   /**
+   * Whether anything survived the filter, kept as state rather than counted at
+   * render time.
+   *
+   * Counting during render reads the hiding from the *previous* pass, because
+   * hiding happens in `updated` against options that are the consumer's
+   * elements rather than this component's markup. So a filter matching nothing
+   * rendered the full list, hid every option, and left an empty box with no
+   * message in it: the count was right one pass too late. Written to state
+   * instead, which schedules the one further render that shows it.
+   */
+  @state()
+  private hasMatches = true
+
+  /**
    * Every option, in the order a reader meets them.
    *
    * Descendants rather than children, because a group puts a level between the
@@ -271,6 +285,11 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
       option.active = option.value === this.activeValue
     }
 
+    const matched = shown.length > 0
+    if (matched !== this.hasMatches) {
+      this.hasMatches = matched
+    }
+
     const active = shown.find((option) => option.value === this.activeValue)
     if (active) {
       const items = this.renderRoot.querySelector<HTMLElement>('[part="items"]')
@@ -325,11 +344,7 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     return html`${this.renderGroupLabel()}
       <div part="items" tabindex=${this.disabled ? -1 : 0}>
         <slot @slotchange=${() => this.place()}></slot>
-        ${
-          this.filter !== '' && this.shown.length === 0
-            ? html`<p part="empty">${this.emptyText}</p>`
-            : ''
-        }
+        ${this.filter !== '' && !this.hasMatches ? html`<p part="empty">${this.emptyText}</p>` : ''}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

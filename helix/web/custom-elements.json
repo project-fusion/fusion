@@ -11207,6 +11207,20 @@
             },
             {
               "kind": "field",
+              "name": "hasMatches",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Whether anything survived the filter, kept as state rather than counted at\nrender time.\n\nCounting during render reads the hiding from the *previous* pass, because\nhiding happens in `updated` against options that are the consumer's\nelements rather than this component's markup. So a filter matching nothing\nrendered the full list, hid every option, and left an empty box with no\nmessage in it: the count was right one pass too late. Written to state\ninstead, which schedules the one further render that shows it.",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "options",
               "type": {
                 "text": "HelixBaseOption[]"
