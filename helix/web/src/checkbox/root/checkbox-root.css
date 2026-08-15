@@ -103,3 +103,20 @@ slot:not([name]):empty {
 :host([disabled]) [part="caption"] {
   opacity: 0.5;
 }
+
+/* Named but not shown, for a field whose purpose the page already makes plain.
+ *
+ * Clipped rather than `display: none` or `visibility: hidden`, both of which
+ * take the label out of the accessibility tree along with the picture, which is
+ * the one thing it is here to stay in. This is the standard clip: a one pixel
+ * box with everything outside it cut away, still rendered, still read, and
+ * still the target of the `for` that focuses the field.
+ */
+:host([hide-label]) [part="label"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

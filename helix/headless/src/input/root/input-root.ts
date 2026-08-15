@@ -160,7 +160,12 @@ export class HelixBaseInput extends MixinField(HelixFormElement) {
   }
 
   protected override render(): TemplateResult {
-    return html`${this.renderLabel()}
+    /* Label, then help, then the field, then what went wrong.
+       The caption sits above the control because it is a condition on what to
+       type and is read before typing starts; the feedback sits below because it
+       is a verdict on what was typed. A hint under the box is a hint arriving
+       after the moment it was for. */
+    return html`${this.renderLabel()}${this.renderCaption()}
     <div part="field">
       <slot name="start"></slot>
       <input
@@ -179,7 +184,7 @@ export class HelixBaseInput extends MixinField(HelixFormElement) {
       />
       <slot name="end"></slot>
     </div>
-    ${this.renderCaption()}${this.renderFeedback()}`
+    ${this.renderFeedback()}`
   }
 }
 

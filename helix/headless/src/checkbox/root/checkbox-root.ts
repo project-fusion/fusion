@@ -118,7 +118,12 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
        Labelling is behaviour, which is what earns an element here rather than a
        bare slot: the wrapper is not decoration and there is no other way to get
        it. The browser handles the forwarding, so there is no click handler to
-       write and none to get wrong. */
+       write and none to get wrong.
+ 
+       Both descriptions go under that row, unlike a field where the caption
+       goes above the control. There is no above here: the box and the words
+       naming it are one line, so a caption between them would come between a
+       label and the thing it labels. */
     return html`<label part="field">
       <input
         part="control"

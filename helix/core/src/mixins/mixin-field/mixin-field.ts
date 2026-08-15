@@ -41,6 +41,17 @@ export declare class MixinFieldInterface {
   feedback: string
 
   /**
+   * Whether the label names the control without being shown.
+   *
+   * For a field whose purpose is already obvious from where it sits: a filter
+   * over the list it filters, a search box under a magnifier. The label is
+   * still rendered and still read, it is only taken off the screen, which is
+   * the difference between a control a screen reader can name and one it
+   * cannot.
+   */
+  hideLabel: boolean
+
+  /**
    * The accessible name, and the fallback for the `label` slot.
    *
    * Content rather than configuration, so it is the slot's fallback and never a
@@ -63,7 +74,7 @@ export declare class MixinFieldInterface {
   protected renderFeedback(): TemplateResult | typeof nothing
 
   /** A label above the control, pointing at it with a real `for`. */
-  protected renderLabel(): TemplateResult
+  protected renderLabel(): TemplateResult | typeof nothing
 
   /** Whether the form refuses to submit without it. */
   required: boolean
@@ -131,6 +142,10 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
     @property()
     feedback = ''
 
+    /** Whether the label names the control without being shown. */
+    @property({ attribute: 'hide-label', reflect: true, type: Boolean })
+    hideLabel = false
+
     /** The accessible name, and the fallback for the `label` slot. */
     @property()
     label = ''
@@ -175,8 +190,21 @@ export const MixinField = <T extends Constructor<HelixFormElement>>(Base: T) => 
      * A real `<label for>`, so pressing the words focuses the field and the
      * browser does the forwarding. It resolves because `for` looks within the
      * same tree, and the control it names is in this shadow root.
+     *
+     * **Nothing at all when there is no label**, which is the same rule the
+     * caption and the feedback follow: none of the three is always used, and an
+     * element rendered empty is not free. It still generates a box, so it still
+     * takes a row of the grid and a gap on either side of it, which is a field
+     * that has moved down the page for a label nobody wrote. `nothing` leaves
+     * comment markers rather than a node, so the gap has nothing to sit between.
+     *
+     * Naming a control without showing the label is `hide-label`, not an empty
+     * one: an unnamed field is a field a screen reader announces as "edit text".
      */
-    protected renderLabel(): TemplateResult {
+    protected renderLabel(): TemplateResult | typeof nothing {
+      if (this.label === '') {
+        return nothing
+      }
       return html`<label part="label" for="control"><slot name="label">${this.label}</slot></label>`
     }
 

@@ -475,6 +475,7 @@ export function SandboxWorkbench({ families }: Props) {
       <helix-flex align="center" class="examplesHeader" data-density="sm" gap="2xs">
         <helix-input
           class="examplesFilter"
+          hide-label
           label="Filter examples"
           onInput={(event: Event) => setFilter((event.target as HelixInput).value)}
           placeholder="Filter"

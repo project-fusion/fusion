@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, type Updatable } from '@fusion-io/testing/dom'
+import {
+  formValue,
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  type Updatable,
+} from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -182,3 +189,74 @@ describe('input descriptions', () => {
     expect(empty.textContent?.trim()).toBe('Used')
   })
 })
+
+describe('input parts that are not always used', () => {
+  test('no label means no label element', async () => {
+    // Not an empty one. An element rendered empty still generates a box, so it
+    // still takes a row of the grid and a gap on either side of it.
+    const host = await mount('<helix-input placeholder="Search"></helix-input>')
+    expect(part(host, 'label')).toBeNull()
+  })
+
+  test('hide-label keeps the name and takes away the picture', async () => {
+    /* The distinction the whole property exists for: an unnamed field is one a
+       screen reader announces as "edit text", so the label is still rendered
+       and still pointed at, only clipped. */
+    const host = await mount('<helix-input label="Filter" hide-label></helix-input>')
+    const label = part(host, 'label') as HTMLLabelElement
+    expect(label).not.toBeNull()
+    expect(label.getAttribute('for')).toBe(control(host)?.id)
+  })
+
+  test('the caption is read before typing and the feedback after', async () => {
+    /* Order, which is the whole of what distinguishes the two. A caption is a
+       condition on what to type, so it goes above the control; feedback is a
+       verdict on what was typed, so it goes below. A hint under the box is a
+       hint arriving after the moment it was for. */
+    const host = await mount(
+      '<helix-input label="A" caption="Hint" feedback="Wrong"></helix-input>',
+    )
+    const order = [...(host.shadowRoot as ShadowRoot).children].map((node) =>
+      node.getAttribute('part'),
+    )
+    expect(order).toEqual(['label', 'caption', 'field', 'feedback'])
+  })
+})
+
+if (hasLayout()) {
+  describe('input field geometry', () => {
+    const heightOf = async (markup: string): Promise<number> => {
+      const host = await mount(markup)
+      return host.getBoundingClientRect().height
+    }
+
+    test('an unused slot costs no gap', async () => {
+      /* The reason `renderLabel` returns `nothing` rather than an empty
+         element. The host is a grid with a gap between its rows, so anything
+         rendered empty still takes a row and a gap, and the field moves down
+         the page for a label nobody wrote. `nothing` leaves comment markers,
+         which generate no box, so the gap has nothing to sit between.
+
+         The assertion is that a bare host is exactly its field and no taller.
+         It was `bare < labelled` first, which is true either way: an empty
+         label is still shorter than a real one, so that version passed against
+         the bug it was written for. Checked by putting the bug back. */
+      const host = await mount('<helix-input placeholder="P"></helix-input>')
+      const field = part(host, 'field') as HTMLElement
+      const outer = host.getBoundingClientRect().height
+      const inner = field.getBoundingClientRect().height
+
+      expect(inner).toBeGreaterThan(0)
+      expect(Math.abs(outer - inner)).toBeLessThan(1)
+    })
+
+    test('a field with every part is taller than one with none, by all of them', async () => {
+      const bare = await heightOf('<helix-input placeholder="P"></helix-input>')
+      const full = await heightOf('<helix-input label="L" caption="C" feedback="F"></helix-input>')
+      const labelOnly = await heightOf('<helix-input label="L"></helix-input>')
+
+      expect(full).toBeGreaterThan(labelOnly)
+      expect(labelOnly).toBeGreaterThan(bare)
+    })
+  })
+}
