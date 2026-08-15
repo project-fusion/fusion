@@ -32,6 +32,7 @@ import type {
   HelixBaseRadio,
   HelixBaseRadioGroup,
   HelixBaseSkeleton,
+  HelixBaseSlider,
   HelixBaseSpinner,
   HelixBaseStat,
   HelixBaseStatGroup,
@@ -1605,6 +1606,107 @@ export type HelixBaseRadioSolidJsProps = {
 export type HelixBaseSkeletonProps = {};
 
 export type HelixBaseSkeletonSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseSlider` component event */
+export type HelixBaseSliderElementEvent<E = Event> = TypedEvent<
+  HelixBaseSlider,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseSliderHelixChangeElementEvent =
+  HelixBaseSliderElementEvent<HelixChangeEvent>;
+
+export type HelixBaseSliderProps = {
+  /** The largest value the reader can choose. */
+  max?: HelixBaseSlider["max"];
+  /** The smallest value the reader can choose. */
+  min?: HelixBaseSlider["min"];
+  /** Name submitted with the form. */
+  name?: HelixBaseSlider["name"];
+  /** Whether the chosen value is shown beside the track. */
+  "show-value"?: HelixBaseSlider["showValue"];
+  /** Whether the chosen value is shown beside the track. */
+  showValue?: HelixBaseSlider["showValue"];
+  /** How far one press of an arrow key moves it. */
+  step?: HelixBaseSlider["step"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseSlider["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseSlider["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  value?: HelixBaseSlider["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseSlider["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseSlider["feedback"];
+  /** Whether the label names the control without being shown. */
+  "hide-label"?: HelixBaseSlider["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  hideLabel?: HelixBaseSlider["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseSlider["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseSlider["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixBaseSlider["disabled"];
+
+  /** Fired as the value changes, and cancelable. */
+  "onhelix-change"?: (e: HelixBaseSliderHelixChangeElementEvent) => void;
+  /** Relayed once the reader has let go. */
+  onchange?: (e: HelixBaseSliderElementEvent) => void;
+};
+
+export type HelixBaseSliderSolidJsProps = {
+  /** The largest value the reader can choose. */
+  "prop:max"?: HelixBaseSlider["max"];
+  /** The smallest value the reader can choose. */
+  "prop:min"?: HelixBaseSlider["min"];
+  /** Name submitted with the form. */
+  "prop:name"?: HelixBaseSlider["name"];
+  /** Whether the chosen value is shown beside the track. */
+  "bool:show-value"?: HelixBaseSlider["showValue"];
+  /** Whether the chosen value is shown beside the track. */
+  "prop:showValue"?: HelixBaseSlider["showValue"];
+  /** How far one press of an arrow key moves it. */
+  "prop:step"?: HelixBaseSlider["step"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseSlider["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseSlider["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  "prop:value"?: HelixBaseSlider["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseSlider["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseSlider["feedback"];
+  /** Whether the label names the control without being shown. */
+  "bool:hide-label"?: HelixBaseSlider["hideLabel"];
+  /** Whether the label names the control without being shown. */
+  "prop:hideLabel"?: HelixBaseSlider["hideLabel"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseSlider["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseSlider["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixBaseSlider["disabled"];
+  /** Fired as the value changes, and cancelable. */
+  "on:helix-change"?: (e: HelixBaseSliderHelixChangeElementEvent) => void;
+  /** Relayed once the reader has let go. */
+  "on:change"?: (e: HelixBaseSliderElementEvent) => void;
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -4067,6 +4169,82 @@ export type CustomElements = {
    */
   "helix-base-skeleton": Partial<
     HelixBaseSkeletonProps & BaseProps<HelixBaseSkeleton> & BaseEvents
+  >;
+
+  /**
+   * A real `<input type="range">`, so the drag, the arrow keys, Home and End, the
+   * page keys and the touch target are all the platform's. Every one of those is
+   * a thing a hand-built slider gets wrong, and the last is the one nobody
+   * notices: a native range has a hit area larger than its thumb, sized by the
+   * platform for a finger.
+   *
+   * **The value is a string, like every other form control's.** A range submits
+   * text and `MixinControllerValue` holds text, so the number is a reading of the
+   * value rather than the value itself. `valueAsNumber` is there for anything
+   * doing arithmetic on it.
+   *
+   * Ticks are the platform's too, through `<datalist>`. A list of marks drawn
+   * here would be marks the input does not snap to.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `max`: The largest value the reader can choose.
+   * - `min`: The smallest value the reader can choose.
+   * - `name`: Name submitted with the form.
+   * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `step`: How far one press of an arrow key moves it.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired as the value changes, and cancelable.
+   * - `change`: Relayed once the reader has let go.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The row: the control and its readout.
+   * - `control`: The range input.
+   * - `output`: The current value, shown beside it.
+   */
+  "helix-base-slider": Partial<
+    HelixBaseSliderProps & BaseProps<HelixBaseSlider> & BaseEvents
   >;
 
   /**
@@ -6693,6 +6871,85 @@ export type CustomElementsSolidJs = {
     HelixBaseSkeletonProps &
       HelixBaseSkeletonSolidJsProps &
       BaseProps<HelixBaseSkeleton> &
+      BaseEvents
+  >;
+
+  /**
+   * A real `<input type="range">`, so the drag, the arrow keys, Home and End, the
+   * page keys and the touch target are all the platform's. Every one of those is
+   * a thing a hand-built slider gets wrong, and the last is the one nobody
+   * notices: a native range has a hit area larger than its thumb, sized by the
+   * platform for a finger.
+   *
+   * **The value is a string, like every other form control's.** A range submits
+   * text and `MixinControllerValue` holds text, so the number is a reading of the
+   * value rather than the value itself. `valueAsNumber` is there for anything
+   * doing arithmetic on it.
+   *
+   * Ticks are the platform's too, through `<datalist>`. A list of marks drawn
+   * here would be marks the input does not snap to.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `max`: The largest value the reader can choose.
+   * - `min`: The smallest value the reader can choose.
+   * - `name`: Name submitted with the form.
+   * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `step`: How far one press of an arrow key moves it.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired as the value changes, and cancelable.
+   * - `change`: Relayed once the reader has let go.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The row: the control and its readout.
+   * - `control`: The range input.
+   * - `output`: The current value, shown beside it.
+   */
+  "helix-base-slider": Partial<
+    HelixBaseSliderProps &
+      HelixBaseSliderSolidJsProps &
+      BaseProps<HelixBaseSlider> &
       BaseEvents
   >;
 
