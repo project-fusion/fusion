@@ -1636,8 +1636,20 @@ export type HelixBaseSliderProps = {
 
 `0` or `1` draws none: one mark on a track says nothing about a range.
 They are decoration, so they are `aria-hidden`; what a reader can land on
-is `step`, which the input enforces regardless. */
+is `step`, which the input enforces regardless.
+
+**Each one is snapped to a step before it is placed.** Evenly spaced and
+on a step are two different things, and asking for four marks across a
+hundred in twenty-fives wants them at 0, 33.3, 66.7 and 100: two of those
+are places the thumb cannot go. A mark the thumb can never sit on is the
+one thing a mark must not be, so the spacing gives way rather than the
+step, and marks may come out unevenly spaced when the two disagree. That
+is the honest picture of the range being offered. */
   markers?: HelixBaseSlider["markers"];
+  /** Whether each mark says which value it stands at. */
+  "marker-labels"?: HelixBaseSlider["markerLabels"];
+  /** Whether each mark says which value it stands at. */
+  markerLabels?: HelixBaseSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   step?: HelixBaseSlider["step"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -1686,8 +1698,20 @@ export type HelixBaseSliderSolidJsProps = {
 
 `0` or `1` draws none: one mark on a track says nothing about a range.
 They are decoration, so they are `aria-hidden`; what a reader can land on
-is `step`, which the input enforces regardless. */
+is `step`, which the input enforces regardless.
+
+**Each one is snapped to a step before it is placed.** Evenly spaced and
+on a step are two different things, and asking for four marks across a
+hundred in twenty-fives wants them at 0, 33.3, 66.7 and 100: two of those
+are places the thumb cannot go. A mark the thumb can never sit on is the
+one thing a mark must not be, so the spacing gives way rather than the
+step, and marks may come out unevenly spaced when the two disagree. That
+is the honest picture of the range being offered. */
   "prop:markers"?: HelixBaseSlider["markers"];
+  /** Whether each mark says which value it stands at. */
+  "bool:marker-labels"?: HelixBaseSlider["markerLabels"];
+  /** Whether each mark says which value it stands at. */
+  "prop:markerLabels"?: HelixBaseSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   "prop:step"?: HelixBaseSlider["step"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -4221,6 +4245,15 @@ export type CustomElements = {
    * `0` or `1` draws none: one mark on a track says nothing about a range.
    * They are decoration, so they are `aria-hidden`; what a reader can land on
    * is `step`, which the input enforces regardless.
+   *
+   * **Each one is snapped to a step before it is placed.** Evenly spaced and
+   * on a step are two different things, and asking for four marks across a
+   * hundred in twenty-fives wants them at 0, 33.3, 66.7 and 100: two of those
+   * are places the thumb cannot go. A mark the thumb can never sit on is the
+   * one thing a mark must not be, so the spacing gives way rather than the
+   * step, and marks may come out unevenly spaced when the two disagree. That
+   * is the honest picture of the range being offered.
+   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
    * - `step`: How far one press of an arrow key moves it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -6939,6 +6972,15 @@ export type CustomElementsSolidJs = {
    * `0` or `1` draws none: one mark on a track says nothing about a range.
    * They are decoration, so they are `aria-hidden`; what a reader can land on
    * is `step`, which the input enforces regardless.
+   *
+   * **Each one is snapped to a step before it is placed.** Evenly spaced and
+   * on a step are two different things, and asking for four marks across a
+   * hundred in twenty-fives wants them at 0, 33.3, 66.7 and 100: two of those
+   * are places the thumb cannot go. A mark the thumb can never sit on is the
+   * one thing a mark must not be, so the spacing gives way rather than the
+   * step, and marks may come out unevenly spaced when the two disagree. That
+   * is the honest picture of the range being offered.
+   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
    * - `step`: How far one press of an arrow key moves it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.

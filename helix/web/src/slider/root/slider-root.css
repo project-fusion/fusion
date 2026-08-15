@@ -61,6 +61,28 @@
   z-index: var(--helix-layer-raised);
 }
 
+/* Room under the track for the labels, added only when there are labels: a
+   slider without them keeps the height of every other field in the form. */
+:host([marker-labels]) [part="field"] {
+  padding-block-end: var(--helix-space-lg);
+}
+
+/* The label hangs off the mark rather than being laid out beside it, so the
+   marks stay where the values are and the text follows. Centred on its own
+   mark, which is what puts the first and last labels half off the ends: they
+   belong to marks that sit on the ends, and moving them in would put them
+   under the wrong place on the track. */
+[part="marker-label"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  inset-block-start: var(--helix-space-sm);
+  inset-inline-start: 50%;
+  position: absolute;
+  translate: -50% 0;
+}
+
 [part="marker"] {
   background-color: var(--slider-marker-color, var(--helix-color-background));
   block-size: var(--_slider-track);

@@ -10199,8 +10199,19 @@
                 "text": "number"
               },
               "default": "0",
-              "description": "How many marks to draw along the track, evenly spaced, ends included.\n\n`0` or `1` draws none: one mark on a track says nothing about a range.\nThey are decoration, so they are `aria-hidden`; what a reader can land on\nis `step`, which the input enforces regardless.",
+              "description": "How many marks to draw along the track, evenly spaced, ends included.\n\n`0` or `1` draws none: one mark on a track says nothing about a range.\nThey are decoration, so they are `aria-hidden`; what a reader can land on\nis `step`, which the input enforces regardless.\n\n**Each one is snapped to a step before it is placed.** Evenly spaced and\non a step are two different things, and asking for four marks across a\nhundred in twenty-fives wants them at 0, 33.3, 66.7 and 100: two of those\nare places the thumb cannot go. A mark the thumb can never sit on is the\none thing a mark must not be, so the spacing gives way rather than the\nstep, and marks may come out unevenly spaced when the two disagree. That\nis the honest picture of the range being offered.",
               "attribute": "markers"
+            },
+            {
+              "kind": "field",
+              "name": "markerLabels",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether each mark says which value it stands at.",
+              "attribute": "marker-labels",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -10211,6 +10222,16 @@
               "default": "1",
               "description": "How far one press of an arrow key moves it.",
               "attribute": "step"
+            },
+            {
+              "kind": "field",
+              "name": "markerValues",
+              "type": {
+                "text": "number[]"
+              },
+              "privacy": "private",
+              "description": "The value each mark stands at, snapped to a step it can be reached on.\n\nDe-duplicated, because snapping can land two marks on one step: five marks\nacross a range of two steps is three marks, not five with a pair on top of\neach other, and two marks in one place read as one drawn badly.",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -10742,8 +10763,17 @@
                 "text": "number"
               },
               "default": "0",
-              "description": "How many marks to draw along the track, evenly spaced, ends included.\n\n`0` or `1` draws none: one mark on a track says nothing about a range.\nThey are decoration, so they are `aria-hidden`; what a reader can land on\nis `step`, which the input enforces regardless.",
+              "description": "How many marks to draw along the track, evenly spaced, ends included.\n\n`0` or `1` draws none: one mark on a track says nothing about a range.\nThey are decoration, so they are `aria-hidden`; what a reader can land on\nis `step`, which the input enforces regardless.\n\n**Each one is snapped to a step before it is placed.** Evenly spaced and\non a step are two different things, and asking for four marks across a\nhundred in twenty-fives wants them at 0, 33.3, 66.7 and 100: two of those\nare places the thumb cannot go. A mark the thumb can never sit on is the\none thing a mark must not be, so the spacing gives way rather than the\nstep, and marks may come out unevenly spaced when the two disagree. That\nis the honest picture of the range being offered.",
               "fieldName": "markers"
+            },
+            {
+              "name": "marker-labels",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether each mark says which value it stands at.",
+              "fieldName": "markerLabels"
             },
             {
               "name": "step",

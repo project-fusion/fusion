@@ -72,13 +72,48 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
    * `0` or `1` draws none: one mark on a track says nothing about a range.
    * They are decoration, so they are `aria-hidden`; what a reader can land on
    * is `step`, which the input enforces regardless.
+   *
+   * **Each one is snapped to a step before it is placed.** Evenly spaced and
+   * on a step are two different things, and asking for four marks across a
+   * hundred in twenty-fives wants them at 0, 33.3, 66.7 and 100: two of those
+   * are places the thumb cannot go. A mark the thumb can never sit on is the
+   * one thing a mark must not be, so the spacing gives way rather than the
+   * step, and marks may come out unevenly spaced when the two disagree. That
+   * is the honest picture of the range being offered.
    */
   @property({ type: Number })
   markers = 0
 
+  /** Whether each mark says which value it stands at. */
+  @property({ attribute: 'marker-labels', reflect: true, type: Boolean })
+  markerLabels = false
+
   /** How far one press of an arrow key moves it. */
   @property({ type: Number })
   step = 1
+
+  /**
+   * The value each mark stands at, snapped to a step it can be reached on.
+   *
+   * De-duplicated, because snapping can land two marks on one step: five marks
+   * across a range of two steps is three marks, not five with a pair on top of
+   * each other, and two marks in one place read as one drawn badly.
+   */
+  private get markerValues(): number[] {
+    const span = this.max - this.min
+    if (this.markers < 2 || span <= 0) {
+      return []
+    }
+    const step = this.step > 0 ? this.step : 1
+    const snapped = Array.from({ length: this.markers }, (_, at) => {
+      const raw = this.min + (at / (this.markers - 1)) * span
+      return Math.min(
+        this.max,
+        Math.max(this.min, this.min + Math.round((raw - this.min) / step) * step),
+      )
+    })
+    return [...new Set(snapped)]
+  }
 
   /** The chosen value as a number, for anything doing arithmetic on it. */
   get valueAsNumber(): number {
@@ -158,13 +193,15 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
       ${
         this.markers > 1
           ? html`<div part="markers" aria-hidden="true">
-              ${Array.from(
-                { length: this.markers },
-                (_, at) =>
+              ${this.markerValues.map(
+                (at) =>
                   html`<span
                     part="marker"
-                    style="--_marker-at: ${(at / (this.markers - 1)) * 100}%"
-                  ></span>`,
+                    style="--_marker-at: ${((at - this.min) / (this.max - this.min)) * 100}%"
+                    >${
+                      this.markerLabels ? html`<span part="marker-label">${at}</span>` : nothing
+                    }</span
+                  >`,
               )}
             </div>`
           : nothing
