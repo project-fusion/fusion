@@ -31,6 +31,13 @@
      through the stylesheet. */
   --site-text-hero: clamp(2.75rem, 9vw, 6.5rem);
   --site-text-section: clamp(2rem, 4.5vw, 3.25rem);
+
+  /* The wordmark, which is between two steps of the scale on purpose and so is
+     named here with the other sizes that are the site's rather than Helix's. A
+     brand lockup is not a step in the type scale: borrowing `xl` would couple
+     the wordmark to every component that uses it, and `lg` is small enough that
+     the display face stops being identifiable. */
+  --site-text-wordmark: 1.375rem;
 }
 
 /* Full width, held off the edges by the inset. Nothing is centered in a measure
@@ -505,14 +512,31 @@ helix-sandbox [slot="panel"]::part(panels) {
 
 /* ============================================================ chrome ===== */
 
-/* The one place capitals are right: a wordmark is read as a shape, not as
-   letters, and the extra tracking is what stops the caps from crowding. The
-   display face is the brand's, and this is the only text that wears it by
-   default rather than by asking. */
+/* Mixed case, and large enough to be worth setting.
+ *
+ * It was capitals, on the reasoning that a wordmark is read as a shape rather
+ * than as letters. That reasoning is fine and it was defeating the whole point
+ * here: everything that identifies Funnel Display lives in its lowercase, the
+ * angled cut on the `F` and the wide round `u`, and `text-transform: uppercase`
+ * throws all of it away. Set side by side in caps, Funnel Display and Geist are
+ * the same picture. That is what "the display face is not being applied" turned
+ * out to be, twice: it was applied, the weight axis drives, and there was
+ * nothing left of the face to see.
+ *
+ * Size is the other half. Below about twenty pixels the two faces are within a
+ * hair of each other whatever the case, so this sits just under the mark beside
+ * it: the smallest setting where the face is still identifiable, and a shade
+ * shorter than the mark so the two read as a lockup rather than as two things
+ * of equal weight.
+ *
+ * Not on a `Text` appearance, because there is no ramp step here and there
+ * should not be: this is a brand lockup rather than a size in the type scale,
+ * and a `heading` that happened to match would be coupled to it by accident. */
 .wordmark::part(text) {
   font-family: var(--helix-font-display);
-  letter-spacing: var(--helix-tracking-wide);
-  text-transform: uppercase;
+  font-size: var(--site-text-wordmark);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
 }
 
 /* The nav drawer's own inset. The drawer places the panel; what goes in it is

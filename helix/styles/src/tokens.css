@@ -52,19 +52,12 @@
    * `surface` and `surface-raised` all sitting on `neutral-0` in light mode:
    * three tokens, one colour, and a card on a page with nothing between them.
    *
-   * **The dark page is near-black, not black, and has to be.** `sunken` is the
-   * bottom of the ramp, so a page at the bottom of it leaves nothing below the
-   * page: every sunken thing lying directly on it is painted the page's own
-   * colour and disappears. Measured on the breadcrumb's hover, which was the
-   * report, and it was never only the breadcrumb: the banner, the nav bar's
-   * marker, a `<kbd>` and an input's fill are all sunken and all sit on the
-   * page. This is the second time these two have collided, the first being when
-   * `sunken` was the one at neutral-950 beside a background already there.
-   *
-   * The 0.06 between the page and `surface` that this leaves is deliberate and
-   * is what a dark surface is worth: lifted a little and told apart mostly by
-   * its border, which is how every dark interface that does not glow does it. */
-  --helix-color-background: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-950));
+   * **The dark page is black, and the ladder moves around it.** It was briefly
+   * near-black instead, to make room underneath for `sunken`, and that is the
+   * wrong token to move: the page is the one fixed point either mode has, and
+   * every other step is defined as a distance from it. Nothing below black is
+   * the constraint, so `sunken` is what gives way. See its note below. */
+  --helix-color-background: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000));
   --helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
   /* Two kinds of "above", and they want opposite fills in light mode.
    *
@@ -84,17 +77,27 @@
    * with it for as long as it did. */
   --helix-color-surface-raised: light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800));
   --helix-color-surface-overlay: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800));
-  /* All the way down to the page. A well cut through a surface exposes what is
-     under it, and what is under everything is the page.
+  /* Down in light, up in dark, because "recessed" is a direction and only one
+     of the two modes has room in it.
 
-     One step short of that was tried and measured: with `surface` and
-     `surface-raised` where they now are, it left a groove and the thumb sitting
-     in it only 0.14 apart in lightness, which is subtle at the dark end of the
-     ramp and was the complaint. Taking the well the whole way puts 0.29 between
-     them while the thumb stays lifted above the surface they are both on. In
-     light there is no room below white, so it takes the step a raised surface
-     takes and the two are told apart by shadow rather than by fill. */
-  --helix-color-surface-sunken: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-1000));
+     In light a well cut through a surface exposes what is under it, and it goes
+     a step past `raised` so a groove and a thumb sitting in it are told apart.
+
+     In dark there is nothing under black. It was at neutral-1000 with the page
+     there too, which is the same colour: every sunken thing lying on the page
+     was painted the page and vanished. Reported on the breadcrumb's hover, and
+     never only that, because the banner, the nav bar's marker, a `<kbd>` and an
+     input's fill are all sunken and all sit on the page. The answer is that in
+     dark a recess reads by coming toward the viewer rather than away, which is
+     what every dark interface does with an input, and which is also the only
+     direction left.
+
+     That leaves the toggle group's thumb 0.14 above its track, which has been
+     the complaint before. Its shadow is doing the rest of that work now, and
+     the component has `--toggle-group-indicator-color` if it needs more: a
+     component reaching for a different rung is a normal thing, whereas a page
+     that is not the colour it was chosen to be is not. */
+  --helix-color-surface-sunken: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950));
   --helix-color-overlay: color-mix(
     in oklab,
     var(--_helix-neutral-950) light-dark(40%, 64%),
