@@ -8,7 +8,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Closes an overlay on Escape or on a pointer press outside it.\n\nBoth, because they are different intentions with the same meaning: Escape is\nthe keyboard's way out and clicking away is the pointer's, and an overlay\nthat honours only one is one half its readers cannot dismiss.\n\nThe outside press is watched on `pointerdown` rather than `click`, so a press\nthat starts outside and drags across the overlay still counts as leaving\nrather than as interacting.",
+          "description": "Closes an overlay on Escape or on a pointer press outside it.\n\nBoth, because they are different intentions with the same meaning: Escape is\nthe keyboard's way out and clicking away is the pointer's, and an overlay\nthat honours only one is one half its readers cannot dismiss.\n\nThe outside press is watched on `pointerdown` rather than `click`, so a press\nthat starts outside and drags across the overlay still counts as leaving\nrather than as interacting.\n\nA press inside a frame is the third case, and it needs its own signal. The\nframe swallows the event, so the document that owns the overlay never sees a\n`pointerdown` at all, and where the frame is cross-origin there is nothing to\nlisten to inside it either. What is observable is that the window lost focus\nand a frame on this page gained it, which is exactly a press the document\ncannot see. Leaving the browser altogether blurs the window too, so what took\nfocus is the part that distinguishes them.",
           "name": "DismissController",
           "members": [
             {
@@ -55,6 +55,13 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleWindowBlur",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Focus left the document. If a frame took it, that was a press.\n\nDeferred by a task, because the order of `blur` against the focus moving is\nnot something every browser agrees on and reading `activeElement` too early\ngives the element that is losing focus rather than the one taking it. The\nguard is for the case where the overlay closed for another reason in\nbetween, which would otherwise dismiss whatever opened next."
             },
             {
               "kind": "field",

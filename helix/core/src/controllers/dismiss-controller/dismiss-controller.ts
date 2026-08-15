@@ -1,5 +1,23 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
+/**
+ * The element that actually has focus, through any number of shadow roots.
+ *
+ * `document.activeElement` stops at the outermost host: focus inside a shadow
+ * tree is reported as the element containing that tree, because what is inside
+ * it is not the document's business. So a frame in a component's shadow root
+ * reads as the component, and a check for a frame never matches one. Each root
+ * keeps its own `activeElement`, so descending through them gives the element
+ * the reader is really on.
+ */
+const deepActiveElement = (): Element | null => {
+  let element = document.activeElement
+  while (element?.shadowRoot?.activeElement) {
+    element = element.shadowRoot.activeElement
+  }
+  return element
+}
+
 export interface DismissOptions {
   /**
    * The element a press must land inside to count as interacting rather than
@@ -26,6 +44,14 @@ export interface DismissOptions {
  * The outside press is watched on `pointerdown` rather than `click`, so a press
  * that starts outside and drags across the overlay still counts as leaving
  * rather than as interacting.
+ *
+ * A press inside a frame is the third case, and it needs its own signal. The
+ * frame swallows the event, so the document that owns the overlay never sees a
+ * `pointerdown` at all, and where the frame is cross-origin there is nothing to
+ * listen to inside it either. What is observable is that the window lost focus
+ * and a frame on this page gained it, which is exactly a press the document
+ * cannot see. Leaving the browser altogether blurs the window too, so what took
+ * focus is the part that distinguishes them.
  */
 export class DismissController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
@@ -49,6 +75,23 @@ export class DismissController implements ReactiveController {
     }
   }
 
+  /**
+   * Focus left the document. If a frame took it, that was a press.
+   *
+   * Deferred by a task, because the order of `blur` against the focus moving is
+   * not something every browser agrees on and reading `activeElement` too early
+   * gives the element that is losing focus rather than the one taking it. The
+   * guard is for the case where the overlay closed for another reason in
+   * between, which would otherwise dismiss whatever opened next.
+   */
+  private readonly handleWindowBlur = (): void => {
+    setTimeout(() => {
+      if (this.active && deepActiveElement()?.tagName === 'IFRAME') {
+        this.onDismiss()
+      }
+    })
+  }
+
   private readonly handlePointerDown = (event: PointerEvent): void => {
     // `composedPath` rather than `target`, so a press inside the overlay's own
     // shadow root is still recognized as inside it.
@@ -66,6 +109,7 @@ export class DismissController implements ReactiveController {
     this.active = true
     document.addEventListener('keydown', this.handleKeydown)
     document.addEventListener('pointerdown', this.handlePointerDown)
+    window.addEventListener('blur', this.handleWindowBlur)
   }
 
   /** Stops listening. */
@@ -76,6 +120,7 @@ export class DismissController implements ReactiveController {
     this.active = false
     document.removeEventListener('keydown', this.handleKeydown)
     document.removeEventListener('pointerdown', this.handlePointerDown)
+    window.removeEventListener('blur', this.handleWindowBlur)
   }
 
   hostDisconnected(): void {
