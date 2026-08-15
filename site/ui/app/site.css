@@ -354,12 +354,24 @@ helix-app-header {
  * fill sits here rather than on the slot: a fill on the slot took the strip
  * with it. */
 helix-sandbox [slot="panel"]::part(tabs) {
+  /* Centred in a stated height, the same figure the toolbar and the rail header
+     take, rather than however tall the padding around a tab makes it. Derived,
+     it came out at fifty-seven against their forty-eight: eight of padding
+     either side of a forty pixel tab, plus the rule. Three bars across one tool
+     and no two the same height.
+
+     `align-items` because the height is now the bar's rather than the tab's: a
+     flex row stretches its children by default, so a thirty-two pixel tab would
+     have grown to fill the bar and the difference would have moved rather than
+     gone. */
+  align-items: center;
   /* Said, not left to show through. Transparent looks the same here because the
      sandbox behind it is the page, and it would stop looking the same the
      moment anything were put between them. */
   background-color: var(--helix-color-background);
+  block-size: var(--helix-size-control-lg);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  padding-block: var(--helix-space-xs);
+  padding-block: var(--helix-space-none);
   padding-inline: var(--helix-space-sm);
 }
 

@@ -734,9 +734,20 @@ export function SandboxWorkbench({ families }: Props) {
 
           {/* The panel's tabs are `helix-tabs`, not a second tab set built
               into the sandbox: tabs are the only behaviour the region has, and
-              that behaviour already exists. */}
+              that behaviour already exists.
+
+              Dense, like the toolbar. A bar of the tool says so once and the
+              controls in it follow; this one did not, so its tabs took the
+              default control height and stood eight pixels taller than the file
+              tabs across the split from them. */}
           {showPanel && (
-            <helix-tabs label="Panel" ref={panelTabs} slot="panel" value="terminal">
+            <helix-tabs
+              data-density="sm"
+              label="Panel"
+              ref={panelTabs}
+              slot="panel"
+              value="terminal"
+            >
               <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
               <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
               <helix-tabs-panel slot="panels" value="terminal">
