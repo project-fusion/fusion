@@ -87,11 +87,17 @@ const shimElementInternals = (): void => {
     let validationMessage = ''
     return {
       ariaCurrent: null,
-      // Declared, not merely assignable: a component that guards on
-      // `'ariaDescribedByElements' in internals` skips the link entirely when
-      // the slot is absent, which is the browser's own feature test.
+      /* Declared, not merely assignable: a component that guards on
+         `'ariaDescribedByElements' in internals` skips the link entirely when
+         the slot is absent, which is the browser's own feature test.
+ 
+         Both of them, and the second was missing. `hostAria` feature-tests each
+         one separately, so a shim carrying only the description silently
+         dropped every name written by reference, and the groups' own specs read
+         that as the component failing to name itself. */
       ariaDescribedByElements: null,
       ariaLabel: null,
+      ariaLabelledByElements: null,
       checkValidity: () => true,
       get form(): HTMLFormElement | null {
         // The platform grants form ownership only to form-associated elements,

@@ -13,7 +13,7 @@ import { Wordmark } from './wordmark'
  * Site navigation: the verticals, centered in the banner.
  *
  * Plain links inside a `NavBar`, marked with `aria-current` and styled by the
- * `data-nav-item` recipe. Not tabs, because a tab controls a panel and
+ * `` recipe. Not tabs, because a tab controls a panel and
  * announces itself inside a `tablist`, and these are routes. Not a toggle group
  * either, which is a radio group and would announce a set of destinations as a
  * set of choices. The look was the only part navigation ever wanted from
@@ -76,7 +76,6 @@ export function SiteNav() {
             {VERTICALS.map((vertical) => (
               <Link
                 aria-current={current === vertical.href ? 'page' : undefined}
-                data-nav-item
                 href={vertical.href}
                 key={vertical.href}
               >

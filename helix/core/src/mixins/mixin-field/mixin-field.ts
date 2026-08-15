@@ -1,6 +1,7 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import { hostAria } from '../../utils/host-aria/host-aria.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -326,12 +327,12 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      */
     protected linkHost(): void {
       const label = this.renderRoot.querySelector('[part="label"]')
-      this.internals.ariaLabelledByElements = label ? [label] : null
-
-      const described = [HINT_ID, FEEDBACK_ID]
-        .map((id) => this.renderRoot.querySelector(`#${id}`))
-        .filter((node): node is Element => node !== null)
-      this.internals.ariaDescribedByElements = described.length > 0 ? described : null
+      hostAria(this.internals, {
+        describedBy: [HINT_ID, FEEDBACK_ID]
+          .map((id) => this.renderRoot.querySelector(`#${id}`))
+          .filter((node): node is Element => node !== null),
+        labelledBy: label ? [label] : [],
+      })
     }
 
     /** What the last render put on screen, so a change can be noticed. */

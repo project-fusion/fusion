@@ -83,33 +83,20 @@ export class HelixBaseNavBar extends HelixElement {
     this.observer?.disconnect()
     this.current?.disconnect()
 
-    /* The recipe goes on, rather than being asked for.
+    /* Nothing is written onto the items any more.
      *
-     * `data-nav-item` is what the base layer styles a destination with, and it
-     * was the consumer's to remember. Forgetting it is silent and total: the
-     * links keep working and come out as bare underlined anchors, and the
-     * marker measures boxes that were never laid out as items. Measured on the
-     * app header's own example, which forgot it, the links rendered at fifteen
-     * pixels in link blue as `display: block`.
+     * `data-nav-item` used to be put here, because the base layer styled a
+     * destination with it and forgetting it was silent and total: the links
+     * kept working and came out as bare underlined anchors. Writing it fixed
+     * that and bought two problems. It happened after upgrade, so a
+     * server-rendered nav arrived unstyled and restyled itself a frame later;
+     * and a React consumer who wrote the attribute themselves got
+     * `data-nav-item="true"` from JSX, which this then had to be careful not to
+     * overwrite or hydration reported a mismatch.
      *
-     * These are already this component's items. It reads them, observes them,
-     * and measures them for the marker, so marking them is the same claim made
-     * once more rather than a new one. Written rather than reflected, and
-     * client-side, so a server-rendered nav is unstyled for the moment before
-     * upgrade unless the consumer wrote it too, which stays worth doing.
-     *
-     * Only where it is absent, and that is not tidiness. A consumer writing it
-     * in JSX writes `data-nav-item`, which is `={true}`, which React serves as
-     * `data-nav-item="true"`. Setting it to `""` here changes an attribute
-     * React put there, and where the element upgrades before hydration React
-     * finds the DOM disagreeing with what it sent and reports a mismatch.
-     * Leaving a value alone costs nothing: the recipe selects on the
-     * attribute being there and never on what it says. */
-    for (const item of this.items) {
-      if (!item.hasAttribute('data-nav-item')) {
-        item.setAttribute('data-nav-item', '')
-      }
-    }
+     * The base layer selects `helix-nav-bar a` as well now, so the styling is
+     * true the moment the markup is parsed, on the server and on the client,
+     * and there is nothing to write or to be careful about. */
     this.place()
 
     this.observer = new ResizeObserver(() => this.place())

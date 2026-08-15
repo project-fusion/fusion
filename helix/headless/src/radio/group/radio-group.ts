@@ -3,6 +3,7 @@ import {
   HelixChangeEvent,
   HelixFormElement,
   type HelixSelectEvent,
+  hostAria,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -138,10 +139,10 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
     super.willUpdate(changed)
     // Through internals, so nothing lands on the host as an attribute a React
     // consumer's server markup never had.
-    this.internals.role = 'radiogroup'
-    /* A string as well as the element reference `linkHost` sets, because this
-       is the half a server can write. */
-    this.internals.ariaLabel = this.label === '' ? null : this.label
+    /* The string half, which is what a server can write. `linkHost` adds the
+       element references on the client, and those win where a consumer slotted
+       a label richer than a string. */
+    hostAria(this.internals, { label: this.label, role: 'radiogroup' })
   }
 
   protected override updated(changed: PropertyValues): void {

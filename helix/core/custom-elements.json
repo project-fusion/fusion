@@ -1149,6 +1149,22 @@
         },
         {
           "kind": "js",
+          "name": "HostAria",
+          "declaration": {
+            "name": "HostAria",
+            "module": "./utils/host-aria/host-aria.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "hostAria",
+          "declaration": {
+            "name": "hostAria",
+            "module": "./utils/host-aria/host-aria.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "ControlledChangeOptions",
           "declaration": {
             "name": "ControlledChangeOptions",
@@ -2465,6 +2481,46 @@
           "declaration": {
             "name": "deepActiveElement",
             "module": "src/utils/focusable-elements/focusable-elements.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/host-aria/host-aria.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "hostAria",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              }
+            },
+            {
+              "name": "semantics",
+              "type": {
+                "text": "HostAria"
+              }
+            }
+          ],
+          "description": "Writes a host's semantics onto its `ElementInternals`.\n\nOnto internals rather than onto the host, which is the whole point: an\nattribute written at upgrade is markup a React consumer's server output never\nhad, and hydration reports the difference. Internals carry the same meaning\nto the accessibility tree and leave the element as the consumer wrote it.\n\n**Empty means absent, and that is the trap this exists for.** Assigning `''`\nto `ariaLabel` is not the same as not naming the element: it is a name of no\ncharacters, which a screen reader announces as an unnamed control while every\ncheck for \"is it labelled\" passes. Every caller had written\n`this.label === '' ? null : this.label` and one of them would eventually not.\n\n**Element references are feature-tested rather than assumed.** They are the\nonly way a host in the light DOM can point at a node in its own shadow root,\nan IDREF cannot cross that boundary, and the plain `element.aria*Elements`\nreflection drops the reference where `ElementInternals` keeps it. Older\nengines have neither, and assigning to a property they do not implement is a\nsilent no-op rather than an error, so the guard is what makes the absence\nvisible to anything reading this.\n\nOmitted keys are left alone, so a component that sets its role once in\n`willUpdate` and its references later in `updated` does not have to repeat\nitself or risk clearing what the other call wrote."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "hostAria",
+          "declaration": {
+            "name": "hostAria",
+            "module": "src/utils/host-aria/host-aria.ts"
           }
         }
       ]

@@ -40,6 +40,10 @@ for (const file of walk(join(root, 'src'))) {
 
 const sorted = [...tags].sort()
 const selector = sorted.map((tag) => `${tag}:not(:defined)`).join(',\n')
+/* Every tag, whether or not it has an `align` of its own. A component without
+   one never matches, and the point is that a component that gains one later is
+   already covered. */
+const aligned = sorted.map((tag) => `${tag}[align]`).join(',\n')
 
 writeFileSync(
   join(root, 'elements.css'),
@@ -59,6 +63,26 @@ writeFileSync(
  */
 ${selector} {
   visibility: hidden;
+}
+
+/* \`align\` is a legacy presentational hint, and a browser applies it to any
+ * element it appears on, including one it has never heard of. So a component
+ * with an \`align\` property for its own layout silently gets \`text-align\` as
+ * well: every \`<helix-flex align="center">\` was centring its text, which is a
+ * thing nobody asked for and nothing in the component could be blamed for.
+ *
+ * Neutralised here rather than in each component, which is where it was. Flex
+ * and Grid both remembered and both were right, and nothing would have told the
+ * next one. Enumerated for the same reason the rule above is: CSS cannot select
+ * "any custom element".
+ *
+ * \`:where()\` keeps this at zero specificity, so a consumer setting
+ * \`text-align\` on the same element still wins.
+ */
+:where(
+${aligned}
+) {
+  text-align: inherit;
 }
 `,
 )

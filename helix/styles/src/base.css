@@ -594,7 +594,17 @@ helix-toggle[disabled]::part(item) {
  * `aria-controls` pointing at a panel, and a tab that controls nothing tells a
  * screen-reader user to expect something that never arrives.
  */
-[data-nav-item] {
+/* Either the recipe or a link inside a nav bar, which is the same thing said
+   two ways so that neither has to be written by script.
+ 
+   `helix-nav-bar a` is what makes this work on the server. The attribute was
+   put onto the anchors by the component after it upgraded, so a server-rendered
+   nav arrived unstyled and restyled itself a frame later, and a React consumer
+   who wrote the attribute themselves got a hydration mismatch for their
+   trouble. A descendant selector needs no script and is true the moment the
+   markup is parsed. The recipe stays for a destination that is not in a nav
+   bar. */
+:where([data-nav-item], helix-nav-bar a) {
   align-items: center;
   block-size: 100%;
   border-radius: var(--helix-radii-sm);
@@ -611,7 +621,7 @@ helix-toggle[disabled]::part(item) {
   white-space: nowrap;
 }
 
-[data-nav-item]:hover {
+:where([data-nav-item], helix-nav-bar a):hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);
 }
@@ -622,13 +632,13 @@ helix-toggle[disabled]::part(item) {
    and a fill here as well would mean two things saying the same thing. Weight
    and full-strength color are what make the current page legible before the
    marker has been measured, which cannot happen on the server. */
-[data-nav-item][aria-current="page"] {
+:where([data-nav-item], helix-nav-bar a)[aria-current="page"] {
   color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-semibold);
 }
 
 /* Above the marker, which sits behind every item. */
-[data-nav-item] {
+:where([data-nav-item], helix-nav-bar a) {
   position: relative;
   z-index: var(--helix-layer-raised);
 }

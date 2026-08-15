@@ -1,4 +1,4 @@
-import { customElement, HelixChangeEvent, HelixElement, MixinField } from '@helix-io/core'
+import { customElement, HelixChangeEvent, HelixElement, hostAria, MixinField } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
@@ -129,10 +129,10 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.role = 'group'
-    /* A string as well as the element reference `linkHost` sets, because this
-       is the half a server can write. */
-    this.internals.ariaLabel = this.label || null
+    /* The string half, which is what a server can write. `linkHost` adds the
+       element references on the client, and those win where a consumer slotted
+       a label richer than a string. */
+    hostAria(this.internals, { label: this.label, role: 'group' })
   }
 
   protected override updated(changed: PropertyValues): void {

@@ -54,6 +54,7 @@ export {
   deepActiveElement,
   focusableElements,
 } from './utils/focusable-elements/focusable-elements.js'
+export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export {
   type ControlledChangeOptions,
   requestControlledChange,
