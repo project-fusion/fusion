@@ -1,0 +1,16 @@
+<!-- A disabled segment stays in the track rather than being dropped from it, so
+     the control keeps its shape and the arrow keys pass over it. -->
+<helix-flex direction="column" gap="lg">
+  <helix-toggle-group hint="Hint" label="Label" value="one">
+    <helix-toggle value="one">Chosen</helix-toggle>
+    <helix-toggle value="two">Not chosen</helix-toggle>
+    <helix-toggle disabled value="three">Disabled</helix-toggle>
+  </helix-toggle-group>
+
+  <!-- Named without being shown, for a control sitting where its purpose is
+       already plain: a toolbar, or a row of chrome. -->
+  <helix-toggle-group hide-label label="Label" value="two">
+    <helix-toggle value="one">Option One</helix-toggle>
+    <helix-toggle value="two">Option Two</helix-toggle>
+  </helix-toggle-group>
+</helix-flex>

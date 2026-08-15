@@ -1,0 +1,23 @@
+<helix-flex direction="column" gap="lg">
+  <helix-input hint="Hint" label="Label" placeholder="Placeholder"></helix-input>
+  <helix-input label="Label" value="Filled in"></helix-input>
+  <helix-input hint="Hint" label="Label" required value="Required"></helix-input>
+
+  <!-- Still readable and still submitted. A read-only field is not a disabled
+       one: it is a value the reader may take and may not change. -->
+  <helix-input label="Label" read-only value="Read only"></helix-input>
+  <helix-input disabled label="Label" value="Disabled"></helix-input>
+
+  <!-- The message takes the hint's place, so the field is one line of small
+       text either way and nothing under it moves when something goes wrong. -->
+  <helix-input
+    feedback="Something is wrong with this"
+    hint="Hint"
+    label="Label"
+    value="Invalid"
+  ></helix-input>
+
+  <!-- Named without being shown, for a field whose purpose the page already
+       makes plain. The label is still there and still read. -->
+  <helix-input hide-label label="Search" placeholder="Hidden label"></helix-input>
+</helix-flex>
