@@ -13,18 +13,22 @@
  * so a theme can retint the mark without the SVG being edited.
  */
 export function FusionLogo({
+  className = 'fusionLogo',
   size = '1.75rem',
   title = 'Fusion',
 }: {
+  className?: string
   size?: string
   title?: string
 }) {
   return (
     <svg
-      aria-label={title}
+      aria-hidden={title ? undefined : 'true'}
+      aria-label={title || undefined}
+      className={className}
       fill="none"
       height={size}
-      role="img"
+      role={title ? 'img' : 'presentation'}
       style={{ display: 'block' }}
       viewBox="0 0 256 256"
       width={size}

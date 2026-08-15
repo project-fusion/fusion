@@ -292,6 +292,20 @@ helix-app-header {
  * and neither right here: a tool runs to the window, and nothing under this
  * header scrolls the document, so the border would never arrive. Set from the
  * outer tree on the host, which the cascade lets win in both scroll states. */
+/* The mark takes the brand.
+ *
+ * Its gradients were declared against `--logo-color-*` with grey literals as
+ * fallbacks, exactly so a theme could retint it without the SVG being touched,
+ * and nothing had ever taken them up. `primary` is the brand blue and follows
+ * the colour mode on its own; the light stop is derived from it rather than
+ * picked, so the two ends of the gradient cannot drift apart when the seed
+ * moves. */
+.fusionLogo {
+  --logo-color-from: var(--helix-color-primary-subtle);
+  --logo-color-mid: var(--helix-color-primary);
+  --logo-color-to: var(--helix-color-primary-hover);
+}
+
 .workbenchHeader {
   --app-header-inset: var(--helix-space-md);
   --app-header-max-inline-size: none;

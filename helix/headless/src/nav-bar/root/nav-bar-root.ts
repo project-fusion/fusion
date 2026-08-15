@@ -82,6 +82,26 @@ export class HelixBaseNavBar extends HelixElement {
   private watch(): void {
     this.observer?.disconnect()
     this.current?.disconnect()
+
+    /* The recipe goes on, rather than being asked for.
+     *
+     * `data-nav-item` is what the base layer styles a destination with, and it
+     * was the consumer's to remember. Forgetting it is silent and total: the
+     * links keep working and come out as bare underlined anchors, and the
+     * marker measures boxes that were never laid out as items. Measured on the
+     * app header's own example, which forgot it, the links rendered at fifteen
+     * pixels in link blue as `display: block`.
+     *
+     * These are already this component's items. It reads them, observes them,
+     * and measures them for the marker, so marking them is the same claim made
+     * once more rather than a new one. Written rather than reflected, and
+     * client-side, so a server-rendered nav is unstyled for the moment before
+     * upgrade unless the consumer wrote it too, which stays worth doing and is
+     * idempotent with this. */
+    for (const item of this.items) {
+      item.setAttribute('data-nav-item', '')
+    }
+
     this.place()
 
     this.observer = new ResizeObserver(() => this.place())

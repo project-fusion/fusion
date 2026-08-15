@@ -9,15 +9,29 @@
   margin: var(--helix-space-none);
 }
 
-/* The passage itself, not a wrapper: the quoted content is slotted straight
-   into the blockquote, so the type lands on whatever the consumer wrote. */
-slot:not([name])::slotted(*) {
+/* On the slot, not on what was slotted into it.
+ *
+ * `::slotted()` matches elements and nothing else, so a quote written as bare
+ * text between the tags got none of this: measured, the component's own example
+ * rendered at fifteen pixels and weight four hundred where a quote wrapped in a
+ * paragraph got twenty-four and five hundred. The example was showing the
+ * component not working, and the plainest way to write a quote was the one way
+ * that failed.
+ *
+ * Every property here is inherited, and inherited properties set on a slot
+ * reach its assigned nodes through the flattened tree, text nodes included. The
+ * margin is the exception, and it is the one that has to stay on the element,
+ * because there is no margin on a text node to remove. */
+slot:not([name]) {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-display);
   font-size: var(--blockquote-size, var(--helix-text-xl));
   font-weight: var(--helix-weight-medium);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
+}
+
+slot:not([name])::slotted(*) {
   margin: var(--helix-space-none);
 }
 

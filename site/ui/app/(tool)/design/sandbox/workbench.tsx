@@ -553,11 +553,18 @@ export function SandboxWorkbench({ families }: Props) {
           this is a tool, so the row runs to the window rather than to the
           site's text column. */}
       <helix-app-header class="workbenchHeader">
-        {/* The mark, and the way out. No trail beside it: the rail already
-            says which component and which example, and a breadcrumb repeating
-            it is a second answer to a question nobody asked twice. */}
-        <a aria-label="Fusion" data-link="quiet" href="/design" slot="start">
-          <FusionLogo size="1.25rem" />
+        {/* The mark and the name, and the way out. No trail beside them: the
+            rail already says which component and which example, and a
+            breadcrumb repeating it is a second answer to a question nobody
+            asked twice.
+
+            The name is the accessible one, so the mark beside it is decoration
+            rather than a second reading of the same word. */}
+        <a data-link="quiet" href="/design" slot="start">
+          <helix-flex align="center" gap="2xs" inline>
+            <FusionLogo size="1.25rem" title="" />
+            <helix-text appearance="body-strong">Fusion</helix-text>
+          </helix-flex>
         </a>
 
         {/* What is about the site rather than the sandbox: how the whole thing
