@@ -140,8 +140,23 @@ export class HelixBaseToggleGroup extends HelixFormElement {
     if (!indicator) {
       return
     }
-    indicator.style.setProperty('--_indicator-x', `${box.left - own.left}px`)
-    indicator.style.setProperty('--_indicator-y', `${box.top - own.top}px`)
+    /* Less the border, because the two boxes are not the same box.
+     *
+     * `getBoundingClientRect` gives the border box, and an absolutely
+     * positioned element is placed against its containing block's *padding*
+     * box, which starts one border in. So an offset measured from the outside
+     * and applied from the inside lands a border-width late on both axes: the
+     * thumb sat a pixel below and a pixel right of the segment it marks, and in
+     * a forty pixel control holding a thirty pixel thumb that is six above and
+     * four below. Even gaps are the whole job of a thing that sits in a groove,
+     * and a two pixel difference is small enough to read as "the spacing is
+     * off" without being obviously a misplacement.
+     *
+     * `clientTop` and `clientLeft` are the border widths, which is exactly the
+     * difference between the two origins.
+     */
+    indicator.style.setProperty('--_indicator-x', `${box.left - own.left - this.clientLeft}px`)
+    indicator.style.setProperty('--_indicator-y', `${box.top - own.top - this.clientTop}px`)
     indicator.style.setProperty('--_indicator-w', `${box.width}px`)
     indicator.style.setProperty('--_indicator-h', `${box.height}px`)
     indicator.toggleAttribute('data-placed', true)
