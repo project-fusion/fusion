@@ -128,16 +128,20 @@
 /* The three nodes the field mixin renders. Same parts on every control, so this
    block is the same block everywhere and only the placement above it differs. */
 
+/* No `display: block` and no bottom padding, both of which came in with the
+   shared block and belong to a label that sits *above* a control. This one sits
+   beside one, in a row centred on its items, and four pixels of padding under
+   the text makes the label's box four pixels taller than its ink: centring the
+   box then puts the ink two pixels high, and the switch reads as sitting low
+   next to its own label. Which is what was reported, and what the measurement
+   missed, because the boxes were aligned to the pixel and the letters were not.
+
+   The checkbox never had this, because its copy of the block predates the
+   padding. That is the fault worth naming: the padding was added for the input
+   and every control that took the block afterwards took it too, whether or not
+   its label was above anything. */
 [part="label"] {
   color: var(--helix-color-foreground);
-  display: block;
-  /* On top of the stack's own gap, so the label sits a step further from the
-     control than the hint under it does. The two distances are not the same
-     job: a label names the thing below it and wants a beat of air to read as a
-     heading for it, while a hint is a continuation of the control it follows
-     and belongs close to it. Padding rather than a larger gap, which would move
-     both. */
-  padding-block-end: var(--helix-space-2xs);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
