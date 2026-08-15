@@ -12597,13 +12597,11 @@
             },
             {
               "kind": "field",
-              "name": "page",
-              "type": {
-                "text": "HelixBaseMenuItem | null"
-              },
+              "name": "drilldown",
               "privacy": "private",
-              "default": "null",
-              "description": "The item whose submenu is showing, if any.",
+              "readonly": true,
+              "default": "new DrilldownController<HelixBaseMenuItem>(this, { isRow: (element: Element): boolean => 'isMenuItem' in element && element.isMenuItem === true, root: () => [...this.children].filter((child) => child.slot !== 'trigger'), slot: 'submenu', })",
+              "description": "Which page is showing, and what is on it.\n\nThis was a `page` field, a title getter and an items getter written here.\nNone of them were about menus: a settings panel or a navigation tree wants\nthe same thing, and could not have it without being a menu. The controller\nholds the same shape, so the port is a rename rather than a rewrite, and it\nadds a real stack: `back()` returns one level instead of to the root, which\nthis could not do because it only ever went two deep.",
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -12652,20 +12650,6 @@
                 "text": "HTMLElement | null"
               },
               "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseMenu",
-                "module": "src/menu/root/menu-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "pageLabel",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "description": "What the page showing is called.\n\nThe item's own text and not its subtree: a row that opens a page contains\nthat page's rows, so `textContent` would read back the whole submenu.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseMenu",

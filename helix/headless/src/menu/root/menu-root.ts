@@ -1,6 +1,7 @@
 import {
   customElement,
   DismissController,
+  DrilldownController,
   FloatingController,
   HelixElement,
   MixinControllerOpen,
@@ -9,7 +10,7 @@ import {
 } from '@helix-io/core'
 import { caretLeft } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixBaseMenuItem } from '../item/menu-item.js'
 
@@ -69,9 +70,21 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
 
-  /** The item whose submenu is showing, if any. */
-  @state()
-  private page: HelixBaseMenuItem | null = null
+  /**
+   * Which page is showing, and what is on it.
+   *
+   * This was a `page` field, a title getter and an items getter written here.
+   * None of them were about menus: a settings panel or a navigation tree wants
+   * the same thing, and could not have it without being a menu. The controller
+   * holds the same shape, so the port is a rename rather than a rewrite, and it
+   * adds a real stack: `back()` returns one level instead of to the root, which
+   * this could not do because it only ever went two deep.
+   */
+  private readonly drilldown = new DrilldownController<HelixBaseMenuItem>(this, {
+    isRow: (element: Element): boolean => 'isMenuItem' in element && element.isMenuItem === true,
+    root: () => [...this.children].filter((child) => child.slot !== 'trigger'),
+    slot: 'submenu',
+  })
 
   private readonly dismiss = new DismissController(this, {
     // The host is `display: contents`, so it has no box a press can land in.
@@ -128,28 +141,9 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
     return this.renderRoot.querySelector<HTMLElement>('[part="menu"]')
   }
 
-  /**
-   * What the page showing is called.
-   *
-   * The item's own text and not its subtree: a row that opens a page contains
-   * that page's rows, so `textContent` would read back the whole submenu.
-   */
-  private get pageLabel(): string {
-    return [...(this.page?.childNodes ?? [])]
-      .filter((node) => node.nodeType === Node.TEXT_NODE)
-      .map((node) => node.textContent?.trim() ?? '')
-      .filter(Boolean)
-      .join(' ')
-  }
-
   /** The items on the page that is showing, which is what the keys move over. */
   private get items(): HelixBaseMenuItem[] {
-    const source = this.page
-      ? [...this.page.children].filter((child) => child.slot === 'submenu')
-      : [...this.children].filter((child) => child.slot !== 'trigger')
-    return source.filter(
-      (child): child is HelixBaseMenuItem => 'isMenuItem' in child && child.isMenuItem === true,
-    )
+    return this.drilldown.rows
   }
 
   /** Opens the menu. */
@@ -173,25 +167,31 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
     this.surface?.hidePopover?.()
     this.floating.stop()
     this.dismiss.deactivate()
-    this.page = null
+    this.drilldown.reset()
     this.trigger.focus()
   }
 
   /** Shows an item's submenu in place of the current page. */
   private enter(item: HelixBaseMenuItem): void {
-    this.page = item
+    if (!this.drilldown.enter(item)) {
+      return
+    }
     this.updateComplete.then(() => this.items[0]?.focus())
   }
 
   /** Returns to the page above, or closes when there is none. */
   private leave(): void {
-    if (this.page === null) {
+    if (this.drilldown.atRoot) {
       this.hide()
       return
     }
-    const leaving = this.page
-    this.page = null
-    this.updateComplete.then(() => leaving.focus())
+    /* Held before going back, because focus returns to the row that opened the
+       page being left: a reader who drills in and comes straight out should be
+       on the row they pressed, not at the top of a list they have already
+       read. */
+    const leaving = this.drilldown.page
+    this.drilldown.back()
+    this.updateComplete.then(() => leaving?.focus())
   }
 
   private readonly handleSelect = (event: Event): void => {
@@ -290,12 +290,12 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
       if (item.isMenuItem !== true) {
         continue
       }
-      item.onPage = this.page === null
-      item.showingSubmenu = this.page === child
+      item.onPage = this.drilldown.atRoot
+      item.showingSubmenu = this.drilldown.page === child
       for (const nested of child.children) {
         const inner = nested as HelixBaseMenuItem
         if (inner.isMenuItem === true) {
-          inner.onPage = this.page === child
+          inner.onPage = this.drilldown.page === child
         }
       }
     }
@@ -308,14 +308,14 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
         popover="manual"
         role="menu"
         aria-label=${this.label}
-        data-drilled=${this.page === null ? nothing : ''}
+        data-drilled=${this.drilldown.atRoot ? nothing : ''}
         ?hidden=${!this.isOpen}
       >
         ${
           // A header rather than a row in the list. The way back is not one of
           // the things on this page, and putting it in the list means an arrow
           // press lands on it as though it were.
-          this.page === null
+          this.drilldown.atRoot
             ? nothing
             : html`<div part="header">
                 <button
@@ -328,7 +328,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
                     ${unsafeSVG(caretLeft.content)}
                   </svg>
                 </button>
-                <span part="title">${this.pageLabel}</span>
+                <span part="title">${this.drilldown.label}</span>
               </div>`
         }
         <slot></slot>
