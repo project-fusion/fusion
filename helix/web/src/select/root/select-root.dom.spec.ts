@@ -103,6 +103,21 @@ if (hasLayout()) {
     expect((part(host, 'surface') as HTMLElement).style.position).toBe('fixed')
   })
 
+  test('the panel takes the trigger"s width, and the content is its floor', async () => {
+    /* Two rules in one declaration, and the second is what stops a long option
+       from wrapping to fit a field it has no relationship to. The panel has no
+       inline padding of its own, so its width is the rows" width exactly. */
+    const host = (await select('open')) as unknown as HTMLElement
+    const surface = part(host, 'surface') as HTMLElement
+    const trigger = part(host, 'trigger') as HTMLElement
+    const style = getComputedStyle(surface)
+    expect(style.minInlineSize).toBe('max-content')
+    expect(style.paddingInline).toBe('0px')
+    expect(surface.getBoundingClientRect().width).toBeGreaterThanOrEqual(
+      trigger.getBoundingClientRect().width,
+    )
+  })
+
   test('the panel is told how wide its trigger is, because CSS cannot ask', async () => {
     // `min-inline-size: 100%` on a `position: fixed` panel is the viewport, so
     // the list came out the full width of the window. The controller publishes
