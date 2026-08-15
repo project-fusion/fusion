@@ -702,6 +702,7 @@ export function SandboxWorkbench({ families }: Props) {
                 placement="bottom"
               >
                 <helix-icon-button
+                  class="railToggle"
                   label={showRail ? 'Hide examples' : 'Show examples'}
                   onClick={() => setShowRail((open) => !open)}
                 >

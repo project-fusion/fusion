@@ -317,6 +317,18 @@ helix-app-header {
   grid-template-columns: minmax(0, 1fr);
 }
 
+/* Mirrored, because the glyph draws its panel against the leading edge and the
+   rail it switches is against the trailing one. An icon of a thing that has a
+   side is a picture of that side, so pointing at the wrong one is the same
+   mistake as a chevron facing the wrong way.
+
+   Here rather than in the icon, which is a picture and has no opinion about
+   which way round it should be shown. If a second one of these turns up it
+   earns a property; one does not. */
+.railToggle helix-icon {
+  scale: -1 1;
+}
+
 .workbenchBody helix-sandbox {
   block-size: 100%;
   min-inline-size: 0;
