@@ -48,6 +48,19 @@
  * in Chrome 148, and `:not(:has(...))` inside it is refused for the same
  * reason, which is the form that actually shipped.
  *
+ * **A `:host([attr])` for an attribute no class declares.** The selector works,
+ * which is what makes it worse than a dead one: the attribute is a real API
+ * that reaches no manifest, no JSX type and no documentation page, so the only
+ * way to find it is to read the stylesheet. `appearance` on the toggle group
+ * was exactly this, branching on `[appearance="filled"]` and on the attribute
+ * being absent, for as long as the component had existed.
+ *
+ * Attribute names are resolved the way Lit resolves them: a property's own name
+ * lowercased, or the explicit `attribute:` where one is given, gathered through
+ * `extends` and through every mixin in the clause. `data-` is exempt, because
+ * those are written imperatively rather than declared, which is the whole
+ * reason they are `data-`.
+ *
  * This one is written down in the area rules and shipped anyway. The drawer
  * hid its header with `:host(:not(:has([slot="header"])))`, the rule did
  * nothing, and every drawer with no header painted a hairline across its top
@@ -225,6 +238,79 @@ for (const tier of TIERS) {
             'which a value written as bare text never receives. Move those onto the slot itself.',
         )
       }
+    }
+  }
+}
+
+/* What each class declares as an attribute, by the rules Lit uses: the property
+   name lowercased, and the explicit `attribute:` where one is given. */
+const attributes = new Map()
+
+for (const tier of TIERS) {
+  for (const file of sources(tier)) {
+    const text = readFileSync(file, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '')
+    for (const [, name] of text.matchAll(/export (?:class|const) (\w+)/g)) {
+      if (!attributes.has(name)) {
+        attributes.set(name, new Set())
+      }
+    }
+    const owner = [...text.matchAll(/export (?:class|const) (\w+)/g)].at(-1)?.[1]
+    if (!owner) {
+      continue
+    }
+    const declared = attributes.get(owner)
+    /* Each decorator with the property that follows it. `attribute: false` opts
+       out of having one at all, and `attribute: 'x'` names it. */
+    for (const [, options, property] of text.matchAll(
+      /@property\(([^)]*)\)\s*(?:override\s+)?(\w+)/g,
+    )) {
+      const explicit = options.match(/attribute:\s*'([^']+)'/)
+      if (/attribute:\s*false/.test(options)) {
+        continue
+      }
+      declared?.add(explicit ? explicit[1] : property.toLowerCase())
+    }
+  }
+}
+
+/** Every attribute a class may be selected on, including what it inherits. */
+const attributesOf = (name, seen = new Set()) => {
+  if (!name || seen.has(name)) {
+    return new Set()
+  }
+  seen.add(name)
+  const own = attributes.get(name) ?? new Set()
+  const inherited = (bases.get(name) ?? []).flatMap((parent) => [...attributesOf(parent, seen)])
+  return new Set([...own, ...inherited])
+}
+
+/* Written imperatively rather than declared, which is what `data-` is for, plus
+   the handful the platform owns. */
+const NOT_PROPERTIES = /^(?:data-|aria-)|^(?:dir|disabled|hidden|id|lang|slot|part|popover)$/
+
+for (const tier of TIERS) {
+  for (const sheet of stylesheets(tier)) {
+    const css = readFileSync(sheet, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    const sibling = sheet.replace(/\.css$/, '.ts')
+    const owner = [...fileOf].find(([, path]) => path === sibling)?.[0]
+    if (!owner) {
+      continue
+    }
+    const available = attributesOf(owner)
+    const used = new Set(
+      [...css.matchAll(/:host\([^)]*?\[([a-z-]+)[\]=]/g)].map(([, name]) => name),
+    )
+    for (const attribute of [...used].sort()) {
+      if (NOT_PROPERTIES.test(attribute) || available.has(attribute)) {
+        continue
+      }
+      problems.push(
+        `${sheet}: \`:host([${attribute}])\` selects an attribute ${owner} does not declare. ` +
+          'It works, which is the problem: it is an API in a stylesheet and nowhere else, ' +
+          'so it reaches no manifest, no JSX type and no documentation page.',
+      )
     }
   }
 }

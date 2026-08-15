@@ -432,8 +432,29 @@ wrappers drift from the element API the first time someone adds a property.
 - **Namespaces mean composition, never variation.** `Card.Root` contains
   `Card.Header`. An icon-only button is not a part of Button, so `IconButton` is
   top-level. Variants are props; alternatives are separate components.
-- **Groups are parts where homogeneous** (`Radio.Group`, `Checkbox.Group`), and
-  separate where not (`Toolbar` holds buttons, dropdowns, and inputs).
+- **A group is a part when it is the control, and a family when it arranges
+  them.** The test is whether the group reports a form value.
+
+  `Radio.Group` and `Toggle.Group` do. They own the `name`, the `value` and the
+  validity, and a lone radio is not a control at all: it is an answer to one. The
+  group is what the family is about, so it is a part of it, and the member has
+  nowhere else to be.
+
+  `Checkbox Group` and `Button Group` do not, and neither calls `setFormValue`.
+  Each checkbox is form-associated and submits itself; the group adds
+  `role="group"`, a shared name and one place to read the set. A button needs no
+  group at all. Both are their own families, because their members are complete
+  controls that the family does not need the group to explain.
+
+  *Corrected 15 Aug 2026.* This read "groups are parts where homogeneous", which
+  is a fact about the members rather than about the group, and by it both
+  `Checkbox Group` and `Button Group` were violations. Neither is: the code was
+  following the better rule and the rule was the thing that had drifted. A set of
+  checkboxes and a set of radios are equally homogeneous and are not the same
+  kind of thing, which is what "homogeneous" could not see.
+
+  A container holding mixed content is a family for the older reason as well:
+  `Toolbar` holds buttons, dropdowns and inputs, and is about none of them.
 - **Skip `readonly` members.** A getter reads as a field in the manifest but
   assigning to it throws.
 - **Components carry their part** (`DisclosureRoot`), because the namespace
