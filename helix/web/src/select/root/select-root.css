@@ -96,7 +96,7 @@
      rather than a pill inset from its edges: the highlight lines up with the
      edge the eye is already following down the list. The block padding stays,
      because the first and last rows still want air above and below them. */
-  padding-block: var(--helix-space-sm);
+  padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-none);
   position: absolute;
   z-index: var(--helix-layer-overlay);
