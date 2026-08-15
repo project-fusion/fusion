@@ -310,6 +310,13 @@ helix-app-header {
   min-block-size: 0;
 }
 
+/* With the rail switched off there is one column, and the sandbox takes the
+   window. The track has to go rather than the element inside it: a `17rem`
+   column with nothing in it is seventeen rems of nothing. */
+.workbenchBody[data-rail="hidden"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .workbenchBody helix-sandbox {
   block-size: 100%;
   min-inline-size: 0;

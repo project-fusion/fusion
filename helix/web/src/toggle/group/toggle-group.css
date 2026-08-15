@@ -44,18 +44,24 @@
   --_toggle-radius: calc(var(--helix-radii-lg) - var(--helix-border-thin) - var(--helix-space-2xs));
 }
 
-/* Equal segments, which is what a segmented control is. Without this the items
-   sat at their label widths and the track ran on past them: in a drawer, where
-   the group stretches to the column, "System Light Dark" bunched at the leading
-   edge with half the groove empty behind them.
-
-   `flex-basis: 0` rather than `auto`, so the share is equal rather than
-   proportional to the label. That also keeps the travelling thumb one width as
-   it moves, where proportional segments make it resize on every change. In an
-   inline context, where there is no free space to share, equal shares resolve
-   to the width of the widest label, which is the same control either way. */
+/* The segments share what is left over, and each label keeps the same space
+   around it.
+ *
+ * `flex-basis: auto` and not `0`, which is the whole point. From zero the
+ * shares are equal and the segments come out the same width, so the longest
+ * label nearly touches its edges while the shortest floats in the middle of
+ * its own: three thirds of a track with three different amounts of air in them,
+ * which reads as spacing that was not thought about. From `auto` each segment
+ * starts at its label and the free space is divided evenly between them, so
+ * every label carries an identical margin and the segments differ instead,
+ * which is the thing nobody looks at.
+ *
+ * Still fills the track. `flex-grow: 1` is what does that, and it was doing it
+ * before: the bunched-up row this replaced had no grow at all. The thumb now
+ * changes width as it travels, which is why `inline-size` has always been in
+ * its transition. */
 ::slotted(helix-toggle) {
-  flex: 1 1 0;
+  flex: 1 1 auto;
 }
 
 /* One marker that travels. Its geometry is measured from the selected item and

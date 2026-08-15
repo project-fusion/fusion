@@ -81,6 +81,22 @@ export class HelixBaseToggleGroup extends HelixFormElement {
     )
   }
 
+  /**
+   * Watches the group and every item it currently holds.
+   *
+   * Called again on `slotchange`, because the set was read once at first paint:
+   * an item added later was measured by nothing, so a group whose options
+   * arrive with the data had a thumb that stopped following the moment one of
+   * them changed width. Observing the same element twice is a no-op, so there
+   * is nothing to unwind first.
+   */
+  private watch(): void {
+    this.observer?.observe(this)
+    for (const item of this.items) {
+      this.observer?.observe(item)
+    }
+  }
+
   private readonly handleSelection = (event: Event): void => {
     this.value = (event as CustomEvent<{ value: string }>).detail.value
   }
@@ -177,10 +193,7 @@ export class HelixBaseToggleGroup extends HelixFormElement {
     // The indicator has to follow a label that rewrapped or a font that loaded
     // late, neither of which fires an event of its own.
     this.observer = new ResizeObserver(() => this.place())
-    this.observer.observe(this)
-    for (const item of this.items) {
-      this.observer.observe(item)
-    }
+    this.watch()
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -211,7 +224,12 @@ export class HelixBaseToggleGroup extends HelixFormElement {
 
   protected override render(): TemplateResult {
     return html`<div part="indicator" aria-hidden="true"></div>
-      <slot @slotchange=${() => this.place()}></slot>`
+      <slot
+        @slotchange=${() => {
+          this.watch()
+          this.place()
+        }}
+      ></slot>`
   }
 }
 

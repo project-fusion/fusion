@@ -155,6 +155,9 @@ export function SandboxWorkbench({ families }: Props) {
   // shut. Once the button is pressed it is an answer, and it holds.
   const [expandAll, setExpandAll] = useState<boolean | null>(null)
   const [railOpen, setRailOpen] = useState(false)
+  // The rail on a wide screen, which is a different thing from the drawer a
+  // phone gets: one is a region of the layout and the other is an overlay.
+  const [showRail, setShowRail] = useState(DEFAULTS.panes.includes('rail'))
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [narrow, setNarrow] = useState(false)
 
@@ -173,6 +176,7 @@ export function SandboxWorkbench({ families }: Props) {
     setShowEditor(url.panes.includes('editor'))
     setShowPanel(url.panes.includes('panel'))
     setShowStatus(url.panes.includes('status'))
+    setShowRail(url.panes.includes('rail'))
     setSiteTheme(document.documentElement.dataset.colorMode === 'light' ? 'light' : 'dark')
 
     const stored = readArrangement()
@@ -317,6 +321,9 @@ export function SandboxWorkbench({ families }: Props) {
     if (showPanel) {
       panes.push('panel')
     }
+    if (showRail) {
+      panes.push('rail')
+    }
     if (showStatus) {
       panes.push('status')
     }
@@ -338,6 +345,7 @@ export function SandboxWorkbench({ families }: Props) {
     previewTheme,
     showEditor,
     showPanel,
+    showRail,
     showStatus,
     syntax,
   ])
@@ -557,7 +565,7 @@ export function SandboxWorkbench({ families }: Props) {
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
-      <div className="workbenchBody">
+      <div className="workbenchBody" data-rail={narrow || showRail ? undefined : 'hidden'}>
         <helix-sandbox
           orientation={narrow ? 'vertical' : 'horizontal'}
           ref={sandbox}
@@ -685,6 +693,21 @@ export function SandboxWorkbench({ families }: Props) {
                   Status bar
                 </helix-menu-item>
               </helix-menu>
+
+              {/* Beside the settings, because it is the same kind of thing: a
+                  switch for a region of the tool rather than anything to do
+                  with the example. */}
+              <helix-tooltip
+                content={showRail ? 'Hide examples' : 'Show examples'}
+                placement="bottom"
+              >
+                <helix-icon-button
+                  label={showRail ? 'Hide examples' : 'Show examples'}
+                  onClick={() => setShowRail((open) => !open)}
+                >
+                  <helix-icon name="sidebar-simple"></helix-icon>
+                </helix-icon-button>
+              </helix-tooltip>
             </helix-toolbar>
           </helix-sandbox-toolbar>
 
@@ -782,7 +805,7 @@ export function SandboxWorkbench({ families }: Props) {
             {tree}
           </helix-drawer>
         ) : (
-          <aside className="examplesRail">{tree}</aside>
+          showRail && <aside className="examplesRail">{tree}</aside>
         )}
       </div>
     </>

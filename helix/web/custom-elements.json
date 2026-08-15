@@ -13764,6 +13764,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Watches the group and every item it currently holds.\n\nCalled again on `slotchange`, because the set was read once at first paint:\nan item added later was measured by nothing, so a group whose options\narrive with the data had a thumb that stopped following the moment one of\nthem changed width. Observing the same element twice is a no-op, so there\nis nothing to unwind first.",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "handleSelection",
               "privacy": "private",

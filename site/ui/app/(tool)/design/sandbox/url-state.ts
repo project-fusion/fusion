@@ -42,7 +42,7 @@ export type Direction = 'ltr' | 'rtl'
 export type Syntax = 'html' | 'tsx'
 
 /** A region of the sandbox that can be turned off. */
-export type Section = 'editor' | 'panel' | 'status'
+export type Section = 'editor' | 'panel' | 'rail' | 'status'
 
 export type SandboxUrlState = {
   /** Colour mode forced on the preview, or null to follow the page. */
@@ -71,14 +71,14 @@ export const DEFAULTS: SandboxUrlState = {
   /* The status bar is off. It reports the caret and the language, which is
      worth having while typing and is noise the rest of the time, so it is
      something to turn on rather than something to dismiss. */
-  panes: ['editor', 'panel'],
+  panes: ['editor', 'panel', 'rail'],
   syntax: 'html',
 }
 
 const LAYOUTS: Layout[] = ['padded', 'centered', 'fullscreen']
 const DIRECTIONS: Direction[] = ['ltr', 'rtl']
 const SYNTAXES: Syntax[] = ['html', 'tsx']
-const SECTIONS: Section[] = ['editor', 'panel', 'status']
+const SECTIONS: Section[] = ['editor', 'panel', 'rail', 'status']
 
 /**
  * One of a known set, or the default.
