@@ -2,6 +2,8 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseCheckboxGroup } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as fieldStyles } from '../../field/field.css.js'
+import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './checkbox-group-root.css.js'
 
 /**
@@ -24,7 +26,7 @@ export class HelixCheckboxGroup extends HelixBaseCheckboxGroup {
   @property({ reflect: true })
   orientation?: 'horizontal'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }
 
 declare global {

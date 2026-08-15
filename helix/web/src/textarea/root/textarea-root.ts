@@ -1,6 +1,8 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseTextarea } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { styles as fieldStyles } from '../../field/field.css.js'
+import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './textarea-root.css.js'
 
 /**
@@ -21,7 +23,7 @@ import { styles } from './textarea-root.css.js'
  */
 @customElement('helix-textarea')
 export class HelixTextarea extends HelixBaseTextarea {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }
 
 declare global {

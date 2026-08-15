@@ -1,6 +1,8 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseCheckbox } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { styles as fieldStyles } from '../../field/field.css.js'
+import { styles as fieldInlineStyles } from '../../field/field-inline.css.js'
 import { styles } from './checkbox-root.css.js'
 
 /**
@@ -24,7 +26,7 @@ import { styles } from './checkbox-root.css.js'
  */
 @customElement('helix-checkbox')
 export class HelixCheckbox extends HelixBaseCheckbox {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [fieldStyles, fieldInlineStyles, styles]
 }
 
 declare global {

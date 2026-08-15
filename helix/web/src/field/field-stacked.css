@@ -1,0 +1,19 @@
+/* A label above its control, which is every field whose control is a box: the
+   input, the textarea, the select, the listbox, the slider, and the three
+   groups. Compose with `field.css`, never instead of it. */
+
+[part="label"] {
+  display: block;
+  /* On top of the stack's own gap, so the label sits a step further from the
+     control than the hint under it does. The two distances are not the same
+     job: a label names the thing below it and wants a beat of air to read as a
+     heading for it, while a hint is a continuation of the control it follows
+     and belongs close to it. Padding rather than a larger gap, which would move
+     both.
+
+     This is the declaration that leaked. It was in the block every control
+     copied, so a beside-label got four pixels of padding under its text, its
+     box came out four pixels taller than its ink, and centring the box put the
+     ink two pixels high. Here it can only reach a control that asked for it. */
+  padding-block-end: var(--helix-space-2xs);
+}

@@ -1,0 +1,26 @@
+/* A label beside its control, which is the checkbox and the switch: a row with
+   a small mark in it, then the words. Compose with `field.css`, never instead
+   of it.
+
+   The label takes neither `display: block` nor a bottom padding, both of which
+   belong to a label above a control. In a row centred on its items, padding
+   under the text makes the label's box taller than its ink and the control
+   reads as sitting low beside its own words.
+
+   The control declares its own width and the indent follows, because the two
+   have to agree and only the control knows the number:
+
+     --_field-control-inline-size: var(--_checkbox-size);
+
+   Left unset the indent is zero, which is wrong rather than harmless, so it is
+   worth saying that a control composing this sheet and not declaring the
+   property gets a hint at the host's own edge. That is what the switch shipped
+   with, and the reason it went unnoticed is that its hint had no rule at all
+   to be wrong. */
+
+[part="hint"],
+[part="feedback"] {
+  /* Lined up under the words rather than under the mark, because the mark is
+     the control and the description is about what the words say. */
+  padding-inline-start: calc(var(--_field-control-inline-size, 0px) + var(--helix-space-xs));
+}

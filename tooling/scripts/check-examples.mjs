@@ -44,8 +44,18 @@ for (const module of JSON.parse(readFileSync(MANIFEST, 'utf8')).modules ?? []) {
 }
 
 const problems = []
-/** Family directories. `src` also holds `index.ts`, which is not one. */
-const all = readdirSync(ROOT).filter((entry) => statSync(join(ROOT, entry)).isDirectory())
+/* Family directories. `src` also holds `index.ts`, which is not one, and
+   directories that are not families either.
+
+   A family is a directory with an `index.ts`, because that is what the barrel
+   exports and what a consumer imports as a subpath. `field/` holds the shared
+   stylesheets the field controls compose and exports nothing, so it is not a
+   family, has no element and no example to show. Naming it here instead would
+   be a list to keep; asking for the file that makes a directory a family is
+   the same question the package's `exports` map asks. */
+const all = readdirSync(ROOT).filter(
+  (entry) => statSync(join(ROOT, entry)).isDirectory() && existsSync(join(ROOT, entry, 'index.ts')),
+)
 const families = all.filter((family) => existsSync(join(ROOT, family, '.examples')))
 
 for (const family of all) {

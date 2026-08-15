@@ -1,6 +1,8 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseRadioGroup } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { styles as fieldStyles } from '../../field/field.css.js'
+import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './radio-group.css.js'
 
 /**
@@ -21,7 +23,7 @@ import { styles } from './radio-group.css.js'
  */
 @customElement('helix-radio-group')
 export class HelixRadioGroup extends HelixBaseRadioGroup {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }
 
 declare global {

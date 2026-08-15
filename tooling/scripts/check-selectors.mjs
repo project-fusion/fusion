@@ -71,7 +71,7 @@
  * Run with `bun run check:selectors` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 
 const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/web/src', 'helix/sandbox/src']
 
@@ -208,20 +208,37 @@ for (const tier of TIERS) {
     if (selected.size === 0) {
       continue
     }
-    /* The class beside it. A stylesheet lives with the component it dresses,
-       so the sibling `.ts` of the same basename is the one that owns it. */
+    /* Who has to render these parts.
+     *
+     * Usually one class, the sibling `.ts` of the same basename, because a
+     * stylesheet lives with the component it dresses.
+     *
+     * A shared sheet has no sibling and is composed instead, so its owners are
+     * whoever imports it. That is not a weaker check but a stronger one: a part
+     * named in `field.css` has to be rendered by every one of the ten controls
+     * that compose it, and a control that stops rendering one fails here rather
+     * than quietly losing a rule. Resolved from the imports rather than from a
+     * list, so composing the sheet is what enrols a component in the check. */
     const sibling = sheet.replace(/\.css$/, '.ts')
-    const owner = [...fileOf].find(([, path]) => path === sibling)?.[0]
-    if (!owner) {
-      problems.push(`${sheet}: no component beside it, so its parts cannot be checked`)
+    let owners = [...fileOf].filter(([, path]) => path === sibling).map(([name]) => name)
+    if (owners.length === 0) {
+      const specifier = basename(sheet, '.css')
+      owners = [...fileOf]
+        .filter(([, path]) => readFileSync(path, 'utf8').includes(`/${specifier}.css.js'`))
+        .map(([name]) => name)
+    }
+    if (owners.length === 0) {
+      problems.push(`${sheet}: nothing owns it, so its parts cannot be checked`)
       continue
     }
     checked += 1
-    const available = partsOf(owner)
-    for (const part of [...selected].sort()) {
-      if (!available.has(part)) {
-        const had = [...available].sort().join(', ') || 'none'
-        problems.push(`${sheet}: [part="${part}"] matches nothing. ${owner} renders: ${had}`)
+    for (const owner of owners) {
+      const available = partsOf(owner)
+      for (const part of [...selected].sort()) {
+        if (!available.has(part)) {
+          const had = [...available].sort().join(', ') || 'none'
+          problems.push(`${sheet}: [part="${part}"] matches nothing. ${owner} renders: ${had}`)
+        }
       }
     }
   }

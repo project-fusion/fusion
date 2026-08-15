@@ -1,6 +1,8 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseSwitch } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { styles as fieldStyles } from '../../field/field.css.js'
+import { styles as fieldInlineStyles } from '../../field/field-inline.css.js'
 import { styles } from './switch-root.css.js'
 
 /**
@@ -35,7 +37,7 @@ import { styles } from './switch-root.css.js'
  */
 @customElement('helix-switch')
 export class HelixSwitch extends HelixBaseSwitch {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [fieldStyles, fieldInlineStyles, styles]
 }
 
 declare global {
