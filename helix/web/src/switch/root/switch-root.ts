@@ -16,12 +16,21 @@ import { styles } from './switch-root.css.js'
  * it and invisible, so the press, the focus and the label forwarding are all
  * the platform's while the picture is ours.
  *
+ * **Its height is `--helix-size-switch`, which is one step above the
+ * checkbox's** at every density rather than the same as it. A checkbox is a box
+ * with a mark in it; a switch is a track with a thumb inside it, and at the
+ * checkbox's height the thumb has two pixels of groove around it and the whole
+ * control reads as a small dash. The width follows the height, so setting
+ * `--switch-height` widens it too and the proportion is not something a
+ * consumer has to keep.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases Toggle switch, On/off
  * @documentation https://helix.fusion.dev/components/switch
  *
- * @cssproperty --switch-width - Length of the track.
+ * @cssproperty --switch-height - Height of the track. The width follows it.
+ * @cssproperty --switch-width - Length of the track, if not the derived one.
  * @cssproperty --switch-on-color - Fill when it is on.
  */
 @customElement('helix-switch')

@@ -4,8 +4,15 @@
   flex-direction: column;
   gap: var(--helix-space-2xs);
 
-  --_switch-height: var(--helix-size-checkbox);
-  --_switch-width: var(--switch-width, calc(var(--helix-size-checkbox) * 1.75));
+  --_switch-height: var(--switch-height, var(--helix-size-switch));
+  /* Derived from the height rather than from the token, which is what keeps the
+     proportion whatever the height turns out to be: a consumer setting
+     `--switch-height` gets a wider switch with it, and the density steps carry
+     the ratio without three widths having to be written down.
+
+     It read the size token twice before, so the two were only in proportion
+     while nothing had touched either. */
+  --_switch-width: var(--switch-width, calc(var(--_switch-height) * 1.75));
   /* The gap around the thumb, named once because three things are derived from
      it and they have to agree: the thumb's size, where it rests, and how far it
      travels. */

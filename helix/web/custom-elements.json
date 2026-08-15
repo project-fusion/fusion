@@ -18095,11 +18095,15 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A thumb travelling in a groove, which is the one place in the library colour\nis used to say \"on\". A checkbox does not, because a tick is legible on its\nown; a switch has no mark, so the fill is the whole of what distinguishes the\ntwo states and there is nothing else for it to be.\n\nThe input itself is the hit target and is drawn as the track, stretched over\nit and invisible, so the press, the focus and the label forwarding are all\nthe platform's while the picture is ours.",
+          "description": "A thumb travelling in a groove, which is the one place in the library colour\nis used to say \"on\". A checkbox does not, because a tick is legible on its\nown; a switch has no mark, so the fill is the whole of what distinguishes the\ntwo states and there is nothing else for it to be.\n\nThe input itself is the hit target and is drawn as the track, stretched over\nit and invisible, so the press, the focus and the label forwarding are all\nthe platform's while the picture is ours.\n\n**Its height is `--helix-size-switch`, which is one step above the\ncheckbox's** at every density rather than the same as it. A checkbox is a box\nwith a mark in it; a switch is a track with a thumb inside it, and at the\ncheckbox's height the thumb has two pixels of groove around it and the whole\ncontrol reads as a small dash. The width follows the height, so setting\n`--switch-height` widens it too and the proportion is not something a\nconsumer has to keep.",
           "name": "HelixSwitch",
           "cssProperties": [
             {
-              "description": "Length of the track.",
+              "description": "Height of the track. The width follows it.",
+              "name": "--switch-height"
+            },
+            {
+              "description": "Length of the track, if not the derived one.",
               "name": "--switch-width"
             },
             {

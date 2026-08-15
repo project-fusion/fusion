@@ -470,6 +470,7 @@ helix-button[disabled]::part(button) {
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-switch: var(--helix-size-switch-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
 }
 
@@ -477,6 +478,7 @@ helix-button[disabled]::part(button) {
   --helix-size-checkbox: var(--helix-size-checkbox-md);
   --helix-size-icon: var(--helix-size-icon-md);
   --helix-size-control: var(--helix-size-control-md);
+  --helix-size-switch: var(--helix-size-switch-md);
   --helix-size-tag: var(--helix-size-tag-md);
 }
 
@@ -484,6 +486,7 @@ helix-button[disabled]::part(button) {
   --helix-size-checkbox: var(--helix-size-checkbox-lg);
   --helix-size-icon: var(--helix-size-icon-lg);
   --helix-size-control: var(--helix-size-control-lg);
+  --helix-size-switch: var(--helix-size-switch-lg);
   --helix-size-tag: var(--helix-size-tag-lg);
 }
 

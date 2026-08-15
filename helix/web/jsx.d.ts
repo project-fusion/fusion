@@ -5301,6 +5301,14 @@ export type CustomElements = {
    * it and invisible, so the press, the focus and the label forwarding are all
    * the platform's while the picture is ours.
    *
+   * **Its height is `--helix-size-switch`, which is one step above the
+   * checkbox's** at every density rather than the same as it. A checkbox is a box
+   * with a mark in it; a switch is a track with a thumb inside it, and at the
+   * checkbox's height the thumb has two pixels of groove around it and the whole
+   * control reads as a small dash. The width follows the height, so setting
+   * `--switch-height` widens it too and the proportion is not something a
+   * consumer has to keep.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -5372,7 +5380,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--switch-width`: Length of the track. (default: `undefined`)
+   * - `--switch-height`: Height of the track. The width follows it. (default: `undefined`)
+   * - `--switch-width`: Length of the track, if not the derived one. (default: `undefined`)
    * - `--switch-on-color`: Fill when it is on. (default: `undefined`)
    *
    * ## CSS Parts
@@ -8458,6 +8467,14 @@ export type CustomElementsSolidJs = {
    * it and invisible, so the press, the focus and the label forwarding are all
    * the platform's while the picture is ours.
    *
+   * **Its height is `--helix-size-switch`, which is one step above the
+   * checkbox's** at every density rather than the same as it. A checkbox is a box
+   * with a mark in it; a switch is a track with a thumb inside it, and at the
+   * checkbox's height the thumb has two pixels of groove around it and the whole
+   * control reads as a small dash. The width follows the height, so setting
+   * `--switch-height` widens it too and the proportion is not something a
+   * consumer has to keep.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -8529,7 +8546,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--switch-width`: Length of the track. (default: `undefined`)
+   * - `--switch-height`: Height of the track. The width follows it. (default: `undefined`)
+   * - `--switch-width`: Length of the track, if not the derived one. (default: `undefined`)
    * - `--switch-on-color`: Fill when it is on. (default: `undefined`)
    *
    * ## CSS Parts
@@ -9466,7 +9484,9 @@ export type CustomCssProperties = {
   "--stat-group-gap"?: string;
   /** Size of the figure. */
   "--stat-value-size"?: string;
-  /** Length of the track. */
+  /** Height of the track. The width follows it. */
+  "--switch-height"?: string;
+  /** Length of the track, if not the derived one. */
   "--switch-width"?: string;
   /** Fill when it is on. */
   "--switch-on-color"?: string;

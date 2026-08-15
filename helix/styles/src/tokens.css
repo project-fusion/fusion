@@ -100,10 +100,10 @@
      there too, which is the same colour: every sunken thing lying on the page
      was painted the page and vanished. Reported on the breadcrumb's hover, and
      never only that, because the announcement, the nav bar's marker, a `<kbd>`
-     and an input's fill are all sunken and all sit on the page. The answer is that in
-     dark a recess reads by coming toward the viewer rather than away, which is
-     what every dark interface does with an input, and which is also the only
-     direction left.
+     and an input's fill are all sunken and all sit on the page. The answer is
+     that in dark a recess reads by coming toward the viewer rather than away,
+     which is what every dark interface does with an input, and which is also
+     the only direction left.
 
      That leaves the toggle group's thumb 0.14 above its track, which has been
      the complaint before. Its shadow is doing the rest of that work now, and
@@ -328,6 +328,24 @@
   --helix-size-checkbox-lg: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-checkbox-md: calc(1.25rem * var(--_helix-seed-density));
   --helix-size-checkbox-sm: calc(1rem * var(--_helix-seed-density));
+  /* Its own step, and one taller than the checkbox at every one of them.
+     Twenty, twenty-four, twenty-eight: the same four pixels a step, offset by
+     one.
+
+     It read `--helix-size-checkbox` before, which is the wrong thing for it to
+     be the same as. A checkbox is a box with a mark in it and is legible at
+     twenty; a switch is a track with a thumb *inside* it, so the same twenty
+     leaves a sixteen pixel thumb with two pixels of groove around it and the
+     whole control reads as a small dash. What the two share is the row they sit
+     in, and a switch one step taller than a checkbox is still a control in the
+     same row, not a different scale.
+
+     The width is derived from this rather than declared, so the proportion
+     holds at every step and through `--switch-height` as well. */
+  --helix-size-switch: var(--helix-size-switch-md);
+  --helix-size-switch-lg: calc(1.75rem * var(--_helix-seed-density));
+  --helix-size-switch-md: calc(1.5rem * var(--_helix-seed-density));
+  --helix-size-switch-sm: calc(1.25rem * var(--_helix-seed-density));
   --helix-size-spinner-md: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-spinner-sm: calc(1rem * var(--_helix-seed-density));
   --helix-size-spinner-lg: calc(2.5rem * var(--_helix-seed-density));
