@@ -1,6 +1,6 @@
 'use client'
 
-import { type RefObject, useEffect, useRef } from 'react'
+import { type RefObject, useEffect, useRef, useState } from 'react'
 
 /**
  * Binds a Helix event to an element, without going through a React prop.
@@ -25,9 +25,21 @@ import { type RefObject, useEffect, useRef } from 'react'
  * The `on*` prop is still right for anything React itself dispatches, native
  * events included: `onClick` on a `<helix-button>` goes through React's own
  * system, which hydration does set up.
+ *
+ * **Pass an element rather than a ref where the element can change.** A
+ * `RefObject` cannot tell anyone that its `.current` moved, so the effect below
+ * binds once and stays bound to whatever was there at mount, detached or not.
+ * The sandbox rendered its examples tree in an `<aside>` on a wide viewport and
+ * in a `<helix-drawer>` on a narrow one, both carrying the same ref: on a
+ * phone, the first commit bound the aside's tree, the media query then swapped
+ * in the drawer's, and every row in it was dead. Measured, an event dispatched
+ * straight at the live tree reached nothing.
+ *
+ * `useElementRef` is the fix at the call site. It holds the node in state, so
+ * the element itself is a dependency and swapping it rebinds.
  */
 export function useHelixEvent<E extends HTMLElement, K extends keyof HTMLElementEventMap>(
-  target: RefObject<E | null>,
+  target: E | RefObject<E | null> | null,
   type: K,
   listener: (event: HTMLElementEventMap[K]) => void,
 ): void {
@@ -35,7 +47,10 @@ export function useHelixEvent<E extends HTMLElement, K extends keyof HTMLElement
   held.current = listener
 
   useEffect(() => {
-    const node = target.current
+    /* An element is its own dependency, so a swap rebinds. A ref is a stable
+       object whose contents this cannot see, which is the older form and is
+       still correct where the element never changes. */
+    const node = target === null ? null : target instanceof HTMLElement ? target : target.current
     if (!node) {
       return
     }
@@ -45,4 +60,20 @@ export function useHelixEvent<E extends HTMLElement, K extends keyof HTMLElement
     node.addEventListener(type, handle)
     return () => node.removeEventListener(type, handle)
   }, [target, type])
+}
+
+/**
+ * Holds an element in state, for a ref whose element can change.
+ *
+ * `ref={setNode}` rather than `ref={someRef}`. React calls a function ref with
+ * the node on attach and with `null` on detach, so state follows the element
+ * and anything depending on it re-runs. The setter from `useState` is stable,
+ * so this does not detach and reattach on every render the way an inline arrow
+ * would.
+ *
+ * Only needed where an element is conditionally rendered or swapped between two
+ * places. A ref is still right for an element that mounts once and stays.
+ */
+export function useElementRef<E extends HTMLElement>(): [E | null, (node: E | null) => void] {
+  return useState<E | null>(null)
 }

@@ -22,7 +22,7 @@ import type {
 } from '@helix-io/web'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
-import { useHelixEvent } from '../../../../lib/use-helix-event'
+import { useElementRef, useHelixEvent } from '../../../../lib/use-helix-event'
 import { PreferencesDrawer } from '../../../preferences'
 import { Wordmark } from '../../../wordmark'
 import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state'
@@ -114,8 +114,12 @@ const resolve = (families: Family[], familySlug: string | null, exampleSlug: str
 export function SandboxWorkbench({ families }: Props) {
   const preview = useRef<HelixSandboxPreview>(null)
   const files = useRef<HelixToggleGroup>(null)
-  const treeRef = useRef<HelixTree>(null)
-  const rail = useRef<HelixDrawer>(null)
+  /* State, not refs. Both of these are rendered in one of two places depending
+     on the viewport, and a `RefObject` cannot tell `useHelixEvent` that its
+     element moved. See the note there: on a phone the tree was bound to the
+     detached wide-viewport copy and every row in it was dead. */
+  const [tree, setTree] = useElementRef<HelixTree>()
+  const [rail, setRail] = useElementRef<HelixDrawer>()
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
   const settings = useRef<HelixMenu>(null)
@@ -306,7 +310,7 @@ export function SandboxWorkbench({ families }: Props) {
       setShowStatus((was) => !was)
     }
   })
-  useHelixEvent(treeRef, 'helix-select', (event) => {
+  useHelixEvent(tree, 'helix-select', (event) => {
     select(event.detail.value)
   })
   useHelixEvent(rail, 'helix-close', () => {
@@ -499,24 +503,69 @@ export function SandboxWorkbench({ families }: Props) {
   const query = filter.trim().toLowerCase()
   const hit = (text: string) => text.toLowerCase().includes(query)
 
-  /* A filter is a request to see what came back, so a narrowed tree opens
-     itself rather than making the reader open each branch to find out. */
-  const open = (slug: string) => query !== '' || (expandAll ?? slug === family.slug)
-
-  /* Driven, not owned.
+  /* The top-level branches, which are the families.
    *
-   * This was a prop on each row, and a prop set at mount is how a consumer says
-   * the state is theirs: the rows this opened would have had their chevrons
-   * stop working, because a controlled item announces and waits to be told.
-   * Opening a branch because a filter matched is an act rather than a claim, so
-   * it is done to the elements and they keep owning themselves. */
+   * `useCallback` with no dependencies, and it has to be: a plain function
+   * declared in the body is a new value every render, so naming it in the
+   * effects below would make them run every render, which is the bug they were
+   * written to fix. It closes over nothing but `treeRef`, which React keeps
+   * stable, and reads `.current` when it is called rather than when it is
+   * made. */
+  const branches = useCallback(
+    (): HelixTreeItem[] => [
+      ...(tree?.querySelectorAll<HelixTreeItem>(':scope > helix-tree-item') ?? []),
+    ],
+    [tree],
+  )
+
+  /* Driven, not owned, and the second half of that took two goes to get right.
+   *
+   * It was a prop on each row, and a prop set at mount is how a consumer says
+   * the state is theirs: those rows had dead chevrons, because a controlled
+   * item announces and waits to be told. So it became an effect writing the
+   * elements, which fixed the chevrons and broke something worse. The effect
+   * had no dependency array, so it ran after *every* render and put every
+   * branch back to what this file thought it should be. Opening a branch
+   * re-rendered the page, the effect ran, and the branch shut again before the
+   * reader's hand left the mouse.
+   *
+   * The rule that was missing: only write when the *reason* to write has
+   * changed. Two effects, because there are two reasons and they are not the
+   * same kind of thing.
+   */
+
+  /* A command about every branch at once. Filtering is a request to see what
+     came back, so a narrowed tree opens itself rather than making the reader
+     open each branch to find out; expand-all is the reader saying it outright.
+     Neither runs while the other is idle, which is what leaves a hand-opened
+     branch alone. */
   useEffect(() => {
-    for (const item of treeRef.current?.querySelectorAll<HelixTreeItem>(
-      ':scope > helix-tree-item',
-    ) ?? []) {
-      item.open = open(item.getAttribute('value') ?? '')
+    if (query === '' && expandAll === null) {
+      return
     }
-  })
+    for (const item of branches()) {
+      item.open = query !== '' || expandAll === true
+    }
+  }, [branches, expandAll, query])
+
+  /* Navigation, which is additive and never closes anything. Arriving at a
+     family shows where you are; it says nothing about the branches you left
+     open on the way, and closing those was the whole bug.
+   *
+   * `item.value`, not `getAttribute('value')`. React assigns a prop as a
+   * *property* on a custom element when the element declares one, so a
+   * `<helix-tree-item value={slug}>` written in JSX carries no attributes at
+   * all: measured, `element.attributes` is empty and `element.value` is the
+   * slug. The attribute form read `null` for every row, so this matched
+   * nothing and the current family never opened itself either. Two bugs in one
+   * effect, and only the loud one was reported. */
+  useEffect(() => {
+    for (const item of branches()) {
+      if (item.value === family.slug) {
+        item.open = true
+      }
+    }
+  }, [branches, family.slug])
 
   /* Every hook is above this, and has to be: an early return past one changes
      how many run, which is the rule React has no way to recover from. The tree
@@ -548,23 +597,15 @@ export function SandboxWorkbench({ families }: Props) {
 
   const allOpen = expandAll ?? false
 
-  /* Also set on the elements, not only through the prop. React writes a prop
-     when its own value changes, and a reader who opened a branch by pressing
-     its chevron changed the element without changing anything React holds: on
-     the next "collapse all" React would see `undefined` before and after, write
-     nothing, and leave that one branch open. The sweep is what makes the button
-     mean every branch. */
+  /* Only the state. The sweep that used to be here is the effect above, which
+     fires on `expandAll` and therefore reaches branches the reader opened by
+     hand as well: those changed the element without changing anything React
+     holds, and that is exactly what the button has to override. */
   const toggleAll = () => {
-    const next = !allOpen
-    setExpandAll(next)
-    for (const item of treeRef.current?.querySelectorAll<HelixTreeItem>(
-      ':scope > helix-tree-item',
-    ) ?? []) {
-      item.open = next
-    }
+    setExpandAll(!allOpen)
   }
 
-  const tree = (
+  const examplesPane = (
     <>
       <helix-flex align="center" class="examplesHeader" data-density="sm" gap="2xs">
         <helix-input
@@ -604,7 +645,7 @@ export function SandboxWorkbench({ families }: Props) {
             Nothing matches {filter}.
           </helix-text>
         ) : (
-          <helix-tree active={activeValue} chevron="end" label="Examples" ref={treeRef}>
+          <helix-tree active={activeValue} chevron="end" label="Examples" ref={setTree}>
             {shown.map((entry) => (
               <helix-tree-item key={entry.slug} value={entry.slug}>
                 {/* Everything here is experimental, and saying so on each row is the
@@ -910,8 +951,8 @@ export function SandboxWorkbench({ families }: Props) {
         {/* A real drawer on a phone: focus trapped, Escape closes, page behind
             covered. The CSS transform it replaced was none of those. */}
         {narrow ? (
-          <helix-drawer label="Examples" open={railOpen} placement="end" ref={rail}>
-            {tree}
+          <helix-drawer label="Examples" open={railOpen} placement="end" ref={setRail}>
+            {examplesPane}
           </helix-drawer>
         ) : (
           /* Always rendered, because a region that unmounts cannot animate out.
@@ -920,7 +961,7 @@ export function SandboxWorkbench({ families }: Props) {
              read: `overflow: hidden` on a zero-width column takes it off the
              screen and leaves it in the page. */
           <aside className="examplesRail" inert={!showRail}>
-            {tree}
+            {examplesPane}
           </aside>
         )}
       </div>
