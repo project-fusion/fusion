@@ -177,9 +177,12 @@ export class HelixBaseCarousel extends HelixElement {
         this.requestUpdate('index', previous)
         this.scrollToIndex()
       },
+      controlled: this.indexIsControlled,
       event: (value) => new HelixSelectEvent({ value: String(value) }),
       host: this,
+      label: 'index',
       next,
+      read: () => this.index,
     })
   }
 

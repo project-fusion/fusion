@@ -329,9 +329,12 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
         this.monthState = month
         this.requestUpdate('month', previous)
       },
+      controlled: this.monthIsControlled,
       event: (month) => new HelixNavigateEvent({ value: month }),
       host: this,
+      label: 'month',
       next,
+      read: () => this.month,
     })
   }
 

@@ -198,10 +198,13 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
           this.openState = open
           this.requestUpdate('open', previous)
         },
+        controlled: this.openIsControlled,
         event: (open) => (open ? new HelixOpenEvent() : new HelixCloseEvent()),
         host: this,
+        label: 'open',
         next,
         notify: this.onOpenChange,
+        read: () => this.open,
       })
     }
 

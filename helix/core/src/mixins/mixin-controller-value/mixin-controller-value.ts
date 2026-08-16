@@ -183,10 +183,13 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
           this.valueState = value
           this.requestUpdate('value', previous)
         },
+        controlled: this.valueIsControlled,
         event: (value) => new HelixChangeEvent({ name: (this as Named).name ?? '', value }),
         host: this,
+        label: 'value',
         next,
         notify: this.onValueChange,
+        read: () => this.value,
       })
     }
 

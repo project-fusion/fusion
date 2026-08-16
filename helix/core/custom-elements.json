@@ -3434,7 +3434,7 @@
           },
           "parameters": [
             {
-              "name": "{\n  apply,\n  event,\n  host,\n  notify,\n  next,\n}",
+              "name": "{\n  apply,\n  controlled,\n  event,\n  host,\n  label,\n  notify,\n  next,\n  read,\n}",
               "type": {
                 "text": "ControlledChangeOptions<T>"
               }

@@ -180,14 +180,17 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
           this.checkedState = checked
           this.requestUpdate('checked', previous)
         },
+        controlled: this.checkedIsControlled,
         event: (checked) =>
           new HelixChangeEvent({
             name: (this as Named).name ?? '',
             value: String(checked),
           }),
         host: this,
+        label: 'checked',
         next,
         notify: this.onCheckedChange,
+        read: () => this.checked,
       })
     }
 

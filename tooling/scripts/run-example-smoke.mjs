@@ -99,9 +99,29 @@ page.on('pageerror', (error) => noise.push(`threw: ${error.message}`))
  * component logs still counts. */
 const NETWORK = /Failed to load resource/
 
+/* The controlled-state audit, which is a `warn` rather than an `error` because
+   it is aimed at a consumer's console. Here it is a failure: it means an
+   example declared a state and listens to nothing, so the thing it is
+   demonstrating does not work. Six examples were in exactly that state before
+   the audit existed and nothing said so.
+ *
+ * **Dormant as things stand, and kept anyway.** The audit fires on a *request*,
+ * and nothing here interacts: this renders each example and looks at it. So it
+ * catches only an example that drives itself, which today means none, since the
+ * autoplaying carousel first moves at five seconds and this waits fifty
+ * milliseconds. It is here so that the day something does interact, or an
+ * example self-drives, the trap is already covered rather than needing to be
+ * remembered. Do not read a green smoke run as saying the examples are all
+ * correctly wired: that is what `check:examples` and a reader's console say. */
+const AUDIT = /is controlled: `/
+
 page.on('console', (message) => {
-  if (message.type() === 'error' && !NETWORK.test(message.text())) {
-    noise.push(`console.error: ${message.text()}`)
+  const text = message.text()
+  if (message.type() === 'error' && !NETWORK.test(text)) {
+    noise.push(`console.error: ${text}`)
+  }
+  if (message.type() === 'warning' && AUDIT.test(text)) {
+    noise.push(`controlled and unattended: ${text}`)
   }
 })
 

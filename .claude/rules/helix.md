@@ -143,6 +143,70 @@ to, which wrote a destination onto a host that is not a link and put a bare
 `target rel` pair into every button ever rendered. `appearance`, `size`,
 `disabled`, and `orientation` reflect; the rest do not.
 
+### State never reflects, and native is where that comes from
+
+**No stateful property reflects: not `value`, not `checked`, not `open`.** This
+has been asked three times, always from the same intuition, that native
+`<input value="abc">` tracks what a reader types. It does not. Measured in
+Chromium with real user input:
+
+```
+text   .value = "Grace"          attribute = "Ada"
+pass   .value = "correcthorse"   attribute = "hunter2"
+area   .value = "Grace"          text content still "Ada"
+check  .checked = false          attribute = ""        (still present)
+sel    .value = "b"              <option value="a" selected="">A</option>
+```
+
+No exceptions anywhere on the form-control surface. The mechanism is in the
+spec: an input in "value" mode reflects its `value` **content attribute to
+`defaultValue`**, and carries a dirty value flag that, once a reader has typed,
+stops the attribute affecting the value at all. Attributes are the declaration;
+the property is the state. What builds the wrong intuition is that
+`setAttribute('value', …)` *does* move the displayed text right up until the
+first edit sets that flag.
+
+**And here reflecting is worse than merely unfaithful, because the attribute is
+the channel ownership is read from.** With `reflect: true` on the value mixin,
+measured:
+
+```
+AT REST:       <helix-input label="L" default-value="Ada" type="text" value="Ada">
+AFTER TYPING:  <helix-input label="L" default-value="Ada" type="text" value="Grace">
+PASTED:        started "Grace", typed "Hopper", still holds "Grace"
+```
+
+Serialize the host, re-parse it, and the new element sees `value` declared
+before its first update, latches controlled, and freezes. Note the first line:
+untouched, the seed had already leaked into `value`, so even a never-typed-in
+control comes back dead from a copy-paste. Decide-once settles the element that
+is already alive; it cannot settle markup that outlives it. Lit SSR does emit
+reflected attributes (verified with `disabled` set as a property), so this is
+not a client-only concern.
+
+The line that is actually drawn, and it is not "value is special":
+
+- **Boolean states mirror to a `data-` name.** `data-open` and `data-checked`,
+  read by sixteen rules across six stylesheets. A different name, so a pasted
+  `data-open` is inert and can never be re-read as a declaration.
+- **Payload states do not.** `value` is a string, and so is `active`, which
+  names which child is active. Option's `data-active` is a boolean its listbox
+  writes, so it is the first rule rather than an exception to the second.
+
+If a payload ever needs a CSS hook, mirror the boolean fact (`data-filled`), not
+the payload: a floating label cares whether there is text, not what it says. And
+`helix-input` takes `type="password"`, which a `data-value` would carry straight
+past every session-replay masker that knows to mask `.value` and `input[value]`.
+
+**Where we do diverge from native is the name, and it is a real trap.** Native
+`<input value="Ada">` seeds; `<helix-input value="Ada">` claims ownership and
+the control goes quiet. We took React's `value`/`defaultValue` split, which is
+right for our consumers and wrong for anyone reasoning from HTML, and it caught
+six of our own examples. `requestControlledChange` therefore audits the first
+controlled request an element makes and warns if nothing answered it. Read the
+state **before** dispatching, or a consumer answering synchronously looks
+identical to one that was never there.
+
 **Shared test scaffolding lives in `web/src/testing/`**, excluded from the build
 in `tsconfig.json`. `registerDom()` is idempotent because bun runs every DOM
 spec in one process and `GlobalRegistrator.register()` throws on the second

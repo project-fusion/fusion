@@ -468,9 +468,12 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
         this.filterState = value
         this.requestUpdate('filter', previous)
       },
+      controlled: this.filterIsControlled,
       event: (value) => new HelixFilterEvent({ value }),
       host: this,
+      label: 'filter',
       next,
+      read: () => this.filter,
     })
   }
 
