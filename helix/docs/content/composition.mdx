@@ -73,6 +73,50 @@ One trap worth knowing: **a whitespace-only text node is assigned to the default
 slot and defeats its fallback.** A newline between the tags is enough. That is
 why some examples close on the same line they open.
 
+## Width comes from the layout, not the control
+
+There is no `width` or `fill` property on a button, for the same reason there is
+no `size` one: how wide a control is says something about the region it is in.
+
+A button already stretches in a column flex or a grid, because that is what a
+stretch-aligned parent does to its children:
+
+```html
+<helix-flex direction="column">
+  <helix-button appearance="primary">Fills its column</helix-button>
+</helix-flex>
+```
+
+To make one hug its label instead, tell the layout:
+
+```html
+<helix-button appearance="secondary" style="align-self: start">
+  Hugs its label
+</helix-button>
+```
+
+That is the whole of it, and it is worth saying out loud because the default
+surprises people: dropping a button into a column makes it full width, and the
+instinct is to look for a property that turns that off.
+
+**A fixed width is a different question, and it belongs to your site.** A
+marketing page whose hero buttons are all the same width is a real and reusable
+practice — but the number is a fact about that page's design, not about buttons.
+Name it once where your other page constants live:
+
+```css
+:root {
+  --site-cta-inline-size: 13rem;
+}
+
+.heroActions helix-button {
+  min-inline-size: var(--site-cta-inline-size);
+}
+```
+
+The same reasoning puts a hero's type size outside the component scale: a
+marketing hero is not a component, so its measurements are the site's own.
+
 ## One property per intent, including labels
 
 Every field control names itself the same way, and there are exactly two cases.

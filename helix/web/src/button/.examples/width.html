@@ -1,0 +1,12 @@
+<!-- Width comes from the layout, not from the button.
+
+     A button stretches to its container in a column flex or a grid, because
+     that is what a stretch-aligned parent does. To make one hug its label
+     instead, tell the layout: `align-self: start`. There is no width property
+     to reach for, for the same reason there is no size one. -->
+<helix-flex direction="column" gap="sm" style="max-inline-size: 20rem">
+  <helix-button appearance="primary">Fills its column</helix-button>
+  <helix-button appearance="secondary" style="align-self: start">
+    Hugs its label
+  </helix-button>
+</helix-flex>
