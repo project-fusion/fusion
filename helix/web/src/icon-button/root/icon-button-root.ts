@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseButton } from '@helix-io/headless'
+import { HelixBaseIconButton } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './icon-button-root.css.js'
@@ -29,7 +29,7 @@ import { styles } from './icon-button-root.css.js'
  * @cssproperty --icon-button-size - Edge length of the control.
  */
 @customElement('helix-icon-button')
-export class HelixIconButton extends HelixBaseButton {
+export class HelixIconButton extends HelixBaseIconButton {
   /** How much visual weight the button carries. */
   @property({ reflect: true })
   appearance?: 'primary' | 'secondary' | 'tertiary' | 'danger'

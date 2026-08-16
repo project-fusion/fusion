@@ -1,4 +1,5 @@
 import { customElement, HelixDismissEvent, HelixElement, hostAria } from '@helix-io/core'
+import '../../icon-button/index.js'
 import { x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -72,10 +73,10 @@ export class HelixBaseAnnouncement extends HelixElement {
       <div part="actions"><slot name="actions"></slot></div>
       ${
         this.dismissible
-          ? html`<button
+          ? html`<helix-base-icon-button
               part="dismiss"
               type="button"
-              aria-label=${this.dismissLabel}
+              label=${this.dismissLabel}
               @click=${this.handleDismiss}
             >
               <slot name="icon">
@@ -83,7 +84,7 @@ export class HelixBaseAnnouncement extends HelixElement {
                   ${unsafeSVG(x.content)}
                 </svg>
               </slot>
-            </button>`
+            </helix-base-icon-button>`
           : nothing
       }`
   }

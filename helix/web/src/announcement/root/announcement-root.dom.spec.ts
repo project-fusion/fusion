@@ -46,6 +46,16 @@ describe('announcement', () => {
     const announcement = await mount(
       '<helix-announcement dismiss-label="Close notice" dismissible><span slot="icon">x</span></helix-announcement>',
     )
-    expect(part(announcement, 'dismiss')?.getAttribute('aria-label')).toBe('Close notice')
+    /* On the icon button's own button, not on the host. The dismiss control is
+       a `helix-base-icon-button` now rather than a bare `<button>`, so the name
+       goes in as `label` and comes out as `aria-label` on the element that is
+       actually focused. Asserting the inner one is asserting what a screen
+       reader reads; asserting the host would pass on a name that never
+       reached the control. */
+    const dismiss = part(announcement, 'dismiss') as HTMLElement
+    expect(dismiss.getAttribute('label')).toBe('Close notice')
+    expect(dismiss.shadowRoot?.querySelector('[part="button"]')?.getAttribute('aria-label')).toBe(
+      'Close notice',
+    )
   })
 })

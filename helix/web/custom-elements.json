@@ -9425,7 +9425,7 @@
             }
           ],
           "superclass": {
-            "name": "HelixBaseButton",
+            "name": "HelixBaseIconButton",
             "package": "@helix-io/headless"
           },
           "summary": "A square button whose content is an icon.",

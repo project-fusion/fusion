@@ -6467,6 +6467,340 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/icon-button/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/icon-button/root/icon-button-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon-button/root/icon-button-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Everything a button does, with one thing added and it is the reason this is\nan element rather than a note on `Button`: **an icon-only control has no\naccessible name unless it is given one.** A button whose content is a glyph\nannounces as \"button\" and nothing else, which is the single most common way a\ntoolbar becomes unusable without sight. `label` is not optional in practice,\nand having a component that says so is what makes it reviewable.\n\n**Registered, so it can be rendered and not only subclassed.** The styled\nicon button extended `HelixBaseButton` directly, which left no\n`helix-base-icon-button` for anything to use: a headless consumer wanting an\nicon button had a button and a naming convention. Anything in this tier that\nneeds one, such as an announcement's dismiss control, can now render it\nwithout reaching into the styled tier for a tag that would never upgrade.\n\nTop-level rather than `Button.Icon`, because a namespace means composition\nand an icon-only button is not part of a button. It is a button with\ndifferent content and a different shape, which makes it its own component.",
+          "name": "HelixBaseIconButton",
+          "cssParts": [
+            {
+              "description": "The inner button or anchor.",
+              "name": "button",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The icon.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "description": "Content before the label, usually an icon.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "description": "Content after the label.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseButton",
+            "module": "/src/button/root/button-root.js"
+          },
+          "summary": "A button whose content is an icon, and which must be named.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/icon-button",
+            "aliases": [
+              "Icon button",
+              "Square button"
+            ],
+            "tier": "headless",
+            "group": "BaseIconButton",
+            "part": "Root"
+          },
+          "tagName": "helix-base-icon-button",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "What activating the button does to its form.",
+              "fieldName": "type",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, for a button whose content is not text.\n\nLives here rather than only on `IconButton` so the two share one render.\nAn icon-only button without it is a control a screen reader announces as\n\"button\" and nothing else.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "What activating the button does to its form.",
+              "attribute": "type",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, for a button whose content is not text.\n\nLives here rather than only on `IconButton` so the two share one render.\nAn icon-only button without it is a control a screen reader announces as\n\"button\" and nothing else.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
+              "description": "Moves focus to the inner control, so the host is never the focus target.",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleClick",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "focusable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether the button holds its group's tab stop.\n\nA toolbar keeps one tab stop across its children, and the obvious way to do\nthat is to write `tabindex` onto each of them. That is a change to markup\nthe consumer rendered, so a React consumer's hydration reports it and does\nnot patch it up. A parent sets this property instead, which writes nothing,\nand the stop lands on the inner control inside the shadow root.\n\nNo attribute, because it is coordination between elements rather than\nanything a consumer sets.",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "modulePath": "src/icon-button/root/icon-button-root.ts",
+          "definitionPath": "src/icon-button/root/icon-button-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseIconButton",
+          "declaration": {
+            "name": "HelixBaseIconButton",
+            "module": "src/icon-button/root/icon-button-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-icon-button",
+          "declaration": {
+            "name": "HelixBaseIconButton",
+            "module": "src/icon-button/root/icon-button-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/icon/index.ts",
       "declarations": [],
       "exports": [
@@ -6818,6 +7152,14 @@
           "declaration": {
             "name": "*",
             "module": "src/icon/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/icon-button/index.js"
           }
         },
         {

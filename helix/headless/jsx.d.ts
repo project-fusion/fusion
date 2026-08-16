@@ -23,6 +23,7 @@ import type {
   HelixBaseDrilldownItem,
   HelixBaseEmpty,
   HelixBaseIcon,
+  HelixBaseIconButton,
   HelixBaseInput,
   HelixBaseKbd,
   HelixBaseList,
@@ -1207,6 +1208,67 @@ On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
   "prop:noAnnounce"?: HelixBaseEmpty["noAnnounce"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseIconButtonProps = {
+  /** What activating the button does to its form. */
+  type?: HelixBaseIconButton["type"];
+  /** Accessible name, for a button whose content is not text.
+
+Lives here rather than only on `IconButton` so the two share one render.
+An icon-only button without it is a control a screen reader announces as
+"button" and nothing else. */
+  label?: HelixBaseIconButton["label"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixBaseIconButton["disabled"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  focusable?: HelixBaseIconButton["focusable"];
+};
+
+export type HelixBaseIconButtonSolidJsProps = {
+  /** What activating the button does to its form. */
+  "prop:type"?: HelixBaseIconButton["type"];
+  /** Accessible name, for a button whose content is not text.
+
+Lives here rather than only on `IconButton` so the two share one render.
+An icon-only button without it is a control a screen reader announces as
+"button" and nothing else. */
+  "prop:label"?: HelixBaseIconButton["label"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixBaseIconButton["disabled"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  "prop:focusable"?: HelixBaseIconButton["focusable"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4101,6 +4163,71 @@ export type CustomElements = {
    */
   "helix-base-empty": Partial<
     HelixBaseEmptyProps & BaseProps<HelixBaseEmpty> & BaseEvents
+  >;
+
+  /**
+   * Everything a button does, with one thing added and it is the reason this is
+   * an element rather than a note on `Button`: **an icon-only control has no
+   * accessible name unless it is given one.** A button whose content is a glyph
+   * announces as "button" and nothing else, which is the single most common way a
+   * toolbar becomes unusable without sight. `label` is not optional in practice,
+   * and having a component that says so is what makes it reviewable.
+   *
+   * **Registered, so it can be rendered and not only subclassed.** The styled
+   * icon button extended `HelixBaseButton` directly, which left no
+   * `helix-base-icon-button` for anything to use: a headless consumer wanting an
+   * icon button had a button and a naming convention. Anything in this tier that
+   * needs one, such as an announcement's dismiss control, can now render it
+   * without reaching into the styled tier for a tag that would never upgrade.
+   *
+   * Top-level rather than `Button.Icon`, because a namespace means composition
+   * and an icon-only button is not part of a button. It is a button with
+   * different content and a different shape, which makes it its own component.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `type`: What activating the button does to its form.
+   * - `label`: Accessible name, for a button whose content is not text.
+   *
+   * Lives here rather than only on `IconButton` so the two share one render.
+   * An icon-only button without it is a control a screen reader announces as
+   * "button" and nothing else.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The icon.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-base-icon-button": Partial<
+    HelixBaseIconButtonProps & BaseProps<HelixBaseIconButton> & BaseEvents
   >;
 
   /**
@@ -7322,6 +7449,74 @@ export type CustomElementsSolidJs = {
     HelixBaseEmptyProps &
       HelixBaseEmptySolidJsProps &
       BaseProps<HelixBaseEmpty> &
+      BaseEvents
+  >;
+
+  /**
+   * Everything a button does, with one thing added and it is the reason this is
+   * an element rather than a note on `Button`: **an icon-only control has no
+   * accessible name unless it is given one.** A button whose content is a glyph
+   * announces as "button" and nothing else, which is the single most common way a
+   * toolbar becomes unusable without sight. `label` is not optional in practice,
+   * and having a component that says so is what makes it reviewable.
+   *
+   * **Registered, so it can be rendered and not only subclassed.** The styled
+   * icon button extended `HelixBaseButton` directly, which left no
+   * `helix-base-icon-button` for anything to use: a headless consumer wanting an
+   * icon button had a button and a naming convention. Anything in this tier that
+   * needs one, such as an announcement's dismiss control, can now render it
+   * without reaching into the styled tier for a tag that would never upgrade.
+   *
+   * Top-level rather than `Button.Icon`, because a namespace means composition
+   * and an icon-only button is not part of a button. It is a button with
+   * different content and a different shape, which makes it its own component.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `type`: What activating the button does to its form.
+   * - `label`: Accessible name, for a button whose content is not text.
+   *
+   * Lives here rather than only on `IconButton` so the two share one render.
+   * An icon-only button without it is a control a screen reader announces as
+   * "button" and nothing else.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The icon.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `button`: The inner button or anchor.
+   */
+  "helix-base-icon-button": Partial<
+    HelixBaseIconButtonProps &
+      HelixBaseIconButtonSolidJsProps &
+      BaseProps<HelixBaseIconButton> &
       BaseEvents
   >;
 
