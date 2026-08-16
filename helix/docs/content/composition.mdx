@@ -1,0 +1,87 @@
+# Composition
+
+Helix has families, parts and groups, and they are not stylistic choices. Each
+answers a different question, and knowing which you are looking at tells you
+what to import and what to write.
+
+## A namespace means composition, never variation
+
+`Card.Root` contains `Card.Header`. The namespace says *this goes inside that*.
+
+It never says *this is a version of that*. An icon-only button is not a part of
+`Button`, so `IconButton` is top-level. The rule falls out of one line:
+
+> Variants are props. Alternatives are separate components.
+
+A button that is filled instead of outlined is the same component with a
+different `appearance`. A button that holds only an icon has a different
+accessible-name requirement and a different shape, so it is its own component.
+
+## A region becomes an element only when it has behaviour, state or API
+
+Otherwise it is a slot.
+
+`Card`'s header, body and footer carried none of the three, so five elements
+became one and a title became a real `<h2>` the consumer writes. `Tabs.Tab`,
+`Select.Option` and `Accordion.Item` do carry state, so they stay elements.
+
+This matters more than it sounds, because **an empty region still costs
+layout**. A `<slot>` is `display: contents`, so an unassigned one generates no
+box: no grid row, no flex item, no gap. A wrapper generates one either way.
+Measured on Card with identical content: wrappers present but empty rendered
+85px against an ideal of 53px. Bare slots rendered 53px with no hiding logic at
+all.
+
+## A group is a part when it is the control, and a family when it arranges them
+
+The test is whether the group reports a form value.
+
+**`Radio.Group` and `Toggle.Group` do.** They own the `name`, the `value` and
+the validity, and a lone radio is not a control at all — it is an answer to one.
+The group is what the family is *about*, so it is a part of it, and the member
+has nowhere else to be.
+
+**`Checkbox Group` and `Button Group` do not.** Neither calls `setFormValue`.
+Each checkbox is form-associated and submits itself; the group adds
+`role="group"`, a shared name, and one place to read the set. A button needs no
+group at all. Both are their own families, because their members are complete
+controls that the family does not need the group to explain.
+
+A container holding mixed content is a family for the same reason. `Toolbar`
+holds buttons, dropdowns and inputs, and is about none of them.
+
+## A content property is its slot's fallback
+
+Where a property carries content rather than configuration, it is the fallback
+content of a slot of the same name — never a second thing rendered beside it.
+
+```html
+<!-- The property -->
+<helix-tooltip content="Save"></helix-tooltip>
+
+<!-- The slot, which replaces it -->
+<helix-tooltip>
+  <strong>Save</strong> — or press <helix-kbd>⌘S</helix-kbd>
+</helix-tooltip>
+```
+
+Text stays an attribute, because that is what most tooltips and most avatars
+hold. Anything richer replaces it by being slotted. Both can never show at once,
+and no component has to detect which you did.
+
+One trap worth knowing: **a whitespace-only text node is assigned to the default
+slot and defeats its fallback.** A newline between the tags is enough. That is
+why some examples close on the same line they open.
+
+## When one behaviour serves several components, it becomes its own family
+
+`Option`, `Listbox` and `Select` are three families rather than one because the
+keyboard, the filtering, the multi-select rules and the active-item tracking
+should be written once. `Select` renders a `Listbox` internally; a future
+combobox will; a command palette would.
+
+The same reasoning made `DrilldownController` — `Menu` had held a page stack and
+derived its rows since it was written, and none of that was about menus. `Menu`
+and `Drilldown` share it now.
+
+If you are about to write the second copy of something, that is the signal.

@@ -1,0 +1,113 @@
+# Using the elements
+
+Write `<helix-card>` in your JSX. They are plain custom elements: no wrapper, no
+patched React, and no React package — there is not one.
+
+```tsx
+export default function Page() {
+  return (
+    <helix-card>
+      <h2 slot="header">Deployments</h2>
+      <helix-button appearance="primary">Ship it</helix-button>
+    </helix-card>
+  )
+}
+```
+
+Everything below is a trap that has actually cost time, rather than general
+advice.
+
+## Bind Helix events with `addEventListener`, not a prop
+
+`onhelix-select` and its siblings **do not survive hydration**. React records the
+prop and attaches no listener, so on a server-rendered page the handler never
+runs. The element still does its own job, nothing is logged, and it repairs
+itself the moment React commits an update for any other reason — which is why it
+passes every casual check.
+
+Use `useHelixEvent`, which binds from an effect and therefore runs on hydration
+and on mount alike.
+
+```tsx
+const tabs = useRef<HelixTabs>(null)
+useHelixEvent(tabs, 'helix-change', (event) => setPane(event.detail.value))
+```
+
+Measured against React 19.2.8: hydrated, a click on a file tab moved the tab and
+left the consumer's state untouched, and dispatching the event straight at the
+host reached nothing either — which is what distinguishes an absent listener
+from one that ignored the event. Navigating away and back so the component
+*mounted* rather than hydrated, the first click worked.
+
+React's own events are unaffected. `onClick` on a `<helix-button>` goes through
+the synthetic system, which hydration does set up.
+
+## Event names carry at most one hyphen
+
+The prop form is what decides an event's name, because it is what a consumer
+reaches for first and what has to keep working once React fixes the above.
+
+- `onhelix-open` reaches `helix-open`. ✅
+- `onHelixOpen` binds an event called `HelixOpen`, which nobody dispatches. ❌
+- `onhelix-value-change` binds **nothing at all**. ❌
+
+Two hyphens is a hard stop, measured against the same version. Every Helix event
+name therefore carries at most one, and the build fails on one that carries two.
+
+## Register once, in a client component
+
+A custom element registers as a side effect of importing its module, and that
+import has to be in the client graph to ever run. A server component's imports
+do not ship to the browser. So one client component holds every element import
+and renders `null`:
+
+```tsx
+'use client'
+import '@helix-io/web/card'
+import '@helix-io/web/button'
+
+export function HelixElements(): null {
+  return null
+}
+```
+
+Render it once in your layout. **Your pages stay server components** — an
+unregistered tag is just an unknown element in the HTML that upgrades when the
+definition lands. Asking you to mark every page `'use client'` to use a button
+would not be a design system.
+
+## Import `elements.css` beside the base layer
+
+```ts
+import '@helix-io/styles/base.css'
+import '@helix-io/web/elements.css'
+```
+
+It hides each tag with `:not(:defined)` until it upgrades, using `visibility` so
+the page does not reflow. Without it a card arrives as a run of unstyled text
+and then snaps into a card.
+
+It is generated from the element sources and enumerates the tags, because CSS
+cannot select "any custom element" and a bare `:not(:defined)` would also catch
+your framework's dev overlay.
+
+## Import from subpaths
+
+```ts
+import '@helix-io/web/card' // ✅ one family
+import '@helix-io/web' // ❌ the barrel
+```
+
+One family per module, so you are not shipping the library to use a button.
+
+## There is no declarative shadow DOM
+
+Components render on the server through Lit SSR in our own tests, but the app
+ships no DSD, and the shadow styles arrive with the definition rather than in
+the markup. You do not need to configure anything for this; it is here so the
+absence is not mistaken for something missing.
+
+The short version of why: DSD cannot activate for script-inserted nodes, a
+server component's output is replayed from the flight payload through DOM APIs
+rather than re-run, and the patch that made it work hooked webpack — which
+Turbopack ignores, silently.

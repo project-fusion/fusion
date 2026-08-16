@@ -44,6 +44,20 @@ export const pages: DocPage[] = [
     title: 'Tiers',
   },
   {
+    description: 'Families, parts and groups, and which to reach for.',
+    order: 2,
+    section: 'Patterns',
+    slug: 'composition',
+    title: 'Composition',
+  },
+  {
+    description: 'Binding events, registering elements, and the traps in both.',
+    order: 3,
+    section: 'Patterns',
+    slug: 'using-the-elements',
+    title: 'Using the elements',
+  },
+  {
     description: 'Why no control has a size, and what to write instead.',
     order: 1,
     section: 'Patterns',
