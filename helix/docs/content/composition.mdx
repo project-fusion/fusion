@@ -73,6 +73,36 @@ One trap worth knowing: **a whitespace-only text node is assigned to the default
 slot and defeats its fallback.** A newline between the tags is enough. That is
 why some examples close on the same line they open.
 
+## One property per intent, including labels
+
+Every field control names itself the same way, and there are exactly two cases.
+
+```html
+<helix-input label="Files"></helix-input>       <!-- a visible label -->
+<helix-input aria-label="Files"></helix-input>  <!-- named, nothing drawn -->
+<helix-input></helix-input>                     <!-- unnamed. avoid -->
+```
+
+`label` means a label. `aria-label` means a name. Neither means a control a
+screen reader announces as "edit text", which is almost never what you want —
+if the page already makes the purpose plain, that is the `aria-label` case, not
+the empty case.
+
+**`aria-label` works here because the component forwards it**, and that is worth
+knowing because it is not true of custom elements in general. A custom element
+cannot delegate a label to the control inside its shadow root: an `aria-label`
+you write on the host sits on a wrapper and never reaches the `<input>` that
+actually takes focus. Measured on this library before it was fixed, the inner
+input came back with no label and no name at all.
+
+So the field renders the label and clips it, and the name arrives through the
+same `<label for>` a visible one does. You write the obvious attribute and it
+does the obvious thing.
+
+There used to be a `hide-label` boolean beside `label`. It is gone: one
+attribute supplying a label and a second saying not to show it is the absence of
+the first, spelled twice.
+
 ## When one behaviour serves several components, it becomes its own family
 
 `Option`, `Listbox` and `Select` are three families rather than one because the
