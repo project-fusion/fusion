@@ -86,15 +86,16 @@ helix-app-header {
    default is a plain inset, which is what an app with no header wants and what
    the component's examples render with. */
 helix-drawer {
-  /* Exactly the header, and nothing for looks. This was the header plus a
-     space, so a panel that then added its own inset put its first line ninety
-     six pixels down while its sides sat at twenty four: the top was clearing
-     the chrome twice and reading as a gap nobody asked for.
+  /* The header, plus the drawer's own inset. This is the whole top padding
+     rather than something added to one, which is what makes it safe to write:
+     it was the header plus a space *and* the panel added its own on top, so
+     the first line sat ninety six pixels down while the sides sat at twenty
+     four, clearing the chrome twice.
 
-     The drawer's job here is to clear what is above it. Whatever is slotted in
-     brings its own breathing room, the same as it does on the other three
-     sides. */
-  --drawer-inset-block-start: var(--helix-size-header);
+     The other three sides are the drawer's now, and so is this one's default.
+     What this says is the one thing the drawer cannot know: that there is a
+     masthead above it and how tall it is. */
+  --drawer-inset-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
 /* ============================================================ hero ======= */
@@ -573,14 +574,6 @@ helix-sandbox [slot="panel"]::part(panels) {
 
 /* The nav drawer's own inset. The drawer places the panel; what goes in it is
    the site's business. */
-.navDrawer {
-  padding: var(--helix-space-lg);
-}
-
-.prefsPanel {
-  padding: var(--helix-space-lg);
-}
-
 /* ============================================================ motion ===== */
 
 /* Sections arrive as they are scrolled to, once, and never on the way back up.

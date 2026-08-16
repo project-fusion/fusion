@@ -101,7 +101,7 @@ export function SiteNav() {
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
       <helix-drawer label="Site navigation" open={open} placement="end" ref={nav}>
-        <helix-flex align="start" class="navDrawer" direction="column" gap="lg">
+        <helix-flex align="start" direction="column" gap="lg">
           {VERTICALS.map((vertical) => (
             <a
               data-link

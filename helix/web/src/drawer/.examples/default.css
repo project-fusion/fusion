@@ -1,6 +1,0 @@
-/* One class on both regions rather than a rule for each. The header and the
-   body are held off the edge by the same amount, and saying it twice is an
-   invitation for them to drift apart. */
-.inset {
-  padding: var(--helix-space-lg);
-}

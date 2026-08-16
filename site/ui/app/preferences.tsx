@@ -77,7 +77,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
 
   return (
     <helix-drawer label="Preferences" open={open} placement="end" ref={drawer}>
-      <helix-flex align="start" class="prefsPanel" direction="column" gap="lg">
+      <helix-flex align="start" direction="column" gap="lg">
         <helix-text as="h2" appearance="subheading">
           Preferences
         </helix-text>

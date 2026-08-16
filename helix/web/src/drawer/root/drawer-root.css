@@ -64,7 +64,24 @@
 
      So the default is a plain inset and `--drawer-inset-block-start` is what a
      page with a masthead sets, which is the direction the knowledge actually
-     travels. The site sets it. */
+     travels. The site sets it, and it is the whole top padding rather than
+     something added to it: a drawer clearing chrome twice reads as a gap
+     nobody asked for, and that is what it did.
+
+     The other three sides are an inset too, which they were not. Every
+     consumer brought their own and both of ours brought the same one, a
+     `padding: var(--helix-space-lg)` class on the thing they slotted, the
+     example and the site's preferences panel alike. Two consumers writing one
+     rule is the default being wrong rather than the consumers being careless,
+     and it left the panel in a state that reads as a bug either way: text
+     pushed down from the top and touching both sides.
+
+     `--drawer-inset` is the hook, the same shape `--dialog-inset` already has
+     on the same kind of surface. A nav drawer whose rows run to the edges sets
+     it to zero and puts the inset on its rows, which is what it wants anyway,
+     for the reason the menu gives: a row's hover should reach the full width
+     of the surface rather than stopping short of it. */
+  padding: var(--drawer-inset, var(--helix-space-lg));
   padding-block-start: var(--drawer-inset-block-start, var(--helix-space-2xl));
   display: flex;
   flex-direction: column;
