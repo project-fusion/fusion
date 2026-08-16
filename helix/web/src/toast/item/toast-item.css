@@ -6,6 +6,10 @@
      at the full 40px beside a 32px dismiss, so the two controls in one row were
      different heights: measured, three centre lines at 654, 660 and 664. */
   --helix-size-control: var(--helix-size-control-sm);
+  /* The height of one line of the message, which is what everything in the row
+     is aligned against. Derived from the two tokens that make it, so a theme
+     changing either keeps the row aligned. */
+  --_toast-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
   /* The width is the message's, not the region's: the region spans an edge so a
      stack can align along it, and a message as wide as the window is a banner. */
   inline-size: var(--toast-inline-size, 22rem);
@@ -13,10 +17,22 @@
 }
 
 [part="item"] {
-  /* Centred, which is what the announcement does with the same row. `start`
-     put the text, the action and the dismiss on three different lines, because
-     the three boxes are different heights and only their tops agreed. */
-  align-items: center;
+  /* Aligned to the top, and then each thing nudged onto the *first line* of
+     the message rather than onto the top of its own box.
+   *
+   * `center` was right for a one-line message and wrong for every other: the
+   * mark and the dismiss floated to the middle of a four-line paragraph, when
+   * a mark belongs beside the words it qualifies and a close belongs in the
+   * corner. Plain `start` is wrong too, and that is what the earlier note here
+   * was reacting to: three boxes of 16px, 21px and 32px sharing a top edge have
+   * their centres 8px apart, so a one-line message came out visibly staggered.
+   *
+   * Both are fixed by aligning to the line box instead of to the box top. The
+   * offsets are derived, not guessed: the line is the font size times the line
+   * height, and each item moves by half the difference between the line and
+   * itself. On one line that reproduces `center` exactly; on four it leaves the
+   * mark and the control where the reading starts. */
+  align-items: start;
   background-color: var(--helix-color-surface-overlay);
   border-radius: var(--helix-radii-md);
   box-shadow: var(--helix-shadow-lg);
@@ -54,6 +70,9 @@
   color: var(--_toast-severity, var(--helix-color-foreground-muted));
   display: inline-flex;
   flex: 0 0 auto;
+  /* Half the difference between the first line and the glyph, so the two share
+     a centre however many lines follow. */
+  margin-block-start: calc((var(--_toast-line) - var(--helix-size-icon)) / 2);
 }
 
 /* Size only. Stroke width belongs to the glyph: the set is drawn on a 256 box
@@ -75,6 +94,14 @@ slot[name="icon"]::slotted(*) {
 [part="content"] {
   flex: 1 1 auto;
   min-inline-size: 0;
+}
+
+/* The controls take the same treatment, and their difference is negative
+   because a control is taller than a line of text: they rise a little above the
+   first line rather than hanging below it. The item's inset is what gives them
+   room to do that without touching the edge. */
+[part="actions"] {
+  margin-block-start: calc((var(--_toast-line) - var(--helix-size-control-sm)) / 2);
 }
 
 [part="actions"] {
@@ -106,8 +133,14 @@ slot[name="icon"]::slotted(*) {
   all: unset;
   /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
      `border-box` every shadow root is given comes from a rule this one
-     outranks. Restored at each site because there is nowhere later to put it. */
+     outranks. Restored at each site because there is nowhere later to put it.
+   *
+   * The first-line offset has to be restored here for the same reason, and was
+   * not: written in an earlier rule it was wiped by this one, and the close sat
+   * 5.5px below the mark and the action it is meant to line up with. Measured,
+   * which is the only way that shows. */
   box-sizing: border-box;
+  margin-block-start: calc((var(--_toast-line) - var(--helix-size-control-sm)) / 2);
   block-size: var(--helix-size-control-sm);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
@@ -193,7 +226,10 @@ slot[name="icon"]::slotted(*) {
    reader has to notice on their own. */
 @media (prefers-reduced-motion: no-preference) {
   [part="item"] {
-    animation: helix-toast-in var(--helix-duration-normal) var(--helix-easing-decelerate);
+    /* `backwards`, so the `from` state holds through any delay a consumer sets
+       on `::part(item)`. Without it a staggered stack paints in full, then each
+       message jumps back to invisible as its turn arrives. */
+    animation: helix-toast-in var(--helix-duration-normal) var(--helix-easing-decelerate) backwards;
   }
 }
 

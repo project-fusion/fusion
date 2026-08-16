@@ -1,0 +1,21 @@
+/* Each message arrives after the one above it, so a stack that lands at once
+   reads as a sequence rather than as a block appearing.
+ *
+ * The delay is set from out here through `::part(item)`, which is the point
+ * worth taking away: the message's own surface is a part, so its motion is
+ * yours to schedule. The component only says what arriving looks like.
+ *
+ * `animation-fill-mode: backwards` is already set by the component, so a
+ * message holds its starting state through the wait rather than painting in
+ * full and then jumping back to begin. */
+.stack helix-toast-item:nth-child(2)::part(item) {
+  animation-delay: 150ms;
+}
+
+.stack helix-toast-item:nth-child(3)::part(item) {
+  animation-delay: 300ms;
+}
+
+.stack helix-toast-item:nth-child(4)::part(item) {
+  animation-delay: 450ms;
+}

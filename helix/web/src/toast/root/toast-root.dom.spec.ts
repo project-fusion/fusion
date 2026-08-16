@@ -373,5 +373,54 @@ if (hasLayout()) {
         Math.round(dismiss.getBoundingClientRect().height),
       )
     })
+
+    test('the mark, the action and the close all sit on the first line', async () => {
+      /* Not centred, which floated them to the middle of a long message, and
+         not plain `start`, which is what an earlier version of this row did:
+         boxes of 16px, 21px and 32px sharing a top edge have centres 8px apart,
+         so a one-line message came out staggered. Each is offset by half the
+         difference between the line and itself, so one line reproduces centring
+         exactly and four leave everything where the reading starts.
+       *
+         The close needed its offset written *inside* its own rule: `all: unset`
+         there wipes a margin set earlier, the same way it wipes `box-sizing`,
+         and it sat 5.5px low until this was measured. */
+      const host = (await mount(
+        `<helix-toast label="N">
+           <helix-toast-item id="short" dismissible severity="danger">Short.
+             <helix-button appearance="tertiary" slot="actions">Retry</helix-button>
+           </helix-toast-item>
+           <helix-toast-item id="long" dismissible severity="danger">A far longer
+             message that wraps onto several separate lines inside the width a
+             toast is given, which is where the alignment question bites.
+             <helix-button appearance="tertiary" slot="actions">Retry</helix-button>
+           </helix-toast-item>
+         </helix-toast>`,
+      )) as HTMLElement
+
+      for (const id of ['short', 'long']) {
+        const found = host.querySelector(`#${id}`) as Item
+        await found.updateComplete
+        const centre = (element: Element): number => {
+          const box = element.getBoundingClientRect()
+          return box.top + box.height / 2
+        }
+        const icon = centre(part(found, 'icon') as HTMLElement)
+        expect(
+          Math.abs(centre(found.querySelector('helix-button') as HTMLElement) - icon),
+        ).toBeLessThan(2)
+        expect(Math.abs(centre(part(found, 'dismiss') as HTMLElement) - icon)).toBeLessThan(2)
+      }
+    })
+
+    test('the arrival holds its starting state through a delay', async () => {
+      /* `backwards` on the entry animation. Without it a stack given staggered
+         delays paints in full and each message jumps back to invisible when its
+         turn comes, which is the opposite of arriving. */
+      const found = await item('severity="info"')
+      expect(getComputedStyle(part(found, 'item') as HTMLElement).animationFillMode).toBe(
+        'backwards',
+      )
+    })
   })
 }
