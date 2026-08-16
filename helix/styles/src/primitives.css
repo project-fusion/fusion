@@ -64,7 +64,7 @@
      nothing else. Below here the ramp can accelerate as much as it likes: 300
      onwards are borders and text, where the eye wants the gaps to open up. */
   --_helix-neutral-200: oklch(
-    0.94 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+    0.95 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
   --_helix-neutral-300: oklch(
     0.84 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)

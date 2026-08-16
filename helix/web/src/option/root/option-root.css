@@ -28,7 +28,11 @@
   block-size: var(--helix-size-control-sm);
   box-sizing: border-box;
   padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs);
+  /* Twelve, matching the drilldown's rows and the select's own trigger. A row
+     that reaches both edges of its panel needs its words held further in than
+     one that sits inside a padded box: the inset is doing the work the box used
+     to. */
+  padding-inline: var(--helix-space-sm);
 }
 
 [part="label"] {

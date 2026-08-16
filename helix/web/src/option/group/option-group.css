@@ -27,5 +27,8 @@
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs);
+  /* The same inset as the rows under it, so the heading and the words it names
+     start on one line down the panel. A group label indented differently from
+     its own group reads as belonging to something else. */
+  padding-inline: var(--helix-space-sm);
 }
