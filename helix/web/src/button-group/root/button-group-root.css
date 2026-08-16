@@ -4,7 +4,7 @@
 
 /* Each button after the first is pulled onto its neighbour's border, so the two
    share one line rather than drawing two against each other. */
-::slotted(*:not(:first-child)) {
+:host(:not([appearance="spaced"])) ::slotted(*:not(:first-child)) {
   margin-inline-start: calc(var(--helix-border-thin) * -1);
 }
 
@@ -14,4 +14,11 @@
 ::slotted(*:focus-within) {
   position: relative;
   z-index: 1;
+}
+
+/* The same set, spaced. The group keeps its role and its name, which is the
+   whole reason this is an appearance and not a `helix-flex`: a row of related
+   actions is still a set, and a screen reader should hear it as one. */
+:host([appearance="spaced"]) {
+  gap: var(--button-group-gap, var(--helix-space-xs));
 }

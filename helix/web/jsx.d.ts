@@ -608,6 +608,8 @@ export type HelixBreadcrumbsSolidJsProps = {
 };
 
 export type HelixButtonGroupProps = {
+  /** Whether the buttons are one bar or a spaced row. */
+  appearance?: HelixButtonGroup["appearance"];
   /** Accessible name for the group.
 
 On the host through internals, so an author's `aria-label` still overrides
@@ -616,6 +618,8 @@ it and nothing lands on the host that a consumer's markup did not have. */
 };
 
 export type HelixButtonGroupSolidJsProps = {
+  /** Whether the buttons are one bar or a spaced row. */
+  "prop:appearance"?: HelixButtonGroup["appearance"];
   /** Accessible name for the group.
 
 On the host through internals, so an author's `aria-label` still overrides
@@ -3605,6 +3609,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the buttons are one bar or a spaced row.
    * - `label`: Accessible name for the group.
    *
    * On the host through internals, so an author's `aria-label` still overrides
@@ -6854,6 +6859,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the buttons are one bar or a spaced row.
    * - `label`: Accessible name for the group.
    *
    * On the host through internals, so an author's `aria-label` still overrides

@@ -390,16 +390,16 @@ helix-button[appearance="primary"]::part(button):hover {
  * this document can. Pairing it with `data-button` means a consumer's own
  * anchor joins the group the same way.
  */
-helix-button-group > :not(:first-child) [data-button],
-helix-button-group > :not(:first-child)::part(button),
-helix-button-group > [data-button]:not(:first-child) {
+helix-button-group:not([appearance="spaced"]) > :not(:first-child) [data-button],
+helix-button-group:not([appearance="spaced"]) > :not(:first-child)::part(button),
+helix-button-group:not([appearance="spaced"]) > [data-button]:not(:first-child) {
   border-start-start-radius: 0;
   border-end-start-radius: 0;
 }
 
-helix-button-group > :not(:last-child) [data-button],
-helix-button-group > :not(:last-child)::part(button),
-helix-button-group > [data-button]:not(:last-child) {
+helix-button-group:not([appearance="spaced"]) > :not(:last-child) [data-button],
+helix-button-group:not([appearance="spaced"]) > :not(:last-child)::part(button),
+helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }

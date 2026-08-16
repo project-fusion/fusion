@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseButtonGroup } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './button-group-root.css.js'
 
 /**
@@ -20,11 +21,29 @@ import { styles } from './button-group-root.css.js'
  * @aliases Segmented buttons, Split button
  * @documentation https://helix.fusion.dev/components/button-group
  *
+ * @property appearance - Whether the buttons are one bar or a spaced row.
+ *
  * @slot - The buttons in the group.
  */
 @customElement('helix-button-group')
 export class HelixButtonGroup extends HelixBaseButtonGroup {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * Whether the buttons are one bar or a spaced row.
+   *
+   * Joined by default, which is what a button group has always meant here: one
+   * control made of parts, sharing borders, reading as a segmented bar.
+   *
+   * `spaced` is the same set with air between them, for a row of related but
+   * separate actions. It exists because the semantics and the joining were one
+   * thing and should not have been: `role="group"` and a shared name are what
+   * make a set of buttons a set, and a consumer who wanted that *and* ordinary
+   * spacing had to choose. `helix-flex` gives the spacing and no group; this
+   * gave the group and no choice about the spacing.
+   */
+  @property({ reflect: true })
+  appearance?: 'joined' | 'spaced'
 }
 
 declare global {
