@@ -400,10 +400,41 @@ export function SandboxWorkbench({ families }: Props) {
   // and handing over the result is the consumer's job rather than a rule the
   // component has to guess at.
   useEffect(() => {
-    if (preview.current) {
-      preview.current.source = syntax === 'html' ? markup : jsxToHtml(markup)
-      preview.current.styles = css
+    if (!preview.current) {
+      return
     }
+    /* Who was typing, before the preview is handed anything.
+     *
+     * An example is free to take focus when it renders, and some of them must:
+     * `showModal()` moves focus into the dialog, and a dialog that does not is
+     * not modal. Measured, that focus lands on the *iframe* from the page's
+     * side, so a reader halfway through typing a dialog example loses the
+     * editor on every keystroke and their next character goes nowhere.
+     *
+     * The example is not wrong to do it and the frame cannot be asked not to,
+     * so the sandbox puts focus back where the reader had it. Only when they
+     * were in an editor: focus is theirs to move, and returning it from
+     * anywhere else would fight them for it. */
+    const typing = Object.values(editors.current).find(
+      (editor) => editor === document.activeElement,
+    )
+
+    preview.current.source = syntax === 'html' ? markup : jsxToHtml(markup)
+    preview.current.styles = css
+
+    if (!typing) {
+      return
+    }
+    /* After the frame has rendered and taken whatever it takes. One frame is
+       enough because the theft happens during the preview's own paint, and
+       waiting longer would mean returning focus after the reader had chosen to
+       move it themselves. */
+    const restore = requestAnimationFrame(() => {
+      if (document.activeElement !== typing) {
+        typing.focus()
+      }
+    })
+    return () => cancelAnimationFrame(restore)
   }, [css, markup, syntax])
 
   // Switching files moves focus into the file switched to. It is what you were
