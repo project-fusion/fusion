@@ -26,6 +26,7 @@
     "rs:test": "cargo test --workspace",
     "specs": "bun tooling/scripts/build-specs.mjs",
     "specs:browser": "bun run specs && node tooling/scripts/run-browser-specs.mjs",
+    "smoke": "node tooling/scripts/run-example-smoke.mjs",
     "styles": "turbo run styles",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",

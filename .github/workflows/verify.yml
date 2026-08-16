@@ -88,3 +88,10 @@ jobs:
       - run: bunx playwright install --with-deps chromium
 
       - run: bun run specs:browser
+
+      # Every example, rendered. `check:examples` reads them and can tell you an
+      # attribute no component declares; only running one can tell you it throws
+      # on upgrade, names an element registered nowhere, or lays out to nothing.
+      # The frame bundle it needs was built by `bun run build` above, because
+      # site-ui's own build emits it.
+      - run: bun run smoke
