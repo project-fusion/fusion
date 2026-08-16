@@ -1,29 +1,16 @@
-<!-- Opened from a button with no script at all. `commandfor` and `command` are
-     the platform's invoker attributes: the browser resolves the id, wires the
-     two together, and dispatches a real activation event, so it works for a
-     click, for Enter and for Space without any of that being written here.
+<helix-button appearance="primary" command="--show" commandfor="confirm">
+  Delete project
+</helix-button>
 
-     Custom commands, prefixed `--`, because the built-in `show-modal` is
-     defined against a native `<dialog>` and does nothing pointed at a custom
-     element. `--show`, `--close` and `--toggle`.
-
-     A real `<dialog>` opened with `showModal()`: the top layer, the backdrop,
-     Escape and inert-behind are the platform's, so nothing here traps focus. -->
-<helix-flex direction="column" gap="md">
-  <helix-button appearance="primary" command="--show" commandfor="confirm">
-    Delete project
-  </helix-button>
-
-  <helix-dialog id="confirm" label="Delete project">
-    <h2 slot="header">Delete project</h2>
-    This removes the project and everything in it. It cannot be undone.
-    <helix-flex slot="footer">
-      <helix-button appearance="tertiary" command="--close" commandfor="confirm">
-        Cancel
-      </helix-button>
-      <helix-button appearance="danger" command="--close" commandfor="confirm">
-        Delete
-      </helix-button>
-    </helix-flex>
-  </helix-dialog>
-</helix-flex>
+<helix-dialog id="confirm" label="Delete project">
+  <h2 slot="header">Delete project</h2>
+  This removes the project and everything in it. It cannot be undone.
+  <helix-flex slot="footer">
+    <helix-button appearance="tertiary" command="--close" commandfor="confirm">
+      Cancel
+    </helix-button>
+    <helix-button appearance="danger" command="--close" commandfor="confirm">
+      Delete
+    </helix-button>
+  </helix-flex>
+</helix-dialog>

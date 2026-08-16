@@ -28,6 +28,30 @@ const config: NextConfig = {
    * directories, no shared state.
    */
   distDir: process.env.NODE_ENV === 'production' ? '.next' : '.next-dev',
+
+  /**
+   * The preview frame's HTML is never cached; everything it points at is.
+   *
+   * `bun run frame` stamps the bundle and the stylesheet with a hash of their
+   * contents, so `frame.js?v=61ce3e17` is a new URL whenever the code changes,
+   * and an old URL can never be served for new code. That is the whole of the
+   * cache story except for the file carrying those two URLs, which is a static
+   * document under `public/` and was cached like any other. A browser holding
+   * yesterday's `frame.html` asks for yesterday's bundle by name and keeps
+   * getting it, so the stamping accomplishes nothing.
+   *
+   * This is the ordinary shape of it and the reason the stamps exist: the
+   * document is small and uncacheable, the assets it names are immutable.
+   */
+  async headers() {
+    return [
+      {
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+        source: '/sandbox/frame.html',
+      },
+    ]
+  },
+
   reactStrictMode: true,
   // Helix ships ESM from workspace packages; Next has to compile it rather
   // than treat it as prebuilt CommonJS. Production resolves `dist` through
