@@ -36,6 +36,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart previous - The control that moves to the previous slide.
  * @csspart next - The control that moves to the next slide.
  * @csspart track - The scroller the slides sit in.
+ * @csspart indicators - The row of controls saying where the reader is.
+ * @csspart indicator - One of them, and a way to reach that slide.
  */
 @customElement('helix-base-carousel')
 export class HelixBaseCarousel extends HelixElement {
@@ -68,6 +70,27 @@ export class HelixBaseCarousel extends HelixElement {
   /** The slides, in light-DOM order. Client only: the server has no tree. */
   get slides(): HTMLElement[] {
     return [...this.children].filter((child): child is HTMLElement => child instanceof HTMLElement)
+  }
+
+  /**
+   * The arrows move between indicators, which is the tablist pattern.
+   *
+   * One tab stop for the set and the arrows within it, so a reader does not
+   * have to press Tab once per slide to get past a carousel of twelve. Moving
+   * changes the slide, because an indicator that could be focused without
+   * selecting would leave the highlight and the slide disagreeing with nothing
+   * on screen saying which is which.
+   */
+  private readonly handleIndicatorKeydown = (event: KeyboardEvent): void => {
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
+    if (step === 0) {
+      return
+    }
+    event.preventDefault()
+    this.goTo(this.index + step)
+    this.updateComplete.then(() => {
+      this.renderRoot.querySelector<HTMLElement>('[part="indicator"][data-current]')?.focus()
+    })
   }
 
   /** Moves to a slide, wrapping only where `loop` says to. */
@@ -215,7 +238,28 @@ export class HelixBaseCarousel extends HelixElement {
           </svg>
         </button>
       </div>
-      <div part="track" @scrollend=${this.handleScroll}><slot></slot></div>`
+      <div part="track" @scrollend=${this.handleScroll}>
+        <slot @slotchange=${() => this.requestUpdate()}></slot>
+      </div>
+      ${
+        this.slides.length > 1
+          ? html`<div part="indicators" role="tablist" aria-label=${`${this.label} slides`}>
+              ${this.slides.map(
+                (_slide, at) => html`<button
+                  part="indicator"
+                  type="button"
+                  role="tab"
+                  aria-label=${`Slide ${at + 1}`}
+                  aria-selected=${at === this.index ? 'true' : 'false'}
+                  tabindex=${at === this.index ? '0' : '-1'}
+                  ?data-current=${at === this.index}
+                  @keydown=${this.handleIndicatorKeydown}
+                  @click=${() => this.goTo(at)}
+                ></button>`,
+              )}
+            </div>`
+          : nothing
+      }`
   }
 }
 

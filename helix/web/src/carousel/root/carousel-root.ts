@@ -19,10 +19,23 @@ import { styles } from './carousel-root.css.js'
  * @aliases Slider, Gallery, Slideshow
  * @documentation https://helix.fusion.dev/components/carousel
  *
+ * @property appearance - Whether the controls sit under the slides or on them.
+ *
  * @cssproperty --carousel-gap - Space between slides.
  */
 @customElement('helix-carousel')
 export class HelixCarousel extends HelixBaseCarousel {
+  /**
+   * Whether the controls sit under the slides or on them.
+   *
+   * `hero` puts the arrows against the track's own edges, over the content,
+   * which is what a full-bleed carousel wants: the slide is the page and the
+   * controls are on it rather than in a bar beneath it. Presentation only, so
+   * it lives here rather than on the headless tier.
+   */
+  @property({ reflect: true })
+  appearance?: 'hero'
+
   /**
    * How many slides are shown across the track at once. Absent shows one.
    *

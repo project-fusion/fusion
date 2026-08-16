@@ -832,6 +832,8 @@ export type HelixCarouselHelixSelectElementEvent =
   HelixCarouselElementEvent<HelixSelectEvent>;
 
 export type HelixCarouselProps = {
+  /** Whether the controls sit under the slides or on them. */
+  appearance?: HelixCarousel["appearance"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 No default, because it reflects. A reflected property with a value writes
@@ -862,6 +864,8 @@ case is the absent attribute, and the styles read it that way. */
 };
 
 export type HelixCarouselSolidJsProps = {
+  /** Whether the controls sit under the slides or on them. */
+  "prop:appearance"?: HelixCarousel["appearance"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 No default, because it reflects. A reflected property with a value writes
@@ -3849,6 +3853,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the controls sit under the slides or on them.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * No default, because it reflects. A reflected property with a value writes
@@ -3895,6 +3900,8 @@ export type CustomElements = {
    * - `previous`: The control that moves to the previous slide.
    * - `next`: The control that moves to the next slide.
    * - `track`: The scroller the slides sit in.
+   * - `indicators`: The row of controls saying where the reader is.
+   * - `indicator`: One of them, and a way to reach that slide.
    */
   "helix-carousel": Partial<
     HelixCarouselProps & BaseProps<HelixCarousel> & BaseEvents
@@ -7113,6 +7120,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the controls sit under the slides or on them.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * No default, because it reflects. A reflected property with a value writes
@@ -7159,6 +7167,8 @@ export type CustomElementsSolidJs = {
    * - `previous`: The control that moves to the previous slide.
    * - `next`: The control that moves to the next slide.
    * - `track`: The scroller the slides sit in.
+   * - `indicators`: The row of controls saying where the reader is.
+   * - `indicator`: One of them, and a way to reach that slide.
    */
   "helix-carousel": Partial<
     HelixCarouselProps &

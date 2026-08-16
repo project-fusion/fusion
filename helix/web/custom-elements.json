@@ -4701,6 +4701,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'hero' | undefined"
+              },
+              "description": "Whether the controls sit under the slides or on them.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "perView",
               "type": {
                 "text": "number | undefined"
@@ -4813,6 +4823,17 @@
               },
               "description": "The slides, in light-DOM order. Client only: the server has no tree.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleIndicatorKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The arrows move between indicators, which is the tablist pattern.\n\nOne tab stop for the set and the arrows within it, so a reader does not\nhave to press Tab once per slide to get past a carousel of twelve. Moving\nchanges the slide, because an indicator that could be focused without\nselecting would leave the highlight and the slide disagreeing with nothing\non screen saying which is which.",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -4968,6 +4989,14 @@
           ],
           "attributes": [
             {
+              "name": "appearance",
+              "type": {
+                "text": "'hero' | undefined"
+              },
+              "description": "Whether the controls sit under the slides or on them.",
+              "fieldName": "appearance"
+            },
+            {
               "name": "per-view",
               "type": {
                 "text": "number | undefined"
@@ -5107,6 +5136,22 @@
             {
               "description": "The scroller the slides sit in.",
               "name": "track",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "description": "The row of controls saying where the reader is.",
+              "name": "indicators",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "description": "One of them, and a way to reach that slide.",
+              "name": "indicator",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"

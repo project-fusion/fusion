@@ -3715,6 +3715,8 @@ export type CustomElements = {
    * - `previous`: The control that moves to the previous slide.
    * - `next`: The control that moves to the next slide.
    * - `track`: The scroller the slides sit in.
+   * - `indicators`: The row of controls saying where the reader is.
+   * - `indicator`: One of them, and a way to reach that slide.
    */
   "helix-base-carousel": Partial<
     HelixBaseCarouselProps & BaseProps<HelixBaseCarousel> & BaseEvents
@@ -6978,6 +6980,8 @@ export type CustomElementsSolidJs = {
    * - `previous`: The control that moves to the previous slide.
    * - `next`: The control that moves to the next slide.
    * - `track`: The scroller the slides sit in.
+   * - `indicators`: The row of controls saying where the reader is.
+   * - `indicator`: One of them, and a way to reach that slide.
    */
   "helix-base-carousel": Partial<
     HelixBaseCarouselProps &

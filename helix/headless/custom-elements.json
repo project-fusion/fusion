@@ -3428,6 +3428,14 @@
             {
               "description": "The scroller the slides sit in.",
               "name": "track"
+            },
+            {
+              "description": "The row of controls saying where the reader is.",
+              "name": "indicators"
+            },
+            {
+              "description": "One of them, and a way to reach that slide.",
+              "name": "indicator"
             }
           ],
           "slots": [
@@ -3513,6 +3521,13 @@
               },
               "description": "The slides, in light-DOM order. Client only: the server has no tree.",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleIndicatorKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The arrows move between indicators, which is the tablist pattern.\n\nOne tab stop for the set and the arrows within it, so a reader does not\nhave to press Tab once per slide to get past a carousel of twelve. Moving\nchanges the slide, because an indicator that could be focused without\nselecting would leave the highlight and the slide disagreeing with nothing\non screen saying which is which."
             },
             {
               "kind": "method",

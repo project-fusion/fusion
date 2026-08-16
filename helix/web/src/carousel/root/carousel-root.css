@@ -98,3 +98,89 @@
     scroll-behavior: auto;
   }
 }
+
+/* Where the reader is, and a way to get anywhere. Dots rather than numbers,
+   because the count is rarely the point and a row of numerals reads as data. */
+[part="indicators"] {
+  display: flex;
+  gap: var(--helix-space-2xs);
+  justify-content: center;
+  padding-block-start: var(--helix-space-sm);
+}
+
+[part="indicator"] {
+  all: unset;
+  background-color: var(--helix-color-border);
+  block-size: var(--helix-space-xs);
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  cursor: pointer;
+  inline-size: var(--helix-space-xs);
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+/* The current one lengthens rather than only changing colour, so the set reads
+   at a glance and still reads without colour. */
+[part="indicator"][data-current] {
+  background-color: var(--helix-color-primary);
+  inline-size: var(--helix-space-lg);
+}
+
+[part="indicator"]:hover {
+  background-color: var(--helix-color-border-strong);
+}
+
+[part="indicator"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Hero. The two arrows leave the controls bar and sit against the track's own
+   edges, over the content, which is what a full-bleed carousel wants: the
+   slide is the page and the controls are on it rather than under it.
+ *
+ * The host becomes the containing block, and the buttons are centred on the
+ * track rather than on the host, because the host also holds the indicators
+ * underneath: centring on it would put the arrows low by half that row. */
+/* A grid, so the controls and the track share one cell and the arrows can be
+   centred on the slides rather than on the whole component. Positioning them
+   against the host does not work: the host holds the indicator row too, so its
+   middle is half that row below the track's, and the arrows came out high. */
+:host([appearance="hero"]) {
+  display: grid;
+  grid-template-rows: auto auto;
+}
+
+:host([appearance="hero"]) [part="controls"],
+:host([appearance="hero"]) [part="track"] {
+  grid-area: 1 / 1;
+}
+
+/* The bar itself catches nothing, so a press between the arrows reaches the
+   slide under it. The buttons take pointer events back. */
+:host([appearance="hero"]) [part="controls"] {
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--helix-space-none);
+  padding-inline: var(--helix-space-md);
+  pointer-events: none;
+  z-index: var(--helix-layer-raised);
+}
+
+/* Over the slide rather than under it, so they need a surface of their own:
+   an arrow drawn straight onto a photograph is legible against about half of
+   one. `overlay` is the token for a thing over the page. */
+:host([appearance="hero"]) [part="previous"],
+:host([appearance="hero"]) [part="next"] {
+  background-color: var(--helix-color-surface-overlay);
+  box-shadow: var(--helix-shadow-md);
+  pointer-events: auto;
+}
+
+/* The rotation toggle stays at the trailing edge, beside the next arrow. */
+:host([appearance="hero"]) [part="rotation"] {
+  order: 1;
+  pointer-events: auto;
+}
