@@ -318,6 +318,15 @@
   --helix-size-tag-lg: calc(1.75rem * var(--_helix-seed-density));
   --helix-size-tag-md: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-tag-sm: calc(1.25rem * var(--_helix-seed-density));
+  /* How thick a bar reporting a proportion is drawn.
+
+     A size rather than a border, which is what it was first: two pixels is a
+     rule, and a reader takes a rule for a divider and a bar for a quantity. It
+     is also the wrong category, and the wrong category is how a token ends up
+     changing when something unrelated to it does. Eight follows the density
+     seed like every other size here, so a dense region gets a thinner bar
+     without the component having a size property to be told about it. */
+  --helix-size-progress: calc(0.5rem * var(--_helix-seed-density));
   /* Sixteen, twenty, twenty-four: an even four pixels a step.
      `md` was eighteen and `lg` twenty-two, which made the top step two pixels
      while the bottom one was four. Moving `md` up to twenty is what was asked

@@ -7852,6 +7852,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/progress/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/quote/index.js"
           }
         },
@@ -11658,6 +11666,239 @@
           "declaration": {
             "name": "HelixBaseOption",
             "module": "src/option/root/option-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/progress/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/progress/root/progress-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/progress/root/progress-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Determinate only. `Spinner` is what says something is happening without\nsaying how much of it is done, and a bar that fills at a made-up rate to\ncover the same case is a bar that lies: a reader takes a position along a\ntrack as a proportion, and it is the one thing the component is for. A task\nwhose total is unknown wants the spinner.\n\n**The fill is a percentage of the track, written as a custom property.** It\nis derived from `value` and `max` rather than measured, so it renders on a\nserver with no layout and needs nothing after upgrade. That is what keeps it\nout of the class of geometry this library writes only on the client.\n\n**`value` is clamped, and out-of-range input is not an error.** A count that\nruns past its own total is ordinary in real applications, and a bar that\noverflows its track or reports `aria-valuenow` above `aria-valuemax` is worse\nthan one that reads as finished.\n\nSemantics are on the host through `ElementInternals`, the same as everywhere\nelse: a `role` in the shadow root announces correctly and leaves the host\nanonymous to anything walking the light DOM, and a `role` written onto the\nhost as an attribute is one a server's markup never had.",
+          "name": "HelixBaseProgress",
+          "cssParts": [
+            {
+              "description": "The full length the work is measured against.",
+              "name": "track"
+            },
+            {
+              "description": "The part of it that is done.",
+              "name": "indicator"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Progress'",
+              "description": "Accessible name for what is in progress.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "The total the work is measured against.",
+              "attribute": "max"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "What has been done so far, in the same units as `max`.\n\nClamped between zero and `max` for both the fill and the announcement, so\nthe two can never disagree about what is on screen.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "valueText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A reading for the value, where the number alone does not say enough.\n\n\"3 of 8 files\" rather than \"37\". Announced instead of the percentage, and\nnever instead of the value itself: `aria-valuenow` still carries the\nnumber, because assistive technology that ignores the text still has to\nreport progress.",
+              "attribute": "value-text"
+            },
+            {
+              "kind": "field",
+              "name": "fraction",
+              "type": {
+                "text": "number"
+              },
+              "description": "What is done, as a fraction of the whole, between 0 and 1.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Progress'",
+              "description": "Accessible name for what is in progress.",
+              "fieldName": "label"
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "The total the work is measured against.",
+              "fieldName": "max"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "What has been done so far, in the same units as `max`.\n\nClamped between zero and `max` for both the fill and the announcement, so\nthe two can never disagree about what is on screen.",
+              "fieldName": "value"
+            },
+            {
+              "name": "value-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A reading for the value, where the number alone does not say enough.\n\n\"3 of 8 files\" rather than \"37\". Announced instead of the percentage, and\nnever instead of the value itself: `aria-valuenow` still carries the\nnumber, because assistive technology that ignores the text still has to\nreport progress.",
+              "fieldName": "valueText"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Shows how far along a task is, when that is known.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/progress",
+            "aliases": [
+              "Progress bar",
+              "Loading bar"
+            ],
+            "tier": "headless",
+            "group": "BaseProgress",
+            "part": "Root"
+          },
+          "tagName": "helix-base-progress",
+          "customElement": true,
+          "modulePath": "src/progress/root/progress-root.ts",
+          "definitionPath": "src/progress/root/progress-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseProgress",
+          "declaration": {
+            "name": "HelixBaseProgress",
+            "module": "src/progress/root/progress-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-progress",
+          "declaration": {
+            "name": "HelixBaseProgress",
+            "module": "src/progress/root/progress-root.ts"
           }
         }
       ]

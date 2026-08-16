@@ -10749,6 +10749,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/progress/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/quote/index.js"
           }
         },
@@ -15435,6 +15443,335 @@
           "declaration": {
             "name": "HelixOption",
             "module": "src/option/root/option-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/progress/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/progress/root/progress-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/progress/root/progress-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/progress/root/progress-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/progress/root/progress-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A track and the part of it that is done. The height comes from a token rather\nthan from a size property, for the reason the rest of the library gives about\ncontrols: how heavy a bar is says something about the region it is in, and a\n`--progress-size` on that region says it once.\n\nThe fill transitions, which is worth more here than it looks. Progress\narrives in steps, often large ones, and a bar that jumps between them reads\nas a series of unrelated states where one that travels reads as a single\nthing advancing.",
+          "name": "HelixProgress",
+          "cssProperties": [
+            {
+              "description": "Thickness of the bar.",
+              "name": "--progress-size"
+            },
+            {
+              "description": "Fill of the part that is done.",
+              "name": "--progress-color"
+            },
+            {
+              "description": "Fill of the part that is not.",
+              "name": "--progress-track-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'success' | undefined"
+              },
+              "description": "What the fill means.\n\nUnset is the accent, which is what progress usually is. `success` is for a\nbar that has arrived somewhere good and stays on screen to say so, and\n`danger` for a quota being consumed rather than a task being finished:\nboth are the same geometry reading the opposite way.",
+              "attribute": "tone",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Progress'",
+              "description": "Accessible name for what is in progress.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "The total the work is measured against.",
+              "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "What has been done so far, in the same units as `max`.\n\nClamped between zero and `max` for both the fill and the announcement, so\nthe two can never disagree about what is on screen.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A reading for the value, where the number alone does not say enough.\n\n\"3 of 8 files\" rather than \"37\". Announced instead of the percentage, and\nnever instead of the value itself: `aria-valuenow` still carries the\nnumber, because assistive technology that ignores the text still has to\nreport progress.",
+              "attribute": "value-text",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "fraction",
+              "type": {
+                "text": "number"
+              },
+              "description": "What is done, as a fraction of the whole, between 0 and 1.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'success' | undefined"
+              },
+              "description": "What the fill means.\n\nUnset is the accent, which is what progress usually is. `success` is for a\nbar that has arrived somewhere good and stays on screen to say so, and\n`danger` for a quota being consumed rather than a task being finished:\nboth are the same geometry reading the opposite way.",
+              "fieldName": "tone"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Progress'",
+              "description": "Accessible name for what is in progress.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "The total the work is measured against.",
+              "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "What has been done so far, in the same units as `max`.\n\nClamped between zero and `max` for both the fill and the announcement, so\nthe two can never disagree about what is on screen.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "name": "value-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A reading for the value, where the number alone does not say enough.\n\n\"3 of 8 files\" rather than \"37\". Announced instead of the percentage, and\nnever instead of the value itself: `aria-valuenow` still carries the\nnumber, because assistive technology that ignores the text still has to\nreport progress.",
+              "fieldName": "valueText",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseProgress",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Shows how far along a task is, when that is known.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/progress",
+            "aliases": [
+              "Progress bar",
+              "Loading bar"
+            ],
+            "tier": "styled",
+            "group": "Progress",
+            "part": "Root"
+          },
+          "tagName": "helix-progress",
+          "customElement": true,
+          "cssParts": [
+            {
+              "description": "The full length the work is measured against.",
+              "name": "track",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "description": "The part of it that is done.",
+              "name": "indicator",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/progress/root/progress-root.ts",
+          "definitionPath": "src/progress/root/progress-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixProgress",
+          "declaration": {
+            "name": "HelixProgress",
+            "module": "src/progress/root/progress-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-progress",
+          "declaration": {
+            "name": "HelixProgress",
+            "module": "src/progress/root/progress-root.ts"
           }
         }
       ]

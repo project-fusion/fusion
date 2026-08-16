@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+/* The whole length the work is measured against, and it is always fully drawn:
+   a track that only appears where the fill has not reached leaves the bar
+   without a total, and a proportion needs both halves to be read as one. */
+[part="track"] {
+  background-color: var(--progress-track-color, var(--helix-color-surface-sunken));
+  block-size: var(--progress-size, var(--helix-size-progress));
+  border-radius: var(--helix-radii-full);
+  inline-size: 100%;
+  /* The fill is a child with a radius of its own, and at low values its
+     trailing corners would otherwise round outside the track. */
+  overflow: hidden;
+}
+
+/* `scale` on the inline axis rather than a width, because a transform is
+   composited: a bar updated many times a second is the ordinary case, and a
+   width animation lays the track out again on every frame.
+ *
+ * The origin is the inline start, so it grows from the same edge in both
+ * writing directions without the component knowing which one it is in. */
+[part="indicator"] {
+  background-color: var(--progress-color, var(--helix-color-primary));
+  block-size: 100%;
+  border-radius: inherit;
+  inline-size: 100%;
+  scale: var(--_progress-fraction, 0) 1;
+  transform-origin: left center;
+  transition: scale var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+:host(:dir(rtl)) [part="indicator"] {
+  transform-origin: right center;
+}
+
+:host([tone="success"]) [part="indicator"] {
+  background-color: var(--progress-color, var(--helix-color-success));
+}
+
+:host([tone="danger"]) [part="indicator"] {
+  background-color: var(--progress-color, var(--helix-color-danger));
+}
+
+/* It arrives at its value rather than travelling to it, for a reader who has
+   asked not to be moved. The bar still reads correctly: what is lost is the
+   sense of advancing, which is exactly what the preference is about. */
+@media (prefers-reduced-motion: reduce) {
+  [part="indicator"] {
+    transition: none;
+  }
+}

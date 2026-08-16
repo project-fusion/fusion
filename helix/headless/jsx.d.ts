@@ -35,6 +35,7 @@ import type {
   HelixBaseNavBar,
   HelixBaseOption,
   HelixBaseOptionGroup,
+  HelixBaseProgress,
   HelixBaseQuote,
   HelixBaseRadio,
   HelixBaseRadioGroup,
@@ -1918,6 +1919,63 @@ export type HelixBaseOptionSolidJsProps = {
   "prop:value"?: HelixBaseOption["value"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseProgressProps = {
+  /** Accessible name for what is in progress. */
+  label?: HelixBaseProgress["label"];
+  /** The total the work is measured against. */
+  max?: HelixBaseProgress["max"];
+  /** What has been done so far, in the same units as `max`.
+
+Clamped between zero and `max` for both the fill and the announcement, so
+the two can never disagree about what is on screen. */
+  value?: HelixBaseProgress["value"];
+  /** A reading for the value, where the number alone does not say enough.
+
+"3 of 8 files" rather than "37". Announced instead of the percentage, and
+never instead of the value itself: `aria-valuenow` still carries the
+number, because assistive technology that ignores the text still has to
+report progress. */
+  "value-text"?: HelixBaseProgress["valueText"];
+  /** A reading for the value, where the number alone does not say enough.
+
+"3 of 8 files" rather than "37". Announced instead of the percentage, and
+never instead of the value itself: `aria-valuenow` still carries the
+number, because assistive technology that ignores the text still has to
+report progress. */
+  valueText?: HelixBaseProgress["valueText"];
+};
+
+export type HelixBaseProgressSolidJsProps = {
+  /** Accessible name for what is in progress. */
+  "prop:label"?: HelixBaseProgress["label"];
+  /** The total the work is measured against. */
+  "prop:max"?: HelixBaseProgress["max"];
+  /** What has been done so far, in the same units as `max`.
+
+Clamped between zero and `max` for both the fill and the announcement, so
+the two can never disagree about what is on screen. */
+  "prop:value"?: HelixBaseProgress["value"];
+  /** A reading for the value, where the number alone does not say enough.
+
+"3 of 8 files" rather than "37". Announced instead of the percentage, and
+never instead of the value itself: `aria-valuenow` still carries the
+number, because assistive technology that ignores the text still has to
+report progress. */
+  "attr:value-text"?: HelixBaseProgress["valueText"];
+  /** A reading for the value, where the number alone does not say enough.
+
+"3 of 8 files" rather than "37". Announced instead of the percentage, and
+never instead of the value itself: `aria-valuenow` still carries the
+number, because assistive technology that ignores the text still has to
+report progress. */
+  "prop:valueText"?: HelixBaseProgress["valueText"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5129,6 +5187,57 @@ export type CustomElements = {
    */
   "helix-base-option": Partial<
     HelixBaseOptionProps & BaseProps<HelixBaseOption> & BaseEvents
+  >;
+
+  /**
+   * Determinate only. `Spinner` is what says something is happening without
+   * saying how much of it is done, and a bar that fills at a made-up rate to
+   * cover the same case is a bar that lies: a reader takes a position along a
+   * track as a proportion, and it is the one thing the component is for. A task
+   * whose total is unknown wants the spinner.
+   *
+   * **The fill is a percentage of the track, written as a custom property.** It
+   * is derived from `value` and `max` rather than measured, so it renders on a
+   * server with no layout and needs nothing after upgrade. That is what keeps it
+   * out of the class of geometry this library writes only on the client.
+   *
+   * **`value` is clamped, and out-of-range input is not an error.** A count that
+   * runs past its own total is ordinary in real applications, and a bar that
+   * overflows its track or reports `aria-valuenow` above `aria-valuemax` is worse
+   * than one that reads as finished.
+   *
+   * Semantics are on the host through `ElementInternals`, the same as everywhere
+   * else: a `role` in the shadow root announces correctly and leaves the host
+   * anonymous to anything walking the light DOM, and a `role` written onto the
+   * host as an attribute is one a server's markup never had.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for what is in progress.
+   * - `max`: The total the work is measured against.
+   * - `value`: What has been done so far, in the same units as `max`.
+   *
+   * Clamped between zero and `max` for both the fill and the announcement, so
+   * the two can never disagree about what is on screen.
+   * - `value-text`/`valueText`: A reading for the value, where the number alone does not say enough.
+   *
+   * "3 of 8 files" rather than "37". Announced instead of the percentage, and
+   * never instead of the value itself: `aria-valuenow` still carries the
+   * number, because assistive technology that ignores the text still has to
+   * report progress.
+   * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `track`: The full length the work is measured against.
+   * - `indicator`: The part of it that is done.
+   */
+  "helix-base-progress": Partial<
+    HelixBaseProgressProps & BaseProps<HelixBaseProgress> & BaseEvents
   >;
 
   /**
@@ -8572,6 +8681,60 @@ export type CustomElementsSolidJs = {
     HelixBaseOptionProps &
       HelixBaseOptionSolidJsProps &
       BaseProps<HelixBaseOption> &
+      BaseEvents
+  >;
+
+  /**
+   * Determinate only. `Spinner` is what says something is happening without
+   * saying how much of it is done, and a bar that fills at a made-up rate to
+   * cover the same case is a bar that lies: a reader takes a position along a
+   * track as a proportion, and it is the one thing the component is for. A task
+   * whose total is unknown wants the spinner.
+   *
+   * **The fill is a percentage of the track, written as a custom property.** It
+   * is derived from `value` and `max` rather than measured, so it renders on a
+   * server with no layout and needs nothing after upgrade. That is what keeps it
+   * out of the class of geometry this library writes only on the client.
+   *
+   * **`value` is clamped, and out-of-range input is not an error.** A count that
+   * runs past its own total is ordinary in real applications, and a bar that
+   * overflows its track or reports `aria-valuenow` above `aria-valuemax` is worse
+   * than one that reads as finished.
+   *
+   * Semantics are on the host through `ElementInternals`, the same as everywhere
+   * else: a `role` in the shadow root announces correctly and leaves the host
+   * anonymous to anything walking the light DOM, and a `role` written onto the
+   * host as an attribute is one a server's markup never had.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for what is in progress.
+   * - `max`: The total the work is measured against.
+   * - `value`: What has been done so far, in the same units as `max`.
+   *
+   * Clamped between zero and `max` for both the fill and the announcement, so
+   * the two can never disagree about what is on screen.
+   * - `value-text`/`valueText`: A reading for the value, where the number alone does not say enough.
+   *
+   * "3 of 8 files" rather than "37". Announced instead of the percentage, and
+   * never instead of the value itself: `aria-valuenow` still carries the
+   * number, because assistive technology that ignores the text still has to
+   * report progress.
+   * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `track`: The full length the work is measured against.
+   * - `indicator`: The part of it that is done.
+   */
+  "helix-base-progress": Partial<
+    HelixBaseProgressProps &
+      HelixBaseProgressSolidJsProps &
+      BaseProps<HelixBaseProgress> &
       BaseEvents
   >;
 

@@ -42,6 +42,7 @@ import type {
   HelixOpenEvent,
   HelixOption,
   HelixOptionGroup,
+  HelixProgress,
   HelixQuote,
   HelixRadio,
   HelixRadioGroup,
@@ -2124,6 +2125,77 @@ export type HelixOptionSolidJsProps = {
   "prop:value"?: HelixOption["value"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixOptionHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixProgressProps = {
+  /** What the fill means.
+
+Unset is the accent, which is what progress usually is. `success` is for a
+bar that has arrived somewhere good and stays on screen to say so, and
+`danger` for a quota being consumed rather than a task being finished:
+both are the same geometry reading the opposite way. */
+  tone?: HelixProgress["tone"];
+  /** Accessible name for what is in progress. */
+  label?: HelixProgress["label"];
+  /** The total the work is measured against. */
+  max?: HelixProgress["max"];
+  /** What has been done so far, in the same units as `max`.
+
+Clamped between zero and `max` for both the fill and the announcement, so
+the two can never disagree about what is on screen. */
+  value?: HelixProgress["value"];
+  /** A reading for the value, where the number alone does not say enough.
+
+"3 of 8 files" rather than "37". Announced instead of the percentage, and
+never instead of the value itself: `aria-valuenow` still carries the
+number, because assistive technology that ignores the text still has to
+report progress. */
+  "value-text"?: HelixProgress["valueText"];
+  /** A reading for the value, where the number alone does not say enough.
+
+"3 of 8 files" rather than "37". Announced instead of the percentage, and
+never instead of the value itself: `aria-valuenow` still carries the
+number, because assistive technology that ignores the text still has to
+report progress. */
+  valueText?: HelixProgress["valueText"];
+};
+
+export type HelixProgressSolidJsProps = {
+  /** What the fill means.
+
+Unset is the accent, which is what progress usually is. `success` is for a
+bar that has arrived somewhere good and stays on screen to say so, and
+`danger` for a quota being consumed rather than a task being finished:
+both are the same geometry reading the opposite way. */
+  "prop:tone"?: HelixProgress["tone"];
+  /** Accessible name for what is in progress. */
+  "prop:label"?: HelixProgress["label"];
+  /** The total the work is measured against. */
+  "prop:max"?: HelixProgress["max"];
+  /** What has been done so far, in the same units as `max`.
+
+Clamped between zero and `max` for both the fill and the announcement, so
+the two can never disagree about what is on screen. */
+  "prop:value"?: HelixProgress["value"];
+  /** A reading for the value, where the number alone does not say enough.
+
+"3 of 8 files" rather than "37". Announced instead of the percentage, and
+never instead of the value itself: `aria-valuenow` still carries the
+number, because assistive technology that ignores the text still has to
+report progress. */
+  "attr:value-text"?: HelixProgress["valueText"];
+  /** A reading for the value, where the number alone does not say enough.
+
+"3 of 8 files" rather than "37". Announced instead of the percentage, and
+never instead of the value itself: `aria-valuenow` still carries the
+number, because assistive technology that ignores the text still has to
+report progress. */
+  "prop:valueText"?: HelixProgress["valueText"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5375,6 +5447,60 @@ export type CustomElements = {
    */
   "helix-option": Partial<
     HelixOptionProps & BaseProps<HelixOption> & BaseEvents
+  >;
+
+  /**
+   * A track and the part of it that is done. The height comes from a token rather
+   * than from a size property, for the reason the rest of the library gives about
+   * controls: how heavy a bar is says something about the region it is in, and a
+   * `--progress-size` on that region says it once.
+   *
+   * The fill transitions, which is worth more here than it looks. Progress
+   * arrives in steps, often large ones, and a bar that jumps between them reads
+   * as a series of unrelated states where one that travels reads as a single
+   * thing advancing.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `tone`: What the fill means.
+   *
+   * Unset is the accent, which is what progress usually is. `success` is for a
+   * bar that has arrived somewhere good and stays on screen to say so, and
+   * `danger` for a quota being consumed rather than a task being finished:
+   * both are the same geometry reading the opposite way.
+   * - `label`: Accessible name for what is in progress.
+   * - `max`: The total the work is measured against.
+   * - `value`: What has been done so far, in the same units as `max`.
+   *
+   * Clamped between zero and `max` for both the fill and the announcement, so
+   * the two can never disagree about what is on screen.
+   * - `value-text`/`valueText`: A reading for the value, where the number alone does not say enough.
+   *
+   * "3 of 8 files" rather than "37". Announced instead of the percentage, and
+   * never instead of the value itself: `aria-valuenow` still carries the
+   * number, because assistive technology that ignores the text still has to
+   * report progress.
+   * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--progress-size`: Thickness of the bar. (default: `undefined`)
+   * - `--progress-color`: Fill of the part that is done. (default: `undefined`)
+   * - `--progress-track-color`: Fill of the part that is not. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `track`: The full length the work is measured against.
+   * - `indicator`: The part of it that is done.
+   */
+  "helix-progress": Partial<
+    HelixProgressProps & BaseProps<HelixProgress> & BaseEvents
   >;
 
   /**
@@ -8844,6 +8970,63 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * A track and the part of it that is done. The height comes from a token rather
+   * than from a size property, for the reason the rest of the library gives about
+   * controls: how heavy a bar is says something about the region it is in, and a
+   * `--progress-size` on that region says it once.
+   *
+   * The fill transitions, which is worth more here than it looks. Progress
+   * arrives in steps, often large ones, and a bar that jumps between them reads
+   * as a series of unrelated states where one that travels reads as a single
+   * thing advancing.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `tone`: What the fill means.
+   *
+   * Unset is the accent, which is what progress usually is. `success` is for a
+   * bar that has arrived somewhere good and stays on screen to say so, and
+   * `danger` for a quota being consumed rather than a task being finished:
+   * both are the same geometry reading the opposite way.
+   * - `label`: Accessible name for what is in progress.
+   * - `max`: The total the work is measured against.
+   * - `value`: What has been done so far, in the same units as `max`.
+   *
+   * Clamped between zero and `max` for both the fill and the announcement, so
+   * the two can never disagree about what is on screen.
+   * - `value-text`/`valueText`: A reading for the value, where the number alone does not say enough.
+   *
+   * "3 of 8 files" rather than "37". Announced instead of the percentage, and
+   * never instead of the value itself: `aria-valuenow` still carries the
+   * number, because assistive technology that ignores the text still has to
+   * report progress.
+   * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--progress-size`: Thickness of the bar. (default: `undefined`)
+   * - `--progress-color`: Fill of the part that is done. (default: `undefined`)
+   * - `--progress-track-color`: Fill of the part that is not. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `track`: The full length the work is measured against.
+   * - `indicator`: The part of it that is done.
+   */
+  "helix-progress": Partial<
+    HelixProgressProps &
+      HelixProgressSolidJsProps &
+      BaseProps<HelixProgress> &
+      BaseEvents
+  >;
+
+  /**
    * Takes the surrounding type rather than a size of its own, because a quotation
    * inside a paragraph is that paragraph's text with marks around it.
    *
@@ -10412,6 +10595,12 @@ export type CustomCssProperties = {
   "--nav-bar-gap"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
+  /** Thickness of the bar. */
+  "--progress-size"?: string;
+  /** Fill of the part that is done. */
+  "--progress-color"?: string;
+  /** Fill of the part that is not. */
+  "--progress-track-color"?: string;
   /** Color of the quoted text. */
   "--quote-color"?: string;
   /** Space between the choices. */
