@@ -17,6 +17,7 @@
  * Run with bun, not node: `Bun.build` is the bundler.
  */
 
+import { createHash } from 'node:crypto'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -56,6 +57,21 @@ if (!built.success) {
 
 const script = await built.outputs[0].text()
 await writeFile(join(out, 'frame.js'), script)
+
+/* What the frame asks for, stamped with what it got.
+ *
+ * The frame loads its bundle with a plain `<script src="./frame.js">`, and a
+ * static file under `public/` is served with caching headers, so a browser that
+ * has seen one build keeps it. The failure that causes is nasty because it does
+ * not look like caching: an element added since the cached bundle is simply not
+ * defined, so it never upgrades, and an unknown element renders its children
+ * inline. A dialog looks permanently open with buttons that do nothing, which
+ * reads as a broken component rather than a stale file.
+ *
+ * Reported exactly that way, and it cost an hour of looking at the component.
+ * The content decides the token, so a rebuild that changes nothing changes no
+ * URL and the cache still does its job. */
+const stamp = (contents) => createHash('sha256').update(contents).digest('hex').slice(0, 8)
 
 const css = await Promise.all(layers.map((layer) => readFile(join(root, layer), 'utf8')))
 
@@ -105,7 +121,8 @@ const families = `:root {
   --_helix-family-display: 'Fusion Display', 'Fusion Sans', ui-sans-serif, sans-serif;
 }`
 
-await writeFile(join(out, 'frame.css'), [...css, ...fonts, families].join('\n'))
+const styles = [...css, ...fonts, families].join('\n')
+await writeFile(join(out, 'frame.css'), styles)
 
 /* `preview-root` carries the layout mode, and the example's markup replaces its
    contents. The script is deferred so the element exists before it runs. */
@@ -117,11 +134,11 @@ await writeFile(
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sandbox preview</title>
-    <link rel="stylesheet" href="./frame.css" />
+    <link rel="stylesheet" href="./frame.css?v=${stamp(styles)}" />
   </head>
   <body>
     <div id="preview-root" data-layout="padded"></div>
-    <script src="./frame.js" defer></script>
+    <script src="./frame.js?v=${stamp(script)}" defer></script>
   </body>
 </html>
 `,
