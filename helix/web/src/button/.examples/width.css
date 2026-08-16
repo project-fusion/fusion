@@ -1,0 +1,12 @@
+/* The column is the thing with a width. Nothing is said about the buttons. */
+.column {
+  max-inline-size: 20rem;
+}
+
+/* And this is the whole of "make a button hug its label": one line about how
+   the child sits in its parent, written where every other layout decision is
+   written. A `width` property on the button would have to answer this question
+   again for every layout it is ever put in. */
+.hug {
+  align-self: start;
+}

@@ -14,7 +14,14 @@ import { join } from 'node:path'
 const MANIFEST = 'helix/web/custom-elements.json'
 const ROOT = 'helix/web/src'
 
-/** Attributes any element may carry, so no component declares them. */
+/**
+ * Attributes any element may carry, so no component declares them.
+ *
+ * `style` stays here so the attribute check passes over it quietly and the
+ * dedicated rule below is the one that speaks. Reported from here it would read
+ * "has no attribute style", which is both wrong and unhelpful: every element
+ * has one, and the objection is not that it does not exist.
+ */
 const GLOBAL = new Set([
   'class',
   'dir',
@@ -66,14 +73,40 @@ for (const family of all) {
 
 for (const family of families) {
   const dir = join(ROOT, family, '.examples')
-  const files = readdirSync(dir).filter((f) => f.endsWith('.html'))
+  const entries = readdirSync(dir)
+  const files = entries.filter((f) => f.endsWith('.html'))
   if (files.length === 0) {
     problems.push(`${family}: .examples holds no example`)
+  }
+
+  /* An example is `<slug>.html` and, where it needs one, `<slug>.css` beside
+     it. The markup is what makes it an example, so a stylesheet without one is
+     a file nothing will ever load: the catalog reads it only when asked for the
+     example of that name, and there is no example of that name. */
+  for (const sheet of entries.filter((f) => f.endsWith('.css'))) {
+    if (!files.includes(sheet.replace(/\.css$/, '.html'))) {
+      problems.push(`${family}/${sheet}: no ${sheet.replace(/\.css$/, '.html')} to style`)
+    }
   }
 
   for (const file of files) {
     const html = readFileSync(join(dir, file), 'utf8')
     const where = `${family}/${file}`
+
+    /* Every element, not only the Helix ones: a `style` on the `<div>` wrapping
+       them teaches the same habit as one on a component. The stylesheet beside
+       the example is where this goes, which the sandbox already shows as
+       `styles.css` next to `index.html`.
+
+       An inline style cannot express a hover, a media query, a pseudo-element
+       or a custom property block, and it outranks every rule a reader then
+       writes against it, so the first thing they learn from copying one is that
+       their own stylesheet does not work. */
+    for (const [, tag] of html.matchAll(/<([a-z][a-z0-9-]*)[^>]*\sstyle=/g)) {
+      problems.push(
+        `${where}: <${tag}> carries a style attribute. Use ${file.replace(/\.html$/, '.css')}`,
+      )
+    }
 
     for (const [, tag, rest] of html.matchAll(/<(helix-[a-z0-9-]+)([^>]*)>/g)) {
       const known = tags.get(tag)

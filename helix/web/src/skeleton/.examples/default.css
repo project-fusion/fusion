@@ -1,0 +1,25 @@
+/* A skeleton takes its size from whatever it is standing in for, which is why
+   it has no size of its own to set. The avatar is a control-sized circle; the
+   two lines are the widths a name and a line of detail actually land on.
+
+   Unequal on purpose. Two bars of the same length read as a pattern, and a
+   reader waiting on content reads a pattern as decoration rather than as
+   something about to be replaced. */
+.avatar {
+  block-size: 2.5rem;
+  inline-size: 2.5rem;
+}
+
+/* Takes the rest of the row, so the lines are measured against the space left
+   after the avatar rather than against the viewport. */
+.lines {
+  flex: 1;
+}
+
+.line-name {
+  inline-size: 40%;
+}
+
+.line-detail {
+  inline-size: 70%;
+}

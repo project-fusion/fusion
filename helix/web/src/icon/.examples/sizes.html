@@ -1,4 +1,8 @@
-<helix-icon name="pulse" style="--icon-size: 1rem"></helix-icon>
-<helix-icon name="pulse" style="--icon-size: 1.5rem"></helix-icon>
-<helix-icon name="pulse" style="--icon-size: 2rem"></helix-icon>
-<helix-icon name="pulse" style="--icon-size: 3rem"></helix-icon>
+<!-- An icon is a picture, so it has an optical size rather than a control
+     height, and it takes it from `--icon-size`. A custom property crosses the
+     shadow boundary on its own, which is why there is no size attribute here
+     for one to be set against. -->
+<helix-icon class="sm" name="pulse"></helix-icon>
+<helix-icon class="md" name="pulse"></helix-icon>
+<helix-icon class="lg" name="pulse"></helix-icon>
+<helix-icon class="xl" name="pulse"></helix-icon>

@@ -1,10 +1,10 @@
+<!-- The shape of a row that has not arrived yet: an avatar and two lines. The
+     sizes belong to the thing being stood in for, not to the skeleton, so they
+     are in the stylesheet beside this. -->
 <helix-flex align="center" gap="md">
-  <helix-skeleton
-    shape="circle"
-    style="inline-size: 2.5rem; block-size: 2.5rem"
-  ></helix-skeleton>
-  <helix-flex direction="column" gap="2xs" style="flex: 1">
-    <helix-skeleton shape="text" style="inline-size: 40%"></helix-skeleton>
-    <helix-skeleton shape="text" style="inline-size: 70%"></helix-skeleton>
+  <helix-skeleton class="avatar" shape="circle"></helix-skeleton>
+  <helix-flex class="lines" direction="column" gap="2xs">
+    <helix-skeleton class="line-name" shape="text"></helix-skeleton>
+    <helix-skeleton class="line-detail" shape="text"></helix-skeleton>
   </helix-flex>
 </helix-flex>

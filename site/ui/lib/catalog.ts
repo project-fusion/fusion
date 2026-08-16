@@ -41,6 +41,8 @@ export interface Element {
 }
 
 export interface Example {
+  /** The example's own stylesheet, or empty where it needs none. */
+  css: string
   html: string
   label: string
   slug: string
@@ -120,7 +122,21 @@ const MANIFESTS = [
   'helix/sandbox/custom-elements.json',
 ]
 
-/** Examples live beside the styled component, keyed by family folder. */
+/**
+ * Examples live beside the styled component, keyed by family folder.
+ *
+ * An example is up to two files, `<slug>.html` and an optional `<slug>.css`.
+ * The HTML is the list: a stylesheet on its own is not an example, and
+ * `check:examples` fails on one whose markup is missing rather than showing a
+ * sandbox with a stylesheet and nothing to style.
+ *
+ * The pair is what the sandbox already shows, `index.html` beside `styles.css`,
+ * so the second file is the one the reader is looking at rather than a build
+ * step. It is also what replaced the `style` attributes these examples used to
+ * carry: an inline style is unreachable from a stylesheet, cannot express a
+ * hover or a media query, and teaches a reader to write the one thing the
+ * library exists to avoid.
+ */
 const examplesOf = (slug: string): Example[] => {
   const dir = join(REPO, 'helix/web/src', slug, '.examples')
   if (!existsSync(dir)) {
@@ -131,7 +147,9 @@ const examplesOf = (slug: string): Example[] => {
     .sort((a, b) => (a === 'default.html' ? -1 : b === 'default.html' ? 1 : a.localeCompare(b)))
     .map((file) => {
       const slugged = file.replace(/\.html$/, '')
+      const stylesheet = join(dir, `${slugged}.css`)
       return {
+        css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
         html: readFileSync(join(dir, file), 'utf8').trim(),
         // The canonical example reads as "Preview": it is the component's
         // headline, not a named variant sitting beside the others.

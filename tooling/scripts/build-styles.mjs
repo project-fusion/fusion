@@ -20,7 +20,20 @@
 import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
-const IGNORED = new Set(['.git', '.local', '.next', '.turbo', 'dist', 'node_modules', 'target'])
+/* `.examples` holds the sandbox's own files, `<slug>.html` and `<slug>.css`.
+   They are a consumer's stylesheet rather than a component's, read at runtime by
+   the catalog and shown in the editor, so compiling one into a `.css.ts` would
+   put a generated module beside an example nobody imports. */
+const IGNORED = new Set([
+  '.examples',
+  '.git',
+  '.local',
+  '.next',
+  '.turbo',
+  'dist',
+  'node_modules',
+  'target',
+])
 
 /** The styles package ships raw CSS to consumers; it has no components. */
 const SKIP = /helix[/\\]styles[/\\]/

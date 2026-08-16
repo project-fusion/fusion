@@ -1,0 +1,7 @@
+/* A settings panel is a column, not a sheet the width of the window. The
+   drill-down does not pick a width for the same reason a menu does not: it is
+   put in a sidebar, a popover and a phone-width screen, and only one of those
+   is knowable from here. */
+.panel {
+  max-inline-size: 18rem;
+}

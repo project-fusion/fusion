@@ -380,9 +380,14 @@ export function SandboxWorkbench({ families }: Props) {
     const last = seeded.current
     if (!last || last.example !== address) {
       setMarkup(syntax === 'html' ? example.html : htmlToJsx(example.html))
-      setCss(CSS_START)
+      /* The example's own stylesheet where it ships one, and the placeholder
+         where it does not. Pushed at the preview here as well as in the effect
+         that follows every edit: that effect runs after this render, so seeding
+         only the state showed one frame of the example unstyled, which on the
+         examples that lay themselves out is the whole preview jumping. */
+      setCss(example.css || CSS_START)
       if (preview.current) {
-        preview.current.styles = ''
+        preview.current.styles = example.css
       }
       // Output belongs to the example that wrote it. Carrying it across reads
       // as the new example having produced warnings it never produced.

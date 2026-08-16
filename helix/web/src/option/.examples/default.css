@@ -1,0 +1,5 @@
+/* The wrapper is hand-written here, so it brings its own width. A real listbox
+   is `Listbox`, which has one. */
+.listbox {
+  max-inline-size: 20rem;
+}
