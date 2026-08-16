@@ -1,0 +1,10 @@
+<!-- No frame at all: the card is a layout, and whatever it sits in is the
+     surface. For a card inside something already bounded, where a second box
+     around it adds a line and no meaning. -->
+<helix-card appearance="plain" aria-labelledby="plain-title">
+  <h3 id="plain-title" slot="header">Plain</h3>
+  It keeps its inset and its regions, which is the whole of what it still does:
+  the header, the content and the footer stay a card even with nothing drawn
+  around them.
+  <helix-button appearance="tertiary" slot="footer">Action</helix-button>
+</helix-card>
