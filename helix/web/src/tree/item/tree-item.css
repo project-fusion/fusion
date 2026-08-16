@@ -1,4 +1,11 @@
 :host {
+  /* The chevron, and the gutter a leaf reserves for one, from a single number.
+     The two have to agree or a leaf's label sits off the line its siblings do,
+     and until this they agreed by both saying `--helix-size-icon` in different
+     rules. `icon-sm` because a chevron is a marker rather than content: at the
+     current step it read as the loudest thing in a row whose text is 14px, and
+     a tree is a list of names with a hint of structure beside them. */
+  --_tree-chevron: var(--tree-chevron-size, var(--helix-size-icon-sm));
   display: block;
 }
 
@@ -65,7 +72,7 @@
     var(--helix-space-xs) +
     (var(--_tree-level, 1) - 1) *
     var(--tree-indent, var(--helix-space-md)) +
-    var(--_tree-gutter, calc(var(--helix-size-icon) + var(--helix-space-2xs)))
+    var(--_tree-gutter, calc(var(--_tree-chevron) + var(--helix-space-2xs)))
   );
 }
 
@@ -106,10 +113,10 @@ slot[name="children"]::slotted(*) {
    type size: a parent at 14px reserved 14 and its child at 12px reserved 12, so
    the two could not line up whatever the indent was. */
 [part="toggle"] {
-  block-size: var(--helix-size-icon);
+  block-size: var(--_tree-chevron);
   color: var(--helix-color-foreground-subtle);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon);
+  inline-size: var(--_tree-chevron);
   order: var(--_tree-chevron-order, 0);
   transform: rotate(-90deg);
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);

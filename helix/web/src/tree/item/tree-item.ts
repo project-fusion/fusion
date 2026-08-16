@@ -33,6 +33,7 @@ import { styles } from './tree-item.css.js'
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  *
  * @cssproperty --tree-indent - Indent added per level.
+ * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  */
 @customElement('helix-tree-item')
 export class HelixTreeItem extends HelixBaseTreeItem {

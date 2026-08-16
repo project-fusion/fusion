@@ -23,6 +23,7 @@ import { styles } from './tree-root.css.js'
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
  *
  * @cssproperty --tree-indent - Indent added per level.
+ * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  */
 @customElement('helix-tree')
 export class HelixTree extends HelixBaseTree {

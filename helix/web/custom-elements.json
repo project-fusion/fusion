@@ -25046,6 +25046,10 @@
             {
               "description": "Indent added per level.",
               "name": "--tree-indent"
+            },
+            {
+              "description": "Size of the chevron, and the gutter a leaf reserves.",
+              "name": "--tree-chevron-size"
             }
           ],
           "cssParts": [
@@ -25478,6 +25482,10 @@
             {
               "description": "Indent added per level.",
               "name": "--tree-indent"
+            },
+            {
+              "description": "Size of the chevron, and the gutter a leaf reserves.",
+              "name": "--tree-chevron-size"
             }
           ],
           "cssParts": [

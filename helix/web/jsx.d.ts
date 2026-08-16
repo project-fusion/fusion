@@ -6325,6 +6325,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -6390,6 +6391,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -9689,6 +9691,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -9757,6 +9760,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--tree-indent`: Indent added per level. (default: `undefined`)
+   * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -9940,6 +9944,8 @@ export type CustomCssProperties = {
   "--tooltip-max-inline-size"?: string;
   /** Indent added per level. */
   "--tree-indent"?: string;
+  /** Size of the chevron, and the gutter a leaf reserves. */
+  "--tree-chevron-size"?: string;
 };
 
 declare module "react" {
