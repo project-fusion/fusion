@@ -1,7 +1,6 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseProgress } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { property } from 'lit/decorators.js'
 import { styles } from './progress-root.css.js'
 
 /**
@@ -29,17 +28,6 @@ import { styles } from './progress-root.css.js'
  */
 @customElement('helix-progress')
 export class HelixProgress extends HelixBaseProgress {
-  /**
-   * What the fill means.
-   *
-   * Unset is the accent, which is what progress usually is. `success` is for a
-   * bar that has arrived somewhere good and stays on screen to say so, and
-   * `danger` for a quota being consumed rather than a task being finished:
-   * both are the same geometry reading the opposite way.
-   */
-  @property({ reflect: true })
-  tone?: 'danger' | 'success'
-
   static override styles: CSSResultGroup = styles
 }
 

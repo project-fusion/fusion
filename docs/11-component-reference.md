@@ -2008,7 +2008,6 @@ thing advancing.
 | `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseProgress` | Whether the work has a knowable end. |
 | `label` | `label` | `string` | `'Progress'` | `HelixBaseProgress` | Accessible name for what is in progress. |
 | `max` | `max` | `number` | `100` | `HelixBaseProgress` | The total the work is measured against. |
-| `tone` | `tone` | `'danger' \| 'success' \| undefined` | - | - | What the fill means. |
 | `value` | `value` | `number` | `0` | `HelixBaseProgress` | What has been done so far, in the same units as `max`. |
 | `valueText` | `value-text` | `string` | `''` | `HelixBaseProgress` | A reading for the value, where the number alone does not say enough. |
 

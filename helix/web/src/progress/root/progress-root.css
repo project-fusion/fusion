@@ -35,14 +35,6 @@
   transform-origin: right center;
 }
 
-:host([tone="success"]) [part="indicator"] {
-  background-color: var(--progress-color, var(--helix-color-success));
-}
-
-:host([tone="danger"]) [part="indicator"] {
-  background-color: var(--progress-color, var(--helix-color-danger));
-}
-
 /* It arrives at its value rather than travelling to it, for a reader who has
    asked not to be moved. The bar still reads correctly: what is lost is the
    sense of advancing, which is exactly what the preference is about. */

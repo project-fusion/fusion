@@ -61,7 +61,7 @@
    * mark and the control where the reading starts. */
   align-items: start;
   background-color: var(--helix-color-surface-overlay);
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
@@ -69,9 +69,23 @@
   display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
-  gap: var(--helix-space-sm);
+  /* Column only. As a flex row this was one gap between four things; as a grid
+     it also became a row gap, drawn between the message and the actions row
+     whether or not that row holds anything. Measured: 12px under every message
+     with nothing to do about it. The row's own spacing is on what is slotted
+     into it, which is nothing when nothing is. */
+  column-gap: var(--helix-space-sm);
   line-height: var(--helix-leading-normal);
   padding: var(--toast-item-inset, var(--helix-space-sm));
+  /* Room for the close, which is out of flow. Reserved here rather than by a
+     grid column, because a column is only as tall as it needs to be and this
+     one was 32px tall next to a 21px line: a one-line message paid eleven
+     pixels of slack under it for a control sitting beside it. */
+  padding-inline-end: calc(
+    var(--helix-space-sm) +
+    var(--helix-size-control-sm) +
+    var(--helix-space-2xs)
+  );
   /* Both needed for `0fr` to bite: a grid item refuses to go below its own
      intrinsic height without the first, and shows its overflow without the
      second. */
@@ -149,7 +163,7 @@ slot[name="icon"]::slotted(*) {
   display: flex;
   gap: var(--helix-space-2xs);
   grid-area: 2 / 2;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 [part="actions"] slot::slotted(*) {
@@ -186,8 +200,16 @@ slot[name="icon"]::slotted(*) {
    * 5.5px below the mark and the action it is meant to line up with. Measured,
    * which is the only way that shows. */
   box-sizing: border-box;
-  grid-area: 1 / 3;
-  margin-block-start: calc((var(--_toast-line) - var(--helix-size-control-sm)) / 2);
+  /* In the corner and out of the flow, so it cannot set the height of the row
+     the message is on. Placed against the first line the same way it was, which
+     is what keeps it level with the mark. */
+  position: absolute;
+  inset-block-start: calc(
+    var(--toast-item-inset, var(--helix-space-sm)) +
+    (var(--_toast-line) - var(--helix-size-control-sm)) /
+    2
+  );
+  inset-inline-end: var(--helix-space-sm);
   block-size: var(--helix-size-control-sm);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
@@ -230,7 +252,6 @@ slot[name="icon"]::slotted(*) {
  * The same colour as the severity mark where there is one, so the two things
  * drawn on a message read as one idea rather than two. */
 [part="timer"] {
-  grid-area: 1 / 1 / -1 / -1;
   animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;
   background-color: var(--_toast-severity, var(--helix-color-foreground-muted));
   block-size: var(--helix-space-2xs);

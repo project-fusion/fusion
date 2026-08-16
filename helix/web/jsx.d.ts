@@ -2737,13 +2737,6 @@ instead. */
 };
 
 export type HelixProgressProps = {
-  /** What the fill means.
-
-Unset is the accent, which is what progress usually is. `success` is for a
-bar that has arrived somewhere good and stays on screen to say so, and
-`danger` for a quota being consumed rather than a task being finished:
-both are the same geometry reading the opposite way. */
-  tone?: HelixProgress["tone"];
   /** Accessible name for what is in progress. */
   label?: HelixProgress["label"];
   /** Whether the work has a knowable end.
@@ -2782,13 +2775,6 @@ report progress. */
 };
 
 export type HelixProgressSolidJsProps = {
-  /** What the fill means.
-
-Unset is the accent, which is what progress usually is. `success` is for a
-bar that has arrived somewhere good and stays on screen to say so, and
-`danger` for a quota being consumed rather than a task being finished:
-both are the same geometry reading the opposite way. */
-  "prop:tone"?: HelixProgress["tone"];
   /** Accessible name for what is in progress. */
   "prop:label"?: HelixProgress["label"];
   /** Whether the work has a knowable end.
@@ -7067,12 +7053,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `tone`: What the fill means.
-   *
-   * Unset is the accent, which is what progress usually is. `success` is for a
-   * bar that has arrived somewhere good and stays on screen to say so, and
-   * `danger` for a quota being consumed rather than a task being finished:
-   * both are the same geometry reading the opposite way.
    * - `label`: Accessible name for what is in progress.
    * - `indeterminate`: Whether the work has a knowable end.
    *
@@ -11424,12 +11404,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `tone`: What the fill means.
-   *
-   * Unset is the accent, which is what progress usually is. `success` is for a
-   * bar that has arrived somewhere good and stays on screen to say so, and
-   * `danger` for a quota being consumed rather than a task being finished:
-   * both are the same geometry reading the opposite way.
    * - `label`: Accessible name for what is in progress.
    * - `indeterminate`: Whether the work has a knowable end.
    *

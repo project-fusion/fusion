@@ -17375,16 +17375,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "tone",
-              "type": {
-                "text": "'danger' | 'success' | undefined"
-              },
-              "description": "What the fill means.\n\nUnset is the accent, which is what progress usually is. `success` is for a\nbar that has arrived somewhere good and stays on screen to say so, and\n`danger` for a quota being consumed rather than a task being finished:\nboth are the same geometry reading the opposite way.",
-              "attribute": "tone",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -17537,15 +17527,44 @@
               }
             }
           ],
-          "attributes": [
+          "superclass": {
+            "name": "HelixBaseProgress",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Shows how far along a task is, when that is known.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/progress",
+            "aliases": [
+              "Progress bar",
+              "Loading bar"
+            ],
+            "tier": "styled",
+            "group": "Progress",
+            "part": "Root"
+          },
+          "tagName": "helix-progress",
+          "customElement": true,
+          "cssParts": [
             {
-              "name": "tone",
-              "type": {
-                "text": "'danger' | 'success' | undefined"
-              },
-              "description": "What the fill means.\n\nUnset is the accent, which is what progress usually is. `success` is for a\nbar that has arrived somewhere good and stays on screen to say so, and\n`danger` for a quota being consumed rather than a task being finished:\nboth are the same geometry reading the opposite way.",
-              "fieldName": "tone"
+              "description": "The full length the work is measured against.",
+              "name": "track",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
             },
+            {
+              "description": "The part of it that is done.",
+              "name": "indicator",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            }
+          ],
+          "attributes": [
             {
               "name": "label",
               "type": {
@@ -17606,43 +17625,6 @@
               "default": "''",
               "description": "A reading for the value, where the number alone does not say enough.\n\n\"3 of 8 files\" rather than \"37\". Announced instead of the percentage, and\nnever instead of the value itself: `aria-valuenow` still carries the\nnumber, because assistive technology that ignores the text still has to\nreport progress.",
               "fieldName": "valueText",
-              "inheritedFrom": {
-                "name": "HelixBaseProgress",
-                "module": "src/progress/root/progress-root.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseProgress",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Shows how far along a task is, when that is known.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/progress",
-            "aliases": [
-              "Progress bar",
-              "Loading bar"
-            ],
-            "tier": "styled",
-            "group": "Progress",
-            "part": "Root"
-          },
-          "tagName": "helix-progress",
-          "customElement": true,
-          "cssParts": [
-            {
-              "description": "The full length the work is measured against.",
-              "name": "track",
-              "inheritedFrom": {
-                "name": "HelixBaseProgress",
-                "module": "src/progress/root/progress-root.ts"
-              }
-            },
-            {
-              "description": "The part of it that is done.",
-              "name": "indicator",
               "inheritedFrom": {
                 "name": "HelixBaseProgress",
                 "module": "src/progress/root/progress-root.ts"
