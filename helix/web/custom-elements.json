@@ -5136,6 +5136,10 @@
             {
               "description": "Corner radius of the surface.",
               "name": "--card-radii"
+            },
+            {
+              "description": "Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover.",
+              "name": "--card-shadow"
             }
           ],
           "slots": [
@@ -6666,6 +6670,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'plain' | 'card' | undefined"
+              },
+              "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a box beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe box stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "checked",
               "type": {
                 "text": "boolean"
@@ -7295,26 +7309,15 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseCheckbox",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A box that is ticked, or not, or neither.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/checkbox",
-            "aliases": [
-              "Tickbox",
-              "Toggle"
-            ],
-            "tier": "styled",
-            "group": "Checkbox",
-            "part": "Root"
-          },
-          "tagName": "helix-checkbox",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'plain' | 'card' | undefined"
+              },
+              "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a box beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe box stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
+              "fieldName": "appearance"
+            },
             {
               "name": "checked",
               "type": {
@@ -7445,6 +7448,25 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseCheckbox",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A box that is ticked, or not, or neither.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/checkbox",
+            "aliases": [
+              "Tickbox",
+              "Toggle"
+            ],
+            "tier": "styled",
+            "group": "Checkbox",
+            "part": "Root"
+          },
+          "tagName": "helix-checkbox",
+          "customElement": true,
           "slots": [
             {
               "description": "The label.",
@@ -18710,6 +18732,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'plain' | 'card' | undefined"
+              },
+              "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "disabled",
               "type": {
                 "text": "boolean"
@@ -18856,6 +18888,55 @@
               }
             }
           ],
+          "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'plain' | 'card' | undefined"
+              },
+              "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
+              "fieldName": "appearance"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this choice can be made.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixBaseRadio",
+                "module": "src/radio/root/radio-root.ts"
+              }
+            },
+            {
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the current choice. Written by the group.",
+              "fieldName": "selected",
+              "inheritedFrom": {
+                "name": "HelixBaseRadio",
+                "module": "src/radio/root/radio-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies this choice to the group, and is what the form submits.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseRadio",
+                "module": "src/radio/root/radio-root.ts"
+              }
+            }
+          ],
           "superclass": {
             "name": "HelixBaseRadio",
             "package": "@helix-io/headless"
@@ -18913,47 +18994,6 @@
             {
               "description": "The words beside it.",
               "name": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseRadio",
-                "module": "src/radio/root/radio-root.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this choice can be made.",
-              "fieldName": "disabled",
-              "inheritedFrom": {
-                "name": "HelixBaseRadio",
-                "module": "src/radio/root/radio-root.ts"
-              }
-            },
-            {
-              "name": "selected",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this is the current choice. Written by the group.",
-              "fieldName": "selected",
-              "inheritedFrom": {
-                "name": "HelixBaseRadio",
-                "module": "src/radio/root/radio-root.ts"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Identifies this choice to the group, and is what the form submits.",
-              "fieldName": "value",
               "inheritedFrom": {
                 "name": "HelixBaseRadio",
                 "module": "src/radio/root/radio-root.ts"

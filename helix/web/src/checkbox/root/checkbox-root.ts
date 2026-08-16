@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseCheckbox } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldInlineStyles } from '../../field/field-inline.css.js'
 import { styles } from './checkbox-root.css.js'
@@ -27,6 +28,23 @@ import { styles } from './checkbox-root.css.js'
 @customElement('helix-checkbox')
 export class HelixCheckbox extends HelixBaseCheckbox {
   static override styles: CSSResultGroup = [fieldStyles, fieldInlineStyles, styles]
+
+  /**
+   * How the choice presents itself.
+   *
+   * - `plain` is the default and is never written: a box beside its words,
+   *   which is what a list of choices should be almost always.
+   * - `card` puts it in a bounded surface, for options that need room to
+   *   explain themselves: a description, an icon, a price. It is the half a
+   *   `data-card` link cannot do, because a link reports no value and belongs
+   *   to no group, so a card that is genuinely an answer has to be this.
+   *
+   * The box stays in both. A card whose only marker was its own border would
+   * ask a reader to compare surfaces across a row to find the answer, and would
+   * leave nothing for a high-contrast display.
+   */
+  @property({ reflect: true })
+  appearance?: 'plain' | 'card'
 }
 
 declare global {

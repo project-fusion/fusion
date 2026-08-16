@@ -10,6 +10,11 @@
      container should do. `--card-radii` is still there for a consumer who
      wants the older, rounder box. */
   border-radius: var(--card-radii, var(--helix-radii-sm));
+  /* A hook rather than a value, so something outside can lift the card without
+     reaching into the shadow root. `elevated` sets it below, and the
+     `data-card` recipe sets it on hover: one property, so a card cannot end up
+     lifted by two rules that disagree about how far. */
+  box-shadow: var(--card-shadow, var(--helix-shadow-none));
   color: var(--helix-color-foreground-muted);
   display: grid;
   gap: var(--helix-space-sm);
@@ -37,7 +42,8 @@
 
 :host([appearance="elevated"]) {
   border-color: transparent;
-  box-shadow: var(--helix-shadow-md);
+
+  --card-shadow: var(--helix-shadow-md);
 }
 
 :host([appearance="plain"]) {

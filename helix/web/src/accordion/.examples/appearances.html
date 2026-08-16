@@ -1,0 +1,25 @@
+<helix-flex direction="column" gap="lg">
+  <helix-accordion appearance="outlined">
+    <helix-accordion-item default-open>
+      <span slot="summary">Outlined, which is the default</span>
+      Framed and divided, for an accordion sitting directly on the page where
+      nothing else says where it starts and stops.
+    </helix-accordion-item>
+    <helix-accordion-item>
+      <span slot="summary">Second item</span>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    </helix-accordion-item>
+  </helix-accordion>
+
+  <helix-accordion appearance="plain">
+    <helix-accordion-item default-open>
+      <span slot="summary">Plain</span>
+      No frame at all, for an accordion already inside something bounded, where
+      a second box adds a line and no meaning.
+    </helix-accordion-item>
+    <helix-accordion-item>
+      <span slot="summary">Second item</span>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    </helix-accordion-item>
+  </helix-accordion>
+</helix-flex>

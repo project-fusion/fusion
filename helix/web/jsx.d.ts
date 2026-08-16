@@ -1260,6 +1260,19 @@ export type HelixCheckboxHelixChangeElementEvent =
   HelixCheckboxElementEvent<HelixChangeEvent>;
 
 export type HelixCheckboxProps = {
+  /** How the choice presents itself.
+
+- `plain` is the default and is never written: a box beside its words,
+  which is what a list of choices should be almost always.
+- `card` puts it in a bounded surface, for options that need room to
+  explain themselves: a description, an icon, a price. It is the half a
+  `data-card` link cannot do, because a link reports no value and belongs
+  to no group, so a card that is genuinely an answer has to be this.
+
+The box stays in both. A card whose only marker was its own border would
+ask a reader to compare surfaces across a row to find the answer, and would
+leave nothing for a high-contrast display. */
+  appearance?: HelixCheckbox["appearance"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -1312,6 +1325,19 @@ instead. */
 };
 
 export type HelixCheckboxSolidJsProps = {
+  /** How the choice presents itself.
+
+- `plain` is the default and is never written: a box beside its words,
+  which is what a list of choices should be almost always.
+- `card` puts it in a bounded surface, for options that need room to
+  explain themselves: a description, an icon, a price. It is the half a
+  `data-card` link cannot do, because a link reports no value and belongs
+  to no group, so a card that is genuinely an answer has to be this.
+
+The box stays in both. A card whose only marker was its own border would
+ask a reader to compare surfaces across a row to find the answer, and would
+leave nothing for a high-contrast display. */
+  "prop:appearance"?: HelixCheckbox["appearance"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -2910,6 +2936,19 @@ export type HelixRadioHelixSelectElementEvent =
   HelixRadioElementEvent<HelixSelectEvent>;
 
 export type HelixRadioProps = {
+  /** How the choice presents itself.
+
+- `plain` is the default and is never written: a circle beside its words,
+  which is what a list of choices should be almost always.
+- `card` puts it in a bounded surface, for options that need room to
+  explain themselves: a description, an icon, a price. It is the half a
+  `data-card` link cannot do, because a link reports no value and belongs
+  to no group, so a card that is genuinely an answer has to be this.
+
+The circle stays in both. A card whose only marker was its own border would
+ask a reader to compare surfaces across a row to find the answer, and would
+leave nothing for a high-contrast display. */
+  appearance?: HelixRadio["appearance"];
   /** Whether this choice can be made. */
   disabled?: HelixRadio["disabled"];
   /** Whether this is the current choice. Written by the group. */
@@ -2922,6 +2961,19 @@ export type HelixRadioProps = {
 };
 
 export type HelixRadioSolidJsProps = {
+  /** How the choice presents itself.
+
+- `plain` is the default and is never written: a circle beside its words,
+  which is what a list of choices should be almost always.
+- `card` puts it in a bounded surface, for options that need room to
+  explain themselves: a description, an icon, a price. It is the half a
+  `data-card` link cannot do, because a link reports no value and belongs
+  to no group, so a card that is genuinely an answer has to be this.
+
+The circle stays in both. A card whose only marker was its own border would
+ask a reader to compare surfaces across a row to find the answer, and would
+leave nothing for a high-contrast display. */
+  "prop:appearance"?: HelixRadio["appearance"];
   /** Whether this choice can be made. */
   "prop:disabled"?: HelixRadio["disabled"];
   /** Whether this is the current choice. Written by the group. */
@@ -5345,6 +5397,7 @@ export type CustomElements = {
    * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
    * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
+   * - `--card-shadow`: Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. (default: `undefined`)
    */
   "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents>;
 
@@ -5500,6 +5553,18 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: How the choice presents itself.
+   *
+   * - `plain` is the default and is never written: a box beside its words,
+   *   which is what a list of choices should be almost always.
+   * - `card` puts it in a bounded surface, for options that need room to
+   *   explain themselves: a description, an icon, a price. It is the half a
+   *   `data-card` link cannot do, because a link reports no value and belongs
+   *   to no group, so a card that is genuinely an answer has to be this.
+   *
+   * The box stays in both. A card whose only marker was its own border would
+   * ask a reader to compare surfaces across a row to find the answer, and would
+   * leave nothing for a high-contrast display.
    * - `checked`: Whether the control is checked.
    *
    * One property rather than two. Reading gives the real state whichever
@@ -7124,6 +7189,18 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: How the choice presents itself.
+   *
+   * - `plain` is the default and is never written: a circle beside its words,
+   *   which is what a list of choices should be almost always.
+   * - `card` puts it in a bounded surface, for options that need room to
+   *   explain themselves: a description, an icon, a price. It is the half a
+   *   `data-card` link cannot do, because a link reports no value and belongs
+   *   to no group, so a card that is genuinely an answer has to be this.
+   *
+   * The circle stays in both. A card whose only marker was its own border would
+   * ask a reader to compare surfaces across a row to find the answer, and would
+   * leave nothing for a high-contrast display.
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice. Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
@@ -9563,6 +9640,7 @@ export type CustomElementsSolidJs = {
    * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
    * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
+   * - `--card-shadow`: Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. (default: `undefined`)
    */
   "helix-card": Partial<
     HelixCardProps & HelixCardSolidJsProps & BaseProps<HelixCard> & BaseEvents
@@ -9726,6 +9804,18 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: How the choice presents itself.
+   *
+   * - `plain` is the default and is never written: a box beside its words,
+   *   which is what a list of choices should be almost always.
+   * - `card` puts it in a bounded surface, for options that need room to
+   *   explain themselves: a description, an icon, a price. It is the half a
+   *   `data-card` link cannot do, because a link reports no value and belongs
+   *   to no group, so a card that is genuinely an answer has to be this.
+   *
+   * The box stays in both. A card whose only marker was its own border would
+   * ask a reader to compare surfaces across a row to find the answer, and would
+   * leave nothing for a high-contrast display.
    * - `checked`: Whether the control is checked.
    *
    * One property rather than two. Reading gives the real state whichever
@@ -11428,6 +11518,18 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: How the choice presents itself.
+   *
+   * - `plain` is the default and is never written: a circle beside its words,
+   *   which is what a list of choices should be almost always.
+   * - `card` puts it in a bounded surface, for options that need room to
+   *   explain themselves: a description, an icon, a price. It is the half a
+   *   `data-card` link cannot do, because a link reports no value and belongs
+   *   to no group, so a card that is genuinely an answer has to be this.
+   *
+   * The circle stays in both. A card whose only marker was its own border would
+   * ask a reader to compare surfaces across a row to find the answer, and would
+   * leave nothing for a high-contrast display.
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice. Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
@@ -13142,6 +13244,8 @@ export type CustomCssProperties = {
   "--card-padding"?: string;
   /** Corner radius of the surface. */
   "--card-radii"?: string;
+  /** Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. */
+  "--card-shadow"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
   /** Space between the boxes. */

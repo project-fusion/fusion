@@ -36,6 +36,8 @@ import { styles } from './card-root.css.js'
  * @cssproperty --card-media-size - Width of the media column when horizontal.
  * @cssproperty --card-padding - Inset applied to each region.
  * @cssproperty --card-radii - Corner radius of the surface.
+ * @cssproperty --card-shadow - Shadow under the surface. What `elevated` sets, and what a
+ *   `data-card` link raises on hover.
  */
 @customElement('helix-card')
 export class HelixCard extends HelixBaseCard {

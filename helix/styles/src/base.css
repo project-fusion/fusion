@@ -699,6 +699,82 @@ helix-toggle[disabled]::part(item) {
   z-index: var(--helix-layer-raised);
 }
 
+/* The clickable-row recipe.
+ *
+ * `List` deliberately does not become a link. A whole-row target needs the
+ * anchor to wrap the layout, and the layout is what `helix-list-item` is, so
+ * the anchor goes around the item and this styles it:
+ *
+ *   <helix-list>
+ *     <a data-list-item href="/one"><helix-list-item>One</helix-list-item></a>
+ *   </helix-list>
+ *
+ * Same reasoning as `data-button` and `data-nav-item`. A router renders its own
+ * `<a>` and cannot render it inside a shadow root, so the destination has to be
+ * the consumer's element and the styling has to be reachable from here.
+ *
+ * The item keeps its own inset. This adds no padding of its own, or a row would
+ * be inset twice and a row without the wrapper would sit at a different height
+ * from one with it.
+ */
+:where([data-list-item]) {
+  border-radius: var(--helix-radii-sm);
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:where([data-list-item]):hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
+}
+
+/* The same `aria-current` the nav item uses, and for the same reason: the
+   correct semantics and the correct look are one act. A `selected` attribute
+   here would be presentation standing in for something the platform already
+   has a word for. */
+:where([data-list-item])[aria-current] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 7%, transparent);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* The clickable-card recipe.
+ *
+ * The other half of the same decision, and the one that keeps `selected` and
+ * `active` off `Card`. A clickable card is the consumer's own anchor wrapped
+ * around a card:
+ *
+ *   <a data-card href="/one"><helix-card>...</helix-card></a>
+ *
+ * Everything it does to the card goes through the card's own custom properties
+ * rather than through `::part`, because those cross the shadow boundary by
+ * inheriting and therefore reach a card at any depth inside the link. A
+ * `::part` selector would only reach a card that is the link's own child.
+ *
+ * A *selected* card is not this. That is a radio whose presentation is a card:
+ * it reports a form value, belongs to a named group and moves under arrow keys,
+ * none of which a link has. `Radio` and `Checkbox` carry `appearance="card"`
+ * for it.
+ */
+:where([data-card]) {
+  /* Matched to the card so the focus ring traces the surface rather than a
+     rectangle around it. */
+  border-radius: var(--card-radii, var(--helix-radii-sm));
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+
+:where([data-card]):hover {
+  --card-border-color: var(--helix-color-border-strong);
+  --card-shadow: var(--helix-shadow-md);
+}
+
+:where([data-card])[aria-current] {
+  --card-border-color: var(--helix-color-border-accent);
+}
+
 :where(code, kbd, samp, pre) {
   font-family: var(--helix-font-mono);
 }

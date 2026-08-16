@@ -1,0 +1,23 @@
+<helix-flex gap="sm">
+  <helix-button appearance="secondary" command="--show" commandfor="surface-drawer">
+    Surface
+  </helix-button>
+  <helix-button appearance="secondary" command="--show" commandfor="plain-drawer">
+    Plain
+  </helix-button>
+</helix-flex>
+
+<helix-drawer appearance="surface" id="surface-drawer" label="Surface" placement="end">
+  <span slot="header">Surface</span>
+  <helix-text appearance="body">
+    Raised off the page, which is what a panel over content should be.
+  </helix-text>
+</helix-drawer>
+
+<helix-drawer appearance="plain" id="plain-drawer" label="Plain" placement="end">
+  <span slot="header">Plain</span>
+  <helix-text appearance="body">
+    The page's own colour, for a drawer that reads as part of the layout rather
+    than as something over it.
+  </helix-text>
+</helix-drawer>

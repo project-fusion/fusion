@@ -338,18 +338,57 @@ for (const tier of TIERS) {
   }
 }
 
+/**
+ * What is actually inside each `:host(...)`, one string per occurrence.
+ *
+ * Paren-counted rather than matched with a regex, and the regex is why: it was
+ * `/:host\([^{]*:has\(/`, whose `[^{]*` runs straight past the closing paren of
+ * `:host()` and on through the descendant selectors after it. So a perfectly
+ * legal `:host([appearance="card"]) [part="field"]:has(:focus-visible)` was
+ * reported as dropped, and the rule it named works. `:host()` takes a compound
+ * selector that can itself hold parens, `:not()` most obviously, so counting
+ * them is the only way to know where the argument ends.
+ *
+ * The failure was a false positive, which for a checker is the expensive
+ * direction: a real fault gets fixed, and a checker that cries about correct
+ * code gets its rule deleted.
+ */
+const hostArguments = (css) => {
+  const found = []
+  for (let at = css.indexOf(':host('); at !== -1; at = css.indexOf(':host(', at + 1)) {
+    let depth = 0
+    for (let scan = at + ':host'.length; scan < css.length; scan += 1) {
+      if (css[scan] === '(') {
+        depth += 1
+      } else if (css[scan] === ')') {
+        depth -= 1
+        if (depth === 0) {
+          found.push(css.slice(at + ':host('.length, scan))
+          break
+        }
+      } else if (css[scan] === '{') {
+        // An unbalanced `:host(` cannot be a selector. Nothing to report.
+        break
+      }
+    }
+  }
+  return found
+}
+
 /* The third rule. Comments are already gone from `css`, but this scans the
    files again rather than folding into the loop above, which only visits sheets
    that name a part. */
 for (const tier of TIERS) {
   for (const sheet of stylesheets(tier)) {
     const css = readFileSync(sheet, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
-    for (const [match] of css.matchAll(/:host\([^{]*:has\(/g)) {
-      problems.push(
-        `${sheet}: \`${match.trim()}…\` is dropped when the sheet is parsed. ` +
-          '`:has()` is not allowed inside the functional `:host()`, in any form, ' +
-          'so this rule has never matched. A region cannot detect its own emptiness.',
-      )
+    for (const inside of hostArguments(css)) {
+      if (inside.includes(':has(')) {
+        problems.push(
+          `${sheet}: \`:host(${inside.trim()})\` is dropped when the sheet is parsed. ` +
+            '`:has()` is not allowed inside the functional `:host()`, in any form, ' +
+            'so this rule has never matched. A region cannot detect its own emptiness.',
+        )
+      }
     }
   }
 }

@@ -209,3 +209,56 @@
 :host(:not([data-has-label])) [part="label"] {
   display: none;
 }
+
+/* A card is the same checkbox in a bounded surface. See the radio's note: this
+ * is the same appearance and the same reasoning, and the two have to match
+ * because a card set of one kind sits beside a card set of the other.
+ *
+ * Different part, same shape. The checkbox's target is its `<label>` rather
+ * than a button, because the label is what forwards a press to the real input,
+ * so `field` is what becomes the surface.
+ */
+:host([appearance="card"]) {
+  display: block;
+}
+
+:host([appearance="card"]) [part="field"] {
+  align-items: start;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: flex;
+  gap: var(--helix-space-sm);
+  inline-size: 100%;
+  padding: var(--checkbox-card-padding, var(--helix-space-md));
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:not([disabled])[appearance="card"]) [part="field"]:hover {
+  border-color: var(--helix-color-border-strong);
+}
+
+/* Lifted rather than coloured, which is the rule the tick already follows. */
+:host([appearance="card"][data-checked]) [part="field"] {
+  background-color: var(--helix-color-surface-raised);
+  border-color: var(--helix-color-border-strong);
+}
+
+/* The ring goes on the card, because the card is the target. It cannot go on
+   `:focus-visible` of the label: the label never takes focus, the input inside
+   it does, so this reads that through `:has()` rather than inventing a class
+   the component would have to write. */
+:host([appearance="card"]) [part="field"]:has([part="control"]:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host([appearance="card"]) [part="control"]:focus-visible {
+  outline: none;
+}
+
+:host([appearance="card"]) [part="box"] {
+  margin-block-start: var(--helix-space-2xs);
+}

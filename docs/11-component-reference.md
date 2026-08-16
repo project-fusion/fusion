@@ -709,6 +709,7 @@ element you slotted, not a wrapper around it.
 | `--card-media-size` | Width of the media column when horizontal. |
 | `--card-padding` | Inset applied to each region. |
 | `--card-radii` | Corner radius of the surface. |
+| `--card-shadow` | Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. |
 
 ## Carousel
 
@@ -793,6 +794,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 | `checked` | `checked` | `boolean` | - | `MixinControllerChecked` | Whether the control is checked. |
 | `defaultChecked` | `default-checked` | `boolean` | `false` | `MixinControllerChecked` | Initial checked state for uncontrolled use, where nothing declared one. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
@@ -2078,6 +2080,7 @@ and being chosen is an answer rather than a state.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseRadio` | Whether this choice can be made. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseRadio` | Whether this is the current choice. Written by the group. |
 | `value` | `value` | `string` | `''` | `HelixBaseRadio` | Identifies this choice to the group, and is what the form submits. |

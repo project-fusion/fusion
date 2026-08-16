@@ -102,3 +102,64 @@
     transition: none;
   }
 }
+
+/* A card is the same radio in a bounded surface, for a set of options that need
+ * room: a description, an icon, a price.
+ *
+ * The half a `data-card` link cannot do. A link has no value to report, no
+ * group to belong to and no place in a roving tab order, so a "selected card"
+ * has to be a real radio and the presentation is what changes. This is still
+ * `<button role="radio">` inside a group that owns the name and the value.
+ *
+ * **The circle stays.** A card whose only marker was its own border would be
+ * asking the reader to compare surfaces across a row to find the answer, and
+ * would leave nothing at all for a monochrome or high-contrast display.
+ */
+:host([appearance="card"]) {
+  display: block;
+}
+
+:host([appearance="card"]) [part="item"] {
+  align-items: start;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: flex;
+  gap: var(--helix-space-sm);
+  inline-size: 100%;
+  padding: var(--radio-card-padding, var(--helix-space-md));
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:not([disabled])[appearance="card"]) [part="item"]:hover {
+  border-color: var(--helix-color-border-strong);
+}
+
+/* Lifted rather than coloured, which is this component's own rule about the
+   mark restated for the surface: colour is reserved for state, and being chosen
+   is an answer rather than a state. The dot is what says which one, and it is
+   already animated and already legible without colour. */
+:host([appearance="card"][selected]) [part="item"] {
+  background-color: var(--helix-color-surface-raised);
+  border-color: var(--helix-color-border-strong);
+}
+
+/* On the whole card, because in this appearance the card is the target. The
+   default row rings the circle instead, since there the circle is all there is
+   to ring. */
+:host([appearance="card"]) [part="item"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host([appearance="card"]) [part="item"]:focus-visible [part="box"] {
+  outline: none;
+}
+
+/* The circle sits on the first line of the label rather than centred against a
+   block of text, which is where a native control sits beside a paragraph. */
+:host([appearance="card"]) [part="box"] {
+  margin-block-start: var(--helix-space-2xs);
+}

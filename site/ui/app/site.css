@@ -221,10 +221,16 @@ helix-drawer {
 
 /* The abstract drawing on a family's gallery card, from `lib/component-art`.
  *
- * `surface-sunken`, so the media reads as a well the drawing sits in rather
- * than as the top of the card. Without it the art floated in the card's own
- * surface with nothing marking where the picture stopped and the text began,
- * and every card looked like it had lost its image.
+ * `background`, the page's own colour, so the media reads as a window onto a
+ * page rather than as a panel on a card. That suits what is drawn on it: every
+ * one of these is a picture of page content, and several are literally a page
+ * with something on it.
+ *
+ * It is the one surface in the ladder that is not a step *away* from the page,
+ * because it is the page: pure white in light and pure black in dark, either
+ * side of the card's own `surface`. So the separation runs in opposite
+ * directions per mode, a hair lighter than the card in light and clearly darker
+ * in dark, and no divider is needed in either.
  *
  * The rest is the card's job. It is slotted into `media`, which the card pulls
  * out to its own border with a negative inset and clips to its corner radius,
@@ -237,7 +243,7 @@ helix-drawer {
  * specificity. A `100%` here would silently un-bleed every card's art. */
 .componentArt {
   aspect-ratio: 16 / 10;
-  background: var(--helix-color-surface-sunken);
+  background: var(--helix-color-background);
   display: block;
 }
 
@@ -265,9 +271,12 @@ helix-drawer {
    segment, the slider's thumb, the ring holding a badge off what it overlaps,
    and the panel above a dialog's scrim.
 
-   It is `surface` against a `sunken` media, so it is now a step *lighter* than
-   its background rather than exactly equal to it. That is what the token means
-   and it is what makes these shapes legible without a stroke. */
+   It is the card's own `surface`, so on bare card it is invisible. That is
+   fine, and it is a rule rather than an accident: **every shape using this
+   class sits on top of a darker one.** The tick is on a 0.44 box, the knob on a
+   0.44 track, the toggle's segment on a 0.12 track, the thumb on the track and
+   its halo, the dialog and drawer panels on a 0.16 page. Put one straight onto
+   the card and it disappears. */
 .artSurface {
   fill: var(--helix-color-surface);
 }
