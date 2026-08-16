@@ -251,24 +251,60 @@ if (hasLayout()) {
       )
     })
 
-    test('an inverted region needs nothing inverted by hand', async () => {
-      /* `data-color-mode` is not scoped to the root and every token resolves
-         through `color-scheme`, so it themes this subtree and the message comes
-         out the other way round without the component knowing. Hardcoding an
-         inverse surface would leave anything slotted in reading the page's
-         tokens instead. */
-      const plain = await item('severity="info"')
-      const region = (await mount(
-        `<helix-toast data-color-mode="dark" label="N">
-           <helix-toast-item severity="info">Saved</helix-toast-item>
-         </helix-toast>`,
+    test('a message is the opposite of what it is sitting on', async () => {
+      /* Inverted by default. A flip of `color-scheme` rather than a named
+         inverse surface, so every token in the subtree re-resolves and anything
+         slotted in comes out right.
+       *
+       * Both in one mount, because `mount` assigns `document.body.innerHTML`:
+       * mounting the second detaches the first, and `getComputedStyle` on a
+       * detached element returns empty strings for everything. */
+      const host = (await mount(
+        `<div>
+           <div data-color-mode="light">
+             <helix-toast id="over-light" label="N">
+               <helix-toast-item severity="info">m</helix-toast-item>
+             </helix-toast>
+           </div>
+           <div data-color-mode="dark">
+             <helix-toast id="over-dark" label="N">
+               <helix-toast-item severity="info">m</helix-toast-item>
+             </helix-toast>
+           </div>
+         </div>`,
       )) as HTMLElement
-      const inverted = region.querySelector('helix-toast-item') as Item
-      await inverted.updateComplete
+      const scheme = (id: string): string =>
+        getComputedStyle(host.querySelector(`#${id}`) as HTMLElement).colorScheme
 
-      const surface = (host: Item): string =>
-        getComputedStyle(part(host, 'item') as HTMLElement).backgroundColor
-      expect(surface(inverted)).not.toBe(surface(plain))
+      expect(scheme('over-light')).toBe('dark')
+      expect(scheme('over-dark')).toBe('light')
+    })
+
+    test('the nearest region decides, which is why it reads an inherited value', async () => {
+      /* A light preview inside a dark page is the case that rules this out
+         being a media query and two descendant selectors: those cannot say
+         "the nearest ancestor that set the mode", so the toast would take the
+         page's answer and invert the wrong way. A custom property inherits,
+         which is that rule for free. */
+      const host = (await mount(
+        `<div data-color-mode="dark"><div data-color-mode="light">
+           <helix-toast label="N"><helix-toast-item severity="info">m</helix-toast-item></helix-toast>
+         </div></div>`,
+      )) as HTMLElement
+      const toast = host.querySelector('helix-toast') as HTMLElement
+      expect(getComputedStyle(toast).colorScheme).toBe('dark')
+    })
+
+    test('a region carrying its own mode takes that instead of inverting', async () => {
+      const host = (await mount(
+        `<div data-color-mode="dark">
+           <helix-toast data-color-mode="dark" label="N">
+             <helix-toast-item severity="info">m</helix-toast-item>
+           </helix-toast>
+         </div>`,
+      )) as HTMLElement
+      const toast = host.querySelector('helix-toast') as HTMLElement
+      expect(getComputedStyle(toast).colorScheme).toBe('dark')
     })
 
     test('the row sits on one line, whatever heights are in it', async () => {

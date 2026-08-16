@@ -840,6 +840,33 @@ helix-toggle[disabled]::part(item) {
   --card-border-color: var(--helix-color-border-accent);
 }
 
+/* The toast is the opposite of the page it is over.
+ *
+ * A message arriving in a corner has to be told apart from the page in the
+ * fraction of a second before it is read, and inverting is what does that
+ * without a colour that means something. `Tooltip` inverts by naming the
+ * inverse surface directly; a toast cannot, because it holds controls. A
+ * consumer's `Retry` button inside a hardcoded inverse surface would resolve
+ * the page's own tokens and come out dark on dark. Flipping `color-scheme`
+ * instead re-resolves every token in the subtree, so anything slotted in is
+ * right without knowing where it is.
+ *
+ * Here rather than in the component, and not only by the usual outer-tree
+ * argument: the value it needs is a private primitive, which nothing outside
+ * `helix/styles` may read.
+ *
+ * `--_helix-mode-inverted` rather than a media query and a pair of descendant
+ * selectors. Those cannot express "the nearest ancestor that set the mode", so
+ * a light preview inside a dark page would take the page's answer and invert
+ * the wrong way. A custom property inherits, which is that rule for free.
+ *
+ * Opted out of by setting `data-color-mode` on the region, which then wins
+ * through the rule above rather than through anything written here.
+ */
+helix-toast:not([data-color-mode]) {
+  color-scheme: var(--_helix-mode-inverted);
+}
+
 :where(code, kbd, samp, pre) {
   font-family: var(--helix-font-mono);
 }

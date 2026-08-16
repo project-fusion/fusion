@@ -39,6 +39,17 @@
      a segmented control kept its light grey track on a dark page. */
   color-scheme: light dark;
 
+  /* Which mode is in force, and its opposite, as values something can read.
+   *
+   * `color-scheme` cannot be read back or negated in CSS, and a descendant
+   * selector cannot say "the nearest ancestor that set it", which is exactly
+   * what a light preview inside a dark page needs. A custom property can:
+   * it inherits, so the nearest declaration wins by the language's own rules
+   * and nesting needs no special case. `Toast` is what reads it, to be the
+   * opposite of whatever it is sitting on. */
+  --_helix-mode: light;
+  --_helix-mode-inverted: dark;
+
   /* ======================================================== color ======= */
   /* Surfaces, from furthest back to nearest front. */
   /* Depth is distance from the page, in whichever direction there is room.
@@ -186,9 +197,12 @@
 
   /* Status. */
   --helix-color-info: var(--_helix-info-500);
-  --helix-color-success: var(--_helix-success-500);
-  --helix-color-warning: var(--_helix-warning-500);
-  --helix-color-danger: var(--_helix-danger-500);
+  /* Both arms, like every other colour here. These were single values, so a
+     severity mark kept its light-mode colour on a dark surface: measured on an
+     inverted toast, danger at 2.85:1 against a 3:1 floor. */
+  --helix-color-success: light-dark(var(--_helix-success-500), var(--_helix-success-400));
+  --helix-color-warning: light-dark(var(--_helix-warning-500), var(--_helix-warning-400));
+  --helix-color-danger: light-dark(var(--_helix-danger-500), var(--_helix-danger-400));
 
   /* ======================================================== space ======= */
   --helix-space-none: var(--_helix-scale-0);
@@ -387,8 +401,24 @@
    dark page, which the old root-only rule could not express. */
 [data-color-mode="light"] {
   color-scheme: light;
+
+  --_helix-mode: light;
+  --_helix-mode-inverted: dark;
 }
 
 [data-color-mode="dark"] {
   color-scheme: dark;
+
+  --_helix-mode: dark;
+  --_helix-mode-inverted: light;
+}
+
+/* The operating system's answer, where nothing has overridden it. Written as a
+   query rather than derived from `color-scheme: light dark`, because that
+   keyword pair says "either is fine" and gives nothing to read. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --_helix-mode: dark;
+    --_helix-mode-inverted: light;
+  }
 }

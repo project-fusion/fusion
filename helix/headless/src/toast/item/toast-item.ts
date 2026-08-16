@@ -34,15 +34,14 @@ const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
  * to nine for the last one. Each message is on its own clock from the moment it
  * is rendered.
  *
- * **To stand out from the page, set `data-color-mode` on the region.** That
- * attribute is the only thing deciding the color mode, it is not scoped to the
- * root, and every token resolves through `color-scheme`, so it themes the
- * subtree and nothing else. Nothing here has to be inverted by hand, and a
- * button a consumer slots in comes out right: measured on a light page, a
- * `data-color-mode="dark"` region gave a dark surface, white text, and a
- * slotted `Retry` whose own label flipped to white with it. Hardcoding an
- * inverse surface the way `Tooltip` does would not have done that, because a
- * tooltip holds no controls and a message does.
+ * **A message is the opposite of the page it is over.** Inverted by default,
+ * because a thing arriving in a corner has to be told apart from the page in
+ * the moment before it is read, and inverting does that without spending a
+ * colour that means something. It is a flip of `color-scheme` rather than a
+ * named inverse surface: every token in the subtree re-resolves, so a `Retry`
+ * a consumer slots in comes out right without knowing where it is. `Tooltip`
+ * can name the inverse surface directly because it holds no controls; this
+ * cannot. Set `data-color-mode` on the region to take the page's mode instead.
  *
  * **No duration means it stays.** That is the safe default rather than the
  * common one: anything carrying an action has to still be there when the reader

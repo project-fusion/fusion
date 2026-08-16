@@ -134,6 +134,13 @@
   --_helix-success-500: oklch(0.58 0.15 155);
   --_helix-warning-500: oklch(0.72 0.16 75);
   --_helix-danger-500: oklch(0.57 0.21 27);
+  /* The dark arms, derived rather than picked, the same `l + 0.12` the brand
+     ramp uses. A severity had exactly one value each, which is what a colour
+     with no dark arm looks like: measured against an inverted surface, the
+     danger mark came out at 2.85:1, under the 3:1 a non-text mark needs. */
+  --_helix-success-400: oklch(from var(--_helix-success-500) calc(l + 0.12) c h);
+  --_helix-warning-400: oklch(from var(--_helix-warning-500) calc(l + 0.12) c h);
+  --_helix-danger-400: oklch(from var(--_helix-danger-500) calc(l + 0.12) c h);
 
   /* ------------------------------------------------------- syntax ------ */
   /* Fixed values, not derived from the seed like everything above.
