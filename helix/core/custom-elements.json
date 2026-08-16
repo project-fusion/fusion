@@ -2339,14 +2339,6 @@
             },
             {
               "kind": "field",
-              "name": "hideLabel",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the label names the control without being shown.\n\nFor a field whose purpose is already obvious from where it sits: a filter\nover the list it filters, a search box under a magnifier. The label is\nstill rendered and still read, it is only taken off the screen, which is\nthe difference between a control a screen reader can name and one it\ncannot."
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -2466,17 +2458,6 @@
             },
             {
               "kind": "field",
-              "name": "hideLabel",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the label names the control without being shown.",
-              "attribute": "hide-label",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -2554,7 +2535,7 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               },
-              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.\n\n**Nothing at all when there is no label**, which is the same rule the\nhint and the feedback follow: none of the three is always used, and an\nelement rendered empty is not free. It still generates a box, so it still\ntakes a row of the grid and a gap on either side of it, which is a field\nthat has moved down the page for a label nobody wrote. `nothing` leaves\ncomment markers rather than a node, so the gap has nothing to sit between.\n\nNaming a control without showing the label is `hide-label`, not an empty\none: an unnamed field is a field a screen reader announces as \"edit text\"."
+              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.\n\n**Nothing at all when there is no label**, which is the same rule the\nhint and the feedback follow: none of the three is always used, and an\nelement rendered empty is not free. It still generates a box, so it still\ntakes a row of the grid and a gap on either side of it, which is a field\nthat has moved down the page for a label nobody wrote. `nothing` leaves\ncomment markers rather than a node, so the gap has nothing to sit between.\n\n**`aria-label` names without showing**, and it is forwarded rather than\nleft where the consumer put it. A custom element has no way to delegate a\nlabel to the control inside it, so an `aria-label` on the host reaches\nnothing: measured, the inner input came back with no label and no name of\nits own while the attribute sat on the wrapper. What happens instead is\nthat the label is rendered and clipped, so the name arrives through the\nsame `<label for>` a visible one does.\n\nThis replaced `hide-label`, which was a second attribute to say what the\nabsence of the first should have said. The rule is now `label` means a\nlabel, `aria-label` means a name, and neither means an unnamed field a\nscreen reader announces as \"edit text\""
             },
             {
               "kind": "method",
@@ -2629,15 +2610,6 @@
               "default": "''",
               "description": "What is wrong, in the reader's words rather than the browser's.",
               "fieldName": "feedback"
-            },
-            {
-              "name": "hide-label",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the label names the control without being shown.",
-              "fieldName": "hideLabel"
             },
             {
               "name": "label",

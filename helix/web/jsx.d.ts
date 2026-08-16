@@ -906,10 +906,6 @@ export type HelixCheckboxGroupProps = {
   hint?: HelixCheckboxGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixCheckboxGroup["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixCheckboxGroup["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixCheckboxGroup["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -937,10 +933,6 @@ export type HelixCheckboxGroupSolidJsProps = {
   "prop:hint"?: HelixCheckboxGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixCheckboxGroup["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixCheckboxGroup["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixCheckboxGroup["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -982,10 +974,6 @@ export type HelixCheckboxProps = {
   hint?: HelixCheckbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixCheckbox["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixCheckbox["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixCheckbox["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixCheckbox["label"];
   /** Whether the form refuses to submit without it. */
@@ -1029,10 +1017,6 @@ export type HelixCheckboxSolidJsProps = {
   "prop:hint"?: HelixCheckbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixCheckbox["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixCheckbox["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixCheckbox["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixCheckbox["label"];
   /** Whether the form refuses to submit without it. */
@@ -1480,10 +1464,6 @@ export type HelixInputProps = {
   hint?: HelixInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixInput["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixInput["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixInput["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -1522,10 +1502,6 @@ export type HelixInputSolidJsProps = {
   "prop:hint"?: HelixInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixInput["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixInput["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixInput["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -1611,10 +1587,6 @@ export type HelixListboxProps = {
   hint?: HelixListbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixListbox["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixListbox["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixListbox["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixListbox["label"];
   /** Whether the form refuses to submit without it. */
@@ -1664,10 +1636,6 @@ export type HelixListboxSolidJsProps = {
   "prop:hint"?: HelixListbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixListbox["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixListbox["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixListbox["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixListbox["label"];
   /** Whether the form refuses to submit without it. */
@@ -1981,10 +1949,6 @@ export type HelixRadioGroupProps = {
   hint?: HelixRadioGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixRadioGroup["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixRadioGroup["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixRadioGroup["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixRadioGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -2015,10 +1979,6 @@ export type HelixRadioGroupSolidJsProps = {
   "prop:hint"?: HelixRadioGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixRadioGroup["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixRadioGroup["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixRadioGroup["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixRadioGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -2105,10 +2065,6 @@ export type HelixSelectProps = {
   hint?: HelixSelect["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixSelect["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixSelect["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixSelect["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixSelect["label"];
   /** Whether the form refuses to submit without it. */
@@ -2166,10 +2122,6 @@ export type HelixSelectSolidJsProps = {
   "prop:hint"?: HelixSelect["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixSelect["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixSelect["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixSelect["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixSelect["label"];
   /** Whether the form refuses to submit without it. */
@@ -2250,10 +2202,6 @@ export type HelixSliderProps = {
   hint?: HelixSlider["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixSlider["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixSlider["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixSlider["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixSlider["label"];
   /** Whether the form refuses to submit without it. */
@@ -2312,10 +2260,6 @@ export type HelixSliderSolidJsProps = {
   "prop:hint"?: HelixSlider["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixSlider["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixSlider["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixSlider["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixSlider["label"];
   /** Whether the form refuses to submit without it. */
@@ -2431,10 +2375,6 @@ export type HelixSwitchProps = {
   hint?: HelixSwitch["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixSwitch["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixSwitch["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixSwitch["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixSwitch["label"];
   /** Whether the form refuses to submit without it. */
@@ -2474,10 +2414,6 @@ export type HelixSwitchSolidJsProps = {
   "prop:hint"?: HelixSwitch["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixSwitch["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixSwitch["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixSwitch["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixSwitch["label"];
   /** Whether the form refuses to submit without it. */
@@ -2790,10 +2726,6 @@ export type HelixTextareaProps = {
   hint?: HelixTextarea["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixTextarea["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixTextarea["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixTextarea["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixTextarea["label"];
   /** Whether the form refuses to submit without it. */
@@ -2836,10 +2768,6 @@ export type HelixTextareaSolidJsProps = {
   "prop:hint"?: HelixTextarea["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixTextarea["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixTextarea["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixTextarea["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixTextarea["label"];
   /** Whether the form refuses to submit without it. */
@@ -2897,10 +2825,6 @@ export type HelixToggleGroupProps = {
   hint?: HelixToggleGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixToggleGroup["feedback"];
-  /** Whether the label names the control without being shown. */
-  "hide-label"?: HelixToggleGroup["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  hideLabel?: HelixToggleGroup["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixToggleGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -2931,10 +2855,6 @@ export type HelixToggleGroupSolidJsProps = {
   "prop:hint"?: HelixToggleGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixToggleGroup["feedback"];
-  /** Whether the label names the control without being shown. */
-  "bool:hide-label"?: HelixToggleGroup["hideLabel"];
-  /** Whether the label names the control without being shown. */
-  "prop:hideLabel"?: HelixToggleGroup["hideLabel"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixToggleGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -3948,7 +3868,6 @@ export type CustomElements = {
    * - `orientation`: Which way the boxes run.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `disabled`: Whether the whole set is out of play.
@@ -4016,7 +3935,6 @@ export type CustomElements = {
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name submitted with the form.
@@ -4545,7 +4463,6 @@ export type CustomElements = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name submitted with the form.
@@ -4706,7 +4623,6 @@ export type CustomElements = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `filter`: Text the options are matched against. Empty shows them all.
@@ -5115,7 +5031,6 @@ export type CustomElements = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name the group reports under when its form is submitted.
@@ -5253,7 +5168,6 @@ export type CustomElements = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `filterable`: Whether the list can be narrowed by typing.
@@ -5392,7 +5306,6 @@ export type CustomElements = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `max`: The largest value the reader can choose.
@@ -5584,7 +5497,6 @@ export type CustomElements = {
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name submitted with the form.
@@ -5980,7 +5892,6 @@ export type CustomElements = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
@@ -6058,7 +5969,6 @@ export type CustomElements = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name the group reports under when its form is submitted.
@@ -7182,7 +7092,6 @@ export type CustomElementsSolidJs = {
    * - `orientation`: Which way the boxes run.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `disabled`: Whether the whole set is out of play.
@@ -7253,7 +7162,6 @@ export type CustomElementsSolidJs = {
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name submitted with the form.
@@ -7811,7 +7719,6 @@ export type CustomElementsSolidJs = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name submitted with the form.
@@ -7984,7 +7891,6 @@ export type CustomElementsSolidJs = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `filter`: Text the options are matched against. Empty shows them all.
@@ -8415,7 +8321,6 @@ export type CustomElementsSolidJs = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name the group reports under when its form is submitted.
@@ -8561,7 +8466,6 @@ export type CustomElementsSolidJs = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `filterable`: Whether the list can be narrowed by typing.
@@ -8706,7 +8610,6 @@ export type CustomElementsSolidJs = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `max`: The largest value the reader can choose.
@@ -8909,7 +8812,6 @@ export type CustomElementsSolidJs = {
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name submitted with the form.
@@ -9331,7 +9233,6 @@ export type CustomElementsSolidJs = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
@@ -9412,7 +9313,6 @@ export type CustomElementsSolidJs = {
    * - `value`: What the control holds now, and what its form submits.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
-   * - `hide-label`/`hideLabel`: Whether the label names the control without being shown.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `name`: Name the group reports under when its form is submitted.

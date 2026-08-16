@@ -230,9 +230,8 @@ export class HelixBaseSelect extends MixinControllerOpen(
           exportparts="items, empty"
           .value=${this.value}
           ?multiple=${this.multiple}
-          hide-label
           ?filterable=${this.filterable}
-          label=${this.label || nothing}
+          aria-label=${this.label || nothing}
           @helix-change=${this.handleChange}
         >
           <!-- The trigger's words are read off the options, and on the first

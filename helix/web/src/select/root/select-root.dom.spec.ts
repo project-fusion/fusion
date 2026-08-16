@@ -94,12 +94,13 @@ describe('select', () => {
   test('the inner list is named by the label, not labelled with it', async () => {
     /* The select already shows the words above its trigger, so the listbox
        inside the panel rendering them again put a heading in the dropdown.
-       It still needs the name, which is why this is `hide-label` and not a
-       dropped attribute: clipped, still read, still the list's own name. */
+       It still needs the name, which is why this is `aria-label` and not a
+       dropped attribute: the mixin renders it clipped, so the list keeps a
+       name a screen reader reads. */
     const host = (await select()) as unknown as HTMLElement
     const listbox = part(host, 'listbox')
-    expect(listbox?.getAttribute('label')).toBe('L')
-    expect(listbox?.hasAttribute('hide-label')).toBe(true)
+    expect(listbox?.getAttribute('aria-label')).toBe('L')
+    expect(listbox?.hasAttribute('label')).toBe(false)
   })
 })
 

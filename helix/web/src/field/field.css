@@ -66,7 +66,10 @@
   opacity: 0.5;
 }
 
-/* Named but not shown, for a field whose purpose the page already makes plain.
+/* Named but not shown, which is what an `aria-label` on the host becomes: the
+ * mixin renders the label and marks it, because a custom element cannot hand a
+ * label to the control inside it and the attribute on the wrapper reaches
+ * nothing on its own.
  *
  * Clipped rather than `display: none` or `visibility: hidden`, both of which
  * take the label out of the accessibility tree along with the picture, which is
@@ -74,7 +77,7 @@
  * box with everything outside it cut away, still rendered, still read, and
  * still the target of the `for` that focuses the field.
  */
-:host([hide-label]) [part="label"] {
+[part="label"][data-hidden] {
   block-size: 1px;
   clip-path: inset(50%);
   inline-size: 1px;

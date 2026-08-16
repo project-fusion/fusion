@@ -475,8 +475,7 @@ export function SandboxWorkbench({ families }: Props) {
       <helix-flex align="center" class="examplesHeader" data-density="sm" gap="2xs">
         <helix-input
           class="examplesFilter"
-          hide-label
-          label="Filter examples"
+          aria-label="Filter examples"
           onInput={(event: Event) => setFilter((event.target as HelixInput).value)}
           placeholder="Filter"
           type="search"
@@ -599,13 +598,7 @@ export function SandboxWorkbench({ families }: Props) {
                 IDREF cannot leave the tab's shadow root to reach it: the
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
-            <helix-toggle-group
-              appearance="plain"
-              hide-label
-              label="Files"
-              ref={files}
-              value={pane}
-            >
+            <helix-toggle-group appearance="plain" aria-label="Files" ref={files} value={pane}>
               <helix-toggle value="source">{current.file}</helix-toggle>
               <helix-toggle value="css">styles.css</helix-toggle>
             </helix-toggle-group>

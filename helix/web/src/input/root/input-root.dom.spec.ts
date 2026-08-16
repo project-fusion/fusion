@@ -205,14 +205,25 @@ describe('input parts that are not always used', () => {
     expect(part(host, 'label')).toBeNull()
   })
 
-  test('hide-label keeps the name and takes away the picture', async () => {
-    /* The distinction the whole property exists for: an unnamed field is one a
-       screen reader announces as "edit text", so the label is still rendered
-       and still pointed at, only clipped. */
-    const host = await mount('<helix-input label="Filter" hide-label></helix-input>')
+  test('aria-label names the control without drawing a label', async () => {
+    /* Forwarded rather than left on the host. A custom element cannot hand a
+       label to the control inside it, so an `aria-label` on the wrapper reaches
+       nothing: measured, the inner input came back with no label at all. The
+       mixin renders it clipped instead, so the name arrives through the same
+       `<label for>` a visible one does, and an unnamed field is not announced
+       as "edit text". */
+    const host = await mount('<helix-input aria-label="Filter"></helix-input>')
     const label = part(host, 'label') as HTMLLabelElement
     expect(label).not.toBeNull()
+    expect(label.hasAttribute('data-hidden')).toBe(true)
     expect(label.getAttribute('for')).toBe(control(host)?.id)
+    expect(control(host)?.labels?.length).toBe(1)
+    expect(label.textContent?.trim()).toBe('Filter')
+  })
+
+  test('a visible label is not marked hidden', async () => {
+    const host = await mount('<helix-input label="Filter"></helix-input>')
+    expect((part(host, 'label') as HTMLElement).hasAttribute('data-hidden')).toBe(false)
   })
 
   test('the description sits under the control, whichever of the two it is', async () => {

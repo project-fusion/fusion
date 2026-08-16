@@ -43,17 +43,6 @@ export declare class MixinFieldInterface {
   feedback: string
 
   /**
-   * Whether the label names the control without being shown.
-   *
-   * For a field whose purpose is already obvious from where it sits: a filter
-   * over the list it filters, a search box under a magnifier. The label is
-   * still rendered and still read, it is only taken off the screen, which is
-   * the difference between a control a screen reader can name and one it
-   * cannot.
-   */
-  hideLabel: boolean
-
-  /**
    * The accessible name, and the fallback for the `label` slot.
    *
    * Content rather than configuration, so it is the slot's fallback and never a
@@ -166,10 +155,6 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     @property()
     feedback = ''
 
-    /** Whether the label names the control without being shown. */
-    @property({ attribute: 'hide-label', reflect: true, type: Boolean })
-    hideLabel = false
-
     /** The accessible name, and the fallback for the `label` slot. */
     @property()
     label = ''
@@ -246,10 +231,17 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * is `linkHost`, pointing the host's internals at this element.
      */
     protected renderGroupLabel(): TemplateResult | typeof nothing {
-      if (this.label === '') {
+      /* A set names itself through `hostAria`, so an `aria-label` here already
+         reaches the group. The label is still rendered and clipped, because
+         `renderGroupLabel` is what the styled tier lays out and a group that
+         drew nothing would collapse its own first row. */
+      const hidden = this.label === '' ? this.getAttribute('aria-label') : null
+      if (this.label === '' && !hidden) {
         return nothing
       }
-      return html`<span part="label"><slot name="label">${this.label}</slot></span>`
+      return html`<span part="label" ?data-hidden=${hidden !== null}
+        ><slot name="label">${this.label || hidden}</slot></span
+      >`
     }
 
     /**
@@ -266,14 +258,27 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * that has moved down the page for a label nobody wrote. `nothing` leaves
      * comment markers rather than a node, so the gap has nothing to sit between.
      *
-     * Naming a control without showing the label is `hide-label`, not an empty
-     * one: an unnamed field is a field a screen reader announces as "edit text".
+     * **`aria-label` names without showing**, and it is forwarded rather than
+     * left where the consumer put it. A custom element has no way to delegate a
+     * label to the control inside it, so an `aria-label` on the host reaches
+     * nothing: measured, the inner input came back with no label and no name of
+     * its own while the attribute sat on the wrapper. What happens instead is
+     * that the label is rendered and clipped, so the name arrives through the
+     * same `<label for>` a visible one does.
+     *
+     * This replaced `hide-label`, which was a second attribute to say what the
+     * absence of the first should have said. The rule is now `label` means a
+     * label, `aria-label` means a name, and neither means an unnamed field a
+     * screen reader announces as "edit text"
      */
     protected renderLabel(): TemplateResult | typeof nothing {
-      if (this.label === '') {
+      const hidden = this.label === '' ? this.getAttribute('aria-label') : null
+      if (this.label === '' && !hidden) {
         return nothing
       }
-      return html`<label part="label" for="control"><slot name="label">${this.label}</slot></label>`
+      return html`<label part="label" for="control" ?data-hidden=${hidden !== null}
+        ><slot name="label">${this.label || hidden}</slot></label
+      >`
     }
 
     /**
