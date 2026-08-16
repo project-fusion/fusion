@@ -1,13 +1,5 @@
-<!-- Press Submit with the field empty, then with something that is not an
-     email. The message under the field is the browser's own, in the hint's
-     place, and it goes back to the hint once the field is right.
-
-     Nothing is shown before that. A field is not wrong before anyone has had a
-     go at it, so the message waits for a submission or for the reader to finish
-     editing, and never appears merely because the field started out empty.
-
-     `onsubmit` because this is a demonstration inside a frame, and a form that
-     validates is a form that eventually submits. -->
+<!-- `onsubmit` because a form that validates is a form that eventually submits,
+     and this one is in a preview frame. -->
 <form onsubmit="event.preventDefault()">
   <helix-flex direction="column" gap="sm">
     <helix-input

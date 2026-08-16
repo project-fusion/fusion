@@ -3007,7 +3007,7 @@
               "type": {
                 "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | undefined"
               },
-              "description": "How much visual weight the button carries.",
+              "description": "How much visual weight the button carries.\n\n- `primary` is the one action a region is for, and there should be one. Two\n  primary buttons are two things claiming to be the most important, and the\n  reader has to work out which of you meant it.\n- `secondary` is an action that is real but not the point, which is most\n  buttons on most pages. A page whose every button is primary has said\n  nothing about which one matters.\n- `tertiary` is quiet enough to sit in a row of them without the row\n  becoming loud: for actions that are available rather than suggested.\n  Cancel, dismiss, the contents of a toolbar.\n- `danger` says the action is destructive before the confirmation does. The\n  shape of the control is what a reader recognises at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThis is also where emphasis comes from, rather than size: a filled primary\nbutton says \"this one matters\" far louder than eight more pixels would.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -3281,7 +3281,7 @@
               "type": {
                 "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | undefined"
               },
-              "description": "How much visual weight the button carries.",
+              "description": "How much visual weight the button carries.\n\n- `primary` is the one action a region is for, and there should be one. Two\n  primary buttons are two things claiming to be the most important, and the\n  reader has to work out which of you meant it.\n- `secondary` is an action that is real but not the point, which is most\n  buttons on most pages. A page whose every button is primary has said\n  nothing about which one matters.\n- `tertiary` is quiet enough to sit in a row of them without the row\n  becoming loud: for actions that are available rather than suggested.\n  Cancel, dismiss, the contents of a toolbar.\n- `danger` says the action is destructive before the confirmation does. The\n  shape of the control is what a reader recognises at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThis is also where emphasis comes from, rather than size: a filled primary\nbutton says \"this one matters\" far louder than eight more pixels would.",
               "fieldName": "appearance"
             },
             {
@@ -4584,7 +4584,7 @@
               "type": {
                 "text": "'outlined' | 'elevated' | 'plain' | undefined"
               },
-              "description": "How the card separates itself from the page.",
+              "description": "How the card separates itself from the page.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  coloured or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -4685,7 +4685,7 @@
               "type": {
                 "text": "'outlined' | 'elevated' | 'plain' | undefined"
               },
-              "description": "How the card separates itself from the page.",
+              "description": "How the card separates itself from the page.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  coloured or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.",
               "fieldName": "appearance"
             },
             {

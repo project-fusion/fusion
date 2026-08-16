@@ -39,7 +39,19 @@ import { styles } from './card-root.css.js'
  */
 @customElement('helix-card')
 export class HelixCard extends HelixBaseCard {
-  /** How the card separates itself from the page. */
+  /**
+   * How the card separates itself from the page.
+   *
+   * - `outlined` is the default, and a hairline is usually enough. It costs
+   *   less attention than a shadow: a screen of shadowed cards reads as a stack
+   *   of things floating, none of them settled.
+   * - `elevated` is lifted off the page instead of framed, for a card on a
+   *   coloured or busy background, where a line has to compete with whatever is
+   *   behind it and a shadow does not.
+   * - `plain` has no frame at all: the card is a layout and whatever it sits in
+   *   is the surface. For a card inside something already bounded, where a
+   *   second box adds a line and no meaning.
+   */
   @property({ reflect: true })
   appearance?: 'outlined' | 'elevated' | 'plain'
 

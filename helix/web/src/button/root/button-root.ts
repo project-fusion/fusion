@@ -29,7 +29,25 @@ import { styles } from './button-root.css.js'
  */
 @customElement('helix-button')
 export class HelixButton extends HelixBaseButton {
-  /** How much visual weight the button carries. */
+  /**
+   * How much visual weight the button carries.
+   *
+   * - `primary` is the one action a region is for, and there should be one. Two
+   *   primary buttons are two things claiming to be the most important, and the
+   *   reader has to work out which of you meant it.
+   * - `secondary` is an action that is real but not the point, which is most
+   *   buttons on most pages. A page whose every button is primary has said
+   *   nothing about which one matters.
+   * - `tertiary` is quiet enough to sit in a row of them without the row
+   *   becoming loud: for actions that are available rather than suggested.
+   *   Cancel, dismiss, the contents of a toolbar.
+   * - `danger` says the action is destructive before the confirmation does. The
+   *   shape of the control is what a reader recognises at a glance, where a red
+   *   word inside a neutral button is something they have to read first.
+   *
+   * This is also where emphasis comes from, rather than size: a filled primary
+   * button says "this one matters" far louder than eight more pixels would.
+   */
   @property({ reflect: true })
   appearance?: 'primary' | 'secondary' | 'tertiary' | 'danger'
 

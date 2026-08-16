@@ -1,6 +1,5 @@
-<!-- A group is a heading over a run, and holds no selection of its own: its
-     options are still the listbox's options, which is what keeps the keyboard
-     moving through a grouped list exactly as it moves through a flat one. -->
+<!-- The listbox is hand-written because `Listbox` is what will own these, and
+     `role="option"` requires an owner. -->
 <div role="listbox" aria-label="Label" class="listbox">
   <helix-option-group label="Group One">
     <helix-option selected value="one">Option One</helix-option>

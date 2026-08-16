@@ -634,7 +634,23 @@ it and nothing lands on the host that a consumer's markup did not have. */
 };
 
 export type HelixButtonProps = {
-  /** How much visual weight the button carries. */
+  /** How much visual weight the button carries.
+
+- `primary` is the one action a region is for, and there should be one. Two
+  primary buttons are two things claiming to be the most important, and the
+  reader has to work out which of you meant it.
+- `secondary` is an action that is real but not the point, which is most
+  buttons on most pages. A page whose every button is primary has said
+  nothing about which one matters.
+- `tertiary` is quiet enough to sit in a row of them without the row
+  becoming loud: for actions that are available rather than suggested.
+  Cancel, dismiss, the contents of a toolbar.
+- `danger` says the action is destructive before the confirmation does. The
+  shape of the control is what a reader recognises at a glance, where a red
+  word inside a neutral button is something they have to read first.
+
+This is also where emphasis comes from, rather than size: a filled primary
+button says "this one matters" far louder than eight more pixels would. */
   appearance?: HelixButton["appearance"];
   /** What activating the button does to its form. */
   type?: HelixButton["type"];
@@ -684,7 +700,23 @@ anything a consumer sets. */
 };
 
 export type HelixButtonSolidJsProps = {
-  /** How much visual weight the button carries. */
+  /** How much visual weight the button carries.
+
+- `primary` is the one action a region is for, and there should be one. Two
+  primary buttons are two things claiming to be the most important, and the
+  reader has to work out which of you meant it.
+- `secondary` is an action that is real but not the point, which is most
+  buttons on most pages. A page whose every button is primary has said
+  nothing about which one matters.
+- `tertiary` is quiet enough to sit in a row of them without the row
+  becoming loud: for actions that are available rather than suggested.
+  Cancel, dismiss, the contents of a toolbar.
+- `danger` says the action is destructive before the confirmation does. The
+  shape of the control is what a reader recognises at a glance, where a red
+  word inside a neutral button is something they have to read first.
+
+This is also where emphasis comes from, rather than size: a filled primary
+button says "this one matters" far louder than eight more pixels would. */
   "prop:appearance"?: HelixButton["appearance"];
   /** What activating the button does to its form. */
   "prop:type"?: HelixButton["type"];
@@ -844,7 +876,17 @@ export type HelixCalloutSolidJsProps = {
 };
 
 export type HelixCardProps = {
-  /** How the card separates itself from the page. */
+  /** How the card separates itself from the page.
+
+- `outlined` is the default, and a hairline is usually enough. It costs
+  less attention than a shadow: a screen of shadowed cards reads as a stack
+  of things floating, none of them settled.
+- `elevated` is lifted off the page instead of framed, for a card on a
+  coloured or busy background, where a line has to compete with whatever is
+  behind it and a shadow does not.
+- `plain` has no frame at all: the card is a layout and whatever it sits in
+  is the surface. For a card inside something already bounded, where a
+  second box adds a line and no meaning. */
   appearance?: HelixCard["appearance"];
   /** Tightens the inset for dense layouts. */
   dense?: HelixCard["dense"];
@@ -853,7 +895,17 @@ export type HelixCardProps = {
 };
 
 export type HelixCardSolidJsProps = {
-  /** How the card separates itself from the page. */
+  /** How the card separates itself from the page.
+
+- `outlined` is the default, and a hairline is usually enough. It costs
+  less attention than a shadow: a screen of shadowed cards reads as a stack
+  of things floating, none of them settled.
+- `elevated` is lifted off the page instead of framed, for a card on a
+  coloured or busy background, where a line has to compete with whatever is
+  behind it and a shadow does not.
+- `plain` has no frame at all: the card is a layout and whatever it sits in
+  is the surface. For a card inside something already bounded, where a
+  second box adds a line and no meaning. */
   "prop:appearance"?: HelixCard["appearance"];
   /** Tightens the inset for dense layouts. */
   "prop:dense"?: HelixCard["dense"];
@@ -3796,6 +3848,22 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much visual weight the button carries.
+   *
+   * - `primary` is the one action a region is for, and there should be one. Two
+   *   primary buttons are two things claiming to be the most important, and the
+   *   reader has to work out which of you meant it.
+   * - `secondary` is an action that is real but not the point, which is most
+   *   buttons on most pages. A page whose every button is primary has said
+   *   nothing about which one matters.
+   * - `tertiary` is quiet enough to sit in a row of them without the row
+   *   becoming loud: for actions that are available rather than suggested.
+   *   Cancel, dismiss, the contents of a toolbar.
+   * - `danger` says the action is destructive before the confirmation does. The
+   *   shape of the control is what a reader recognises at a glance, where a red
+   *   word inside a neutral button is something they have to read first.
+   *
+   * This is also where emphasis comes from, rather than size: a filled primary
+   * button says "this one matters" far louder than eight more pixels would.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
@@ -3990,6 +4058,16 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How the card separates itself from the page.
+   *
+   * - `outlined` is the default, and a hairline is usually enough. It costs
+   *   less attention than a shadow: a screen of shadowed cards reads as a stack
+   *   of things floating, none of them settled.
+   * - `elevated` is lifted off the page instead of framed, for a card on a
+   *   coloured or busy background, where a line has to compete with whatever is
+   *   behind it and a shadow does not.
+   * - `plain` has no frame at all: the card is a layout and whatever it sits in
+   *   is the surface. For a card inside something already bounded, where a
+   *   second box adds a line and no meaning.
    * - `dense`: Tightens the inset for dense layouts.
    * - `orientation`: Whether media sits above the content stack or beside it.
    *
@@ -7158,6 +7236,22 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How much visual weight the button carries.
+   *
+   * - `primary` is the one action a region is for, and there should be one. Two
+   *   primary buttons are two things claiming to be the most important, and the
+   *   reader has to work out which of you meant it.
+   * - `secondary` is an action that is real but not the point, which is most
+   *   buttons on most pages. A page whose every button is primary has said
+   *   nothing about which one matters.
+   * - `tertiary` is quiet enough to sit in a row of them without the row
+   *   becoming loud: for actions that are available rather than suggested.
+   *   Cancel, dismiss, the contents of a toolbar.
+   * - `danger` says the action is destructive before the confirmation does. The
+   *   shape of the control is what a reader recognises at a glance, where a red
+   *   word inside a neutral button is something they have to read first.
+   *
+   * This is also where emphasis comes from, rather than size: a filled primary
+   * button says "this one matters" far louder than eight more pixels would.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
@@ -7361,6 +7455,16 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How the card separates itself from the page.
+   *
+   * - `outlined` is the default, and a hairline is usually enough. It costs
+   *   less attention than a shadow: a screen of shadowed cards reads as a stack
+   *   of things floating, none of them settled.
+   * - `elevated` is lifted off the page instead of framed, for a card on a
+   *   coloured or busy background, where a line has to compete with whatever is
+   *   behind it and a shadow does not.
+   * - `plain` has no frame at all: the card is a layout and whatever it sits in
+   *   is the surface. For a card inside something already bounded, where a
+   *   second box adds a line and no meaning.
    * - `dense`: Tightens the inset for dense layouts.
    * - `orientation`: Whether media sits above the content stack or beside it.
    *
