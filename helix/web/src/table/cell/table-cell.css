@@ -1,8 +1,19 @@
 :host {
+  /* A stated height rather than one falling out of the padding, so every row is
+     the same height whatever is in it: a cell holding a tag or an icon button
+     was taller than the text cell beside it, and a table whose rows differ by a
+     few pixels reads as a table nobody measured. `control-md` is forty, which
+     is a row a pointer can hit and a line of text can breathe in.
+
+     `min-block-size` and not `block-size`, because a cell that wraps to two
+     lines has to be allowed to grow. The height is a floor, not a cage. */
+  align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
-  display: block;
+  display: flex;
   font-size: var(--helix-text-sm);
+  min-block-size: var(--helix-size-control-md);
   min-inline-size: 0;
   padding: var(--helix-space-xs) var(--helix-space-md) var(--helix-space-xs) var(--helix-space-none);
 }

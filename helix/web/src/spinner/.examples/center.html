@@ -1,0 +1,17 @@
+<!-- The centre is a slot and is empty by default: a spinner with a mark in the
+     middle is somebody's spinner, and the library does not know whose. What goes
+     in it is the application's, put in once wherever the app wraps this.
+
+     What is slotted does not turn. Only the arc moves, because a mark rotating
+     with it stops reading as a mark. -->
+<helix-flex align="center" gap="lg">
+  <helix-spinner size="lg">
+    <helix-icon name="cube"></helix-icon>
+  </helix-spinner>
+  <helix-spinner>
+    <helix-icon name="cube"></helix-icon>
+  </helix-spinner>
+  <helix-spinner size="sm">
+    <helix-icon name="cube"></helix-icon>
+  </helix-spinner>
+</helix-flex>

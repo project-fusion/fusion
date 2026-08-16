@@ -55,8 +55,12 @@
  * square touching a rounded rectangle reads as a mistake rather than as a
  * control inside a chip.
  *
- * The tag is a few pixels wider for it. That is the correct width: it is what
- * a padded box holding two things has always been. */
+ * Pulled back by its own padding, though, and not by the tag's inset. The
+ * control's four pixels are hit area rather than space, so left to sit inside
+ * the inset they added to it and the gap on the right came out at the inset
+ * plus four while the label's on the left was the inset exactly. Cancelling the
+ * padding puts the visible gap back at the inset on both sides and leaves the
+ * control the same size to press. */
 [part="dismiss"] {
   background: none;
   border: none;
@@ -64,6 +68,7 @@
   color: inherit;
   cursor: pointer;
   display: inline-flex;
+  margin-inline-end: calc(var(--helix-space-2xs) * -1);
   padding: var(--helix-space-2xs);
 }
 

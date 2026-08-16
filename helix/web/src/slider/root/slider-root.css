@@ -132,11 +132,25 @@
 
 /* Centred on the track by hand, because a WebKit thumb is laid out from the top
    of the runnable track rather than centred in it. */
+/* No border, and the shadow is what separates it.
+ *
+ * The border was `border-strong`, a hairline drawn all the way round a circle
+ * the size of a checkbox, which at that scale reads as a ring rather than as an
+ * edge. A shadow separates the thumb from the track by lifting it, which is
+ * what a thumb is doing anyway, and it does not compete with the accent fill
+ * the track carries on the chosen side.
+ *
+ * `shadow-sm` is offset downward, so it also stops the thumb reading as
+ * floating: it sits on the track rather than over it. The same reasoning the
+ * switch uses in reverse, where a border was chosen precisely because a shadow
+ * at twenty pixels was too asymmetric to centre. A slider's thumb is larger and
+ * moves horizontally, so the asymmetry reads as weight rather than as a
+ * mistake. */
 [part="control"]::-webkit-slider-thumb {
   appearance: none;
   background-color: var(--helix-color-background);
   block-size: var(--_slider-thumb);
-  border: var(--helix-border-thin) solid var(--helix-color-border-strong);
+  border: none;
   border-radius: var(--helix-radii-full);
   box-shadow: var(--helix-shadow-sm);
   inline-size: var(--_slider-thumb);
@@ -146,7 +160,9 @@
 [part="control"]::-moz-range-thumb {
   background-color: var(--helix-color-background);
   block-size: var(--_slider-thumb);
-  border: var(--helix-border-thin) solid var(--helix-color-border-strong);
+  /* Stated rather than dropped: Firefox's UA stylesheet gives the thumb a
+     border, so leaving the declaration out leaves a border rather than none. */
+  border: none;
   border-radius: var(--helix-radii-full);
   box-shadow: var(--helix-shadow-sm);
   inline-size: var(--_slider-thumb);
