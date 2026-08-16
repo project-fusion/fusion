@@ -47,13 +47,22 @@ export const overlaysArt: Record<string, ReactNode> = {
   /**
    * The path to here, ending on where you are. Three crumbs rather than four:
    * the fourth added a shape without adding an idea.
+   *
+   * The separators are chevrons rather than filled triangles.
+   *
+   * A solid triangle is a caret, which is a different mark: it is heavier than
+   * anything else at that size, and the library's own marks are chevrons.
+   * `accordion-item.css` names its `[part="chevron"]` outright, and `select`
+   * flips its indicator across the x-axis precisely because a chevron is
+   * symmetric about that axis. The only filled triangle left in the gallery is
+   * `tooltip`, where it is a pointer rather than a glyph.
    */
   breadcrumbs: (
     <>
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="40" x="76" y="96" />
-      <path className="artFg" d="M126 94l5 6-5 6z" fillOpacity="0.12" />
+      <path className="artFg" d="M126 96l4 4-4 4 1.5 1.5 5.5-5.5-5.5-5.5z" fillOpacity="0.28" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="48" x="142" y="96" />
-      <path className="artFg" d="M200 94l5 6-5 6z" fillOpacity="0.12" />
+      <path className="artFg" d="M198 96l4 4-4 4 1.5 1.5 5.5-5.5-5.5-5.5z" fillOpacity="0.28" />
       <rect className="artFg" fillOpacity="0.82" height="8" rx="4" width="30" x="214" y="96" />
     </>
   ),
@@ -106,13 +115,16 @@ export const overlaysArt: Record<string, ReactNode> = {
   /**
    * A stack of pages, one showing, with a way back. Three planes at one alpha,
    * so the depth comes from them compounding rather than from three values.
+   *
+   * The back mark is a chevron for the same reason the breadcrumb separators
+   * are: it points the way out of the stack, it does not open anything.
    */
   drilldown: (
     <>
       <rect className="artFg" fillOpacity="0.06" height="112" rx="8" width="176" x="48" y="44" />
       <rect className="artFg" fillOpacity="0.06" height="112" rx="8" width="176" x="72" y="56" />
       <rect className="artFg" fillOpacity="0.06" height="112" rx="8" width="176" x="96" y="68" />
-      <path className="artFg" d="M124 82l-10 8 10 8z" fillOpacity="0.55" />
+      <path className="artFg" d="M121 84.5l-5.5 5.5 5.5 5.5 1.5-1.5-4-4 4-4z" fillOpacity="0.55" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="72" x="136" y="86" />
     </>
   ),
@@ -150,6 +162,62 @@ export const overlaysArt: Record<string, ReactNode> = {
         />
       ))}
       <rect className="artFg" fillOpacity="0.82" height="2" width="48" x="112" y="116" />
+    </>
+  ),
+
+  /**
+   * Headings on this page, with a marker on the one being read.
+   *
+   * The hairline down the left is the component's own: it is a repeating
+   * background rather than a border, and each item carries a transparent
+   * `border-inline-start` at `border-thick` that the current one colours in.
+   * So the marker sits *on* the rule rather than beside it, and the indents are
+   * heading depth rather than tree depth.
+   */
+  'page-nav': (
+    <>
+      <rect className="artFg" fillOpacity="0.12" height="112" width="1" x="64" y="44" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="80" y="48" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="64" x="96" y="76" />
+      <rect className="artFg" fillOpacity="0.82" height="16" width="2" x="63" y="100" />
+      <rect className="artFg" fillOpacity="0.82" height="8" rx="4" width="72" x="96" y="104" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="80" x="80" y="132" />
+    </>
+  ),
+
+  /**
+   * A panel that opens against a trigger and holds anything.
+   *
+   * Mixed content rather than a column of equal rows, which is the whole of
+   * what separates it from `menu`: a menu holds commands, a popover holds
+   * whatever you put in it. Its panel is also offset from the trigger rather
+   * than flush under it, because it opens *against* one.
+   */
+  popover: (
+    <>
+      <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="64" x="56" y="36" />
+      <rect className="artFg" fillOpacity="0.06" height="80" rx="8" width="184" x="88" y="88" />
+      <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="88" x="104" y="104" />
+      <rect className="artFg" fillOpacity="0.28" height="6" rx="3" width="140" x="104" y="124" />
+      <rect className="artFg" fillOpacity="0.28" height="20" rx="4" width="48" x="104" y="140" />
+    </>
+  ),
+
+  /**
+   * Messages arriving at a corner, each with a coloured leading edge.
+   *
+   * A toast is `22rem` wide, which is 352 at this scale and wider than the
+   * frame, so both are cropped by the right edge. That is the truthful drawing
+   * and it happens to say the right thing: they come in from off the page.
+   */
+  toast: (
+    <>
+      <rect className="artFg" fillOpacity="0.06" height="44" rx="8" width="290" x="48" y="56" />
+      <rect className="artFg" fillOpacity="0.55" height="44" width="2" x="48" y="56" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="140" x="68" y="74" />
+      <rect className="artFg" fillOpacity="0.06" height="44" rx="8" width="290" x="48" y="112" />
+      <rect className="artFg" fillOpacity="0.55" height="44" width="2" x="48" y="112" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="112" x="68" y="130" />
     </>
   ),
 

@@ -286,3 +286,26 @@ describe('tabs, controlled and uncontrolled', () => {
     expect(host.active).toBe('two')
   })
 })
+
+describe('tabs modes are decided once', () => {
+  test('a script may move a seeded set without taking it over', async () => {
+    /* The mode is read at the first update, from what declared one then. A
+       write afterwards moves the set and leaves it owning itself, which is what
+       both a native control and anyone reading this code would expect. */
+    const host = (await mount(
+      `<helix-tabs default-active="one">
+        <helix-tabs-tab value="one">One</helix-tabs-tab>
+        <helix-tabs-tab value="two">Two</helix-tabs-tab>
+      </helix-tabs>`,
+    )) as Updatable & { active: string }
+    await host.updateComplete
+
+    host.active = 'two'
+    await host.updateComplete
+    expect(host.active).toBe('two')
+
+    ;(tabs(host)[0] as unknown as { select(): void }).select()
+    await host.updateComplete
+    expect(host.active).toBe('one')
+  })
+})

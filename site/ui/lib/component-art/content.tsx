@@ -132,6 +132,23 @@ export const contentArt: Record<string, ReactNode> = {
   ),
 
   /**
+   * A track and how far along it something is, at the eight pixel progress
+   * height.
+   *
+   * Two shapes, and the second is the point: `progress` is `slider` with the
+   * thumb taken off. One reports, the other takes a value, and at this level of
+   * abstraction the thumb is the entire visible difference. Anything added here
+   * to make the card busier would blur that.
+   */
+  progress: (
+    <>
+      <rect className="artFg" fillOpacity="0.28" height="6" rx="3" width="64" x="48" y="76" />
+      <rect className="artFg" fillOpacity="0.12" height="8" rx="4" width="224" x="48" y="96" />
+      <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="136" x="48" y="96" />
+    </>
+  ),
+
+  /**
    * Set inline and carried by weight. The run wraps across two lines, which is
    * what stops it reading as a highlighted phrase: a quotation is part of the
    * sentence it sits in.

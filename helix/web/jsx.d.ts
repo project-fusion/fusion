@@ -304,9 +304,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   open?: HelixAccordionItem["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixAccordionItem["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixAccordionItem["defaultOpen"];
   /** Where the open indicator sits, or whether there is one.
 
@@ -364,9 +364,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixAccordionItem["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixAccordionItem["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixAccordionItem["defaultOpen"];
   /** Where the open indicator sits, or whether there is one.
 
@@ -1210,9 +1210,9 @@ same shape all four of these mixins have, for the reason given on
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `data-checked` carries the resolved state for stylesheets. */
   checked?: HelixCheckbox["checked"];
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Initial checked state for uncontrolled use, where nothing declared one. */
   "default-checked"?: HelixCheckbox["defaultChecked"];
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Initial checked state for uncontrolled use, where nothing declared one. */
   defaultChecked?: HelixCheckbox["defaultChecked"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixCheckbox["hint"];
@@ -1262,9 +1262,9 @@ same shape all four of these mixins have, for the reason given on
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `data-checked` carries the resolved state for stylesheets. */
   "prop:checked"?: HelixCheckbox["checked"];
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Initial checked state for uncontrolled use, where nothing declared one. */
   "bool:default-checked"?: HelixCheckbox["defaultChecked"];
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Initial checked state for uncontrolled use, where nothing declared one. */
   "prop:defaultChecked"?: HelixCheckbox["defaultChecked"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixCheckbox["hint"];
@@ -1341,9 +1341,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   open?: HelixDialog["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixDialog["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixDialog["defaultOpen"];
   /** Accessible name for the dialog. */
   label?: HelixDialog["label"];
@@ -1393,9 +1393,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixDialog["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixDialog["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixDialog["defaultOpen"];
   /** Accessible name for the dialog. */
   "prop:label"?: HelixDialog["label"];
@@ -1496,9 +1496,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   open?: HelixDrawer["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixDrawer["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixDrawer["defaultOpen"];
   /** Which edge the drawer comes from. */
   placement?: HelixDrawer["placement"];
@@ -1554,9 +1554,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixDrawer["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixDrawer["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixDrawer["defaultOpen"];
   /** Which edge the drawer comes from. */
   "prop:placement"?: HelixDrawer["placement"];
@@ -2316,9 +2316,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   open?: HelixMenu["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixMenu["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixMenu["defaultOpen"];
   /** Preferred side. It moves if that side does not fit. */
   placement?: HelixMenu["placement"];
@@ -2370,9 +2370,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixMenu["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixMenu["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixMenu["defaultOpen"];
   /** Preferred side. It moves if that side does not fit. */
   "prop:placement"?: HelixMenu["placement"];
@@ -2546,9 +2546,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   open?: HelixPopover["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixPopover["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixPopover["defaultOpen"];
   /** Accessible name for the panel. */
   label?: HelixPopover["label"];
@@ -2600,9 +2600,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixPopover["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixPopover["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixPopover["defaultOpen"];
   /** Accessible name for the panel. */
   "prop:label"?: HelixPopover["label"];
@@ -2891,9 +2891,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   open?: HelixSelect["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixSelect["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixSelect["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixSelect["defaultValue"];
@@ -2986,9 +2986,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixSelect["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixSelect["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixSelect["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixSelect["defaultValue"];
@@ -3305,9 +3305,9 @@ same shape all four of these mixins have, for the reason given on
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `data-checked` carries the resolved state for stylesheets. */
   checked?: HelixSwitch["checked"];
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Initial checked state for uncontrolled use, where nothing declared one. */
   "default-checked"?: HelixSwitch["defaultChecked"];
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Initial checked state for uncontrolled use, where nothing declared one. */
   defaultChecked?: HelixSwitch["defaultChecked"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixSwitch["hint"];
@@ -3353,9 +3353,9 @@ same shape all four of these mixins have, for the reason given on
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `data-checked` carries the resolved state for stylesheets. */
   "prop:checked"?: HelixSwitch["checked"];
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Initial checked state for uncontrolled use, where nothing declared one. */
   "bool:default-checked"?: HelixSwitch["defaultChecked"];
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Initial checked state for uncontrolled use, where nothing declared one. */
   "prop:defaultChecked"?: HelixSwitch["defaultChecked"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixSwitch["hint"];
@@ -4124,9 +4124,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   open?: HelixTooltip["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixTooltip["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixTooltip["defaultOpen"];
   /** The text shown in the bubble.
 
@@ -4188,9 +4188,9 @@ cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixTooltip["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixTooltip["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+  /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixTooltip["defaultOpen"];
   /** The text shown in the bubble.
 
@@ -4406,7 +4406,7 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `chevron-placement`/`chevronPlacement`: Where the open indicator sits, or whether there is one.
    *
    * `auto` resolves to `end`, which is where a reader scanning a list of
@@ -5343,7 +5343,7 @@ export type CustomElements = {
    *
    * Not reflected: the attribute is the consumer's input and stays as they
    * wrote it, and `data-checked` carries the resolved state for stylesheets.
-   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use, where nothing declared one.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -5460,7 +5460,7 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: Accessible name for the dialog.
    * - `persistent`: Whether Escape and the backdrop can close it.
    *
@@ -5594,7 +5594,7 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `placement`: Which edge the drawer comes from.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
@@ -6417,7 +6417,7 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
@@ -6684,7 +6684,7 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
    * - `placement`: Preferred side. It moves if that side does not fit.
@@ -7018,7 +7018,7 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -7410,7 +7410,7 @@ export type CustomElements = {
    *
    * Not reflected: the attribute is the consumer's input and stays as they
    * wrote it, and `data-checked` carries the resolved state for stylesheets.
-   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use, where nothing declared one.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -8260,7 +8260,7 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `content`: The text shown in the bubble.
    *
    * The common case, and the fallback for the `content` slot: slot something
@@ -8508,7 +8508,7 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `chevron-placement`/`chevronPlacement`: Where the open indicator sits, or whether there is one.
    *
    * `auto` resolves to `end`, which is where a reader scanning a list of
@@ -9497,7 +9497,7 @@ export type CustomElementsSolidJs = {
    *
    * Not reflected: the attribute is the consumer's input and stays as they
    * wrote it, and `data-checked` carries the resolved state for stylesheets.
-   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use, where nothing declared one.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -9617,7 +9617,7 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: Accessible name for the dialog.
    * - `persistent`: Whether Escape and the backdrop can close it.
    *
@@ -9757,7 +9757,7 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `placement`: Which edge the drawer comes from.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
@@ -10621,7 +10621,7 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
@@ -10902,7 +10902,7 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
    * - `placement`: Preferred side. It moves if that side does not fit.
@@ -11255,7 +11255,7 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -11664,7 +11664,7 @@ export type CustomElementsSolidJs = {
    *
    * Not reflected: the attribute is the consumer's input and stays as they
    * wrote it, and `data-checked` carries the resolved state for stylesheets.
-   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
+   * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use, where nothing declared one.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -12563,7 +12563,7 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `content`: The text shown in the bubble.
    *
    * The common case, and the fallback for the `content` slot: slot something

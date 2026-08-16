@@ -1,3 +1,4 @@
+import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixChangeEvent } from '../../events/events.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
@@ -103,31 +104,51 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      */
     @property()
     get value(): string {
-      return this.ownedValue ?? this.internalValue ?? this.defaultValue
+      return this.valueState ?? this.defaultValue
     }
 
     set value(next: string) {
       const previous = this.value
-      this.ownedValue = next
+      this.valueState = next
       this.requestUpdate('value', previous)
     }
 
-    /** What the consumer set, and the only thing that says they own this. */
-    private ownedValue: string | undefined = undefined
+    /**
+     * The state, whoever set it, and `undefined` until somebody has.
+     *
+     * One field and not two. Writing always applies, the way a native control
+     * does when a script assigns to it. What the write does not do is change
+     * which mode the element is in.
+     */
+    private valueState: string | undefined = undefined
 
     /**
-     * Uncontrolled state, `undefined` until the control is first changed.
+     * Whether the consumer owns the state, decided once and then fixed.
      *
-     * Falling back through the getter is what replaced seeding `value` from
-     * `defaultValue` in `willUpdate`. That seeding had to go: under this shape
-     * it would have been a write, and a write is how a consumer says they own
-     * the value, so every control with a `default-value` would have declared
-     * itself controlled on its first render and then refused to change.
+     * Read off whether anything had set `value` by the first update, which is
+     * where markup, a hydrating server's attributes and a framework's initial
+     * properties have all landed. See `MixinControllerOpen` for why this is
+     * decided once rather than continuously.
      */
-    private internalValue: string | undefined = undefined
+    private valueMode: boolean | undefined = undefined
 
-    private get isControlled(): boolean {
-      return this.ownedValue !== undefined
+    private get valueIsControlled(): boolean {
+      return this.valueMode === true
+    }
+
+    /**
+     * Reads the mode, once, before anything else looks at it.
+     *
+     * Everything that declares it has arrived by the first update: attributes
+     * from markup or from a server's output, and properties a framework
+     * assigned on mount. Nothing after that changes it, which is what lets a
+     * script assign `value` to an uncontrolled element without taking it over.
+     */
+    protected override willUpdate(changed: PropertyValues): void {
+      super.willUpdate(changed)
+      if (this.valueMode === undefined) {
+        this.valueMode = this.valueState !== undefined
+      }
     }
 
     /**
@@ -155,11 +176,11 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
       }
       return requestControlledChange({
         apply: (value) => {
-          if (this.isControlled) {
+          if (this.valueIsControlled) {
             return
           }
           const previous = this.value
-          this.internalValue = value
+          this.valueState = value
           this.requestUpdate('value', previous)
         },
         event: (value) => new HelixChangeEvent({ name: (this as Named).name ?? '', value }),
@@ -178,8 +199,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      */
     formResetCallback(): void {
       const previous = this.value
-      this.internalValue = undefined
-      this.ownedValue = undefined
+      this.valueState = undefined
       this.requestUpdate('value', previous)
     }
 
@@ -192,8 +212,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      */
     formStateRestoreCallback(state: string | null): void {
       const previous = this.value
-      this.ownedValue = undefined
-      this.internalValue = state ?? undefined
+      this.valueState = state ?? undefined
       this.requestUpdate('value', previous)
     }
   }

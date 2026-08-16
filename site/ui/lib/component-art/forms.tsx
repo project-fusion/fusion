@@ -14,9 +14,10 @@ import type { ReactNode } from 'react'
  * - **Count carries meaning.** One row is Option, rows on selection bands are
  *   Listbox, rows with squares are Checkbox Group.
  *
- * `Field` and `Input` are the closest pair in the gallery, separated only by
- * state: Field is the bare stack, Input is that control focused. If one has to
- * go, it is Field.
+ * There is no `field` entry. `Field` is a real part of the library but it is
+ * not a family in the catalog, so a drawing for it would never be rendered:
+ * the registry is keyed by the slugs `getFamilies` returns, and a key nothing
+ * looks up is dead art nobody will notice has gone stale.
  */
 export const formsArt: Record<string, ReactNode> = {
   /**
@@ -84,12 +85,19 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /** Ticked, not ticked, and neither, at twenty pixels. */
+  /**
+   * Ticked, not ticked, and neither, at twenty pixels.
+   *
+   * The tick is drawn at two units thick, not three and a half. The jog at the
+   * elbow is what sets it: an offset of 1.4 on each axis is a perpendicular
+   * distance of two across a 45 degree arm, and the first version's 2.5 came
+   * out at three and a half, which is a seventh of the box it sits in.
+   */
   checkbox: (
     <>
       <rect className="artFg" fillOpacity="0.12" height="20" rx="4" width="20" x="110" y="90" />
       <rect className="artFg" fillOpacity="0.82" height="20" rx="4" width="20" x="150" y="90" />
-      <path className="artSurface" d="M154 100l3.5 3.5 7-7.5 2.5 2.5-9.5 10-6-6z" />
+      <path className="artSurface" d="M154 100l3.5 3.5 7-7.5 1.4 1.4-8.4 8.9-4.9-4.9z" />
       <rect className="artFg" fillOpacity="0.82" height="20" rx="4" width="20" x="190" y="90" />
       <rect className="artSurface" height="3" rx="1.5" width="10" x="195" y="98.5" />
     </>
@@ -132,15 +140,6 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /** Label, control, message, and no state on any of them. */
-  field: (
-    <>
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="56" x="48" y="52" />
-      <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="224" x="48" y="72" />
-      <rect className="artFg" fillOpacity="0.28" height="6" rx="3" width="120" x="48" y="126" />
-    </>
-  ),
-
   /** Square at the control height, and the glyph is all of it. */
   'icon-button': (
     <>
@@ -168,7 +167,7 @@ export const formsArt: Record<string, ReactNode> = {
     <>
       <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="192" x="64" y="80" />
       <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="88" x="80" y="96" />
-      <path className="artFg" d="M224 100l4 4 9-10 3 3-12 13-7-7z" fillOpacity="0.55" />
+      <path className="artFg" d="M224 100l4 4 9-10 1.4 1.4-10.4 11.4-5.4-5.4z" fillOpacity="0.55" />
     </>
   ),
 
@@ -181,12 +180,19 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /** A closed list, opened. The caret is what says it was ever closed. */
+  /**
+   * A closed list, opened. The indicator is what says it was ever closed.
+   *
+   * A chevron rather than a filled caret, and the same one the breadcrumbs use
+   * turned a quarter: the component flips its indicator across the x-axis when
+   * the panel opens, which only makes sense for a mark that is symmetric about
+   * that axis, and it names the chevron as the shape that is.
+   */
   select: (
     <>
       <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="208" x="56" y="36" />
       <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="72" x="72" y="52" />
-      <path className="artFg" d="M236 52h12l-6 8z" fillOpacity="0.28" />
+      <path className="artFg" d="M236.5 54l5.5 5.5 5.5-5.5-1.5-1.5-4 4-4-4z" fillOpacity="0.28" />
       <rect className="artFg" fillOpacity="0.06" height="80" rx="8" width="208" x="56" y="88" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="76" y="108" />
       <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="104" x="76" y="140" />

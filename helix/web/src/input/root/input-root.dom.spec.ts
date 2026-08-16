@@ -344,6 +344,41 @@ describe('input, controlled and uncontrolled', () => {
 
   const native = (host: HTMLElement): string => control(host).value
 
+  test('a script may set an uncontrolled value without taking it over', async () => {
+    /* What a native input does: `element.value = x` sets the value and the
+       field keeps working. It did not, because any write was read as the
+       consumer claiming ownership, so one line of script froze the field for
+       the rest of the page's life. Which mode an element is in is read once, at
+       the first update, from whether anything had declared one by then; a write
+       after that is just a write. */
+    const host = (await mount('<helix-input label="Name"></helix-input>')) as HTMLElement & {
+      updateComplete: Promise<boolean>
+      value: string
+    }
+    await host.updateComplete
+
+    host.value = 'set by a script'
+    await host.updateComplete
+    expect(host.value).toBe('set by a script')
+
+    await typed(host, 'then typed')
+    expect(host.value).toBe('then typed')
+  })
+
+  test('a controlled value is still the consumer’s to change', async () => {
+    const host = (await mount(
+      '<helix-input label="Name" value="mine"></helix-input>',
+    )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
+    await host.updateComplete
+
+    await typed(host, 'tried')
+    expect(host.value).toBe('mine')
+
+    host.value = 'handed back'
+    await host.updateComplete
+    expect(host.value).toBe('handed back')
+  })
+
   test('typing does not quietly hand the value to nobody', async () => {
     /* Writing `value` is how a consumer says they own it, so a control that
        wrote its own would declare itself controlled on the first keystroke and

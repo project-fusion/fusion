@@ -3,14 +3,20 @@ import { contentArt } from './content'
 import { coreArt } from './core'
 import { formsArt } from './forms'
 import { overlaysArt } from './overlays'
+import { toolingArt } from './tooling'
 
 /**
  * Abstract art for a family's gallery card, keyed by slug.
  *
- * Every family in `helix/web/src` has an entry, and the four files are split by
- * kind rather than by anything the build cares about: one file of forty-nine is
- * hard to navigate and every entry would sit beside a neighbour it has nothing
- * to do with. The system they all obey is documented at the top of `core.tsx`.
+ * All fifty-four families have an entry, and the five files are split by kind
+ * rather than by anything the build cares about: one file of fifty-four is hard
+ * to navigate and every entry would sit beside a neighbour it has nothing to do
+ * with. The system they all obey is documented at the top of `core.tsx`.
+ *
+ * **Fifty-four, not the forty-nine folders in `helix/web/src`.** The catalog is
+ * built from the manifests, so it also carries `editor` and `sandbox` from
+ * `@helix-io/sandbox`. Counting directories is how five families were missed on
+ * the first pass, and the count that matters is whatever `getFamilies` returns.
  *
  * A slug with no entry renders nothing rather than a placeholder. Card's media
  * region is a bare `<slot>`, so an unassigned one generates no box at all: no
@@ -22,6 +28,7 @@ const art: Record<string, ReactNode> = {
   ...coreArt,
   ...formsArt,
   ...overlaysArt,
+  ...toolingArt,
 }
 
 /**

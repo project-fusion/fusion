@@ -53,9 +53,11 @@ export declare class MixinControllerOpenInterface {
 /**
  * Grafts controlled and uncontrolled open state onto a base class.
  *
- * Controlled mode is detected automatically: once a consumer sets `open`, the
- * element stops managing the value and only emits `open-change`. Uncontrolled
- * consumers set `defaultOpen` and let the element own it.
+ * Which mode it is in is read once, at the first update, from whether anything
+ * had set `open` by then: markup, a hydrating server's attributes and a
+ * framework's initial properties have all arrived, and nothing else has
+ * happened yet. Set, and the consumer owns it and the element only announces.
+ * Unset, and the element owns it and `defaultOpen` says where it starts.
  *
  * Sets `data-open` on the host whenever the element is open, in either mode.
  * Styled tiers select on that rather than `[open]`, which is absent for
@@ -92,40 +94,54 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      */
     @property({ type: Boolean })
     get open(): boolean {
-      return this.ownedOpen ?? this.internalOpen ?? this.defaultOpen
+      return this.openState ?? this.defaultOpen
     }
 
     set open(next: boolean) {
       const previous = this.open
-      this.ownedOpen = next
+      this.openState = next
       this.requestUpdate('open', previous)
     }
 
-    /** Initial open state for uncontrolled use. Ignored once `open` is written. */
+    /** Initial open state for uncontrolled use, where nothing declared one. */
     @property({ attribute: 'default-open', type: Boolean })
     defaultOpen = false
 
     /**
-     * What the consumer set, and the only thing that says they own this.
+     * The state, whoever set it, and `undefined` until somebody has.
      *
-     * `undefined` until they write, which is why it is a separate field from
-     * the internal one rather than a flag beside it: "never written" and
-     * "written false" have to be different, and one field cannot hold both.
+     * Prefixed, and it has to be. These mixins compose onto one prototype
+     * chain, `Select` takes this one and `MixinControllerValue` together, and
+     * TypeScript's `private` is a compile-time fiction: two mixins with a field
+     * called `state` share one property on the instance, and the second one
+     * silently overwrites the first. Measured, as a select whose `value` came
+     * back holding its `open` boolean.
+     *
+     * One field and not two. Writing always applies, which is what a native
+     * control does when a script assigns to it, and is the behaviour an
+     * imperative `element.open = true` should have whatever mode the element is
+     * in. What the write does *not* do is change which mode that is.
      */
-    private ownedOpen: boolean | undefined = undefined
+    private openState: boolean | undefined = undefined
 
     /**
-     * Uncontrolled state, `undefined` until the element is first toggled.
+     * Whether the consumer owns the state, decided once and then fixed.
      *
-     * Deliberately not seeded from `defaultOpen` in `connectedCallback`: SSR
-     * never calls that hook, so a `default-open` element would render closed on
-     * the server and snap open at hydration. Falling back to `defaultOpen` in
-     * the getter needs no lifecycle at all, so server and client agree.
+     * Read off whether anything had set `open` by the time of the first update,
+     * which is where markup, a hydrating server's attributes and a framework's
+     * initial properties have all landed and nothing else has happened yet.
+     *
+     * Decided once, because the alternative is deciding continuously, and that
+     * was tried: taking any write as a claim of ownership meant an uncontrolled
+     * element became controlled the moment a script assigned to it, or the
+     * moment the component set its own state, and then stopped responding. Both
+     * were real and neither is anything a consumer asked for. A mode is a
+     * declaration, and a declaration is made once.
      */
-    private internalOpen: boolean | undefined = undefined
+    private openMode: boolean | undefined = undefined
 
-    private get isControlled(): boolean {
-      return this.ownedOpen !== undefined
+    private get openIsControlled(): boolean {
+      return this.openMode === true
     }
 
     /**
@@ -136,6 +152,12 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
+      /* Before anything else reads it, and only the first time. Everything that
+         declares the mode has arrived by now: attributes from markup or from a
+         server's output, and properties a framework assigned on mount. */
+      if (this.openMode === undefined) {
+        this.openMode = this.openState !== undefined
+      }
       this.toggleAttribute('data-open', this.open)
     }
 
@@ -165,11 +187,15 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
       }
       return requestControlledChange({
         apply: (open) => {
-          if (this.isControlled) {
+          /* Nothing in controlled mode: the element announced, and the consumer
+             is the one who decides. This is the only path that respects that,
+             which is why a component's own changes go through here and never
+             through the setter. */
+          if (this.openIsControlled) {
             return
           }
           const previous = this.open
-          this.internalOpen = open
+          this.openState = open
           this.requestUpdate('open', previous)
         },
         event: (open) => (open ? new HelixOpenEvent() : new HelixCloseEvent()),

@@ -67,9 +67,11 @@ interface Named {
 /**
  * Grafts controlled and uncontrolled checked state onto a base class.
  *
- * Controlled mode is detected automatically: once a consumer sets `checked`,
- * the element stops managing the value and only announces. Uncontrolled
- * consumers set `defaultChecked` and let the element own it.
+ * Which mode it is in is read once, at the first update, from whether anything
+ * had set `checked` by then: markup, a hydrating server's attributes and a
+ * framework's initial properties have all arrived, and nothing else has
+ * happened yet. Set, and the consumer owns it and the element only announces.
+ * Unset, and the element owns it and `defaultChecked` says where it starts.
  *
  * Sets `data-checked` on the host whenever the element is checked, in either
  * mode. Styled tiers select on that rather than `[checked]`, which is absent
@@ -94,34 +96,40 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      */
     @property({ type: Boolean })
     get checked(): boolean {
-      return this.ownedChecked ?? this.internalChecked ?? this.defaultChecked
+      return this.checkedState ?? this.defaultChecked
     }
 
     set checked(next: boolean) {
       const previous = this.checked
-      this.ownedChecked = next
+      this.checkedState = next
       this.requestUpdate('checked', previous)
     }
 
-    /** What the consumer set, and the only thing that says they own this. */
-    private ownedChecked: boolean | undefined = undefined
-
-    /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+    /** Initial checked state for uncontrolled use, where nothing declared one. */
     @property({ attribute: 'default-checked', type: Boolean })
     defaultChecked = false
 
     /**
-     * Uncontrolled state, `undefined` until the control is first changed.
+     * The state, whoever set it, and `undefined` until somebody has.
      *
-     * Not seeded from `defaultChecked` in `connectedCallback`: SSR never calls
-     * that hook, so a `default-checked` control would render unchecked on the
-     * server and snap checked at hydration. Falling back in the getter needs no
-     * lifecycle at all, so server and client agree.
+     * One field and not two. Writing always applies, the way a native control
+     * does when a script assigns to it. What the write does not do is change
+     * which mode the element is in.
      */
-    private internalChecked: boolean | undefined = undefined
+    private checkedState: boolean | undefined = undefined
 
-    private get isControlled(): boolean {
-      return this.ownedChecked !== undefined
+    /**
+     * Whether the consumer owns the state, decided once and then fixed.
+     *
+     * Read off whether anything had set `checked` by the first update, which is
+     * where markup, a hydrating server's attributes and a framework's initial
+     * properties have all landed. See `MixinControllerOpen` for why this is
+     * decided once rather than continuously.
+     */
+    private checkedMode: boolean | undefined = undefined
+
+    private get checkedIsControlled(): boolean {
+      return this.checkedMode === true
     }
 
     /**
@@ -132,6 +140,10 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
+      // Only the first time, before anything reads it. See `MixinControllerOpen`.
+      if (this.checkedMode === undefined) {
+        this.checkedMode = this.checkedState !== undefined
+      }
       this.toggleAttribute('data-checked', this.checked)
     }
 
@@ -161,11 +173,11 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
       }
       return requestControlledChange({
         apply: (checked) => {
-          if (this.isControlled) {
+          if (this.checkedIsControlled) {
             return
           }
           const previous = this.checked
-          this.internalChecked = checked
+          this.checkedState = checked
           this.requestUpdate('checked', previous)
         },
         event: (checked) =>
@@ -194,8 +206,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      */
     resetChecked(): void {
       const previous = this.checked
-      this.internalChecked = undefined
-      this.ownedChecked = undefined
+      this.checkedState = undefined
       this.requestUpdate('checked', previous)
     }
   }

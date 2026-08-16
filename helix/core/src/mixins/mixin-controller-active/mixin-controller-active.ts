@@ -1,3 +1,4 @@
+import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixChangeEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
@@ -96,12 +97,12 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      */
     @property()
     get active(): string {
-      return this.ownedActive ?? this.internalActive ?? this.defaultActive
+      return this.activeState ?? this.defaultActive
     }
 
     set active(next: string) {
       const previous = this.active
-      this.ownedActive = next
+      this.activeState = next
       this.requestUpdate('active', previous)
     }
 
@@ -109,20 +110,42 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     @property({ attribute: 'default-active' })
     defaultActive = ''
 
-    /** What the consumer set, and the only thing that says they own this. */
-    private ownedActive: string | undefined = undefined
+    /**
+     * The state, whoever set it, and `undefined` until somebody has.
+     *
+     * One field and not two. Writing always applies, the way a native control
+     * does when a script assigns to it. What the write does not do is change
+     * which mode the element is in.
+     */
+    private activeState: string | undefined = undefined
 
     /**
-     * Uncontrolled state, `undefined` until the set is first moved.
+     * Whether the consumer owns the state, decided once and then fixed.
      *
-     * Not seeded from `defaultActive` in `connectedCallback`, which SSR never
-     * calls: falling back in the getter needs no lifecycle, so the server and
-     * the client agree.
+     * Read off whether anything had set `active` by the first update, which is
+     * where markup, a hydrating server's attributes and a framework's initial
+     * properties have all landed. See `MixinControllerOpen` for why this is
+     * decided once rather than continuously.
      */
-    private internalActive: string | undefined = undefined
+    private activeMode: boolean | undefined = undefined
 
-    private get isControlled(): boolean {
-      return this.ownedActive !== undefined
+    private get activeIsControlled(): boolean {
+      return this.activeMode === true
+    }
+
+    /**
+     * Reads the mode, once, before anything else looks at it.
+     *
+     * Everything that declares it has arrived by the first update: attributes
+     * from markup or from a server's output, and properties a framework
+     * assigned on mount. Nothing after that changes it, which is what lets a
+     * script assign `active` to an uncontrolled element without taking it over.
+     */
+    protected override willUpdate(changed: PropertyValues): void {
+      super.willUpdate(changed)
+      if (this.activeMode === undefined) {
+        this.activeMode = this.activeState !== undefined
+      }
     }
 
     /**
@@ -143,11 +166,11 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
              the set announces and waits to be told. This was a bare
              `this.value = next`, so a consumer who owned the state had it
              overwritten on every choice and could not own it at all. */
-          if (this.isControlled) {
+          if (this.activeIsControlled) {
             return
           }
           const previous = this.active
-          this.internalActive = value
+          this.activeState = value
           this.requestUpdate('active', previous)
         },
         event: (value) => new HelixChangeEvent({ name: '', value }),

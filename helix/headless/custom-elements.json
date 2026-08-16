@@ -146,7 +146,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "attribute": "default-open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -155,13 +155,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedOpen",
+              "name": "openState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.\n\n`undefined` until they write, which is why it is a separate field from\nthe internal one rather than a flag beside it: \"never written\" and\n\"written false\" have to be different, and one field cannot hold both.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -169,13 +169,13 @@
             },
             {
               "kind": "field",
-              "name": "internalOpen",
+              "name": "openMode",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -183,7 +183,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "openIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -356,7 +356,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultOpen",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -3127,13 +3127,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedValue",
+              "name": "valueState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -3141,13 +3141,13 @@
             },
             {
               "kind": "field",
-              "name": "internalValue",
+              "name": "valueMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nFalling back through the getter is what replaced seeding `value` from\n`defaultValue` in `willUpdate`. That seeding had to go: under this shape\nit would have been a write, and a write is how a consumer says they own\nthe value, so every control with a `default-value` would have declared\nitself controlled on its first render and then refused to change.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -3155,7 +3155,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "valueIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -5002,26 +5002,12 @@
             },
             {
               "kind": "field",
-              "name": "ownedChecked",
-              "type": {
-                "text": "boolean | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
-              "inheritedFrom": {
-                "name": "MixinControllerChecked",
-                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "defaultChecked",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set.",
+              "description": "Initial checked state for uncontrolled use, where nothing declared one.",
               "attribute": "default-checked",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
@@ -5030,13 +5016,13 @@
             },
             {
               "kind": "field",
-              "name": "internalChecked",
+              "name": "checkedState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nNot seeded from `defaultChecked` in `connectedCallback`: SSR never calls\nthat hook, so a `default-checked` control would render unchecked on the\nserver and snap checked at hydration. Falling back in the getter needs no\nlifecycle at all, so server and client agree.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -5044,7 +5030,21 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "checkedMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `checked` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "checkedIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -5532,7 +5532,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set.",
+              "description": "Initial checked state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultChecked",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
@@ -5799,7 +5799,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "attribute": "default-open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -5808,13 +5808,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedOpen",
+              "name": "openState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.\n\n`undefined` until they write, which is why it is a separate field from\nthe internal one rather than a flag beside it: \"never written\" and\n\"written false\" have to be different, and one field cannot hold both.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -5822,13 +5822,13 @@
             },
             {
               "kind": "field",
-              "name": "internalOpen",
+              "name": "openMode",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -5836,7 +5836,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "openIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -6027,7 +6027,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultOpen",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -6399,7 +6399,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "attribute": "default-open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -6408,13 +6408,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedOpen",
+              "name": "openState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.\n\n`undefined` until they write, which is why it is a separate field from\nthe internal one rather than a flag beside it: \"never written\" and\n\"written false\" have to be different, and one field cannot hold both.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -6422,13 +6422,13 @@
             },
             {
               "kind": "field",
-              "name": "internalOpen",
+              "name": "openMode",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -6436,7 +6436,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "openIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -6627,7 +6627,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultOpen",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -8653,13 +8653,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedValue",
+              "name": "valueState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -8667,13 +8667,13 @@
             },
             {
               "kind": "field",
-              "name": "internalValue",
+              "name": "valueMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nFalling back through the getter is what replaced seeding `value` from\n`defaultValue` in `willUpdate`. That seeding had to go: under this shape\nit would have been a write, and a write is how a consumer says they own\nthe value, so every control with a `default-value` would have declared\nitself controlled on its first render and then refused to change.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -8681,7 +8681,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "valueIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -10094,13 +10094,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedValue",
+              "name": "valueState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -10108,13 +10108,13 @@
             },
             {
               "kind": "field",
-              "name": "internalValue",
+              "name": "valueMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nFalling back through the getter is what replaced seeding `value` from\n`defaultValue` in `willUpdate`. That seeding had to go: under this shape\nit would have been a write, and a write is how a consumer says they own\nthe value, so every control with a `default-value` would have declared\nitself controlled on its first render and then refused to change.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -10122,7 +10122,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "valueIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -11305,7 +11305,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "attribute": "default-open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -11314,13 +11314,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedOpen",
+              "name": "openState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.\n\n`undefined` until they write, which is why it is a separate field from\nthe internal one rather than a flag beside it: \"never written\" and\n\"written false\" have to be different, and one field cannot hold both.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -11328,13 +11328,13 @@
             },
             {
               "kind": "field",
-              "name": "internalOpen",
+              "name": "openMode",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -11342,7 +11342,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "openIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -11559,7 +11559,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultOpen",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -12674,7 +12674,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "attribute": "default-open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -12683,13 +12683,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedOpen",
+              "name": "openState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.\n\n`undefined` until they write, which is why it is a separate field from\nthe internal one rather than a flag beside it: \"never written\" and\n\"written false\" have to be different, and one field cannot hold both.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -12697,13 +12697,13 @@
             },
             {
               "kind": "field",
-              "name": "internalOpen",
+              "name": "openMode",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -12711,7 +12711,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "openIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -12911,7 +12911,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultOpen",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -13513,13 +13513,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedValue",
+              "name": "valueState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -13527,13 +13527,13 @@
             },
             {
               "kind": "field",
-              "name": "internalValue",
+              "name": "valueMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nFalling back through the getter is what replaced seeding `value` from\n`defaultValue` in `willUpdate`. That seeding had to go: under this shape\nit would have been a write, and a write is how a consumer says they own\nthe value, so every control with a `default-value` would have declared\nitself controlled on its first render and then refused to change.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -13541,7 +13541,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "valueIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -14601,7 +14601,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "attribute": "default-open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -14610,13 +14610,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedOpen",
+              "name": "openState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.\n\n`undefined` until they write, which is why it is a separate field from\nthe internal one rather than a flag beside it: \"never written\" and\n\"written false\" have to be different, and one field cannot hold both.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -14624,13 +14624,13 @@
             },
             {
               "kind": "field",
-              "name": "internalOpen",
+              "name": "openMode",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -14638,15 +14638,15 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "openIsControlled",
               "type": {
                 "text": "boolean"
               },
               "privacy": "private",
               "readonly": true,
               "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -14733,13 +14733,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedValue",
+              "name": "valueState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -14747,13 +14747,26 @@
             },
             {
               "kind": "field",
-              "name": "internalValue",
+              "name": "valueMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nFalling back through the getter is what replaced seeding `value` from\n`defaultValue` in `willUpdate`. That seeding had to go: under this shape\nit would have been a write, and a write is how a consumer says they own\nthe value, so every control with a `default-value` would have declared\nitself controlled on its first render and then refused to change.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -15261,7 +15274,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultOpen",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -15750,13 +15763,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedValue",
+              "name": "valueState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -15764,13 +15777,13 @@
             },
             {
               "kind": "field",
-              "name": "internalValue",
+              "name": "valueMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nFalling back through the getter is what replaced seeding `value` from\n`defaultValue` in `willUpdate`. That seeding had to go: under this shape\nit would have been a write, and a write is how a consumer says they own\nthe value, so every control with a `default-value` would have declared\nitself controlled on its first render and then refused to change.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -15778,7 +15791,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "valueIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -17046,26 +17059,12 @@
             },
             {
               "kind": "field",
-              "name": "ownedChecked",
-              "type": {
-                "text": "boolean | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
-              "inheritedFrom": {
-                "name": "MixinControllerChecked",
-                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "defaultChecked",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set.",
+              "description": "Initial checked state for uncontrolled use, where nothing declared one.",
               "attribute": "default-checked",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
@@ -17074,13 +17073,13 @@
             },
             {
               "kind": "field",
-              "name": "internalChecked",
+              "name": "checkedState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nNot seeded from `defaultChecked` in `connectedCallback`: SSR never calls\nthat hook, so a `default-checked` control would render unchecked on the\nserver and snap checked at hydration. Falling back in the getter needs no\nlifecycle at all, so server and client agree.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -17088,7 +17087,21 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "checkedMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `checked` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "checkedIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -17567,7 +17580,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set.",
+              "description": "Initial checked state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultChecked",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
@@ -18769,13 +18782,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedActive",
+              "name": "activeState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerActive",
                 "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
@@ -18783,13 +18796,13 @@
             },
             {
               "kind": "field",
-              "name": "internalActive",
+              "name": "activeMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the set is first moved.\n\nNot seeded from `defaultActive` in `connectedCallback`, which SSR never\ncalls: falling back in the getter needs no lifecycle, so the server and\nthe client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `active` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerActive",
                 "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
@@ -18797,7 +18810,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "activeIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -19664,13 +19677,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedValue",
+              "name": "valueState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -19678,13 +19691,13 @@
             },
             {
               "kind": "field",
-              "name": "internalValue",
+              "name": "valueMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nFalling back through the getter is what replaced seeding `value` from\n`defaultValue` in `willUpdate`. That seeding had to go: under this shape\nit would have been a write, and a write is how a consumer says they own\nthe value, so every control with a `default-value` would have declared\nitself controlled on its first render and then refused to change.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -19692,7 +19705,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "valueIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -20971,13 +20984,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedValue",
+              "name": "valueState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -20985,13 +20998,13 @@
             },
             {
               "kind": "field",
-              "name": "internalValue",
+              "name": "valueMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the control is first changed.\n\nFalling back through the getter is what replaced seeding `value` from\n`defaultValue` in `willUpdate`. That seeding had to go: under this shape\nit would have been a write, and a write is how a consumer says they own\nthe value, so every control with a `default-value` would have declared\nitself controlled on its first render and then refused to change.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -20999,7 +21012,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "valueIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -22325,7 +22338,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "attribute": "default-open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -22334,13 +22347,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedOpen",
+              "name": "openState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.\n\n`undefined` until they write, which is why it is a separate field from\nthe internal one rather than a flag beside it: \"never written\" and\n\"written false\" have to be different, and one field cannot hold both.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -22348,13 +22361,13 @@
             },
             {
               "kind": "field",
-              "name": "internalOpen",
+              "name": "openMode",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the element is first toggled.\n\nDeliberately not seeded from `defaultOpen` in `connectedCallback`: SSR\nnever calls that hook, so a `default-open` element would render closed on\nthe server and snap open at hydration. Falling back to `defaultOpen` in\nthe getter needs no lifecycle at all, so server and client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -22362,7 +22375,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "openIsControlled",
               "type": {
                 "text": "boolean"
               },
@@ -22589,7 +22602,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Initial open state for uncontrolled use. Ignored once `open` is written.",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
               "fieldName": "defaultOpen",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -23146,13 +23159,13 @@
             },
             {
               "kind": "field",
-              "name": "ownedActive",
+              "name": "activeState",
               "type": {
                 "text": "string | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "What the consumer set, and the only thing that says they own this.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
               "inheritedFrom": {
                 "name": "MixinControllerActive",
                 "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
@@ -23160,13 +23173,13 @@
             },
             {
               "kind": "field",
-              "name": "internalActive",
+              "name": "activeMode",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Uncontrolled state, `undefined` until the set is first moved.\n\nNot seeded from `defaultActive` in `connectedCallback`, which SSR never\ncalls: falling back in the getter needs no lifecycle, so the server and\nthe client agree.",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `active` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
               "inheritedFrom": {
                 "name": "MixinControllerActive",
                 "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
@@ -23174,7 +23187,7 @@
             },
             {
               "kind": "field",
-              "name": "isControlled",
+              "name": "activeIsControlled",
               "type": {
                 "text": "boolean"
               },
