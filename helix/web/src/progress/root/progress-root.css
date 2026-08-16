@@ -54,50 +54,83 @@
 
 /* Running, with no knowable end.
  *
- * One design, moving or still, which is what makes the reduced-motion case
- * honest. A sliding segment stopped would park somewhere and read as a value,
- * and a bar filling the track would read as finished. A hatched fill is not a
- * quantity at either speed: moving it says "still going", still it says
- * "running, amount unknown", and neither says a number.
+ * The same fill the determinate bar draws, doing the same thing it does, over
+ * and over. Same colour, same corner, same track: an indeterminate bar is the
+ * component in a different state, not a different component, and a reader
+ * should not have to work out that they are looking at the same control.
  *
- * Stopped here rather than left to the base layer, and that is not belt and
+ * The segment grows from the inline start, travels, and leaves at the far end.
+ * It stops short of filling the track, because a fill that reaches the end
+ * reads as finished, which is the one thing this state must never say.
+ *
+ * `translate` then `scale`, which is the order CSS applies the individual
+ * transform properties in, both about an origin at the inline start. So
+ * `translate: 30%` puts the leading edge three tenths along and `scale: 0.6`
+ * makes it six tenths wide, and the two compose without either needing to know
+ * the track's pixel width.
+ */
+:host([indeterminate]) [part="indicator"] {
+  animation: helix-progress-indeterminate var(--_progress-cycle) ease-in-out infinite;
+  /* Nothing to travel to: this is not moving between two values. */
+  transition: none;
+
+  /* Slow enough to read as work rather than as a stripe going past. Derived
+     from the slowest duration token, so a theme that slows its motion slows
+     this with it. */
+  --_progress-cycle: calc(var(--helix-duration-slow) * 5);
+}
+
+@keyframes helix-progress-indeterminate {
+  0% {
+    scale: 0 1;
+    translate: 0;
+  }
+
+  40% {
+    scale: 0.6 1;
+    translate: 0;
+  }
+
+  60% {
+    scale: 0.6 1;
+    translate: 40%;
+  }
+
+  100% {
+    scale: 0 1;
+    translate: 100%;
+  }
+}
+
+/* Still, and no longer a segment.
+ *
+ * This is the one place the two states cannot look alike. A travelling segment
+ * that has been stopped is parked somewhere along the track, which is exactly
+ * what a value looks like, and a bar that cannot move cannot correct the
+ * impression. So when motion is off the fill spans the track and is hatched: a
+ * hatch is not a quantity at any speed, and "running, amount unknown" is what
+ * is left to say once the movement is gone.
+ *
+ * Written here rather than left to the base layer, and that is not belt and
  * braces. The global reduced-motion rule is `*, *::before, *::after` in the
  * document, and `*` does not cross a shadow boundary, so it reaches no part of
  * any component in this library. Measured: under `prefers-reduced-motion:
  * reduce`, a light-DOM element came back at 1e-05s and this element at its full
- * duration. Every component wanting the preference honoured has to say so
- * itself, in its own sheet, the way this one now does.
- */
-:host([indeterminate]) [part="indicator"] {
-  animation: helix-progress-indeterminate var(--_progress-cycle) linear infinite;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    var(--helix-color-background) 0 var(--_progress-hatch),
-    transparent var(--_progress-hatch) calc(var(--_progress-hatch) * 2)
-  );
-  /* The whole track, because there is no part of it that is done. */
-  scale: 1 1;
-  /* Nothing to travel to: the fill is not moving between values. */
-  transition: none;
-
-  /* Slow enough to read as work rather than as a barber's pole. Derived from
-     the slowest duration token so a theme that slows its motion slows this. */
-  --_progress-cycle: calc(var(--helix-duration-slow) * 4);
-  --_progress-hatch: var(--helix-space-xs);
-}
-
-@keyframes helix-progress-indeterminate {
-  to {
-    /* Exactly one stripe pair, so the loop has no seam. */
-    background-position-x: calc(var(--_progress-hatch) * -2 * 1.4142);
-  }
-}
-
-/* After the indeterminate rule above, not folded into the reduced-motion block
-   further up: the selectors are identical, so source order is the whole of the
-   cascade here and a block written earlier loses. Measured wrong first time. */
+ * authored duration. Every component that animates has to answer the preference
+ * in its own sheet.
+ *
+ * After the rule it overrides, not folded into the reduced-motion block further
+ * up: the selectors are identical, so source order is the whole of the cascade
+ * and a block written earlier loses. Measured wrong first time. */
 @media (prefers-reduced-motion: reduce) {
   :host([indeterminate]) [part="indicator"] {
     animation: none;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--helix-color-background) 0 var(--helix-space-xs),
+      transparent var(--helix-space-xs) calc(var(--helix-space-xs) * 2)
+    );
+    scale: 1 1;
+    translate: 0;
   }
 }

@@ -124,29 +124,66 @@ if (hasLayout()) {
   })
 
   describe('indeterminate', () => {
-    test('the fill is hatched and spans the track, because no part of it is done', async () => {
-      const bar = await progress('indeterminate')
-      const fill = part(bar, 'indicator') as HTMLElement
-      expect(getComputedStyle(fill).backgroundImage).not.toBe('none')
-      expect(getComputedStyle(fill).scale).toBe('1')
+    test('it is the same fill the determinate bar draws, not a different one', async () => {
+      /* An indeterminate bar is this component in another state, not another
+         component. Same colour, same solid fill; what differs is that it never
+         stops. */
+      /* Both in one mount. `mount` assigns `document.body.innerHTML`, so
+         mounting the second detaches the first and `getComputedStyle` on a
+         detached element returns empty strings for everything. */
+      const board = (await mount(
+        `<div>
+           <helix-progress id="running" indeterminate label="R"></helix-progress>
+           <helix-progress id="settled" value="40" label="S"></helix-progress>
+         </div>`,
+      )) as HTMLElement
+      const fill = (id: string): HTMLElement =>
+        part(board.querySelector(`#${id}`) as HTMLElement, 'indicator') as HTMLElement
+      const running = fill('running')
+      const settled = fill('settled')
+      expect(getComputedStyle(running).backgroundColor).toBe(
+        getComputedStyle(settled).backgroundColor,
+      )
+      expect(getComputedStyle(running).backgroundImage).toBe('none')
+      expect(getComputedStyle(running).animationName).toBe('helix-progress-indeterminate')
     })
 
-    test('reduced motion stops it and leaves the hatch, which is why it is a hatch', async () => {
-      /* A sliding segment stopped would park somewhere and read as a value; a
-         filled track would read as finished. A hatch is not a quantity at
-         either speed.
+    test('the segment never reaches the end of the track', async () => {
+      /* A fill that arrives reads as finished, which is the one thing this
+         state must never say. The keyframes stop it at six tenths. */
+      const bar = await progress('indeterminate')
+      const track = (part(bar, 'track') as HTMLElement).getBoundingClientRect()
+      const fill = part(bar, 'indicator') as HTMLElement
+      let widest = 0
+      for (let sample = 0; sample < 12; sample += 1) {
+        widest = Math.max(widest, fill.getBoundingClientRect().width)
+        await new Promise((done) => setTimeout(done, 120))
+      }
+      expect(widest).toBeGreaterThan(0)
+      expect(widest).toBeLessThan(track.width * 0.85)
+    })
+
+    test('reduced motion trades the segment for a hatch, which is not a quantity', async () => {
+      /* The one place the two states cannot look alike. A travelling segment
+         that has been stopped is parked somewhere along the track, which is
+         exactly what a value looks like, and a bar that cannot move cannot
+         correct the impression.
        *
-       * The component has to say this itself. The base layer's global rule is
-       * `*, *::before, *::after` in the document, and `*` does not cross a
-       * shadow boundary, so it reaches no part of any component here. Measured:
-       * under `reduce`, a light-DOM element came back at 1e-05s and this one at
-       * its full authored duration until this rule was added. */
+       * The component has to say this itself. The base layer's rule is `*,
+       * *::before, *::after` in the document, and `*` does not cross a shadow
+       * boundary, so it reaches no part of any component here. Measured: under
+       * `reduce`, a light-DOM element came back at 1e-05s and this one at its
+       * full authored duration until this rule was added. */
       const fill = part(await progress('indeterminate'), 'indicator') as HTMLElement
-      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      expect(getComputedStyle(fill).animationName).toBe(
-        still ? 'none' : 'helix-progress-indeterminate',
-      )
-      expect(getComputedStyle(fill).backgroundImage).not.toBe('none')
+      const style = getComputedStyle(fill)
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        expect(style.animationName).toBe('none')
+        expect(style.backgroundImage).not.toBe('none')
+        expect(style.scale).toBe('1')
+      } else {
+        expect(style.animationName).toBe('helix-progress-indeterminate')
+        expect(style.backgroundImage).toBe('none')
+      }
     })
   })
 }
