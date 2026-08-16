@@ -46,8 +46,17 @@
   --_tag-color: var(--helix-color-danger);
 }
 
-/* The remove control sits inside the tag's inline padding, so the tag does not
-   grow a second inset around it. */
+/* Inside the tag's inline padding, and not pulled past it.
+ *
+ * This had `margin-inline-end: calc(var(--_tag-inset) * -1)`, which cancelled
+ * the tag's own inset so the control sat flush to the border. The intent was
+ * for the tag not to grow a second inset around it; the effect was that the
+ * control's hover fill and focus ring ran into the tag's edge, and a rounded
+ * square touching a rounded rectangle reads as a mistake rather than as a
+ * control inside a chip.
+ *
+ * The tag is a few pixels wider for it. That is the correct width: it is what
+ * a padded box holding two things has always been. */
 [part="dismiss"] {
   background: none;
   border: none;
@@ -55,7 +64,6 @@
   color: inherit;
   cursor: pointer;
   display: inline-flex;
-  margin-inline-end: calc(var(--_tag-inset) * -1);
   padding: var(--helix-space-2xs);
 }
 

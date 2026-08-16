@@ -1,12 +1,21 @@
-<helix-table columns="Column One,Column Two,Column Three" label="Label">
+<!-- `columns` is a CSS track list, not a list of headings: a table's columns are
+     rarely equal, and `16rem minmax(0, 1fr) minmax(0, 1fr)` is the common shape
+     that no count expresses. The headings are a row of header cells, which is
+     what a screen reader reads as the column names. -->
+<helix-table columns="16rem minmax(0, 1fr) minmax(0, 1fr)" label="Deployments">
   <helix-table-row>
-    <helix-table-cell header>Item One</helix-table-cell>
-    <helix-table-cell>Value</helix-table-cell>
-    <helix-table-cell>Value</helix-table-cell>
+    <helix-table-cell header>Service</helix-table-cell>
+    <helix-table-cell header>Region</helix-table-cell>
+    <helix-table-cell header>Status</helix-table-cell>
   </helix-table-row>
   <helix-table-row>
-    <helix-table-cell header>Item Two</helix-table-cell>
-    <helix-table-cell>Value</helix-table-cell>
-    <helix-table-cell>Value</helix-table-cell>
+    <helix-table-cell header>helix-web</helix-table-cell>
+    <helix-table-cell>us-east-1</helix-table-cell>
+    <helix-table-cell>Healthy</helix-table-cell>
+  </helix-table-row>
+  <helix-table-row>
+    <helix-table-cell header>cortex-core</helix-table-cell>
+    <helix-table-cell>eu-west-2</helix-table-cell>
+    <helix-table-cell>Healthy</helix-table-cell>
   </helix-table-row>
 </helix-table>
