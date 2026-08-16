@@ -66,6 +66,8 @@ import type {
   HelixTag,
   HelixText,
   HelixTextarea,
+  HelixToast,
+  HelixToastItem,
   HelixToggle,
   HelixToggleGroup,
   HelixToolbar,
@@ -3228,6 +3230,84 @@ tree, so a screen reader can still announce that the control exists. */
   "on:helix-change"?: (e: HelixTextareaHelixChangeElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
   "on:change"?: (e: HelixTextareaElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixToastItem` component event */
+export type HelixToastItemElementEvent<E = Event> = TypedEvent<
+  HelixToastItem,
+  E
+>;
+/** `helix-dismiss` event type */
+export type HelixToastItemHelixDismissElementEvent =
+  HelixToastItemElementEvent<HelixDismissEvent>;
+
+export type HelixToastItemProps = {
+  /** Accessible name for the dismiss control. */
+  "dismiss-label"?: HelixToastItem["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  dismissLabel?: HelixToastItem["dismissLabel"];
+  /** Whether the reader can ask for it to go. */
+  dismissible?: HelixToastItem["dismissible"];
+  /** How long it stays, in milliseconds. Absent means until it is dismissed.
+
+Read once when the item is first rendered. Changing it afterwards does not
+restart a message the reader is already partway through. */
+  duration?: HelixToastItem["duration"];
+  /** What kind of message it is, which picks the mark and its name. */
+  severity?: HelixToastItem["severity"];
+
+  /** Fired when it asks to go, whether by the control or by its timer. */
+  "onhelix-dismiss"?: (e: HelixToastItemHelixDismissElementEvent) => void;
+};
+
+export type HelixToastItemSolidJsProps = {
+  /** Accessible name for the dismiss control. */
+  "attr:dismiss-label"?: HelixToastItem["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  "prop:dismissLabel"?: HelixToastItem["dismissLabel"];
+  /** Whether the reader can ask for it to go. */
+  "prop:dismissible"?: HelixToastItem["dismissible"];
+  /** How long it stays, in milliseconds. Absent means until it is dismissed.
+
+Read once when the item is first rendered. Changing it afterwards does not
+restart a message the reader is already partway through. */
+  "prop:duration"?: HelixToastItem["duration"];
+  /** What kind of message it is, which picks the mark and its name. */
+  "prop:severity"?: HelixToastItem["severity"];
+  /** Fired when it asks to go, whether by the control or by its timer. */
+  "on:helix-dismiss"?: (e: HelixToastItemHelixDismissElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixToastProps = {
+  /** Accessible name for the region, such as "Notifications". */
+  label?: HelixToast["label"];
+  /** Which corner or edge the stack sits at.
+
+Named here rather than on each message, because where a page puts its
+toasts is a fact about the page: a stack whose members disagreed about
+where they were would not be a stack. */
+  placement?: HelixToast["placement"];
+};
+
+export type HelixToastSolidJsProps = {
+  /** Accessible name for the region, such as "Notifications". */
+  "prop:label"?: HelixToast["label"];
+  /** Which corner or edge the stack sits at.
+
+Named here rather than on each message, because where a page puts its
+toasts is a fact about the page: a stack whose members disagreed about
+where they were would not be a stack. */
+  "prop:placement"?: HelixToast["placement"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6744,6 +6824,112 @@ export type CustomElements = {
   "helix-textarea": Partial<
     HelixTextareaProps & BaseProps<HelixTextarea> & BaseEvents
   >;
+
+  /**
+   * A surface with a shadow, because a toast sits over whatever the reader was
+   * looking at rather than in it. The severity is a bar down the leading edge and
+   * not a fill: a message is text to be read, and a coloured panel behind it
+   * costs contrast for something the mark already says.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `dismissible`: Whether the reader can ask for it to go.
+   * - `duration`: How long it stays, in milliseconds. Absent means until it is dismissed.
+   *
+   * Read once when the item is first rendered. Changing it afterwards does not
+   * restart a message the reader is already partway through.
+   * - `severity`: What kind of message it is, which picks the mark and its name.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The message.
+   * - `actions`: What to do about it, usually a button or a link.
+   * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dismiss() => boolean`: Asks to be taken away, and reports whether the request stood.
+   * - `pause() => void`: Stops the clock, leaving whatever is left of it.
+   * - `resume() => void`: Starts it again from where it stopped.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The message's own surface.
+   * - `content`: The message.
+   * - `actions`: The region holding what to do about it.
+   * - `dismiss`: The control that asks to close.
+   */
+  "helix-toast-item": Partial<
+    HelixToastItemProps & BaseProps<HelixToastItem> & BaseEvents
+  >;
+
+  /**
+   * Fixed to the window, and it catches nothing: the region spans a whole edge,
+   * so a stack of one message in a corner would otherwise put an invisible bar
+   * across everything beside it. The region is transparent to a pointer and the
+   * messages take it back.
+   *
+   * **It belongs at the root of the application.** `position: fixed` is
+   * positioned against the viewport only while no ancestor carries `transform`,
+   * `filter`, `perspective` or `contain`, any of which makes that ancestor the
+   * containing block instead, and it is still clipped by an ancestor with
+   * `overflow: hidden`. That is a real constraint rather than a style note, and
+   * it is the same fact that put every other floating surface in this library
+   * into the top layer.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the region, such as "Notifications".
+   * - `placement`: Which corner or edge the stack sits at.
+   *
+   * Named here rather than on each message, because where a page puts its
+   * toasts is a fact about the page: a stack whose members disagreed about
+   * where they were would not be a stack.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The messages, as `helix-toast-item` elements.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toast-inset`: Distance from the edges of the window. (default: `undefined`)
+   * - `--toast-gap`: Space between one message and the next. (default: `undefined`)
+   * - `--toast-inline-size`: Width of a message. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `region`: The stack the messages are in.
+   */
+  "helix-toast": Partial<HelixToastProps & BaseProps<HelixToast> & BaseEvents>;
 
   /**
    * The indicator travels between items rather than the fill swapping. A fill
@@ -10469,6 +10655,120 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * A surface with a shadow, because a toast sits over whatever the reader was
+   * looking at rather than in it. The severity is a bar down the leading edge and
+   * not a fill: a message is text to be read, and a coloured panel behind it
+   * costs contrast for something the mark already says.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `dismissible`: Whether the reader can ask for it to go.
+   * - `duration`: How long it stays, in milliseconds. Absent means until it is dismissed.
+   *
+   * Read once when the item is first rendered. Changing it afterwards does not
+   * restart a message the reader is already partway through.
+   * - `severity`: What kind of message it is, which picks the mark and its name.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The message.
+   * - `actions`: What to do about it, usually a button or a link.
+   * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dismiss() => boolean`: Asks to be taken away, and reports whether the request stood.
+   * - `pause() => void`: Stops the clock, leaving whatever is left of it.
+   * - `resume() => void`: Starts it again from where it stopped.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The message's own surface.
+   * - `content`: The message.
+   * - `actions`: The region holding what to do about it.
+   * - `dismiss`: The control that asks to close.
+   */
+  "helix-toast-item": Partial<
+    HelixToastItemProps &
+      HelixToastItemSolidJsProps &
+      BaseProps<HelixToastItem> &
+      BaseEvents
+  >;
+
+  /**
+   * Fixed to the window, and it catches nothing: the region spans a whole edge,
+   * so a stack of one message in a corner would otherwise put an invisible bar
+   * across everything beside it. The region is transparent to a pointer and the
+   * messages take it back.
+   *
+   * **It belongs at the root of the application.** `position: fixed` is
+   * positioned against the viewport only while no ancestor carries `transform`,
+   * `filter`, `perspective` or `contain`, any of which makes that ancestor the
+   * containing block instead, and it is still clipped by an ancestor with
+   * `overflow: hidden`. That is a real constraint rather than a style note, and
+   * it is the same fact that put every other floating surface in this library
+   * into the top layer.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the region, such as "Notifications".
+   * - `placement`: Which corner or edge the stack sits at.
+   *
+   * Named here rather than on each message, because where a page puts its
+   * toasts is a fact about the page: a stack whose members disagreed about
+   * where they were would not be a stack.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The messages, as `helix-toast-item` elements.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toast-inset`: Distance from the edges of the window. (default: `undefined`)
+   * - `--toast-gap`: Space between one message and the next. (default: `undefined`)
+   * - `--toast-inline-size`: Width of a message. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `region`: The stack the messages are in.
+   */
+  "helix-toast": Partial<
+    HelixToastProps &
+      HelixToastSolidJsProps &
+      BaseProps<HelixToast> &
+      BaseEvents
+  >;
+
+  /**
    * The indicator travels between items rather than the fill swapping. A fill
    * that appears on one item as it disappears from another is two changes at once
    * and reads as a flicker; one object moving is something the eye follows, and
@@ -11029,6 +11329,14 @@ export type CustomCssProperties = {
   "--tag-radii"?: string;
   /** Fill behind the text. */
   "--textarea-background-color"?: string;
+  /** Space between the message's edge and its contents. */
+  "--toast-item-inset"?: string;
+  /** Distance from the edges of the window. */
+  "--toast-inset"?: string;
+  /** Space between one message and the next. */
+  "--toast-gap"?: string;
+  /** Width of a message. */
+  "--toast-inline-size"?: string;
   /** Fill of the moving marker. */
   "--toggle-group-indicator-color"?: string;
   /** Space between controls. */

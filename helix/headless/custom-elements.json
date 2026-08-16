@@ -8163,6 +8163,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/toast/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/toggle/index.js"
           }
         },
@@ -19305,6 +19313,516 @@
           "declaration": {
             "name": "HelixBaseTextarea",
             "module": "src/textarea/root/textarea-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/toast/item/toast-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/toast/root/toast-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast/item/toast-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An element rather than a slot, because it carries a timeout, a severity, a\ndismiss control and a lifetime that pauses: behaviour, state and API, which\nis the test for whether a region becomes an element in this library.\n\n**The timer is the item's own.** Held by the region, one message arriving\nwould restart another's, so a stack of three would go from three seconds each\nto nine for the last one. Each message is on its own clock from the moment it\nis rendered.\n\n**No duration means it stays.** That is the safe default rather than the\ncommon one: anything carrying an action has to still be there when the reader\ndecides to take it, and a component cannot tell from the outside whether the\nmessage it was given is disposable.\n\n**The clock stops while it is being read.** Hover pauses it, and so does\nfocus landing anywhere inside, which is the case that matters more: a\nkeyboard reader tabbing towards the action in a toast is exactly the person a\ntimer must not race. Both resume where they left off rather than starting\nagain, so a message half-read does not get a full second life every time a\npointer crosses it.\n\n**Going away is a request, never an act.** It dispatches a cancelable\n`helix-dismiss` and does nothing else: the consumer owns the list, so the\nitem removing itself would leave the two disagreeing. Auto-dismiss and the\ndismiss control raise the same event, so a consumer handles one path and not\ntwo.",
+          "name": "HelixBaseToastItem",
+          "cssParts": [
+            {
+              "description": "The message's own surface.",
+              "name": "item"
+            },
+            {
+              "description": "The message.",
+              "name": "content"
+            },
+            {
+              "description": "The region holding what to do about it.",
+              "name": "actions"
+            },
+            {
+              "description": "The control that asks to close.",
+              "name": "dismiss"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The message.",
+              "name": ""
+            },
+            {
+              "description": "What to do about it, usually a button or a link.",
+              "name": "actions"
+            },
+            {
+              "description": "Replaces the glyph inside the dismiss control.",
+              "name": "icon"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "dismissLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "attribute": "dismiss-label"
+            },
+            {
+              "kind": "field",
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader can ask for it to go.",
+              "attribute": "dismissible",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "duration",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How long it stays, in milliseconds. Absent means until it is dismissed.\n\nRead once when the item is first rendered. Changing it afterwards does not\nrestart a message the reader is already partway through.",
+              "attribute": "duration"
+            },
+            {
+              "kind": "field",
+              "name": "severity",
+              "type": {
+                "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
+              },
+              "description": "What kind of message it is, which picks the mark and its name.",
+              "attribute": "severity",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "startedAt",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "When the current run of the timer began, or nothing while it is paused."
+            },
+            {
+              "kind": "field",
+              "name": "remaining",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "What is left of the duration, so resuming continues rather than restarts."
+            },
+            {
+              "kind": "field",
+              "name": "timer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "dismiss",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Asks to be taken away, and reports whether the request stood.",
+              "type": {
+                "text": "dismiss() => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "pause",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Stops the clock, leaving whatever is left of it.",
+              "type": {
+                "text": "pause() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resume",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Starts it again from where it stopped.",
+              "type": {
+                "text": "resume() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePause",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleResume",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixDismissEvent"
+              },
+              "description": "Fired when it asks to go, whether by the control or by its timer.",
+              "name": "helix-dismiss",
+              "reactProp": "onhelix-dismiss"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "dismiss-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "fieldName": "dismissLabel"
+            },
+            {
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader can ask for it to go.",
+              "fieldName": "dismissible"
+            },
+            {
+              "name": "duration",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How long it stays, in milliseconds. Absent means until it is dismissed.\n\nRead once when the item is first rendered. Changing it afterwards does not\nrestart a message the reader is already partway through.",
+              "fieldName": "duration"
+            },
+            {
+              "name": "severity",
+              "type": {
+                "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
+              },
+              "description": "What kind of message it is, which picks the mark and its name.",
+              "fieldName": "severity"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One message in the toast region.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toast",
+            "tier": "headless",
+            "group": "BaseToast",
+            "part": "Item"
+          },
+          "tagName": "helix-base-toast-item",
+          "customElement": true,
+          "modulePath": "src/toast/item/toast-item.ts",
+          "definitionPath": "src/toast/item/toast-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseToastItem",
+          "declaration": {
+            "name": "HelixBaseToastItem",
+            "module": "src/toast/item/toast-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-toast-item",
+          "declaration": {
+            "name": "HelixBaseToastItem",
+            "module": "src/toast/item/toast-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast/root/toast-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**The region is why this is one family rather than two.** A live region has\nto be in the document *before* a message is put into it: assistive technology\nsubscribes to the region, and a region that arrives already holding its\nmessage is frequently not announced at all. So the container is a part of the\nfamily and not an arranger of complete things, which is the same reasoning\nthat puts `Radio.Group` inside its own family.\n\n**Polite, never assertive.** `role=\"alert\"` interrupts whatever a reader is\nbeing told, and almost nothing that arrives in a corner of the screen has\nearned that. Something that genuinely cannot wait is a `Dialog`, which stops\nthe page for everyone rather than only for the people who cannot see it.\n\n**It never creates or destroys anything.** The consumer renders items and\nremoves them; asking to go is a cancelable `helix-dismiss` from the item.\nThere is no `toast.show()`, because an imperative queue inside a component is\na second copy of the application's state that nothing can render from: an app\nthat wants a `toast()` function writes a thin one over the state it already\nhas, and keeps the ability to render the same messages on the server, in a\ntest, or twice.",
+          "name": "HelixBaseToast",
+          "cssParts": [
+            {
+              "description": "The stack the messages are in.",
+              "name": "region"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The messages, as `helix-toast-item` elements.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Notifications'",
+              "description": "Accessible name for the region, such as \"Notifications\".",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "placement",
+              "type": {
+                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start'"
+              },
+              "default": "'bottom-end'",
+              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.",
+              "attribute": "placement",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Notifications'",
+              "description": "Accessible name for the region, such as \"Notifications\".",
+              "fieldName": "label"
+            },
+            {
+              "name": "placement",
+              "type": {
+                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start'"
+              },
+              "default": "'bottom-end'",
+              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.",
+              "fieldName": "placement"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "The region messages arrive in, and the only thing that announces them.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toast",
+            "aliases": [
+              "Toaster",
+              "Snackbar",
+              "Notifications"
+            ],
+            "tier": "headless",
+            "group": "BaseToast",
+            "part": "Root"
+          },
+          "tagName": "helix-base-toast",
+          "customElement": true,
+          "modulePath": "src/toast/root/toast-root.ts",
+          "definitionPath": "src/toast/root/toast-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseToast",
+          "declaration": {
+            "name": "HelixBaseToast",
+            "module": "src/toast/root/toast-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-toast",
+          "declaration": {
+            "name": "HelixBaseToast",
+            "module": "src/toast/root/toast-root.ts"
           }
         }
       ]

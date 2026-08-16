@@ -11130,6 +11130,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/toast/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/toggle/index.js"
           }
         },
@@ -24872,6 +24880,696 @@
           "declaration": {
             "name": "HelixTextarea",
             "module": "src/textarea/root/textarea-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/toast/item/toast-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/toast/root/toast-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast/item/toast-item.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/toast/item/toast-item.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast/item/toast-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A surface with a shadow, because a toast sits over whatever the reader was\nlooking at rather than in it. The severity is a bar down the leading edge and\nnot a fill: a message is text to be read, and a coloured panel behind it\ncosts contrast for something the mark already says.",
+          "name": "HelixToastItem",
+          "cssProperties": [
+            {
+              "description": "Space between the message's edge and its contents.",
+              "name": "--toast-item-inset"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "dismissLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "attribute": "dismiss-label",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader can ask for it to go.",
+              "attribute": "dismissible",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "duration",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How long it stays, in milliseconds. Absent means until it is dismissed.\n\nRead once when the item is first rendered. Changing it afterwards does not\nrestart a message the reader is already partway through.",
+              "attribute": "duration",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "severity",
+              "type": {
+                "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
+              },
+              "description": "What kind of message it is, which picks the mark and its name.",
+              "attribute": "severity",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "startedAt",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "When the current run of the timer began, or nothing while it is paused.",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "remaining",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "What is left of the duration, so resuming continues rather than restarts.",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "timer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "dismiss",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Asks to be taken away, and reports whether the request stood.",
+              "type": {
+                "text": "dismiss() => boolean"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "pause",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Stops the clock, leaving whatever is left of it.",
+              "type": {
+                "text": "pause() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resume",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Starts it again from where it stopped.",
+              "type": {
+                "text": "resume() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePause",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleResume",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseToastItem",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One message in the toast region.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toast",
+            "tier": "styled",
+            "group": "Toast",
+            "part": "Item"
+          },
+          "tagName": "helix-toast-item",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The message.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "What to do about it, usually a button or a link.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "Replaces the glyph inside the dismiss control.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The message's own surface.",
+              "name": "item",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "The message.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "The region holding what to do about it.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "The control that asks to close.",
+              "name": "dismiss",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "dismiss-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "fieldName": "dismissLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader can ask for it to go.",
+              "fieldName": "dismissible",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "name": "duration",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How long it stays, in milliseconds. Absent means until it is dismissed.\n\nRead once when the item is first rendered. Changing it afterwards does not\nrestart a message the reader is already partway through.",
+              "fieldName": "duration",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "name": "severity",
+              "type": {
+                "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
+              },
+              "description": "What kind of message it is, which picks the mark and its name.",
+              "fieldName": "severity",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixDismissEvent"
+              },
+              "description": "Fired when it asks to go, whether by the control or by its timer.",
+              "name": "helix-dismiss",
+              "reactProp": "onhelix-dismiss",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            }
+          ],
+          "modulePath": "src/toast/item/toast-item.ts",
+          "definitionPath": "src/toast/item/toast-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixToastItem",
+          "declaration": {
+            "name": "HelixToastItem",
+            "module": "src/toast/item/toast-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-toast-item",
+          "declaration": {
+            "name": "HelixToastItem",
+            "module": "src/toast/item/toast-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast/root/toast-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/toast/root/toast-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast/root/toast-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Fixed to the window, and it catches nothing: the region spans a whole edge,\nso a stack of one message in a corner would otherwise put an invisible bar\nacross everything beside it. The region is transparent to a pointer and the\nmessages take it back.\n\n**It belongs at the root of the application.** `position: fixed` is\npositioned against the viewport only while no ancestor carries `transform`,\n`filter`, `perspective` or `contain`, any of which makes that ancestor the\ncontaining block instead, and it is still clipped by an ancestor with\n`overflow: hidden`. That is a real constraint rather than a style note, and\nit is the same fact that put every other floating surface in this library\ninto the top layer.",
+          "name": "HelixToast",
+          "cssProperties": [
+            {
+              "description": "Distance from the edges of the window.",
+              "name": "--toast-inset"
+            },
+            {
+              "description": "Space between one message and the next.",
+              "name": "--toast-gap"
+            },
+            {
+              "description": "Width of a message.",
+              "name": "--toast-inline-size"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Notifications'",
+              "description": "Accessible name for the region, such as \"Notifications\".",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseToast",
+                "module": "src/toast/root/toast-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "placement",
+              "type": {
+                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start'"
+              },
+              "default": "'bottom-end'",
+              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.",
+              "attribute": "placement",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToast",
+                "module": "src/toast/root/toast-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseToast",
+            "package": "@helix-io/headless"
+          },
+          "summary": "The region messages arrive in, and the only thing that announces them.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toast",
+            "aliases": [
+              "Toaster",
+              "Snackbar",
+              "Notifications"
+            ],
+            "tier": "styled",
+            "group": "Toast",
+            "part": "Root"
+          },
+          "tagName": "helix-toast",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The messages, as `helix-toast-item` elements.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseToast",
+                "module": "src/toast/root/toast-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The stack the messages are in.",
+              "name": "region",
+              "inheritedFrom": {
+                "name": "HelixBaseToast",
+                "module": "src/toast/root/toast-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Notifications'",
+              "description": "Accessible name for the region, such as \"Notifications\".",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseToast",
+                "module": "src/toast/root/toast-root.ts"
+              }
+            },
+            {
+              "name": "placement",
+              "type": {
+                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start'"
+              },
+              "default": "'bottom-end'",
+              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.",
+              "fieldName": "placement",
+              "inheritedFrom": {
+                "name": "HelixBaseToast",
+                "module": "src/toast/root/toast-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/toast/root/toast-root.ts",
+          "definitionPath": "src/toast/root/toast-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixToast",
+          "declaration": {
+            "name": "HelixToast",
+            "module": "src/toast/root/toast-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-toast",
+          "declaration": {
+            "name": "HelixToast",
+            "module": "src/toast/root/toast-root.ts"
           }
         }
       ]

@@ -1,0 +1,173 @@
+import { customElement, HelixDismissEvent, HelixElement } from '@helix-io/core'
+import { x } from '@helix-io/icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+
+/**
+ * @summary One message in the toast region.
+ *
+ * @description
+ * An element rather than a slot, because it carries a timeout, a severity, a
+ * dismiss control and a lifetime that pauses: behaviour, state and API, which
+ * is the test for whether a region becomes an element in this library.
+ *
+ * **The timer is the item's own.** Held by the region, one message arriving
+ * would restart another's, so a stack of three would go from three seconds each
+ * to nine for the last one. Each message is on its own clock from the moment it
+ * is rendered.
+ *
+ * **No duration means it stays.** That is the safe default rather than the
+ * common one: anything carrying an action has to still be there when the reader
+ * decides to take it, and a component cannot tell from the outside whether the
+ * message it was given is disposable.
+ *
+ * **The clock stops while it is being read.** Hover pauses it, and so does
+ * focus landing anywhere inside, which is the case that matters more: a
+ * keyboard reader tabbing towards the action in a toast is exactly the person a
+ * timer must not race. Both resume where they left off rather than starting
+ * again, so a message half-read does not get a full second life every time a
+ * pointer crosses it.
+ *
+ * **Going away is a request, never an act.** It dispatches a cancelable
+ * `helix-dismiss` and does nothing else: the consumer owns the list, so the
+ * item removing itself would leave the two disagreeing. Auto-dismiss and the
+ * dismiss control raise the same event, so a consumer handles one path and not
+ * two.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @documentation https://helix.fusion.dev/components/toast
+ *
+ * @slot - The message.
+ * @slot actions - What to do about it, usually a button or a link.
+ * @slot icon - Replaces the glyph inside the dismiss control.
+ *
+ * @csspart item - The message's own surface.
+ * @csspart content - The message.
+ * @csspart actions - The region holding what to do about it.
+ * @csspart dismiss - The control that asks to close.
+ *
+ * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer.
+ */
+@customElement('helix-base-toast-item')
+export class HelixBaseToastItem extends HelixElement {
+  /** Accessible name for the dismiss control. */
+  @property({ attribute: 'dismiss-label' })
+  dismissLabel = 'Dismiss'
+
+  /** Whether the reader can ask for it to go. */
+  @property({ reflect: true, type: Boolean })
+  dismissible = false
+
+  /**
+   * How long it stays, in milliseconds. Absent means until it is dismissed.
+   *
+   * Read once when the item is first rendered. Changing it afterwards does not
+   * restart a message the reader is already partway through.
+   */
+  @property({ type: Number })
+  duration?: number
+
+  /** What kind of message it is, which picks the mark and its name. */
+  @property({ reflect: true })
+  severity?: 'danger' | 'info' | 'success' | 'warning'
+
+  /** When the current run of the timer began, or nothing while it is paused. */
+  private startedAt: number | undefined
+
+  /** What is left of the duration, so resuming continues rather than restarts. */
+  private remaining: number | undefined
+
+  private timer: ReturnType<typeof setTimeout> | undefined
+
+  /** Asks to be taken away, and reports whether the request stood. */
+  dismiss(): boolean {
+    const event = new HelixDismissEvent({ label: this.textContent?.trim() ?? '' })
+    this.dispatchEvent(event)
+    return !event.defaultPrevented
+  }
+
+  /** Stops the clock, leaving whatever is left of it. */
+  pause(): void {
+    if (this.timer === undefined || this.startedAt === undefined) {
+      return
+    }
+    clearTimeout(this.timer)
+    this.timer = undefined
+    this.remaining = Math.max((this.remaining ?? 0) - (Date.now() - this.startedAt), 0)
+    this.startedAt = undefined
+  }
+
+  /** Starts it again from where it stopped. */
+  resume(): void {
+    if (this.timer !== undefined || this.remaining === undefined || this.remaining <= 0) {
+      return
+    }
+    this.startedAt = Date.now()
+    this.timer = setTimeout(() => {
+      this.timer = undefined
+      this.dismiss()
+    }, this.remaining)
+  }
+
+  /* Arrows, so `this` is the item wherever the listener ends up. Lit does bind
+     a template listener to its host, and relying on that puts a load-bearing
+     fact about a library in a place nobody reading this file would look. */
+  private readonly handlePause = (): void => this.pause()
+
+  private readonly handleResume = (): void => this.resume()
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    // A message removed while its timer is running would otherwise fire into
+    // nothing, and hold the item alive until it did.
+    clearTimeout(this.timer)
+    this.timer = undefined
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* Here rather than in `connectedCallback`, which the server never calls, and
+       started only once: the clock belongs to this message's life on screen. */
+    if (this.duration !== undefined && this.duration > 0) {
+      this.remaining = this.duration
+      this.resume()
+    }
+  }
+
+  protected override render(): TemplateResult {
+    return html`<div
+      part="item"
+      @mouseenter=${this.handlePause}
+      @mouseleave=${this.handleResume}
+      @focusin=${this.handlePause}
+      @focusout=${this.handleResume}
+    >
+      <div part="content"><slot></slot></div>
+      <div part="actions"><slot name="actions"></slot></div>
+      ${
+        this.dismissible
+          ? html`<button
+              part="dismiss"
+              type="button"
+              aria-label=${this.dismissLabel}
+              @click=${() => this.dismiss()}
+            >
+              <slot name="icon">
+                <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
+                  ${unsafeSVG(x.content)}
+                </svg>
+              </slot>
+            </button>`
+          : nothing
+      }
+    </div>`
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'helix-base-toast-item': HelixBaseToastItem
+  }
+}

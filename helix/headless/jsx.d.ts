@@ -57,6 +57,8 @@ import type {
   HelixBaseTabsTab,
   HelixBaseTag,
   HelixBaseTextarea,
+  HelixBaseToast,
+  HelixBaseToastItem,
   HelixBaseToggle,
   HelixBaseToggleGroup,
   HelixBaseToolbar,
@@ -2972,6 +2974,84 @@ tree, so a screen reader can still announce that the control exists. */
   "on:helix-change"?: (e: HelixBaseTextareaHelixChangeElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
   "on:change"?: (e: HelixBaseTextareaElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseToastItem` component event */
+export type HelixBaseToastItemElementEvent<E = Event> = TypedEvent<
+  HelixBaseToastItem,
+  E
+>;
+/** `helix-dismiss` event type */
+export type HelixBaseToastItemHelixDismissElementEvent =
+  HelixBaseToastItemElementEvent<HelixDismissEvent>;
+
+export type HelixBaseToastItemProps = {
+  /** Accessible name for the dismiss control. */
+  "dismiss-label"?: HelixBaseToastItem["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  dismissLabel?: HelixBaseToastItem["dismissLabel"];
+  /** Whether the reader can ask for it to go. */
+  dismissible?: HelixBaseToastItem["dismissible"];
+  /** How long it stays, in milliseconds. Absent means until it is dismissed.
+
+Read once when the item is first rendered. Changing it afterwards does not
+restart a message the reader is already partway through. */
+  duration?: HelixBaseToastItem["duration"];
+  /** What kind of message it is, which picks the mark and its name. */
+  severity?: HelixBaseToastItem["severity"];
+
+  /** Fired when it asks to go, whether by the control or by its timer. */
+  "onhelix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
+};
+
+export type HelixBaseToastItemSolidJsProps = {
+  /** Accessible name for the dismiss control. */
+  "attr:dismiss-label"?: HelixBaseToastItem["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  "prop:dismissLabel"?: HelixBaseToastItem["dismissLabel"];
+  /** Whether the reader can ask for it to go. */
+  "prop:dismissible"?: HelixBaseToastItem["dismissible"];
+  /** How long it stays, in milliseconds. Absent means until it is dismissed.
+
+Read once when the item is first rendered. Changing it afterwards does not
+restart a message the reader is already partway through. */
+  "prop:duration"?: HelixBaseToastItem["duration"];
+  /** What kind of message it is, which picks the mark and its name. */
+  "prop:severity"?: HelixBaseToastItem["severity"];
+  /** Fired when it asks to go, whether by the control or by its timer. */
+  "on:helix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseToastProps = {
+  /** Accessible name for the region, such as "Notifications". */
+  label?: HelixBaseToast["label"];
+  /** Which corner or edge the stack sits at.
+
+Named here rather than on each message, because where a page puts its
+toasts is a fact about the page: a stack whose members disagreed about
+where they were would not be a stack. */
+  placement?: HelixBaseToast["placement"];
+};
+
+export type HelixBaseToastSolidJsProps = {
+  /** Accessible name for the region, such as "Notifications". */
+  "prop:label"?: HelixBaseToast["label"];
+  /** Which corner or edge the stack sits at.
+
+Named here rather than on each message, because where a page puts its
+toasts is a fact about the page: a stack whose members disagreed about
+where they were would not be a stack. */
+  "prop:placement"?: HelixBaseToast["placement"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6457,6 +6537,129 @@ export type CustomElements = {
    */
   "helix-base-textarea": Partial<
     HelixBaseTextareaProps & BaseProps<HelixBaseTextarea> & BaseEvents
+  >;
+
+  /**
+   * An element rather than a slot, because it carries a timeout, a severity, a
+   * dismiss control and a lifetime that pauses: behaviour, state and API, which
+   * is the test for whether a region becomes an element in this library.
+   *
+   * **The timer is the item's own.** Held by the region, one message arriving
+   * would restart another's, so a stack of three would go from three seconds each
+   * to nine for the last one. Each message is on its own clock from the moment it
+   * is rendered.
+   *
+   * **No duration means it stays.** That is the safe default rather than the
+   * common one: anything carrying an action has to still be there when the reader
+   * decides to take it, and a component cannot tell from the outside whether the
+   * message it was given is disposable.
+   *
+   * **The clock stops while it is being read.** Hover pauses it, and so does
+   * focus landing anywhere inside, which is the case that matters more: a
+   * keyboard reader tabbing towards the action in a toast is exactly the person a
+   * timer must not race. Both resume where they left off rather than starting
+   * again, so a message half-read does not get a full second life every time a
+   * pointer crosses it.
+   *
+   * **Going away is a request, never an act.** It dispatches a cancelable
+   * `helix-dismiss` and does nothing else: the consumer owns the list, so the
+   * item removing itself would leave the two disagreeing. Auto-dismiss and the
+   * dismiss control raise the same event, so a consumer handles one path and not
+   * two.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `dismissible`: Whether the reader can ask for it to go.
+   * - `duration`: How long it stays, in milliseconds. Absent means until it is dismissed.
+   *
+   * Read once when the item is first rendered. Changing it afterwards does not
+   * restart a message the reader is already partway through.
+   * - `severity`: What kind of message it is, which picks the mark and its name.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The message.
+   * - `actions`: What to do about it, usually a button or a link.
+   * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dismiss() => boolean`: Asks to be taken away, and reports whether the request stood.
+   * - `pause() => void`: Stops the clock, leaving whatever is left of it.
+   * - `resume() => void`: Starts it again from where it stopped.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The message's own surface.
+   * - `content`: The message.
+   * - `actions`: The region holding what to do about it.
+   * - `dismiss`: The control that asks to close.
+   */
+  "helix-base-toast-item": Partial<
+    HelixBaseToastItemProps & BaseProps<HelixBaseToastItem> & BaseEvents
+  >;
+
+  /**
+   * **The region is why this is one family rather than two.** A live region has
+   * to be in the document *before* a message is put into it: assistive technology
+   * subscribes to the region, and a region that arrives already holding its
+   * message is frequently not announced at all. So the container is a part of the
+   * family and not an arranger of complete things, which is the same reasoning
+   * that puts `Radio.Group` inside its own family.
+   *
+   * **Polite, never assertive.** `role="alert"` interrupts whatever a reader is
+   * being told, and almost nothing that arrives in a corner of the screen has
+   * earned that. Something that genuinely cannot wait is a `Dialog`, which stops
+   * the page for everyone rather than only for the people who cannot see it.
+   *
+   * **It never creates or destroys anything.** The consumer renders items and
+   * removes them; asking to go is a cancelable `helix-dismiss` from the item.
+   * There is no `toast.show()`, because an imperative queue inside a component is
+   * a second copy of the application's state that nothing can render from: an app
+   * that wants a `toast()` function writes a thin one over the state it already
+   * has, and keeps the ability to render the same messages on the server, in a
+   * test, or twice.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the region, such as "Notifications".
+   * - `placement`: Which corner or edge the stack sits at.
+   *
+   * Named here rather than on each message, because where a page puts its
+   * toasts is a fact about the page: a stack whose members disagreed about
+   * where they were would not be a stack.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The messages, as `helix-toast-item` elements.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `region`: The stack the messages are in.
+   */
+  "helix-base-toast": Partial<
+    HelixBaseToastProps & BaseProps<HelixBaseToast> & BaseEvents
   >;
 
   /**
@@ -10151,6 +10354,135 @@ export type CustomElementsSolidJs = {
     HelixBaseTextareaProps &
       HelixBaseTextareaSolidJsProps &
       BaseProps<HelixBaseTextarea> &
+      BaseEvents
+  >;
+
+  /**
+   * An element rather than a slot, because it carries a timeout, a severity, a
+   * dismiss control and a lifetime that pauses: behaviour, state and API, which
+   * is the test for whether a region becomes an element in this library.
+   *
+   * **The timer is the item's own.** Held by the region, one message arriving
+   * would restart another's, so a stack of three would go from three seconds each
+   * to nine for the last one. Each message is on its own clock from the moment it
+   * is rendered.
+   *
+   * **No duration means it stays.** That is the safe default rather than the
+   * common one: anything carrying an action has to still be there when the reader
+   * decides to take it, and a component cannot tell from the outside whether the
+   * message it was given is disposable.
+   *
+   * **The clock stops while it is being read.** Hover pauses it, and so does
+   * focus landing anywhere inside, which is the case that matters more: a
+   * keyboard reader tabbing towards the action in a toast is exactly the person a
+   * timer must not race. Both resume where they left off rather than starting
+   * again, so a message half-read does not get a full second life every time a
+   * pointer crosses it.
+   *
+   * **Going away is a request, never an act.** It dispatches a cancelable
+   * `helix-dismiss` and does nothing else: the consumer owns the list, so the
+   * item removing itself would leave the two disagreeing. Auto-dismiss and the
+   * dismiss control raise the same event, so a consumer handles one path and not
+   * two.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `dismissible`: Whether the reader can ask for it to go.
+   * - `duration`: How long it stays, in milliseconds. Absent means until it is dismissed.
+   *
+   * Read once when the item is first rendered. Changing it afterwards does not
+   * restart a message the reader is already partway through.
+   * - `severity`: What kind of message it is, which picks the mark and its name.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The message.
+   * - `actions`: What to do about it, usually a button or a link.
+   * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dismiss() => boolean`: Asks to be taken away, and reports whether the request stood.
+   * - `pause() => void`: Stops the clock, leaving whatever is left of it.
+   * - `resume() => void`: Starts it again from where it stopped.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The message's own surface.
+   * - `content`: The message.
+   * - `actions`: The region holding what to do about it.
+   * - `dismiss`: The control that asks to close.
+   */
+  "helix-base-toast-item": Partial<
+    HelixBaseToastItemProps &
+      HelixBaseToastItemSolidJsProps &
+      BaseProps<HelixBaseToastItem> &
+      BaseEvents
+  >;
+
+  /**
+   * **The region is why this is one family rather than two.** A live region has
+   * to be in the document *before* a message is put into it: assistive technology
+   * subscribes to the region, and a region that arrives already holding its
+   * message is frequently not announced at all. So the container is a part of the
+   * family and not an arranger of complete things, which is the same reasoning
+   * that puts `Radio.Group` inside its own family.
+   *
+   * **Polite, never assertive.** `role="alert"` interrupts whatever a reader is
+   * being told, and almost nothing that arrives in a corner of the screen has
+   * earned that. Something that genuinely cannot wait is a `Dialog`, which stops
+   * the page for everyone rather than only for the people who cannot see it.
+   *
+   * **It never creates or destroys anything.** The consumer renders items and
+   * removes them; asking to go is a cancelable `helix-dismiss` from the item.
+   * There is no `toast.show()`, because an imperative queue inside a component is
+   * a second copy of the application's state that nothing can render from: an app
+   * that wants a `toast()` function writes a thin one over the state it already
+   * has, and keeps the ability to render the same messages on the server, in a
+   * test, or twice.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the region, such as "Notifications".
+   * - `placement`: Which corner or edge the stack sits at.
+   *
+   * Named here rather than on each message, because where a page puts its
+   * toasts is a fact about the page: a stack whose members disagreed about
+   * where they were would not be a stack.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The messages, as `helix-toast-item` elements.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `region`: The stack the messages are in.
+   */
+  "helix-base-toast": Partial<
+    HelixBaseToastProps &
+      HelixBaseToastSolidJsProps &
+      BaseProps<HelixBaseToast> &
       BaseEvents
   >;
 
