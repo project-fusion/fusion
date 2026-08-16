@@ -15,7 +15,15 @@
    reader arrowing through the rows should not land on it. */
 [part="header"] {
   align-items: center;
-  block-size: var(--helix-size-control-sm);
+  /* A step above the rows rather than level with them. The header is the one
+     thing on the page that is not a row, and at the rows' own height it read as
+     the first of them with a different weight of text. `control-md` against the
+     rows' `control-sm` is eight pixels, which is enough to separate the bar
+     from the list without making it a banner.
+
+     Both are pinned to a step rather than reading the current one, so the gap
+     between them holds whatever density the panel is dropped into. */
+  block-size: var(--helix-size-control-md);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
   gap: var(--helix-space-2xs);
