@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -159,6 +159,85 @@ if (hasLayout()) {
     test('at the top, the newest message is the one nearest that edge instead', async () => {
       const { newest, oldest } = await stack('top-center')
       expect(newest).toBeLessThan(oldest)
+    })
+  })
+
+  describe('toast item appearance', () => {
+    const item = async (attrs = ''): Promise<Item> => {
+      const host = await region(`<helix-toast-item ${attrs}>Saved</helix-toast-item>`)
+      const found = host.querySelector('helix-toast-item') as Item
+      await found.updateComplete
+      return found
+    }
+
+    test('the timer bar is drawn only where there is a clock to show', async () => {
+      /* A message that stays until it is dismissed has nothing to count down,
+         and a bar sitting full and still under it would be a progress
+         indicator for a process that is not running. */
+      expect(part(await item('duration="4000"'), 'timer')).toBeTruthy()
+      expect(part(await item(''), 'timer')).toBeNull()
+    })
+
+    test('the bar carries the duration, so one clock drives both', async () => {
+      // The item already holds the timer. A second one writing a width each
+      // frame would be two clocks to keep in step, so the animation is given
+      // the duration and the browser runs it.
+      const found = await item('duration="4000"')
+      const bar = part(found, 'timer') as HTMLElement
+      expect(bar.style.getPropertyValue('--_toast-duration')).toBe('4000ms')
+      expect(getComputedStyle(bar).animationDuration).toBe('4s')
+    })
+
+    test('pausing the clock freezes the bar with it', async () => {
+      /* The half that makes the pair honest. Hovering stops the timer, and a
+         bar that kept draining would promise the message was about to go while
+         it was in fact waiting for the pointer to leave. */
+      const found = await item('duration="4000"')
+      const bar = part(found, 'timer') as HTMLElement
+      expect(getComputedStyle(bar).animationPlayState).toBe('running')
+
+      found.pause()
+      await found.updateComplete
+      expect(found.hasAttribute('data-paused')).toBe(true)
+      expect(getComputedStyle(bar).animationPlayState).toBe('paused')
+
+      found.resume()
+      await found.updateComplete
+      expect(getComputedStyle(bar).animationPlayState).toBe('running')
+    })
+
+    test('the severity bar owes nothing to the corner radius', async () => {
+      /* It was `border-inline-start`, and a border is part of the element's own
+         box, so the radius bent it into a parenthesis. A separate pill cannot
+         be bent by the container it sits in. */
+      const found = await item('severity="danger"')
+      const box = part(found, 'item') as HTMLElement
+      expect(getComputedStyle(box).borderLeftWidth).toBe('0px')
+      expect(getComputedStyle(box, '::before').borderRadius).not.toBe('0px')
+    })
+
+    test('the row sits on one line, whatever heights are in it', async () => {
+      /* Measured before this: the text, the action and the dismiss were at 654,
+         664 and 660, because `start` aligned three boxes of different heights
+         by their tops. The heights differ because a toast is dense by nature
+         and had never said so. */
+      const found = (await mount(
+        `<helix-toast label="N"><helix-toast-item dismissible>Message
+           <helix-button appearance="tertiary" slot="actions">Retry</helix-button>
+         </helix-toast-item></helix-toast>`,
+      )) as HTMLElement
+      const found_item = found.querySelector('helix-toast-item') as Item
+      await found_item.updateComplete
+      const action = found.querySelector('helix-button') as HTMLElement
+      const dismiss = part(found_item, 'dismiss') as HTMLElement
+      const middle = (element: HTMLElement): number => {
+        const box = element.getBoundingClientRect()
+        return Math.round(box.top + box.height / 2)
+      }
+      expect(middle(action)).toBe(middle(dismiss))
+      expect(Math.round(action.getBoundingClientRect().height)).toBe(
+        Math.round(dismiss.getBoundingClientRect().height),
+      )
     })
   })
 }

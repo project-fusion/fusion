@@ -47,6 +47,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart content - The message.
  * @csspart actions - The region holding what to do about it.
  * @csspart dismiss - The control that asks to close.
+ * @csspart timer - The bar showing how long is left, where a duration was given.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer.
  */
@@ -97,6 +98,11 @@ export class HelixBaseToastItem extends HelixElement {
     this.timer = undefined
     this.remaining = Math.max((this.remaining ?? 0) - (Date.now() - this.startedAt), 0)
     this.startedAt = undefined
+    /* Said on the host so the indicator can freeze with the clock. A `data-`
+       attribute rather than a property, because it is written after upgrade
+       from a pointer moving: nothing declares it and no server rendered it,
+       which is the same reason `Carousel` names its slides from here. */
+    this.toggleAttribute('data-paused', true)
   }
 
   /** Starts it again from where it stopped. */
@@ -105,6 +111,7 @@ export class HelixBaseToastItem extends HelixElement {
       return
     }
     this.startedAt = Date.now()
+    this.toggleAttribute('data-paused', false)
     this.timer = setTimeout(() => {
       this.timer = undefined
       this.dismiss()
@@ -160,6 +167,15 @@ export class HelixBaseToastItem extends HelixElement {
                 </svg>
               </slot>
             </button>`
+          : nothing
+      }
+      ${
+        this.duration
+          ? html`<div
+              part="timer"
+              style=${`--_toast-duration: ${this.duration}ms`}
+              aria-hidden="true"
+            ></div>`
           : nothing
       }
     </div>`

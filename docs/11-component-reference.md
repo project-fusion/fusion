@@ -3073,6 +3073,7 @@ costs contrast for something the mark already says.
 | `content` | The message. |
 | `actions` | The region holding what to do about it. |
 | `dismiss` | The control that asks to close. |
+| `timer` | The bar showing how long is left, where a duration was given. |
 
 #### Custom properties
 

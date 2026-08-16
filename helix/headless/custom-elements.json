@@ -20607,6 +20607,10 @@
             {
               "description": "The control that asks to close.",
               "name": "dismiss"
+            },
+            {
+              "description": "The bar showing how long is left, where a duration was given.",
+              "name": "timer"
             }
           ],
           "slots": [

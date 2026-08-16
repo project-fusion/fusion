@@ -1,5 +1,11 @@
 :host {
   display: block;
+  /* Dense by nature, and it never said so. A toast is a compact region the same
+     way the app header, the toolbar and the announcement are, and every one of
+     those declares this on its own host. Without it a slotted `Retry` came out
+     at the full 40px beside a 32px dismiss, so the two controls in one row were
+     different heights: measured, three centre lines at 654, 660 and 664. */
+  --helix-size-control: var(--helix-size-control-sm);
   /* The width is the message's, not the region's: the region spans an edge so a
      stack can align along it, and a message as wide as the window is a banner. */
   inline-size: var(--toast-inline-size, 22rem);
@@ -7,7 +13,10 @@
 }
 
 [part="item"] {
-  align-items: start;
+  /* Centred, which is what the announcement does with the same row. `start`
+     put the text, the action and the dismiss on three different lines, because
+     the three boxes are different heights and only their tops agreed. */
+  align-items: center;
   background-color: var(--helix-color-surface-overlay);
   border-radius: var(--helix-radii-md);
   box-shadow: var(--helix-shadow-lg);
@@ -19,11 +28,30 @@
   gap: var(--helix-space-sm);
   line-height: var(--helix-leading-normal);
   padding: var(--toast-item-inset, var(--helix-space-sm));
-  /* The severity bar, drawn as an inset border on the leading edge so it
-     follows the writing direction without the component knowing which one it is
-     in. Transparent by default, so a message with no severity keeps the same
-     box and the same text position as one with. */
-  border-inline-start: var(--helix-border-thick) solid transparent;
+  /* The containing block for the severity bar and the timer, both of which are
+     placed against this box. */
+  position: relative;
+}
+
+/* The severity bar.
+ *
+ * It was `border-inline-start`, and a border is part of the element's own box,
+ * so `border-radius` bent it: the bar bowed inwards at both ends and read as a
+ * parenthesis rather than a rule. The same fault the tabs strip and the page
+ * nav both hit, and the same answer as the page nav's: a pill of its own,
+ * inset from the edges, owing nothing to the container's corners.
+ *
+ * Out of flow, so a message with no severity has exactly the same box and the
+ * same text position as one with. The border form only approximated that by
+ * staying transparent, which meant it was still there in the layout. */
+[part="item"]::before {
+  background-color: var(--_toast-severity, transparent);
+  border-radius: var(--helix-radii-full);
+  content: "";
+  inline-size: var(--helix-border-thick);
+  inset-block: var(--helix-space-2xs);
+  inset-inline-start: var(--helix-space-2xs);
+  position: absolute;
 }
 
 [part="content"] {
@@ -40,20 +68,20 @@
 /* A bar down the edge rather than a fill behind the words. A message is text to
    be read, and a coloured panel costs contrast to say what the bar already
    says. */
-:host([severity="info"]) [part="item"] {
-  border-inline-start-color: var(--helix-color-primary);
+:host([severity="info"]) {
+  --_toast-severity: var(--helix-color-primary);
 }
 
-:host([severity="success"]) [part="item"] {
-  border-inline-start-color: var(--helix-color-success);
+:host([severity="success"]) {
+  --_toast-severity: var(--helix-color-success);
 }
 
-:host([severity="warning"]) [part="item"] {
-  border-inline-start-color: var(--helix-color-warning);
+:host([severity="warning"]) {
+  --_toast-severity: var(--helix-color-warning);
 }
 
-:host([severity="danger"]) [part="item"] {
-  border-inline-start-color: var(--helix-color-danger);
+:host([severity="danger"]) {
+  --_toast-severity: var(--helix-color-danger);
 }
 
 [part="dismiss"] {
@@ -86,6 +114,57 @@
 [part="dismiss"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* How long is left, and only where a duration was given.
+ *
+ * A CSS animation rather than a timer writing a width each frame: the item
+ * already holds the clock, and a second one counting alongside it is two
+ * clocks to keep in step. `animation-play-state` is what makes the pair
+ * honest, because the item pauses on hover and focus and the bar has to stop
+ * with it rather than merely look like it did.
+ *
+ * The same colour as the severity bar where there is one, so the two marks on
+ * a message are one idea rather than two. */
+[part="timer"] {
+  animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;
+  background-color: var(--_toast-severity, var(--helix-color-foreground-muted));
+  block-size: var(--helix-border-thick);
+  border-radius: var(--helix-radii-full);
+  inset-block-end: var(--helix-space-2xs);
+  inset-inline: var(--helix-space-2xs);
+  opacity: 0.5;
+  position: absolute;
+  /* Physical, because `transform-origin` has no logical keyword. `:dir()` is
+     what puts it at the other end in a right-to-left document, where the bar
+     should drain towards the side the text ends on. */
+  transform-origin: 0 50%;
+}
+
+[part="timer"]:dir(rtl) {
+  transform-origin: 100% 50%;
+}
+
+:host([data-paused]) [part="timer"] {
+  animation-play-state: paused;
+}
+
+@keyframes helix-toast-drain {
+  to {
+    scale: 0 1;
+  }
+}
+
+/* Hidden outright rather than left still.
+ *
+ * The base layer's reduced-motion rule caps every animation at 0.01ms, which
+ * would run this one to empty on the first frame and leave a bar saying no time
+ * remains while the message sits there for another four seconds. A bar that
+ * cannot move cannot tell the truth, and a wrong indicator is worse than none. */
+@media (prefers-reduced-motion: reduce) {
+  [part="timer"] {
+    display: none;
+  }
 }
 
 /* It arrives rather than appearing. A message that is simply there is one a

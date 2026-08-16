@@ -26701,6 +26701,14 @@
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"
               }
+            },
+            {
+              "description": "The bar showing how long is left, where a duration was given.",
+              "name": "timer",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
             }
           ],
           "attributes": [
