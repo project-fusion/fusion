@@ -15,6 +15,17 @@
       "cache": false,
       "persistent": true
     },
+    "frame": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "lib/preview-frame-entry.ts",
+        "lib/preview-frame.css",
+        "app/fonts/**",
+        "$TURBO_ROOT$/helix/styles/src/*.css",
+        "$TURBO_ROOT$/tooling/scripts/build-frame.mjs"
+      ],
+      "outputs": ["public/sandbox/**"]
+    },
     "icons": {
       "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/tooling/scripts/build-icons.mjs"],
       "outputs": ["src/generated.ts"]

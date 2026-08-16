@@ -673,6 +673,19 @@
               }
             },
             {
+              "kind": "method",
+              "name": "reload",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Loads the frame's document again, and re-sends the example to it.\n\nFor a bundle that has changed underneath a page nobody reloaded. The frame\ncarries its own build of the component library, as a classic script it ran\nonce at load, so a rebuilt bundle reaches a tab that is already open\nexactly never: the sandbox around it hot-reloads and the preview inside it\nkeeps running whatever it started with, which reads as a component fix that\ndid not work.\n\nNothing needs to be resent by the caller. Clearing `ready` and reassigning\n`src` puts this back in the state it was in before the first load, and the\nnew document announces itself the same way the first one did.",
+              "type": {
+                "text": "reload() => void"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {

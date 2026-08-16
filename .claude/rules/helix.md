@@ -501,24 +501,29 @@ shows it immediately. **The preview does not.** It runs `frame.js`, a 400 kB
 classic-script IIFE built by `bun run frame` and served from `public/`, which is
 the only shape that can carry the library into a sandboxed document (see below).
 
-Three consequences, all of which have cost real time:
+Both halves of that had to be fixed, and the second is the one that is easy to
+miss: a bundle nothing rebuilds, and a bundle that, once rebuilt, still cannot
+reach a tab that is already open.
 
-- **`dev:watch` never rebuilds it.** The filter is
-  `--filter=@fusion-io/site-ui^...`, which is site-ui's *dependencies*, and the
-  frame build lives in site-ui's own `build`. So a component fix appears in the
-  chrome and not in the preview, which looks exactly like the fix not working.
-- **HMR cannot reach it.** The iframe is not re-created on a hot update, so the
-  bundle it executed at page load is the one still running. A tab left open
-  across a rebuild shows old components indefinitely. `next dev` now builds the
-  frame on start, so restarting the dev server is enough; a hot reload is not.
+- **`frame` is a turbo task**, `dependsOn: ["^build"]`, and `dev:watch` watches
+  it rather than `build`. Because of that dependency, watching the frame
+  rebuilds every library it carries as well, so the command does more and says
+  less: `turbo watch frame --filter=@fusion-io/site-ui`. Turbo does not accept
+  `--filter=pkg#task`, which is what makes the obvious version of this fail.
+- **The preview reloads itself.** HMR never re-creates the iframe, so the bundle
+  it executed at page load is the one still running, forever. The workbench
+  polls `frame.html` in development and calls `HelixSandboxPreview.reload()`
+  when its text changes; the new document announces itself and the source is
+  resent by the path the first load already uses.
 - **`frame.html` must never be cached.** `build-frame.mjs` stamps `frame.js` and
   `frame.css` with a hash of their contents, and those stamps live *inside*
   `frame.html`. Cache that file and the browser asks for yesterday's bundle by
   name forever, which is the stamping achieving precisely nothing. It is served
   `no-store` from `next.config.ts`, and the assets it names stay immutable.
 
-**So verifying a component fix in the sandbox means `bun run frame` and a page
-reload.** Not a hot reload, and not the chrome looking right.
+**If you are ever verifying a fix without `dev:watch` running, it is
+`bun run frame` and a page reload.** Not a hot reload, and not the chrome
+looking right.
 
 ### The preview runs untrusted code
 

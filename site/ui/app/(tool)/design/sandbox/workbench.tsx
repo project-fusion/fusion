@@ -372,6 +372,46 @@ export function SandboxWorkbench({ families }: Props) {
      HTML and then shown under a TSX tab. Comparing against what was last put
      there settles it on the following render instead of needing the two to be
      ordered. */
+  /**
+   * Reloads the preview when its bundle changes, in development only.
+   *
+   * The frame runs its own build of the component library, carried in as a
+   * classic script because a sandboxed document has an opaque origin and cannot
+   * import a module from this site. That script is outside the module graph, so
+   * nothing about it hot-reloads: the sandbox around the preview updates on
+   * every component change and the preview keeps running whatever it loaded
+   * when the tab was opened. It looks exactly like a fix that did not work, and
+   * it cost most of two days before anyone looked at the file in the middle.
+   *
+   * `frame.html` is tiny and served `no-store`, and it names both stamped URLs,
+   * so its text *is* the version. Compared rather than its `ETag`, which is
+   * derived from mtime and changes on a rebuild that produced identical output.
+   *
+   * Nothing is resent here: the frame announces itself on load and the preview
+   * answers, which is the same path the first load takes.
+   */
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      return
+    }
+    let last: string | null = null
+    const check = async (): Promise<void> => {
+      let text: string
+      try {
+        text = await (await fetch('/sandbox/frame.html', { cache: 'no-store' })).text()
+      } catch {
+        return // The dev server is restarting. Ask again on the next tick.
+      }
+      if (last !== null && text !== last) {
+        preview.current?.reload()
+      }
+      last = text
+    }
+    void check()
+    const timer = setInterval(() => void check(), 2000)
+    return () => clearInterval(timer)
+  }, [])
+
   useEffect(() => {
     if (!example) {
       return

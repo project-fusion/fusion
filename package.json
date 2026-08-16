@@ -13,7 +13,7 @@
     "check:tokens": "node tooling/scripts/check-tokens.mjs",
     "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
     "dev": "turbo run dev",
-    "dev:watch": "turbo watch build --filter=@fusion-io/site-ui^...",
+    "dev:watch": "turbo watch frame --filter=@fusion-io/site-ui",
     "format": "biome format --write .",
     "frame": "bun tooling/scripts/build-frame.mjs",
     "lint": "biome lint .",

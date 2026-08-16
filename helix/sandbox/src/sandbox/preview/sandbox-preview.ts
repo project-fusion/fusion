@@ -202,6 +202,29 @@ export class HelixSandboxPreview extends HelixElement {
     window.removeEventListener('message', this.handleMessage)
   }
 
+  /**
+   * Loads the frame's document again, and re-sends the example to it.
+   *
+   * For a bundle that has changed underneath a page nobody reloaded. The frame
+   * carries its own build of the component library, as a classic script it ran
+   * once at load, so a rebuilt bundle reaches a tab that is already open
+   * exactly never: the sandbox around it hot-reloads and the preview inside it
+   * keeps running whatever it started with, which reads as a component fix that
+   * did not work.
+   *
+   * Nothing needs to be resent by the caller. Clearing `ready` and reassigning
+   * `src` puts this back in the state it was in before the first load, and the
+   * new document announces itself the same way the first one did.
+   */
+  reload(): void {
+    const frame = this.frame
+    if (!frame) {
+      return
+    }
+    this.ready = false
+    frame.src = this.src
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // A new document has to say it is listening again before anything is sent.
