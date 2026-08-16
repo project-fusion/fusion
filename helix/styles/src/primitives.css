@@ -77,15 +77,40 @@
   --_helix-neutral-200: oklch(
     0.96 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
+  /* 0.88, not 0.84. This rung and 700 below it are read by exactly one token,
+     `--helix-color-border`, so moving them moves every border in the library
+     and nothing else: a card, a field, a table rule, a key, an accordion seam,
+     twenty-eight components in all. That is why the change is here rather than
+     twenty-eight times over.
+
+     The old pair drew a hairline that was doing more work than a hairline
+     should. On a 0.985 surface a 0.84 border is a fifth of the way to black,
+     and a grid of outlined cards read as a grid of boxes rather than as
+     content: the line arrived before the thing it was containing. Both ends
+     move toward their surface by roughly the same amount, so the border is a
+     touch quieter in each mode rather than quieter in one and unchanged in the
+     other.
+
+     `border-strong` is untouched and still reads off 400 and 600, so the gap
+     between a resting edge and an emphasised one has widened, which is the
+     point: the two were close enough that hover on a field was easy to miss. */
   --_helix-neutral-300: oklch(
-    0.84 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+    0.88 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
   --_helix-neutral-400: oklch(
     0.71 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
   --_helix-neutral-500: oklch(0.6 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue));
   --_helix-neutral-600: oklch(0.5 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue));
-  --_helix-neutral-700: oklch(0.4 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue));
+  /* 0.34, not 0.4. The dark half of the border pair. See the note on 300.
+
+     Lighter here means nearer the surface it sits on, not nearer white: a dark
+     page runs at 0.21, so a border that recedes has to come *down*. Moving it
+     up would have made the line louder in dark at the same moment it got
+     quieter in light, which is one change reading as two. */
+  --_helix-neutral-700: oklch(
+    0.34 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+  );
   --_helix-neutral-800: oklch(
     0.29 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );

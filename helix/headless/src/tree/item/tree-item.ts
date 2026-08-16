@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
+import { customElement, HelixElement, HelixSelectEvent, MixinControllerOpen } from '@helix-io/core'
 import { caretDown } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -8,7 +8,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One node in a tree.
  *
  * @description
- * An element rather than a slot because it owns state: whether it is expanded,
+ * **`open`, on `MixinControllerOpen`, where it was a bare `expanded` boolean.**
+ * A branch showing its children is the same state a disclosure holds, and
+ * `AccordionItem` has been on that mixin all along. Written here by hand it had
+ * neither half of what the mixin gives: `this.expanded = !this.expanded`
+ * announced nothing, so a consumer could not know a branch had opened, and
+ * could not own the state either. `aria-expanded` is still what the row
+ * renders, because that is the attribute a tree uses; the property is what
+ * changed, not the semantics.
+ *
+ * An element rather than a slot because it owns state: whether it is open,
  * whether it is selected, and whether it is the one holding focus.
  *
  * A branch is any item with something slotted into `children`, detected in
@@ -36,7 +45,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  */
 @customElement('helix-base-tree-item')
-export class HelixBaseTreeItem extends HelixElement {
+export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
   /** Identifies the item to the consumer, carried in `SelectionChange`. */
   @property()
   value = ''
@@ -44,10 +53,6 @@ export class HelixBaseTreeItem extends HelixElement {
   /** Whether this item is the current one. */
   @property({ reflect: true, type: Boolean })
   selected = false
-
-  /** Whether a branch is showing its children. */
-  @property({ reflect: true, type: Boolean })
-  expanded = false
 
   /**
    * Depth from the root, set by the tree so indentation needs no CSS nesting.
@@ -94,7 +99,7 @@ export class HelixBaseTreeItem extends HelixElement {
 
   private readonly handleRowClick = (): void => {
     if (this.branch) {
-      this.expanded = !this.expanded
+      this.toggleOpen()
       return
     }
     this.select()
@@ -104,7 +109,7 @@ export class HelixBaseTreeItem extends HelixElement {
     return html`<div
         part="item"
         role="treeitem"
-        aria-expanded=${this.branch ? (this.expanded ? 'true' : 'false') : nothing}
+        aria-expanded=${this.branch ? (this.open ? 'true' : 'false') : nothing}
         aria-selected=${this.selected ? 'true' : 'false'}
         aria-level=${this.level ?? 1}
         tabindex=${this.focusable ? '0' : '-1'}
@@ -126,7 +131,7 @@ export class HelixBaseTreeItem extends HelixElement {
           <slot name="end"></slot>
         </div>
       </div>
-      <div part="group" role="group" ?hidden=${!this.expanded}>
+      <div part="group" role="group" ?hidden=${!this.open}>
         <slot name="children"></slot>
       </div>`
   }

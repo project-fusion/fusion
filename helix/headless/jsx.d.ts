@@ -69,7 +69,9 @@ import type {
   HelixChangeEvent,
   HelixCloseEvent,
   HelixDismissEvent,
+  HelixFilterEvent,
   HelixFormElement,
+  HelixNavigateEvent,
   HelixOpenEvent,
   HelixSelectEvent,
   initialsOf,
@@ -772,6 +774,9 @@ export type HelixBaseCalendarElementEvent<E = Event> = TypedEvent<
 /** `helix-change` event type */
 export type HelixBaseCalendarHelixChangeElementEvent =
   HelixBaseCalendarElementEvent<HelixChangeEvent>;
+/** `helix-navigate` event type */
+export type HelixBaseCalendarHelixNavigateElementEvent =
+  HelixBaseCalendarElementEvent<HelixNavigateEvent>;
 
 export type HelixBaseCalendarProps = {
   /** Name the calendar reports under when its form is submitted.
@@ -797,8 +802,18 @@ its panel will stay quiet, the same way `Select` holds the name and the
   disableDays?: HelixBaseCalendar["disableDays"];
   /** Whether the current selection fails validation. */
   invalid?: HelixBaseCalendar["invalid"];
-  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
+  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+
+Separate from `value` on purpose, so paging selects nothing and a consumer
+can drive the view. It said that and could not do it: the calendar wrote
+this when the reader paged, so a consumer holding it was overwritten and
+never told. Reading gives the month on show; writing declares it theirs,
+and `default-month` seeds one the calendar owns. */
   month?: HelixBaseCalendar["month"];
+  /** Month to open on, where nothing declared one. */
+  "default-month"?: HelixBaseCalendar["defaultMonth"];
+  /** Month to open on, where nothing declared one. */
+  defaultMonth?: HelixBaseCalendar["defaultMonth"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
   min?: HelixBaseCalendar["min"];
   /** Latest selectable date, as `YYYY-MM-DD`. */
@@ -839,8 +854,10 @@ it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   onValueChange?: HelixBaseCalendar["onValueChange"];
 
-  /** Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`. */
+  /** Fired before the dates change, and cancelable. */
   "onhelix-change"?: (e: HelixBaseCalendarHelixChangeElementEvent) => void;
+  /** Fired before the month on show changes, and cancelable. */
+  "onhelix-navigate"?: (e: HelixBaseCalendarHelixNavigateElementEvent) => void;
 };
 
 export type HelixBaseCalendarSolidJsProps = {
@@ -867,8 +884,18 @@ its panel will stay quiet, the same way `Select` holds the name and the
   "prop:disableDays"?: HelixBaseCalendar["disableDays"];
   /** Whether the current selection fails validation. */
   "prop:invalid"?: HelixBaseCalendar["invalid"];
-  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
+  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+
+Separate from `value` on purpose, so paging selects nothing and a consumer
+can drive the view. It said that and could not do it: the calendar wrote
+this when the reader paged, so a consumer holding it was overwritten and
+never told. Reading gives the month on show; writing declares it theirs,
+and `default-month` seeds one the calendar owns. */
   "prop:month"?: HelixBaseCalendar["month"];
+  /** Month to open on, where nothing declared one. */
+  "attr:default-month"?: HelixBaseCalendar["defaultMonth"];
+  /** Month to open on, where nothing declared one. */
+  "prop:defaultMonth"?: HelixBaseCalendar["defaultMonth"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
   "prop:min"?: HelixBaseCalendar["min"];
   /** Latest selectable date, as `YYYY-MM-DD`. */
@@ -908,8 +935,10 @@ because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   "prop:onValueChange"?: HelixBaseCalendar["onValueChange"];
-  /** Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`. */
+  /** Fired before the dates change, and cancelable. */
   "on:helix-change"?: (e: HelixBaseCalendarHelixChangeElementEvent) => void;
+  /** Fired before the month on show changes, and cancelable. */
+  "on:helix-navigate"?: (e: HelixBaseCalendarHelixNavigateElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1881,10 +1910,22 @@ export type HelixBaseListboxElementEvent<E = Event> = TypedEvent<
 /** `helix-change` event type */
 export type HelixBaseListboxHelixChangeElementEvent =
   HelixBaseListboxElementEvent<HelixChangeEvent>;
+/** `helix-filter` event type */
+export type HelixBaseListboxHelixFilterElementEvent =
+  HelixBaseListboxElementEvent<HelixFilterEvent>;
 
 export type HelixBaseListboxProps = {
-  /** Text the options are matched against. Empty shows them all. */
+  /** What the list is narrowed to, if anything.
+
+Filtering hides rather than removes, so nothing about the value changes and
+the list is still the consumer's own elements in their own order. Reading
+gives what is being filtered on; writing declares it theirs, and
+`default-filter` seeds one the list owns. */
   filter?: HelixBaseListbox["filter"];
+  /** What to start narrowed to, where nothing declared it. */
+  "default-filter"?: HelixBaseListbox["defaultFilter"];
+  /** What to start narrowed to, where nothing declared it. */
+  defaultFilter?: HelixBaseListbox["defaultFilter"];
   /** Whether the list renders a field for narrowing itself.
 
 The field lives here rather than in whatever frames the list, because the
@@ -1946,11 +1987,22 @@ fire at all. */
 
   /** Fired when the answer changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseListboxHelixChangeElementEvent) => void;
+  /** Fired before the list narrows, and cancelable. */
+  "onhelix-filter"?: (e: HelixBaseListboxHelixFilterElementEvent) => void;
 };
 
 export type HelixBaseListboxSolidJsProps = {
-  /** Text the options are matched against. Empty shows them all. */
+  /** What the list is narrowed to, if anything.
+
+Filtering hides rather than removes, so nothing about the value changes and
+the list is still the consumer's own elements in their own order. Reading
+gives what is being filtered on; writing declares it theirs, and
+`default-filter` seeds one the list owns. */
   "prop:filter"?: HelixBaseListbox["filter"];
+  /** What to start narrowed to, where nothing declared it. */
+  "attr:default-filter"?: HelixBaseListbox["defaultFilter"];
+  /** What to start narrowed to, where nothing declared it. */
+  "prop:defaultFilter"?: HelixBaseListbox["defaultFilter"];
   /** Whether the list renders a field for narrowing itself.
 
 The field lives here rather than in whatever frames the list, because the
@@ -2011,6 +2063,8 @@ fire at all. */
   "prop:onValueChange"?: HelixBaseListbox["onValueChange"];
   /** Fired when the answer changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseListboxHelixChangeElementEvent) => void;
+  /** Fired before the list narrows, and cancelable. */
+  "on:helix-filter"?: (e: HelixBaseListboxHelixFilterElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4020,8 +4074,6 @@ export type HelixBaseTreeItemProps = {
   value?: HelixBaseTreeItem["value"];
   /** Whether this item is the current one. */
   selected?: HelixBaseTreeItem["selected"];
-  /** Whether a branch is showing its children. */
-  expanded?: HelixBaseTreeItem["expanded"];
   /** Depth from the root, set by the tree so indentation needs no CSS nesting.
 
 Not reflected. The tree assigns this after it upgrades, so an attribute
@@ -4029,8 +4081,42 @@ here would be a change to markup the consumer rendered and hydration would
 report it. The indent it drives is written onto the row instead, inside the
 shadow root, which is not part of the tree React hydrates. */
   level?: HelixBaseTreeItem["level"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixBaseTreeItem["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixBaseTreeItem["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixBaseTreeItem["defaultOpen"];
   /** Whether this item holds the tree's single tab stop. */
   focusable?: HelixBaseTreeItem["focusable"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixBaseTreeItem["onOpenChange"];
 
   /** Fired when the item is chosen. */
   "onhelix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
@@ -4041,8 +4127,6 @@ export type HelixBaseTreeItemSolidJsProps = {
   "prop:value"?: HelixBaseTreeItem["value"];
   /** Whether this item is the current one. */
   "prop:selected"?: HelixBaseTreeItem["selected"];
-  /** Whether a branch is showing its children. */
-  "prop:expanded"?: HelixBaseTreeItem["expanded"];
   /** Depth from the root, set by the tree so indentation needs no CSS nesting.
 
 Not reflected. The tree assigns this after it upgrades, so an attribute
@@ -4050,8 +4134,42 @@ here would be a change to markup the consumer rendered and hydration would
 report it. The indent it drives is written onto the row instead, inside the
 shadow root, which is not part of the tree React hydrates. */
   "prop:level"?: HelixBaseTreeItem["level"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixBaseTreeItem["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixBaseTreeItem["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixBaseTreeItem["defaultOpen"];
   /** Whether this item holds the tree's single tab stop. */
   "prop:focusable"?: HelixBaseTreeItem["focusable"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixBaseTreeItem["onOpenChange"];
   /** Fired when the item is chosen. */
   "on:helix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
 
@@ -4796,6 +4914,13 @@ export type CustomElements = {
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
    * - `invalid`: Whether the current selection fails validation.
    * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   *
+   * Separate from `value` on purpose, so paging selects nothing and a consumer
+   * can drive the view. It said that and could not do it: the calendar wrote
+   * this when the reader paged, so a consumer holding it was overwritten and
+   * never told. Reading gives the month on show; writing declares it theirs,
+   * and `default-month` seeds one the calendar owns.
+   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
@@ -4830,7 +4955,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`.
+   * - `helix-change`: Fired before the dates change, and cancelable.
+   * - `helix-navigate`: Fired before the month on show changes, and cancelable.
    *
    * ## Methods
    *
@@ -5939,7 +6065,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `filter`: Text the options are matched against. Empty shows them all.
+   * - `filter`: What the list is narrowed to, if anything.
+   *
+   * Filtering hides rather than removes, so nothing about the value changes and
+   * the list is still the consumer's own elements in their own order. Reading
+   * gives what is being filtered on; writing declares it theirs, and
+   * `default-filter` seeds one the list owns.
+   * - `default-filter`/`defaultFilter`: What to start narrowed to, where nothing declared it.
    * - `filterable`: Whether the list renders a field for narrowing itself.
    *
    * The field lives here rather than in whatever frames the list, because the
@@ -5999,6 +6131,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the answer changes, and cancelable.
+   * - `helix-filter`: Fired before the list narrows, and cancelable.
    *
    * ## Slots
    *
@@ -6012,6 +6145,7 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestFilter(next: string) => boolean`: Requests a narrowing, and reports whether the request stood.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
@@ -8153,7 +8287,16 @@ export type CustomElements = {
   >;
 
   /**
-   * An element rather than a slot because it owns state: whether it is expanded,
+   * **`open`, on `MixinControllerOpen`, where it was a bare `expanded` boolean.**
+   * A branch showing its children is the same state a disclosure holds, and
+   * `AccordionItem` has been on that mixin all along. Written here by hand it had
+   * neither half of what the mixin gives: `this.expanded = !this.expanded`
+   * announced nothing, so a consumer could not know a branch had opened, and
+   * could not own the state either. `aria-expanded` is still what the row
+   * renders, because that is the attribute a tree uses; the property is what
+   * changed, not the semantics.
+   *
+   * An element rather than a slot because it owns state: whether it is open,
    * whether it is selected, and whether it is the one holding focus.
    *
    * A branch is any item with something slotted into `children`, detected in
@@ -8168,15 +8311,43 @@ export type CustomElements = {
    *
    * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
    * - `selected`: Whether this item is the current one.
-   * - `expanded`: Whether a branch is showing its children.
    * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
    *
    * Not reflected. The tree assigns this after it upgrades, so an attribute
    * here would be a change to markup the consumer rendered and hydration would
    * report it. The indent it drives is written onto the row instead, inside the
    * shadow root, which is not part of the tree React hydrates.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    * - `isBranch`: Whether this node has children. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
    *
    * ## Events
    *
@@ -8199,6 +8370,14 @@ export type CustomElements = {
    *
    * - `focusItem() => void`: Moves focus to this node.
    * - `select() => void`: Selects this node and announces it.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
    *
@@ -8972,6 +9151,13 @@ export type CustomElementsSolidJs = {
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
    * - `invalid`: Whether the current selection fails validation.
    * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   *
+   * Separate from `value` on purpose, so paging selects nothing and a consumer
+   * can drive the view. It said that and could not do it: the calendar wrote
+   * this when the reader paged, so a consumer holding it was overwritten and
+   * never told. Reading gives the month on show; writing declares it theirs,
+   * and `default-month` seeds one the calendar owns.
+   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
@@ -9006,7 +9192,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`.
+   * - `helix-change`: Fired before the dates change, and cancelable.
+   * - `helix-navigate`: Fired before the month on show changes, and cancelable.
    *
    * ## Methods
    *
@@ -10169,7 +10356,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `filter`: Text the options are matched against. Empty shows them all.
+   * - `filter`: What the list is narrowed to, if anything.
+   *
+   * Filtering hides rather than removes, so nothing about the value changes and
+   * the list is still the consumer's own elements in their own order. Reading
+   * gives what is being filtered on; writing declares it theirs, and
+   * `default-filter` seeds one the list owns.
+   * - `default-filter`/`defaultFilter`: What to start narrowed to, where nothing declared it.
    * - `filterable`: Whether the list renders a field for narrowing itself.
    *
    * The field lives here rather than in whatever frames the list, because the
@@ -10229,6 +10422,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the answer changes, and cancelable.
+   * - `helix-filter`: Fired before the list narrows, and cancelable.
    *
    * ## Slots
    *
@@ -10242,6 +10436,7 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestFilter(next: string) => boolean`: Requests a narrowing, and reports whether the request stood.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
@@ -12485,7 +12680,16 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * An element rather than a slot because it owns state: whether it is expanded,
+   * **`open`, on `MixinControllerOpen`, where it was a bare `expanded` boolean.**
+   * A branch showing its children is the same state a disclosure holds, and
+   * `AccordionItem` has been on that mixin all along. Written here by hand it had
+   * neither half of what the mixin gives: `this.expanded = !this.expanded`
+   * announced nothing, so a consumer could not know a branch had opened, and
+   * could not own the state either. `aria-expanded` is still what the row
+   * renders, because that is the attribute a tree uses; the property is what
+   * changed, not the semantics.
+   *
+   * An element rather than a slot because it owns state: whether it is open,
    * whether it is selected, and whether it is the one holding focus.
    *
    * A branch is any item with something slotted into `children`, detected in
@@ -12500,15 +12704,43 @@ export type CustomElementsSolidJs = {
    *
    * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
    * - `selected`: Whether this item is the current one.
-   * - `expanded`: Whether a branch is showing its children.
    * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
    *
    * Not reflected. The tree assigns this after it upgrades, so an attribute
    * here would be a change to markup the consumer rendered and hydration would
    * report it. The indent it drives is written onto the row instead, inside the
    * shadow root, which is not part of the tree React hydrates.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    * - `isBranch`: Whether this node has children. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
    *
    * ## Events
    *
@@ -12531,6 +12763,14 @@ export type CustomElementsSolidJs = {
    *
    * - `focusItem() => void`: Moves focus to this node.
    * - `select() => void`: Selects this node and announces it.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
    *

@@ -142,7 +142,7 @@ slot[name="children"]::slotted(*) {
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host([expanded]) [part="toggle"] {
+:host([data-open]) [part="toggle"] {
   transform: rotate(0deg);
 }
 

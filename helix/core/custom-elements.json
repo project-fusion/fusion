@@ -1002,7 +1002,51 @@
         },
         {
           "kind": "class",
-          "description": "Fired when the reader selects an item in a set.\n\nBubbles and is composed, because this is how a set coordinates: a tree, a\ntab list and a toggle group all learn which of their children was chosen by\nhearing it arrive.",
+          "description": "Fired when a component moves the view it is showing, rather than its value.\n\nA calendar paging to another month is not choosing a date, and the two have\nto be separable: a consumer driving the view needs to hear that it moved\nwithout being told the answer changed. `helix-change` belongs to the value,\nand giving it both jobs would make either one unusable on its own.",
+          "name": "HelixNavigateEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-navigate'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "Fired when a component narrows what it is showing.\n\nFiltering hides rather than removes, so nothing about the value changes and\n`helix-change` would be a lie. What a consumer wants to know is that the list\nin front of the reader is no longer the whole list.",
+          "name": "HelixFilterEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-filter'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "",
           "name": "HelixSelectEvent",
           "members": [
             {
@@ -1069,6 +1113,22 @@
           "name": "HelixCaretEvent",
           "declaration": {
             "name": "HelixCaretEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixNavigateEvent",
+          "declaration": {
+            "name": "HelixNavigateEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixFilterEvent",
+          "declaration": {
+            "name": "HelixFilterEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -1521,6 +1581,14 @@
         },
         {
           "kind": "js",
+          "name": "FilterDetail",
+          "declaration": {
+            "name": "FilterDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixCaretEvent",
           "declaration": {
             "name": "HelixCaretEvent",
@@ -1561,6 +1629,22 @@
         },
         {
           "kind": "js",
+          "name": "HelixFilterEvent",
+          "declaration": {
+            "name": "HelixFilterEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixNavigateEvent",
+          "declaration": {
+            "name": "HelixNavigateEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixOpenEvent",
           "declaration": {
             "name": "HelixOpenEvent",
@@ -1572,6 +1656,14 @@
           "name": "HelixSelectEvent",
           "declaration": {
             "name": "HelixSelectEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NavigateDetail",
+          "declaration": {
+            "name": "NavigateDetail",
             "module": "./events/events.js"
           }
         },

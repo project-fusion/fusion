@@ -557,6 +557,7 @@ grid reads as a continuous run of dates.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `defaultMonth` | `default-month` | `string` | `''` | `HelixBaseCalendar` | Month to open on, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseCalendar` | Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. |
@@ -571,7 +572,7 @@ grid reads as a continuous run of dates.
 | `max` | `max` | `string` | `''` | `HelixBaseCalendar` | Latest selectable date, as `YYYY-MM-DD`. |
 | `min` | `min` | `string` | `''` | `HelixBaseCalendar` | Earliest selectable date, as `YYYY-MM-DD`. |
 | `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseCalendar` | How many dates can be held at once. |
-| `month` | `month` | `string` | `''` | `HelixBaseCalendar` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
+| `month` | `month` | `string` | - | `HelixBaseCalendar` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
 | `months` | `months` | `number` | `1` | `HelixBaseCalendar` | How many months to show, side by side. |
 | `name` | `name` | `string` | `''` | `HelixBaseCalendar` | Name the calendar reports under when its form is submitted. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
@@ -589,7 +590,8 @@ grid reads as a continuous run of dates.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`. |
+| `helix-change` | `HelixChangeEvent` | Fired before the dates change, and cancelable. |
+| `helix-navigate` | `HelixNavigateEvent` | Fired before the month on show changes, and cancelable. |
 
 #### Parts
 
@@ -1557,12 +1559,13 @@ list moves under the reader rather than the reader moving to find it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `defaultFilter` | `default-filter` | `string` | `''` | `HelixBaseListbox` | What to start narrowed to, where nothing declared it. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseListbox` | What is shown when a filter has hidden every option. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `filter` | `filter` | `string` | `''` | `HelixBaseListbox` | Text the options are matched against. Empty shows them all. |
+| `filter` | `filter` | `string` | - | `HelixBaseListbox` | What the list is narrowed to, if anything. |
 | `filterable` | `filterable` | `boolean` | `false` | `HelixBaseListbox` | Whether the list renders a field for narrowing itself. |
 | `filterLabel` | `filter-label` | `string` | `'Filter'` | `HelixBaseListbox` | Placeholder for the field that narrows the list. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -1585,6 +1588,7 @@ list moves under the reader rather than the reader moving to find it.
 | --- | --- | --- |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestFilter()` | `HelixBaseListbox` | Requests a narrowing, and reports whether the request stood. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 
 #### Events
@@ -1592,6 +1596,7 @@ list moves under the reader rather than the reader moving to find it.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-change` | `HelixChangeEvent` | Fired when the answer changes, and cancelable. |
+| `helix-filter` | `HelixFilterEvent` | Fired before the list narrows, and cancelable. |
 
 #### Slots
 
@@ -3356,10 +3361,12 @@ the row itself stays flat.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `expanded` | `expanded` | `boolean` | `false` | `HelixBaseTreeItem` | Whether a branch is showing its children. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `focusable` | - | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item holds the tree's single tab stop. |
 | `isBranch` | - | `boolean` | - | `HelixBaseTreeItem` | Whether this node has children. |
 | `level` | `level` | `number \| undefined` | - | `HelixBaseTreeItem` | Depth from the root, set by the tree so indentation needs no CSS nesting. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item is the current one. |
 | `value` | `value` | `string` | `''` | `HelixBaseTreeItem` | Identifies the item to the consumer, carried in `SelectionChange`. |
 
@@ -3368,7 +3375,9 @@ the row itself stays flat.
 | Method | From | Description |
 | --- | --- | --- |
 | `focusItem()` | `HelixBaseTreeItem` | Moves focus to this node. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
 | `select()` | `HelixBaseTreeItem` | Selects this node and announces it. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
 #### Events
 

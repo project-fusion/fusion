@@ -5,7 +5,7 @@ import '../index.js'
 
 const calendar = html`<helix-calendar
   label="Choose a date"
-  month="2026-08"
+  default-month="2026-08"
   value="2026-08-14"
 ></helix-calendar>`
 
@@ -21,7 +21,11 @@ describe('calendar server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(calendar), 'helix-calendar')).toEqual(['label', 'month', 'value'])
+    expect(hostAttributes(ssr(calendar), 'helix-calendar')).toEqual([
+      'default-month',
+      'label',
+      'value',
+    ])
   })
 })
 
@@ -39,6 +43,8 @@ describe('calendar as a form control, on the server', () => {
   })
 
   test('the grid still serves, which becoming a form control must not change', () => {
-    expect(hasPart(ssr(html`<helix-calendar month="2026-08"></helix-calendar>`), 'grid')).toBe(true)
+    expect(
+      hasPart(ssr(html`<helix-calendar default-month="2026-08"></helix-calendar>`), 'grid'),
+    ).toBe(true)
   })
 })

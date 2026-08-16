@@ -1,4 +1,11 @@
-import { customElement, HelixFormElement, hostAria, MixinControllerValue } from '@helix-io/core'
+import {
+  customElement,
+  HelixFormElement,
+  HelixNavigateEvent,
+  hostAria,
+  MixinControllerValue,
+  requestControlledChange,
+} from '@helix-io/core'
 import { caretLeft, caretRight } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -96,14 +103,18 @@ const addMonths = (date: Date, months: number): Date => {
  * @aliases Date grid, Month view
  * @documentation https://helix.fusion.dev/components/calendar
  *
- * @event {HelixChangeEvent} helix-change - Fired before the dates change, and cancelable.
+ * `helix-change` was `helix-select`, and it moved when the calendar became a
+ * form control. A control whose value changes dispatches `helix-change` here:
+ * `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a
+ * calendar submitting a date is the same kind of thing. `helix-select` stays
+ * what it is elsewhere, which is a row or an item being chosen in something
+ * that reports no value at all, such as `Menu` or `Tree`.
  *
- * It was `helix-select`, and it moved when the calendar became a form control.
- * A control whose value changes dispatches `helix-change` here: `Input`,
- * `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar
- * submitting a date is the same kind of thing. `helix-select` stays what it is
- * elsewhere, which is a row or an item being chosen in something that reports
- * no value at all, such as `Menu` or `Tree`.
+ * Paging is `helix-navigate` and not either of those, because it chooses
+ * nothing: the view moves and the answer does not.
+ *
+ * @event {HelixChangeEvent} helix-change - Fired before the dates change, and cancelable.
+ * @event {HelixNavigateEvent} helix-navigate - Fired before the month on show changes, and cancelable.
  *
  * @csspart months - The run of months.
  * @csspart month - One month, its header and its grid.
@@ -154,9 +165,39 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
   @property({ reflect: true, type: Boolean })
   invalid = false
 
-  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month. */
+  /**
+   * The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   *
+   * Separate from `value` on purpose, so paging selects nothing and a consumer
+   * can drive the view. It said that and could not do it: the calendar wrote
+   * this when the reader paged, so a consumer holding it was overwritten and
+   * never told. Reading gives the month on show; writing declares it theirs,
+   * and `default-month` seeds one the calendar owns.
+   */
   @property()
-  month = ''
+  get month(): string {
+    return this.monthState ?? this.defaultMonth
+  }
+
+  set month(next: string) {
+    const previous = this.month
+    this.monthState = next
+    this.requestUpdate('month', previous)
+  }
+
+  /** Month to open on, where nothing declared one. */
+  @property({ attribute: 'default-month' })
+  defaultMonth = ''
+
+  /** The month on show, whoever set it, and `undefined` until somebody has. */
+  private monthState: string | undefined = undefined
+
+  /** Whether the consumer owns the view, decided once and then fixed. */
+  private monthMode: boolean | undefined = undefined
+
+  private get monthIsControlled(): boolean {
+    return this.monthMode === true
+  }
 
   /** Earliest selectable date, as `YYYY-MM-DD`. */
   @property()
@@ -266,8 +307,32 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
     return list(this.disableDates).includes(iso)
   }
 
+  /**
+   * Moves the view, announcing it first.
+   *
+   * `helix-navigate` and not `helix-change`: paging chooses nothing, and a
+   * consumer driving the view has to hear that it moved without being told the
+   * answer did. In controlled mode nothing moves and the consumer decides,
+   * which is the point of them holding it.
+   */
   private show(date: Date): void {
-    this.month = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
+    const next = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
+    if (next === this.month) {
+      return
+    }
+    requestControlledChange({
+      apply: (month) => {
+        if (this.monthIsControlled) {
+          return
+        }
+        const previous = this.month
+        this.monthState = month
+        this.requestUpdate('month', previous)
+      },
+      event: (month) => new HelixNavigateEvent({ value: month }),
+      host: this,
+      next,
+    })
   }
 
   private moveTo(date: Date): void {
@@ -355,6 +420,10 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    // Only the first time, before anything reads it. See `MixinControllerOpen`.
+    if (this.monthMode === undefined) {
+      this.monthMode = this.monthState !== undefined
+    }
     hostAria(this.internals, { label: this.label, role: 'group' })
     this.internals.ariaInvalid = this.invalid ? 'true' : null
     this.report()

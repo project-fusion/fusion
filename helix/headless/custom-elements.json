@@ -2852,9 +2852,47 @@
               "type": {
                 "text": "string"
               },
-              "default": "''",
-              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.",
+              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.\n\nSeparate from `value` on purpose, so paging selects nothing and a consumer\ncan drive the view. It said that and could not do it: the calendar wrote\nthis when the reader paged, so a consumer holding it was overwritten and\nnever told. Reading gives the month on show; writing declares it theirs,\nand `default-month` seeds one the calendar owns.",
               "attribute": "month"
+            },
+            {
+              "kind": "field",
+              "name": "defaultMonth",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Month to open on, where nothing declared one.",
+              "attribute": "default-month"
+            },
+            {
+              "kind": "field",
+              "name": "monthState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The month on show, whoever set it, and `undefined` until somebody has."
+            },
+            {
+              "kind": "field",
+              "name": "monthMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the view, decided once and then fixed."
+            },
+            {
+              "kind": "field",
+              "name": "monthIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -3018,7 +3056,8 @@
                     "text": "Date"
                   }
                 }
-              ]
+              ],
+              "description": "Moves the view, announcing it first.\n\n`helix-navigate` and not `helix-change`: paging chooses nothing, and a\nconsumer driving the view has to hear that it moved without being told the\nanswer did. In controlled mode nothing moves and the consumer decides,\nwhich is the point of them holding it."
             },
             {
               "kind": "method",
@@ -3377,9 +3416,17 @@
               "type": {
                 "text": "HelixChangeEvent"
               },
-              "description": "Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`.",
+              "description": "Fired before the dates change, and cancelable.",
               "name": "helix-change",
               "reactProp": "onhelix-change"
+            },
+            {
+              "type": {
+                "text": "HelixNavigateEvent"
+              },
+              "description": "Fired before the month on show changes, and cancelable.",
+              "name": "helix-navigate",
+              "reactProp": "onhelix-navigate"
             }
           ],
           "attributes": [
@@ -3450,9 +3497,17 @@
               "type": {
                 "text": "string"
               },
-              "default": "''",
-              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.",
+              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.\n\nSeparate from `value` on purpose, so paging selects nothing and a consumer\ncan drive the view. It said that and could not do it: the calendar wrote\nthis when the reader paged, so a consumer holding it was overwritten and\nnever told. Reading gives the month on show; writing declares it theirs,\nand `default-month` seeds one the calendar owns.",
               "fieldName": "month"
+            },
+            {
+              "name": "default-month",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Month to open on, where nothing declared one.",
+              "fieldName": "defaultMonth"
             },
             {
               "name": "min",
@@ -3543,7 +3598,7 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/calendar",
+            "documentation": "https://helix.fusion.dev/components/calendar\n\n`helix-change` was `helix-select`, and it moved when the calendar became a\nform control. A control whose value changes dispatches `helix-change` here:\n`Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a\ncalendar submitting a date is the same kind of thing. `helix-select` stays\nwhat it is elsewhere, which is a row or an item being chosen in something\nthat reports no value at all, such as `Menu` or `Tree`.\n\nPaging is `helix-navigate` and not either of those, because it chooses\nnothing: the view moves and the answer does not.",
             "aliases": [
               "Date grid",
               "Month view"
@@ -9892,9 +9947,47 @@
               "type": {
                 "text": "string"
               },
-              "default": "''",
-              "description": "Text the options are matched against. Empty shows them all.",
+              "description": "What the list is narrowed to, if anything.\n\nFiltering hides rather than removes, so nothing about the value changes and\nthe list is still the consumer's own elements in their own order. Reading\ngives what is being filtered on; writing declares it theirs, and\n`default-filter` seeds one the list owns.",
               "attribute": "filter"
+            },
+            {
+              "kind": "field",
+              "name": "defaultFilter",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What to start narrowed to, where nothing declared it.",
+              "attribute": "default-filter"
+            },
+            {
+              "kind": "field",
+              "name": "filterState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "What the list is narrowed to, whoever set it."
+            },
+            {
+              "kind": "field",
+              "name": "filterMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the narrowing, decided once and then fixed."
+            },
+            {
+              "kind": "field",
+              "name": "filterIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -10102,7 +10195,28 @@
               "name": "handleFilter",
               "privacy": "private",
               "readonly": true,
-              "description": "Narrows the list as the reader types."
+              "description": "Narrows the list as the reader types, announcing it first.\n\n`helix-filter` and not `helix-change`, because nothing about the value\nchanges: the options are hidden rather than removed, and telling a consumer\ntheir answer moved when it did not is worse than telling them nothing. It\ntold them nothing before this."
+            },
+            {
+              "kind": "method",
+              "name": "requestFilter",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a narrowing, and reports whether the request stood.",
+              "type": {
+                "text": "requestFilter(next: string) => boolean"
+              }
             },
             {
               "kind": "field",
@@ -10608,6 +10722,14 @@
               "description": "Fired when the answer changes, and cancelable.",
               "name": "helix-change",
               "reactProp": "onhelix-change"
+            },
+            {
+              "type": {
+                "text": "HelixFilterEvent"
+              },
+              "description": "Fired before the list narrows, and cancelable.",
+              "name": "helix-filter",
+              "reactProp": "onhelix-filter"
             }
           ],
           "attributes": [
@@ -10616,9 +10738,17 @@
               "type": {
                 "text": "string"
               },
-              "default": "''",
-              "description": "Text the options are matched against. Empty shows them all.",
+              "description": "What the list is narrowed to, if anything.\n\nFiltering hides rather than removes, so nothing about the value changes and\nthe list is still the consumer's own elements in their own order. Reading\ngives what is being filtered on; writing declares it theirs, and\n`default-filter` seeds one the list owns.",
               "fieldName": "filter"
+            },
+            {
+              "name": "default-filter",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What to start narrowed to, where nothing declared it.",
+              "fieldName": "defaultFilter"
             },
             {
               "name": "filterable",
@@ -22743,7 +22873,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "An element rather than a slot because it owns state: whether it is expanded,\nwhether it is selected, and whether it is the one holding focus.\n\nA branch is any item with something slotted into `children`, detected in\n`firstUpdated` rather than declared by the consumer. That is a client-side\nenhancement by necessity, since the server cannot inspect children, so the\nserver renders the node as a leaf and the twisty appears on hydration. It\nappears rather than disappearing, which is the harmless direction.",
+          "description": "**`open`, on `MixinControllerOpen`, where it was a bare `expanded` boolean.**\nA branch showing its children is the same state a disclosure holds, and\n`AccordionItem` has been on that mixin all along. Written here by hand it had\nneither half of what the mixin gives: `this.expanded = !this.expanded`\nannounced nothing, so a consumer could not know a branch had opened, and\ncould not own the state either. `aria-expanded` is still what the row\nrenders, because that is the attribute a tree uses; the property is what\nchanged, not the semantics.\n\nAn element rather than a slot because it owns state: whether it is open,\nwhether it is selected, and whether it is the one holding focus.\n\nA branch is any item with something slotted into `children`, detected in\n`firstUpdated` rather than declared by the consumer. That is a client-side\nenhancement by necessity, since the server cannot inspect children, so the\nserver renders the node as a leaf and the twisty appears on hydration. It\nappears rather than disappearing, which is the harmless direction.",
           "name": "HelixBaseTreeItem",
           "cssParts": [
             {
@@ -22805,17 +22935,6 @@
               "default": "false",
               "description": "Whether this item is the current one.",
               "attribute": "selected",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "expanded",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether a branch is showing its children.",
-              "attribute": "expanded",
               "reflects": true
             },
             {
@@ -22886,6 +23005,129 @@
               "name": "handleRowClick",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
+              "attribute": "open",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
+              "attribute": "default-open",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openState",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onOpenChange",
+              "type": {
+                "text": "((open: boolean) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. In uncontrolled mode the\nelement then updates itself; in controlled mode it applies nothing and\nwaits for the consumer to pass a new `open`, which is what \"controlled\"\nmeans.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              },
+              "type": {
+                "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              },
+              "type": {
+                "text": "toggleOpen() => boolean"
+              }
             },
             {
               "kind": "field",
@@ -22987,21 +23229,43 @@
               "fieldName": "selected"
             },
             {
-              "name": "expanded",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether a branch is showing its children.",
-              "fieldName": "expanded"
-            },
-            {
               "name": "level",
               "type": {
                 "text": "number | undefined"
               },
               "description": "Depth from the root, set by the tree so indentation needs no CSS nesting.\n\nNot reflected. The tree assigns this after it upgrades, so an attribute\nhere would be a change to markup the consumer rendered and hydration would\nreport it. The indent it drives is written onto the row instead, inside the\nshadow root, which is not part of the tree React hydrates.",
               "fieldName": "level"
+            },
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
+              "fieldName": "open",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "name": "default-open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
+              "fieldName": "defaultOpen",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinControllerOpen",
+              "package": "@helix-io/core"
             }
           ],
           "superclass": {

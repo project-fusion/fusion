@@ -89,6 +89,18 @@ export class HelixCloseEvent extends CustomEvent<OpenDetail> {
   }
 }
 
+/** Detail carried by `helix-navigate`. */
+export interface NavigateDetail {
+  /** Where the view is moving to, in whatever the component pages by. */
+  value: string
+}
+
+/** Detail carried by `helix-filter`. */
+export interface FilterDetail {
+  /** What the list is being narrowed to. */
+  value: string
+}
+
 /** Detail carried by `helix-dismiss`. */
 export interface DismissDetail {
   /** Text content of the element asking to go, for identifying which it was. */
@@ -236,6 +248,47 @@ export interface SelectDetail {
  * tab list and a toggle group all learn which of their children was chosen by
  * hearing it arrive.
  */
+/**
+ * Fired when a component moves the view it is showing, rather than its value.
+ *
+ * A calendar paging to another month is not choosing a date, and the two have
+ * to be separable: a consumer driving the view needs to hear that it moved
+ * without being told the answer changed. `helix-change` belongs to the value,
+ * and giving it both jobs would make either one unusable on its own.
+ */
+export class HelixNavigateEvent extends CustomEvent<NavigateDetail> {
+  static readonly eventName = 'helix-navigate'
+
+  constructor(detail: NavigateDetail) {
+    super(HelixNavigateEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * Fired when a component narrows what it is showing.
+ *
+ * Filtering hides rather than removes, so nothing about the value changes and
+ * `helix-change` would be a lie. What a consumer wants to know is that the list
+ * in front of the reader is no longer the whole list.
+ */
+export class HelixFilterEvent extends CustomEvent<FilterDetail> {
+  static readonly eventName = 'helix-filter'
+
+  constructor(detail: FilterDetail) {
+    super(HelixFilterEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 export class HelixSelectEvent extends CustomEvent<SelectDetail> {
   static readonly eventName = 'helix-select'
 

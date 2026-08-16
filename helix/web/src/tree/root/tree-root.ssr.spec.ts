@@ -4,7 +4,7 @@ import { html } from 'lit'
 import '../index.js'
 
 const tree = html`<helix-tree label="Repository">
-  <helix-tree-item expanded value="helix">
+  <helix-tree-item default-open value="helix">
     helix
     <helix-tree-item slot="children" value="web">web</helix-tree-item>
   </helix-tree-item>

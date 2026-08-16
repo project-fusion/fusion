@@ -14,13 +14,20 @@ type Calendar = HTMLElement & {
   mode?: string
 }
 
-const calendar = async (attrs = 'month="2026-08" default-value="2026-08-14"'): Promise<Calendar> =>
+const calendar = async (
+  attrs = 'default-month="2026-08" default-value="2026-08-14"',
+): Promise<Calendar> =>
   (await mount(`<helix-calendar label="Choose a date" ${attrs}></helix-calendar>`)) as Calendar
 
 /** The cells, which is what carries a day's role, state, and tab stop. */
 const days = (cal: Calendar): HTMLElement[] => [
   ...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part="cell"]') ?? []),
 ]
+
+/** Presses the forward arrow, which is the only way a reader pages. */
+const next = (cal: Calendar): void => {
+  cal.shadowRoot?.querySelector<HTMLElement>('[part="next"]')?.click()
+}
 
 const stop = (cal: Calendar): string | null =>
   cal.shadowRoot?.querySelector('[part="cell"][tabindex="0"]')?.getAttribute('aria-label') ?? null
@@ -85,7 +92,7 @@ describe('calendar', () => {
   test('a month step clamps to the shorter month', async () => {
     // Adding a month to the 31st has to land on the last day of a month with
     // fewer, rather than rolling into the one after it.
-    const cal = await calendar('month="2026-01" default-value="2026-01-31"')
+    const cal = await calendar('default-month="2026-01" default-value="2026-01-31"')
     await press(cal, 'PageDown')
     expect(stop(cal)).toContain('February 28, 2026')
   })
@@ -126,14 +133,16 @@ describe('calendar', () => {
   test('shows as many months as asked, with one set of controls', async () => {
     // A pair of controls per month offers several ways to make the same move
     // and leaves the reader to work out which.
-    const cal = await calendar('month="2026-08" months="2"')
+    const cal = await calendar('default-month="2026-08" months="2"')
     expect(cal.shadowRoot?.querySelectorAll('[part="month"]')).toHaveLength(2)
     expect(cal.shadowRoot?.querySelectorAll('[part="previous"]')).toHaveLength(1)
     expect(cal.shadowRoot?.querySelectorAll('[part="next"]')).toHaveLength(1)
   })
 
   test('a range marks its ends and everything between them', async () => {
-    const cal = await calendar('mode="range" month="2026-08" default-value="2026-08-11,2026-08-14"')
+    const cal = await calendar(
+      'mode="range" default-month="2026-08" default-value="2026-08-11,2026-08-14"',
+    )
     expect(days(cal).filter((day) => day.hasAttribute('aria-selected'))).toHaveLength(4)
     expect(days(cal).filter((day) => day.hasAttribute('data-range-start'))).toHaveLength(1)
     expect(days(cal).filter((day) => day.hasAttribute('data-range-end'))).toHaveLength(1)
@@ -142,7 +151,9 @@ describe('calendar', () => {
   test('a range starts over on the third date', async () => {
     // Rather than extending, or replacing whichever end is nearer, which is a
     // guess at which one was meant.
-    const cal = await calendar('mode="range" month="2026-08" default-value="2026-08-11,2026-08-14"')
+    const cal = await calendar(
+      'mode="range" default-month="2026-08" default-value="2026-08-11,2026-08-14"',
+    )
     days(cal)
       .find((day) => day.getAttribute('aria-label')?.includes('August 20'))
       ?.click()
@@ -151,7 +162,7 @@ describe('calendar', () => {
 
   test('multiple toggles, so a chosen date comes back out', async () => {
     const cal = await calendar(
-      'mode="multiple" month="2026-08" default-value="2026-08-05,2026-08-06"',
+      'mode="multiple" default-month="2026-08" default-value="2026-08-05,2026-08-06"',
     )
     days(cal)
       .find((day) => day.getAttribute('aria-label')?.includes('August 6'))
@@ -160,7 +171,7 @@ describe('calendar', () => {
   })
 
   test('a weekday can be barred without naming every date', async () => {
-    const cal = await calendar('month="2026-08" disable-days="0,6"')
+    const cal = await calendar('default-month="2026-08" disable-days="0,6"')
     const saturday = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 15'))
     const wednesday = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 12'))
     expect(saturday?.getAttribute('aria-disabled')).toBe('true')
@@ -168,14 +179,14 @@ describe('calendar', () => {
   })
 
   test('a single date can be barred by name', async () => {
-    const cal = await calendar('month="2026-08" disable-dates="2026-08-17"')
+    const cal = await calendar('default-month="2026-08" disable-dates="2026-08-17"')
     const holiday = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 17'))
     expect(holiday?.getAttribute('aria-disabled')).toBe('true')
   })
 
   test('a date outside the range stays in the grid and refuses selection', async () => {
     // Dropping it would leave a ragged week. It is marked instead.
-    const cal = await calendar('month="2026-08" min="2026-08-10" max="2026-08-22"')
+    const cal = await calendar('default-month="2026-08" min="2026-08-10" max="2026-08-22"')
     const blocked = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 5'))
     expect(blocked?.getAttribute('aria-disabled')).toBe('true')
 
@@ -241,7 +252,7 @@ describe('calendar as a form control', () => {
 
   test('one date submits one entry', async () => {
     expect(
-      submitted(await calendar('name="when" month="2026-08" default-value="2026-08-14"')),
+      submitted(await calendar('name="when" default-month="2026-08" default-value="2026-08-14"')),
     ).toEqual(['2026-08-14'])
   })
 
@@ -251,20 +262,22 @@ describe('calendar as a form control', () => {
        library invented; one entry per date is what every other multi-valued
        control on the platform sends. */
     const cal = await calendar(
-      'mode="multiple" name="when" month="2026-08" value="2026-08-04,2026-08-06"',
+      'mode="multiple" name="when" default-month="2026-08" value="2026-08-04,2026-08-06"',
     )
     expect(submitted(cal)).toEqual(['2026-08-04', '2026-08-06'])
   })
 
   test('a range submits its two the same way, in order', async () => {
     const cal = await calendar(
-      'mode="range" name="when" month="2026-08" value="2026-08-11,2026-08-14"',
+      'mode="range" name="when" default-month="2026-08" value="2026-08-11,2026-08-14"',
     )
     expect(submitted(cal)).toEqual(['2026-08-11', '2026-08-14'])
   })
 
   test('nothing chosen submits nothing', async () => {
-    expect(formValue((await calendar('name="when" month="2026-08"')) as HTMLElement)).toBeNull()
+    expect(
+      formValue((await calendar('name="when" default-month="2026-08"')) as HTMLElement),
+    ).toBeNull()
   })
 
   test('no name submits nothing, which is what lets one sit inside something else', async () => {
@@ -275,7 +288,9 @@ describe('calendar as a form control', () => {
        the element is called, so an unnamed calendar would otherwise submit
        empty-named dates. */
     expect(
-      formValue((await calendar('month="2026-08" default-value="2026-08-14"')) as HTMLElement),
+      formValue(
+        (await calendar('default-month="2026-08" default-value="2026-08-14"')) as HTMLElement,
+      ),
     ).toBeNull()
   })
 
@@ -283,7 +298,7 @@ describe('calendar as a form control', () => {
     expect(
       formValue(
         (await calendar(
-          'disabled name="when" month="2026-08" default-value="2026-08-14"',
+          'disabled name="when" default-month="2026-08" default-value="2026-08-14"',
         )) as HTMLElement,
       ),
     ).toBeNull()
@@ -291,7 +306,7 @@ describe('calendar as a form control', () => {
 
   test('a reset returns to the date the markup declared', async () => {
     const cal = (await calendar(
-      'name="when" month="2026-08" default-value="2026-08-14"',
+      'name="when" default-month="2026-08" default-value="2026-08-14"',
     )) as Calendar & { formResetCallback(): void; updateComplete: Promise<boolean> }
     expect(cal.value).toBe('2026-08-14')
 
@@ -303,5 +318,51 @@ describe('calendar as a form control', () => {
     await cal.updateComplete
     expect(cal.value).toBe('2026-08-14')
     expect(submitted(cal)).toEqual(['2026-08-14'])
+  })
+
+  test('paging is announced, and refusing it leaves the month where it was', async () => {
+    const cal = await calendar()
+    cal.addEventListener('helix-navigate', (event) => event.preventDefault())
+    next(cal)
+    await (cal as Calendar & { updateComplete: Promise<boolean> }).updateComplete
+    expect(cal.month).toBe('2026-08')
+  })
+
+  test('the event names the month it would move to, not the one it is on', async () => {
+    const cal = await calendar()
+    let announced = ''
+    cal.addEventListener('helix-navigate', (event) => {
+      announced = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    next(cal)
+    expect(announced).toBe('2026-09')
+  })
+
+  test("a declared month is the consumer's, and the arrows only ask", async () => {
+    /* The reason this is worth a spec of its own. `month` said in its own
+       documentation that a consumer could drive the view, and the calendar
+       wrote it on every page, so a consumer holding it in state was overwritten
+       and never told which way to put it back. */
+    const cal = await calendar('month="2026-08" default-value="2026-08-14"')
+    let announced = ''
+    cal.addEventListener('helix-navigate', (event) => {
+      announced = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    next(cal)
+    await (cal as Calendar & { updateComplete: Promise<boolean> }).updateComplete
+    expect(announced).toBe('2026-09')
+    expect(cal.month).toBe('2026-08')
+
+    // And the consumer moving it is what moves it.
+    cal.month = '2026-09'
+    await (cal as Calendar & { updateComplete: Promise<boolean> }).updateComplete
+    expect(cal.month).toBe('2026-09')
+  })
+
+  test("a month nobody declared is the calendar's, and the arrows move it", async () => {
+    const cal = await calendar()
+    next(cal)
+    await (cal as Calendar & { updateComplete: Promise<boolean> }).updateComplete
+    expect(cal.month).toBe('2026-09')
   })
 })

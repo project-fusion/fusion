@@ -58,7 +58,7 @@ export default function Page() {
         </helix-text>
         <helix-grid gap="md" min="17rem">
           {families.map((family) => (
-            <helix-card appearance="elevated" aria-label={family.label} key={family.slug}>
+            <helix-card appearance="outlined" aria-label={family.label} key={family.slug}>
               <ComponentArt slug={family.slug} />
               <helix-flex align="center" gap="sm" justify="between" slot="header">
                 <helix-text as="h3" appearance="title">

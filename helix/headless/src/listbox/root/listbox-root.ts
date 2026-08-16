@@ -1,11 +1,13 @@
 import {
   customElement,
   DisabledCascadeController,
+  HelixFilterEvent,
   HelixFormElement,
   type HelixSelectEvent,
   hostAria,
   MixinControllerValue,
   MixinField,
+  requestControlledChange,
   scrollItemIntoView,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -61,6 +63,7 @@ const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
  * @slot hint - Richer than a string.
  *
  * @event {HelixChangeEvent} helix-change - Fired when the answer changes, and cancelable.
+ * @event {HelixFilterEvent} helix-filter - Fired before the list narrows, and cancelable.
  *
  * @csspart label - The question, over the list.
  * @csspart items - The list itself.
@@ -72,9 +75,38 @@ const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
  */
 @customElement('helix-base-listbox')
 export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormElement)) {
-  /** Text the options are matched against. Empty shows them all. */
+  /**
+   * What the list is narrowed to, if anything.
+   *
+   * Filtering hides rather than removes, so nothing about the value changes and
+   * the list is still the consumer's own elements in their own order. Reading
+   * gives what is being filtered on; writing declares it theirs, and
+   * `default-filter` seeds one the list owns.
+   */
   @property()
-  filter = ''
+  get filter(): string {
+    return this.filterState ?? this.defaultFilter
+  }
+
+  set filter(next: string) {
+    const previous = this.filter
+    this.filterState = next
+    this.requestUpdate('filter', previous)
+  }
+
+  /** What to start narrowed to, where nothing declared it. */
+  @property({ attribute: 'default-filter' })
+  defaultFilter = ''
+
+  /** What the list is narrowed to, whoever set it. */
+  private filterState: string | undefined = undefined
+
+  /** Whether the consumer owns the narrowing, decided once and then fixed. */
+  private filterMode: boolean | undefined = undefined
+
+  private get filterIsControlled(): boolean {
+    return this.filterMode === true
+  }
 
   /**
    * Whether the list renders a field for narrowing itself.
@@ -355,6 +387,10 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    // Only the first time, before anything reads it. See `MixinControllerOpen`.
+    if (this.filterMode === undefined) {
+      this.filterMode = this.filterState !== undefined
+    }
     hostAria(this.internals, { label: this.label, role: 'listbox' })
     this.internals.ariaMultiSelectable = this.multiple ? 'true' : null
   }
@@ -402,9 +438,40 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     this.linkActive()
   }
 
-  /** Narrows the list as the reader types. */
+  /**
+   * Narrows the list as the reader types, announcing it first.
+   *
+   * `helix-filter` and not `helix-change`, because nothing about the value
+   * changes: the options are hidden rather than removed, and telling a consumer
+   * their answer moved when it did not is worse than telling them nothing. It
+   * told them nothing before this.
+   */
   private readonly handleFilter = (event: Event): void => {
-    this.filter = (event.target as HTMLInputElement).value
+    const control = event.target as HTMLInputElement
+    this.requestFilter(control.value)
+    if (control.value !== this.filter) {
+      control.value = this.filter
+    }
+  }
+
+  /** Requests a narrowing, and reports whether the request stood. */
+  requestFilter(next: string): boolean {
+    if (next === this.filter) {
+      return true
+    }
+    return requestControlledChange({
+      apply: (value) => {
+        if (this.filterIsControlled) {
+          return
+        }
+        const previous = this.filter
+        this.filterState = value
+        this.requestUpdate('filter', previous)
+      },
+      event: (value) => new HelixFilterEvent({ value }),
+      host: this,
+      next,
+    })
   }
 
   /**
@@ -423,9 +490,13 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
    */
   private readonly handleFilterKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape' && this.filter !== '') {
+      /* Stopped and prevented whether or not the clearing stands. The reader
+         pressed Escape at a filtered list, so the key was for this list either
+         way, and letting it through to close the surface around it would be a
+         second thing happening from one press. */
       event.stopPropagation()
       event.preventDefault()
-      this.filter = ''
+      this.requestFilter('')
       return
     }
     if (!MOVES.has(event.key)) {

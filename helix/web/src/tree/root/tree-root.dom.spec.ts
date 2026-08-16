@@ -7,7 +7,7 @@ beforeAll(async () => {
 })
 
 const markup = `<helix-tree label="Repository" default-active="web">
-  <helix-tree-item expanded value="helix">
+  <helix-tree-item default-open value="helix">
     helix
     <helix-tree-item slot="children" value="web">web</helix-tree-item>
     <helix-tree-item slot="children" value="headless">headless</helix-tree-item>
@@ -98,7 +98,7 @@ if (hasLayout()) {
       const labelX = (item: Element): number =>
         (part(item as HTMLElement, 'label') as HTMLElement).getBoundingClientRect().x
 
-      const branch = items.find((item) => item.hasAttribute('expanded'))
+      const branch = items.find((item) => item.hasAttribute('default-open'))
       const leaf = items.find((item) => item.getAttribute('value') === 'cortex')
       if (!branch || !leaf) {
         throw new Error('the fixture no longer holds a branch and a leaf at the top level')
@@ -126,3 +126,64 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('a branch opening is announced, and can be owned', () => {
+  /* It was a bare `this.expanded = !this.expanded`: no event, so a consumer
+     could not know a branch had opened, and no mode, so they could not hold it
+     either. `AccordionItem` has been on `MixinControllerOpen` all along, and a
+     branch showing its children is the same state a disclosure holds. */
+  const branch = async (
+    attrs = 'default-open',
+  ): Promise<
+    HTMLElement & { open: boolean; toggleOpen(): boolean; updateComplete: Promise<boolean> }
+  > => {
+    const tree = (await mount(
+      `<helix-tree label="R">
+        <helix-tree-item ${attrs} value="a">A
+          <helix-tree-item slot="children" value="b">B</helix-tree-item>
+        </helix-tree-item>
+      </helix-tree>`,
+    )) as HTMLElement
+    const item = tree.querySelector('helix-tree-item') as HTMLElement & {
+      open: boolean
+      toggleOpen(): boolean
+      updateComplete: Promise<boolean>
+    }
+    await item.updateComplete
+    return item
+  }
+
+  test('closing a branch is announced before it happens', async () => {
+    const item = await branch()
+    let told = true
+    item.addEventListener('helix-close', () => {
+      told = true
+    })
+    item.toggleOpen()
+    await item.updateComplete
+    expect(told).toBe(true)
+    expect(item.open).toBe(false)
+  })
+
+  test('a refusal leaves the branch as it was', async () => {
+    const item = await branch()
+    item.addEventListener('helix-close', (event) => event.preventDefault())
+    item.toggleOpen()
+    await item.updateComplete
+    expect(item.open).toBe(true)
+  })
+
+  test('open in the markup is the consumer’s, and the branch does not move it', async () => {
+    const item = await branch('open')
+    item.toggleOpen()
+    await item.updateComplete
+    expect(item.open).toBe(true)
+  })
+
+  test('default-open seeds one that owns itself', async () => {
+    const item = await branch()
+    item.toggleOpen()
+    await item.updateComplete
+    expect(item.open).toBe(false)
+  })
+})

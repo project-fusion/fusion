@@ -496,6 +496,31 @@ export function SandboxWorkbench({ families }: Props) {
     window.setTimeout(() => setCopied(false), 2000)
   }
 
+  const query = filter.trim().toLowerCase()
+  const hit = (text: string) => text.toLowerCase().includes(query)
+
+  /* A filter is a request to see what came back, so a narrowed tree opens
+     itself rather than making the reader open each branch to find out. */
+  const open = (slug: string) => query !== '' || (expandAll ?? slug === family.slug)
+
+  /* Driven, not owned.
+   *
+   * This was a prop on each row, and a prop set at mount is how a consumer says
+   * the state is theirs: the rows this opened would have had their chevrons
+   * stop working, because a controlled item announces and waits to be told.
+   * Opening a branch because a filter matched is an act rather than a claim, so
+   * it is done to the elements and they keep owning themselves. */
+  useEffect(() => {
+    for (const item of treeRef.current?.querySelectorAll<HelixTreeItem>(
+      ':scope > helix-tree-item',
+    ) ?? []) {
+      item.open = open(item.getAttribute('value') ?? '')
+    }
+  })
+
+  /* Every hook is above this, and has to be: an early return past one changes
+     how many run, which is the rule React has no way to recover from. The tree
+     effect in particular reads nothing this branch decides. */
   if (!example) {
     return (
       <helix-text as="p" tone="subtle">
@@ -505,9 +530,6 @@ export function SandboxWorkbench({ families }: Props) {
   }
 
   const activeValue = `${family.slug}/${example.slug}`
-
-  const query = filter.trim().toLowerCase()
-  const hit = (text: string) => text.toLowerCase().includes(query)
 
   /* A family matching by name keeps all of its examples, because the reader
      asked for the component and not for a particular one of its pages. A family
@@ -538,13 +560,9 @@ export function SandboxWorkbench({ families }: Props) {
     for (const item of treeRef.current?.querySelectorAll<HelixTreeItem>(
       ':scope > helix-tree-item',
     ) ?? []) {
-      item.expanded = next
+      item.open = next
     }
   }
-
-  /* A filter is a request to see what came back, so a narrowed tree opens
-     itself rather than making the reader open each branch to find out. */
-  const open = (slug: string) => query !== '' || (expandAll ?? slug === family.slug)
 
   const tree = (
     <>
@@ -588,11 +606,7 @@ export function SandboxWorkbench({ families }: Props) {
         ) : (
           <helix-tree active={activeValue} chevron="end" label="Examples" ref={treeRef}>
             {shown.map((entry) => (
-              <helix-tree-item
-                expanded={open(entry.slug) ? true : undefined}
-                key={entry.slug}
-                value={entry.slug}
-              >
+              <helix-tree-item key={entry.slug} value={entry.slug}>
                 {/* Everything here is experimental, and saying so on each row is the
               honest form of that: a badge on the page a reader has already
               opened tells them after they chose it. */}

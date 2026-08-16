@@ -75,7 +75,7 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
     return this.items.filter((item) => {
       let parent = item.parentElement
       while (parent && parent !== this) {
-        if (parent instanceof HelixBaseTreeItem && !parent.expanded) {
+        if (parent instanceof HelixBaseTreeItem && !parent.open) {
           return false
         }
         parent = parent.parentElement
@@ -165,15 +165,15 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
     } else if (event.key === 'ArrowRight') {
       // Open a closed branch, then step into it. Two presses rather than one
       // that does both, which is what the pattern specifies.
-      if (current.isBranch && !current.expanded) {
-        current.expanded = true
+      if (current.isBranch && !current.open) {
+        current.requestOpen(true)
         this.syncItems()
       } else if (current.isBranch) {
         this.move(current, 1)
       }
     } else if (event.key === 'ArrowLeft') {
-      if (current.isBranch && current.expanded) {
-        current.expanded = false
+      if (current.isBranch && current.open) {
+        current.requestOpen(false)
         this.syncItems()
       } else {
         const parent = current.parentElement?.closest('helix-base-tree-item, helix-tree-item')
@@ -181,7 +181,7 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
       }
     } else {
       if (current.isBranch) {
-        current.expanded = !current.expanded
+        current.toggleOpen()
         this.syncItems()
       } else {
         current.select()

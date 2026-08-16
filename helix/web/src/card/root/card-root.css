@@ -3,7 +3,13 @@
 :host {
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid var(--card-border-color, var(--helix-color-border));
-  border-radius: var(--card-radii, var(--helix-radii-md));
+  /* `sm`, the same 4px the controls take. A card is a container and the reflex
+     is to round it more than the things inside it, but at `md` the corner was
+     twice a button's and the card read as the softest object on a page full of
+     square-ish controls. Matching them makes the card recede, which is what a
+     container should do. `--card-radii` is still there for a consumer who
+     wants the older, rounder box. */
+  border-radius: var(--card-radii, var(--helix-radii-sm));
   color: var(--helix-color-foreground-muted);
   display: grid;
   gap: var(--helix-space-sm);

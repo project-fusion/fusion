@@ -88,6 +88,79 @@ describe('listbox', () => {
   })
 })
 
+/** The search field, which only exists on a list that says it is filterable. */
+const field = (host: Updatable): HTMLInputElement => {
+  const input = host.shadowRoot?.querySelector<HTMLInputElement>('[part="search-field"]')
+  if (!input) {
+    throw new Error('the list rendered no search field, so there is nothing to type into')
+  }
+  return input
+}
+
+/** Types into the search field the way a reader does, one whole value. */
+const type = (host: Updatable, value: string): void => {
+  const input = field(host)
+  input.value = value
+  input.dispatchEvent(new Event('input', { bubbles: true }))
+}
+
+describe('listbox filtering ownership', () => {
+  test('typing is announced, and refusing it leaves the list as it was', async () => {
+    const host = (await list('filterable')) as Updatable & { filter: string }
+    host.addEventListener('helix-filter', (event) => event.preventDefault())
+    type(host, 'gam')
+    await host.updateComplete
+    expect(host.filter).toBe('')
+    // And the field is put back, because a refused keystroke that stays on
+    // screen is a control showing something the component does not have.
+    expect(field(host).value).toBe('')
+  })
+
+  test("a filter nobody declared is the list's, and typing narrows it", async () => {
+    const host = (await list('filterable')) as Updatable & { filter: string }
+    type(host, 'gam')
+    await host.updateComplete
+    expect(host.filter).toBe('gam')
+    expect(options(host).filter((option) => !option.hasAttribute('hidden'))).toHaveLength(1)
+  })
+
+  test("a declared filter is the consumer's, and typing only asks", async () => {
+    const host = (await list('filterable filter="be"')) as Updatable & { filter: string }
+    let announced: string | undefined
+    host.addEventListener('helix-filter', (event) => {
+      announced = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    type(host, 'gam')
+    await host.updateComplete
+    expect(announced).toBe('gam')
+    expect(host.filter).toBe('be')
+    expect(field(host).value).toBe('be')
+
+    // The consumer answering is what moves it.
+    host.filter = 'gam'
+    await host.updateComplete
+    expect(host.filter).toBe('gam')
+  })
+
+  test("a seeded filter is the list's own, and typing over it works", async () => {
+    const host = (await list('filterable default-filter="be"')) as Updatable & { filter: string }
+    expect(host.filter).toBe('be')
+    type(host, 'gam')
+    await host.updateComplete
+    expect(host.filter).toBe('gam')
+  })
+
+  test('Escape goes down the same path, so a consumer can refuse the clearing', async () => {
+    const host = (await list('filterable default-filter="be"')) as Updatable & { filter: string }
+    host.addEventListener('helix-filter', (event) => event.preventDefault())
+    field(host).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+    )
+    await host.updateComplete
+    expect(host.filter).toBe('be')
+  })
+})
+
 describe('listbox filtering', () => {
   test('hides rather than removes, so clearing puts the list back', async () => {
     /* An option the filter excluded is still the consumer's element in the
