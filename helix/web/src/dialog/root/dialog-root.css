@@ -36,6 +36,21 @@
 /* The platform's own scrim, in the top layer with the dialog. A div positioned
    behind it would need a `z-index` that beats whatever the page already has,
    which is a fight nobody wins for long. */
+/* No ring on the panel itself.
+ *
+ * `showModal()` moves focus into the dialog, and where nothing inside asks for
+ * it the platform focuses the dialog element: it matches `:focus-visible` and
+ * the base layer draws a ring around the whole panel, which reads as the panel
+ * being the thing you are on rather than a place you are in.
+ *
+ * A container is not a control. The ring belongs to whatever the reader reaches
+ * inside, and every one of those still draws its own. Put `autofocus` on the
+ * control that should have it and the platform focuses that instead. */
+[part="dialog"]:focus,
+[part="dialog"]:focus-visible {
+  outline: none;
+}
+
 /* The token where it is available, and a literal where the platform will not
  * provide it.
  *

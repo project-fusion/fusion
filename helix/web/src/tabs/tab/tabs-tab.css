@@ -16,6 +16,9 @@
      button and made a toolbar look assembled from parts. */
   block-size: var(--helix-size-control);
   border: none;
+  /* Transparent always. The mark that says which tab is current is one
+     element in the strip that travels, not a border that blinks off here and
+     on there. The width is kept so the box is the same either way. */
   border-block-end: var(--helix-border-thick) solid transparent;
   border-radius: var(--_tab-radius, var(--helix-radii-none));
   color: var(--helix-color-foreground-subtle);
@@ -28,7 +31,7 @@
   padding-inline: var(--helix-space-sm);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-normal) var(--helix-easing-emphasized),
     color var(--helix-duration-fast) var(--helix-easing-standard);
   white-space: nowrap;
 }
@@ -39,7 +42,6 @@
 
 :host([selected]) [part="tab"] {
   background-color: var(--_tab-selected-surface, transparent);
-  border-block-end-color: var(--_tab-selected-rule, var(--helix-color-primary));
   box-shadow: var(--_tab-selected-shadow, none);
   color: var(--helix-color-foreground);
 }

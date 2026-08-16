@@ -64,6 +64,9 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
   @property({ reflect: true, type: Boolean })
   manual = false
 
+  /** Watches for anything that moves a tab, since none of it is a property. */
+  private observer: ResizeObserver | undefined
+
   private get tabs(): HelixBaseTabsTab[] {
     return [...this.children].filter(
       (child): child is HelixBaseTabsTab => child instanceof HelixBaseTabsTab,
@@ -137,11 +140,29 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
     this.removeEventListener('keydown', this.handleKeydown)
+    this.observer?.disconnect()
+    this.observer = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.sync()
+    /* Straight away, and again after a frame. The first call is what places it
+       in a document that is already laid out; the second covers a first paint
+       that has not happened yet, where every tab measures zero and `place`
+       refuses rather than writing a wrong position.
+
+       Not the frame alone: `requestAnimationFrame` does not run in a document
+       the browser is not painting, so a tab set rendered in a hidden tab or an
+       inactive pane would never place its mark at all and would slide in from
+       the origin the moment the page was looked at. */
+    this.place()
+    requestAnimationFrame(() => this.place())
+    this.observer = new ResizeObserver(() => this.place())
+    this.observer.observe(this)
+    for (const tab of this.tabs) {
+      this.observer.observe(tab)
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -149,11 +170,59 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
     if (changed.has('value')) {
       this.sync()
     }
+    this.place()
+  }
+
+  /**
+   * Measures the selected tab and writes the geometry onto the indicator.
+   *
+   * One element that travels, rather than a border on each tab. A border can
+   * only appear and disappear; a single mark can move, and moving is what says
+   * the two tabs are places in one set rather than two separate states.
+   *
+   * Written onto the indicator rather than the host, for the reason the toggle
+   * group gives: geometry is only readable after layout, and anything written
+   * to the host then is an attribute a server's markup never had.
+   */
+  private place(): void {
+    const strip = this.renderRoot?.querySelector<HTMLElement>('[part="tabs"]')
+    const indicator = this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]')
+    const active = this.tabs.find((tab) => tab.selected)
+    if (!strip || !indicator || !active) {
+      return
+    }
+    const box = active.getBoundingClientRect()
+    const own = strip.getBoundingClientRect()
+    if (box.width === 0) {
+      return
+    }
+    /* Along the inline axis rather than the page's left, and offset by the
+       strip's own scroll: the tabs scroll inside it, so a distance taken from
+       the viewport drifts by however far it has been scrolled. */
+    /* Less the border, because the two boxes are not the same box: an
+       absolutely positioned element is placed against its containing block's
+       *padding* box, which starts one border in, while `getBoundingClientRect`
+       gives the border box. The segmented set has a bordered track, so its mark
+       sat a pixel inside the tab it marks. The same arithmetic the toggle
+       group's indicator does, and the third time this repo has met it. */
+    const style = getComputedStyle(strip)
+    const rtl = style.direction === 'rtl'
+    const borderStart = Number.parseFloat(rtl ? style.borderRightWidth : style.borderLeftWidth)
+    const inline = rtl ? own.right - box.right - borderStart : box.left - own.left - borderStart
+    indicator.style.setProperty('--_indicator-x', `${rtl ? -inline : inline}px`)
+    indicator.style.setProperty('--_indicator-w', `${box.width}px`)
+    /* The height too, because the same mark serves both shapes: a bar along the
+       bottom for the underline set, and a pill filling the tab for the
+       segmented one. Two appearances, one thing that moves. */
+    indicator.style.setProperty('--_indicator-h', `${box.height}px`)
+    indicator.style.setProperty('--_indicator-y', `${box.top - own.top - strip.clientTop}px`)
+    indicator.toggleAttribute('data-placed', true)
   }
 
   protected override render(): TemplateResult {
     return html`<div part="tabs" role="tablist" aria-label=${this.label}>
         <slot @slotchange=${() => this.sync()}></slot>
+        <span part="indicator" aria-hidden="true"></span>
       </div>
       <div part="panels"><slot name="panels" @slotchange=${() => this.sync()}></slot></div>`
   }

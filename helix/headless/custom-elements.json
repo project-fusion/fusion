@@ -16720,6 +16720,15 @@
             },
             {
               "kind": "field",
+              "name": "observer",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private",
+              "description": "Watches for anything that moves a tab, since none of it is a property."
+            },
+            {
+              "kind": "field",
               "name": "tabs",
               "type": {
                 "text": "HelixBaseTabsTab[]"
@@ -16758,6 +16767,17 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "place",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Measures the selected tab and writes the geometry onto the indicator.\n\nOne element that travels, rather than a border on each tab. A border can\nonly appear and disappear; a single mark can move, and moving is what says\nthe two tabs are places in one set rather than two separate states.\n\nWritten onto the indicator rather than the host, for the reason the toggle\ngroup gives: geometry is only readable after layout, and anything written\nto the host then is an attribute a server's markup never had."
             },
             {
               "kind": "field",

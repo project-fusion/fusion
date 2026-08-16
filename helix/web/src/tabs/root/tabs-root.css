@@ -104,3 +104,108 @@
   min-block-size: 0;
   min-inline-size: 0;
 }
+
+/* One mark, travelling.
+ *
+ * A border on each tab can only appear here and disappear there, which reads as
+ * two states rather than one thing moving. A single element that slides says
+ * the tabs are places in one set, and the movement is what carries that.
+ *
+ * Inside the strip and at the bottom of its content box, which is exactly where
+ * the rule is drawn: the mark covers the rule for its own width. It is not
+ * clipped, because it sits inside the content box rather than in the border
+ * area the strip's `overflow-x: auto` cuts away.
+ *
+ * Hidden until it has been measured, so it fades in where it belongs rather
+ * than sliding from the origin on first paint. */
+[part="indicator"] {
+  background-color: var(--_indicator-color, transparent);
+  block-size: var(--_indicator-block, var(--helix-border-thick));
+  border-radius: var(--_indicator-radius, var(--helix-radii-none));
+  box-shadow: var(--_indicator-shadow, none);
+  inline-size: var(--_indicator-w, 0);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  position: absolute;
+  translate: var(--_indicator-x, 0) var(--_indicator-offset, 0);
+  /* It slides and then settles: `emphasized` overshoots slightly and comes
+     back, which is the breath. Width and position move together, so a mark
+     travelling to a longer tab grows as it goes rather than after it arrives. */
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  z-index: var(--helix-layer-base);
+}
+
+[part="indicator"][data-placed] {
+  opacity: 1;
+}
+
+/* The strip is the containing block, so the mark is positioned against the row
+   of tabs rather than the component. */
+[part="tabs"] {
+  position: relative;
+}
+
+/* The tabs stack above the mark. The mark is positioned and comes later in the
+   tree, so without this it paints over its own tab and the label disappears
+   under the pill: measured, "Overview" was invisible in two of three
+   appearances. A positioned child is what gives the tab a layer of its own. */
+::slotted(helix-tabs-tab) {
+  position: relative;
+  z-index: var(--helix-layer-raised);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="indicator"] {
+    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  }
+}
+
+/* Underline: a bar along the bottom of the strip, on the rule it replaces. */
+:host([appearance="underline"]) [part="indicator"] {
+  --_indicator-block: var(--helix-border-thick);
+  --_indicator-color: var(--helix-color-primary);
+  --_indicator-offset: calc(var(--_indicator-h, 0px) - var(--helix-border-thick));
+}
+
+/* Segmented: the same mark, grown to the tab's own box. The pill travels rather
+   than the tab's background switching on and off, which is what makes the set
+   read as one control with a thumb in it.
+
+   The tab's own fill is transparent here for that reason: two things saying
+   "this one" would double at the moment of the change, and the one that cannot
+   move would win the eye. */
+:host([appearance="toggle"]) [part="indicator"] {
+  --_indicator-block: var(--_indicator-h, 0);
+  --_indicator-color: var(--helix-color-surface-overlay);
+  --_indicator-radius: calc(var(--helix-radii-md) - var(--helix-space-2xs));
+  --_indicator-shadow: var(--helix-shadow-sm);
+  --_indicator-offset: 0px;
+}
+
+:host([appearance="toggle"]) {
+  --_tab-selected-surface: transparent;
+}
+
+/* The default is a pill too, so it travels for the same reason. All three
+   appearances are now one mark that moves and differ only in its shape: a bar
+   on the rule, a pill on the page, a pill in a groove.
+
+   `raised` rather than `overlay` here, because this pill lies *on* the page
+   with nothing framing it, where the segmented one sits inside a sunken track.
+   The same distinction the rest of the library makes. */
+:host(:not([appearance])) [part="indicator"] {
+  --_indicator-block: var(--_indicator-h, 0);
+  --_indicator-color: var(--helix-color-surface-raised);
+  --_indicator-radius: var(--helix-radii-sm);
+  --_indicator-shadow: var(--helix-shadow-sm);
+  --_indicator-offset: 0px;
+}
+
+:host(:not([appearance])) {
+  --_tab-selected-surface: transparent;
+  --_tab-selected-shadow: none;
+}
