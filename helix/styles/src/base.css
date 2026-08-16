@@ -98,30 +98,40 @@ body {
    link inside a `column` flex container stretches, and the shadow ran the full
    width of the container instead of underlining the words.
 
-   All three change, but only two of them move. Measured in Chrome:
-   `text-underline-offset` and `text-decoration-color` animate, while
-   `text-decoration-thickness` snaps straight to its target. A one-pixel snap is
-   imperceptible next to the offset travelling, so thickness is still worth
-   changing; it is listed in the transition anyway, in case it becomes
-   animatable. */
+   What animates is the colour. Measured in Chrome, `text-decoration-thickness`
+   snaps straight to its target rather than tweening, and `text-underline-offset`
+   does animate — which is exactly why the offset is no longer allowed to
+   change. It was the only thing visibly moving, and what it did was carry the
+   line down the descenders, so a link answering the pointer looked like the
+   rule sliding away from the words rather than settling into them.
+
+   So the line stays where it is and gains weight and colour. The one pixel of
+   thickness snaps and is imperceptible; the colour is what a reader sees. It is
+   listed in the transition anyway, in case it becomes animatable. */
 :where(a) {
   color: var(--helix-color-primary);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
+  /* One offset, in both states. It moved from `0.15em` to `0.28em` on hover, so
+     the underline travelled down the descenders while it thickened, and what a
+     reader saw was the line shifting rather than the link answering. A rule
+     that changes place says "something else is here now"; a rule that thickens
+     where it already was says "this one".
+
+     Thickness grows downward from the offset, so the top edge of the line stays
+     put and the weight is added below it. That is the growing. */
+  text-underline-offset: 0.2em;
   transition:
     color var(--helix-duration-fast) var(--helix-easing-standard),
     text-decoration-color var(--helix-duration-fast) var(--helix-easing-standard),
-    text-decoration-thickness var(--helix-duration-fast) var(--helix-easing-standard),
-    text-underline-offset var(--helix-duration-fast) var(--helix-easing-standard);
+    text-decoration-thickness var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 :where(a):hover {
   color: var(--helix-color-primary-hover);
   text-decoration-color: currentColor;
   text-decoration-thickness: 2px;
-  text-underline-offset: 0.28em;
 }
 
 /* A link opening a new context says so, rather than surprising the reader. */
