@@ -5479,6 +5479,12 @@ export type CustomElements = {
    * - `size`: Diameter relative to the surrounding text.
    * - `label`: Accessible name, announced while the work is outstanding.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: A mark to sit still at the centre, usually a logo. Empty by default.
+   *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
@@ -5492,6 +5498,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `svg`: The rotating circle pair.
+   * - `mark`: The region holding what was slotted at the centre.
    * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
    */
@@ -8787,6 +8794,12 @@ export type CustomElementsSolidJs = {
    * - `size`: Diameter relative to the surrounding text.
    * - `label`: Accessible name, announced while the work is outstanding.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: A mark to sit still at the centre, usually a logo. Empty by default.
+   *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
@@ -8800,6 +8813,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `svg`: The rotating circle pair.
+   * - `mark`: The region holding what was slotted at the centre.
    * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
    */

@@ -18554,10 +18554,28 @@
           },
           "tagName": "helix-spinner",
           "customElement": true,
+          "slots": [
+            {
+              "description": "A mark to sit still at the centre, usually a logo. Empty by default.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseSpinner",
+                "module": "src/spinner/root/spinner-root.ts"
+              }
+            }
+          ],
           "cssParts": [
             {
               "description": "The rotating circle pair.",
               "name": "svg",
+              "inheritedFrom": {
+                "name": "HelixBaseSpinner",
+                "module": "src/spinner/root/spinner-root.ts"
+              }
+            },
+            {
+              "description": "The region holding what was slotted at the centre.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseSpinner",
                 "module": "src/spinner/root/spinner-root.ts"

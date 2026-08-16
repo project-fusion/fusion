@@ -10,6 +10,16 @@ import { property } from 'lit/decorators.js'
  * moving part read as a proportion of a whole rather than as a shape drifting
  * on its own, and it costs one element.
  *
+ * **The centre is a slot and is empty by default.** A spinner with a mark in
+ * the middle is a brand's spinner, and this library does not know whose. The
+ * slot is the capability; the logo is the application's, put in once wherever
+ * the app wraps it. Nothing is rendered when nothing is slotted, so an
+ * unbranded spinner is still two circles and no extra box.
+ *
+ * What is slotted does not turn. Only the arc moves, because a mark rotating
+ * with it stops reading as a mark and becomes part of the animation, and a
+ * wordmark upside down twice a second is worse than no wordmark.
+ *
  * The semantics are on the host through `ElementInternals`, not on an inner
  * span. A `role` written into the shadow root announces correctly but leaves
  * the host itself anonymous to anything walking the light DOM, and a `role`
@@ -21,7 +31,10 @@ import { property } from 'lit/decorators.js'
  * @aliases Loader, Busy, Activity
  * @documentation https://helix.fusion.dev/components/spinner
  *
+ * @slot - A mark to sit still at the centre, usually a logo. Empty by default.
+ *
  * @csspart svg - The rotating circle pair.
+ * @csspart mark - The region holding what was slotted at the centre.
  * @csspart track - The full circle behind the indicator.
  * @csspart indicator - The arc that turns.
  */
@@ -39,9 +52,10 @@ export class HelixBaseSpinner extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`<svg part="svg" viewBox="0 0 24 24" aria-hidden="true">
-      <circle part="track" cx="12" cy="12" r="10" fill="none" />
-      <circle part="indicator" cx="12" cy="12" r="10" fill="none" />
-    </svg>`
+        <circle part="track" cx="12" cy="12" r="10" fill="none" />
+        <circle part="indicator" cx="12" cy="12" r="10" fill="none" />
+      </svg>
+      <span part="mark" aria-hidden="true"><slot></slot></span>`
   }
 }
 

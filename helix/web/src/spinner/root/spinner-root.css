@@ -1,7 +1,12 @@
 :host {
   color: inherit;
-  display: inline-flex;
+  /* An inline grid rather than an inline flex, and one cell: both children take
+     `grid-area: 1 / 1`, so a mark is centred over the circles with no offsets
+     to keep in step with the size. Still inline, so a spinner beside text sits
+     on the line the way it did. */
+  display: inline-grid;
   flex-shrink: 0;
+  place-items: center;
   vertical-align: middle;
 
   /* Tokens, so a spinner is the same size wherever it is placed. Set
@@ -20,6 +25,7 @@
 
 [part="svg"] {
   animation: helix-spinner-turn 0.8s linear infinite;
+  grid-area: 1 / 1;
   block-size: var(--spinner-size, var(--_spinner-size));
   inline-size: var(--spinner-size, var(--_spinner-size));
 }
@@ -54,4 +60,36 @@
   [part="svg"] {
     animation-duration: calc(var(--helix-duration-slow) * 12);
   }
+}
+
+/* The centre. Sized against the spinner rather than stated, so a mark stays in
+   proportion at every size the spinner comes in: `size` survives on this
+   component precisely because it is a picture, and a fixed mark inside a
+   picture that scales is a mark that is wrong at two of the three sizes.
+
+   `display: contents` when empty is not available here, because the grid needs
+   a cell either way. It carries no fill and no inset, so an unslotted spinner
+   paints nothing extra. */
+[part="mark"] {
+  /* Derived from the spinner's own size rather than as a percentage. A
+     percentage here resolves against the grid cell, which is sized by whatever
+     is in it, so the mark measured itself against itself and came out 136px
+     inside a 40px spinner. Measured, before this was a `calc`. */
+  --_mark-size: calc(var(--spinner-size, var(--_spinner-size)) * 0.4);
+  --icon-size: var(--_mark-size);
+
+  align-items: center;
+  block-size: var(--_mark-size);
+  display: flex;
+  grid-area: 1 / 1;
+  inline-size: var(--_mark-size);
+  justify-content: center;
+}
+
+[part="mark"] ::slotted(*) {
+  block-size: 100%;
+  inline-size: 100%;
+  /* Still, while the arc turns. A mark rotating with the spinner stops reading
+     as a mark and becomes part of the animation. */
+  rotate: none;
 }

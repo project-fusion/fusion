@@ -13933,12 +13933,16 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Two concentric circles rather than one arc: the track is what makes the\nmoving part read as a proportion of a whole rather than as a shape drifting\non its own, and it costs one element.\n\nThe semantics are on the host through `ElementInternals`, not on an inner\nspan. A `role` written into the shadow root announces correctly but leaves\nthe host itself anonymous to anything walking the light DOM, and a `role`\nwritten onto the host as an attribute is one a React consumer's server markup\nnever had.",
+          "description": "Two concentric circles rather than one arc: the track is what makes the\nmoving part read as a proportion of a whole rather than as a shape drifting\non its own, and it costs one element.\n\n**The centre is a slot and is empty by default.** A spinner with a mark in\nthe middle is a brand's spinner, and this library does not know whose. The\nslot is the capability; the logo is the application's, put in once wherever\nthe app wraps it. Nothing is rendered when nothing is slotted, so an\nunbranded spinner is still two circles and no extra box.\n\nWhat is slotted does not turn. Only the arc moves, because a mark rotating\nwith it stops reading as a mark and becomes part of the animation, and a\nwordmark upside down twice a second is worse than no wordmark.\n\nThe semantics are on the host through `ElementInternals`, not on an inner\nspan. A `role` written into the shadow root announces correctly but leaves\nthe host itself anonymous to anything walking the light DOM, and a `role`\nwritten onto the host as an attribute is one a React consumer's server markup\nnever had.",
           "name": "HelixBaseSpinner",
           "cssParts": [
             {
               "description": "The rotating circle pair.",
               "name": "svg"
+            },
+            {
+              "description": "The region holding what was slotted at the centre.",
+              "name": "mark"
             },
             {
               "description": "The full circle behind the indicator.",
@@ -13947,6 +13951,12 @@
             {
               "description": "The arc that turns.",
               "name": "indicator"
+            }
+          ],
+          "slots": [
+            {
+              "description": "A mark to sit still at the centre, usually a logo. Empty by default.",
+              "name": ""
             }
           ],
           "members": [

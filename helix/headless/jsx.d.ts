@@ -5184,6 +5184,16 @@ export type CustomElements = {
    * moving part read as a proportion of a whole rather than as a shape drifting
    * on its own, and it costs one element.
    *
+   * **The centre is a slot and is empty by default.** A spinner with a mark in
+   * the middle is a brand's spinner, and this library does not know whose. The
+   * slot is the capability; the logo is the application's, put in once wherever
+   * the app wraps it. Nothing is rendered when nothing is slotted, so an
+   * unbranded spinner is still two circles and no extra box.
+   *
+   * What is slotted does not turn. Only the arc moves, because a mark rotating
+   * with it stops reading as a mark and becomes part of the animation, and a
+   * wordmark upside down twice a second is worse than no wordmark.
+   *
    * The semantics are on the host through `ElementInternals`, not on an inner
    * span. A `role` written into the shadow root announces correctly but leaves
    * the host itself anonymous to anything walking the light DOM, and a `role`
@@ -5196,11 +5206,18 @@ export type CustomElements = {
    *
    * - `label`: Accessible name, announced while the work is outstanding.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: A mark to sit still at the centre, usually a logo. Empty by default.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `svg`: The rotating circle pair.
+   * - `mark`: The region holding what was slotted at the centre.
    * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
    */
@@ -8394,6 +8411,16 @@ export type CustomElementsSolidJs = {
    * moving part read as a proportion of a whole rather than as a shape drifting
    * on its own, and it costs one element.
    *
+   * **The centre is a slot and is empty by default.** A spinner with a mark in
+   * the middle is a brand's spinner, and this library does not know whose. The
+   * slot is the capability; the logo is the application's, put in once wherever
+   * the app wraps it. Nothing is rendered when nothing is slotted, so an
+   * unbranded spinner is still two circles and no extra box.
+   *
+   * What is slotted does not turn. Only the arc moves, because a mark rotating
+   * with it stops reading as a mark and becomes part of the animation, and a
+   * wordmark upside down twice a second is worse than no wordmark.
+   *
    * The semantics are on the host through `ElementInternals`, not on an inner
    * span. A `role` written into the shadow root announces correctly but leaves
    * the host itself anonymous to anything walking the light DOM, and a `role`
@@ -8406,11 +8433,18 @@ export type CustomElementsSolidJs = {
    *
    * - `label`: Accessible name, announced while the work is outstanding.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: A mark to sit still at the centre, usually a logo. Empty by default.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `svg`: The rotating circle pair.
+   * - `mark`: The region holding what was slotted at the centre.
    * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
    */
