@@ -37,8 +37,25 @@
   min-block-size: 0;
 }
 
+/* The rule is a background, not a border, and that is what lets a tab sit on it.
+ *
+ * A border is outside the padding box, and this strip has `overflow-x: auto` so
+ * a wide tab set can scroll. Overflow clips at the padding box, so a tab pulled
+ * down onto a border had its own border clipped away: at `thick` it stood proud
+ * of the rule and at `thin` it disappeared. Two attempts, both wrong for the
+ * same reason.
+ *
+ * A background paints inside the element's own box and is not clipped by its
+ * overflow. Drawn as a gradient in the last pixel of the content box, the rule
+ * lands exactly where a tab's bottom border does, and a child paints over its
+ * parent's background: the selected tab covers the rule for its own width and
+ * the rule shows through everywhere else. One line, coloured under the current
+ * tab, which is what an underline tab set is. */
 [part="tabs"] {
-  border-block-end: var(--_tabs-rule, var(--helix-border-thin) solid var(--helix-color-border));
+  background-image: var(--_tabs-rule, none);
+  background-position: bottom;
+  background-repeat: repeat-x;
+  background-size: 100% var(--helix-border-thin);
   display: flex;
   gap: var(--helix-space-2xs);
   overflow-x: auto;
@@ -54,7 +71,7 @@
    there, and an attribute written onto each tab would be an attribute the
    element gave itself. Custom properties cross both boundaries on their own. */
 :host([appearance="underline"]) {
-  --_tabs-rule: var(--helix-border-thin) solid var(--helix-color-border);
+  --_tabs-rule: linear-gradient(var(--helix-color-border), var(--helix-color-border));
   --_tab-radius: var(--helix-radii-none);
   --_tab-selected-rule: var(--helix-color-primary);
   --_tab-selected-shadow: none;
