@@ -203,3 +203,18 @@ slot[name="icon"]::slotted(*) {
     translate: 0 var(--helix-space-sm);
   }
 }
+
+/* Gone when it has gone.
+ *
+ * On the host, because a message is an item in a stack and leaving an empty box
+ * behind would hold its gap open. `display: none` takes it out of the
+ * accessibility tree with it, which is right: a dismissed message is not
+ * something to be read, and the region is `aria-relevant="additions"` so
+ * nothing is announced on the way out either.
+ *
+ * Here rather than in the headless tier, which has no CSS: what the state means
+ * is the component's, how it is drawn is this tier's. A headless consumer reads
+ * `data-open` and decides for themselves. */
+:host(:not([data-open])) {
+  display: none;
+}

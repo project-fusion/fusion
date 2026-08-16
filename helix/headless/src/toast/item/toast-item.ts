@@ -1,4 +1,9 @@
-import { customElement, HelixDismissEvent, HelixElement } from '@helix-io/core'
+import {
+  customElement,
+  HelixDismissEvent,
+  HelixElement,
+  requestControlledChange,
+} from '@helix-io/core'
 import {
   checkCircleFill,
   type HelixIcon,
@@ -113,11 +118,80 @@ export class HelixBaseToastItem extends HelixElement {
 
   private timer: ReturnType<typeof setTimeout> | undefined
 
-  /** Asks to be taken away, and reports whether the request stood. */
+  /**
+   * Whether the message is still showing.
+   *
+   * The same decide-once contract every other stateful thing here carries, and
+   * it was the one exception: this waited to be told in every case, so
+   * `duration` did nothing at all without consumer script and the dismiss
+   * control looked broken to anyone who pressed it. `Dialog` closes itself,
+   * `Accordion` closes itself, and there was no reason a message should not.
+   *
+   * Declared by the markup and it is the consumer's: the item announces and
+   * waits. Not declared and it is the item's: it goes when it is asked to, and
+   * the consumer still hears `helix-dismiss` and takes it out of their own
+   * list. Read once, at the first update.
+   *
+   * **No `default-open`, unlike the four mixins.** A `default-` seed exists so
+   * markup can choose a starting state without claiming ownership, and there is
+   * only one starting state that makes sense: a message that has been rendered
+   * is showing. An attribute whose only legal value is the default is an
+   * attribute nobody can use.
+   */
+  @property({ type: Boolean })
+  get open(): boolean {
+    return this.openState ?? true
+  }
+
+  set open(next: boolean) {
+    const previous = this.open
+    this.openState = next
+    this.requestUpdate('open', previous)
+  }
+
+  /** Whether it is showing, whoever said so, and `undefined` until somebody has. */
+  private openState: boolean | undefined = undefined
+
+  /** Whether the consumer owns it, decided once and then fixed. */
+  private openMode: boolean | undefined = undefined
+
+  private get openIsControlled(): boolean {
+    return this.openMode === true
+  }
+
+  /**
+   * Asks to be taken away, and reports whether the request stood.
+   *
+   * Announced before anything happens, so `preventDefault()` is a refusal and
+   * the message stays. The event still carries the label, because a consumer
+   * removing this from their own state has to know which one went, and that is
+   * true whether or not the item hid itself first.
+   */
   dismiss(): boolean {
-    const event = new HelixDismissEvent({ label: this.textContent?.trim() ?? '' })
-    this.dispatchEvent(event)
-    return !event.defaultPrevented
+    if (!this.open) {
+      return true
+    }
+    /* The clock stops either way. A timer left running on a message that has
+       gone would fire into nothing, and would hold the item alive until it
+       did. */
+    clearTimeout(this.timer)
+    this.timer = undefined
+    return requestControlledChange({
+      apply: () => {
+        if (this.openIsControlled) {
+          return
+        }
+        const previous = this.open
+        this.openState = false
+        this.requestUpdate('open', previous)
+      },
+      controlled: this.openIsControlled,
+      event: () => new HelixDismissEvent({ label: this.textContent?.trim() ?? '' }),
+      host: this,
+      label: 'open',
+      next: false,
+      read: () => this.open,
+    })
   }
 
   /** Stops the clock, leaving whatever is left of it. */
@@ -162,6 +236,21 @@ export class HelixBaseToastItem extends HelixElement {
     // nothing, and hold the item alive until it did.
     clearTimeout(this.timer)
     this.timer = undefined
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* Before anything else reads it, and only the first time. Everything that
+       declares the mode has arrived by now: attributes from markup or from a
+       server's output, and properties a framework assigned on mount. */
+    if (this.openMode === undefined) {
+      this.openMode = this.openState !== undefined
+    }
+    /* Mirrored for CSS rather than reflected onto `open` itself, which is the
+       library's rule about state: a reflected `open` is indistinguishable from
+       one the consumer declared, and that attribute is what ownership is read
+       from. `data-open` can never be mistaken for a declaration. */
+    this.toggleAttribute('data-open', this.open)
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

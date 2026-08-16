@@ -3726,6 +3726,25 @@ restart a message the reader is already partway through. */
   duration?: HelixBaseToastItem["duration"];
   /** What kind of message it is, which picks the mark and its name. */
   severity?: HelixBaseToastItem["severity"];
+  /** Whether the message is still showing.
+
+The same decide-once contract every other stateful thing here carries, and
+it was the one exception: this waited to be told in every case, so
+`duration` did nothing at all without consumer script and the dismiss
+control looked broken to anyone who pressed it. `Dialog` closes itself,
+`Accordion` closes itself, and there was no reason a message should not.
+
+Declared by the markup and it is the consumer's: the item announces and
+waits. Not declared and it is the item's: it goes when it is asked to, and
+the consumer still hears `helix-dismiss` and takes it out of their own
+list. Read once, at the first update.
+
+**No `default-open`, unlike the four mixins.** A `default-` seed exists so
+markup can choose a starting state without claiming ownership, and there is
+only one starting state that makes sense: a message that has been rendered
+is showing. An attribute whose only legal value is the default is an
+attribute nobody can use. */
+  open?: HelixBaseToastItem["open"];
 
   /** Fired when it asks to go, whether by the control or by its timer. */
   "onhelix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
@@ -3745,6 +3764,25 @@ restart a message the reader is already partway through. */
   "prop:duration"?: HelixBaseToastItem["duration"];
   /** What kind of message it is, which picks the mark and its name. */
   "prop:severity"?: HelixBaseToastItem["severity"];
+  /** Whether the message is still showing.
+
+The same decide-once contract every other stateful thing here carries, and
+it was the one exception: this waited to be told in every case, so
+`duration` did nothing at all without consumer script and the dismiss
+control looked broken to anyone who pressed it. `Dialog` closes itself,
+`Accordion` closes itself, and there was no reason a message should not.
+
+Declared by the markup and it is the consumer's: the item announces and
+waits. Not declared and it is the item's: it goes when it is asked to, and
+the consumer still hears `helix-dismiss` and takes it out of their own
+list. Read once, at the first update.
+
+**No `default-open`, unlike the four mixins.** A `default-` seed exists so
+markup can choose a starting state without claiming ownership, and there is
+only one starting state that makes sense: a message that has been rendered
+is showing. An attribute whose only legal value is the default is an
+attribute nobody can use. */
+  "prop:open"?: HelixBaseToastItem["open"];
   /** Fired when it asks to go, whether by the control or by its timer. */
   "on:helix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
 
@@ -7943,6 +7981,24 @@ export type CustomElements = {
    * Read once when the item is first rendered. Changing it afterwards does not
    * restart a message the reader is already partway through.
    * - `severity`: What kind of message it is, which picks the mark and its name.
+   * - `open`: Whether the message is still showing.
+   *
+   * The same decide-once contract every other stateful thing here carries, and
+   * it was the one exception: this waited to be told in every case, so
+   * `duration` did nothing at all without consumer script and the dismiss
+   * control looked broken to anyone who pressed it. `Dialog` closes itself,
+   * `Accordion` closes itself, and there was no reason a message should not.
+   *
+   * Declared by the markup and it is the consumer's: the item announces and
+   * waits. Not declared and it is the item's: it goes when it is asked to, and
+   * the consumer still hears `helix-dismiss` and takes it out of their own
+   * list. Read once, at the first update.
+   *
+   * **No `default-open`, unlike the four mixins.** A `default-` seed exists so
+   * markup can choose a starting state without claiming ownership, and there is
+   * only one starting state that makes sense: a message that has been rendered
+   * is showing. An attribute whose only legal value is the default is an
+   * attribute nobody can use.
    *
    * ## Events
    *
@@ -7964,6 +8020,11 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `dismiss() => boolean`: Asks to be taken away, and reports whether the request stood.
+   *
+   * Announced before anything happens, so `preventDefault()` is a refusal and
+   * the message stays. The event still carries the label, because a consumer
+   * removing this from their own state has to know which one went, and that is
+   * true whether or not the item hid itself first.
    * - `pause() => void`: Stops the clock, leaving whatever is left of it.
    * - `resume() => void`: Starts it again from where it stopped.
    *
@@ -7997,6 +8058,11 @@ export type CustomElements = {
    *
    * **It never creates or destroys anything.** The consumer renders items and
    * removes them; asking to go is a cancelable `helix-dismiss` from the item.
+   * That is still exactly true of the region: an item that has gone hides itself
+   * and stays in the tree, so a consumer whose state still lists it does not have
+   * their framework fighting a node this component took away. What changed is
+   * that the item no longer waits to be told before hiding, unless the consumer
+   * declared `open` and said the state is theirs.
    * There is no `toast.show()`, because an imperative queue inside a component is
    * a second copy of the application's state that nothing can render from: an app
    * that wants a `toast()` function writes a thin one over the state it already
@@ -12342,6 +12408,24 @@ export type CustomElementsSolidJs = {
    * Read once when the item is first rendered. Changing it afterwards does not
    * restart a message the reader is already partway through.
    * - `severity`: What kind of message it is, which picks the mark and its name.
+   * - `open`: Whether the message is still showing.
+   *
+   * The same decide-once contract every other stateful thing here carries, and
+   * it was the one exception: this waited to be told in every case, so
+   * `duration` did nothing at all without consumer script and the dismiss
+   * control looked broken to anyone who pressed it. `Dialog` closes itself,
+   * `Accordion` closes itself, and there was no reason a message should not.
+   *
+   * Declared by the markup and it is the consumer's: the item announces and
+   * waits. Not declared and it is the item's: it goes when it is asked to, and
+   * the consumer still hears `helix-dismiss` and takes it out of their own
+   * list. Read once, at the first update.
+   *
+   * **No `default-open`, unlike the four mixins.** A `default-` seed exists so
+   * markup can choose a starting state without claiming ownership, and there is
+   * only one starting state that makes sense: a message that has been rendered
+   * is showing. An attribute whose only legal value is the default is an
+   * attribute nobody can use.
    *
    * ## Events
    *
@@ -12363,6 +12447,11 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `dismiss() => boolean`: Asks to be taken away, and reports whether the request stood.
+   *
+   * Announced before anything happens, so `preventDefault()` is a refusal and
+   * the message stays. The event still carries the label, because a consumer
+   * removing this from their own state has to know which one went, and that is
+   * true whether or not the item hid itself first.
    * - `pause() => void`: Stops the clock, leaving whatever is left of it.
    * - `resume() => void`: Starts it again from where it stopped.
    *
@@ -12399,6 +12488,11 @@ export type CustomElementsSolidJs = {
    *
    * **It never creates or destroys anything.** The consumer renders items and
    * removes them; asking to go is a cancelable `helix-dismiss` from the item.
+   * That is still exactly true of the region: an item that has gone hides itself
+   * and stays in the tree, so a consumer whose state still lists it does not have
+   * their framework fighting a node this component took away. What changed is
+   * that the item no longer waits to be told before hiding, unless the consumer
+   * declared `open` and said the state is theirs.
    * There is no `toast.show()`, because an imperative queue inside a component is
    * a second copy of the application's state that nothing can render from: an app
    * that wants a `toast()` function writes a thin one over the state it already

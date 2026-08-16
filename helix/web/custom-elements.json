@@ -26516,6 +26516,60 @@
               }
             },
             {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the message is still showing.\n\nThe same decide-once contract every other stateful thing here carries, and\nit was the one exception: this waited to be told in every case, so\n`duration` did nothing at all without consumer script and the dismiss\ncontrol looked broken to anyone who pressed it. `Dialog` closes itself,\n`Accordion` closes itself, and there was no reason a message should not.\n\nDeclared by the markup and it is the consumer's: the item announces and\nwaits. Not declared and it is the item's: it goes when it is asked to, and\nthe consumer still hears `helix-dismiss` and takes it out of their own\nlist. Read once, at the first update.\n\n**No `default-open`, unlike the four mixins.** A `default-` seed exists so\nmarkup can choose a starting state without claiming ownership, and there is\nonly one starting state that makes sense: a message that has been rendered\nis showing. An attribute whose only legal value is the default is an\nattribute nobody can use.",
+              "attribute": "open",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openState",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether it is showing, whoever said so, and `undefined` until somebody has.",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns it, decided once and then fixed.",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "dismiss",
               "return": {
@@ -26523,7 +26577,7 @@
                   "text": "boolean"
                 }
               },
-              "description": "Asks to be taken away, and reports whether the request stood.",
+              "description": "Asks to be taken away, and reports whether the request stood.\n\nAnnounced before anything happens, so `preventDefault()` is a refusal and\nthe message stays. The event still carries the label, because a consumer\nremoving this from their own state has to know which one went, and that is\ntrue whether or not the item hid itself first.",
               "type": {
                 "text": "dismiss() => boolean"
               },
@@ -26801,6 +26855,18 @@
               },
               "description": "What kind of message it is, which picks the mark and its name.",
               "fieldName": "severity",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the message is still showing.\n\nThe same decide-once contract every other stateful thing here carries, and\nit was the one exception: this waited to be told in every case, so\n`duration` did nothing at all without consumer script and the dismiss\ncontrol looked broken to anyone who pressed it. `Dialog` closes itself,\n`Accordion` closes itself, and there was no reason a message should not.\n\nDeclared by the markup and it is the consumer's: the item announces and\nwaits. Not declared and it is the item's: it goes when it is asked to, and\nthe consumer still hears `helix-dismiss` and takes it out of their own\nlist. Read once, at the first update.\n\n**No `default-open`, unlike the four mixins.** A `default-` seed exists so\nmarkup can choose a starting state without claiming ownership, and there is\nonly one starting state that makes sense: a message that has been rendered\nis showing. An attribute whose only legal value is the default is an\nattribute nobody can use.",
+              "fieldName": "open",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"

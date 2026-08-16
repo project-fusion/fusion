@@ -3042,6 +3042,7 @@ costs contrast for something the mark already says.
 | `dismissible` | `dismissible` | `boolean` | `false` | `HelixBaseToastItem` | Whether the reader can ask for it to go. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixBaseToastItem` | Accessible name for the dismiss control. |
 | `duration` | `duration` | `number \| undefined` | - | `HelixBaseToastItem` | How long it stays, in milliseconds. Absent means until it is dismissed. |
+| `open` | `open` | `boolean` | - | `HelixBaseToastItem` | Whether the message is still showing. |
 | `severity` | `severity` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseToastItem` | What kind of message it is, which picks the mark and its name. |
 
 #### Methods

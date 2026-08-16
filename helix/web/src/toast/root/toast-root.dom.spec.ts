@@ -9,6 +9,7 @@ beforeAll(async () => {
 type Item = HTMLElement & {
   dismiss(): boolean
   duration?: number
+  open: boolean
   pause(): void
   resume(): void
   updateComplete: Promise<boolean>
@@ -52,9 +53,11 @@ describe('toast item', () => {
     return found
   }
 
-  test('asking to go is an event, and the item does not remove itself', async () => {
-    /* The consumer owns the list. An item that took itself out would leave the
-       two disagreeing about what is on screen. */
+  test('it goes when asked, and takes itself out of no list at all', async () => {
+    /* Two halves, and they used to be one. The message hides itself, which is
+       what every other stateful thing here does when nothing has claimed it,
+       and it stays in the DOM, because the consumer owns the list and a node
+       removed under a framework would be put straight back. */
     const found = await item('dismissible')
     let seen = ''
     found.addEventListener('helix-dismiss', (event) => {
@@ -62,7 +65,47 @@ describe('toast item', () => {
     })
     expect(found.dismiss()).toBe(true)
     expect(seen).toBe('Saved')
+    // The property answers at once; the mirror is written by the next render,
+    // which is what `data-` attributes are and why they are not the state.
+    expect(found.open).toBe(false)
+    await found.updateComplete
+    expect(found.hasAttribute('data-open')).toBe(false)
     expect(found.isConnected).toBe(true)
+  })
+
+  test('a declared `open` belongs to the consumer, and dismissing only asks', async () => {
+    /* The exception this component used to be: it waited to be told in every
+       case, so `duration` did nothing without consumer script and the control
+       looked broken. Now only a consumer who said the state is theirs gets
+       that, which is the contract everywhere else. */
+    const found = await item('dismissible open')
+    let asked = false
+    found.addEventListener('helix-dismiss', () => {
+      asked = true
+    })
+    found.dismiss()
+    await found.updateComplete
+    expect(asked).toBe(true)
+    expect(found.open).toBe(true)
+
+    found.open = false
+    await found.updateComplete
+    expect(found.open).toBe(false)
+  })
+
+  test('a refused dismissal leaves it showing', async () => {
+    const found = await item('dismissible')
+    found.addEventListener('helix-dismiss', (event) => event.preventDefault())
+    expect(found.dismiss()).toBe(false)
+    await found.updateComplete
+    expect(found.open).toBe(true)
+  })
+
+  test('a timer that runs out hides it, which is what a duration is for', async () => {
+    const found = await item('duration="40"')
+    await new Promise((done) => setTimeout(done, 250))
+    await found.updateComplete
+    expect(found.open).toBe(false)
   })
 
   test('a refused dismissal reports that it was refused', async () => {

@@ -20,6 +20,11 @@ import { property } from 'lit/decorators.js'
  *
  * **It never creates or destroys anything.** The consumer renders items and
  * removes them; asking to go is a cancelable `helix-dismiss` from the item.
+ * That is still exactly true of the region: an item that has gone hides itself
+ * and stays in the tree, so a consumer whose state still lists it does not have
+ * their framework fighting a node this component took away. What changed is
+ * that the item no longer waits to be told before hiding, unless the consumer
+ * declared `open` and said the state is theirs.
  * There is no `toast.show()`, because an imperative queue inside a component is
  * a second copy of the application's state that nothing can render from: an app
  * that wants a `toast()` function writes a thin one over the state it already
