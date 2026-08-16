@@ -186,3 +186,43 @@ describe('calendar', () => {
     expect(cal.value).toBe('')
   })
 })
+
+describe('calendar selection can be refused', () => {
+  /* Same fault the carousel had: `value` was written and then announced, so a
+     listener refusing a date was refusing one already chosen. Every other
+     stateful component in the library announces first, through the helper whose
+     own documentation calls itself the one audited path for this. */
+  const press = (cal: Calendar, label: string): void => {
+    const day = days(cal).find((one) => one.getAttribute('aria-label')?.includes(label))
+    if (!day) {
+      throw new Error(`the fixture no longer renders ${label}`)
+    }
+    day.click()
+  }
+
+  test('a listener that refuses leaves the date where it was', async () => {
+    const cal = await calendar()
+    cal.addEventListener('helix-select', (event) => event.preventDefault())
+    press(cal, 'August 20')
+    expect(cal.value).toBe('2026-08-14')
+  })
+
+  test('and one that does not still changes it', async () => {
+    // The other half: a refusal that refused everything would pass the first.
+    const cal = await calendar()
+    press(cal, 'August 20')
+    expect(cal.value).toBe('2026-08-20')
+  })
+
+  test('the announcement carries the date being proposed, not the one held', async () => {
+    const cal = await calendar()
+    let seen = ''
+    cal.addEventListener('helix-select', (event) => {
+      seen = (event as CustomEvent<{ value: string }>).detail.value
+      event.preventDefault()
+    })
+    press(cal, 'August 20')
+    expect(seen).toBe('2026-08-20')
+    expect(cal.value).toBe('2026-08-14')
+  })
+})

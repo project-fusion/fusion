@@ -121,3 +121,59 @@ describe('carousel naming', () => {
     expect(host.internals.ariaLabel).toBeNull()
   })
 })
+
+describe('carousel selection can be refused', () => {
+  /* It announced after moving, so a listener refusing a slide change was
+     refusing a decision already taken and the carousel moved anyway. Every
+     other stateful component in the library announces first, through the same
+     helper, whose own documentation calls itself the one audited path for this. */
+  const carousel = async (): Promise<
+    HTMLElement & { goTo(index: number): void; index: number; updateComplete: Promise<boolean> }
+  > => {
+    const host = (await mount(
+      `<helix-carousel label="Highlights">
+        <div>One</div><div>Two</div><div>Three</div>
+      </helix-carousel>`,
+    )) as HTMLElement & {
+      goTo(index: number): void
+      index: number
+      updateComplete: Promise<boolean>
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('a listener that refuses leaves the carousel where it was', async () => {
+    const host = await carousel()
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.goTo(2)
+    await host.updateComplete
+    expect(host.index).toBe(0)
+  })
+
+  test('and one that does not still moves it', async () => {
+    // The other half. A refusal that refused everything would pass the first.
+    const host = await carousel()
+    let announced = ''
+    host.addEventListener('helix-select', (event) => {
+      announced = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    host.goTo(2)
+    await host.updateComplete
+    expect(host.index).toBe(2)
+    expect(announced).toBe('2')
+  })
+
+  test('the announcement carries the slide being proposed, not the one left behind', async () => {
+    const host = await carousel()
+    let seen = ''
+    host.addEventListener('helix-select', (event) => {
+      seen = (event as CustomEvent<{ value: string }>).detail.value
+      event.preventDefault()
+    })
+    host.goTo(1)
+    await host.updateComplete
+    expect(seen).toBe('1')
+    expect(host.index).toBe(0)
+  })
+})

@@ -1,4 +1,10 @@
-import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@helix-io/core'
+import {
+  customElement,
+  HelixElement,
+  HelixSelectEvent,
+  hostAria,
+  requestControlledChange,
+} from '@helix-io/core'
 import { caretLeft, caretRight } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -285,9 +291,24 @@ export class HelixBaseCalendar extends HelixElement {
       next = [iso]
     }
 
-    this.value = next.join(',')
+    /* Focus moves whatever happens, because the reader pressed there and the
+       roving tab stop is about where they are rather than about what is
+       chosen. The selection is the part that can be refused. */
     this.focused = iso
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+
+    /* Announced before it is written, which it was not: this set `value` and
+       then dispatched, so a listener calling `preventDefault()` was refusing a
+       date that had already been chosen. `requestControlledChange` is the one
+       audited path its own documentation claims for every stateful change in
+       the system, and this was not on it. */
+    requestControlledChange({
+      apply: (value) => {
+        this.value = value
+      },
+      event: (value) => new HelixSelectEvent({ value }),
+      host: this,
+      next: next.join(','),
+    })
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {

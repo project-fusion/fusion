@@ -1,4 +1,10 @@
-import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@helix-io/core'
+import {
+  customElement,
+  HelixElement,
+  HelixSelectEvent,
+  hostAria,
+  requestControlledChange,
+} from '@helix-io/core'
 import { caretLeft, caretRight, play, stop } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -117,9 +123,21 @@ export class HelixBaseCarousel extends HelixElement {
     if (next === this.index) {
       return
     }
-    this.index = next
-    this.scrollToIndex()
-    this.dispatchEvent(new HelixSelectEvent({ value: String(next) }))
+    /* Announced before it moves, which it was not: this set `index`, scrolled,
+       and then dispatched, so a listener calling `preventDefault()` was
+       refusing a decision already taken and the carousel moved anyway.
+       `requestControlledChange` is the audited path its own documentation says
+       every stateful change in the system goes through, and three components
+       were not on it. */
+    requestControlledChange({
+      apply: (value) => {
+        this.index = value
+        this.scrollToIndex()
+      },
+      event: (value) => new HelixSelectEvent({ value: String(value) }),
+      host: this,
+      next,
+    })
   }
 
   private scrollToIndex(): void {
@@ -165,6 +183,12 @@ export class HelixBaseCarousel extends HelixElement {
       },
       { distance: Number.POSITIVE_INFINITY, index: this.index },
     )
+    /* Announced after the fact, and deliberately, where `goTo` announces
+       before. The reader has already dragged the track here: there is nothing
+       to refuse, and `preventDefault()` could not un-drag it. This is the case
+       the controlled-change helper's own documentation distinguishes, a native
+       control that has already moved, and putting it on that path would offer a
+       refusal that cannot be honoured. */
     if (nearest.index !== this.index) {
       this.index = nearest.index
       this.dispatchEvent(new HelixSelectEvent({ value: String(nearest.index) }))
