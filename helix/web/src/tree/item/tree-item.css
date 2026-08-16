@@ -60,6 +60,16 @@
   font-weight: var(--helix-weight-medium);
 }
 
+/* And a leaf is only a step behind it. Leaves inherited the page's regular
+   weight, so a child sat noticeably lighter than the branch above it and the
+   deeper the tree the fainter it read, as though depth meant less important.
+   It does not: a leaf is usually the thing being looked for. The chevron is
+   what marks a branch, so the two rows can be closer in weight than they were
+   without becoming the same. */
+[part="row"]:not(:has([part="toggle"])) {
+  font-weight: var(--helix-weight-medium);
+}
+
 /* A leaf holds the space a chevron would take, so labels at one depth start at
    one place whether or not the item opens. Without it the eye reads two
    columns where there is one list, and the deeper the tree the worse it looks.

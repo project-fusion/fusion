@@ -1,8 +1,17 @@
 <helix-app-header>
-  <span slot="start">Brand</span>
+  <span slot="start">Logo</span>
   <helix-nav-bar label="Sections">
     <a aria-current="page" href="#one">Item One</a>
     <a href="#two">Item Two</a>
   </helix-nav-bar>
-  <helix-button appearance="primary" slot="end">Action</helix-button>
+
+  <!-- Icon buttons at the end, which is what a masthead's trailing edge holds:
+       a row of marks rather than a row of words. A labelled button there
+       competes with the navigation for the same attention. -->
+  <helix-icon-button label="Search" slot="end">
+    <helix-icon name="magnifying-glass"></helix-icon>
+  </helix-icon-button>
+  <helix-icon-button label="Settings" slot="end">
+    <helix-icon name="gear"></helix-icon>
+  </helix-icon-button>
 </helix-app-header>
