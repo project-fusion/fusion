@@ -221,11 +221,15 @@ helix-drawer {
 
 /* The abstract drawing on a family's gallery card, from `lib/component-art`.
  *
- * Three declarations, and everything else about how it sits is the card's job.
- * It is slotted into `media`, which the card pulls out to its own border with a
- * negative inset and clips to its corner radius, so a width, a background, a
- * border or a radius stated here would either fight that or draw a second frame
- * inside the first. Only the ratio is ours, because the card cannot know it.
+ * `surface-sunken`, so the media reads as a well the drawing sits in rather
+ * than as the top of the card. Without it the art floated in the card's own
+ * surface with nothing marking where the picture stopped and the text began,
+ * and every card looked like it had lost its image.
+ *
+ * The rest is the card's job. It is slotted into `media`, which the card pulls
+ * out to its own border with a negative inset and clips to its corner radius,
+ * so a border or a radius stated here would draw a second frame inside the
+ * first.
  *
  * **Do not add `inline-size` here.** The card sets `inline-size: calc(100% +
  * inset * 2)` on the slotted element through `::slotted()`, and a normal
@@ -233,14 +237,20 @@ helix-drawer {
  * specificity. A `100%` here would silently un-bleed every card's art. */
 .componentArt {
   aspect-ratio: 16 / 10;
+  background: var(--helix-color-surface-sunken);
   display: block;
 }
 
-/* The whole palette. Every shape in all forty-nine drawings is one of these two
-   fills at some `fill-opacity`, on a five step ramp: 0.06, 0.12, 0.28, 0.55,
-   0.82. There are no strokes anywhere, so every edge in the set is one fill
+/* The whole palette. Every shape in all fifty-four drawings is one of these two
+   fills at some `fill-opacity`, on a five step ramp: 0.04, 0.09, 0.16, 0.28,
+   0.44. There are no strokes anywhere, so every edge in the set is one fill
    meeting another, and a shape is visible only when it differs in weight from
-   what it sits on. The minimum readable step is about four points.
+   what it sits on.
+
+   The ramp used to top out at 0.82, which on a white page is near enough black:
+   a selected label or a badge's dot came out as the heaviest mark on the whole
+   grid, and a wall of cards read as a wall of ink. 0.44 is still unambiguously
+   the darkest step and is a grey rather than a hole.
 
    `foreground` rather than a rung on the surface ladder, for the reason the
    button's own fill gives in `base.css`: a percentage of the foreground is a
@@ -253,7 +263,11 @@ helix-drawer {
 /* The page coming back through, for the shapes that have to be lighter than
    what they sit on: a checkbox tick, a switch knob, the toggle's raised
    segment, the slider's thumb, the ring holding a badge off what it overlaps,
-   and the panel above a dialog's scrim. Never a lighter grey. */
+   and the panel above a dialog's scrim.
+
+   It is `surface` against a `sunken` media, so it is now a step *lighter* than
+   its background rather than exactly equal to it. That is what the token means
+   and it is what makes these shapes legible without a stroke. */
 .artSurface {
   fill: var(--helix-color-surface);
 }

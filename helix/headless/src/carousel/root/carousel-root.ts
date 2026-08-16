@@ -51,9 +51,45 @@ export class HelixBaseCarousel extends HelixElement {
   @property()
   label = 'Carousel'
 
-  /** The slide in view, counted from zero. */
+  /**
+   * The slide in view, counted from zero.
+   *
+   * Reading gives the real slide, in either mode. Writing sets it, the way a
+   * script assigning to a native control does. Which mode the carousel is in is
+   * read once, at the first update, from whether anything had declared an
+   * `index` by then: declared, and the consumer owns it and the carousel only
+   * announces where it would have gone; not declared, and the carousel owns it
+   * and `default-index` says where it starts.
+   *
+   * The same contract the four mixins carry, written out here rather than
+   * extracted, because a slide is addressed by position and every one of those
+   * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
+   * state turns up, this is what it is extracted from.
+   */
   @property({ type: Number })
-  index = 0
+  get index(): number {
+    return this.indexState ?? this.defaultIndex
+  }
+
+  set index(next: number) {
+    const previous = this.index
+    this.indexState = next
+    this.requestUpdate('index', previous)
+  }
+
+  /** Slide to start on, where nothing declared one. */
+  @property({ attribute: 'default-index', type: Number })
+  defaultIndex = 0
+
+  /** The slide in view, whoever set it, and `undefined` until somebody has. */
+  private indexState: number | undefined = undefined
+
+  /** Whether the consumer owns the slide, decided once and then fixed. */
+  private indexMode: boolean | undefined = undefined
+
+  private get indexIsControlled(): boolean {
+    return this.indexMode === true
+  }
 
   /** Whether moving past either end wraps to the other. */
   @property({ type: Boolean })
@@ -131,7 +167,14 @@ export class HelixBaseCarousel extends HelixElement {
        were not on it. */
     requestControlledChange({
       apply: (value) => {
-        this.index = value
+        /* Nothing in controlled mode: the carousel has said where it would go
+           and the consumer decides whether it goes. */
+        if (this.indexIsControlled) {
+          return
+        }
+        const previous = this.index
+        this.indexState = value
+        this.requestUpdate('index', previous)
         this.scrollToIndex()
       },
       event: (value) => new HelixSelectEvent({ value: String(value) }),
@@ -190,7 +233,8 @@ export class HelixBaseCarousel extends HelixElement {
        control that has already moved, and putting it on that path would offer a
        refusal that cannot be honoured. */
     if (nearest.index !== this.index) {
-      this.index = nearest.index
+      this.indexState = nearest.index
+      this.requestUpdate('index')
       this.dispatchEvent(new HelixSelectEvent({ value: String(nearest.index) }))
     }
   }
@@ -213,6 +257,10 @@ export class HelixBaseCarousel extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    // Only the first time, before anything reads it. See `MixinControllerOpen`.
+    if (this.indexMode === undefined) {
+      this.indexMode = this.indexState !== undefined
+    }
     hostAria(this.internals, { label: this.label, role: 'group' })
     // Announced as a carousel rather than as a bare group, so a reader knows
     // what the controls beside it are for.

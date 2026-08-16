@@ -728,7 +728,8 @@ which is what a run of cards wants rather than a run of full-width panels.
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'hero' \| undefined` | - | - | Whether the controls sit under the slides or on them. |
 | `autoplay` | `autoplay` | `boolean` | `false` | `HelixBaseCarousel` | Whether the carousel advances on its own. |
-| `index` | `index` | `number` | `0` | `HelixBaseCarousel` | The slide in view, counted from zero. |
+| `defaultIndex` | `default-index` | `number` | `0` | `HelixBaseCarousel` | Slide to start on, where nothing declared one. |
+| `index` | `index` | `number` | - | `HelixBaseCarousel` | The slide in view, counted from zero. |
 | `interval` | `interval` | `number` | `5000` | `HelixBaseCarousel` | How long each slide is held, in milliseconds. |
 | `label` | `label` | `string` | `'Carousel'` | `HelixBaseCarousel` | Accessible name for the carousel. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseCarousel` | Whether moving past either end wraps to the other. |
@@ -1884,7 +1885,7 @@ document is not always where the headings are.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `current` | - | `string` | `''` | `HelixBasePageNav` | The id of the section being read, or empty before anything is measured. |
+| `current` | - | `string` | - | `HelixBasePageNav` | The id of the section being read, or empty before anything is measured. |
 | `label` | `label` | `string` | `'On this page'` | `HelixBasePageNav` | Accessible name for the navigation. |
 | `offset` | `offset` | `number` | `0` | `HelixBasePageNav` | How far below the top of the window a heading counts as reached, in pixels. |
 

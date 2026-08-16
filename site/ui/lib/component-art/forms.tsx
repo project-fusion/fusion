@@ -33,18 +33,18 @@ export const formsArt: Record<string, ReactNode> = {
       <path
         className="artFg"
         d="M56 80h68v40H56a4 4 0 0 1-4-4V84a4 4 0 0 1 4-4z"
-        fillOpacity="0.12"
+        fillOpacity="0.09"
       />
-      <path className="artFg" d="M124 80h72v40h-72z" fillOpacity="0.12" />
+      <path className="artFg" d="M124 80h72v40h-72z" fillOpacity="0.09" />
       <path
         className="artFg"
         d="M196 80h68a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4h-68z"
-        fillOpacity="0.12"
+        fillOpacity="0.09"
       />
       {[74, 146, 218].map((x) => (
         <rect
           className="artFg"
-          fillOpacity="0.55"
+          fillOpacity="0.28"
           height="8"
           key={x}
           rx="4"
@@ -71,7 +71,7 @@ export const formsArt: Record<string, ReactNode> = {
           (row === 0 && column < 3) || (row === 3 && column > 4) ? null : (
             <rect
               className="artFg"
-              fillOpacity={row === 1 && column === 3 ? 0.82 : 0.06}
+              fillOpacity={row === 1 && column === 3 ? 0.44 : 0.04}
               height="28"
               key={`${x}-${y}`}
               rx="4"
@@ -95,10 +95,10 @@ export const formsArt: Record<string, ReactNode> = {
    */
   checkbox: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="20" rx="4" width="20" x="110" y="90" />
-      <rect className="artFg" fillOpacity="0.82" height="20" rx="4" width="20" x="150" y="90" />
+      <rect className="artFg" fillOpacity="0.09" height="20" rx="4" width="20" x="110" y="90" />
+      <rect className="artFg" fillOpacity="0.44" height="20" rx="4" width="20" x="150" y="90" />
       <path className="artSurface" d="M154 100l3.5 3.5 7-7.5 1.4 1.4-8.4 8.9-4.9-4.9z" />
-      <rect className="artFg" fillOpacity="0.82" height="20" rx="4" width="20" x="190" y="90" />
+      <rect className="artFg" fillOpacity="0.44" height="20" rx="4" width="20" x="190" y="90" />
       <rect className="artSurface" height="3" rx="1.5" width="10" x="195" y="98.5" />
     </>
   ),
@@ -112,9 +112,9 @@ export const formsArt: Record<string, ReactNode> = {
   'checkbox-group': (
     <>
       {[
-        { box: 0.82, w: 96, y: 62 },
-        { box: 0.12, w: 72, y: 94 },
-        { box: 0.82, w: 84, y: 126 },
+        { box: 0.44, w: 96, y: 62 },
+        { box: 0.09, w: 72, y: 94 },
+        { box: 0.44, w: 84, y: 126 },
       ].map((row) => (
         <g key={row.y}>
           <rect
@@ -128,7 +128,7 @@ export const formsArt: Record<string, ReactNode> = {
           />
           <rect
             className="artFg"
-            fillOpacity="0.28"
+            fillOpacity="0.16"
             height="8"
             rx="4"
             width={row.w}
@@ -143,7 +143,7 @@ export const formsArt: Record<string, ReactNode> = {
   /** Square at the control height, and the glyph is all of it. */
   'icon-button': (
     <>
-      <rect className="artFg" fillOpacity="0.82" height="40" rx="4" width="40" x="140" y="80" />
+      <rect className="artFg" fillOpacity="0.44" height="40" rx="4" width="40" x="140" y="80" />
       {[90, 98.75, 107.5].map((y) => (
         <rect className="artSurface" height="2.5" key={y} rx="1.25" width="20" x="150" y={y} />
       ))}
@@ -153,29 +153,29 @@ export const formsArt: Record<string, ReactNode> = {
   /** More than one of them is the answer, and only those carry a band. */
   listbox: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="28" rx="4" width="208" x="56" y="44" />
-      <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="104" x="72" y="54" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="80" x="72" y="90" />
-      <rect className="artFg" fillOpacity="0.12" height="28" rx="4" width="208" x="56" y="116" />
-      <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="120" x="72" y="126" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="72" y="162" />
+      <rect className="artFg" fillOpacity="0.09" height="28" rx="4" width="208" x="56" y="44" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="104" x="72" y="54" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="80" x="72" y="90" />
+      <rect className="artFg" fillOpacity="0.09" height="28" rx="4" width="208" x="56" y="116" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="120" x="72" y="126" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="88" x="72" y="162" />
     </>
   ),
 
   /** One choice, on its own. The count is the distinction from Listbox. */
   option: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="192" x="64" y="80" />
-      <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="88" x="80" y="96" />
-      <path className="artFg" d="M224 100l4 4 9-10 1.4 1.4-10.4 11.4-5.4-5.4z" fillOpacity="0.55" />
+      <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="192" x="64" y="80" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="80" y="96" />
+      <path className="artFg" d="M224 100l4 4 9-10 1.4 1.4-10.4 11.4-5.4-5.4z" fillOpacity="0.28" />
     </>
   ),
 
   /** One choice, and the one it is an answer to. */
   radio: (
     <>
-      <circle className="artFg" cx="136" cy="100" fillOpacity="0.12" r="10" />
-      <circle className="artFg" cx="184" cy="100" fillOpacity="0.82" r="10" />
+      <circle className="artFg" cx="136" cy="100" fillOpacity="0.09" r="10" />
+      <circle className="artFg" cx="184" cy="100" fillOpacity="0.44" r="10" />
       <circle className="artSurface" cx="184" cy="100" r="4" />
     </>
   ),
@@ -190,21 +190,21 @@ export const formsArt: Record<string, ReactNode> = {
    */
   select: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="208" x="56" y="36" />
-      <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="72" x="72" y="52" />
-      <path className="artFg" d="M236.5 54l5.5 5.5 5.5-5.5-1.5-1.5-4 4-4-4z" fillOpacity="0.28" />
-      <rect className="artFg" fillOpacity="0.06" height="80" rx="8" width="208" x="56" y="88" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="76" y="108" />
-      <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="104" x="76" y="140" />
+      <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="208" x="56" y="36" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="72" x="72" y="52" />
+      <path className="artFg" d="M236.5 54l5.5 5.5 5.5-5.5-1.5-1.5-4 4-4-4z" fillOpacity="0.16" />
+      <rect className="artFg" fillOpacity="0.04" height="80" rx="8" width="208" x="56" y="88" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="88" x="76" y="108" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="104" x="76" y="140" />
     </>
   ),
 
   /** Width is height times 1.75, exactly, which is what the component computes. */
   switch: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="24" rx="12" width="42" x="88" y="88" />
+      <rect className="artFg" fillOpacity="0.09" height="24" rx="12" width="42" x="88" y="88" />
       <circle className="artSurface" cx="100" cy="100" r="8" />
-      <rect className="artFg" fillOpacity="0.82" height="24" rx="12" width="42" x="190" y="88" />
+      <rect className="artFg" fillOpacity="0.44" height="24" rx="12" width="42" x="190" y="88" />
       <circle className="artSurface" cx="220" cy="100" r="8" />
     </>
   ),
@@ -212,12 +212,12 @@ export const formsArt: Record<string, ReactNode> = {
   /** Several lines, and a corner to pull. */
   textarea: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="104" rx="4" width="224" x="48" y="48" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="160" x="64" y="66" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="176" x="64" y="84" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="112" x="64" y="102" />
-      <rect className="artFg" fillOpacity="0.28" height="4" rx="1" width="4" x="256" y="134" />
-      <rect className="artFg" fillOpacity="0.28" height="4" rx="1" width="4" x="250" y="140" />
+      <rect className="artFg" fillOpacity="0.09" height="104" rx="4" width="224" x="48" y="48" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="160" x="64" y="66" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="176" x="64" y="84" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="112" x="64" y="102" />
+      <rect className="artFg" fillOpacity="0.16" height="4" rx="1" width="4" x="256" y="134" />
+      <rect className="artFg" fillOpacity="0.16" height="4" rx="1" width="4" x="250" y="140" />
     </>
   ),
 
@@ -227,11 +227,11 @@ export const formsArt: Record<string, ReactNode> = {
    */
   toggle: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="40" rx="12" width="192" x="64" y="80" />
+      <rect className="artFg" fillOpacity="0.09" height="40" rx="12" width="192" x="64" y="80" />
       <rect className="artSurface" height="32" rx="4" width="60" x="68" y="84" />
-      <rect className="artFg" fillOpacity="0.82" height="8" rx="4" width="28" x="84" y="96" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="28" x="146" y="96" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="28" x="210" y="96" />
+      <rect className="artFg" fillOpacity="0.44" height="8" rx="4" width="28" x="84" y="96" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="28" x="146" y="96" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="28" x="210" y="96" />
     </>
   ),
 }

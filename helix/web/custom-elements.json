@@ -5354,9 +5354,63 @@
               "type": {
                 "text": "number"
               },
-              "default": "0",
-              "description": "The slide in view, counted from zero.",
+              "description": "The slide in view, counted from zero.\n\nReading gives the real slide, in either mode. Writing sets it, the way a\nscript assigning to a native control does. Which mode the carousel is in is\nread once, at the first update, from whether anything had declared an\n`index` by then: declared, and the consumer owns it and the carousel only\nannounces where it would have gone; not declared, and the carousel owns it\nand `default-index` says where it starts.\n\nThe same contract the four mixins carry, written out here rather than\nextracted, because a slide is addressed by position and every one of those\nmixins is keyed by a name. One consumer is not a mixin: if a second numeric\nstate turns up, this is what it is extracted from.",
               "attribute": "index",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultIndex",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Slide to start on, where nothing declared one.",
+              "attribute": "default-index",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "indexState",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The slide in view, whoever set it, and `undefined` until somebody has.",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "indexMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the slide, decided once and then fixed.",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "indexIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -5637,9 +5691,21 @@
               "type": {
                 "text": "number"
               },
-              "default": "0",
-              "description": "The slide in view, counted from zero.",
+              "description": "The slide in view, counted from zero.\n\nReading gives the real slide, in either mode. Writing sets it, the way a\nscript assigning to a native control does. Which mode the carousel is in is\nread once, at the first update, from whether anything had declared an\n`index` by then: declared, and the consumer owns it and the carousel only\nannounces where it would have gone; not declared, and the carousel owns it\nand `default-index` says where it starts.\n\nThe same contract the four mixins carry, written out here rather than\nextracted, because a slide is addressed by position and every one of those\nmixins is keyed by a name. One consumer is not a mixin: if a second numeric\nstate turns up, this is what it is extracted from.",
               "fieldName": "index",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "name": "default-index",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Slide to start on, where nothing declared one.",
+              "fieldName": "defaultIndex",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -16193,8 +16259,22 @@
               "type": {
                 "text": "string"
               },
+              "description": "The id of the section being read, or empty before anything is measured.\n\nRead-only, and a getter rather than a property for that reason: it is\nderived from where the page is scrolled to, so a consumer setting it would\nbe overwritten by the next thing that crossed the reading line. Every other\nwritable property in this library that a component also writes is state a\nconsumer can own; this one cannot be, and saying so with the type is better\nthan saying it in a sentence nobody reads.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBasePageNav",
+                "module": "src/page-nav/root/page-nav-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "reading",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
               "default": "''",
-              "description": "The id of the section being read, or empty before anything is measured.",
+              "description": "What `current` reports, which only `mark` writes.",
               "inheritedFrom": {
                 "name": "HelixBasePageNav",
                 "module": "src/page-nav/root/page-nav-root.ts"

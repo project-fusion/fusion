@@ -1076,8 +1076,24 @@ case is the absent attribute, and the styles read it that way. */
   perView?: HelixCarousel["perView"];
   /** Accessible name for the carousel. */
   label?: HelixCarousel["label"];
-  /** The slide in view, counted from zero. */
+  /** The slide in view, counted from zero.
+
+Reading gives the real slide, in either mode. Writing sets it, the way a
+script assigning to a native control does. Which mode the carousel is in is
+read once, at the first update, from whether anything had declared an
+`index` by then: declared, and the consumer owns it and the carousel only
+announces where it would have gone; not declared, and the carousel owns it
+and `default-index` says where it starts.
+
+The same contract the four mixins carry, written out here rather than
+extracted, because a slide is addressed by position and every one of those
+mixins is keyed by a name. One consumer is not a mixin: if a second numeric
+state turns up, this is what it is extracted from. */
   index?: HelixCarousel["index"];
+  /** Slide to start on, where nothing declared one. */
+  "default-index"?: HelixCarousel["defaultIndex"];
+  /** Slide to start on, where nothing declared one. */
+  defaultIndex?: HelixCarousel["defaultIndex"];
   /** Whether moving past either end wraps to the other. */
   loop?: HelixCarousel["loop"];
   /** Whether the carousel advances on its own. */
@@ -1108,8 +1124,24 @@ case is the absent attribute, and the styles read it that way. */
   "prop:perView"?: HelixCarousel["perView"];
   /** Accessible name for the carousel. */
   "prop:label"?: HelixCarousel["label"];
-  /** The slide in view, counted from zero. */
+  /** The slide in view, counted from zero.
+
+Reading gives the real slide, in either mode. Writing sets it, the way a
+script assigning to a native control does. Which mode the carousel is in is
+read once, at the first update, from whether anything had declared an
+`index` by then: declared, and the consumer owns it and the carousel only
+announces where it would have gone; not declared, and the carousel owns it
+and `default-index` says where it starts.
+
+The same contract the four mixins carry, written out here rather than
+extracted, because a slide is addressed by position and every one of those
+mixins is keyed by a name. One consumer is not a mixin: if a second numeric
+state turns up, this is what it is extracted from. */
   "prop:index"?: HelixCarousel["index"];
+  /** Slide to start on, where nothing declared one. */
+  "attr:default-index"?: HelixCarousel["defaultIndex"];
+  /** Slide to start on, where nothing declared one. */
+  "prop:defaultIndex"?: HelixCarousel["defaultIndex"];
   /** Whether moving past either end wraps to the other. */
   "prop:loop"?: HelixCarousel["loop"];
   /** Whether the carousel advances on its own. */
@@ -2485,8 +2517,6 @@ The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
   offset?: HelixPageNav["offset"];
-  /** The id of the section being read, or empty before anything is measured. */
-  current?: HelixPageNav["current"];
 };
 
 export type HelixPageNavSolidJsProps = {
@@ -2498,8 +2528,6 @@ The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
   "prop:offset"?: HelixPageNav["offset"];
-  /** The id of the section being read, or empty before anything is measured. */
-  "prop:current"?: HelixPageNav["current"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5214,6 +5242,19 @@ export type CustomElements = {
    * case is the absent attribute, and the styles read it that way.
    * - `label`: Accessible name for the carousel.
    * - `index`: The slide in view, counted from zero.
+   *
+   * Reading gives the real slide, in either mode. Writing sets it, the way a
+   * script assigning to a native control does. Which mode the carousel is in is
+   * read once, at the first update, from whether anything had declared an
+   * `index` by then: declared, and the consumer owns it and the carousel only
+   * announces where it would have gone; not declared, and the carousel owns it
+   * and `default-index` says where it starts.
+   *
+   * The same contract the four mixins carry, written out here rather than
+   * extracted, because a slide is addressed by position and every one of those
+   * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
+   * state turns up, this is what it is extracted from.
+   * - `default-index`/`defaultIndex`: Slide to start on, where nothing declared one.
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
    * - `interval`: How long each slide is held, in milliseconds.
@@ -6618,7 +6659,14 @@ export type CustomElements = {
    * The reading line. A page with a sticky masthead sets this to its height, or
    * a little more: without it the current section changes as a heading slides
    * under the chrome rather than as it reaches the top of what can be seen.
-   * - `current`: The id of the section being read, or empty before anything is measured. (property only)
+   * - `current`: The id of the section being read, or empty before anything is measured.
+   *
+   * Read-only, and a getter rather than a property for that reason: it is
+   * derived from where the page is scrolled to, so a consumer setting it would
+   * be overwritten by the next thing that crossed the reading line. Every other
+   * writable property in this library that a component also writes is state a
+   * consumer can own; this one cannot be, and saying so with the type is better
+   * than saying it in a sentence nobody reads. (property only) (readonly)
    *
    * ## Slots
    *
@@ -9362,6 +9410,19 @@ export type CustomElementsSolidJs = {
    * case is the absent attribute, and the styles read it that way.
    * - `label`: Accessible name for the carousel.
    * - `index`: The slide in view, counted from zero.
+   *
+   * Reading gives the real slide, in either mode. Writing sets it, the way a
+   * script assigning to a native control does. Which mode the carousel is in is
+   * read once, at the first update, from whether anything had declared an
+   * `index` by then: declared, and the consumer owns it and the carousel only
+   * announces where it would have gone; not declared, and the carousel owns it
+   * and `default-index` says where it starts.
+   *
+   * The same contract the four mixins carry, written out here rather than
+   * extracted, because a slide is addressed by position and every one of those
+   * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
+   * state turns up, this is what it is extracted from.
+   * - `default-index`/`defaultIndex`: Slide to start on, where nothing declared one.
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
    * - `interval`: How long each slide is held, in milliseconds.
@@ -10833,7 +10894,14 @@ export type CustomElementsSolidJs = {
    * The reading line. A page with a sticky masthead sets this to its height, or
    * a little more: without it the current section changes as a heading slides
    * under the chrome rather than as it reaches the top of what can be seen.
-   * - `current`: The id of the section being read, or empty before anything is measured. (property only)
+   * - `current`: The id of the section being read, or empty before anything is measured.
+   *
+   * Read-only, and a getter rather than a property for that reason: it is
+   * derived from where the page is scrolled to, so a consumer setting it would
+   * be overwritten by the next thing that crossed the reading line. Every other
+   * writable property in this library that a component also writes is state a
+   * consumer can own; this one cannot be, and saying so with the type is better
+   * than saying it in a sentence nobody reads. (property only) (readonly)
    *
    * ## Slots
    *

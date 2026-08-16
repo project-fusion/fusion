@@ -14,7 +14,7 @@ import type { ReactNode } from 'react'
  *   20, badge 16, switch 24 by 42, icon 20, header 56.
  * - **Radii are 4, 8, 12 and full.** The seed is `0.5rem`, so that is the whole
  *   ladder.
- * - **Alpha is a five step ramp**: 0.06, 0.12, 0.28, 0.55, 0.82.
+ * - **Alpha is a five step ramp**: 0.04, 0.09, 0.16, 0.28, 0.44.
  * - **A background plane appears only where the component paints one.** Tabs
  *   is the case that made this a rule: its default is a raised pill on the
  *   selected tab "and nothing at all behind the row", with `--_tabs-rule: none`.
@@ -24,49 +24,49 @@ export const coreArt: Record<string, ReactNode> = {
   /** Items flush against each other, one hairline between neighbours. */
   accordion: (
     <>
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="68" y="44" />
-      <rect className="artFg" fillOpacity="0.28" height="1" width="224" x="48" y="66" />
-      <rect className="artFg" fillOpacity="0.82" height="8" rx="4" width="104" x="68" y="86" />
-      <rect className="artFg" fillOpacity="0.12" height="6" rx="3" width="160" x="68" y="112" />
-      <rect className="artFg" fillOpacity="0.28" height="1" width="224" x="48" y="142" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="72" x="68" y="162" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="88" x="68" y="44" />
+      <rect className="artFg" fillOpacity="0.16" height="1" width="224" x="48" y="66" />
+      <rect className="artFg" fillOpacity="0.44" height="8" rx="4" width="104" x="68" y="86" />
+      <rect className="artFg" fillOpacity="0.09" height="6" rx="3" width="160" x="68" y="112" />
+      <rect className="artFg" fillOpacity="0.16" height="1" width="224" x="48" y="142" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="72" x="68" y="162" />
     </>
   ),
 
   /** A 16 pixel mark pinned at 45 degrees, held off by a ring of the page. */
   badge: (
     <>
-      <circle className="artFg" cx="160" cy="104" fillOpacity="0.12" r="40" />
+      <circle className="artFg" cx="160" cy="104" fillOpacity="0.09" r="40" />
       <circle className="artSurface" cx="188" cy="76" r="12" />
-      <circle className="artFg" cx="188" cy="76" fillOpacity="0.82" r="8" />
+      <circle className="artFg" cx="188" cy="76" fillOpacity="0.44" r="8" />
     </>
   ),
 
   /** One control at 40, three times, gaining weight as it comes forward. */
   button: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="120" x="80" y="58" />
-      <rect className="artFg" fillOpacity="0.28" height="40" rx="4" width="120" x="100" y="76" />
-      <rect className="artFg" fillOpacity="0.82" height="40" rx="4" width="120" x="120" y="94" />
+      <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="120" x="80" y="58" />
+      <rect className="artFg" fillOpacity="0.16" height="40" rx="4" width="120" x="100" y="76" />
+      <rect className="artFg" fillOpacity="0.44" height="40" rx="4" width="120" x="120" y="94" />
     </>
   ),
 
   /** Two surfaces at radius 8, and the third tone is their overlap. */
   card: (
     <>
-      <rect className="artFg" fillOpacity="0.06" height="104" rx="8" width="176" x="48" y="40" />
-      <rect className="artFg" fillOpacity="0.06" height="104" rx="8" width="176" x="96" y="72" />
-      <rect className="artFg" fillOpacity="0.55" height="32" rx="4" width="64" x="192" y="128" />
+      <rect className="artFg" fillOpacity="0.04" height="104" rx="8" width="176" x="48" y="40" />
+      <rect className="artFg" fillOpacity="0.04" height="104" rx="8" width="176" x="96" y="72" />
+      <rect className="artFg" fillOpacity="0.28" height="32" rx="4" width="64" x="192" y="128" />
     </>
   ),
 
   /** A 40 pixel field at radius 4, sunken, with a caret in it. */
   input: (
     <>
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="56" x="48" y="52" />
-      <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="224" x="48" y="72" />
-      <rect className="artFg" fillOpacity="0.55" height="8" rx="4" width="88" x="64" y="88" />
-      <rect className="artFg" fillOpacity="0.82" height="20" width="2" x="160" y="82" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="56" x="48" y="52" />
+      <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="224" x="48" y="72" />
+      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="64" y="88" />
+      <rect className="artFg" fillOpacity="0.44" height="20" width="2" x="160" y="82" />
     </>
   ),
 
@@ -75,10 +75,10 @@ export const coreArt: Record<string, ReactNode> = {
     <>
       {[128, 168].map((x) => (
         <g key={x}>
-          <rect className="artFg" fillOpacity="0.12" height="24" rx="4" width="24" x={x} y="88" />
+          <rect className="artFg" fillOpacity="0.09" height="24" rx="4" width="24" x={x} y="88" />
           <rect
             className="artFg"
-            fillOpacity="0.28"
+            fillOpacity="0.16"
             height="3"
             rx="1.5"
             width="22"
@@ -87,7 +87,7 @@ export const coreArt: Record<string, ReactNode> = {
           />
           <rect
             className="artFg"
-            fillOpacity="0.55"
+            fillOpacity="0.28"
             height="4"
             rx="2"
             width="12"
@@ -128,11 +128,11 @@ export const coreArt: Record<string, ReactNode> = {
           y2="0"
         >
           <stop offset="0" stopColor="var(--helix-color-foreground)" stopOpacity="0" />
-          <stop offset="0.5" stopColor="var(--helix-color-foreground)" stopOpacity="0.14" />
+          <stop offset="0.5" stopColor="var(--helix-color-foreground)" stopOpacity="0.09" />
           <stop offset="1" stopColor="var(--helix-color-foreground)" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <use className="artFg" fillOpacity="0.12" href="#componentArtSkeleton" />
+      <use className="artFg" fillOpacity="0.09" href="#componentArtSkeleton" />
       <use fill="url(#componentArtSkeletonSweep)" href="#componentArtSkeleton" />
     </>
   ),
@@ -147,10 +147,10 @@ export const coreArt: Record<string, ReactNode> = {
    */
   slider: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="4" rx="2" width="224" x="48" y="98" />
-      <rect className="artFg" fillOpacity="0.55" height="4" rx="2" width="104" x="48" y="98" />
-      <circle className="artSurface" cx="96" cy="100" fillOpacity="0.55" r="10" />
-      <circle className="artFg" cx="152" cy="100" fillOpacity="0.12" r="16" />
+      <rect className="artFg" fillOpacity="0.09" height="4" rx="2" width="224" x="48" y="98" />
+      <rect className="artFg" fillOpacity="0.28" height="4" rx="2" width="104" x="48" y="98" />
+      <circle className="artSurface" cx="96" cy="100" fillOpacity="0.28" r="10" />
+      <circle className="artFg" cx="152" cy="100" fillOpacity="0.09" r="16" />
       <circle className="artSurface" cx="152" cy="100" r="10" />
     </>
   ),
@@ -163,10 +163,10 @@ export const coreArt: Record<string, ReactNode> = {
    */
   tabs: (
     <>
-      <rect className="artFg" fillOpacity="0.12" height="40" rx="4" width="80" x="120" y="80" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="36" x="62" y="96" />
-      <rect className="artFg" fillOpacity="0.82" height="8" rx="4" width="36" x="142" y="96" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="36" x="222" y="96" />
+      <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="80" x="120" y="80" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="36" x="62" y="96" />
+      <rect className="artFg" fillOpacity="0.44" height="8" rx="4" width="36" x="142" y="96" />
+      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="36" x="222" y="96" />
     </>
   ),
 
@@ -174,9 +174,9 @@ export const coreArt: Record<string, ReactNode> = {
   tag: (
     <>
       {[
-        { box: 0.06, label: 0.28, x: 48 },
-        { box: 0.12, label: 0.55, x: 124 },
-        { box: 0.28, label: 0.82, x: 200 },
+        { box: 0.04, label: 0.16, x: 48 },
+        { box: 0.09, label: 0.28, x: 124 },
+        { box: 0.16, label: 0.44, x: 200 },
       ].map((chip) => (
         <g key={chip.x}>
           <rect

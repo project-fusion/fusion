@@ -1,6 +1,6 @@
 import { customElement, HelixElement } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * @summary Links to the headings on this page, marking the one being read.
@@ -64,9 +64,23 @@ export class HelixBasePageNav extends HelixElement {
   @property({ type: Number })
   offset = 0
 
-  /** The id of the section being read, or empty before anything is measured. */
-  @property({ attribute: false })
-  current = ''
+  /**
+   * The id of the section being read, or empty before anything is measured.
+   *
+   * Read-only, and a getter rather than a property for that reason: it is
+   * derived from where the page is scrolled to, so a consumer setting it would
+   * be overwritten by the next thing that crossed the reading line. Every other
+   * writable property in this library that a component also writes is state a
+   * consumer can own; this one cannot be, and saying so with the type is better
+   * than saying it in a sentence nobody reads.
+   */
+  get current(): string {
+    return this.reading
+  }
+
+  /** What `current` reports, which only `mark` writes. */
+  @state()
+  private reading = ''
 
   private observer: IntersectionObserver | undefined
 
@@ -113,7 +127,7 @@ export class HelixBasePageNav extends HelixElement {
         link.removeAttribute('aria-current')
       }
     }
-    this.current = active?.target.id ?? ''
+    this.reading = active?.target.id ?? ''
   }
 
   /**

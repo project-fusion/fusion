@@ -177,3 +177,61 @@ describe('carousel selection can be refused', () => {
     expect(host.index).toBe(0)
   })
 })
+
+describe('carousel, controlled and uncontrolled', () => {
+  const carousel = async (
+    attrs = '',
+  ): Promise<
+    HTMLElement & { goTo(index: number): void; index: number; updateComplete: Promise<boolean> }
+  > => {
+    const host = (await mount(
+      `<helix-carousel label="Highlights" ${attrs}>
+        <div>One</div><div>Two</div><div>Three</div>
+      </helix-carousel>`,
+    )) as HTMLElement & {
+      goTo(index: number): void
+      index: number
+      updateComplete: Promise<boolean>
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('an index in the markup is the consumer’s, and the carousel does not move it', async () => {
+    /* The same fault the four mixins were reshaped for, in the one component
+       whose state is a position rather than a name. */
+    const host = await carousel('index="1"')
+    host.goTo(2)
+    await host.updateComplete
+    expect(host.index).toBe(1)
+  })
+
+  test('and it is still told where the carousel would have gone', async () => {
+    const host = await carousel('index="1"')
+    let asked = ''
+    host.addEventListener('helix-select', (event) => {
+      asked = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    host.goTo(2)
+    await host.updateComplete
+    expect(asked).toBe('2')
+  })
+
+  test('default-index seeds one that moves itself', async () => {
+    const host = await carousel('default-index="1"')
+    expect(host.index).toBe(1)
+    host.goTo(2)
+    await host.updateComplete
+    expect(host.index).toBe(2)
+  })
+
+  test('a script may move a seeded carousel without taking it over', async () => {
+    const host = await carousel('default-index="0"')
+    host.index = 2
+    await host.updateComplete
+    expect(host.index).toBe(2)
+    host.goTo(1)
+    await host.updateComplete
+    expect(host.index).toBe(1)
+  })
+})
