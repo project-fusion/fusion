@@ -137,7 +137,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
 
   /** Closes the list and puts focus back where it came from. */
   private close(): void {
-    if (!this.isOpen) {
+    if (!this.open) {
       return
     }
     this.requestOpen(false)
@@ -148,7 +148,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
 
   private readonly handleChange = (event: Event): void => {
     const next = (event.target as HelixBaseListbox).value
-    this.value = next
+    this.requestValue(next)
     /* Closed on a choice, unless more than one can be made: a multi-select that
        shut after each pick would be a control the reader has to reopen to use
        again. `helix-change` is left to travel, since it came from the listbox
@@ -191,7 +191,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
     super.updated(changed)
     this.sync()
     this.linkHost()
-    if (this.isOpen) {
+    if (this.open) {
       /* Driven from `updated` rather than from a `show()` method, because the
          open state is the property and a consumer may set it directly. The
          controller is idempotent, so arriving here twice for the same open
@@ -212,7 +212,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
         id="control"
         type="button"
         aria-haspopup="listbox"
-        aria-expanded=${this.isOpen ? 'true' : 'false'}
+        aria-expanded=${this.open ? 'true' : 'false'}
         aria-describedby=${this.describedBy ?? nothing}
         ?disabled=${this.disabled}
         @click=${() => this.toggleOpen()}
@@ -222,7 +222,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
         <slot name="indicator"></slot>
       </button>
 
-      <div part="surface" popover="manual" ?hidden=${!this.isOpen}>
+      <div part="surface" popover="manual" ?hidden=${!this.open}>
         <helix-listbox
           part="listbox"
           exportparts="items, empty"

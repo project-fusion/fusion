@@ -7,7 +7,7 @@ beforeAll(async () => {
 })
 
 type Checkbox = HTMLElement & {
-  isChecked: boolean
+  checked: boolean
   checked: boolean | undefined
   indeterminate: boolean
   updateComplete: Promise<unknown>
@@ -28,7 +28,7 @@ describe('checkbox', () => {
     // Seeding it on connect would render unchecked on the server and snap
     // checked at hydration, because SSR never calls that hook.
     const box = await checkbox('default-checked')
-    expect(box.isChecked).toBe(true)
+    expect(box.checked).toBe(true)
     expect(control(box).checked).toBe(true)
   })
 
@@ -39,7 +39,7 @@ describe('checkbox', () => {
     })
     control(box).click()
     await box.updateComplete
-    expect(box.isChecked).toBe(false)
+    expect(box.checked).toBe(false)
     // The input flipped itself first, so it is put back to what the element
     // holds. Otherwise the box shows a state the element refused.
     expect(control(box).checked).toBe(false)
@@ -51,7 +51,7 @@ describe('checkbox', () => {
     const box = await checkbox('checked')
     control(box).click()
     await box.updateComplete
-    expect(box.isChecked).toBe(true)
+    expect(box.checked).toBe(true)
   })
 
   test('the native change is relayed, so `onChange` reaches a consumer', async () => {

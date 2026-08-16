@@ -22,7 +22,9 @@ describe('slider', () => {
   test('the fill is written as a fraction, not measured off the thumb', async () => {
     // Arithmetic the component can do exactly, where a measurement of the thumb
     // would be a guess at where the platform drew it.
-    const host = await mount('<helix-slider label="A" max="200" min="0" value="50"></helix-slider>')
+    const host = await mount(
+      '<helix-slider label="A" max="200" min="0" default-value="50"></helix-slider>',
+    )
     expect(host.style.getPropertyValue('--_slider-fraction')).toBe('0.25')
   })
 })

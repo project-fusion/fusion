@@ -9,7 +9,7 @@ beforeAll(async () => {
 type Updatable = HTMLElement & { updateComplete: Promise<unknown> }
 
 const markup = `
-  <helix-tabs value="one">
+  <helix-tabs default-active="one">
     <helix-tabs-tab value="one">One</helix-tabs-tab>
     <helix-tabs-tab value="two">Two</helix-tabs-tab>
     <helix-tabs-tab disabled value="three">Three</helix-tabs-tab>
@@ -119,9 +119,9 @@ describe('tabs selection can be refused', () => {
        item's event, so `helix-change` was an announcement nobody could answer,
        while `Radio.Group` two folders away could be. Whether a selection can be
        refused should not depend on which component is being looked at. */
-    const host = (await mount(markup)) as Updatable & { value: string }
+    const host = (await mount(markup)) as Updatable & { active: string }
     await host.updateComplete
-    const started = host.value
+    const started = host.active
 
     host.addEventListener('helix-change', (event) => event.preventDefault())
     const other = [...host.querySelectorAll('helix-tabs-tab')].find(
@@ -136,7 +136,7 @@ describe('tabs selection can be refused', () => {
     )
     await host.updateComplete
 
-    expect(host.value).toBe(started)
+    expect(host.active).toBe(started)
   })
 
   test('a disabled first tab is not made current by default', async () => {
@@ -223,3 +223,66 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('tabs, controlled and uncontrolled', () => {
+  /* The reason all four mixins changed shape. A consumer who wrote `value="one"`
+     and then clicked another tab read back "two": the set overwrote them, so a
+     tab strip could not be owned by the thing rendering it. */
+  test('writing active hands the set to the consumer, and it stays put', async () => {
+    const host = (await mount(
+      `<helix-tabs active="one">
+        <helix-tabs-tab value="one">One</helix-tabs-tab>
+        <helix-tabs-tab value="two">Two</helix-tabs-tab>
+      </helix-tabs>`,
+    )) as Updatable & { active: string }
+    await host.updateComplete
+    ;(tabs(host)[1] as unknown as { select(): void }).select()
+    await host.updateComplete
+
+    // Announced, and not applied: the consumer owns it and will say what next.
+    expect(host.active).toBe('one')
+    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+  })
+
+  test('the change is still announced, so the consumer knows what to set', async () => {
+    const host = (await mount(
+      `<helix-tabs active="one">
+        <helix-tabs-tab value="one">One</helix-tabs-tab>
+        <helix-tabs-tab value="two">Two</helix-tabs-tab>
+      </helix-tabs>`,
+    )) as Updatable & { active: string }
+    await host.updateComplete
+    let asked = ''
+    host.addEventListener('helix-change', (event) => {
+      asked = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    ;(tabs(host)[1] as unknown as { select(): void }).select()
+    await host.updateComplete
+    expect(asked).toBe('two')
+  })
+
+  test('default-active seeds instead, and the set then owns itself', async () => {
+    const host = (await mount(
+      `<helix-tabs default-active="one">
+        <helix-tabs-tab value="one">One</helix-tabs-tab>
+        <helix-tabs-tab value="two">Two</helix-tabs-tab>
+      </helix-tabs>`,
+    )) as Updatable & { active: string }
+    await host.updateComplete
+    ;(tabs(host)[1] as unknown as { select(): void }).select()
+    await host.updateComplete
+    expect(host.active).toBe('two')
+  })
+
+  test('reading active always gives the real tab, in either mode', async () => {
+    // The point of one property rather than two: nobody has to ask which.
+    const host = (await mount(
+      `<helix-tabs default-active="two">
+        <helix-tabs-tab value="one">One</helix-tabs-tab>
+        <helix-tabs-tab value="two">Two</helix-tabs-tab>
+      </helix-tabs>`,
+    )) as Updatable & { active: string }
+    await host.updateComplete
+    expect(host.active).toBe('two')
+  })
+})

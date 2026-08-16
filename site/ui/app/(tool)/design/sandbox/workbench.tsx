@@ -544,7 +544,7 @@ export function SandboxWorkbench({ families }: Props) {
 
   /* A filter is a request to see what came back, so a narrowed tree opens
      itself rather than making the reader open each branch to find out. */
-  const isOpen = (slug: string) => query !== '' || (expandAll ?? slug === family.slug)
+  const open = (slug: string) => query !== '' || (expandAll ?? slug === family.slug)
 
   const tree = (
     <>
@@ -586,10 +586,10 @@ export function SandboxWorkbench({ families }: Props) {
             Nothing matches {filter}.
           </helix-text>
         ) : (
-          <helix-tree chevron="end" label="Examples" ref={treeRef} value={activeValue}>
+          <helix-tree active={activeValue} chevron="end" label="Examples" ref={treeRef}>
             {shown.map((entry) => (
               <helix-tree-item
-                expanded={isOpen(entry.slug) ? true : undefined}
+                expanded={open(entry.slug) ? true : undefined}
                 key={entry.slug}
                 value={entry.slug}
               >
@@ -861,10 +861,10 @@ export function SandboxWorkbench({ families }: Props) {
           {showPanel && (
             <helix-tabs
               data-density="sm"
+              defaultActive="terminal"
               label="Panel"
               ref={panelTabs}
               slot="panel"
-              value="terminal"
             >
               <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
               <helix-tabs-tab value="specs">Specs</helix-tabs-tab>

@@ -160,7 +160,7 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   /** Shows the bubble, unless there is nothing to show. */
   show(): void {
     clearTimeout(this.timer)
-    if (this.disabled || !this.hasContent || this.isOpen) {
+    if (this.disabled || !this.hasContent || this.open) {
       return
     }
     if (!this.requestOpen(true)) {
@@ -175,7 +175,7 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   /** Hides the bubble. */
   hide(): void {
     clearTimeout(this.timer)
-    if (!this.isOpen) {
+    if (!this.open) {
       return
     }
     if (!this.requestOpen(false)) {
@@ -198,7 +198,7 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape' && this.isOpen) {
+    if (event.key === 'Escape' && this.open) {
       // Not stopped from propagating: a tooltip is not what the reader was
       // trying to escape if it sits inside something else that also closes.
       this.hide()

@@ -18,11 +18,14 @@ export declare class MixinControllerOpenInterface {
   /** Initial open state for uncontrolled use. Ignored once `open` is set. */
   defaultOpen: boolean
 
-  /** The resolved open state, whichever mode the element is in. */
-  readonly isOpen: boolean
-
-  /** Whether the element is open. Setting this enters controlled mode. */
-  open: boolean | undefined
+  /**
+   * Whether the element is open.
+   *
+   * Reading gives the real state, in either mode. Writing hands ownership to
+   * the consumer: from then on the element announces changes and applies none
+   * of them, and waits to be told.
+   */
+  open: boolean
 
   /**
    * The consumer's callback, invoked after the state is applied.
@@ -63,13 +66,48 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
   // what TypeScript consumers see; this class is what the manifest analyzer
   // reads when resolving inherited members into dependent packages.
   class OpenElement extends Base {
-    /** Whether the element is open. Setting this enters controlled mode. */
-    @property({ reflect: true, type: Boolean })
-    open: boolean | undefined = undefined
+    /**
+     * Whether the element is open.
+     *
+     * One property, not two. Reading gives the real state whichever mode the
+     * element is in, so `dialog.open` answers the question anyone asking it
+     * meant. Writing hands ownership to the consumer, which is what the
+     * attribute in `<helix-dialog open>` does as well: from then on the element
+     * announces changes and applies none of them.
+     *
+     * It reads as an accessor pair rather than a field because those are two
+     * different questions sharing one name, and the alternative was a second
+     * property answering the first. That worked for a boolean, where `isOpen`
+     * reads well; there is no such word for a value or an active item, so all
+     * four of these mixins now have this shape instead of two shapes.
+     *
+     * Not reflected. The attribute is the consumer's input and stays as they
+     * wrote it; `data-open` carries the resolved state for stylesheets, which
+     * is what it has always been for.
+     */
+    @property({ type: Boolean })
+    get open(): boolean {
+      return this.ownedOpen ?? this.internalOpen ?? this.defaultOpen
+    }
 
-    /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+    set open(next: boolean) {
+      const previous = this.open
+      this.ownedOpen = next
+      this.requestUpdate('open', previous)
+    }
+
+    /** Initial open state for uncontrolled use. Ignored once `open` is written. */
     @property({ attribute: 'default-open', type: Boolean })
     defaultOpen = false
+
+    /**
+     * What the consumer set, and the only thing that says they own this.
+     *
+     * `undefined` until they write, which is why it is a separate field from
+     * the internal one rather than a flag beside it: "never written" and
+     * "written false" have to be different, and one field cannot hold both.
+     */
+    private ownedOpen: boolean | undefined = undefined
 
     /**
      * Uncontrolled state, `undefined` until the element is first toggled.
@@ -81,16 +119,8 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      */
     private internalOpen: boolean | undefined = undefined
 
-    /** The resolved open state, whichever mode the element is in. */
-    get isOpen(): boolean {
-      if (this.isControlled) {
-        return this.open ?? false
-      }
-      return this.internalOpen ?? this.defaultOpen
-    }
-
     private get isControlled(): boolean {
-      return this.open !== undefined
+      return this.ownedOpen !== undefined
     }
 
     /**
@@ -101,7 +131,7 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      this.toggleAttribute('data-open', this.isOpen)
+      this.toggleAttribute('data-open', this.open)
     }
 
     /**
@@ -125,7 +155,7 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * means.
      */
     requestOpen(next: boolean): boolean {
-      if (this.isOpen === next) {
+      if (this.open === next) {
         return true
       }
       return requestControlledChange({
@@ -133,8 +163,9 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
           if (this.isControlled) {
             return
           }
+          const previous = this.open
           this.internalOpen = open
-          this.requestUpdate()
+          this.requestUpdate('open', previous)
         },
         event: (open) => (open ? new HelixOpenEvent() : new HelixCloseEvent()),
         host: this,
@@ -145,7 +176,7 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
 
     /** Requests the opposite of the current state. */
     toggleOpen(): boolean {
-      return this.requestOpen(!this.isOpen)
+      return this.requestOpen(!this.open)
     }
   }
 

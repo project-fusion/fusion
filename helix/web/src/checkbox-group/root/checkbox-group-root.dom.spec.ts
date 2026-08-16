@@ -10,7 +10,7 @@ beforeAll(async () => {
 type Group = HTMLElement & {
   value: string
   name: string
-  boxes: (HTMLElement & { isChecked: boolean; value: string; name: string })[]
+  boxes: (HTMLElement & { checked: boolean; value: string; name: string })[]
   updateComplete: Promise<unknown>
   internals?: ElementInternals
 }
@@ -40,7 +40,7 @@ describe('checkbox group', () => {
 
   test('the value ticks exactly those boxes', async () => {
     const g = await group()
-    expect(g.boxes.map((b) => `${b.value}:${b.isChecked}`)).toEqual([
+    expect(g.boxes.map((b) => `${b.value}:${b.checked}`)).toEqual([
       'design:true',
       'mind:true',
       'energy:false',

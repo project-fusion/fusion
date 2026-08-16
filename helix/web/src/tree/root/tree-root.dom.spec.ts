@@ -6,7 +6,7 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const markup = `<helix-tree label="Repository" value="web">
+const markup = `<helix-tree label="Repository" default-active="web">
   <helix-tree-item expanded value="helix">
     helix
     <helix-tree-item slot="children" value="web">web</helix-tree-item>
@@ -60,7 +60,7 @@ describe('tree selection can be refused', () => {
        Tabs had the same hole and both are closed by the same mixin. */
     const host = (await mount(markup)) as Updatable & { value: string }
     await host.updateComplete
-    const started = host.value
+    const started = host.active
 
     host.addEventListener('helix-change', (event) => event.preventDefault())
     const other = [...host.querySelectorAll('helix-tree-item')].find(
@@ -75,7 +75,7 @@ describe('tree selection can be refused', () => {
     )
     await host.updateComplete
 
-    expect(host.value).toBe(started)
+    expect(host.active).toBe(started)
   })
 })
 

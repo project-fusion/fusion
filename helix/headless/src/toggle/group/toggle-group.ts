@@ -104,7 +104,7 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
   }
 
   private readonly handleSelection = (event: Event): void => {
-    this.value = (event as CustomEvent<{ value: string }>).detail.value
+    this.requestValue((event as CustomEvent<{ value: string }>).detail.value)
   }
 
   /**

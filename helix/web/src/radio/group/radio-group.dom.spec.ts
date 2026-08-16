@@ -13,7 +13,7 @@ const settle = async (host: Updatable): Promise<void> => {
 }
 
 const group = async (extra = '', chosen = ''): Promise<Updatable> => {
-  document.body.innerHTML = `<helix-radio-group label="Label" name="choice" ${extra} value="${chosen}">
+  document.body.innerHTML = `<helix-radio-group label="Label" name="choice" ${extra} default-value="${chosen}">
     <helix-radio value="one">One</helix-radio>
     <helix-radio value="two">Two</helix-radio>
     <helix-radio value="three">Three</helix-radio>

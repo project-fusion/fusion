@@ -107,7 +107,7 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
     const active = this.resolveActive(visible)
 
     for (const item of this.items) {
-      item.selected = item.value !== '' && item.value === this.value
+      item.selected = item.value !== '' && item.value === this.active
       item.focusable = item === active
       let level = 1
       let parent = item.parentElement
@@ -210,7 +210,7 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('value')) {
+    if (changed.has('active')) {
       this.syncItems()
     }
   }

@@ -10,7 +10,7 @@ beforeAll(async () => {
 
 type Popover = HTMLElement & {
   hide(): void
-  isOpen: boolean
+  open: boolean
   show(): void
   updateComplete: Promise<boolean>
 }

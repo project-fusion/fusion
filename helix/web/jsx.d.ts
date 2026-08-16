@@ -281,11 +281,27 @@ export type HelixAccordionItemHelixOpenElementEvent =
 export type HelixAccordionItemProps = {
   /** Tightens the trigger for dense layouts. */
   dense?: HelixAccordionItem["dense"];
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   open?: HelixAccordionItem["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixAccordionItem["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   defaultOpen?: HelixAccordionItem["defaultOpen"];
   /** Where the open indicator sits, or whether there is one.
 
@@ -320,11 +336,27 @@ instead. */
 export type HelixAccordionItemSolidJsProps = {
   /** Tightens the trigger for dense layouts. */
   "prop:dense"?: HelixAccordionItem["dense"];
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   "prop:open"?: HelixAccordionItem["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixAccordionItem["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "prop:defaultOpen"?: HelixAccordionItem["defaultOpen"];
   /** Where the open indicator sits, or whether there is one.
 
@@ -812,7 +844,17 @@ export type HelixCalendarProps = {
   "default-value"?: HelixCalendar["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   defaultValue?: HelixCalendar["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   value?: HelixCalendar["value"];
   /** Name the calendar reports under when its form is submitted.
 
@@ -855,6 +897,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixCalendar["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixCalendar["onValueChange"];
 
   /** Fired when a date is chosen, with the ISO date. */
   "onhelix-select"?: (e: HelixCalendarHelixSelectElementEvent) => void;
@@ -865,7 +914,17 @@ export type HelixCalendarSolidJsProps = {
   "attr:default-value"?: HelixCalendar["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "prop:defaultValue"?: HelixCalendar["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixCalendar["value"];
   /** Name the calendar reports under when its form is submitted.
 
@@ -908,6 +967,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixCalendar["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixCalendar["onValueChange"];
   /** Fired when a date is chosen, with the ISO date. */
   "on:helix-select"?: (e: HelixCalendarHelixSelectElementEvent) => void;
 
@@ -1123,7 +1189,16 @@ export type HelixCheckboxHelixChangeElementEvent =
   HelixCheckboxElementEvent<HelixChangeEvent>;
 
 export type HelixCheckboxProps = {
-  /** Whether the control is checked. Setting this enters controlled mode. */
+  /** Whether the control is checked.
+
+One property rather than two. Reading gives the real state whichever
+mode the control is in; writing hands ownership to the consumer, which
+is what the attribute in `<helix-checkbox checked>` does as well. The
+same shape all four of these mixins have, for the reason given on
+`MixinControllerOpen.open`.
+
+Not reflected: the attribute is the consumer's input and stays as they
+wrote it, and `data-checked` carries the resolved state for stylesheets. */
   checked?: HelixCheckbox["checked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   "default-checked"?: HelixCheckbox["defaultChecked"];
@@ -1166,7 +1241,16 @@ instead. */
 };
 
 export type HelixCheckboxSolidJsProps = {
-  /** Whether the control is checked. Setting this enters controlled mode. */
+  /** Whether the control is checked.
+
+One property rather than two. Reading gives the real state whichever
+mode the control is in; writing hands ownership to the consumer, which
+is what the attribute in `<helix-checkbox checked>` does as well. The
+same shape all four of these mixins have, for the reason given on
+`MixinControllerOpen.open`.
+
+Not reflected: the attribute is the consumer's input and stays as they
+wrote it, and `data-checked` carries the resolved state for stylesheets. */
   "prop:checked"?: HelixCheckbox["checked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   "bool:default-checked"?: HelixCheckbox["defaultChecked"];
@@ -1224,11 +1308,27 @@ export type HelixDialogHelixCloseElementEvent =
 export type HelixDialogProps = {
   /** How wide the panel is allowed to be. */
   appearance?: HelixDialog["appearance"];
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   open?: HelixDialog["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixDialog["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   defaultOpen?: HelixDialog["defaultOpen"];
   /** Accessible name for the dialog. */
   label?: HelixDialog["label"];
@@ -1255,11 +1355,27 @@ instead. */
 export type HelixDialogSolidJsProps = {
   /** How wide the panel is allowed to be. */
   "prop:appearance"?: HelixDialog["appearance"];
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   "prop:open"?: HelixDialog["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixDialog["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "prop:defaultOpen"?: HelixDialog["defaultOpen"];
   /** Accessible name for the dialog. */
   "prop:label"?: HelixDialog["label"];
@@ -1337,11 +1453,27 @@ export type HelixDrawerHelixOpenElementEvent =
 export type HelixDrawerProps = {
   /** Removes the panel's own surface, for a drawer inside another surface. */
   appearance?: HelixDrawer["appearance"];
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   open?: HelixDrawer["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixDrawer["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   defaultOpen?: HelixDrawer["defaultOpen"];
   /** Which edge the drawer comes from. */
   placement?: HelixDrawer["placement"];
@@ -1374,11 +1506,27 @@ instead. */
 export type HelixDrawerSolidJsProps = {
   /** Removes the panel's own surface, for a drawer inside another surface. */
   "prop:appearance"?: HelixDrawer["appearance"];
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   "prop:open"?: HelixDrawer["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixDrawer["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "prop:defaultOpen"?: HelixDrawer["defaultOpen"];
   /** Which edge the drawer comes from. */
   "prop:placement"?: HelixDrawer["placement"];
@@ -1732,7 +1880,17 @@ export type HelixInputProps = {
   "default-value"?: HelixInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   defaultValue?: HelixInput["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   value?: HelixInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixInput["hint"];
@@ -1758,6 +1916,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixInput["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixInput["onValueChange"];
 
   /** Fired as the text changes, and cancelable. */
   "onhelix-change"?: (e: HelixInputHelixChangeElementEvent) => void;
@@ -1770,7 +1935,17 @@ export type HelixInputSolidJsProps = {
   "attr:default-value"?: HelixInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "prop:defaultValue"?: HelixInput["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixInput["hint"];
@@ -1796,6 +1971,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixInput["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixInput["onValueChange"];
   /** Fired as the text changes, and cancelable. */
   "on:helix-change"?: (e: HelixInputHelixChangeElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
@@ -1855,7 +2037,17 @@ export type HelixListboxProps = {
   "default-value"?: HelixListbox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   defaultValue?: HelixListbox["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   value?: HelixListbox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixListbox["hint"];
@@ -1894,6 +2086,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixListbox["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixListbox["onValueChange"];
 
   /** Fired when the answer changes, and cancelable. */
   "onhelix-change"?: (e: HelixListboxHelixChangeElementEvent) => void;
@@ -1904,7 +2103,17 @@ export type HelixListboxSolidJsProps = {
   "attr:default-value"?: HelixListbox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "prop:defaultValue"?: HelixListbox["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixListbox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixListbox["hint"];
@@ -1943,6 +2152,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixListbox["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixListbox["onValueChange"];
   /** Fired when the answer changes, and cancelable. */
   "on:helix-change"?: (e: HelixListboxHelixChangeElementEvent) => void;
 
@@ -2047,11 +2263,27 @@ export type HelixMenuHelixSelectElementEvent =
   HelixMenuElementEvent<HelixSelectEvent>;
 
 export type HelixMenuProps = {
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   open?: HelixMenu["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixMenu["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   defaultOpen?: HelixMenu["defaultOpen"];
   /** Preferred side. It moves if that side does not fit. */
   placement?: HelixMenu["placement"];
@@ -2080,11 +2312,27 @@ instead. */
 };
 
 export type HelixMenuSolidJsProps = {
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   "prop:open"?: HelixMenu["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixMenu["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "prop:defaultOpen"?: HelixMenu["defaultOpen"];
   /** Preferred side. It moves if that side does not fit. */
   "prop:placement"?: HelixMenu["placement"];
@@ -2235,11 +2483,27 @@ Unset is a surface with an inset, which is what a panel of content wants.
 `plain` removes both, for a panel holding something that brings its own,
 such as a list whose rows run to the edges. */
   appearance?: HelixPopover["appearance"];
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   open?: HelixPopover["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixPopover["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   defaultOpen?: HelixPopover["defaultOpen"];
   /** Accessible name for the panel. */
   label?: HelixPopover["label"];
@@ -2268,11 +2532,27 @@ Unset is a surface with an inset, which is what a panel of content wants.
 `plain` removes both, for a panel holding something that brings its own,
 such as a list whose rows run to the edges. */
   "prop:appearance"?: HelixPopover["appearance"];
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   "prop:open"?: HelixPopover["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixPopover["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "prop:defaultOpen"?: HelixPopover["defaultOpen"];
   /** Accessible name for the panel. */
   "prop:label"?: HelixPopover["label"];
@@ -2398,7 +2678,17 @@ export type HelixRadioGroupProps = {
   "default-value"?: HelixRadioGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   defaultValue?: HelixRadioGroup["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   value?: HelixRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixRadioGroup["hint"];
@@ -2418,6 +2708,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixRadioGroup["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixRadioGroup["onValueChange"];
 
   /** Fired when the answer changes, and cancelable. */
   "onhelix-change"?: (e: HelixRadioGroupHelixChangeElementEvent) => void;
@@ -2428,7 +2725,17 @@ export type HelixRadioGroupSolidJsProps = {
   "attr:default-value"?: HelixRadioGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "prop:defaultValue"?: HelixRadioGroup["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixRadioGroup["hint"];
@@ -2448,6 +2755,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixRadioGroup["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixRadioGroup["onValueChange"];
   /** Fired when the answer changes, and cancelable. */
   "on:helix-change"?: (e: HelixRadioGroupHelixChangeElementEvent) => void;
 
@@ -2504,17 +2818,43 @@ export type HelixSelectHelixCloseElementEvent =
   HelixSelectElementEvent<HelixCloseEvent>;
 
 export type HelixSelectProps = {
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   open?: HelixSelect["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixSelect["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   defaultOpen?: HelixSelect["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixSelect["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   defaultValue?: HelixSelect["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   value?: HelixSelect["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixSelect["hint"];
@@ -2551,6 +2891,13 @@ which reserves every `on[A-Z]` prop for its own event system and drops
 what it does not recognise; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixSelect["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixSelect["onValueChange"];
 
   /** Relayed from the listbox when the answer changes. */
   "onhelix-change"?: (e: HelixSelectHelixChangeElementEvent) => void;
@@ -2561,17 +2908,43 @@ instead. */
 };
 
 export type HelixSelectSolidJsProps = {
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   "prop:open"?: HelixSelect["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixSelect["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "prop:defaultOpen"?: HelixSelect["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixSelect["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "prop:defaultValue"?: HelixSelect["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixSelect["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixSelect["hint"];
@@ -2608,6 +2981,13 @@ which reserves every `on[A-Z]` prop for its own event system and drops
 what it does not recognise; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixSelect["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixSelect["onValueChange"];
   /** Relayed from the listbox when the answer changes. */
   "on:helix-change"?: (e: HelixSelectHelixChangeElementEvent) => void;
   /** Fired when the list opens. */
@@ -2651,7 +3031,17 @@ export type HelixSliderProps = {
   "default-value"?: HelixSlider["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   defaultValue?: HelixSlider["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   value?: HelixSlider["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixSlider["hint"];
@@ -2697,6 +3087,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixSlider["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixSlider["onValueChange"];
 
   /** Fired as the value changes, and cancelable. */
   "onhelix-change"?: (e: HelixSliderHelixChangeElementEvent) => void;
@@ -2709,7 +3106,17 @@ export type HelixSliderSolidJsProps = {
   "attr:default-value"?: HelixSlider["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "prop:defaultValue"?: HelixSlider["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixSlider["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixSlider["hint"];
@@ -2755,6 +3162,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixSlider["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixSlider["onValueChange"];
   /** Fired as the value changes, and cancelable. */
   "on:helix-change"?: (e: HelixSliderHelixChangeElementEvent) => void;
   /** Relayed once the reader has let go. */
@@ -2820,7 +3234,16 @@ export type HelixSwitchHelixChangeElementEvent =
   HelixSwitchElementEvent<HelixChangeEvent>;
 
 export type HelixSwitchProps = {
-  /** Whether the control is checked. Setting this enters controlled mode. */
+  /** Whether the control is checked.
+
+One property rather than two. Reading gives the real state whichever
+mode the control is in; writing hands ownership to the consumer, which
+is what the attribute in `<helix-checkbox checked>` does as well. The
+same shape all four of these mixins have, for the reason given on
+`MixinControllerOpen.open`.
+
+Not reflected: the attribute is the consumer's input and stays as they
+wrote it, and `data-checked` carries the resolved state for stylesheets. */
   checked?: HelixSwitch["checked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   "default-checked"?: HelixSwitch["defaultChecked"];
@@ -2859,7 +3282,16 @@ instead. */
 };
 
 export type HelixSwitchSolidJsProps = {
-  /** Whether the control is checked. Setting this enters controlled mode. */
+  /** Whether the control is checked.
+
+One property rather than two. Reading gives the real state whichever
+mode the control is in; writing hands ownership to the consumer, which
+is what the attribute in `<helix-checkbox checked>` does as well. The
+same shape all four of these mixins have, for the reason given on
+`MixinControllerOpen.open`.
+
+Not reflected: the attribute is the consumer's input and stays as they
+wrote it, and `data-checked` carries the resolved state for stylesheets. */
   "prop:checked"?: HelixSwitch["checked"];
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   "bool:default-checked"?: HelixSwitch["defaultChecked"];
@@ -3013,8 +3445,24 @@ export type HelixTabsHelixSelectElementEvent =
   HelixTabsElementEvent<HelixSelectEvent>;
 
 export type HelixTabsProps = {
-  /** Which item is current, by its `value`. */
-  value?: HelixTabs["value"];
+  /** Which item is current, by its `value`.
+
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
+
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  active?: HelixTabs["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "default-active"?: HelixTabs["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  defaultActive?: HelixTabs["defaultActive"];
   /** How the row reads.
 
 Unset is a raised pill on the selected tab with nothing behind the row,
@@ -3042,8 +3490,24 @@ panels on the way. */
 };
 
 export type HelixTabsSolidJsProps = {
-  /** Which item is current, by its `value`. */
-  "prop:value"?: HelixTabs["value"];
+  /** Which item is current, by its `value`.
+
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
+
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  "prop:active"?: HelixTabs["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "attr:default-active"?: HelixTabs["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "prop:defaultActive"?: HelixTabs["defaultActive"];
   /** How the row reads.
 
 Unset is a raised pill on the selected tab with nothing behind the row,
@@ -3212,7 +3676,17 @@ export type HelixTextareaProps = {
   "default-value"?: HelixTextarea["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   defaultValue?: HelixTextarea["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   value?: HelixTextarea["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixTextarea["hint"];
@@ -3242,6 +3716,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixTextarea["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixTextarea["onValueChange"];
 
   /** Fired as the text changes, and cancelable. */
   "onhelix-change"?: (e: HelixTextareaHelixChangeElementEvent) => void;
@@ -3254,7 +3735,17 @@ export type HelixTextareaSolidJsProps = {
   "attr:default-value"?: HelixTextarea["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "prop:defaultValue"?: HelixTextarea["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixTextarea["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixTextarea["hint"];
@@ -3284,6 +3775,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixTextarea["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixTextarea["onValueChange"];
   /** Fired as the text changes, and cancelable. */
   "on:helix-change"?: (e: HelixTextareaHelixChangeElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
@@ -3389,7 +3887,17 @@ export type HelixToggleGroupProps = {
   "default-value"?: HelixToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   defaultValue?: HelixToggleGroup["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   value?: HelixToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixToggleGroup["hint"];
@@ -3407,6 +3915,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixToggleGroup["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixToggleGroup["onValueChange"];
 
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "onhelix-select"?: (e: HelixToggleGroupHelixSelectElementEvent) => void;
@@ -3419,7 +3934,17 @@ export type HelixToggleGroupSolidJsProps = {
   "attr:default-value"?: HelixToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "prop:defaultValue"?: HelixToggleGroup["defaultValue"];
-  /** What the control holds now, and what its form submits. */
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixToggleGroup["hint"];
@@ -3437,6 +3962,13 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixToggleGroup["disabled"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixToggleGroup["onValueChange"];
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "on:helix-select"?: (e: HelixToggleGroupHelixSelectElementEvent) => void;
 
@@ -3509,11 +4041,27 @@ export type HelixTooltipHelixCloseElementEvent =
   HelixTooltipElementEvent<HelixCloseEvent>;
 
 export type HelixTooltipProps = {
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   open?: HelixTooltip["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixTooltip["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   defaultOpen?: HelixTooltip["defaultOpen"];
   /** The text shown in the bubble.
 
@@ -3552,11 +4100,27 @@ instead. */
 };
 
 export type HelixTooltipSolidJsProps = {
-  /** Whether the element is open. Setting this enters controlled mode. */
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+Not reflected. The attribute is the consumer's input and stays as they
+wrote it; `data-open` carries the resolved state for stylesheets, which
+is what it has always been for. */
   "prop:open"?: HelixTooltip["open"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixTooltip["defaultOpen"];
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "prop:defaultOpen"?: HelixTooltip["defaultOpen"];
   /** The text shown in the bubble.
 
@@ -3657,8 +4221,24 @@ export type HelixTreeHelixSelectElementEvent =
   HelixTreeElementEvent<HelixSelectEvent>;
 
 export type HelixTreeProps = {
-  /** Which item is current, by its `value`. */
-  value?: HelixTree["value"];
+  /** Which item is current, by its `value`.
+
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
+
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  active?: HelixTree["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "default-active"?: HelixTree["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  defaultActive?: HelixTree["defaultActive"];
   /** Which end of a row the chevron sits at.
 
 Unset is the start, which is what a tree of folders looks like. `end` puts
@@ -3679,8 +4259,24 @@ somewhere different from its siblings' would be a mistake, not a choice. */
 };
 
 export type HelixTreeSolidJsProps = {
-  /** Which item is current, by its `value`. */
-  "prop:value"?: HelixTree["value"];
+  /** Which item is current, by its `value`.
+
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
+
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  "prop:active"?: HelixTree["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "attr:default-active"?: HelixTree["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "prop:defaultActive"?: HelixTree["defaultActive"];
   /** Which end of a row the chevron sits at.
 
 Unset is the start, which is what a tree of folders looks like. `end` puts
@@ -3718,8 +4314,24 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `dense`: Tightens the trigger for dense layouts.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `chevron-placement`/`chevronPlacement`: Where the open indicator sits, or whether there is one.
    *
    * `auto` resolves to `end`, which is where a reader scanning a list of
@@ -3728,7 +4340,6 @@ export type CustomElements = {
    * `start` is for a tree-like reading, where the indicator leads the label.
    * `none` is for a row that carries its own affordance and would otherwise
    * have two.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -4317,6 +4928,16 @@ export type CustomElements = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `name`: Name the calendar reports under when its form is submitted.
    *
    * Absent means it submits nothing, which is what makes it safe to put one
@@ -4339,6 +4960,12 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -4352,7 +4979,17 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -4621,7 +5258,16 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `checked`: Whether the control is checked. Setting this enters controlled mode.
+   * - `checked`: Whether the control is checked.
+   *
+   * One property rather than two. Reading gives the real state whichever
+   * mode the control is in; writing hands ownership to the consumer, which
+   * is what the attribute in `<helix-checkbox checked>` does as well. The
+   * same shape all four of these mixins have, for the reason given on
+   * `MixinControllerOpen.open`.
+   *
+   * Not reflected: the attribute is the consumer's input and stays as they
+   * wrote it, and `data-checked` carries the resolved state for stylesheets.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
@@ -4637,7 +5283,6 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
-   * - `isChecked`: The resolved checked state, whichever mode the element is in. (property only) (readonly)
    * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -4718,15 +5363,30 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How wide the panel is allowed to be.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `label`: Accessible name for the dialog.
    * - `persistent`: Whether Escape and the backdrop can close it.
    *
    * Off for a dialog that must be answered. It does not disable the close
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -4832,8 +5492,24 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: Removes the panel's own surface, for a drawer inside another surface.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `placement`: Which edge the drawer comes from.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
@@ -4847,7 +5523,6 @@ export type CustomElements = {
    * lost its focus trap because a consumer forgot a word would be worse than an
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -5241,6 +5916,16 @@ export type CustomElements = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -5254,6 +5939,12 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -5281,7 +5972,17 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -5401,6 +6102,16 @@ export type CustomElements = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -5423,6 +6134,12 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -5456,7 +6173,17 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -5583,13 +6310,28 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
    * - `back-label`/`backLabel`: What the row returning from a submenu reads.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -5830,12 +6572,27 @@ export type CustomElements = {
    * Unset is a surface with an inset, which is what a panel of content wants.
    * `plain` removes both, for a panel holding something that brings its own,
    * such as a list whose rows run to the edges.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
    * - `placement`: Preferred side. It moves if that side does not fit.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -5985,6 +6742,16 @@ export type CustomElements = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -5996,6 +6763,12 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -6024,7 +6797,17 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -6118,10 +6901,36 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -6141,13 +6950,18 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
    * what it does not recognise; the generated wrapper listens for the events
    * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -6186,7 +7000,17 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -6260,6 +7084,16 @@ export type CustomElements = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -6288,6 +7122,12 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -6309,7 +7149,17 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -6450,7 +7300,16 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `checked`: Whether the control is checked. Setting this enters controlled mode.
+   * - `checked`: Whether the control is checked.
+   *
+   * One property rather than two. Reading gives the real state whichever
+   * mode the control is in; writing hands ownership to the consumer, which
+   * is what the attribute in `<helix-checkbox checked>` does as well. The
+   * same shape all four of these mixins have, for the reason given on
+   * `MixinControllerOpen.open`.
+   *
+   * Not reflected: the attribute is the consumer's input and stays as they
+   * wrote it, and `data-checked` carries the resolved state for stylesheets.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
@@ -6463,7 +7322,6 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
-   * - `isChecked`: The resolved checked state, whichever mode the element is in. (property only) (readonly)
    * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -6683,7 +7541,20 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Which item is current, by its `value`.
+   * - `active`: Which item is current, by its `value`.
+   *
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
+   *
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `appearance`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -6888,6 +7759,16 @@ export type CustomElements = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -6902,6 +7783,12 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -6922,7 +7809,17 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -7071,6 +7968,16 @@ export type CustomElements = {
    * - `appearance`: How much chrome the group carries around its items.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -7081,6 +7988,12 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -7106,7 +8019,17 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -7215,8 +8138,24 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `content`: The text shown in the bubble.
    *
    * The common case, and the fallback for the `content` slot: slot something
@@ -7231,7 +8170,6 @@ export type CustomElements = {
    * of them, which is noise rather than help. Focus opens with no delay: a
    * keyboard reader arriving on a control has already committed to it.
    * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -7364,7 +8302,20 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Which item is current, by its `value`.
+   * - `active`: Which item is current, by its `value`.
+   *
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
+   *
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `chevron`: Which end of a row the chevron sits at.
    *
    * Unset is the start, which is what a tree of folders looks like. `end` puts
@@ -7430,8 +8381,24 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `dense`: Tightens the trigger for dense layouts.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `chevron-placement`/`chevronPlacement`: Where the open indicator sits, or whether there is one.
    *
    * `auto` resolves to `end`, which is where a reader scanning a list of
@@ -7440,7 +8407,6 @@ export type CustomElementsSolidJs = {
    * `start` is for a tree-like reading, where the indicator leads the label.
    * `none` is for a row that carries its own affordance and would otherwise
    * have two.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -8067,6 +9033,16 @@ export type CustomElementsSolidJs = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `name`: Name the calendar reports under when its form is submitted.
    *
    * Absent means it submits nothing, which is what makes it safe to put one
@@ -8089,6 +9065,12 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -8102,7 +9084,17 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -8385,7 +9377,16 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `checked`: Whether the control is checked. Setting this enters controlled mode.
+   * - `checked`: Whether the control is checked.
+   *
+   * One property rather than two. Reading gives the real state whichever
+   * mode the control is in; writing hands ownership to the consumer, which
+   * is what the attribute in `<helix-checkbox checked>` does as well. The
+   * same shape all four of these mixins have, for the reason given on
+   * `MixinControllerOpen.open`.
+   *
+   * Not reflected: the attribute is the consumer's input and stays as they
+   * wrote it, and `data-checked` carries the resolved state for stylesheets.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
@@ -8401,7 +9402,6 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
-   * - `isChecked`: The resolved checked state, whichever mode the element is in. (property only) (readonly)
    * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -8485,15 +9485,30 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: How wide the panel is allowed to be.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `label`: Accessible name for the dialog.
    * - `persistent`: Whether Escape and the backdrop can close it.
    *
    * Off for a dialog that must be answered. It does not disable the close
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -8605,8 +9620,24 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: Removes the panel's own surface, for a drawer inside another surface.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `placement`: Which edge the drawer comes from.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
@@ -8620,7 +9651,6 @@ export type CustomElementsSolidJs = {
    * lost its focus trap because a consumer forgot a word would be worse than an
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -9037,6 +10067,16 @@ export type CustomElementsSolidJs = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -9050,6 +10090,12 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -9077,7 +10123,17 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -9209,6 +10265,16 @@ export type CustomElementsSolidJs = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -9231,6 +10297,12 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -9264,7 +10336,17 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -9397,13 +10479,28 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
    * - `back-label`/`backLabel`: What the row returning from a submenu reads.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -9658,12 +10755,27 @@ export type CustomElementsSolidJs = {
    * Unset is a surface with an inset, which is what a panel of content wants.
    * `plain` removes both, for a panel holding something that brings its own,
    * such as a list whose rows run to the edges.
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
    * - `placement`: Preferred side. It moves if that side does not fit.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -9824,6 +10936,16 @@ export type CustomElementsSolidJs = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -9835,6 +10957,12 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -9863,7 +10991,17 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -9965,10 +11103,36 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -9988,13 +11152,18 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
    * what it does not recognise; the generated wrapper listens for the events
    * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -10033,7 +11202,17 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -10113,6 +11292,16 @@ export type CustomElementsSolidJs = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -10141,6 +11330,12 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -10162,7 +11357,17 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -10314,7 +11519,16 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `checked`: Whether the control is checked. Setting this enters controlled mode.
+   * - `checked`: Whether the control is checked.
+   *
+   * One property rather than two. Reading gives the real state whichever
+   * mode the control is in; writing hands ownership to the consumer, which
+   * is what the attribute in `<helix-checkbox checked>` does as well. The
+   * same shape all four of these mixins have, for the reason given on
+   * `MixinControllerOpen.open`.
+   *
+   * Not reflected: the attribute is the consumer's input and stays as they
+   * wrote it, and `data-checked` carries the resolved state for stylesheets.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use. Ignored once `checked` is set.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
@@ -10327,7 +11541,6 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
-   * - `isChecked`: The resolved checked state, whichever mode the element is in. (property only) (readonly)
    * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -10567,7 +11780,20 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Which item is current, by its `value`.
+   * - `active`: Which item is current, by its `value`.
+   *
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
+   *
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `appearance`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -10781,6 +12007,16 @@ export type CustomElementsSolidJs = {
    *
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -10795,6 +12031,12 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -10815,7 +12057,17 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -10975,6 +12227,16 @@ export type CustomElementsSolidJs = {
    * - `appearance`: How much chrome the group carries around its items.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -10985,6 +12247,12 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -11010,7 +12278,17 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
    *
    * Falling back to `defaultValue` rather than to empty, because a restore
@@ -11128,8 +12406,24 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `open`: Whether the element is open. Setting this enters controlled mode.
-   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * Not reflected. The attribute is the consumer's input and stays as they
+   * wrote it; `data-open` carries the resolved state for stylesheets, which
+   * is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `content`: The text shown in the bubble.
    *
    * The common case, and the fallback for the `content` slot: slot something
@@ -11144,7 +12438,6 @@ export type CustomElementsSolidJs = {
    * of them, which is noise rather than help. Focus opens with no delay: a
    * keyboard reader arriving on a control has already committed to it.
    * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
-   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -11283,7 +12576,20 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Which item is current, by its `value`.
+   * - `active`: Which item is current, by its `value`.
+   *
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
+   *
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `chevron`: Which end of a row the chevron sits at.
    *
    * Unset is the start, which is what a tree of folders looks like. `end` puts

@@ -15,14 +15,17 @@ type Constructor<T> = new (...args: any[]) => T
  * to this interface keeps the internals private and the build working.
  */
 export declare class MixinControllerCheckedInterface {
-  /** Whether the control is checked. Setting this enters controlled mode. */
-  checked: boolean | undefined
+  /**
+   * Whether the control is checked.
+   *
+   * Reading gives the real state, in either mode. Writing hands ownership to
+   * the consumer: from then on the control announces changes and applies none
+   * of them.
+   */
+  checked: boolean
 
   /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
   defaultChecked: boolean
-
-  /** The resolved checked state, whichever mode the element is in. */
-  readonly isChecked: boolean
 
   /**
    * The consumer's callback, invoked after the state is applied.
@@ -51,7 +54,7 @@ export declare class MixinControllerCheckedInterface {
    * A form reset has to return a control to what its markup declared. Clearing
    * `checked` alone cannot do it: that only leaves controlled mode, and the
    * uncontrolled value the element has been keeping is private to the mixin
-   * and would still be what `isChecked` reports.
+   * and would still be what `checked` reports.
    */
   resetChecked(): void
 }
@@ -77,9 +80,31 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
   // interface is what TypeScript consumers see; this class is what the manifest
   // analyzer reads when resolving inherited members into dependent packages.
   class CheckedElement extends Base {
-    /** Whether the control is checked. Setting this enters controlled mode. */
-    @property({ reflect: true, type: Boolean })
-    checked: boolean | undefined = undefined
+    /**
+     * Whether the control is checked.
+     *
+     * One property rather than two. Reading gives the real state whichever
+     * mode the control is in; writing hands ownership to the consumer, which
+     * is what the attribute in `<helix-checkbox checked>` does as well. The
+     * same shape all four of these mixins have, for the reason given on
+     * `MixinControllerOpen.open`.
+     *
+     * Not reflected: the attribute is the consumer's input and stays as they
+     * wrote it, and `data-checked` carries the resolved state for stylesheets.
+     */
+    @property({ type: Boolean })
+    get checked(): boolean {
+      return this.ownedChecked ?? this.internalChecked ?? this.defaultChecked
+    }
+
+    set checked(next: boolean) {
+      const previous = this.checked
+      this.ownedChecked = next
+      this.requestUpdate('checked', previous)
+    }
+
+    /** What the consumer set, and the only thing that says they own this. */
+    private ownedChecked: boolean | undefined = undefined
 
     /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
     @property({ attribute: 'default-checked', type: Boolean })
@@ -95,16 +120,8 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      */
     private internalChecked: boolean | undefined = undefined
 
-    /** The resolved checked state, whichever mode the element is in. */
-    get isChecked(): boolean {
-      if (this.isControlled) {
-        return this.checked ?? false
-      }
-      return this.internalChecked ?? this.defaultChecked
-    }
-
     private get isControlled(): boolean {
-      return this.checked !== undefined
+      return this.ownedChecked !== undefined
     }
 
     /**
@@ -115,7 +132,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      this.toggleAttribute('data-checked', this.isChecked)
+      this.toggleAttribute('data-checked', this.checked)
     }
 
     /**
@@ -139,7 +156,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * "controlled" means.
      */
     requestChecked(next: boolean): boolean {
-      if (this.isChecked === next) {
+      if (this.checked === next) {
         return true
       }
       return requestControlledChange({
@@ -147,8 +164,9 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
           if (this.isControlled) {
             return
           }
+          const previous = this.checked
           this.internalChecked = checked
-          this.requestUpdate()
+          this.requestUpdate('checked', previous)
         },
         event: (checked) =>
           new HelixChangeEvent({
@@ -163,7 +181,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
 
     /** Requests the opposite of the current state. */
     toggleChecked(): boolean {
-      return this.requestChecked(!this.isChecked)
+      return this.requestChecked(!this.checked)
     }
 
     /**
@@ -175,8 +193,10 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * element has been keeping lives here, so this is where it is dropped.
      */
     resetChecked(): void {
+      const previous = this.checked
       this.internalChecked = undefined
-      this.requestUpdate()
+      this.ownedChecked = undefined
+      this.requestUpdate('checked', previous)
     }
   }
 

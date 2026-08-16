@@ -51,7 +51,7 @@ describe('textarea', () => {
   test('read-only still submits, unlike disabled', async () => {
     // A read-only field is a value the reader may take and may not change.
     const host = await mount(
-      '<helix-textarea label="A" name="q" read-only value="x"></helix-textarea>',
+      '<helix-textarea label="A" name="q" read-only default-value="x"></helix-textarea>',
     )
     expect(control(host).readOnly).toBe(true)
     expect(formValue(host)).toBe('x')

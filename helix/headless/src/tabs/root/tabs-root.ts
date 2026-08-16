@@ -202,7 +202,7 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('value')) {
+    if (changed.has('active')) {
       this.sync()
     }
     this.place()

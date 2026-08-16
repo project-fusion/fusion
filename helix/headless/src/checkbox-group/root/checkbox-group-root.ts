@@ -120,7 +120,7 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
    *
    * The requested state comes from the event rather than from the box. Driving
    * the boxes from `value` makes them controlled, so a controlled box applies
-   * nothing on its own and reports what it was asked for. Reading `isChecked`
+   * nothing on its own and reports what it was asked for. Reading `checked`
    * here would read the state it still holds and nothing would ever change.
    */
   private readonly handleChange = (event: Event): void => {
@@ -137,7 +137,7 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
 
     const wanted = (event as CustomEvent<{ value: string }>).detail.value === 'true'
     this.value = this.boxes
-      .filter((box) => (box === changed ? wanted : box.isChecked))
+      .filter((box) => (box === changed ? wanted : box.checked))
       .map((box) => box.value)
       .join(',')
     this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: this.value }))

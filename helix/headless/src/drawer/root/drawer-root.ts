@@ -93,7 +93,7 @@ export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
     // gesture that most obviously means "close" never closed anything.
     boundary: () => this.renderRoot.querySelector('[part="panel"]'),
     onDismiss: () => {
-      if (this.isOpen) {
+      if (this.open) {
         this.requestOpen(false)
       }
     },
@@ -105,10 +105,10 @@ export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
 
-    // Driven by `isOpen` rather than by which property changed. Uncontrolled
+    // Driven by `open` rather than by which property changed. Uncontrolled
     // state does not live on `open` at all, so watching that property meant the
     // trap never engaged for the common case.
-    const shouldEngage = this.isOpen && this.modal
+    const shouldEngage = this.open && this.modal
     if (shouldEngage === this.engaged) {
       return
     }
@@ -125,7 +125,7 @@ export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    const open = this.isOpen
+    const open = this.open
     return html`<div part="scrim" ?hidden=${!open || !this.modal}></div>
       <div
         part="panel"

@@ -14,7 +14,7 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const markup = `<helix-toggle-group label="Color mode" value="light">
+const markup = `<helix-toggle-group label="Color mode" default-value="light">
   <helix-toggle value="system">System</helix-toggle>
   <helix-toggle value="light">Light</helix-toggle>
   <helix-toggle value="dark">Dark</helix-toggle>

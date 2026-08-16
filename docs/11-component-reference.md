@@ -67,11 +67,10 @@ Usable on its own as a disclosure, with no accordion around it.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `chevronPlacement` | `chevron-placement` | `'auto' \| 'start' \| 'end' \| 'none' \| undefined` | - | `HelixBaseAccordionItem` | Where the open indicator sits, or whether there is one. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is written. |
 | `dense` | `dense` | `boolean` | `false` | - | Tightens the trigger for dense layouts. |
-| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 
 #### Methods
 
@@ -575,7 +574,8 @@ grid reads as a continuous run of dates.
 | `month` | `month` | `string` | `''` | `HelixBaseCalendar` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
 | `months` | `months` | `number` | `1` | `HelixBaseCalendar` | How many months to show, side by side. |
 | `name` | `name` | `string` | `''` | `HelixBaseCalendar` | Name the calendar reports under when its form is submitted. |
-| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
@@ -583,6 +583,7 @@ grid reads as a continuous run of dates.
 | --- | --- | --- |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 
 #### Events
 
@@ -789,7 +790,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `checked` | `checked` | `boolean \| undefined` | `undefined` | `MixinControllerChecked` | Whether the control is checked. Setting this enters controlled mode. |
+| `checked` | `checked` | `boolean` | - | `MixinControllerChecked` | Whether the control is checked. |
 | `defaultChecked` | `default-checked` | `boolean` | `false` | `MixinControllerChecked` | Initial checked state for uncontrolled use. Ignored once `checked` is set. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -798,7 +799,6 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseCheckbox` | Whether the box shows as neither checked nor unchecked. |
-| `isChecked` | - | `boolean` | - | `MixinControllerChecked` | The resolved checked state, whichever mode the element is in. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixBaseCheckbox` | Name submitted with the form. |
@@ -921,11 +921,10 @@ dialog rather than being a div somebody positioned.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'compact' \| 'wide' \| undefined` | - | - | How wide the panel is allowed to be. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
-| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is written. |
 | `label` | `label` | `string` | `''` | `HelixBaseDialog` | Accessible name for the dialog. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `persistent` | `persistent` | `boolean` | `false` | `HelixBaseDialog` | Whether Escape and the backdrop can close it. |
 
 #### Methods
@@ -1015,12 +1014,11 @@ rest is flat and the movement is what says something happened.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'surface' \| 'plain' \| undefined` | - | - | Removes the panel's own surface, for a drawer inside another surface. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
-| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is written. |
 | `label` | `label` | `string` | `''` | `HelixBaseDrawer` | Accessible name for the panel. |
 | `modal` | `modal` | `boolean` | `true` | `HelixBaseDrawer` | Whether the drawer blocks the page behind it. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom' \| undefined` | - | `HelixBaseDrawer` | Which edge the drawer comes from. |
 
 #### Methods
@@ -1400,13 +1398,14 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixBaseInput` | Name submitted with the form. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInput` | Focus is delegated to the input, so the host is never the focus target. |
 | `type` | `type` | `InputType` | `'text'` | `HelixBaseInput` | What the field accepts, which decides the keyboard and the validation. |
-| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
@@ -1415,6 +1414,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `focus()` | `HelixBaseInput` | Puts the caret in the field, the way a label pointing at one would. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 | `select()` | `HelixBaseInput` | Selects everything in the field. |
 
 #### Events
@@ -1571,10 +1571,11 @@ list moves under the reader rather than the reader moving to find it.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseListbox` | Whether more than one option can be the answer. |
 | `name` | `name` | `string` | `''` | `HelixBaseListbox` | Name the list reports under when its form is submitted. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `options` | - | `HelixBaseOption[]` | - | `HelixBaseListbox` | Every option, in the order a reader meets them. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `values` | - | `string[]` | - | `HelixBaseListbox` | The chosen values, which is a list whether or not `multiple` is set. |
 
 #### Methods
@@ -1583,6 +1584,7 @@ list moves under the reader rather than the reader moving to find it.
 | --- | --- | --- |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 
 #### Events
 
@@ -1635,12 +1637,11 @@ one panel and reads the same on a phone as on a desk.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseMenu` | What the row returning from a submenu reads. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
-| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is written. |
 | `label` | `label` | `string` | `'Menu'` | `HelixBaseMenu` | Accessible name for the surface. |
 | `offset` | `offset` | `number` | `4` | `HelixBaseMenu` | Space between the trigger and the surface, in pixels. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `Placement` | `'bottom-end'` | `HelixBaseMenu` | Preferred side. It moves if that side does not fit. |
 
 #### Methods
@@ -1928,12 +1929,11 @@ time.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'plain' \| undefined` | - | - | How the panel is framed. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
-| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is written. |
 | `label` | `label` | `string` | `'Popover'` | `HelixBasePopover` | Accessible name for the panel. |
 | `offset` | `offset` | `number` | `4` | `HelixBasePopover` | Space between the trigger and the panel, in pixels. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixBasePopover` | Preferred side. It moves if that side does not fit. |
 
 #### Methods
@@ -2137,10 +2137,11 @@ group keeps its question above the row rather than beside the first choice.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixBaseRadioGroup` | Name the group reports under when its form is submitted. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'vertical'` | `HelixBaseRadioGroup` | Which way the choices run. A column reads one line per answer. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
@@ -2148,6 +2149,7 @@ group keeps its question above the row rather than beside the first choice.
 | --- | --- | --- |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 
 #### Events
 
@@ -2198,7 +2200,7 @@ from the field it came out of.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is written. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -2207,17 +2209,17 @@ from the field it came out of.
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseSelect` | Whether more than one option can be the answer. |
 | `name` | `name` | `string` | `''` | `HelixBaseSelect` | Name the control reports under when its form is submitted. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'Choose'` | `HelixBaseSelect` | Shown on the trigger while nothing is chosen. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
@@ -2226,6 +2228,7 @@ from the field it came out of.
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 | `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
 #### Events
@@ -2328,12 +2331,13 @@ the thumb being dragged.
 | `max` | `max` | `number` | `100` | `HelixBaseSlider` | The largest value the reader can choose. |
 | `min` | `min` | `number` | `0` | `HelixBaseSlider` | The smallest value the reader can choose. |
 | `name` | `name` | `string` | `''` | `HelixBaseSlider` | Name submitted with the form. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseSlider` | Focus is delegated to the control, so the host is never the target. |
 | `showValue` | `show-value` | `boolean` | `false` | `HelixBaseSlider` | Whether the chosen value is shown beside the track. |
 | `step` | `step` | `number` | `1` | `HelixBaseSlider` | How far one press of an arrow key moves it. |
-| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `valueAsNumber` | - | `number` | - | `HelixBaseSlider` | The chosen value as a number, for anything doing arithmetic on it. |
 
 #### Methods
@@ -2342,6 +2346,7 @@ the thumb being dragged.
 | --- | --- | --- |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 
 #### Events
 
@@ -2496,7 +2501,7 @@ consumer has to keep.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `checked` | `checked` | `boolean \| undefined` | `undefined` | `MixinControllerChecked` | Whether the control is checked. Setting this enters controlled mode. |
+| `checked` | `checked` | `boolean` | - | `MixinControllerChecked` | Whether the control is checked. |
 | `defaultChecked` | `default-checked` | `boolean` | `false` | `MixinControllerChecked` | Initial checked state for uncontrolled use. Ignored once `checked` is set. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -2504,7 +2509,6 @@ consumer has to keep.
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `isChecked` | - | `boolean` | - | `MixinControllerChecked` | The resolved checked state, whichever mode the element is in. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixBaseSwitch` | Name submitted with the form. |
@@ -2675,11 +2679,12 @@ a movement instead of two separate fills.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `appearance` | `appearance` | `'toggle' \| 'underline' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
+| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Tabs'` | `HelixBaseTabs` | Accessible name for the tab list. |
 | `manual` | `manual` | `boolean` | `false` | `HelixBaseTabs` | Whether arrowing to a tab also selects it. |
 | `onActiveChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerActive` | The consumer's callback, invoked after the change is applied. |
-| `value` | `value` | `string` | `''` | `MixinControllerActive` | Which item is current, by its `value`. |
 
 #### Methods
 
@@ -2916,13 +2921,14 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixBaseTextarea` | Name submitted with the form. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseTextarea` | Shown while the field is empty. Not a label: it goes when typing starts. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseTextarea` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `rows` | `rows` | `number` | `3` | `HelixBaseTextarea` | How many lines the box is before anything is typed. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseTextarea` | Focus is delegated to the control, so the host is never the target. |
-| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
@@ -2931,6 +2937,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `focus()` | `HelixBaseTextarea` | Puts the caret in the field, the way a label pointing at one would. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 
 #### Events
 
@@ -3138,9 +3145,10 @@ corner radius, which is worse than the exception.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixBaseToggleGroup` | Name the group reports under when its form is submitted. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
@@ -3148,6 +3156,7 @@ corner radius, which is worse than the exception.
 | --- | --- | --- |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 
 #### Events
 
@@ -3228,14 +3237,13 @@ still points at the trigger after the bubble has slid along to stay in view.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `content` | `content` | `string` | `''` | `HelixBaseTooltip` | The text shown in the bubble. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is written. |
 | `delay` | `delay` | `number` | `400` | `HelixBaseTooltip` | How long the pointer must rest before the bubble appears, in milliseconds. |
 | `delayOut` | `delay-out` | `number` | `100` | `HelixBaseTooltip` | How long the bubble stays after the pointer leaves, in milliseconds. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseTooltip` | Whether the tooltip never shows. |
-| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
 | `offset` | `offset` | `number` | `8` | `HelixBaseTooltip` | Space between the trigger and the bubble, in pixels. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `Placement` | `'top'` | `HelixBaseTooltip` | Preferred side. It moves if that side does not fit. |
 
 #### Methods
@@ -3291,10 +3299,11 @@ to it is one more thing between the reader and the label.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `chevron` | `chevron` | `'end' \| undefined` | - | `HelixBaseTree` | Which end of a row the chevron sits at. |
+| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Tree'` | `HelixBaseTree` | Accessible name for the tree. |
 | `onActiveChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerActive` | The consumer's callback, invoked after the change is applied. |
-| `value` | `value` | `string` | `''` | `MixinControllerActive` | Which item is current, by its `value`. |
 
 #### Methods
 

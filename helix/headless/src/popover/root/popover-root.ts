@@ -88,7 +88,7 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
     commands: {
       '--close': () => this.hide(),
       '--show': () => this.show(),
-      '--toggle': () => (this.isOpen ? this.hide() : this.show()),
+      '--toggle': () => (this.open ? this.hide() : this.show()),
     },
   })
 
@@ -102,7 +102,7 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
 
   /** Opens the panel. */
   show(): void {
-    if (this.isOpen || !this.requestOpen(true)) {
+    if (this.open || !this.requestOpen(true)) {
       return
     }
     // After the render that unhides it: `showPopover` on an element still
@@ -112,7 +112,7 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
 
   /** Closes the panel and puts focus back on the trigger. */
   hide(): void {
-    if (!this.isOpen || !this.requestOpen(false)) {
+    if (!this.open || !this.requestOpen(false)) {
       return
     }
     this.panel.hide()
@@ -126,7 +126,7 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleTriggerClick = (): void => {
-    if (this.isOpen) {
+    if (this.open) {
       this.hide()
     } else {
       this.show()
@@ -140,7 +140,7 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
 
   protected override render(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}></slot>
-      <div part="popover" popover="manual" ?hidden=${!this.isOpen}>
+      <div part="popover" popover="manual" ?hidden=${!this.open}>
         <slot></slot>
       </div>`
   }

@@ -62,7 +62,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
     <div className="docsShell">
       {/* Families only. Examples belong to the sandbox, and listing them here
           is what made the two surfaces one confusing thing. */}
-      <helix-tree class="docsNav" label="Components" value={family.slug}>
+      <helix-tree active={family.slug} class="docsNav" label="Components">
         {getFamilies().map((entry) => (
           <helix-tree-item key={entry.slug} value={entry.slug}>
             <a data-link="quiet" href={`/design/components/${entry.slug}`}>

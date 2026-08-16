@@ -1,7 +1,6 @@
 import {
   customElement,
   DisabledCascadeController,
-  HelixChangeEvent,
   HelixFormElement,
   type HelixSelectEvent,
   hostAria,
@@ -98,7 +97,7 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
     if (next === this.value) {
       return
     }
-    const allowed = this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: next }))
+    const allowed = this.requestValue(next)
     if (!allowed) {
       return
     }

@@ -49,7 +49,7 @@ describe('listbox', () => {
   test('moving is choosing when only one can be chosen', async () => {
     // Which is the radio group pattern, and is what arrow keys do in a
     // single-select list.
-    const host = (await list('value="one"')) as Updatable & { value: string }
+    const host = (await list('default-value="one"')) as Updatable & { value: string }
     await press(host, 'ArrowDown')
     expect(host.value).toBe('two')
   })
@@ -57,7 +57,7 @@ describe('listbox', () => {
   test('moving is not choosing when several can be', async () => {
     /* A reader passing over four options on the way to the fifth did not mean
        to pick all five, so with `multiple` the arrows move and Space chooses. */
-    const host = (await list('multiple value="one"')) as Updatable & { value: string }
+    const host = (await list('multiple default-value="one"')) as Updatable & { value: string }
     await press(host, 'ArrowDown')
     expect(host.value).toBe('one')
     expect(options(host)[1]?.active).toBe(true)
@@ -68,20 +68,20 @@ describe('listbox', () => {
 
   test('choosing the same option again takes it back', async () => {
     // The same press has to be able to undo itself, or a mis-tap is permanent.
-    const host = (await list('multiple value="one,two"')) as Updatable & { value: string }
+    const host = (await list('multiple default-value="one,two"')) as Updatable & { value: string }
     await press(host, 'ArrowDown')
     await press(host, ' ')
     expect(host.value).toBe('one')
   })
 
   test('the value is comma separated, and is what the form submits', async () => {
-    const host = await list('multiple value="one,three"')
+    const host = await list('multiple default-value="one,three"')
     expect(formValue(host)).toBe('one,three')
     expect(options(host).map((option) => option.selected)).toEqual([true, false, true])
   })
 
   test('a refused change leaves the answer alone', async () => {
-    const host = (await list('value="one"')) as Updatable & { value: string }
+    const host = (await list('default-value="one"')) as Updatable & { value: string }
     host.addEventListener('helix-change', (event) => event.preventDefault())
     await press(host, 'ArrowDown')
     expect(host.value).toBe('one')
@@ -103,7 +103,7 @@ describe('listbox filtering', () => {
   test('the keyboard cannot sit on something the filter hid', async () => {
     // A list whose active option has just been filtered away is a list the next
     // arrow press would start from the top of anyway.
-    const host = (await list('value="one"')) as Updatable & { filter: string }
+    const host = (await list('default-value="one"')) as Updatable & { filter: string }
     host.filter = 'gam'
     await settle(host)
     expect(options(host)[2]?.active).toBe(true)
@@ -142,7 +142,7 @@ if (hasLayout()) {
   describe('listbox active descendant', () => {
     const listbox = async (): Promise<HTMLElement> => {
       const host = (await mount(
-        `<helix-listbox label="Owner" value="a">
+        `<helix-listbox label="Owner" default-value="a">
           <helix-option value="a">Ross</helix-option>
           <helix-option value="b">Sam</helix-option>
           <helix-option value="c">Kit</helix-option>

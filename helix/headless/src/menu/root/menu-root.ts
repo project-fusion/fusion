@@ -117,7 +117,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
 
   /** Opens the menu. */
   show(): void {
-    if (this.isOpen || !this.requestOpen(true)) {
+    if (this.open || !this.requestOpen(true)) {
       return
     }
     this.updateComplete.then(() => {
@@ -128,7 +128,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
 
   /** Closes the menu, and forgets which page was showing. */
   hide(): void {
-    if (!this.isOpen || !this.requestOpen(false)) {
+    if (!this.open || !this.requestOpen(false)) {
       return
     }
     this.panel.hide()
@@ -226,7 +226,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleTriggerClick = (): void => {
-    if (this.isOpen) {
+    if (this.open) {
       this.hide()
     } else {
       this.show()
@@ -274,7 +274,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
         role="menu"
         aria-label=${this.label}
         data-drilled=${this.drilldown.atRoot ? nothing : ''}
-        ?hidden=${!this.isOpen}
+        ?hidden=${!this.open}
       >
         ${
           // A header rather than a row in the list. The way back is not one of

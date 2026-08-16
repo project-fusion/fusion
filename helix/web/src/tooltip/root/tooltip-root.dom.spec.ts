@@ -9,7 +9,7 @@ beforeAll(async () => {
 type Tooltip = HTMLElement & {
   content: string
   delay: number
-  isOpen: boolean
+  open: boolean
   placement: string
   show: () => void
   hide: () => void
@@ -78,11 +78,11 @@ describe('tooltip', () => {
     // them. A keyboard reader landing on one has already committed to it.
     const tip = await tooltip('content="x" delay="50"')
     tip.dispatchEvent(new Event('pointerenter'))
-    expect(tip.isOpen).toBe(false)
+    expect(tip.open).toBe(false)
 
     tip.dispatchEvent(new Event('focusin'))
     await tip.updateComplete
-    expect(tip.isOpen).toBe(true)
+    expect(tip.open).toBe(true)
   })
 
   test('it announces before it opens, and a refusal holds it shut', async () => {
@@ -92,7 +92,7 @@ describe('tooltip', () => {
     })
     tip.show()
     await tip.updateComplete
-    expect(tip.isOpen).toBe(false)
+    expect(tip.open).toBe(false)
   })
 
   test('it announces before it closes', async () => {
@@ -134,7 +134,7 @@ describe('tooltip', () => {
     const tip = await slotted()
     tip.show()
     await tip.updateComplete
-    expect(tip.isOpen).toBe(true)
+    expect(tip.open).toBe(true)
     const linked = tip.internals?.ariaDescribedByElements
     expect(Array.isArray(linked) ? linked[0] : null).toBe(part(tip, 'tooltip'))
   })
@@ -143,7 +143,7 @@ describe('tooltip', () => {
     const tip = await slotted('', '   ')
     tip.show()
     await tip.updateComplete
-    expect(tip.isOpen).toBe(false)
+    expect(tip.open).toBe(false)
   })
 
   test('an element with no text of its own is still something to say', async () => {
@@ -152,7 +152,7 @@ describe('tooltip', () => {
     const tip = await slotted('', '<helix-icon name="info"></helix-icon>')
     tip.show()
     await tip.updateComplete
-    expect(tip.isOpen).toBe(true)
+    expect(tip.open).toBe(true)
   })
 
   test('disabled never shows', async () => {

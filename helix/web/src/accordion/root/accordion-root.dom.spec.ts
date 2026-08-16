@@ -6,7 +6,7 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Item = HTMLElement & { isOpen: boolean; requestOpen(next: boolean): boolean }
+type Item = HTMLElement & { open: boolean; requestOpen(next: boolean): boolean }
 
 const items = (host: HTMLElement): Item[] =>
   [...host.querySelectorAll('helix-accordion-item')] as Item[]
@@ -39,19 +39,19 @@ describe('accordion exclusivity', () => {
     const [first, second] = items(accordion)
     click(first as Item)
     click(second as Item)
-    expect(first?.isOpen).toBe(true)
-    expect(second?.isOpen).toBe(true)
+    expect(first?.open).toBe(true)
+    expect(second?.open).toBe(true)
   })
 
   test('single-collapsible closes the others', async () => {
     const accordion = await mount(single)
     const [first, second] = items(accordion)
     click(first as Item)
-    expect(first?.isOpen).toBe(true)
+    expect(first?.open).toBe(true)
 
     click(second as Item)
-    expect(second?.isOpen).toBe(true)
-    expect(first?.isOpen).toBe(false)
+    expect(second?.open).toBe(true)
+    expect(first?.open).toBe(false)
   })
 
   test('single-collapsible lets the last one close', async () => {
@@ -59,7 +59,7 @@ describe('accordion exclusivity', () => {
     const [first] = items(accordion)
     click(first as Item)
     click(first as Item)
-    expect(first?.isOpen).toBe(false)
+    expect(first?.open).toBe(false)
   })
 
   test('single refuses to close the last one', async () => {
@@ -70,7 +70,7 @@ describe('accordion exclusivity', () => {
     const [first] = items(accordion)
     click(first as Item)
     click(first as Item)
-    expect(first?.isOpen).toBe(true)
+    expect(first?.open).toBe(true)
   })
 
   test('closing an item does not disturb the others', async () => {
@@ -79,7 +79,7 @@ describe('accordion exclusivity', () => {
     click(first as Item)
     click(second as Item)
     click(second as Item)
-    expect(first?.isOpen).toBe(true)
+    expect(first?.open).toBe(true)
   })
 
   test('membership is resolved on demand, so an item added later coordinates', async () => {
@@ -93,8 +93,8 @@ describe('accordion exclusivity', () => {
     await (added as unknown as { updateComplete: Promise<unknown> }).updateComplete
     click(added)
 
-    expect(added.isOpen).toBe(true)
-    expect(first?.isOpen).toBe(false)
+    expect(added.open).toBe(true)
+    expect(first?.open).toBe(false)
   })
 
   test('a nested accordion is a separate set', async () => {
@@ -113,8 +113,8 @@ describe('accordion exclusivity', () => {
     click(outer as Item)
     const inner = (outer as HTMLElement).querySelector('helix-accordion-item') as Item
     click(inner)
-    expect(inner.isOpen).toBe(true)
-    expect(outer?.isOpen).toBe(true)
+    expect(inner.open).toBe(true)
+    expect(outer?.open).toBe(true)
   })
 })
 

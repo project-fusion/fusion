@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 type Updatable = HTMLElement & {
   updateComplete: Promise<unknown>
-  isOpen: boolean
+  open: boolean
   requestOpen(next: boolean): void
 }
 
@@ -40,7 +40,7 @@ describe('drawer', () => {
     drawer.requestOpen(true)
     await drawer.updateComplete
 
-    expect(drawer.isOpen).toBe(true)
+    expect(drawer.open).toBe(true)
     expect(part(drawer, 'panel')?.hasAttribute('inert')).toBe(false)
     expect(part(drawer, 'scrim')?.hasAttribute('hidden')).toBe(false)
   })
@@ -70,7 +70,7 @@ describe('drawer', () => {
   })
 
   test('opening moves focus into the panel', async () => {
-    // The trap engages on `isOpen`, not on which property changed: uncontrolled
+    // The trap engages on `open`, not on which property changed: uncontrolled
     // state does not live on `open`, so watching that property meant the trap
     // never engaged for the common case.
     const drawer = (await mount(markup)) as Updatable
@@ -89,6 +89,6 @@ describe('drawer', () => {
 
     document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
     await drawer.updateComplete
-    expect(drawer.isOpen).toBe(false)
+    expect(drawer.open).toBe(false)
   })
 })

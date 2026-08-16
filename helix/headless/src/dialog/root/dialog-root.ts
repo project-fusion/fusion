@@ -126,7 +126,7 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
    * saying otherwise would be a lie the next `showModal()` would trip over.
    */
   private readonly handleClose = (): void => {
-    if (this.isOpen) {
+    if (this.open) {
       this.requestOpen(false)
     }
   }
@@ -145,9 +145,9 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
     if (!dialog) {
       return
     }
-    if (this.isOpen && !dialog.open) {
+    if (this.open && !dialog.open) {
       dialog.showModal()
-    } else if (!this.isOpen && dialog.open) {
+    } else if (!this.open && dialog.open) {
       dialog.close()
     }
   }

@@ -107,7 +107,7 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
    * set collapsed after a listener refused it.
    */
   protected handleToggle = (): void => {
-    const next = !this.isOpen
+    const next = !this.open
     const mode = this.accordion?.mode
 
     // `single` keeps one open at all times, so the last one cannot be closed.
@@ -122,7 +122,7 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
 
     if (next && mode !== undefined) {
       for (const peer of this.peers) {
-        if (peer !== this && peer.isOpen) {
+        if (peer !== this && peer.open) {
           // A peer in controlled mode will only notify: its consumer owns the
           // value and may decline, which can legitimately leave two open.
           peer.requestOpen(false)
@@ -143,7 +143,7 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    const open = this.isOpen
+    const open = this.open
     return html`
       <div part="container">
         <button

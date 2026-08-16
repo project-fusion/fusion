@@ -52,7 +52,7 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
     event.stopPropagation()
     const control = event.target as HTMLInputElement
     if (!this.requestChecked(control.checked)) {
-      control.checked = this.isChecked
+      control.checked = this.checked
       return
     }
     this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
@@ -62,8 +62,8 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
   private sync(): void {
     // `null` rather than the value when it is off, which is how a checkbox
     // behaves: an unticked box submits nothing rather than a blank.
-    this.internals.setFormValue(this.isChecked ? this.value : null)
-    if (this.required && !this.isChecked) {
+    this.internals.setFormValue(this.checked ? this.value : null)
+    if (this.required && !this.checked) {
       this.internals.setValidity(
         { valueMissing: true },
         'Turn this on to continue.',
@@ -77,7 +77,8 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
 
   /** Returns the switch to the state its markup declared. */
   formResetCallback(): void {
-    this.checked = undefined
+    // `resetChecked` drops both halves now, the consumer's and the element's,
+    // so there is nothing to clear before it.
     this.resetChecked()
   }
 
@@ -95,7 +96,7 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
           part="control"
           type="checkbox"
           role="switch"
-          .checked=${this.isChecked}
+          .checked=${this.checked}
           ?disabled=${this.disabled}
           ?required=${this.required}
           aria-describedby=${this.describedBy ?? nothing}

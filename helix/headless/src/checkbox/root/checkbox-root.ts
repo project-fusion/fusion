@@ -71,14 +71,14 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
     const next = input.checked
     this.indeterminate = false
     this.requestChecked(next)
-    input.checked = this.isChecked
+    input.checked = this.checked
     this.relayNativeEvent(event)
   }
 
   /** Reports the value and the validity the host stands behind. */
   private sync(): void {
-    this.internals.setFormValue(this.isChecked ? this.value : null)
-    if (this.required && !this.isChecked) {
+    this.internals.setFormValue(this.checked ? this.value : null)
+    if (this.required && !this.checked) {
       this.internals.setValidity(
         { valueMissing: true },
         'Tick this box to continue.',
@@ -93,8 +93,9 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
 
   /** Returns the box to the state its markup declared. */
   formResetCallback(): void {
-    this.checked = undefined
     this.indeterminate = false
+    // `resetChecked` drops both halves now, the consumer's and the element's,
+    // so there is nothing to clear before it.
     this.resetChecked()
   }
 
@@ -170,7 +171,7 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
         <input
           part="control"
           type="checkbox"
-          .checked=${this.isChecked}
+          .checked=${this.checked}
           .indeterminate=${this.indeterminate}
           ?disabled=${this.disabled}
           ?required=${this.required}

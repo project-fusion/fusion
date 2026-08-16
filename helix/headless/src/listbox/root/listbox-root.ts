@@ -1,7 +1,6 @@
 import {
   customElement,
   DisabledCascadeController,
-  HelixChangeEvent,
   HelixFormElement,
   type HelixSelectEvent,
   hostAria,
@@ -218,10 +217,11 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     if (joined === this.value) {
       return
     }
-    if (!this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: joined }))) {
-      return
-    }
-    this.value = joined
+    /* Through the mixin rather than hand-rolled. It did the same two steps in
+       the same order, and doing them here meant the control could not be
+       owned: writing `value` is how a consumer says it is theirs, so a listbox
+       writing its own would take ownership away from them on every change. */
+    this.requestValue(joined)
   }
 
   private readonly handleSelection = (event: HelixSelectEvent): void => {
