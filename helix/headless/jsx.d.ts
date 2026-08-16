@@ -2498,6 +2498,18 @@ instead. */
 export type HelixBaseProgressProps = {
   /** Accessible name for what is in progress. */
   label?: HelixBaseProgress["label"];
+  /** Whether the work has a knowable end.
+
+On the headless tier rather than as an `appearance`, because it is
+semantics before it is a picture: a progressbar with no `aria-valuenow` is
+how the platform says "running, and nobody knows how far", and a reader on
+a screen reader is told that rather than being read a number that means
+nothing. `value` and `max` are ignored while it is set.
+
+Not `Spinner`, which is the other thing this could be. A spinner says the
+page is busy; a bar says a named piece of work is running, and keeps its
+place in the layout when the answer arrives and it becomes determinate. */
+  indeterminate?: HelixBaseProgress["indeterminate"];
   /** The total the work is measured against. */
   max?: HelixBaseProgress["max"];
   /** What has been done so far, in the same units as `max`.
@@ -2524,6 +2536,18 @@ report progress. */
 export type HelixBaseProgressSolidJsProps = {
   /** Accessible name for what is in progress. */
   "prop:label"?: HelixBaseProgress["label"];
+  /** Whether the work has a knowable end.
+
+On the headless tier rather than as an `appearance`, because it is
+semantics before it is a picture: a progressbar with no `aria-valuenow` is
+how the platform says "running, and nobody knows how far", and a reader on
+a screen reader is told that rather than being read a number that means
+nothing. `value` and `max` are ignored while it is set.
+
+Not `Spinner`, which is the other thing this could be. A spinner says the
+page is busy; a bar says a named piece of work is running, and keeps its
+place in the layout when the answer arrives and it becomes determinate. */
+  "prop:indeterminate"?: HelixBaseProgress["indeterminate"];
   /** The total the work is measured against. */
   "prop:max"?: HelixBaseProgress["max"];
   /** What has been done so far, in the same units as `max`.
@@ -6703,6 +6727,17 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for what is in progress.
+   * - `indeterminate`: Whether the work has a knowable end.
+   *
+   * On the headless tier rather than as an `appearance`, because it is
+   * semantics before it is a picture: a progressbar with no `aria-valuenow` is
+   * how the platform says "running, and nobody knows how far", and a reader on
+   * a screen reader is told that rather than being read a number that means
+   * nothing. `value` and `max` are ignored while it is set.
+   *
+   * Not `Spinner`, which is the other thing this could be. A spinner says the
+   * page is busy; a bar says a named piece of work is running, and keeps its
+   * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
    * - `value`: What has been done so far, in the same units as `max`.
    *
@@ -11031,6 +11066,17 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for what is in progress.
+   * - `indeterminate`: Whether the work has a knowable end.
+   *
+   * On the headless tier rather than as an `appearance`, because it is
+   * semantics before it is a picture: a progressbar with no `aria-valuenow` is
+   * how the platform says "running, and nobody knows how far", and a reader on
+   * a screen reader is told that rather than being read a number that means
+   * nothing. `value` and `max` are ignored while it is set.
+   *
+   * Not `Spinner`, which is the other thing this could be. A spinner says the
+   * page is busy; a bar says a named piece of work is running, and keeps its
+   * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
    * - `value`: What has been done so far, in the same units as `max`.
    *

@@ -2005,6 +2005,7 @@ thing advancing.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `fraction` | - | `number` | - | `HelixBaseProgress` | What is done, as a fraction of the whole, between 0 and 1. |
+| `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseProgress` | Whether the work has a knowable end. |
 | `label` | `label` | `string` | `'Progress'` | `HelixBaseProgress` | Accessible name for what is in progress. |
 | `max` | `max` | `number` | `100` | `HelixBaseProgress` | The total the work is measured against. |
 | `tone` | `tone` | `'danger' \| 'success' \| undefined` | - | - | What the fill means. |

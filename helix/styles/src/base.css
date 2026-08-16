@@ -712,6 +712,11 @@ helix-toggle[disabled]::part(item) {
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
+  /* A step up from body weight even at rest. A contents page is scanned rather
+     than read, and at `regular` against `foreground-muted` the whole column sat
+     back far enough that the current item was doing all the work of saying
+     there was a list there at all. */
+  font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-normal);
   /* Margin rather than more padding, so the hover fill starts after the rail
      instead of covering it. A fill that swallowed the hairline made the rule
@@ -741,7 +746,8 @@ helix-toggle[disabled]::part(item) {
  * mark has been measured, which cannot happen on the server. */
 :where(helix-page-nav a[aria-current]) {
   color: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-medium);
+  /* One step above the rest, which is what it was before the rest moved up. */
+  font-weight: var(--helix-weight-semibold);
 }
 
 /* Nesting, said by the consumer. Multiplied rather than enumerated, so a page
@@ -885,8 +891,19 @@ helix-toast:not([data-color-mode]) {
 }
 
 /* The only place !important is correct: a user asking the OS to reduce motion
-   is overriding author intent, so it has to beat author specificity, including
-   a component's own transition. */
+   is overriding author intent, so it has to beat author specificity.
+ *
+ * **It reaches the document and nothing else.** `*` does not cross a shadow
+ * boundary, so this covers prose, layout and the `data-` recipes above and not
+ * one part of any component. This comment used to claim it beat "a component's
+ * own transition", which is exactly backwards. Measured under
+ * `prefers-reduced-motion: reduce`: a light-DOM element came back at 1e-05s and
+ * a component's shadow child at its full authored duration.
+ *
+ * So every component that animates has to answer the preference in its own
+ * sheet. That is not a gap to be closed from here, because it cannot be: a
+ * document rule has no way in. It is a rule for writing components, and the
+ * place to enforce it is a check, not a stylesheet. */
 @media (prefers-reduced-motion: reduce) {
   /* biome-ignore-start lint/complexity/noImportantStyles: user preference must win over author styles */
   *,

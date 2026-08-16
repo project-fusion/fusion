@@ -51,3 +51,53 @@
     transition: none;
   }
 }
+
+/* Running, with no knowable end.
+ *
+ * One design, moving or still, which is what makes the reduced-motion case
+ * honest. A sliding segment stopped would park somewhere and read as a value,
+ * and a bar filling the track would read as finished. A hatched fill is not a
+ * quantity at either speed: moving it says "still going", still it says
+ * "running, amount unknown", and neither says a number.
+ *
+ * Stopped here rather than left to the base layer, and that is not belt and
+ * braces. The global reduced-motion rule is `*, *::before, *::after` in the
+ * document, and `*` does not cross a shadow boundary, so it reaches no part of
+ * any component in this library. Measured: under `prefers-reduced-motion:
+ * reduce`, a light-DOM element came back at 1e-05s and this element at its full
+ * duration. Every component wanting the preference honoured has to say so
+ * itself, in its own sheet, the way this one now does.
+ */
+:host([indeterminate]) [part="indicator"] {
+  animation: helix-progress-indeterminate var(--_progress-cycle) linear infinite;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--helix-color-background) 0 var(--_progress-hatch),
+    transparent var(--_progress-hatch) calc(var(--_progress-hatch) * 2)
+  );
+  /* The whole track, because there is no part of it that is done. */
+  scale: 1 1;
+  /* Nothing to travel to: the fill is not moving between values. */
+  transition: none;
+
+  /* Slow enough to read as work rather than as a barber's pole. Derived from
+     the slowest duration token so a theme that slows its motion slows this. */
+  --_progress-cycle: calc(var(--helix-duration-slow) * 4);
+  --_progress-hatch: var(--helix-space-xs);
+}
+
+@keyframes helix-progress-indeterminate {
+  to {
+    /* Exactly one stripe pair, so the loop has no seam. */
+    background-position-x: calc(var(--_progress-hatch) * -2 * 1.4142);
+  }
+}
+
+/* After the indeterminate rule above, not folded into the reduced-motion block
+   further up: the selectors are identical, so source order is the whole of the
+   cascade here and a block written earlier loses. Measured wrong first time. */
+@media (prefers-reduced-motion: reduce) {
+  :host([indeterminate]) [part="indicator"] {
+    animation: none;
+  }
+}

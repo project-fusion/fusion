@@ -75,6 +75,28 @@ describe('progress', () => {
   test('no value text means none is announced, rather than an empty one', async () => {
     expect((await progress()).internals?.ariaValueText).toBeNull()
   })
+  test('reports no value at all, which is how the platform says unknown', async () => {
+    /* Absent, not zero. An omitted `aria-valuenow` is the platform's own
+         signal for indeterminate and the only one. Reporting 0 would announce
+         "0 percent" for work that is running, which is wrong rather than
+         merely unknown. */
+    const bar = await progress('indeterminate')
+    expect(bar.internals?.ariaValueNow ?? null).toBeNull()
+    expect(bar.internals?.role).toBe('progressbar')
+    expect(bar.internals?.ariaValueMax).toBe('100')
+  })
+
+  test('a value is ignored while it is set, rather than half-honoured', async () => {
+    const bar = await progress('indeterminate value="40"')
+    expect(bar.internals?.ariaValueNow ?? null).toBeNull()
+  })
+
+  test('going determinate restores the number', async () => {
+    const bar = await progress('indeterminate value="40"')
+    ;(bar as unknown as { indeterminate: boolean }).indeterminate = false
+    await bar.updateComplete
+    expect(bar.internals?.ariaValueNow).toBe('40')
+  })
 })
 
 if (hasLayout()) {
@@ -98,6 +120,33 @@ if (hasLayout()) {
       const fill = part(bar, 'indicator') as HTMLElement
       const edge = track.getBoundingClientRect().left
       expect(within(fill.getBoundingClientRect().left, edge, 1)).toBe(true)
+    })
+  })
+
+  describe('indeterminate', () => {
+    test('the fill is hatched and spans the track, because no part of it is done', async () => {
+      const bar = await progress('indeterminate')
+      const fill = part(bar, 'indicator') as HTMLElement
+      expect(getComputedStyle(fill).backgroundImage).not.toBe('none')
+      expect(getComputedStyle(fill).scale).toBe('1')
+    })
+
+    test('reduced motion stops it and leaves the hatch, which is why it is a hatch', async () => {
+      /* A sliding segment stopped would park somewhere and read as a value; a
+         filled track would read as finished. A hatch is not a quantity at
+         either speed.
+       *
+       * The component has to say this itself. The base layer's global rule is
+       * `*, *::before, *::after` in the document, and `*` does not cross a
+       * shadow boundary, so it reaches no part of any component here. Measured:
+       * under `reduce`, a light-DOM element came back at 1e-05s and this one at
+       * its full authored duration until this rule was added. */
+      const fill = part(await progress('indeterminate'), 'indicator') as HTMLElement
+      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      expect(getComputedStyle(fill).animationName).toBe(
+        still ? 'none' : 'helix-progress-indeterminate',
+      )
+      expect(getComputedStyle(fill).backgroundImage).not.toBe('none')
     })
   })
 }

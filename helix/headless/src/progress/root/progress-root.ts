@@ -41,6 +41,22 @@ export class HelixBaseProgress extends HelixElement {
   @property()
   label = 'Progress'
 
+  /**
+   * Whether the work has a knowable end.
+   *
+   * On the headless tier rather than as an `appearance`, because it is
+   * semantics before it is a picture: a progressbar with no `aria-valuenow` is
+   * how the platform says "running, and nobody knows how far", and a reader on
+   * a screen reader is told that rather than being read a number that means
+   * nothing. `value` and `max` are ignored while it is set.
+   *
+   * Not `Spinner`, which is the other thing this could be. A spinner says the
+   * page is busy; a bar says a named piece of work is running, and keeps its
+   * place in the layout when the answer arrives and it becomes determinate.
+   */
+  @property({ reflect: true, type: Boolean })
+  indeterminate = false
+
   /** The total the work is measured against. */
   @property({ type: Number })
   max = 100
@@ -80,7 +96,14 @@ export class HelixBaseProgress extends HelixElement {
        type were checked. */
     this.internals.ariaValueMin = '0'
     this.internals.ariaValueMax = String(this.max > 0 ? this.max : 100)
-    this.internals.ariaValueNow = String(this.fraction * (this.max > 0 ? this.max : 100))
+    /* Absent, not zero. An omitted `aria-valuenow` is the platform's own signal
+       for indeterminate, and it is the only one: `aria-busy` says the element
+       is being updated, which is a different claim. Reporting 0 would announce
+       "0 percent" for work that is running, which is worse than saying nothing
+       because it is wrong rather than unknown. */
+    this.internals.ariaValueNow = this.indeterminate
+      ? null
+      : String(this.fraction * (this.max > 0 ? this.max : 100))
     this.internals.ariaValueText = this.valueText || null
   }
 
@@ -88,7 +111,10 @@ export class HelixBaseProgress extends HelixElement {
     /* A custom property rather than a width, so the styled tier decides what
        the number means: a bar fills along it, and a ring would sweep. */
     return html`<div part="track">
-      <div part="indicator" style="--_progress-fraction: ${this.fraction}"></div>
+      <div
+        part="indicator"
+        style="--_progress-fraction: ${this.indeterminate ? 1 : this.fraction}"
+      ></div>
     </div>`
   }
 }

@@ -168,17 +168,19 @@ slot[name="icon"]::slotted(*) {
   }
 }
 
-/* Hidden outright rather than left still.
+/* Kept, and this was hidden for a reason that turned out not to be true.
  *
- * The base layer's reduced-motion rule caps every animation at 0.01ms, which
- * would run this one to empty on the first frame and leave a bar saying no time
- * remains while the message sits there for another four seconds. A bar that
- * cannot move cannot tell the truth, and a wrong indicator is worse than none. */
-@media (prefers-reduced-motion: reduce) {
-  [part="timer"] {
-    display: none;
-  }
-}
+ * The note here said the base layer's reduced-motion rule would cap this at
+ * 0.01ms and leave a bar claiming no time remained. It does not: that rule is
+ * `*, *::before, *::after` in the document, and `*` does not cross a shadow
+ * boundary. Measured under `prefers-reduced-motion: reduce`, this element kept
+ * its full eight seconds while a light-DOM element beside it came back at
+ * 1e-05s. So the bar was being hidden to avoid a failure that could not happen.
+ *
+ * It stays visible, because it is the only thing saying how long is left and a
+ * 2px rule travelling once over the message's own lifetime is closer to a clock
+ * than to an animation. What the preference is about is motion that surprises,
+ * and this is the message's duration drawn at the speed of the message. */
 
 /* It arrives rather than appearing. A message that is simply there is one a
    reader has to notice on their own. */

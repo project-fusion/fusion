@@ -17399,6 +17399,21 @@
             },
             {
               "kind": "field",
+              "name": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the work has a knowable end.\n\nOn the headless tier rather than as an `appearance`, because it is\nsemantics before it is a picture: a progressbar with no `aria-valuenow` is\nhow the platform says \"running, and nobody knows how far\", and a reader on\na screen reader is told that rather than being read a number that means\nnothing. `value` and `max` are ignored while it is set.\n\nNot `Spinner`, which is the other thing this could be. A spinner says the\npage is busy; a bar says a named piece of work is running, and keeps its\nplace in the layout when the answer arrives and it becomes determinate.",
+              "attribute": "indeterminate",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "max",
               "type": {
                 "text": "number"
@@ -17539,6 +17554,19 @@
               "default": "'Progress'",
               "description": "Accessible name for what is in progress.",
               "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "name": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the work has a knowable end.\n\nOn the headless tier rather than as an `appearance`, because it is\nsemantics before it is a picture: a progressbar with no `aria-valuenow` is\nhow the platform says \"running, and nobody knows how far\", and a reader on\na screen reader is told that rather than being read a number that means\nnothing. `value` and `max` are ignored while it is set.\n\nNot `Spinner`, which is the other thing this could be. A spinner says the\npage is busy; a bar says a named piece of work is running, and keeps its\nplace in the layout when the answer arrives and it becomes determinate.",
+              "fieldName": "indeterminate",
               "inheritedFrom": {
                 "name": "HelixBaseProgress",
                 "module": "src/progress/root/progress-root.ts"
