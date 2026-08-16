@@ -28,6 +28,10 @@ export {
   type NavigableItem,
 } from './controllers/keyboard-navigation-controller/keyboard-navigation-controller.js'
 export {
+  PopoverController,
+  type PopoverOptions,
+} from './controllers/popover-controller/popover-controller.js'
+export {
   type CaretDetail,
   type ChangeDetail,
   type ConsoleDetail,
@@ -61,6 +65,7 @@ export {
   type MixinControllerValueInterface,
 } from './mixins/mixin-controller-value/mixin-controller-value.js'
 export { MixinField, type MixinFieldInterface } from './mixins/mixin-field/mixin-field.js'
+export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export { customElement } from './utils/custom-element/custom-element.js'
 export {

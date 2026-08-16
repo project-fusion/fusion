@@ -43,6 +43,7 @@ import type {
   HelixOpenEvent,
   HelixOption,
   HelixOptionGroup,
+  HelixPopover,
   HelixProgress,
   HelixQuote,
   HelixRadio,
@@ -2151,6 +2152,85 @@ export type HelixOptionSolidJsProps = {
   "prop:value"?: HelixOption["value"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixOptionHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixPopover` component event */
+export type HelixPopoverElementEvent<E = Event> = TypedEvent<HelixPopover, E>;
+/** `helix-open` event type */
+export type HelixPopoverHelixOpenElementEvent =
+  HelixPopoverElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixPopoverHelixCloseElementEvent =
+  HelixPopoverElementEvent<HelixCloseEvent>;
+
+export type HelixPopoverProps = {
+  /** How the panel is framed.
+
+Unset is a surface with an inset, which is what a panel of content wants.
+`plain` removes both, for a panel holding something that brings its own,
+such as a list whose rows run to the edges. */
+  appearance?: HelixPopover["appearance"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixPopover["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixPopover["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixPopover["defaultOpen"];
+  /** Accessible name for the panel. */
+  label?: HelixPopover["label"];
+  /** Space between the trigger and the panel, in pixels. */
+  offset?: HelixPopover["offset"];
+  /** Preferred side. It moves if that side does not fit. */
+  placement?: HelixPopover["placement"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixPopover["onOpenChange"];
+
+  /** Fired before it opens, and cancelable. */
+  "onhelix-open"?: (e: HelixPopoverHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "onhelix-close"?: (e: HelixPopoverHelixCloseElementEvent) => void;
+};
+
+export type HelixPopoverSolidJsProps = {
+  /** How the panel is framed.
+
+Unset is a surface with an inset, which is what a panel of content wants.
+`plain` removes both, for a panel holding something that brings its own,
+such as a list whose rows run to the edges. */
+  "prop:appearance"?: HelixPopover["appearance"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixPopover["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixPopover["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixPopover["defaultOpen"];
+  /** Accessible name for the panel. */
+  "prop:label"?: HelixPopover["label"];
+  /** Space between the trigger and the panel, in pixels. */
+  "prop:offset"?: HelixPopover["offset"];
+  /** Preferred side. It moves if that side does not fit. */
+  "prop:placement"?: HelixPopover["placement"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixPopover["onOpenChange"];
+  /** Fired before it opens, and cancelable. */
+  "on:helix-open"?: (e: HelixPopoverHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "on:helix-close"?: (e: HelixPopoverHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5526,6 +5606,85 @@ export type CustomElements = {
    */
   "helix-option": Partial<
     HelixOptionProps & BaseProps<HelixOption> & BaseEvents
+  >;
+
+  /**
+   * A surface with an inset and a shadow, and nothing about what goes in it. The
+   * inset is the panel's rather than the consumer's, which is the same call
+   * `Dialog` and `Drawer` make and for the same reason: everyone was writing it,
+   * and everyone was writing the same one.
+   *
+   * It arrives from the side it opened on. `data-placement` is written by the
+   * positioning, so the panel knows which way it flipped and can animate from the
+   * trigger rather than from a fixed direction that would be backwards half the
+   * time.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How the panel is framed.
+   *
+   * Unset is a surface with an inset, which is what a panel of content wants.
+   * `plain` removes both, for a panel holding something that brings its own,
+   * such as a list whose rows run to the edges.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `label`: Accessible name for the panel.
+   * - `offset`: Space between the trigger and the panel, in pixels.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: What opens it.
+   * - `(default)`: The contents of the panel.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `show() => void`: Opens the panel.
+   * - `hide() => void`: Closes the panel and puts focus back on the trigger.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
+   * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `popover`: The panel.
+   */
+  "helix-popover": Partial<
+    HelixPopoverProps & BaseProps<HelixPopover> & BaseEvents
   >;
 
   /**
@@ -9105,6 +9264,88 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * A surface with an inset and a shadow, and nothing about what goes in it. The
+   * inset is the panel's rather than the consumer's, which is the same call
+   * `Dialog` and `Drawer` make and for the same reason: everyone was writing it,
+   * and everyone was writing the same one.
+   *
+   * It arrives from the side it opened on. `data-placement` is written by the
+   * positioning, so the panel knows which way it flipped and can animate from the
+   * trigger rather than from a fixed direction that would be backwards half the
+   * time.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How the panel is framed.
+   *
+   * Unset is a surface with an inset, which is what a panel of content wants.
+   * `plain` removes both, for a panel holding something that brings its own,
+   * such as a list whose rows run to the edges.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `label`: Accessible name for the panel.
+   * - `offset`: Space between the trigger and the panel, in pixels.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: What opens it.
+   * - `(default)`: The contents of the panel.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `show() => void`: Opens the panel.
+   * - `hide() => void`: Closes the panel and puts focus back on the trigger.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
+   * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `popover`: The panel.
+   */
+  "helix-popover": Partial<
+    HelixPopoverProps &
+      HelixPopoverSolidJsProps &
+      BaseProps<HelixPopover> &
+      BaseEvents
+  >;
+
+  /**
    * A track and the part of it that is done. The height comes from a token rather
    * than from a size property, for the reason the rest of the library gives about
    * controls: how heavy a bar is says something about the region it is in, and a
@@ -10734,6 +10975,10 @@ export type CustomCssProperties = {
   "--nav-bar-gap"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
+  /** Space between the panel's edge and its contents. */
+  "--popover-inset"?: string;
+  /** Width of the panel. */
+  "--popover-inline-size"?: string;
   /** Thickness of the bar. */
   "--progress-size"?: string;
   /** Fill of the part that is done. */

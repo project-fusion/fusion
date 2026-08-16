@@ -1,0 +1,69 @@
+:host {
+  /* No box of its own: the trigger is the consumer's element and the panel is
+     in the top layer, so anything here would be a third box between them. */
+  display: contents;
+}
+
+[part="popover"] {
+  background-color: var(--helix-color-surface-overlay);
+  /* No border, said rather than left out: the UA stylesheet gives `[popover]`
+     `border: solid`, so dropping the declaration leaves a three-pixel medium
+     border rather than none at all. The shadow is what says it is floating; a
+     rule as well only makes it look cut out. */
+  border: none;
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-lg);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  /* The popover API puts it in the top layer, where the UA's own inset would
+     centre it in the window and its margin would offset it from wherever the
+     positioning put it. Both have to be cleared, not merely overridden. */
+  inset: auto;
+  margin: var(--helix-space-none);
+  /* Never wider than the window, whatever it was asked for. A panel is placed
+     against a trigger that can be anywhere, including hard against an edge. */
+  max-inline-size: calc(100vw - var(--helix-space-lg));
+  padding: var(--popover-inset, var(--helix-space-md));
+  inline-size: var(--popover-inline-size, max-content);
+}
+
+/* The UA hides a closed popover with `[popover]:not(:popover-open)`, and the
+   rules above are author declarations that outrank it whatever their
+   specificity. Restated here, the same way Tooltip and Menu restate theirs, and
+   for the same reason Dialog had to learn: origin beats specificity, so one
+   word of layout can silently undo the rule that hides a thing. */
+[part="popover"]:not(:popover-open) {
+  display: none;
+}
+
+/* Nothing but the surface. For a panel holding something that brings its own
+   inset, such as a list whose rows run to the edges so their hover reaches
+   them. */
+:host([appearance="plain"]) [part="popover"] {
+  padding: var(--popover-inset, var(--helix-space-none));
+}
+
+/* It arrives from the side it opened on, which `data-placement` is written for:
+   the panel knows which way it flipped, so the movement reads as coming out of
+   the trigger rather than from a fixed direction that is backwards half the
+   time. */
+@media (prefers-reduced-motion: no-preference) {
+  [part="popover"]:popover-open {
+    animation: helix-popover-in var(--helix-duration-fast) var(--helix-easing-decelerate);
+  }
+
+  [part="popover"][data-placement^="top"] {
+    --_popover-from: var(--helix-space-2xs);
+  }
+
+  [part="popover"][data-placement^="bottom"] {
+    --_popover-from: calc(-1 * var(--helix-space-2xs));
+  }
+}
+
+@keyframes helix-popover-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--_popover-from, 0);
+  }
+}

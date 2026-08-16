@@ -753,6 +753,119 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/popover-controller/popover-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A surface that floats against something, in the top layer, until dismissed.\n\nThree things always travel together and were written out longhand three\ntimes: the popover API, a `FloatingController` and a `DismissController`.\nIndividually each is small, which is exactly why the copies drifted rather\nthan being noticed. **`Select` never called `showPopover` at all**, so its\nlist was an ordinary positioned panel and any ancestor with `overflow:\nhidden` clipped it, while a menu two folders away in the same position did\nnot. That is not a difference anyone chose.\n\n**The top layer is the whole point.** A floating panel has to escape every\nclipping ancestor between it and the page, and `position: fixed` does not do\nthat: it is clipped by `overflow` on any ancestor and re-anchored entirely by\nan ancestor carrying `transform`, `filter` or `contain`. The popover API\nlifts the element out of the tree's paint order for real, and it is the only\nthing that does.\n\n`manual` rather than `auto`, because the host owns dismissal. `auto`\npopovers light-dismiss themselves and close each other, which is close to\nwhat is wanted and not the same: a select that closed itself before its own\nchange event landed, or a submenu that closed its parent, are both things the\nplatform would do here and neither is right.\n\n**The order matters on the way up.** `showPopover` first, then position:\nmeasuring an element that is still `display: none` gives zeroes, so a surface\npositioned before it is shown lands at the origin and slides into place on\nthe next frame. On the way down it is the reverse, and stopping the observer\nbefore hiding avoids a final measurement of an element on its way out.\n\nWhat this does not own is *when*. Opening is the host's, because a menu opens\non click, a tooltip on hover and a select on either, and none of that is\nabout surfaces.",
+          "name": "PopoverController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "PopoverOptions"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "options"
+            },
+            {
+              "kind": "field",
+              "name": "floating",
+              "type": {
+                "text": "FloatingController"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "new FloatingController(host, { anchor: options.anchor, floating: options.surface, ...(options.offset === undefined ? {} : { offset: options.offset }), ...(options.placement === undefined ? {} : { placement: options.placement }), })"
+            },
+            {
+              "kind": "field",
+              "name": "dismisser",
+              "type": {
+                "text": "DismissController"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "new DismissController(host, { boundary: options.boundary ?? options.surface, onDismiss: options.onDismiss, })"
+            },
+            {
+              "kind": "field",
+              "name": "shown",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the surface is currently shown, so the calls can be idempotent."
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the surface is showing.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Shows the surface, positions it, and starts listening for a way out.\n\nSafe to call when already open, so a host may call it from whatever\ncombination of a property, an event and a command it likes without keeping\ntrack of which one got there first."
+            },
+            {
+              "kind": "method",
+              "name": "hide",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Hides the surface and stops everything watching it."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Whichever of the two the surface is not already doing."
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Leaves the top layer when the host does.\n\nAn element removed while its popover is showing is removed from the top\nlayer by the platform, but the controllers watching it are this host's to\nstop, and `autoUpdate` in particular holds listeners on every scrolling\nancestor of something no longer in the document."
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "PopoverController",
+          "declaration": {
+            "name": "PopoverController",
+            "module": "src/controllers/popover-controller/popover-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/events/events.ts",
       "declarations": [
         {
@@ -1360,6 +1473,22 @@
         },
         {
           "kind": "js",
+          "name": "PopoverController",
+          "declaration": {
+            "name": "PopoverController",
+            "module": "./controllers/popover-controller/popover-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "PopoverOptions",
+          "declaration": {
+            "name": "PopoverOptions",
+            "module": "./controllers/popover-controller/popover-controller.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "CaretDetail",
           "declaration": {
             "name": "CaretDetail",
@@ -1556,6 +1685,14 @@
           "declaration": {
             "name": "MixinFieldInterface",
             "module": "./mixins/mixin-field/mixin-field.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "anchorElement",
+          "declaration": {
+            "name": "anchorElement",
+            "module": "./utils/anchor-element/anchor-element.js"
           }
         },
         {
@@ -2813,6 +2950,46 @@
           "declaration": {
             "name": "MixinField",
             "module": "src/mixins/mixin-field/mixin-field.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/anchor-element/anchor-element.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "anchorElement",
+          "return": {
+            "type": {
+              "text": "HTMLElement"
+            }
+          },
+          "parameters": [
+            {
+              "name": "slot",
+              "type": {
+                "text": "HTMLSlotElement | null | undefined"
+              }
+            },
+            {
+              "name": "fallback",
+              "type": {
+                "text": "HTMLElement"
+              }
+            }
+          ],
+          "description": "The element a floating surface should open against, given the slot it wraps.\n\n**A wrapper with no box is not an anchor.** `display: contents` puts an\nelement's children into the layout and leaves the element itself without a\nbox, so its `getBoundingClientRect()` is `0 0 0 0`. Measured: a tooltip host\nreports exactly that while the button inside it reports 32 by 32. Anchoring\nto it opens the surface against the top left of the window, and focusing it\non close puts focus nowhere.\n\nThat is not an edge case, because wrapping is how a tooltip attaches to the\nthing it describes. Without this, an icon button used as a trigger is the one\nbutton on a toolbar that cannot have a tooltip.\n\nSo this descends past anything that draws nothing, and the first child with a\nbox is the anchor. The wrapper is transparent by construction, so the thing\nwith the box is the thing the reader is pointing at.\n\nBounded rather than a walk to the leaves: a chain of box-less wrappers is\nalready unusual, and descending without a limit through a tree this library\ndoes not own is worse than stopping and anchoring to something imperfect."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "anchorElement",
+          "declaration": {
+            "name": "anchorElement",
+            "module": "src/utils/anchor-element/anchor-element.ts"
           }
         }
       ]

@@ -36,6 +36,7 @@ import type {
   HelixBaseNavBar,
   HelixBaseOption,
   HelixBaseOptionGroup,
+  HelixBasePopover,
   HelixBaseProgress,
   HelixBaseQuote,
   HelixBaseRadio,
@@ -1945,6 +1946,76 @@ export type HelixBaseOptionSolidJsProps = {
   "prop:value"?: HelixBaseOption["value"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBasePopover` component event */
+export type HelixBasePopoverElementEvent<E = Event> = TypedEvent<
+  HelixBasePopover,
+  E
+>;
+/** `helix-open` event type */
+export type HelixBasePopoverHelixOpenElementEvent =
+  HelixBasePopoverElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBasePopoverHelixCloseElementEvent =
+  HelixBasePopoverElementEvent<HelixCloseEvent>;
+
+export type HelixBasePopoverProps = {
+  /** Accessible name for the panel. */
+  label?: HelixBasePopover["label"];
+  /** Space between the trigger and the panel, in pixels. */
+  offset?: HelixBasePopover["offset"];
+  /** Preferred side. It moves if that side does not fit. */
+  placement?: HelixBasePopover["placement"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixBasePopover["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixBasePopover["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixBasePopover["defaultOpen"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixBasePopover["onOpenChange"];
+
+  /** Fired before it opens, and cancelable. */
+  "onhelix-open"?: (e: HelixBasePopoverHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "onhelix-close"?: (e: HelixBasePopoverHelixCloseElementEvent) => void;
+};
+
+export type HelixBasePopoverSolidJsProps = {
+  /** Accessible name for the panel. */
+  "prop:label"?: HelixBasePopover["label"];
+  /** Space between the trigger and the panel, in pixels. */
+  "prop:offset"?: HelixBasePopover["offset"];
+  /** Preferred side. It moves if that side does not fit. */
+  "prop:placement"?: HelixBasePopover["placement"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixBasePopover["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixBasePopover["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixBasePopover["defaultOpen"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixBasePopover["onOpenChange"];
+  /** Fired before it opens, and cancelable. */
+  "on:helix-open"?: (e: HelixBasePopoverHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "on:helix-close"?: (e: HelixBasePopoverHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5269,6 +5340,84 @@ export type CustomElements = {
    */
   "helix-base-option": Partial<
     HelixBaseOptionProps & BaseProps<HelixBaseOption> & BaseEvents
+  >;
+
+  /**
+   * The general case the specific overlays are versions of. `Menu` holds
+   * commands, `Select` holds options, `Tooltip` holds a description; this holds
+   * whatever the consumer puts in it, which is why it has no keyboard of its own
+   * and no opinion about what is inside.
+   *
+   * **The trigger is slotted and stays the consumer's own element.** Nothing is
+   * written onto it: no `aria-expanded`, no `id`, no `tabindex`. A component that
+   * decorates a consumer's markup after upgrading is a component whose output a
+   * React consumer's hydration disagrees with, and the attribute they would care
+   * about most is the one that changes on every open.
+   *
+   * **The panel is in the top layer**, through the popover API, so it clears any
+   * ancestor with `overflow: hidden` without a `z-index` fight. `position: fixed`
+   * does not do that: it is still clipped by `overflow`, and re-anchored entirely
+   * by an ancestor carrying `transform`, `filter` or `contain`.
+   *
+   * **It opens on click, and from a command.** `command="--show"` and its
+   * siblings work here the way they do on `Dialog` and `Drawer`, so a trigger
+   * elsewhere on the page can open it without a line of script and without being
+   * slotted into it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the panel.
+   * - `offset`: Space between the trigger and the panel, in pixels.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: What opens it.
+   * - `(default)`: The contents of the panel.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `show() => void`: Opens the panel.
+   * - `hide() => void`: Closes the panel and puts focus back on the trigger.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `popover`: The panel.
+   */
+  "helix-base-popover": Partial<
+    HelixBasePopoverProps & BaseProps<HelixBasePopover> & BaseEvents
   >;
 
   /**
@@ -8822,6 +8971,87 @@ export type CustomElementsSolidJs = {
     HelixBaseOptionProps &
       HelixBaseOptionSolidJsProps &
       BaseProps<HelixBaseOption> &
+      BaseEvents
+  >;
+
+  /**
+   * The general case the specific overlays are versions of. `Menu` holds
+   * commands, `Select` holds options, `Tooltip` holds a description; this holds
+   * whatever the consumer puts in it, which is why it has no keyboard of its own
+   * and no opinion about what is inside.
+   *
+   * **The trigger is slotted and stays the consumer's own element.** Nothing is
+   * written onto it: no `aria-expanded`, no `id`, no `tabindex`. A component that
+   * decorates a consumer's markup after upgrading is a component whose output a
+   * React consumer's hydration disagrees with, and the attribute they would care
+   * about most is the one that changes on every open.
+   *
+   * **The panel is in the top layer**, through the popover API, so it clears any
+   * ancestor with `overflow: hidden` without a `z-index` fight. `position: fixed`
+   * does not do that: it is still clipped by `overflow`, and re-anchored entirely
+   * by an ancestor carrying `transform`, `filter` or `contain`.
+   *
+   * **It opens on click, and from a command.** `command="--show"` and its
+   * siblings work here the way they do on `Dialog` and `Drawer`, so a trigger
+   * elsewhere on the page can open it without a line of script and without being
+   * slotted into it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the panel.
+   * - `offset`: Space between the trigger and the panel, in pixels.
+   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: What opens it.
+   * - `(default)`: The contents of the panel.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `show() => void`: Opens the panel.
+   * - `hide() => void`: Closes the panel and puts focus back on the trigger.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `popover`: The panel.
+   */
+  "helix-base-popover": Partial<
+    HelixBasePopoverProps &
+      HelixBasePopoverSolidJsProps &
+      BaseProps<HelixBasePopover> &
       BaseEvents
   >;
 
