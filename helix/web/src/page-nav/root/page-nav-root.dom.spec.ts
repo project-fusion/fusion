@@ -92,6 +92,22 @@ if (hasLayout()) {
       expect(marked(nav)).toBe('#three')
     })
 
+    test('moving the reading line re-marks without the page having moved', async () => {
+      /* Nothing else would notice. The observer fires on sections crossing the
+         viewport, and changing `offset` changes what crossing means rather than
+         whether anything did, so without this the marker stays wrong until the
+         reader happens to scroll. */
+      const nav = await build()
+      const two = document.getElementById('two') as HTMLElement
+      window.scrollTo(0, two.offsetTop - 100)
+      await settle()
+      expect(marked(nav)).toBe('#one')
+
+      nav.offset = 200
+      await nav.updateComplete
+      expect(marked(nav)).toBe('#two')
+    })
+
     test('the reading line moves down with offset, which is what chrome needs', async () => {
       /* The direction is worth stating, because it reads backwards at first and
          this spec asserted the opposite before it was run. `offset` is where the

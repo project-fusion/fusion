@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -146,6 +146,17 @@ export class HelixBasePageNav extends HelixElement {
 
   protected override firstUpdated(): void {
     this.watch()
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    /* The reading line moved, so where the reader is may have changed without
+       the page having moved at all. Nothing else would notice: the observer
+       fires on sections crossing the viewport, and this changes what crossing
+       means rather than whether anything did. */
+    if (changed.has('offset')) {
+      this.mark()
+    }
   }
 
   protected override render(): TemplateResult {
