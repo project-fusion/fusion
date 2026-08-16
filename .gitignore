@@ -48,3 +48,8 @@ site/ui/public/specs
 
 # The sandbox preview document, built from source by `bun run frame`.
 site/ui/public/sandbox
+
+# Worktrees an agent made for isolation. A second checkout of this repo, so
+# tracking it would track everything twice and linting it collides with this
+# tree's own root config.
+.claude/worktrees/

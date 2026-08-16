@@ -5,6 +5,7 @@ import type {
   HelixAnnouncement,
   HelixAppHeader,
   HelixAvatar,
+  HelixAvatarGroup,
   HelixBadge,
   HelixBlockquote,
   HelixBreadcrumb,
@@ -497,6 +498,31 @@ the wordmark and the actions happen to measure.
 
 `start` is the opt-out, for a header whose navigation trails the brand. */
   "prop:navAlign"?: HelixAppHeader["navAlign"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixAvatarGroupProps = {
+  /** Accessible name for the set, such as "Reviewers". */
+  label?: HelixAvatarGroup["label"];
+  /** How many avatars are shown before the rest become a count.
+
+Zero or less shows all of them, which is what an unset limit means and is
+more useful than refusing to render. */
+  max?: HelixAvatarGroup["max"];
+};
+
+export type HelixAvatarGroupSolidJsProps = {
+  /** Accessible name for the set, such as "Reviewers". */
+  "prop:label"?: HelixAvatarGroup["label"];
+  /** How many avatars are shown before the rest become a count.
+
+Zero or less shows all of them, which is what an unset limit means and is
+more useful than refusing to render. */
+  "prop:max"?: HelixAvatarGroup["max"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3692,6 +3718,59 @@ export type CustomElements = {
    */
   "helix-app-header": Partial<
     HelixAppHeaderProps & BaseProps<HelixAppHeader> & BaseEvents
+  >;
+
+  /**
+   * They overlap by a step of space, which is enough to read as a stack without
+   * the faces occluding each other. Each carries a ring in the page's own
+   * background colour, because a stack with no separation between its members
+   * reads as one shape rather than several: the ring is what makes the edge of
+   * each avatar visible against the one behind it.
+   *
+   * Each avatar is drawn over the one before it, which falls out of document
+   * order and needs no `z-index`. The familiar trick for putting the *first*
+   * avatar on top is `row-reverse`, and it also reverses the row: the person
+   * written first appears last. A facepile whose reading order is the reverse of
+   * its markup is the worse trade of the two.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the set, such as "Reviewers".
+   * - `max`: How many avatars are shown before the rest become a count.
+   *
+   * Zero or less shows all of them, which is what an unset limit means and is
+   * more useful than refusing to render.
+   * - `avatars`: The avatars, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
+   * - `overflow`: How many avatars are past the limit, and so not shown.
+   *
+   * Not `hidden`, which is `HTMLElement`'s own boolean: a getter of that name
+   * returning a number is a type error, and had it been assignable it would
+   * have been worse, because a group with three extra members would have set
+   * the attribute that hides the whole group. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The avatars, in the order they should be read.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--avatar-group-overlap`: How far each avatar sits over the one before it. (default: `undefined`)
+   * - `--avatar-group-ring-color`: The separation drawn between one avatar and the next. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `overflow`: The count of avatars past `max`.
+   */
+  "helix-avatar-group": Partial<
+    HelixAvatarGroupProps & BaseProps<HelixAvatarGroup> & BaseEvents
   >;
 
   /**
@@ -7117,6 +7196,62 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * They overlap by a step of space, which is enough to read as a stack without
+   * the faces occluding each other. Each carries a ring in the page's own
+   * background colour, because a stack with no separation between its members
+   * reads as one shape rather than several: the ring is what makes the edge of
+   * each avatar visible against the one behind it.
+   *
+   * Each avatar is drawn over the one before it, which falls out of document
+   * order and needs no `z-index`. The familiar trick for putting the *first*
+   * avatar on top is `row-reverse`, and it also reverses the row: the person
+   * written first appears last. A facepile whose reading order is the reverse of
+   * its markup is the worse trade of the two.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the set, such as "Reviewers".
+   * - `max`: How many avatars are shown before the rest become a count.
+   *
+   * Zero or less shows all of them, which is what an unset limit means and is
+   * more useful than refusing to render.
+   * - `avatars`: The avatars, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
+   * - `overflow`: How many avatars are past the limit, and so not shown.
+   *
+   * Not `hidden`, which is `HTMLElement`'s own boolean: a getter of that name
+   * returning a number is a type error, and had it been assignable it would
+   * have been worse, because a group with three extra members would have set
+   * the attribute that hides the whole group. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The avatars, in the order they should be read.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--avatar-group-overlap`: How far each avatar sits over the one before it. (default: `undefined`)
+   * - `--avatar-group-ring-color`: The separation drawn between one avatar and the next. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `overflow`: The count of avatars past `max`.
+   */
+  "helix-avatar-group": Partial<
+    HelixAvatarGroupProps &
+      HelixAvatarGroupSolidJsProps &
+      BaseProps<HelixAvatarGroup> &
+      BaseEvents
+  >;
+
+  /**
    * Initials scale with the avatar rather than being sized per size, because the
    * font size is set in `em` against the avatar's own dimension. One rule covers
    * every size, including one a consumer sets themselves through
@@ -10489,6 +10624,10 @@ export type CustomCssProperties = {
   "--app-header-inset"?: string;
   /** Width the content is centered in. */
   "--app-header-max-inline-size"?: string;
+  /** How far each avatar sits over the one before it. */
+  "--avatar-group-overlap"?: string;
+  /** The separation drawn between one avatar and the next. */
+  "--avatar-group-ring-color"?: string;
   /** Fill behind the initials. */
   "--avatar-background-color"?: string;
   /** Edge length of the avatar. */

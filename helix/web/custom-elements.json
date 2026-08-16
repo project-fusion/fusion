@@ -1398,9 +1398,270 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/avatar/group/avatar-group.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/avatar/group/avatar-group.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/avatar/group/avatar-group.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "They overlap by a step of space, which is enough to read as a stack without\nthe faces occluding each other. Each carries a ring in the page's own\nbackground colour, because a stack with no separation between its members\nreads as one shape rather than several: the ring is what makes the edge of\neach avatar visible against the one behind it.\n\nEach avatar is drawn over the one before it, which falls out of document\norder and needs no `z-index`. The familiar trick for putting the *first*\navatar on top is `row-reverse`, and it also reverses the row: the person\nwritten first appears last. A facepile whose reading order is the reverse of\nits markup is the worse trade of the two.",
+          "name": "HelixAvatarGroup",
+          "cssProperties": [
+            {
+              "description": "How far each avatar sits over the one before it.",
+              "name": "--avatar-group-overlap"
+            },
+            {
+              "description": "The separation drawn between one avatar and the next.",
+              "name": "--avatar-group-ring-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the set, such as \"Reviewers\".",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many avatars are shown before the rest become a count.\n\nZero or less shows all of them, which is what an unset limit means and is\nmore useful than refusing to render.",
+              "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "avatars",
+              "type": {
+                "text": "HTMLElement[]"
+              },
+              "description": "The avatars, in light-DOM order. Empty on the server, which has no tree.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "overflow",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many avatars are past the limit, and so not shown.\n\nNot `hidden`, which is `HTMLElement`'s own boolean: a getter of that name\nreturning a number is a type error, and had it been assignable it would\nhave been worse, because a group with three extra members would have set\nthe attribute that hides the whole group.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseAvatarGroup",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Overlapping avatars, with a count for the ones not shown.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/avatar",
+            "aliases": [
+              "Avatar stack",
+              "Facepile"
+            ],
+            "tier": "styled",
+            "group": "Avatar",
+            "part": "Group"
+          },
+          "tagName": "helix-avatar-group",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The avatars, in the order they should be read.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The count of avatars past `max`.",
+              "name": "overflow",
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the set, such as \"Reviewers\".",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many avatars are shown before the rest become a count.\n\nZero or less shows all of them, which is what an unset limit means and is\nmore useful than refusing to render.",
+              "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            }
+          ],
+          "modulePath": "src/avatar/group/avatar-group.ts",
+          "definitionPath": "src/avatar/group/avatar-group.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixAvatarGroup",
+          "declaration": {
+            "name": "HelixAvatarGroup",
+            "module": "src/avatar/group/avatar-group.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-avatar-group",
+          "declaration": {
+            "name": "HelixAvatarGroup",
+            "module": "src/avatar/group/avatar-group.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/avatar/index.ts",
       "declarations": [],
       "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/avatar/group/avatar-group.js"
+          }
+        },
         {
           "kind": "js",
           "name": "*",

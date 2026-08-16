@@ -19,7 +19,8 @@
       "!**/custom-elements.json",
       "!**/*.css.ts",
       "!**/jsx.d.ts",
-      "!helix/icons/raw"
+      "!helix/icons/raw",
+      "!.claude/worktrees"
     ]
   },
   "formatter": {

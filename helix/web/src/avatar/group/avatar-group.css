@@ -1,0 +1,63 @@
+:host {
+  --_avatar-group-ring: var(--avatar-group-ring-color, var(--helix-color-background));
+  align-items: center;
+  display: flex;
+}
+
+/* Each avatar overlaps the one before it and is drawn over it, which falls out
+   of document order and needs no `z-index`: nothing here is positioned, so
+   painting follows the tree.
+ *
+ * `row-reverse` was the first attempt, for the familiar trick that puts the
+ * *first* avatar on top. It also reverses the row, so the person written first
+ * appears last, and a facepile whose reading order is the reverse of its markup
+ * is a worse trade than which face is in front. Measured before it was
+ * believed: the second avatar landed left of the first.
+ *
+ * The ring goes on as a shadow rather than a border. `::slotted()` reaches the
+ * avatar's host, which is where its size and radius already are, and a border
+ * there would sit inside the box the avatar sized itself to and eat into the
+ * picture. */
+::slotted(*) {
+  box-shadow: 0 0 0 var(--helix-border-thick) var(--_avatar-group-ring);
+  flex: 0 0 auto;
+}
+
+/* The overlap, as a negative margin on everything after the first.
+ *
+ * Not a negative `gap`, which is what this was: `gap` is a `<length-percentage>`
+ * that refuses negative values, so the declaration is invalid and dropped, and
+ * the row came out merely adjacent with nothing to say why. The browser spec
+ * caught it at one pixel of difference, `expected 40 to be less than 40`.
+ *
+ * `::slotted()` takes a compound selector, and `:not(:first-child)` is one, so
+ * the first avatar can keep its edge without the group writing an attribute
+ * onto anybody's element to mark it. */
+::slotted(*:not(:first-child)) {
+  margin-inline-start: calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)));
+}
+
+/* Past `max`. Hidden rather than removed, so nothing re-renders when the limit
+   changes and the group can still count what it is not showing. */
+::slotted([data-overflow]) {
+  display: none;
+}
+
+/* The count, drawn as one more member of the stack and last along the row,
+   which is where the avatars it stands for would have continued. */
+[part="overflow"] {
+  align-items: center;
+  margin-inline-start: calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)));
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--avatar-size, var(--helix-size-control-md));
+  border-radius: var(--helix-radii-full);
+  box-shadow: 0 0 0 var(--helix-border-thick) var(--_avatar-group-ring);
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  inline-size: var(--avatar-size, var(--helix-size-control-md));
+  justify-content: center;
+}
