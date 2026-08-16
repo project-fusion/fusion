@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "bun ../../tooling/scripts/build-frame.mjs && next build",
-    "dev": "next dev --port 3000",
+    "dev": "bun ../../tooling/scripts/build-frame.mjs && next dev --port 3000",
     "start": "next start --port 3000",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

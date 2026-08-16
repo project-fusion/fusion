@@ -491,6 +491,35 @@ site, with element registration in one client component.
   arrow keys as well as by pointer. A divider only a mouse can move is unusable
   without one.
 
+### The preview runs a different copy of Helix, and it is pinned
+
+Two copies of the library are on that page and they are not the same build.
+
+The sandbox's own chrome (the tabs, the tree, the toolbar) comes through Next's
+module graph from `helix/web/dist`, so `bun run dev:watch` rebuilds it and HMR
+shows it immediately. **The preview does not.** It runs `frame.js`, a 400 kB
+classic-script IIFE built by `bun run frame` and served from `public/`, which is
+the only shape that can carry the library into a sandboxed document (see below).
+
+Three consequences, all of which have cost real time:
+
+- **`dev:watch` never rebuilds it.** The filter is
+  `--filter=@fusion-io/site-ui^...`, which is site-ui's *dependencies*, and the
+  frame build lives in site-ui's own `build`. So a component fix appears in the
+  chrome and not in the preview, which looks exactly like the fix not working.
+- **HMR cannot reach it.** The iframe is not re-created on a hot update, so the
+  bundle it executed at page load is the one still running. A tab left open
+  across a rebuild shows old components indefinitely. `next dev` now builds the
+  frame on start, so restarting the dev server is enough; a hot reload is not.
+- **`frame.html` must never be cached.** `build-frame.mjs` stamps `frame.js` and
+  `frame.css` with a hash of their contents, and those stamps live *inside*
+  `frame.html`. Cache that file and the browser asks for yesterday's bundle by
+  name forever, which is the stamping achieving precisely nothing. It is served
+  `no-store` from `next.config.ts`, and the assets it names stay immutable.
+
+**So verifying a component fix in the sandbox means `bun run frame` and a page
+reload.** Not a hot reload, and not the chrome looking right.
+
 ### The preview runs untrusted code
 
 A sandbox executes whatever is typed into it, so the preview frame is the
