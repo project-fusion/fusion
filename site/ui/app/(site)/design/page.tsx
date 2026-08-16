@@ -74,13 +74,13 @@ export default function Page() {
               <helix-flex data-density="sm" gap="2xs" slot="footer">
                 {family.examples.length > 0 && (
                   <Link
-                    data-button="subtle"
+                    data-button="tertiary"
                     href={`/design/sandbox?e=${family.slug}.${family.examples[0]?.slug}`}
                   >
                     Sandbox
                   </Link>
                 )}
-                <Link data-button="subtle" href={`/design/components/${family.slug}`}>
+                <Link data-button="tertiary" href={`/design/components/${family.slug}`}>
                   API
                 </Link>
               </helix-flex>

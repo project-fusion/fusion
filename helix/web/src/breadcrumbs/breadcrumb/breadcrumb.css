@@ -26,7 +26,7 @@
 }
 
 /* The step reads as a subtle button under the pointer: transparent until then,
-   and the sunken surface on hover, which is what `data-button="subtle"` does.
+   and the sunken surface on hover, which is what `data-button="tertiary"` does.
 
    `::slotted` reaches the link here where it could not reach its color. The
    base layer's `:where(a)` sets color and text-decoration and nothing else, so

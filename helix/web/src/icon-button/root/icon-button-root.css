@@ -48,7 +48,7 @@
    waiting to be hovered, which is what a control standing beside a field wants:
    the field paints itself and a transparent button next to it reads as a box
    with something floating after it, not as one piece of chrome. */
-:host([appearance="neutral"]) [part="button"] {
+:host([appearance="secondary"]) [part="button"] {
   background-color: var(--helix-color-surface);
   border-color: var(--helix-color-border);
 }
@@ -57,7 +57,7 @@
    reach: that rule is two selectors' worth of specificity and this is three, so
    the fill won in every state and a neutral button was the one variant that did
    not answer the pointer at all. */
-:host([appearance="neutral"]) [part="button"]:hover {
+:host([appearance="secondary"]) [part="button"]:hover {
   background-color: var(--helix-color-surface-raised);
 }
 

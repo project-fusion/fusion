@@ -404,14 +404,14 @@ helix-button-group > [data-button]:not(:last-child) {
   border-end-end-radius: 0;
 }
 
-[data-button="subtle"],
-helix-button[appearance="subtle"]::part(button) {
+[data-button="tertiary"],
+helix-button[appearance="tertiary"]::part(button) {
   background-color: transparent;
   border-color: transparent;
 }
 
-[data-button="subtle"]:hover,
-helix-button[appearance="subtle"]::part(button):hover {
+[data-button="tertiary"]:hover,
+helix-button[appearance="tertiary"]::part(button):hover {
   background-color: var(--helix-color-surface-sunken);
   border-color: transparent;
 }

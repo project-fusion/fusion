@@ -92,7 +92,7 @@ export function SiteNav() {
         </helix-tooltip>
 
         {narrow && (
-          <helix-button appearance="subtle" onClick={() => setOpen(true)} slot="end">
+          <helix-button appearance="tertiary" onClick={() => setOpen(true)} slot="end">
             Menu
           </helix-button>
         )}

@@ -490,7 +490,7 @@ export function SandboxWorkbench({ families }: Props) {
             is missing. */}
         <helix-tooltip content={allOpen ? 'Collapse all' : 'Expand all'} placement="bottom">
           <helix-icon-button
-            appearance="neutral"
+            appearance="secondary"
             label={allOpen ? 'Collapse all' : 'Expand all'}
             onClick={toggleAll}
           >
@@ -569,7 +569,7 @@ export function SandboxWorkbench({ families }: Props) {
             settings are in its toolbar. */}
         <helix-flex align="center" gap="2xs" slot="end">
           {narrow && (
-            <helix-button appearance="subtle" onClick={() => setRailOpen(true)}>
+            <helix-button appearance="tertiary" onClick={() => setRailOpen(true)}>
               Examples
             </helix-button>
           )}
