@@ -1906,6 +1906,38 @@
             "name": "scrollItemIntoView",
             "module": "./utils/scroll-item-into-view/scroll-item-into-view.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSeverity",
+          "declaration": {
+            "name": "HelixSeverity",
+            "module": "./utils/severities/severities.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SEVERITIES",
+          "declaration": {
+            "name": "SEVERITIES",
+            "module": "./utils/severities/severities.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SeverityMark",
+          "declaration": {
+            "name": "SeverityMark",
+            "module": "./utils/severities/severities.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "severityMark",
+          "declaration": {
+            "name": "severityMark",
+            "module": "./utils/severities/severities.js"
+          }
         }
       ]
     },
@@ -3531,6 +3563,57 @@
           "declaration": {
             "name": "scrollItemIntoView",
             "module": "src/utils/scroll-item-into-view/scroll-item-into-view.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/severities/severities.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "SEVERITIES",
+          "type": {
+            "text": "Record<HelixSeverity, SeverityMark>"
+          },
+          "default": "{ danger: { icon: xCircleFill, label: 'Error' }, info: { icon: infoFill, label: 'Information' }, success: { icon: checkCircleFill, label: 'Success' }, warning: { icon: warningFill, label: 'Warning' }, }",
+          "description": "The one severity vocabulary.\n\nIt was two, defined identically in `Callout` and in `Toast.Item`, and only one\nof the copies carried the comment saying the two must not drift. A reader\nmeets these marks in a passage and in a message and has to read them as the\nsame four things, so there is one place they come from.\n\n**Filled at every severity**, which is what it already was at one of them.\n`danger` took `xCircleFill` and the other three took outlines, so a set meant\nto be read as one vocabulary had one member drawn a different way. Filled\nbecause a severity mark is a status indicator and not an action: it wants to\nread at a glance and at a small size, where an outline at this weight loses\nits interior.\n\n**The label is not the severity name.** `danger` is announced as \"Error\",\nbecause that is the word a reader understands and `danger` is the word the API\nuses. Both matter and they are not the same string."
+        },
+        {
+          "kind": "function",
+          "name": "severityMark",
+          "return": {
+            "type": {
+              "text": "SeverityMark | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "severity",
+              "type": {
+                "text": "string | undefined"
+              }
+            }
+          ],
+          "description": "The mark for a severity, or `undefined` where the name is not one.\n\nA lookup rather than direct indexing, because `severity` reaches a component\nas an attribute and an attribute can say anything. Callers decide what an\nunknown one means: `Callout` falls back to `info`, since a callout is always\n*about* something, and `Toast.Item` draws nothing, since a message is just the\nnext thing that happened."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SEVERITIES",
+          "declaration": {
+            "name": "SEVERITIES",
+            "module": "src/utils/severities/severities.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "severityMark",
+          "declaration": {
+            "name": "severityMark",
+            "module": "src/utils/severities/severities.ts"
           }
         }
       ]

@@ -3,28 +3,12 @@ import {
   HelixDismissEvent,
   HelixElement,
   requestControlledChange,
+  severityMark,
 } from '@helix-io/core'
-import {
-  checkCircleFill,
-  type HelixIcon,
-  infoFill,
-  warningFill,
-  x,
-  xCircleFill,
-} from '@helix-io/icons'
+import { x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-
-/* Icon and accessible name for each severity. The same four `Callout` uses,
-   deliberately: a reader meets these marks in a passage and in a message, and a
-   vocabulary that changed shape between the two would be two vocabularies. */
-const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
-  danger: { icon: xCircleFill, label: 'Error' },
-  info: { icon: infoFill, label: 'Information' },
-  success: { icon: checkCircleFill, label: 'Success' },
-  warning: { icon: warningFill, label: 'Warning' },
-}
 
 /**
  * @summary One message in the toast region.
@@ -270,7 +254,7 @@ export class HelixBaseToastItem extends HelixElement {
        falls back to `info` because a callout exists to set a passage apart and
        is always *about* something; a toast is just the next thing that
        happened. */
-    const severity = this.severity ? SEVERITIES[this.severity] : undefined
+    const severity = severityMark(this.severity)
 
     return html`<div
       part="item"

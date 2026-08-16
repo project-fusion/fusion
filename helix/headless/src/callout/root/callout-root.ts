@@ -1,29 +1,7 @@
-import { customElement, HelixElement, hostAria } from '@helix-io/core'
-import {
-  checkCircleFill,
-  type HelixIcon,
-  infoFill,
-  warningFill,
-  xCircleFill,
-} from '@helix-io/icons'
+import { customElement, HelixElement, hostAria, SEVERITIES, severityMark } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-
-/** Icon and accessible name for each severity. */
-/* Filled at every severity, which is what it already was at one of them.
-   `danger` took `xCircleFill` and the other three took outlines, so a set meant
-   to be read as one vocabulary had one member drawn a different way. Filled
-   rather than outlined for all four, because a severity mark is a status
-   indicator and not an action: it wants to read at a glance and at a small
-   size, where an outline at this weight loses its interior. All four exist in
-   the generated set already. */
-const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
-  danger: { icon: xCircleFill, label: 'Error' },
-  info: { icon: infoFill, label: 'Information' },
-  success: { icon: checkCircleFill, label: 'Success' },
-  warning: { icon: warningFill, label: 'Warning' },
-}
 
 /**
  * @summary Sets a passage apart as information, a warning, or an error.
@@ -70,8 +48,11 @@ export class HelixBaseCallout extends HelixElement {
   severity?: 'info' | 'success' | 'warning' | 'danger'
 
   protected override render(): TemplateResult {
-    const { icon, label } =
-      SEVERITIES[this.severity ?? 'info'] ?? (SEVERITIES.info as { icon: HelixIcon; label: string })
+    /* Falls back to `info`, because a callout exists to set a passage apart and
+       is therefore always *about* something. `Toast.Item` takes the same lookup
+       and draws nothing instead, since a message is just the next thing that
+       happened. Same vocabulary, two honest answers to an absent severity. */
+    const { icon, label } = severityMark(this.severity) ?? SEVERITIES.info
 
     return html`<span part="icon">
         <slot name="icon">

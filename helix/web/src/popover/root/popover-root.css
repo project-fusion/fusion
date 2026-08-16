@@ -67,3 +67,11 @@
     translate: 0 var(--_popover-from, 0);
   }
 }
+
+/* It arrives instantly rather than not at all. The panel still appears, which is
+   the whole point of it; what is given up is the sense of it moving there. */
+@media (prefers-reduced-motion: reduce) {
+  [part="popover"] {
+    animation: none;
+  }
+}

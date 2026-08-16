@@ -259,3 +259,23 @@ slot[name="icon"]::slotted(*) {
 :host(:not([data-open])) {
   display: none;
 }
+
+/* Two answers in one file, which is why the check asks whether the question was
+   answered rather than how.
+ *
+ * The arrival goes: a message that slides in is the kind of movement the
+ * preference is about, and it still appears.
+ *
+ * The timer stays. It is the only thing saying how long is left, and a 2px rule
+ * crossing once over the message's own lifetime is nearer a clock than an
+ * animation. It was hidden here once, on the belief that the base layer would
+ * cap it to nothing; measured, the base layer never reached it at all. */
+@media (prefers-reduced-motion: reduce) {
+  [part="item"] {
+    animation: none;
+  }
+
+  [part="dismiss"] {
+    transition: none;
+  }
+}
