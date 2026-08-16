@@ -2217,6 +2217,26 @@
             },
             {
               "kind": "field",
+              "name": "command",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognised as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
+              "attribute": "command"
+            },
+            {
+              "kind": "field",
+              "name": "commandFor",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element the command is sent to.",
+              "attribute": "commandfor"
+            },
+            {
+              "kind": "field",
               "name": "shadowRootOptions",
               "type": {
                 "text": "ShadowRootInit"
@@ -2239,6 +2259,17 @@
               },
               "default": "true",
               "description": "Whether the button holds its group's tab stop.\n\nA toolbar keeps one tab stop across its children, and the obvious way to do\nthat is to write `tabindex` onto each of them. That is a change to markup\nthe consumer rendered, so a React consumer's hydration reports it and does\nnot patch it up. A parent sets this property instead, which writes nothing,\nand the stop lands on the inner control inside the shadow root.\n\nNo attribute, because it is coordination between elements rather than\nanything a consumer sets."
+            },
+            {
+              "kind": "method",
+              "name": "linkCommand",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Points the inner button at the command's target, by reference.\n\n**The attribute cannot do this and it fails silently.** `commandfor` is an\nIDREF, and an IDREF resolves inside the tree it is written in: forwarded\nonto a button in this shadow root it looks for the id *here*, finds\nnothing, and the trigger does nothing at all. Measured before this existed:\nthe button clicked, no `command` event was dispatched, and there was\nnothing anywhere to say why.\n\n`commandForElement` takes an element instead, and an element reference\nresolves outward: a node in a shadow root may point at one in the document.\nThe same asymmetry the listbox relies on for `aria-activedescendant`, and\nthe second place in this library where the id form is the one that cannot\nwork.\n\nThe id is looked up in the host's own root rather than the document, so a\nbutton inside somebody else's shadow root finds a target in that same root\nand not a coincidence in the page."
             },
             {
               "kind": "field",
@@ -2384,6 +2415,24 @@
               "default": "''",
               "description": "Accessible name, for a button whose content is not text.\n\nLives here rather than only on `IconButton` so the two share one render.\nAn icon-only button without it is a control a screen reader announces as\n\"button\" and nothing else.",
               "fieldName": "label"
+            },
+            {
+              "name": "command",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognised as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
+              "fieldName": "command"
+            },
+            {
+              "name": "commandfor",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element the command is sent to.",
+              "fieldName": "commandFor"
             },
             {
               "name": "disabled",
@@ -5199,6 +5248,13 @@
             },
             {
               "kind": "field",
+              "name": "commands",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new CommandController(this, { commands: { '--close': () => this.close(), '--show': () => this.show(), '--toggle': () => this.toggleOpen(), }, })"
+            },
+            {
+              "kind": "field",
               "name": "dialog",
               "type": {
                 "text": "HTMLDialogElement | null"
@@ -5519,7 +5575,7 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/dialog",
+            "documentation": "https://helix.fusion.dev/components/dialog\n\nOpened declaratively with the platform's invoker attributes:\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n<helix-dialog id=\"confirm\">…</helix-dialog>\n```\n\n`--show`, `--close` and `--toggle`. Custom commands rather than the built-in\n`show-modal`, because those are defined against native elements and do\nnothing when pointed at a custom one.",
             "aliases": [
               "Modal",
               "Lightbox",
@@ -5788,6 +5844,13 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "commands",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new CommandController(this, { commands: { '--close': () => this.requestOpen(false), '--show': () => this.requestOpen(true), '--toggle': () => this.toggleOpen(), }, })"
+            },
             {
               "kind": "field",
               "name": "placement",
@@ -6114,7 +6177,7 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/drawer",
+            "documentation": "https://helix.fusion.dev/components/drawer\n\nOpened declaratively with the platform's invoker attributes:\n\n```html\n<helix-button commandfor=\"nav\" command=\"--toggle\">Menu</helix-button>\n<helix-drawer id=\"nav\">…</helix-drawer>\n```",
             "aliases": [
               "Sheet",
               "Sidebar",
@@ -7008,6 +7071,32 @@
               }
             },
             {
+              "name": "command",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognised as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
+              "fieldName": "command",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "commandfor",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element the command is sent to.",
+              "fieldName": "commandFor",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
               "name": "disabled",
               "type": {
                 "text": "boolean"
@@ -7052,6 +7141,34 @@
             },
             {
               "kind": "field",
+              "name": "command",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognised as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
+              "attribute": "command",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "commandFor",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element the command is sent to.",
+              "attribute": "commandfor",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "shadowRootOptions",
               "type": {
                 "text": "ShadowRootInit"
@@ -7082,6 +7199,21 @@
               },
               "default": "true",
               "description": "Whether the button holds its group's tab stop.\n\nA toolbar keeps one tab stop across its children, and the obvious way to do\nthat is to write `tabindex` onto each of them. That is a change to markup\nthe consumer rendered, so a React consumer's hydration reports it and does\nnot patch it up. A parent sets this property instead, which writes nothing,\nand the stop lands on the inner control inside the shadow root.\n\nNo attribute, because it is coordination between elements rather than\nanything a consumer sets.",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "linkCommand",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Points the inner button at the command's target, by reference.\n\n**The attribute cannot do this and it fails silently.** `commandfor` is an\nIDREF, and an IDREF resolves inside the tree it is written in: forwarded\nonto a button in this shadow root it looks for the id *here*, finds\nnothing, and the trigger does nothing at all. Measured before this existed:\nthe button clicked, no `command` event was dispatched, and there was\nnothing anywhere to say why.\n\n`commandForElement` takes an element instead, and an element reference\nresolves outward: a node in a shadow root may point at one in the document.\nThe same asymmetry the listbox relies on for `aria-activedescendant`, and\nthe second place in this library where the id form is the one that cannot\nwork.\n\nThe id is looked up in the host's own root rather than the document, so a\nbutton inside somebody else's shadow root finds a target in that same root\nand not a coincidence in the page.",
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"

@@ -599,6 +599,26 @@ Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
   label?: HelixBaseButton["label"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognised as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  command?: HelixBaseButton["command"];
+  /** The id of the element the command is sent to. */
+  commandfor?: HelixBaseButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  commandFor?: HelixBaseButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -627,6 +647,26 @@ Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
   "prop:label"?: HelixBaseButton["label"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognised as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  "prop:command"?: HelixBaseButton["command"];
+  /** The id of the element the command is sent to. */
+  "attr:commandfor"?: HelixBaseButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  "prop:commandFor"?: HelixBaseButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1299,6 +1339,26 @@ Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
   label?: HelixBaseIconButton["label"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognised as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  command?: HelixBaseIconButton["command"];
+  /** The id of the element the command is sent to. */
+  commandfor?: HelixBaseIconButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  commandFor?: HelixBaseIconButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1327,6 +1387,26 @@ Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
   "prop:label"?: HelixBaseIconButton["label"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognised as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  "prop:command"?: HelixBaseIconButton["command"];
+  /** The id of the element the command is sent to. */
+  "attr:commandfor"?: HelixBaseIconButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  "prop:commandFor"?: HelixBaseIconButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3557,6 +3637,22 @@ export type CustomElements = {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
+   * - `command`: What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognised as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -4355,6 +4451,22 @@ export type CustomElements = {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
+   * - `command`: What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognised as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -6894,6 +7006,22 @@ export type CustomElementsSolidJs = {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
+   * - `command`: What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognised as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -7731,6 +7859,22 @@ export type CustomElementsSolidJs = {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
+   * - `command`: What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognised as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to

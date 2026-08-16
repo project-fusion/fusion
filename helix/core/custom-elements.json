@@ -4,6 +4,74 @@
   "modules": [
     {
       "kind": "javascript-module",
+      "path": "src/controllers/command-controller/command-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Lets a control elsewhere on the page operate this one, declaratively.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n<helix-dialog id=\"confirm\">…</helix-dialog>\n```\n\n**The platform's own invoker, not a convention of ours.** `commandfor` and\n`command` are attributes the browser understands: it resolves the id, wires\nthe two together, and dispatches a `command` event at the target when the\ntrigger is activated. That is a real event with a real source, so it works\nfor a click, for Enter, for Space, and for anything else the platform decides\ncounts as activation later.\n\nThe alternative was a `data-` recipe of our own with a delegated listener on\nthe document, and it is worse in every direction: a global listener a\nconsumer cannot see, an id lookup we would write ourselves, activation\nsemantics we would have to guess at, and a convention that is ours to\ndocument and theirs to learn.\n\n**Only custom commands reach a custom element.** The built-in ones —\n`show-modal`, `close`, `toggle-popover` — are defined against native elements\nand the browser applies them itself; pointed at a custom element they do\nnothing. So the names here start with `--`, which is the platform's marker\nfor \"the target decides what this means\", and the target deciding is exactly\nwhat this is.\n\nUnrecognised commands are left alone rather than swallowed, so a host that\nanswers `--show` does not quietly absorb a `--print` meant for something\nelse.",
+          "name": "CommandController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "host",
+              "type": {
+                "text": "ReactiveControllerHost & HTMLElement"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "host"
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "CommandOptions"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "options"
+            },
+            {
+              "kind": "field",
+              "name": "handle",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "hostConnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CommandController",
+          "declaration": {
+            "name": "CommandController",
+            "module": "src/controllers/command-controller/command-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/controllers/disabled-cascade-controller/disabled-cascade-controller.ts",
       "declarations": [
         {
@@ -1096,6 +1164,22 @@
       "path": "src/index.ts",
       "declarations": [],
       "exports": [
+        {
+          "kind": "js",
+          "name": "CommandController",
+          "declaration": {
+            "name": "CommandController",
+            "module": "./controllers/command-controller/command-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CommandOptions",
+          "declaration": {
+            "name": "CommandOptions",
+            "module": "./controllers/command-controller/command-controller.js"
+          }
+        },
         {
           "kind": "js",
           "name": "DisabledCascadeController",

@@ -1,4 +1,10 @@
-import { customElement, HelixElement, hostAria, MixinControllerOpen } from '@helix-io/core'
+import {
+  CommandController,
+  customElement,
+  HelixElement,
+  hostAria,
+  MixinControllerOpen,
+} from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -34,6 +40,17 @@ import { property } from 'lit/decorators.js'
  * @aliases Modal, Lightbox, Sheet
  * @documentation https://helix.fusion.dev/components/dialog
  *
+ * Opened declaratively with the platform's invoker attributes:
+ *
+ * ```html
+ * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+ * <helix-dialog id="confirm">…</helix-dialog>
+ * ```
+ *
+ * `--show`, `--close` and `--toggle`. Custom commands rather than the built-in
+ * `show-modal`, because those are defined against native elements and do
+ * nothing when pointed at a custom one.
+ *
  * @slot - The dialog's content.
  * @slot header - The title, and anything beside it.
  * @slot footer - The actions.
@@ -58,6 +75,17 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
    */
   @property({ reflect: true, type: Boolean })
   persistent = false
+
+  /* Opened and closed from anywhere on the page, without a line of script:
+     `<helix-button commandfor="…" command="--show">`. See `CommandController`
+     for why this is the platform's invoker rather than a `data-` recipe. */
+  protected readonly commands = new CommandController(this, {
+    commands: {
+      '--close': () => this.close(),
+      '--show': () => this.show(),
+      '--toggle': () => this.toggleOpen(),
+    },
+  })
 
   /** The native dialog, or nothing where there is no DOM to hold one. */
   private get dialog(): HTMLDialogElement | null {

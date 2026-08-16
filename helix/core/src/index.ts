@@ -1,4 +1,8 @@
 export {
+  CommandController,
+  type CommandOptions,
+} from './controllers/command-controller/command-controller.js'
+export {
   DisabledCascadeController,
   type DisabledCascadeOptions,
 } from './controllers/disabled-cascade-controller/disabled-cascade-controller.js'

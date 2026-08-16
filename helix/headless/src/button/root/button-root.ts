@@ -1,5 +1,5 @@
 import { customElement, HelixFormElement } from '@helix-io/core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -52,6 +52,30 @@ export class HelixBaseButton extends HelixFormElement {
   @property()
   label = ''
 
+  /**
+   * What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognised as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   */
+  @property()
+  command = ''
+
+  /** The id of the element the command is sent to. */
+  @property({ attribute: 'commandfor' })
+  commandFor = ''
+
   /** Moves focus to the inner control, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixFormElement.shadowRootOptions,
@@ -90,6 +114,42 @@ export class HelixBaseButton extends HelixFormElement {
   @property({ attribute: false })
   focusable = true
 
+  /**
+   * Points the inner button at the command's target, by reference.
+   *
+   * **The attribute cannot do this and it fails silently.** `commandfor` is an
+   * IDREF, and an IDREF resolves inside the tree it is written in: forwarded
+   * onto a button in this shadow root it looks for the id *here*, finds
+   * nothing, and the trigger does nothing at all. Measured before this existed:
+   * the button clicked, no `command` event was dispatched, and there was
+   * nothing anywhere to say why.
+   *
+   * `commandForElement` takes an element instead, and an element reference
+   * resolves outward: a node in a shadow root may point at one in the document.
+   * The same asymmetry the listbox relies on for `aria-activedescendant`, and
+   * the second place in this library where the id form is the one that cannot
+   * work.
+   *
+   * The id is looked up in the host's own root rather than the document, so a
+   * button inside somebody else's shadow root finds a target in that same root
+   * and not a coincidence in the page.
+   */
+  private linkCommand(): void {
+    const button = this.renderRoot?.querySelector('button')
+    if (!button || !('commandForElement' in button)) {
+      return
+    }
+    const root = this.getRootNode() as Document | ShadowRoot
+    const target = this.commandFor ? (root.getElementById?.(this.commandFor) ?? null) : null
+    ;(button as HTMLButtonElement & { commandForElement: Element | null }).commandForElement =
+      target
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.linkCommand()
+  }
+
   protected override render(): TemplateResult {
     const label = html`<slot name="start"></slot><slot></slot><slot name="end"></slot>`
     const stop = this.focusable ? nothing : '-1'
@@ -98,6 +158,7 @@ export class HelixBaseButton extends HelixFormElement {
       part="button"
       type="button"
       aria-label=${this.label || nothing}
+      command=${this.command || nothing}
       tabindex=${stop}
       ?disabled=${this.disabled}
       @click=${this.handleClick}

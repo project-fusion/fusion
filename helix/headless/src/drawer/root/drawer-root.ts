@@ -1,4 +1,5 @@
 import {
+  CommandController,
   customElement,
   DismissController,
   FocusTrapController,
@@ -29,6 +30,13 @@ import { property } from 'lit/decorators.js'
  * @aliases Sheet, Sidebar, Panel, Off-canvas
  * @documentation https://helix.fusion.dev/components/drawer
  *
+ * Opened declaratively with the platform's invoker attributes:
+ *
+ * ```html
+ * <helix-button commandfor="nav" command="--toggle">Menu</helix-button>
+ * <helix-drawer id="nav">…</helix-drawer>
+ * ```
+ *
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.
  *
@@ -41,6 +49,18 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-drawer')
 export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
+  /* Opened and closed from anywhere on the page, without a line of script:
+     `<helix-button commandfor="…" command="--show">`. The same three commands
+     the dialog answers, because they are the same act: a drawer and a dialog
+     differ in where they sit, not in what opening one means. */
+  protected readonly commands = new CommandController(this, {
+    commands: {
+      '--close': () => this.requestOpen(false),
+      '--show': () => this.requestOpen(true),
+      '--toggle': () => this.toggleOpen(),
+    },
+  })
+
   /** Which edge the drawer comes from. */
   @property({ reflect: true })
   placement?: 'start' | 'end' | 'top' | 'bottom'

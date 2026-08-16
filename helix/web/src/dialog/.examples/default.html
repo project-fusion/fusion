@@ -1,19 +1,29 @@
-<!-- Shown open, because a modal is the one thing a preview cannot demonstrate
-     by being closed. In an application it opens from `open`, or from `show()`
-     on the element.
+<!-- Opened from a button with no script at all. `commandfor` and `command` are
+     the platform's invoker attributes: the browser resolves the id, wires the
+     two together, and dispatches a real activation event, so it works for a
+     click, for Enter and for Space without any of that being written here.
 
-     A real `<dialog>` opened with `showModal()`. The top layer, the backdrop,
-     Escape and inert-behind are the platform's, so nothing here traps focus:
-     press Tab and it stays inside, press Escape and it asks to close.
+     Custom commands, prefixed `--`, because the built-in `show-modal` is
+     defined against a native `<dialog>` and does nothing pointed at a custom
+     element. `--show`, `--close` and `--toggle`.
 
-     Escape is a request rather than an act. It is intercepted and routed
-     through `helix-close`, so a consumer can refuse it and the dialog and the
-     consumer's state can never disagree. -->
-<helix-dialog label="Delete project" open>
-  <h2 slot="header">Delete project</h2>
-  This removes the project and everything in it. It cannot be undone.
-  <helix-flex slot="footer">
-    <helix-button appearance="tertiary">Cancel</helix-button>
-    <helix-button appearance="danger">Delete</helix-button>
-  </helix-flex>
-</helix-dialog>
+     A real `<dialog>` opened with `showModal()`: the top layer, the backdrop,
+     Escape and inert-behind are the platform's, so nothing here traps focus. -->
+<helix-flex direction="column" gap="md">
+  <helix-button appearance="primary" command="--show" commandfor="confirm">
+    Delete project
+  </helix-button>
+
+  <helix-dialog id="confirm" label="Delete project">
+    <h2 slot="header">Delete project</h2>
+    This removes the project and everything in it. It cannot be undone.
+    <helix-flex slot="footer">
+      <helix-button appearance="tertiary" command="--close" commandfor="confirm">
+        Cancel
+      </helix-button>
+      <helix-button appearance="danger" command="--close" commandfor="confirm">
+        Delete
+      </helix-button>
+    </helix-flex>
+  </helix-dialog>
+</helix-flex>
