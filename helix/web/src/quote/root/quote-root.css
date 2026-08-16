@@ -4,7 +4,15 @@
 }
 
 [part="quote"] {
-  color: var(--quote-color, inherit);
+  /* Quieter than the prose it sits in. A quotation is somebody else speaking
+     inside a sentence that is yours, and it reads as an aside rather than as
+     the point: the italic says it is set apart, and the colour says how far.
+
+     `inherit` before, which made a quotation exactly as loud as the text
+     carrying it, so the only thing marking it was the slant. Muted rather than
+     subtle, because this is still prose a reader is meant to read, not a label
+     they are meant to skip. */
+  color: var(--quote-color, var(--helix-color-foreground-muted));
   font: inherit;
   font-style: italic;
 }
