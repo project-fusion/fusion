@@ -120,8 +120,13 @@ body {
      where it already was says "this one".
 
      Thickness grows downward from the offset, so the top edge of the line stays
-     put and the weight is added below it. That is the growing. */
-  text-underline-offset: 0.2em;
+     put and the weight is added below it. That is the growing.
+
+     A quarter of an em, which clears a descender at both weights. The line has
+     to sit under the word rather than through the tail of a `g`, and it has to
+     do so at two pixels as well as at one, since the offset no longer moves to
+     make room. */
+  text-underline-offset: 0.25em;
   transition:
     color var(--helix-duration-fast) var(--helix-easing-standard),
     text-decoration-color var(--helix-duration-fast) var(--helix-easing-standard),
