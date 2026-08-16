@@ -1,6 +1,8 @@
 export {
   CommandController,
   type CommandOptions,
+  HelixFallbackCommandEvent,
+  supportsInvokers,
 } from './controllers/command-controller/command-controller.js'
 export {
   DisabledCascadeController,

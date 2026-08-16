@@ -12,6 +12,55 @@ interface CommandLike extends Event {
   readonly source: Element | null
 }
 
+/**
+ * Whether the browser implements invoker commands.
+ *
+ * Feature-detected on the prototype rather than on an instance, so it can be
+ * answered before anything has rendered, and guarded for a server, which has no
+ * `HTMLButtonElement` at all.
+ */
+export const supportsInvokers = (): boolean =>
+  typeof HTMLButtonElement !== 'undefined' && 'commandForElement' in HTMLButtonElement.prototype
+
+/**
+ * The `command` event, for a browser that does not send one.
+ *
+ * Invoker commands are recent: Chrome 135, Firefox 137, Safari 18.4. Before
+ * this, a button in an older browser set `commandForElement` on nothing, the
+ * wiring silently did not happen, and the control did nothing at all when
+ * clicked. No error, no warning, and every `command` in the library dead at
+ * once, which is the worst way for a feature to be missing: the markup is
+ * right, the component is right, and the button is simply inert.
+ *
+ * So the button sends this instead where the platform will not. It carries the
+ * two members `CommandController` reads and dispatches at the target, which is
+ * where the platform dispatches too, so nothing downstream can tell the
+ * difference.
+ *
+ * **The built-in commands are not reproduced.** `show-modal`, `close` and
+ * `toggle-popover` are defined against native elements and applied by the
+ * browser itself, and writing our own would mean reimplementing part of the
+ * platform against elements we do not own. Nothing in this library uses them:
+ * a custom element only ever answers a `--` command, which is the platform's
+ * marker for "the target decides", and the target is ours.
+ */
+export class HelixFallbackCommandEvent extends Event {
+  /** The command asked for, verbatim. */
+  readonly command: string
+
+  /** The element that asked. */
+  readonly source: Element | null
+
+  constructor(command: string, source: Element | null) {
+    // Matching the platform: fired at the invokee, cancelable, and not
+    // bubbling. `CommandController` listens on the target itself, so there is
+    // nothing above it that a bubble would reach anyway.
+    super('command', { cancelable: true })
+    this.command = command
+    this.source = source
+  }
+}
+
 /** What the host answers to, by command name. */
 export interface CommandOptions {
   /** Each command the host implements, keyed by the name a trigger writes. */

@@ -6,6 +6,9 @@ import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  // The button too: what is being asserted below is the pair, and a trigger
+  // that never upgrades is a trigger that cannot command anything.
+  await import('../../button/index.js')
 })
 
 type Dialog = HTMLElement & {
@@ -85,6 +88,73 @@ describe('dialog', () => {
     await host.updateComplete
     expect(cancel.defaultPrevented).toBe(true)
     expect(host.hasAttribute('data-open')).toBe(true)
+  })
+})
+
+describe('dialog invokers', () => {
+  const wired = async (): Promise<{ dialog: Dialog; trigger: HTMLElement }> => {
+    const trigger = (await mount(
+      `<helix-button command="--show" commandfor="confirm">Delete</helix-button>
+       <helix-dialog id="confirm" label="Delete project">Body</helix-dialog>`,
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    const dialog = trigger.nextElementSibling as Dialog
+    await trigger.updateComplete
+    await dialog.updateComplete
+    return { dialog, trigger }
+  }
+
+  /* The inner control, because that is what a reader's pointer lands on: the
+     host has no activation behaviour of its own, and a click dispatched at it
+     runs none. Measured, and it is the difference between this spec meaning
+     something and this spec passing on a button nobody can press. */
+  const press = (trigger: HTMLElement): void => {
+    const inner = trigger.shadowRoot?.querySelector('button')
+    if (!inner) {
+      throw new Error('the trigger rendered no button, so there is nothing to press')
+    }
+    inner.click()
+  }
+
+  test('a button opens it, whether or not the browser has invokers', async () => {
+    /* This is the one that matters, and it is the same assertion in both
+       environments by design. Chromium runs it through the platform's own
+       invoker; happy-dom has no `commandForElement` at all, so it runs it
+       through the fallback. Before the fallback existed, every `command` in the
+       library was dead in any browser older than Chrome 135, Firefox 137 or
+       Safari 18.4, and dead in the quietest possible way: right markup, right
+       component, and a button that did nothing when pressed. */
+    const { dialog, trigger } = await wired()
+    press(trigger)
+    await dialog.updateComplete
+    expect(dialog.hasAttribute('data-open')).toBe(true)
+  })
+
+  test('exactly one command arrives, so the two paths never both fire', async () => {
+    /* The failure this guards is only visible where things work. If the button
+       sent its own event *and* the platform sent one, a browser with invokers
+       would open the dialog and immediately toggle it shut, and every browser
+       without them would look fine. */
+    const { dialog, trigger } = await wired()
+    const seen: string[] = []
+    dialog.addEventListener('command', (event) => {
+      seen.push((event as Event & { command: string }).command)
+    })
+    press(trigger)
+    await dialog.updateComplete
+    expect(seen).toEqual(['--show'])
+  })
+
+  test('a command naming nothing reaches nothing', async () => {
+    /* No `toThrow` here, in either direction: the browser harness does not
+       implement it, and a press that threw would fail this test by itself. The
+       assertion after it is what says the press was a no-op rather than that it
+       merely survived. */
+    const { dialog, trigger } = await wired()
+    trigger.setAttribute('commandfor', 'absent')
+    await (trigger as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    press(trigger)
+    await dialog.updateComplete
+    expect(dialog.hasAttribute('data-open')).toBe(false)
   })
 })
 

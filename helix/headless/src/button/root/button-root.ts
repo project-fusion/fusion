@@ -1,4 +1,9 @@
-import { customElement, HelixFormElement } from '@helix-io/core'
+import {
+  customElement,
+  HelixFallbackCommandEvent,
+  HelixFormElement,
+  supportsInvokers,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -83,6 +88,10 @@ export class HelixBaseButton extends HelixFormElement {
   }
 
   private readonly handleClick = (): void => {
+    // Before the type check, which returns for `button`, the default and the
+    // type every invoker in this library uses.
+    this.sendCommand()
+
     if (this.type === 'button') {
       return
     }
@@ -136,13 +145,45 @@ export class HelixBaseButton extends HelixFormElement {
    */
   private linkCommand(): void {
     const button = this.renderRoot?.querySelector('button')
-    if (!button || !('commandForElement' in button)) {
+    if (!button || !supportsInvokers()) {
       return
     }
-    const root = this.getRootNode() as Document | ShadowRoot
-    const target = this.commandFor ? (root.getElementById?.(this.commandFor) ?? null) : null
     ;(button as HTMLButtonElement & { commandForElement: Element | null }).commandForElement =
-      target
+      this.commandTarget()
+  }
+
+  /**
+   * The element this button commands, or nothing.
+   *
+   * Looked up in the button's own root rather than in the document, so a button
+   * inside somebody else's shadow root finds a target in that same root and not
+   * a coincidence in the page.
+   */
+  private commandTarget(): HTMLElement | null {
+    const root = this.getRootNode() as Document | ShadowRoot
+    return this.commandFor ? (root.getElementById?.(this.commandFor) ?? null) : null
+  }
+
+  /**
+   * Sends the `command` event where the browser will not.
+   *
+   * Invoker commands are recent, and where they are missing `linkCommand` set a
+   * property that does not exist and returned, so the button did nothing at all
+   * when clicked. Silently: the markup was right, the component was right, and
+   * every `command` in the library was inert at once with no error to find. A
+   * design system cannot ship an example that depends on a feature failing that
+   * quietly.
+   *
+   * Only where the platform is absent, so a browser that has invokers sends
+   * exactly one event and this sends none. Doing both would open a dialog and
+   * immediately toggle it shut again, which is a worse bug than the one this
+   * fixes and would only appear on the browsers that work.
+   */
+  private sendCommand(): void {
+    if (!this.command || supportsInvokers()) {
+      return
+    }
+    this.commandTarget()?.dispatchEvent(new HelixFallbackCommandEvent(this.command, this))
   }
 
   protected override updated(changed: PropertyValues): void {
