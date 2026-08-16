@@ -3063,13 +3063,15 @@ costs contrast for something the mark already says.
 | --- | --- |
 | *(default)* | The message. |
 | `actions` | What to do about it, usually a button or a link. |
-| `icon` | Replaces the glyph inside the dismiss control. |
+| `icon` | Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for. |
+| `dismiss-icon` | Replaces the glyph inside the dismiss control. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `item` | The message's own surface. |
+| `icon` | The severity mark, where the message has one. |
 | `content` | The message. |
 | `actions` | The region holding what to do about it. |
 | `dismiss` | The control that asks to close. |

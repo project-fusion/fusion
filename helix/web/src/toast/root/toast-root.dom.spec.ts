@@ -206,14 +206,69 @@ if (hasLayout()) {
       expect(getComputedStyle(bar).animationPlayState).toBe('running')
     })
 
-    test('the severity bar owes nothing to the corner radius', async () => {
-      /* It was `border-inline-start`, and a border is part of the element's own
-         box, so the radius bent it into a parenthesis. A separate pill cannot
-         be bent by the container it sits in. */
+    test('the severity is a named icon, not only a colour', async () => {
+      /* It was a coloured bar, which says *something* is different about this
+         message and never says what. A reader who cannot tell green from red
+         was told nothing at all. The glyph carries the name. */
       const found = await item('severity="danger"')
-      const box = part(found, 'item') as HTMLElement
-      expect(getComputedStyle(box).borderLeftWidth).toBe('0px')
-      expect(getComputedStyle(box, '::before').borderRadius).not.toBe('0px')
+      const glyph = (part(found, 'icon') as HTMLElement).querySelector('svg')
+      expect(glyph?.getAttribute('role')).toBe('img')
+      expect(glyph?.getAttribute('aria-label')).toBe('Error')
+      expect(getComputedStyle(part(found, 'item') as HTMLElement).borderLeftWidth).toBe('0px')
+    })
+
+    test('each severity names itself, in the same words `Callout` uses', async () => {
+      // One vocabulary, met in a passage and in a message. Two would be two.
+      for (const [severity, name] of [
+        ['info', 'Information'],
+        ['success', 'Success'],
+        ['warning', 'Warning'],
+        ['danger', 'Error'],
+      ]) {
+        const found = await item(`severity="${severity}"`)
+        const glyph = (part(found, 'icon') as HTMLElement).querySelector('svg')
+        expect(glyph?.getAttribute('aria-label'), severity).toBe(name)
+      }
+    })
+
+    test('no severity means no mark at all', async () => {
+      /* The common message. "Project saved" is not an error, a warning or an
+         announcement, and an icon there would be decoration standing where
+         meaning is supposed to be. `Callout` falls back to `info` because it is
+         always *about* something; a toast is the next thing that happened. */
+      expect(part(await item(''), 'icon')).toBeNull()
+    })
+
+    test('the dismiss glyph has its own slot name, because two cannot share one', async () => {
+      /* Assignment goes to whichever slot comes first in the tree, so the
+         severity mark would have swallowed anything meant for the control. */
+      const found = await item('dismissible severity="info"')
+      expect(part(found, 'dismiss')?.querySelector('slot')?.getAttribute('name')).toBe(
+        'dismiss-icon',
+      )
+      expect((part(found, 'icon') as HTMLElement).querySelector('slot')?.getAttribute('name')).toBe(
+        'icon',
+      )
+    })
+
+    test('an inverted region needs nothing inverted by hand', async () => {
+      /* `data-color-mode` is not scoped to the root and every token resolves
+         through `color-scheme`, so it themes this subtree and the message comes
+         out the other way round without the component knowing. Hardcoding an
+         inverse surface would leave anything slotted in reading the page's
+         tokens instead. */
+      const plain = await item('severity="info"')
+      const region = (await mount(
+        `<helix-toast data-color-mode="dark" label="N">
+           <helix-toast-item severity="info">Saved</helix-toast-item>
+         </helix-toast>`,
+      )) as HTMLElement
+      const inverted = region.querySelector('helix-toast-item') as Item
+      await inverted.updateComplete
+
+      const surface = (host: Item): string =>
+        getComputedStyle(part(host, 'item') as HTMLElement).backgroundColor
+      expect(surface(inverted)).not.toBe(surface(plain))
     })
 
     test('the row sits on one line, whatever heights are in it', async () => {

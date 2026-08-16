@@ -20589,12 +20589,16 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "An element rather than a slot, because it carries a timeout, a severity, a\ndismiss control and a lifetime that pauses: behaviour, state and API, which\nis the test for whether a region becomes an element in this library.\n\n**The timer is the item's own.** Held by the region, one message arriving\nwould restart another's, so a stack of three would go from three seconds each\nto nine for the last one. Each message is on its own clock from the moment it\nis rendered.\n\n**No duration means it stays.** That is the safe default rather than the\ncommon one: anything carrying an action has to still be there when the reader\ndecides to take it, and a component cannot tell from the outside whether the\nmessage it was given is disposable.\n\n**The clock stops while it is being read.** Hover pauses it, and so does\nfocus landing anywhere inside, which is the case that matters more: a\nkeyboard reader tabbing towards the action in a toast is exactly the person a\ntimer must not race. Both resume where they left off rather than starting\nagain, so a message half-read does not get a full second life every time a\npointer crosses it.\n\n**Going away is a request, never an act.** It dispatches a cancelable\n`helix-dismiss` and does nothing else: the consumer owns the list, so the\nitem removing itself would leave the two disagreeing. Auto-dismiss and the\ndismiss control raise the same event, so a consumer handles one path and not\ntwo.",
+          "description": "An element rather than a slot, because it carries a timeout, a severity, a\ndismiss control and a lifetime that pauses: behaviour, state and API, which\nis the test for whether a region becomes an element in this library.\n\n**The timer is the item's own.** Held by the region, one message arriving\nwould restart another's, so a stack of three would go from three seconds each\nto nine for the last one. Each message is on its own clock from the moment it\nis rendered.\n\n**To stand out from the page, set `data-color-mode` on the region.** That\nattribute is the only thing deciding the color mode, it is not scoped to the\nroot, and every token resolves through `color-scheme`, so it themes the\nsubtree and nothing else. Nothing here has to be inverted by hand, and a\nbutton a consumer slots in comes out right: measured on a light page, a\n`data-color-mode=\"dark\"` region gave a dark surface, white text, and a\nslotted `Retry` whose own label flipped to white with it. Hardcoding an\ninverse surface the way `Tooltip` does would not have done that, because a\ntooltip holds no controls and a message does.\n\n**No duration means it stays.** That is the safe default rather than the\ncommon one: anything carrying an action has to still be there when the reader\ndecides to take it, and a component cannot tell from the outside whether the\nmessage it was given is disposable.\n\n**The clock stops while it is being read.** Hover pauses it, and so does\nfocus landing anywhere inside, which is the case that matters more: a\nkeyboard reader tabbing towards the action in a toast is exactly the person a\ntimer must not race. Both resume where they left off rather than starting\nagain, so a message half-read does not get a full second life every time a\npointer crosses it.\n\n**Going away is a request, never an act.** It dispatches a cancelable\n`helix-dismiss` and does nothing else: the consumer owns the list, so the\nitem removing itself would leave the two disagreeing. Auto-dismiss and the\ndismiss control raise the same event, so a consumer handles one path and not\ntwo.",
           "name": "HelixBaseToastItem",
           "cssParts": [
             {
               "description": "The message's own surface.",
               "name": "item"
+            },
+            {
+              "description": "The severity mark, where the message has one.",
+              "name": "icon"
             },
             {
               "description": "The message.",
@@ -20623,8 +20627,12 @@
               "name": "actions"
             },
             {
-              "description": "Replaces the glyph inside the dismiss control.",
+              "description": "Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.",
               "name": "icon"
+            },
+            {
+              "description": "Replaces the glyph inside the dismiss control.",
+              "name": "dismiss-icon"
             }
           ],
           "members": [

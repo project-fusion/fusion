@@ -28,30 +28,43 @@
   gap: var(--helix-space-sm);
   line-height: var(--helix-leading-normal);
   padding: var(--toast-item-inset, var(--helix-space-sm));
-  /* The containing block for the severity bar and the timer, both of which are
-     placed against this box. */
+  /* The containing block for the timer, which is placed against this box. */
   position: relative;
 }
 
-/* The severity bar.
+/* The severity mark.
  *
- * It was `border-inline-start`, and a border is part of the element's own box,
- * so `border-radius` bent it: the bar bowed inwards at both ends and read as a
- * parenthesis rather than a rule. The same fault the tabs strip and the page
- * nav both hit, and the same answer as the page nav's: a pill of its own,
- * inset from the edges, owing nothing to the container's corners.
+ * It was a bar down the leading edge, and before that a bar drawn as a border
+ * that the corner radius bent. Both were the same mistake in different shapes:
+ * a coloured line says *something* is different about this message and never
+ * says what, so a reader who cannot tell green from red is told nothing at all.
+ * The icon carries an `aria-label`, so the severity is in the accessibility
+ * tree rather than only in the paint.
  *
- * Out of flow, so a message with no severity has exactly the same box and the
- * same text position as one with. The border form only approximated that by
- * staying transparent, which meant it was still there in the layout. */
-[part="item"]::before {
-  background-color: var(--_toast-severity, transparent);
-  border-radius: var(--helix-radii-full);
-  content: "";
-  inline-size: var(--helix-border-thick);
-  inset-block: var(--helix-space-2xs);
-  inset-inline-start: var(--helix-space-2xs);
-  position: absolute;
+ * The same four glyphs `Callout` uses. A reader meets these marks in a passage
+ * and in a message, and a vocabulary that changed shape between the two would
+ * be two vocabularies.
+ */
+[part="icon"] {
+  color: var(--_toast-severity, var(--helix-color-foreground-muted));
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+/* Size only. Stroke width belongs to the glyph: the set is drawn on a 256 box
+   at width 16, and a value tuned for a 24 box would make it hairline. */
+[part="icon"] svg {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+/* A slotted replacement is sized like the default, so swapping it does not
+   change the message's rhythm. */
+slot[name="icon"]::slotted(*) {
+  --icon-size: var(--helix-size-icon);
+
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
 }
 
 [part="content"] {
@@ -65,9 +78,9 @@
   gap: var(--helix-space-2xs);
 }
 
-/* A bar down the edge rather than a fill behind the words. A message is text to
-   be read, and a coloured panel costs contrast to say what the bar already
-   says. */
+/* Colour on the mark rather than a fill behind the words. A message is text to
+   be read, and a coloured panel costs contrast to say what the icon already
+   says in words. */
 :host([severity="info"]) {
   --_toast-severity: var(--helix-color-primary);
 }
@@ -124,8 +137,8 @@
  * honest, because the item pauses on hover and focus and the bar has to stop
  * with it rather than merely look like it did.
  *
- * The same colour as the severity bar where there is one, so the two marks on
- * a message are one idea rather than two. */
+ * The same colour as the severity mark where there is one, so the two things
+ * drawn on a message read as one idea rather than two. */
 [part="timer"] {
   animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;
   background-color: var(--_toast-severity, var(--helix-color-foreground-muted));

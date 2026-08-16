@@ -1,8 +1,25 @@
 import { customElement, HelixDismissEvent, HelixElement } from '@helix-io/core'
-import { x } from '@helix-io/icons'
+import {
+  checkCircleFill,
+  type HelixIcon,
+  infoFill,
+  warningFill,
+  x,
+  xCircleFill,
+} from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+
+/* Icon and accessible name for each severity. The same four `Callout` uses,
+   deliberately: a reader meets these marks in a passage and in a message, and a
+   vocabulary that changed shape between the two would be two vocabularies. */
+const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
+  danger: { icon: xCircleFill, label: 'Error' },
+  info: { icon: infoFill, label: 'Information' },
+  success: { icon: checkCircleFill, label: 'Success' },
+  warning: { icon: warningFill, label: 'Warning' },
+}
 
 /**
  * @summary One message in the toast region.
@@ -16,6 +33,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * would restart another's, so a stack of three would go from three seconds each
  * to nine for the last one. Each message is on its own clock from the moment it
  * is rendered.
+ *
+ * **To stand out from the page, set `data-color-mode` on the region.** That
+ * attribute is the only thing deciding the color mode, it is not scoped to the
+ * root, and every token resolves through `color-scheme`, so it themes the
+ * subtree and nothing else. Nothing here has to be inverted by hand, and a
+ * button a consumer slots in comes out right: measured on a light page, a
+ * `data-color-mode="dark"` region gave a dark surface, white text, and a
+ * slotted `Retry` whose own label flipped to white with it. Hardcoding an
+ * inverse surface the way `Tooltip` does would not have done that, because a
+ * tooltip holds no controls and a message does.
  *
  * **No duration means it stays.** That is the safe default rather than the
  * common one: anything carrying an action has to still be there when the reader
@@ -41,9 +68,14 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The message.
  * @slot actions - What to do about it, usually a button or a link.
- * @slot icon - Replaces the glyph inside the dismiss control.
+ * @slot icon - Replaces the severity mark. Matches `Callout`, which is why the
+ *   dismiss control's own glyph is `dismiss-icon` rather than this: two slots
+ *   cannot share a name, assignment goes to whichever comes first in the tree,
+ *   and the severity mark is the one a consumer reaches for.
+ * @slot dismiss-icon - Replaces the glyph inside the dismiss control.
  *
  * @csspart item - The message's own surface.
+ * @csspart icon - The severity mark, where the message has one.
  * @csspart content - The message.
  * @csspart actions - The region holding what to do about it.
  * @csspart dismiss - The control that asks to close.
@@ -144,6 +176,14 @@ export class HelixBaseToastItem extends HelixElement {
   }
 
   protected override render(): TemplateResult {
+    /* Nothing when no severity was given, which is the common message: "Project
+       saved" is not an error, a warning or an announcement, and an icon there
+       would be decoration standing where meaning is supposed to be. `Callout`
+       falls back to `info` because a callout exists to set a passage apart and
+       is always *about* something; a toast is just the next thing that
+       happened. */
+    const severity = this.severity ? SEVERITIES[this.severity] : undefined
+
     return html`<div
       part="item"
       @mouseenter=${this.handlePause}
@@ -151,6 +191,22 @@ export class HelixBaseToastItem extends HelixElement {
       @focusin=${this.handlePause}
       @focusout=${this.handleResume}
     >
+      ${
+        severity
+          ? html`<span part="icon">
+              <slot name="icon">
+                <svg
+                  fill="currentColor"
+                  viewBox=${severity.icon.viewBox}
+                  role="img"
+                  aria-label=${severity.label}
+                >
+                  ${unsafeSVG(severity.icon.content)}
+                </svg>
+              </slot>
+            </span>`
+          : nothing
+      }
       <div part="content"><slot></slot></div>
       <div part="actions"><slot name="actions"></slot></div>
       ${
@@ -161,7 +217,7 @@ export class HelixBaseToastItem extends HelixElement {
               aria-label=${this.dismissLabel}
               @click=${() => this.dismiss()}
             >
-              <slot name="icon">
+              <slot name="dismiss-icon">
                 <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
                   ${unsafeSVG(x.content)}
                 </svg>

@@ -7870,6 +7870,16 @@ export type CustomElements = {
    * to nine for the last one. Each message is on its own clock from the moment it
    * is rendered.
    *
+   * **To stand out from the page, set `data-color-mode` on the region.** That
+   * attribute is the only thing deciding the color mode, it is not scoped to the
+   * root, and every token resolves through `color-scheme`, so it themes the
+   * subtree and nothing else. Nothing here has to be inverted by hand, and a
+   * button a consumer slots in comes out right: measured on a light page, a
+   * `data-color-mode="dark"` region gave a dark surface, white text, and a
+   * slotted `Retry` whose own label flipped to white with it. Hardcoding an
+   * inverse surface the way `Tooltip` does would not have done that, because a
+   * tooltip holds no controls and a message does.
+   *
    * **No duration means it stays.** That is the safe default rather than the
    * common one: anything carrying an action has to still be there when the reader
    * decides to take it, and a component cannot tell from the outside whether the
@@ -7912,7 +7922,8 @@ export type CustomElements = {
    *
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a button or a link.
-   * - `icon`: Replaces the glyph inside the dismiss control.
+   * - `icon`: Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.
+   * - `dismiss-icon`: Replaces the glyph inside the dismiss control.
    *
    * ## Methods
    *
@@ -7927,6 +7938,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The message's own surface.
+   * - `icon`: The severity mark, where the message has one.
    * - `content`: The message.
    * - `actions`: The region holding what to do about it.
    * - `dismiss`: The control that asks to close.
@@ -12247,6 +12259,16 @@ export type CustomElementsSolidJs = {
    * to nine for the last one. Each message is on its own clock from the moment it
    * is rendered.
    *
+   * **To stand out from the page, set `data-color-mode` on the region.** That
+   * attribute is the only thing deciding the color mode, it is not scoped to the
+   * root, and every token resolves through `color-scheme`, so it themes the
+   * subtree and nothing else. Nothing here has to be inverted by hand, and a
+   * button a consumer slots in comes out right: measured on a light page, a
+   * `data-color-mode="dark"` region gave a dark surface, white text, and a
+   * slotted `Retry` whose own label flipped to white with it. Hardcoding an
+   * inverse surface the way `Tooltip` does would not have done that, because a
+   * tooltip holds no controls and a message does.
+   *
    * **No duration means it stays.** That is the safe default rather than the
    * common one: anything carrying an action has to still be there when the reader
    * decides to take it, and a component cannot tell from the outside whether the
@@ -12289,7 +12311,8 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a button or a link.
-   * - `icon`: Replaces the glyph inside the dismiss control.
+   * - `icon`: Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.
+   * - `dismiss-icon`: Replaces the glyph inside the dismiss control.
    *
    * ## Methods
    *
@@ -12304,6 +12327,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The message's own surface.
+   * - `icon`: The severity mark, where the message has one.
    * - `content`: The message.
    * - `actions`: The region holding what to do about it.
    * - `dismiss`: The control that asks to close.

@@ -26661,8 +26661,16 @@
               }
             },
             {
-              "description": "Replaces the glyph inside the dismiss control.",
+              "description": "Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.",
               "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "Replaces the glyph inside the dismiss control.",
+              "name": "dismiss-icon",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"
@@ -26673,6 +26681,14 @@
             {
               "description": "The message's own surface.",
               "name": "item",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "The severity mark, where the message has one.",
+              "name": "icon",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"
