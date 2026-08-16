@@ -1,0 +1,77 @@
+# Size and density
+
+**A control has no size. It takes its height from the region it is in.**
+
+```html
+<helix-flex data-density="lg">
+  <helix-button appearance="primary">See what is shipping</helix-button>
+</helix-flex>
+```
+
+There is no `size` prop on a button, an input, a select or a checkbox. That
+looks like a restriction and is not one, so it is worth saying why.
+
+## Size is asked to do three jobs, and only one belongs to the control
+
+**Emphasis.** `appearance` carries it. A filled primary button says "this one
+matters" far louder than eight more pixels ever will.
+
+**Fit.** This is a fact about the region rather than about the control. A
+toolbar is tight, a hero is spacious, a table row is tighter still. The control
+does not know which it is in; the region does.
+
+**Optical role.** Real, and only for things that are not controls. An avatar at
+24 in a list and 96 on a profile is a different graphic, not a taller control.
+That is why `size` survives on `Avatar` and `Spinner` and nowhere else: those
+are pictures.
+
+## The test that settles it
+
+*Can two controls sitting together legitimately differ in height?*
+
+Save and Cancel. An icon button beside a text button. An input and its submit.
+The two halves of a split button. In every case the answer is no.
+
+So a per-instance size is only ever used to say something about the **region**,
+one element at a time — which is exactly how a row ends up with one member the
+wrong height. Said once on the region, a ragged row is not discouraged. It is
+unwritable.
+
+That is also what makes this safe for anything generating code, whether that is
+a person or a model: there is no size to get wrong, and one question to ask per
+region instead of one per element.
+
+## How to use it
+
+Put `data-density` on any container. `sm`, `md` or `lg`. `md` is the default and
+is never written.
+
+```html
+<helix-toolbar>
+  <!-- Nothing here needs a size. The toolbar is already dense. -->
+  <helix-button>Run</helix-button>
+  <helix-select label="Target"><!-- … --></helix-select>
+</helix-toolbar>
+```
+
+**Containers that are dense by nature declare it themselves.** The app header,
+the toolbar and the announcement all do, so a control put in one is already the
+right height without anybody deciding.
+
+It works through custom properties — `--helix-size-control`,
+`--helix-size-checkbox`, `--helix-size-switch`, `--helix-size-tag` — which is
+why it costs no component any API and crosses every shadow boundary on its own.
+
+The `-sm` / `-md` / `-lg` tokens are the scale and never move. The unsuffixed
+ones are the current step, and `data-density` is what moves them.
+
+## Two things that are not this
+
+**`data-link-size` stays.** A text link has no control height: its size is
+typography, and it follows the text around it.
+
+**A control may still declare its own scale.** `--helix-size-switch` is one step
+above `--helix-size-checkbox` at every density, because a switch is a track with
+a thumb inside it and a checkbox is a box with a mark in it. That is the
+component choosing where it sits on the scale, once, for everyone. It is not the
+same thing as a consumer setting a height per instance.

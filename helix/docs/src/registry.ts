@@ -44,6 +44,13 @@ export const pages: DocPage[] = [
     title: 'Tiers',
   },
   {
+    description: 'Why no control has a size, and what to write instead.',
+    order: 1,
+    section: 'Patterns',
+    slug: 'size-and-density',
+    title: 'Size and density',
+  },
+  {
     description: 'Deriving an accessible token set from intent inputs.',
     order: 1,
     section: 'Theming',
