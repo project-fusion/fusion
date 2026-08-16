@@ -114,7 +114,20 @@ export class PopoverController implements ReactiveController {
        that a browser without it should still get a positioned panel, which is
        what every one of these was before the API existed: worse, because it can
        be clipped, and not broken. */
-    surface.showPopover?.()
+    if (typeof surface.showPopover === 'function') {
+      /* And said plainly where the surface is not one. `showPopover` on an
+         element with no `popover` attribute throws `NotSupportedError`, from
+         inside the promise the host called this in, so it surfaces as an
+         unhandled rejection naming a method rather than as the thing that is
+         actually wrong. Which is how `Select` looked for as long as it was
+         broken: no error at all, just a panel that could be clipped. */
+      if (!surface.hasAttribute('popover')) {
+        throw new Error(
+          'PopoverController: the surface needs a `popover` attribute to reach the top layer',
+        )
+      }
+      surface.showPopover()
+    }
     this.floating.start()
     this.dismisser.activate()
   }

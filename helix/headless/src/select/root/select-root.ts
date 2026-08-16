@@ -1,12 +1,11 @@
 import {
   customElement,
-  DismissController,
-  FloatingController,
   HelixFormElement,
   hostAria,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
+  PopoverController,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -98,24 +97,27 @@ export class HelixBaseSelect extends MixinControllerOpen(
     return this.renderRoot?.querySelector<HelixBaseListbox>('[part="listbox"]') ?? null
   }
 
-  /* The surface floats, so it is placed against the trigger rather than laid
-     out beside it: a panel in flow would be clipped by anything with
-     `overflow` between here and the page. */
-  protected readonly floating = new FloatingController(this, {
-    anchor: () => this.renderRoot.querySelector<HTMLElement>('[part="trigger"]'),
-    floating: () => this.renderRoot.querySelector<HTMLElement>('[part="surface"]'),
-    /* Held off the trigger by the controller rather than by a margin on the
-       panel. A margin is inside the box the controller measures, so it would be
-       counted once in the placement and again in the layout, and the gap would
-       change as the panel flipped above the trigger for want of room. The same
-       four pixels the menu holds its surface off its own trigger. */
+  /* The surface floats *and is in the top layer*, which it was not.
+   *
+   * It had a `FloatingController` and a `DismissController` and never called
+   * `showPopover`, so the panel was an ordinary positioned element and the
+   * first ancestor with `overflow: hidden` clipped it. A select inside a
+   * scrolling card was cut off where a menu in the same place was not, and the
+   * two are the same shape: floating panel, trigger, dismissal. That is what
+   * `PopoverController` is, and having one of them is what stops the third copy
+   * being subtly different again.
+   *
+   * Held off the trigger by the controller rather than by a margin on the
+   * panel. A margin is inside the box the controller measures, so it would be
+   * counted once in the placement and again in the layout, and the gap would
+   * change as the panel flipped above the trigger for want of room. */
+  protected readonly panel = new PopoverController(this, {
+    anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
+    boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
     offset: () => 4,
-    placement: 'bottom-start',
-  })
-
-  private readonly dismisser = new DismissController(this, {
-    boundary: () => this.renderRoot.querySelector<HTMLElement>('[part="surface"]'),
     onDismiss: () => this.close(),
+    placement: 'bottom-start',
+    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
   })
 
   /**
@@ -190,20 +192,16 @@ export class HelixBaseSelect extends MixinControllerOpen(
     this.sync()
     this.linkHost()
     if (this.isOpen) {
-      /* Started here, and it was not started at all: the controller was
-         constructed and nothing ever ran it. Without it the surface keeps the
-         `position: absolute` its stylesheet declares and no offsets, so it
-         lands at the host's own top-left, which is over the label and above the
-         trigger rather than under it. The menu and the tooltip both start
-         theirs; this one was the odd one out. */
-      this.floating.start()
-      this.dismisser.activate()
+      /* Driven from `updated` rather than from a `show()` method, because the
+         open state is the property and a consumer may set it directly. The
+         controller is idempotent, so arriving here twice for the same open
+         costs nothing. */
+      this.panel.show()
       // Into the list, which is where the keyboard has to be for the arrows to
       // mean anything.
       this.renderRoot.querySelector<HTMLElement>('[part="listbox"]')?.focus()
     } else {
-      this.floating.stop()
-      this.dismisser.deactivate()
+      this.panel.hide()
     }
   }
 
@@ -224,7 +222,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
         <slot name="indicator"></slot>
       </button>
 
-      <div part="surface" ?hidden=${!this.isOpen}>
+      <div part="surface" popover="manual" ?hidden=${!this.isOpen}>
         <helix-listbox
           part="listbox"
           exportparts="items, empty"

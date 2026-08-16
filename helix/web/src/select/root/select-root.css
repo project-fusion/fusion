@@ -98,8 +98,23 @@
      because the first and last rows still want air above and below them. */
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-none);
-  position: absolute;
-  z-index: var(--helix-layer-overlay);
+  /* No border, said rather than left out: the UA stylesheet gives `[popover]`
+     `border: solid`, so dropping the declaration leaves a three-pixel medium
+     border rather than none at all. The same line the menu's surface carries,
+     and now for the same reason: this is a popover.
+
+     `inset` and `margin` for the same reason. The UA centres a popover in the
+     window and gives it a margin, and the positioning this panel gets from the
+     controller is applied on top of both, so neither can merely be overridden
+     by something more specific: they have to be cleared.
+
+     No `z-index` any more, and no `position` either. Both were this panel's way
+     of trying to get above the page from inside it, and neither works against
+     an ancestor with `overflow: hidden`, which is what was actually clipping
+     it. The top layer is above everything by construction. */
+  border: none;
+  inset: auto;
+  margin: var(--helix-space-none);
 }
 
 /* Shown and placed are two different moments, and this waits for the second.
@@ -148,7 +163,14 @@
   }
 }
 
-[part="surface"][hidden] {
+/* The UA hides a closed popover with `[popover]:not(:popover-open)`, and every
+   author declaration above outranks it whatever its specificity. Restated here,
+   the same way Tooltip, Menu and Popover restate theirs, and the same rule
+   Dialog had to learn the hard way. `[hidden]` stays alongside it: the attribute
+   is what the server renders, and it is the only thing holding the panel closed
+   before the element upgrades. */
+[part="surface"][hidden],
+[part="surface"]:not(:popover-open) {
   display: none;
 }
 

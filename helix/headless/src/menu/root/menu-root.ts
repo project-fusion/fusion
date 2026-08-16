@@ -1,11 +1,11 @@
 import {
+  anchorElement,
   customElement,
-  DismissController,
   DrilldownController,
-  FloatingController,
   HelixElement,
   MixinControllerOpen,
   type Placement,
+  PopoverController,
   scrollItemIntoView,
 } from '@helix-io/core'
 import { caretLeft } from '@helix-io/icons'
@@ -86,59 +86,28 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
     slot: 'submenu',
   })
 
-  private readonly dismiss = new DismissController(this, {
+  /* One controller where there were two and a hand-written sequence between
+     them. It is the same three things in the same order; what it is not is a
+     third copy of them, and the second copy is how `Select` ended up never
+     reaching the top layer at all. */
+  private readonly panel = new PopoverController(this, {
+    anchor: () => this.trigger,
     // The host is `display: contents`, so it has no box a press can land in.
     // What counts as inside is the surface, plus the trigger, whose own click
     // handler decides what a press there means.
     boundary: () => this,
-    onDismiss: () => this.hide(),
-  })
-
-  private readonly floating = new FloatingController(this, {
-    anchor: () => this.trigger,
-    floating: () => this.renderRoot.querySelector<HTMLElement>('[part="menu"]'),
     offset: () => this.offset,
+    onDismiss: () => this.hide(),
     placement: () => this.placement,
+    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="menu"]'),
   })
 
-  /**
-   * The element the surface opens against.
-   *
-   * Past a wrapper that draws no box of its own. `display: contents` puts an
-   * element's children in the layout and leaves the element without one, so its
-   * `getBoundingClientRect()` is `0 0 0 0`: measured, a tooltip host reports
-   * exactly that while the button inside it reports 32 by 32. Anchoring to it
-   * would open the menu against the top left of the window, and focusing it on
-   * close would put focus nowhere.
-   *
-   * That matters because wrapping is how a tooltip attaches to what it
-   * describes, so without this an icon button used as a trigger is the one
-   * button on a toolbar that cannot have one. Descending is the whole fix: the
-   * wrapper is transparent by construction, so the thing with the box is the
-   * thing the reader is pointing at.
-   */
+  /** The element the surface opens against. */
   private get trigger(): HTMLElement {
-    const slot = this.renderRoot.querySelector('slot[name="trigger"]') as HTMLSlotElement | null
-    const assigned = slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined
-    if (!assigned) {
-      return this
-    }
-    let element = assigned
-    // A guard rather than a `while (true)`: a chain of box-less wrappers is
-    // already unusual and an unbounded walk over a tree we do not own is worse
-    // than stopping.
-    for (let depth = 0; depth < 4; depth += 1) {
-      const child = element.firstElementChild as HTMLElement | null
-      if (!child || element.getClientRects().length > 0) {
-        return element
-      }
-      element = child
-    }
-    return element
-  }
-
-  private get surface(): HTMLElement | null {
-    return this.renderRoot.querySelector<HTMLElement>('[part="menu"]')
+    return anchorElement(
+      this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]'),
+      this,
+    )
   }
 
   /** The items on the page that is showing, which is what the keys move over. */
@@ -152,9 +121,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
       return
     }
     this.updateComplete.then(() => {
-      this.surface?.showPopover?.()
-      this.floating.start()
-      this.dismiss.activate()
+      this.panel.show()
       this.items[0]?.focus()
     })
   }
@@ -164,9 +131,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
     if (!this.isOpen || !this.requestOpen(false)) {
       return
     }
-    this.surface?.hidePopover?.()
-    this.floating.stop()
-    this.dismiss.deactivate()
+    this.panel.hide()
     this.drilldown.reset()
     this.trigger.focus()
   }

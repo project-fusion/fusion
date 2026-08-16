@@ -14379,21 +14379,10 @@
             },
             {
               "kind": "field",
-              "name": "dismiss",
+              "name": "panel",
               "privacy": "private",
               "readonly": true,
-              "default": "new DismissController(this, { // The host is `display: contents`, so it has no box a press can land in. // What counts as inside is the surface, plus the trigger, whose own click // handler decides what a press there means. boundary: () => this, onDismiss: () => this.hide(), })",
-              "inheritedFrom": {
-                "name": "HelixBaseMenu",
-                "module": "src/menu/root/menu-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "floating",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new FloatingController(this, { anchor: () => this.trigger, floating: () => this.renderRoot.querySelector<HTMLElement>('[part=\"menu\"]'), offset: () => this.offset, placement: () => this.placement, })",
+              "default": "new PopoverController(this, { anchor: () => this.trigger, // The host is `display: contents`, so it has no box a press can land in. // What counts as inside is the surface, plus the trigger, whose own click // handler decides what a press there means. boundary: () => this, offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"menu\"]'), })",
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -14406,20 +14395,7 @@
                 "text": "HTMLElement"
               },
               "privacy": "private",
-              "description": "The element the surface opens against.\n\nPast a wrapper that draws no box of its own. `display: contents` puts an\nelement's children in the layout and leaves the element without one, so its\n`getBoundingClientRect()` is `0 0 0 0`: measured, a tooltip host reports\nexactly that while the button inside it reports 32 by 32. Anchoring to it\nwould open the menu against the top left of the window, and focusing it on\nclose would put focus nowhere.\n\nThat matters because wrapping is how a tooltip attaches to what it\ndescribes, so without this an icon button used as a trigger is the one\nbutton on a toolbar that cannot have one. Descending is the whole fix: the\nwrapper is transparent by construction, so the thing with the box is the\nthing the reader is pointing at.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseMenu",
-                "module": "src/menu/root/menu-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "surface",
-              "type": {
-                "text": "HTMLElement | null"
-              },
-              "privacy": "private",
+              "description": "The element the surface opens against.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
@@ -18478,21 +18454,10 @@
             },
             {
               "kind": "field",
-              "name": "floating",
+              "name": "panel",
               "privacy": "protected",
               "readonly": true,
-              "default": "new FloatingController(this, { anchor: () => this.renderRoot.querySelector<HTMLElement>('[part=\"trigger\"]'), floating: () => this.renderRoot.querySelector<HTMLElement>('[part=\"surface\"]'), /* Held off the trigger by the controller rather than by a margin on the panel. A margin is inside the box the controller measures, so it would be counted once in the placement and again in the layout, and the gap would change as the panel flipped above the trigger for want of room. The same four pixels the menu holds its surface off its own trigger. */ offset: () => 4, placement: 'bottom-start', })",
-              "inheritedFrom": {
-                "name": "HelixBaseSelect",
-                "module": "src/select/root/select-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "dismisser",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new DismissController(this, { boundary: () => this.renderRoot.querySelector<HTMLElement>('[part=\"surface\"]'), onDismiss: () => this.close(), })",
+              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"trigger\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), offset: () => 4, onDismiss: () => this.close(), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
               "inheritedFrom": {
                 "name": "HelixBaseSelect",
                 "module": "src/select/root/select-root.ts"

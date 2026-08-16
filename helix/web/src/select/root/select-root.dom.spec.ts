@@ -166,3 +166,39 @@ if (hasLayout()) {
     })
   })
 }
+
+if (hasLayout()) {
+  describe('select in a browser', () => {
+    test('the open panel is in the top layer, not merely positioned', async () => {
+      /* This is the defect the shared controller was extracted to fix. The
+         select had a `FloatingController` and a `DismissController` and never
+         called `showPopover`, so its panel was an ordinary positioned element:
+         placed correctly, and clipped by the first ancestor with `overflow:
+         hidden`, while a menu in the same position was not.
+
+         `:popover-open` is the only thing that distinguishes the two. A panel
+         that is merely visible passes every other spec in this file. */
+      const host = (await mount(
+        `<helix-select label="Fruit" open>
+          <helix-option value="apple">Apple</helix-option>
+          <helix-option value="pear">Pear</helix-option>
+        </helix-select>`,
+      )) as HTMLElement & { updateComplete: Promise<boolean> }
+      await host.updateComplete
+      const surface = part(host, 'surface') as HTMLElement
+      expect(surface.matches(':popover-open')).toBe(true)
+    })
+
+    test('a closed panel is not in it, and paints nothing', async () => {
+      const host = (await mount(
+        `<helix-select label="Fruit">
+          <helix-option value="apple">Apple</helix-option>
+        </helix-select>`,
+      )) as HTMLElement & { updateComplete: Promise<boolean> }
+      await host.updateComplete
+      const surface = part(host, 'surface') as HTMLElement
+      expect(surface.matches(':popover-open')).toBe(false)
+      expect(surface.getBoundingClientRect().height).toBe(0)
+    })
+  })
+}
