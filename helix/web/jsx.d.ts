@@ -19,6 +19,7 @@ import type {
   HelixCheckbox,
   HelixCheckboxGroup,
   HelixCloseEvent,
+  HelixDialog,
   HelixDismissEvent,
   HelixDivider,
   HelixDrawer,
@@ -1055,6 +1056,81 @@ instead. */
   "on:helix-change"?: (e: HelixCheckboxHelixChangeElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixCheckboxElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixDialog` component event */
+export type HelixDialogElementEvent<E = Event> = TypedEvent<HelixDialog, E>;
+/** `helix-open` event type */
+export type HelixDialogHelixOpenElementEvent =
+  HelixDialogElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixDialogHelixCloseElementEvent =
+  HelixDialogElementEvent<HelixCloseEvent>;
+
+export type HelixDialogProps = {
+  /** How wide the panel is allowed to be. */
+  appearance?: HelixDialog["appearance"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixDialog["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixDialog["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixDialog["defaultOpen"];
+  /** Accessible name for the dialog. */
+  label?: HelixDialog["label"];
+  /** Whether Escape and the backdrop can close it.
+
+Off for a dialog that must be answered. It does not disable the close
+control a consumer slots in: refusing to be dismissed is not the same as
+refusing to be closed, and a dialog with no way out at all is a trap. */
+  persistent?: HelixDialog["persistent"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixDialog["onOpenChange"];
+
+  /** Fired before it opens, and cancelable. */
+  "onhelix-open"?: (e: HelixDialogHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "onhelix-close"?: (e: HelixDialogHelixCloseElementEvent) => void;
+};
+
+export type HelixDialogSolidJsProps = {
+  /** How wide the panel is allowed to be. */
+  "prop:appearance"?: HelixDialog["appearance"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixDialog["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixDialog["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixDialog["defaultOpen"];
+  /** Accessible name for the dialog. */
+  "prop:label"?: HelixDialog["label"];
+  /** Whether Escape and the backdrop can close it.
+
+Off for a dialog that must be answered. It does not disable the close
+control a consumer slots in: refusing to be dismissed is not the same as
+refusing to be closed, and a dialog with no way out at all is a trap. */
+  "prop:persistent"?: HelixDialog["persistent"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixDialog["onOpenChange"];
+  /** Fired before it opens, and cancelable. */
+  "on:helix-open"?: (e: HelixDialogHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "on:helix-close"?: (e: HelixDialogHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4065,6 +4141,80 @@ export type CustomElements = {
    */
   "helix-checkbox": Partial<
     HelixCheckboxProps & BaseProps<HelixCheckbox> & BaseEvents
+  >;
+
+  /**
+   * The panel is `surface-overlay` with a shadow, because that is what it is: a
+   * thing over the page rather than on it. The scrim is drawn on `::backdrop`,
+   * which is the platform's own element for it and sits in the top layer with the
+   * dialog rather than being a div somebody positioned.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How wide the panel is allowed to be.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `label`: Accessible name for the dialog.
+   * - `persistent`: Whether Escape and the backdrop can close it.
+   *
+   * Off for a dialog that must be answered. It does not disable the close
+   * control a consumer slots in: refusing to be dismissed is not the same as
+   * refusing to be closed, and a dialog with no way out at all is a trap.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The dialog's content.
+   * - `header`: The title, and anything beside it.
+   * - `footer`: The actions.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `show() => void`: Moves focus into the dialog and makes the rest of the page inert.
+   * - `close() => void`: Asks to close, which a consumer may refuse.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
+   * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `dialog`: The native dialog element.
+   */
+  "helix-dialog": Partial<
+    HelixDialogProps & BaseProps<HelixDialog> & BaseEvents
   >;
 
   /**
@@ -7344,6 +7494,83 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The panel is `surface-overlay` with a shadow, because that is what it is: a
+   * thing over the page rather than on it. The scrim is drawn on `::backdrop`,
+   * which is the platform's own element for it and sits in the top layer with the
+   * dialog rather than being a div somebody positioned.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `appearance`: How wide the panel is allowed to be.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `label`: Accessible name for the dialog.
+   * - `persistent`: Whether Escape and the backdrop can close it.
+   *
+   * Off for a dialog that must be answered. It does not disable the close
+   * control a consumer slots in: refusing to be dismissed is not the same as
+   * refusing to be closed, and a dialog with no way out at all is a trap.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The dialog's content.
+   * - `header`: The title, and anything beside it.
+   * - `footer`: The actions.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `show() => void`: Moves focus into the dialog and makes the rest of the page inert.
+   * - `close() => void`: Asks to close, which a consumer may refuse.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
+   * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `dialog`: The native dialog element.
+   */
+  "helix-dialog": Partial<
+    HelixDialogProps &
+      HelixDialogSolidJsProps &
+      BaseProps<HelixDialog> &
+      BaseEvents
+  >;
+
+  /**
    * A one-pixel rule in the border color, running the full inline size by
    * default. A vertical divider stretches to its flex parent instead of setting
    * its own height, so it matches whatever it sits beside without being told how
@@ -9887,6 +10114,10 @@ export type CustomCssProperties = {
   "--checkbox-size"?: string;
   /** Fill of a ticked box. */
   "--checkbox-checked-color"?: string;
+  /** Width of the panel. */
+  "--dialog-inline-size"?: string;
+  /** Padding inside the panel. */
+  "--dialog-inset"?: string;
   /** Color of the rule. */
   "--divider-color"?: string;
   /** Thickness of the rule. */

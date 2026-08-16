@@ -1,0 +1,19 @@
+<!-- Shown open, because a modal is the one thing a preview cannot demonstrate
+     by being closed. In an application it opens from `open`, or from `show()`
+     on the element.
+
+     A real `<dialog>` opened with `showModal()`. The top layer, the backdrop,
+     Escape and inert-behind are the platform's, so nothing here traps focus:
+     press Tab and it stays inside, press Escape and it asks to close.
+
+     Escape is a request rather than an act. It is intercepted and routed
+     through `helix-close`, so a consumer can refuse it and the dialog and the
+     consumer's state can never disagree. -->
+<helix-dialog label="Delete project" open>
+  <h2 slot="header">Delete project</h2>
+  This removes the project and everything in it. It cannot be undone.
+  <helix-flex slot="footer">
+    <helix-button appearance="tertiary">Cancel</helix-button>
+    <helix-button appearance="danger">Delete</helix-button>
+  </helix-flex>
+</helix-dialog>

@@ -17,6 +17,7 @@ import type {
   HelixBaseCarousel,
   HelixBaseCheckbox,
   HelixBaseCheckboxGroup,
+  HelixBaseDialog,
   HelixBaseDivider,
   HelixBaseDrawer,
   HelixBaseDrilldown,
@@ -969,6 +970,80 @@ instead. */
   "on:helix-change"?: (e: HelixBaseCheckboxHelixChangeElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixBaseCheckboxElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseDialog` component event */
+export type HelixBaseDialogElementEvent<E = Event> = TypedEvent<
+  HelixBaseDialog,
+  E
+>;
+/** `helix-open` event type */
+export type HelixBaseDialogHelixOpenElementEvent =
+  HelixBaseDialogElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBaseDialogHelixCloseElementEvent =
+  HelixBaseDialogElementEvent<HelixCloseEvent>;
+
+export type HelixBaseDialogProps = {
+  /** Accessible name for the dialog. */
+  label?: HelixBaseDialog["label"];
+  /** Whether Escape and the backdrop can close it.
+
+Off for a dialog that must be answered. It does not disable the close
+control a consumer slots in: refusing to be dismissed is not the same as
+refusing to be closed, and a dialog with no way out at all is a trap. */
+  persistent?: HelixBaseDialog["persistent"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  open?: HelixBaseDialog["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "default-open"?: HelixBaseDialog["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  defaultOpen?: HelixBaseDialog["defaultOpen"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixBaseDialog["onOpenChange"];
+
+  /** Fired before it opens, and cancelable. */
+  "onhelix-open"?: (e: HelixBaseDialogHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "onhelix-close"?: (e: HelixBaseDialogHelixCloseElementEvent) => void;
+};
+
+export type HelixBaseDialogSolidJsProps = {
+  /** Accessible name for the dialog. */
+  "prop:label"?: HelixBaseDialog["label"];
+  /** Whether Escape and the backdrop can close it.
+
+Off for a dialog that must be answered. It does not disable the close
+control a consumer slots in: refusing to be dismissed is not the same as
+refusing to be closed, and a dialog with no way out at all is a trap. */
+  "prop:persistent"?: HelixBaseDialog["persistent"];
+  /** Whether the element is open. Setting this enters controlled mode. */
+  "prop:open"?: HelixBaseDialog["open"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "bool:default-open"?: HelixBaseDialog["defaultOpen"];
+  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  "prop:defaultOpen"?: HelixBaseDialog["defaultOpen"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognise; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixBaseDialog["onOpenChange"];
+  /** Fired before it opens, and cancelable. */
+  "on:helix-open"?: (e: HelixBaseDialogHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "on:helix-close"?: (e: HelixBaseDialogHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3887,6 +3962,90 @@ export type CustomElements = {
    */
   "helix-base-checkbox": Partial<
     HelixBaseCheckboxProps & BaseProps<HelixBaseCheckbox> & BaseEvents
+  >;
+
+  /**
+   * A real `<dialog>` opened with `showModal()`, not a div with a role and a
+   * hand-built trap. The platform gives four things that are each a day's work to
+   * reimplement and easy to get subtly wrong: the top layer, so the dialog is
+   * above everything regardless of what `z-index` anyone else wrote; a real
+   * backdrop; Escape; and inert-behind, so the page underneath is not reachable
+   * by pointer, keyboard, or a screen reader's virtual cursor.
+   *
+   * **`open` drives `showModal()`, and every way it can close comes back through
+   * `requestOpen`.** A native dialog can close from three directions: the
+   * property, Escape, and a `<form method="dialog">` submit inside it. Left
+   * alone, two of those would shut the dialog while the consumer's state still
+   * said open, which is the bug that makes a modal impossible to reopen. Escape
+   * is intercepted and routed through the request, so `preventDefault()` on the
+   * `helix-close` refuses it; a close that happens anyway is reflected back.
+   *
+   * **Nothing here traps focus.** `showModal()` does it, and better: `inert` on
+   * the rest of the document is something no JavaScript trap can achieve.
+   * `FocusTrapController` stays for the surfaces that are not modal.
+   *
+   * The regions are bare slots rather than wrappers, for the reason the card's
+   * are: an unassigned `<slot>` is `display: contents` and generates no box, so a
+   * dialog with no footer has no empty band where one would be.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the dialog.
+   * - `persistent`: Whether Escape and the backdrop can close it.
+   *
+   * Off for a dialog that must be answered. It does not disable the close
+   * control a consumer slots in: refusing to be dismissed is not the same as
+   * refusing to be closed, and a dialog with no way out at all is a trap.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The dialog's content.
+   * - `header`: The title, and anything beside it.
+   * - `footer`: The actions.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `show() => void`: Moves focus into the dialog and makes the rest of the page inert.
+   * - `close() => void`: Asks to close, which a consumer may refuse.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `dialog`: The native dialog element.
+   */
+  "helix-base-dialog": Partial<
+    HelixBaseDialogProps & BaseProps<HelixBaseDialog> & BaseEvents
   >;
 
   /**
@@ -7160,6 +7319,93 @@ export type CustomElementsSolidJs = {
     HelixBaseCheckboxProps &
       HelixBaseCheckboxSolidJsProps &
       BaseProps<HelixBaseCheckbox> &
+      BaseEvents
+  >;
+
+  /**
+   * A real `<dialog>` opened with `showModal()`, not a div with a role and a
+   * hand-built trap. The platform gives four things that are each a day's work to
+   * reimplement and easy to get subtly wrong: the top layer, so the dialog is
+   * above everything regardless of what `z-index` anyone else wrote; a real
+   * backdrop; Escape; and inert-behind, so the page underneath is not reachable
+   * by pointer, keyboard, or a screen reader's virtual cursor.
+   *
+   * **`open` drives `showModal()`, and every way it can close comes back through
+   * `requestOpen`.** A native dialog can close from three directions: the
+   * property, Escape, and a `<form method="dialog">` submit inside it. Left
+   * alone, two of those would shut the dialog while the consumer's state still
+   * said open, which is the bug that makes a modal impossible to reopen. Escape
+   * is intercepted and routed through the request, so `preventDefault()` on the
+   * `helix-close` refuses it; a close that happens anyway is reflected back.
+   *
+   * **Nothing here traps focus.** `showModal()` does it, and better: `inert` on
+   * the rest of the document is something no JavaScript trap can achieve.
+   * `FocusTrapController` stays for the surfaces that are not modal.
+   *
+   * The regions are bare slots rather than wrappers, for the reason the card's
+   * are: an unassigned `<slot>` is `display: contents` and generates no box, so a
+   * dialog with no footer has no empty band where one would be.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the dialog.
+   * - `persistent`: Whether Escape and the backdrop can close it.
+   *
+   * Off for a dialog that must be answered. It does not disable the close
+   * control a consumer slots in: refusing to be dismissed is not the same as
+   * refusing to be closed, and a dialog with no way out at all is a trap.
+   * - `open`: Whether the element is open. Setting this enters controlled mode.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is set.
+   * - `isOpen`: The resolved open state, whichever mode the element is in. (property only) (readonly)
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognise; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The dialog's content.
+   * - `header`: The title, and anything beside it.
+   * - `footer`: The actions.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `show() => void`: Moves focus into the dialog and makes the rest of the page inert.
+   * - `close() => void`: Asks to close, which a consumer may refuse.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `dialog`: The native dialog element.
+   */
+  "helix-base-dialog": Partial<
+    HelixBaseDialogProps &
+      HelixBaseDialogSolidJsProps &
+      BaseProps<HelixBaseDialog> &
       BaseEvents
   >;
 

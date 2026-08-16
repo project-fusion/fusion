@@ -1,0 +1,118 @@
+/* The host draws nothing. The dialog is in the top layer, so the host is only
+   where the element lives in the document and has no box worth having. */
+:host {
+  display: contents;
+}
+
+[part="dialog"] {
+  background-color: var(--helix-color-surface-overlay);
+  border: none;
+  border-radius: var(--helix-radii-lg);
+  box-shadow: var(--helix-shadow-lg);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-md);
+  /* The panel takes the width it is given and stops short of the viewport on a
+     narrow screen. `min` rather than a media query: the same rule holds at
+     every width, and there is no breakpoint where it changes character. */
+  inline-size: min(var(--dialog-inline-size, 28rem), calc(100vw - var(--helix-space-xl)));
+  /* Never taller than the screen, and scrolling inside itself when it would be.
+     A dialog is in the top layer, so a page scroll cannot reach it. */
+  max-block-size: calc(100dvh - var(--helix-space-xl));
+  overflow-y: auto;
+  padding: var(--dialog-inset, var(--helix-space-lg));
+}
+
+:host([appearance="compact"]) [part="dialog"] {
+  --dialog-inline-size: 22rem;
+}
+
+:host([appearance="wide"]) [part="dialog"] {
+  --dialog-inline-size: 44rem;
+}
+
+/* The platform's own scrim, in the top layer with the dialog. A div positioned
+   behind it would need a `z-index` that beats whatever the page already has,
+   which is a fight nobody wins for long. */
+/* The token where it is available, and a literal where the platform will not
+ * provide it.
+ *
+ * `::backdrop` is a pseudo-element in the top layer and cannot see custom
+ * properties declared outside the shadow tree, which is every Helix token.
+ * Measured in Chromium: a literal colour applies, a property declared on
+ * `:host` applies, and `--helix-color-overlay` comes out as nothing, so the
+ * scrim was fully transparent and the page behind a modal was not dimmed at
+ * all. Re-declaring the token onto the host does not help either, because a
+ * custom property is substituted where it is *used*, so the reference simply
+ * fails one level further down.
+ *
+ * A `var()` fallback does not rescue it either, and that is worth knowing: the
+ * fallback fires only when a property is *unset*. `--helix-color-overlay` is
+ * set and inherited fine; what fails is that its own value references
+ * `--_helix-neutral-950`, which the backdrop cannot see, so the whole thing
+ * resolves to invalid rather than to absent and the fallback never runs.
+ *
+ * So the value is literal, and it is the only literal colour in this library.
+ * It is the same mix `--helix-color-overlay` is, written out. The duplication
+ * is real and is the platform's price: if that token moves, this moves with it,
+ * and there is nothing that will tell you.
+ *
+ * `light-dark()` wraps the two mixes rather than the two percentages, because
+ * it returns a colour: a percentage inside it is invalid. Written the other way
+ * round the whole declaration collapsed to a tenth of an alpha, which is a
+ * scrim you can barely see rather than an error you can find. The same trap the
+ * option's highlight hit, and it caught me twice. */
+[part="dialog"]::backdrop {
+  background-color: light-dark(
+    color-mix(in oklab, black 40%, transparent),
+    color-mix(in oklab, black 64%, transparent)
+  );
+}
+
+/* The heading, whatever the consumer slotted, without a wrapper to give it a
+   box of its own. A dialog with no header has no empty band where one is not. */
+::slotted([slot="header"]) {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  margin: var(--helix-space-none);
+}
+
+/* Actions at the trailing edge, which is where a reader looks for the way out
+   of something modal. */
+::slotted([slot="footer"]) {
+  display: flex;
+  gap: var(--helix-space-xs);
+  justify-content: flex-end;
+}
+
+/* It arrives rather than appearing. A modal that snaps in gives no sense of
+   where it came from, and the scrim fading under it is what says the page is
+   still there. */
+@media (prefers-reduced-motion: no-preference) {
+  [part="dialog"][open] {
+    animation: helix-dialog-in var(--helix-duration-normal) var(--helix-easing-decelerate);
+  }
+
+  [part="dialog"][open]::backdrop {
+    animation: helix-dialog-scrim var(--helix-duration-normal) var(--helix-easing-standard);
+  }
+}
+
+@keyframes helix-dialog-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--helix-space-sm);
+  }
+}
+
+@keyframes helix-dialog-scrim {
+  from {
+    opacity: 0;
+  }
+}
