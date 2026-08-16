@@ -4,6 +4,11 @@
    rendering mistake rather than as a bar. Square on the accent edge, rounded on
    the other three, so the bar is a bar. */
 :host {
+  /* Its own size rather than the page's. A callout is an aside inside prose, so
+     it sets its type a step down from the body it interrupts: inheriting left
+     it at 15 while its own title was 14, which is a title smaller than the text
+     under it. */
+  font-size: var(--helix-text-sm);
   background-color: var(
     --callout-background-color,
     color-mix(in oklab, var(--_callout-color) 10%, transparent)
@@ -63,6 +68,12 @@ slot[name="icon"]::slotted(*) {
    and the content sits where it would have anyway. */
 slot[name="title"]::slotted(*) {
   color: var(--helix-color-foreground);
+  /* Its own line. A slotted `<span>` is inline by default, so the title and the
+     first words of the content ran together as one sentence in two weights,
+     which reads as emphasis rather than as a heading. The title is optional and
+     this costs nothing when it is absent: a bare slot with nothing assigned
+     generates no box, so the content sits exactly where it would have. */
+  display: block;
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-semibold);
   margin: var(--helix-space-none);

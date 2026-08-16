@@ -1,15 +1,28 @@
 import { customElement, HelixElement, hostAria } from '@helix-io/core'
-import { checkCircle, type HelixIcon, info, warning, xCircleFill } from '@helix-io/icons'
+import {
+  checkCircleFill,
+  type HelixIcon,
+  infoFill,
+  warningFill,
+  xCircleFill,
+} from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /** Icon and accessible name for each severity. */
+/* Filled at every severity, which is what it already was at one of them.
+   `danger` took `xCircleFill` and the other three took outlines, so a set meant
+   to be read as one vocabulary had one member drawn a different way. Filled
+   rather than outlined for all four, because a severity mark is a status
+   indicator and not an action: it wants to read at a glance and at a small
+   size, where an outline at this weight loses its interior. All four exist in
+   the generated set already. */
 const SEVERITIES: Record<string, { icon: HelixIcon; label: string }> = {
   danger: { icon: xCircleFill, label: 'Error' },
-  info: { icon: info, label: 'Information' },
-  success: { icon: checkCircle, label: 'Success' },
-  warning: { icon: warning, label: 'Warning' },
+  info: { icon: infoFill, label: 'Information' },
+  success: { icon: checkCircleFill, label: 'Success' },
+  warning: { icon: warningFill, label: 'Warning' },
 }
 
 /**
