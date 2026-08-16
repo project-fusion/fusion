@@ -43,12 +43,39 @@ for (const module of JSON.parse(readFileSync(MANIFEST, 'utf8')).modules ?? []) {
     if (!declaration.tagName) {
       continue
     }
+    const attributes = new Set((declaration.attributes ?? []).map((a) => a.name))
     tags.set(declaration.tagName, {
-      attributes: new Set((declaration.attributes ?? []).map((a) => a.name)),
+      attributes,
+      /* Which attributes hand the state to a consumer, derived rather than
+         listed: an attribute is a controlled state exactly when the element
+         also declares its `default-` sibling, because that pair is what the
+         model is. Twenty elements and twenty-four attributes fall out of it
+         today, and a twenty-fifth is covered the day someone adds it, which a
+         list in this file would not be. */
+      controlled: new Set([...attributes].filter((name) => attributes.has(`default-${name}`))),
       slots: new Set((declaration.slots ?? []).map((s) => s.name).filter(Boolean)),
     })
   }
 }
+
+/**
+ * Says why a declared state is wrong here, in the words a reader needs.
+ *
+ * The trap, and the reason this check exists: `value="Ada"` is the native seed
+ * and in Helix it is a claim of ownership, so the control announces its changes
+ * and waits to be told. Six examples were in exactly that state, silently, and
+ * a reader opening the sandbox found a calendar whose arrows did nothing.
+ *
+ * **What makes it absolute here rather than a judgement call.** Nothing in an
+ * example can answer. An example is HTML and a stylesheet, the sandbox refuses
+ * a `<script>` (`innerHTML` does), and the smoke harness is handed only those
+ * two files. So there is no correct way to write a controlled control in one,
+ * and the runtime audit that catches this elsewhere fires only once a reader
+ * has already interacted with something broken.
+ */
+const declaresState = (where, tag, name) =>
+  `${where}: <${tag}> declares "${name}", which hands that state to a consumer. ` +
+  `Nothing in an example can answer, so the control will not respond. Use "default-${name}".`
 
 const problems = []
 /* Family directories. `src` also holds `index.ts`, which is not one, and
@@ -145,6 +172,10 @@ for (const family of families) {
         }
         if (!known.attributes.has(name)) {
           problems.push(`${where}: <${tag}> has no attribute "${name}"`)
+          continue
+        }
+        if (known.controlled.has(name)) {
+          problems.push(declaresState(where, tag, name))
         }
       }
     }
@@ -181,6 +212,25 @@ for (const dir of DOCS) {
     for (const [, fence] of text.matchAll(/```html\n([\s\S]*?)```/g)) {
       for (const [, tag] of fence.matchAll(/<([a-z][a-z0-9-]*)[^>]*\sstyle=/g)) {
         problems.push(`${dir}/${file}: <${tag}> carries a style attribute in an HTML sample`)
+      }
+
+      /* And the same rule about state, for the same reason as the style one: a
+         reader copies what is in front of them. An HTML fence is markup with no
+         script by definition, so a declared state in one is a sample that does
+         not work when it is pasted. A prose mention is untouched, and a page
+         that means to show controlled use writes the listener beside it, which
+         makes it a `ts` fence rather than an `html` one. */
+      for (const [, tag, rest] of fence.matchAll(/<(helix-[a-z0-9-]+)([^>]*)>/g)) {
+        const known = tags.get(tag)
+        if (!known) {
+          continue
+        }
+        const bare = rest.replace(/=\s*"[^"]*"/g, '=').replace(/=\s*'[^']*'/g, '=')
+        for (const [, name] of bare.matchAll(/(?:^|\s)([a-z][a-z0-9-]*)/g)) {
+          if (known.controlled.has(name)) {
+            problems.push(declaresState(`${dir}/${file}`, tag, name))
+          }
+        }
       }
     }
   }
