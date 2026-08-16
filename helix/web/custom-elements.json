@@ -8290,7 +8290,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/empty-state/index.ts",
+      "path": "src/empty/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -8298,14 +8298,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/empty-state/root/empty-state-root.js"
+            "module": "src/empty/root/empty-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/empty-state/root/empty-state-root.css.ts",
+      "path": "src/empty/root/empty-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -8318,23 +8318,23 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/empty-state/root/empty-state-root.css.ts"
+            "module": "src/empty/root/empty-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/empty-state/root/empty-state-root.ts",
+      "path": "src/empty/root/empty-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Centered and given room, because an empty state is the only thing on screen\nand crowding it against the top edge makes the region look broken rather than\nempty.",
-          "name": "HelixEmptyState",
+          "description": "Centered and given room, because an empty view is the only thing on screen\nand crowding it against the top edge makes the region look broken rather than\nempty.",
+          "name": "HelixEmpty",
           "cssProperties": [
             {
               "description": "Space around the whole block.",
-              "name": "--empty-state-inset"
+              "name": "--empty-inset"
             }
           ],
           "members": [
@@ -8355,12 +8355,12 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty state almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
+              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty view almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
               "attribute": "no-announce",
               "reflects": true,
               "inheritedFrom": {
-                "name": "HelixBaseEmptyState",
-                "module": "src/empty-state/root/empty-state-root.ts"
+                "name": "HelixBaseEmpty",
+                "module": "src/empty/root/empty-root.ts"
               }
             },
             {
@@ -8448,87 +8448,87 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty state almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
+              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty view almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
               "fieldName": "noAnnounce",
               "inheritedFrom": {
-                "name": "HelixBaseEmptyState",
-                "module": "src/empty-state/root/empty-state-root.ts"
+                "name": "HelixBaseEmpty",
+                "module": "src/empty/root/empty-root.ts"
               }
             }
           ],
           "superclass": {
-            "name": "HelixBaseEmptyState",
+            "name": "HelixBaseEmpty",
             "package": "@helix-io/headless"
           },
           "summary": "Says that a region has nothing in it, and what to do about it.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/empty-state",
+            "documentation": "https://helix.fusion.dev/components/empty",
             "aliases": [
               "Placeholder",
               "NoResults",
               "Blank"
             ],
             "tier": "styled",
-            "group": "EmptyState",
+            "group": "Empty",
             "part": "Root"
           },
-          "tagName": "helix-empty-state",
+          "tagName": "helix-empty",
           "customElement": true,
           "slots": [
             {
               "description": "A mark above the heading.",
               "name": "icon",
               "inheritedFrom": {
-                "name": "HelixBaseEmptyState",
-                "module": "src/empty-state/root/empty-state-root.ts"
+                "name": "HelixBaseEmpty",
+                "module": "src/empty/root/empty-root.ts"
               }
             },
             {
               "description": "What is missing.",
               "name": "heading",
               "inheritedFrom": {
-                "name": "HelixBaseEmptyState",
-                "module": "src/empty-state/root/empty-state-root.ts"
+                "name": "HelixBaseEmpty",
+                "module": "src/empty/root/empty-root.ts"
               }
             },
             {
               "description": "Why, and what to do about it.",
               "name": "",
               "inheritedFrom": {
-                "name": "HelixBaseEmptyState",
-                "module": "src/empty-state/root/empty-state-root.ts"
+                "name": "HelixBaseEmpty",
+                "module": "src/empty/root/empty-root.ts"
               }
             },
             {
               "description": "The way out.",
               "name": "actions",
               "inheritedFrom": {
-                "name": "HelixBaseEmptyState",
-                "module": "src/empty-state/root/empty-state-root.ts"
+                "name": "HelixBaseEmpty",
+                "module": "src/empty/root/empty-root.ts"
               }
             }
           ],
-          "modulePath": "src/empty-state/root/empty-state-root.ts",
-          "definitionPath": "src/empty-state/root/empty-state-root.ts"
+          "modulePath": "src/empty/root/empty-root.ts",
+          "definitionPath": "src/empty/root/empty-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixEmptyState",
+          "name": "HelixEmpty",
           "declaration": {
-            "name": "HelixEmptyState",
-            "module": "src/empty-state/root/empty-state-root.ts"
+            "name": "HelixEmpty",
+            "module": "src/empty/root/empty-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-empty-state",
+          "name": "helix-empty",
           "declaration": {
-            "name": "HelixEmptyState",
-            "module": "src/empty-state/root/empty-state-root.ts"
+            "name": "HelixEmpty",
+            "module": "src/empty/root/empty-root.ts"
           }
         }
       ]
@@ -9894,7 +9894,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/empty-state/index.js"
+            "module": "src/empty/index.js"
           }
         },
         {

@@ -10,7 +10,7 @@ import { property } from 'lit/decorators.js'
  * to load, so this exists to tell the difference: what would be here, and the
  * one action that would put something here.
  *
- * `role="status"` on a polite live region, because an empty state usually
+ * `role="status"` on a polite live region, because an empty view usually
  * arrives in place of content that was being fetched. Announcing it is the only
  * way a screen-reader user learns the search returned nothing, rather than
  * being left waiting.
@@ -22,19 +22,19 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Placeholder, NoResults, Blank
- * @documentation https://helix.fusion.dev/components/empty-state
+ * @documentation https://helix.fusion.dev/components/empty
  *
  * @slot icon - A mark above the heading.
  * @slot heading - What is missing.
  * @slot - Why, and what to do about it.
  * @slot actions - The way out.
  */
-@customElement('helix-base-empty-state')
-export class HelixBaseEmptyState extends HelixElement {
+@customElement('helix-base-empty')
+export class HelixBaseEmpty extends HelixElement {
   /**
    * Whether the state is announced when it appears.
    *
-   * On by default: an empty state almost always replaces something that was
+   * On by default: an empty view almost always replaces something that was
    * loading. Turn it off for one that was on the page from the start, which
    * has nothing to announce because nothing changed.
    */
@@ -57,6 +57,6 @@ export class HelixBaseEmptyState extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-empty-state': HelixBaseEmptyState
+    'helix-base-empty': HelixBaseEmpty
   }
 }

@@ -24,7 +24,7 @@ import type {
   HelixDrawer,
   HelixDrilldown,
   HelixDrilldownItem,
-  HelixEmptyState,
+  HelixEmpty,
   HelixFlex,
   HelixFormElement,
   HelixGrid,
@@ -1272,38 +1272,38 @@ export type HelixDrilldownSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixEmptyStateProps = {
+export type HelixEmptyProps = {
   /** Whether the state sits on a surface of its own. */
-  appearance?: HelixEmptyState["appearance"];
+  appearance?: HelixEmpty["appearance"];
   /** Whether the state is announced when it appears.
 
-On by default: an empty state almost always replaces something that was
+On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "no-announce"?: HelixEmptyState["noAnnounce"];
+  "no-announce"?: HelixEmpty["noAnnounce"];
   /** Whether the state is announced when it appears.
 
-On by default: an empty state almost always replaces something that was
+On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  noAnnounce?: HelixEmptyState["noAnnounce"];
+  noAnnounce?: HelixEmpty["noAnnounce"];
 };
 
-export type HelixEmptyStateSolidJsProps = {
+export type HelixEmptySolidJsProps = {
   /** Whether the state sits on a surface of its own. */
-  "prop:appearance"?: HelixEmptyState["appearance"];
+  "prop:appearance"?: HelixEmpty["appearance"];
   /** Whether the state is announced when it appears.
 
-On by default: an empty state almost always replaces something that was
+On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "bool:no-announce"?: HelixEmptyState["noAnnounce"];
+  "bool:no-announce"?: HelixEmpty["noAnnounce"];
   /** Whether the state is announced when it appears.
 
-On by default: an empty state almost always replaces something that was
+On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "prop:noAnnounce"?: HelixEmptyState["noAnnounce"];
+  "prop:noAnnounce"?: HelixEmpty["noAnnounce"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4334,7 +4334,7 @@ export type CustomElements = {
   >;
 
   /**
-   * Centered and given room, because an empty state is the only thing on screen
+   * Centered and given room, because an empty view is the only thing on screen
    * and crowding it against the top edge makes the region look broken rather than
    * empty.
    *
@@ -4345,7 +4345,7 @@ export type CustomElements = {
    * - `appearance`: Whether the state sits on a surface of its own.
    * - `no-announce`/`noAnnounce`: Whether the state is announced when it appears.
    *
-   * On by default: an empty state almost always replaces something that was
+   * On by default: an empty view almost always replaces something that was
    * loading. Turn it off for one that was on the page from the start, which
    * has nothing to announce because nothing changed.
    *
@@ -4362,11 +4362,9 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--empty-state-inset`: Space around the whole block. (default: `undefined`)
+   * - `--empty-inset`: Space around the whole block. (default: `undefined`)
    */
-  "helix-empty-state": Partial<
-    HelixEmptyStateProps & BaseProps<HelixEmptyState> & BaseEvents
-  >;
+  "helix-empty": Partial<HelixEmptyProps & BaseProps<HelixEmpty> & BaseEvents>;
 
   /**
    * The host is the flex container itself and the only child is a slot, so the
@@ -7579,7 +7577,7 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Centered and given room, because an empty state is the only thing on screen
+   * Centered and given room, because an empty view is the only thing on screen
    * and crowding it against the top edge makes the region look broken rather than
    * empty.
    *
@@ -7590,7 +7588,7 @@ export type CustomElementsSolidJs = {
    * - `appearance`: Whether the state sits on a surface of its own.
    * - `no-announce`/`noAnnounce`: Whether the state is announced when it appears.
    *
-   * On by default: an empty state almost always replaces something that was
+   * On by default: an empty view almost always replaces something that was
    * loading. Turn it off for one that was on the page from the start, which
    * has nothing to announce because nothing changed.
    *
@@ -7607,12 +7605,12 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--empty-state-inset`: Space around the whole block. (default: `undefined`)
+   * - `--empty-inset`: Space around the whole block. (default: `undefined`)
    */
-  "helix-empty-state": Partial<
-    HelixEmptyStateProps &
-      HelixEmptyStateSolidJsProps &
-      BaseProps<HelixEmptyState> &
+  "helix-empty": Partial<
+    HelixEmptyProps &
+      HelixEmptySolidJsProps &
+      BaseProps<HelixEmpty> &
       BaseEvents
   >;
 
@@ -9843,7 +9841,7 @@ export type CustomCssProperties = {
   /** Width of the region. */
   "--drilldown-inline-size"?: string;
   /** Space around the whole block. */
-  "--empty-state-inset"?: string;
+  "--empty-inset"?: string;
   /** Column width floor when `min` is set. */
   "--grid-min"?: string;
   /** Edge length of the control. */

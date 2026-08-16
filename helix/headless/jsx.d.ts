@@ -21,7 +21,7 @@ import type {
   HelixBaseDrawer,
   HelixBaseDrilldown,
   HelixBaseDrilldownItem,
-  HelixBaseEmptyState,
+  HelixBaseEmpty,
   HelixBaseIcon,
   HelixBaseInput,
   HelixBaseKbd,
@@ -1194,34 +1194,34 @@ export type HelixBaseDrilldownSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseEmptyStateProps = {
+export type HelixBaseEmptyProps = {
   /** Whether the state is announced when it appears.
 
-On by default: an empty state almost always replaces something that was
+On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "no-announce"?: HelixBaseEmptyState["noAnnounce"];
+  "no-announce"?: HelixBaseEmpty["noAnnounce"];
   /** Whether the state is announced when it appears.
 
-On by default: an empty state almost always replaces something that was
+On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  noAnnounce?: HelixBaseEmptyState["noAnnounce"];
+  noAnnounce?: HelixBaseEmpty["noAnnounce"];
 };
 
-export type HelixBaseEmptyStateSolidJsProps = {
+export type HelixBaseEmptySolidJsProps = {
   /** Whether the state is announced when it appears.
 
-On by default: an empty state almost always replaces something that was
+On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "bool:no-announce"?: HelixBaseEmptyState["noAnnounce"];
+  "bool:no-announce"?: HelixBaseEmpty["noAnnounce"];
   /** Whether the state is announced when it appears.
 
-On by default: an empty state almost always replaces something that was
+On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "prop:noAnnounce"?: HelixBaseEmptyState["noAnnounce"];
+  "prop:noAnnounce"?: HelixBaseEmpty["noAnnounce"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4115,7 +4115,7 @@ export type CustomElements = {
    * to load, so this exists to tell the difference: what would be here, and the
    * one action that would put something here.
    *
-   * `role="status"` on a polite live region, because an empty state usually
+   * `role="status"` on a polite live region, because an empty view usually
    * arrives in place of content that was being fetched. Announcing it is the only
    * way a screen-reader user learns the search returned nothing, rather than
    * being left waiting.
@@ -4130,7 +4130,7 @@ export type CustomElements = {
    *
    * - `no-announce`/`noAnnounce`: Whether the state is announced when it appears.
    *
-   * On by default: an empty state almost always replaces something that was
+   * On by default: an empty view almost always replaces something that was
    * loading. Turn it off for one that was on the page from the start, which
    * has nothing to announce because nothing changed.
    *
@@ -4143,8 +4143,8 @@ export type CustomElements = {
    * - `(default)`: Why, and what to do about it.
    * - `actions`: The way out.
    */
-  "helix-base-empty-state": Partial<
-    HelixBaseEmptyStateProps & BaseProps<HelixBaseEmptyState> & BaseEvents
+  "helix-base-empty": Partial<
+    HelixBaseEmptyProps & BaseProps<HelixBaseEmpty> & BaseEvents
   >;
 
   /**
@@ -7271,7 +7271,7 @@ export type CustomElementsSolidJs = {
    * to load, so this exists to tell the difference: what would be here, and the
    * one action that would put something here.
    *
-   * `role="status"` on a polite live region, because an empty state usually
+   * `role="status"` on a polite live region, because an empty view usually
    * arrives in place of content that was being fetched. Announcing it is the only
    * way a screen-reader user learns the search returned nothing, rather than
    * being left waiting.
@@ -7286,7 +7286,7 @@ export type CustomElementsSolidJs = {
    *
    * - `no-announce`/`noAnnounce`: Whether the state is announced when it appears.
    *
-   * On by default: an empty state almost always replaces something that was
+   * On by default: an empty view almost always replaces something that was
    * loading. Turn it off for one that was on the page from the start, which
    * has nothing to announce because nothing changed.
    *
@@ -7299,10 +7299,10 @@ export type CustomElementsSolidJs = {
    * - `(default)`: Why, and what to do about it.
    * - `actions`: The way out.
    */
-  "helix-base-empty-state": Partial<
-    HelixBaseEmptyStateProps &
-      HelixBaseEmptyStateSolidJsProps &
-      BaseProps<HelixBaseEmptyState> &
+  "helix-base-empty": Partial<
+    HelixBaseEmptyProps &
+      HelixBaseEmptySolidJsProps &
+      BaseProps<HelixBaseEmpty> &
       BaseEvents
   >;
 

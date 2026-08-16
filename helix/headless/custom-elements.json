@@ -6346,7 +6346,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/empty-state/index.ts",
+      "path": "src/empty/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -6354,19 +6354,19 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/empty-state/root/empty-state-root.js"
+            "module": "src/empty/root/empty-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/empty-state/root/empty-state-root.ts",
+      "path": "src/empty/root/empty-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "An empty region with no explanation is indistinguishable from one that failed\nto load, so this exists to tell the difference: what would be here, and the\none action that would put something here.\n\n`role=\"status\"` on a polite live region, because an empty state usually\narrives in place of content that was being fetched. Announcing it is the only\nway a screen-reader user learns the search returned nothing, rather than\nbeing left waiting.\n\nEvery region is a bare slot. The reference ships an `empty-state-heading` and\nan `empty-state-actions` whose only job is to assign themselves a slot on\nconnect, which is a component for something the consumer can write.",
-          "name": "HelixBaseEmptyState",
+          "description": "An empty region with no explanation is indistinguishable from one that failed\nto load, so this exists to tell the difference: what would be here, and the\none action that would put something here.\n\n`role=\"status\"` on a polite live region, because an empty view usually\narrives in place of content that was being fetched. Announcing it is the only\nway a screen-reader user learns the search returned nothing, rather than\nbeing left waiting.\n\nEvery region is a bare slot. The reference ships an `empty-state-heading` and\nan `empty-state-actions` whose only job is to assign themselves a slot on\nconnect, which is a component for something the consumer can write.",
+          "name": "HelixBaseEmpty",
           "slots": [
             {
               "description": "A mark above the heading.",
@@ -6393,7 +6393,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty state almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
+              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty view almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
               "attribute": "no-announce",
               "reflects": true
             },
@@ -6474,7 +6474,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty state almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
+              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty view almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
               "fieldName": "noAnnounce"
             }
           ],
@@ -6486,37 +6486,37 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/empty-state",
+            "documentation": "https://helix.fusion.dev/components/empty",
             "aliases": [
               "Placeholder",
               "NoResults",
               "Blank"
             ],
             "tier": "headless",
-            "group": "BaseEmptyState",
+            "group": "BaseEmpty",
             "part": "Root"
           },
-          "tagName": "helix-base-empty-state",
+          "tagName": "helix-base-empty",
           "customElement": true,
-          "modulePath": "src/empty-state/root/empty-state-root.ts",
-          "definitionPath": "src/empty-state/root/empty-state-root.ts"
+          "modulePath": "src/empty/root/empty-root.ts",
+          "definitionPath": "src/empty/root/empty-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseEmptyState",
+          "name": "HelixBaseEmpty",
           "declaration": {
-            "name": "HelixBaseEmptyState",
-            "module": "src/empty-state/root/empty-state-root.ts"
+            "name": "HelixBaseEmpty",
+            "module": "src/empty/root/empty-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-empty-state",
+          "name": "helix-base-empty",
           "declaration": {
-            "name": "HelixBaseEmptyState",
-            "module": "src/empty-state/root/empty-state-root.ts"
+            "name": "HelixBaseEmpty",
+            "module": "src/empty/root/empty-root.ts"
           }
         }
       ]
@@ -6865,7 +6865,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/empty-state/index.js"
+            "module": "src/empty/index.js"
           }
         },
         {

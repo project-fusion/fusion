@@ -50,7 +50,7 @@
     0.985 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
   --_helix-neutral-100: oklch(
-    0.96 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+    0.97 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
   /* 0.94, not 0.91. The light end of this ramp is where every surface lives,
      and it was accelerating through the range they need: .015 from white to 50,
@@ -63,8 +63,19 @@
      Only `surface-sunken` reads this step in light, so moving it moves that and
      nothing else. Below here the ramp can accelerate as much as it likes: 300
      onwards are borders and text, where the eye wants the gaps to open up. */
+  /* 0.96, with 100 lifted to 0.97 above it. `surface-sunken` reads this step
+     and was reported heavy three times running; each time it moved on its own,
+     and by 0.95 it was one hundredth from `raised` and the two were the same
+     colour to any eye.
+
+     So the pair moves together. Lifting only this one would have put a field's
+     fill lighter than a hovered row, which inverts what the names mean, and
+     lifting only that one would not have answered the report. The ladder is
+     what has to stay ordered: surface 0.985, raised 0.97, sunken 0.96, each a
+     step nearer the page than the last and none of them collapsed into its
+     neighbour. */
   --_helix-neutral-200: oklch(
-    0.95 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
+    0.96 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
   );
   --_helix-neutral-300: oklch(
     0.84 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
