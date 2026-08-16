@@ -15,10 +15,12 @@
  * from named against it. Documenting both tiers would print most of the library
  * twice to say the same thing.
  *
- * **First paragraph in the table, and nothing after it.** A property's full
- * reasoning belongs on the component, where it is written, and on
- * `/components/<family>`, which renders the manifest in a browser. A table cell
- * holding four paragraphs is a table nobody reads.
+ * **First paragraph in a table cell, and the whole thing everywhere else.** A
+ * cell holding four paragraphs is a table nobody reads, so a property's own
+ * reasoning stays on the component and on `/components/<family>`, which renders
+ * the manifest in a browser. A component's description is not in a cell: it is
+ * prose under a heading, and truncating that threw away everything `Calendar`
+ * says about its three modes.
  *
  * Run `bun run reference` to write it, and `bun run check:reference` to fail
  * when it is behind. `verify` runs the check rather than the writer, for the
@@ -148,7 +150,7 @@ for (const [family, parts] of [...families].sort(([a], [b]) => a.localeCompare(b
       lines.push(`Extends \`${superclass.name}\`.`, '')
     }
     if (description) {
-      lines.push(cell(description), '')
+      lines.push(description.trim(), '')
     }
 
     const attributeOf = new Map(attributes.map((one) => [one.fieldName ?? one.name, one.name]))

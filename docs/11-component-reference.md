@@ -18,7 +18,9 @@ Groups collapsible sections, one open at a time by default.
 
 Extends `HelixBaseAccordion`.
 
-Items sit in a single bordered stack, sharing one rule between neighbours rather than each drawing its own, so the seam between two items is one pixel and not two.
+Items sit in a single bordered stack, sharing one rule between neighbours
+rather than each drawing its own, so the seam between two items is one pixel
+and not two.
 
 #### Properties
 
@@ -53,7 +55,12 @@ One collapsible section of an accordion.
 
 Extends `HelixBaseAccordionItem`.
 
-The open and close transition animates `grid-template-rows` from `0fr` to `1fr`, which is the only technique that reaches the content's intrinsic height without measuring it in JavaScript. It is disabled under `prefers-reduced-motion`.
+The open and close transition animates `grid-template-rows` from `0fr` to
+`1fr`, which is the only technique that reaches the content's intrinsic
+height without measuring it in JavaScript. It is disabled under
+`prefers-reduced-motion`.
+
+Usable on its own as a disclosure, with no accordion around it.
 
 #### Properties
 
@@ -111,7 +118,9 @@ A page-level message above the masthead, which can be dismissed.
 
 Extends `HelixBaseAnnouncement`.
 
-Full width and flat, with the severity carried by a tinted fill and a hairline beneath rather than by a border on four sides: an announcement is a band across the top of the page, not a box that happens to be wide.
+Full width and flat, with the severity carried by a tinted fill and a
+hairline beneath rather than by a border on four sides: an announcement is a
+band across the top of the page, not a box that happens to be wide.
 
 #### Properties
 
@@ -157,7 +166,10 @@ Page-level banner holding brand, navigation, and actions.
 
 Extends `HelixBaseAppHeader`.
 
-Sticky and translucent, drawn on the material tokens so the page content blurs behind it rather than being hidden by an opaque bar. The separating rule and shadow appear only once the page has scrolled, which keeps the bar flat against the hero and lifts it off the content afterwards.
+Sticky and translucent, drawn on the material tokens so the page content
+blurs behind it rather than being hidden by an opaque bar. The separating
+rule and shadow appear only once the page has scrolled, which keeps the bar
+flat against the hero and lifts it off the content afterwards.
 
 #### Properties
 
@@ -204,7 +216,10 @@ Represents a person or entity with an image or their initials.
 
 Extends `HelixBaseAvatar`.
 
-Initials scale with the avatar rather than being sized per size, because the font size is set in `em` against the avatar's own dimension. One rule covers every size, including one a consumer sets themselves through `--avatar-size`.
+Initials scale with the avatar rather than being sized per size, because the
+font size is set in `em` against the avatar's own dimension. One rule covers
+every size, including one a consumer sets themselves through
+`--avatar-size`.
 
 #### Properties
 
@@ -249,7 +264,17 @@ Overlapping avatars, with a count for the ones not shown.
 
 Extends `HelixBaseAvatarGroup`.
 
-They overlap by a step of space, which is enough to read as a stack without the faces occluding each other. Each carries a ring in the page's own background colour, because a stack with no separation between its members reads as one shape rather than several: the ring is what makes the edge of each avatar visible against the one behind it.
+They overlap by a step of space, which is enough to read as a stack without
+the faces occluding each other. Each carries a ring in the page's own
+background colour, because a stack with no separation between its members
+reads as one shape rather than several: the ring is what makes the edge of
+each avatar visible against the one behind it.
+
+Each avatar is drawn over the one before it, which falls out of document
+order and needs no `z-index`. The familiar trick for putting the *first*
+avatar on top is `row-reverse`, and it also reverses the row: the person
+written first appears last. A facepile whose reading order is the reverse of
+its markup is the worse trade of the two.
 
 #### Properties
 
@@ -287,7 +312,9 @@ Attaches a count or a presence mark to another element.
 
 Extends `HelixBaseBadge`.
 
-The indicator carries a ring in the page's own background color, so it stays legible where it overlaps the thing it is pinned to. Without it a dark badge on a dark icon reads as a bite taken out of the icon.
+The indicator carries a ring in the page's own background color, so it stays
+legible where it overlaps the thing it is pinned to. Without it a dark badge
+on a dark icon reads as a bite taken out of the icon.
 
 #### Properties
 
@@ -326,7 +353,10 @@ A passage set off from the prose around it.
 
 Extends `HelixBaseBlockquote`.
 
-Set larger than body text on the display face, because a pulled quotation is a change of voice and the type is what says so. No quotation marks are drawn: the size and the space around it already set the passage apart, and marks on top of that are the same thing said twice.
+Set larger than body text on the display face, because a pulled quotation is
+a change of voice and the type is what says so. No quotation marks are drawn:
+the size and the space around it already set the passage apart, and marks on
+top of that are the same thing said twice.
 
 #### Properties
 
@@ -362,7 +392,8 @@ Shows the path to the current page.
 
 Extends `HelixBaseBreadcrumbs`.
 
-A single wrapping line by default. The trail wraps rather than scrolling, because a truncated path tells the reader less than a two-line one.
+A single wrapping line by default. The trail wraps rather than scrolling,
+because a truncated path tells the reader less than a two-line one.
 
 #### Slots
 
@@ -389,7 +420,14 @@ One step in a breadcrumb trail.
 
 Extends `HelixBaseBreadcrumb`.
 
-The separator is hidden on the first item with `:host(:first-child)`, so no item needs to know its own index and the parent needs no coordination.
+The separator is hidden on the first item with `:host(:first-child)`, so no
+item needs to know its own index and the parent needs no coordination.
+
+The link carries `data-link="quiet"`, the recipe navigation uses everywhere
+else, which is what owns its color. Under the pointer it reads as a subtle
+button. That part is styled from in here: the base layer sets color and
+text-decoration on an anchor and nothing else, so the outer tree wins those
+and leaves box and background to `::slotted`.
 
 #### Properties
 
@@ -425,7 +463,10 @@ Triggers an action, submits a form, or navigates.
 
 Extends `HelixBaseButton`.
 
-Four appearances and three sizes, all drawn on one control so a link styled as a button and a real button are indistinguishable to a reader. The focus ring is declared here rather than inherited, because the base layer's `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+Four appearances and three sizes, all drawn on one control so a link styled
+as a button and a real button are indistinguishable to a reader. The focus
+ring is declared here rather than inherited, because the base layer's
+`:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
 
 #### Properties
 
@@ -473,7 +514,13 @@ Groups related buttons into one control.
 
 Extends `HelixBaseButtonGroup`.
 
-The buttons are joined into a single shape: the outer corners keep their radius, the inner ones lose it, and adjacent borders collapse into one line.
+The buttons are joined into a single shape: the outer corners keep their
+radius, the inner ones lose it, and adjacent borders collapse into one line.
+
+That joining is in the base layer, paired with `data-button` the way the
+button's own box is, because the corner belongs to the control inside each
+button's shadow root and a rule in here cannot reach it. The same rule
+therefore serves a consumer's own anchor styled as a button.
 
 #### Properties
 
@@ -496,24 +543,46 @@ Shows a month, and takes a date from it.
 
 Extends `HelixBaseCalendar`.
 
-Six week rows always, so the grid keeps one height and a month change does not move whatever sits beneath it.
+Six week rows always, so the grid keeps one height and a month change does
+not move whatever sits beneath it.
+
+The column track is wider than the day, and the day is centred in it. The
+difference is the space between days, which belongs to the track rather than
+to a `gap`, so a range can paint across the whole track and stay continuous.
+
+Days from the neighbouring months stay in place and stay selectable, marked
+quieter rather than hidden, so the first and last weeks are whole and the
+grid reads as a continuous run of dates.
 
 #### Properties
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseCalendar` | Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. |
 | `disableDays` | `disable-days` | `string` | `''` | `HelixBaseCalendar` | Days of the week that cannot be chosen, comma separated, `0` to `6`. |
 | `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseCalendar` | First column of the week, `0` for Sunday through `6` for Saturday. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `invalid` | `invalid` | `boolean` | `false` | `HelixBaseCalendar` | Whether the current selection fails validation. |
 | `label` | `label` | `string` | `'Calendar'` | `HelixBaseCalendar` | Accessible name for the grid. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `locale` | `locale` | `string` | `''` | `HelixBaseCalendar` | Locale for month and day names. Absent uses the runtime's own. |
 | `max` | `max` | `string` | `''` | `HelixBaseCalendar` | Latest selectable date, as `YYYY-MM-DD`. |
 | `min` | `min` | `string` | `''` | `HelixBaseCalendar` | Earliest selectable date, as `YYYY-MM-DD`. |
 | `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseCalendar` | How many dates can be held at once. |
 | `month` | `month` | `string` | `''` | `HelixBaseCalendar` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
 | `months` | `months` | `number` | `1` | `HelixBaseCalendar` | How many months to show, side by side. |
-| `value` | `value` | `string` | `''` | `HelixBaseCalendar` | The selected dates, comma separated, as `YYYY-MM-DD`. |
+| `name` | `name` | `string` | `''` | `HelixBaseCalendar` | Name the calendar reports under when its form is submitted. |
+| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 
 #### Events
 
@@ -555,7 +624,12 @@ Sets a passage apart as information, a warning, or an error.
 
 Extends `HelixBaseCallout`.
 
-Tinted from the severity's status color with `color-mix`, and marked with a bar on the inline start so the severity survives being read in greyscale or by anyone who does not distinguish the hues.
+Tinted from the severity's status color with `color-mix`, and marked with a
+bar on the inline start so the severity survives being read in greyscale or
+by anyone who does not distinguish the hues.
+
+There is no `appearance` here. `severity` carries the meaning and lives on
+the headless tier; this tier only decides what that meaning looks like.
 
 #### Properties
 
@@ -593,7 +667,18 @@ Groups related content and actions into a single surface.
 
 Extends `HelixBaseCard`.
 
-Regions are slots: `media`, `header`, the default slot for content, and `footer`. An omitted region takes no space, so a card with only content needs no wrapper markup at all.
+Regions are slots: `media`, `header`, the default slot for content, and
+`footer`. An omitted region takes no space, so a card with only content needs
+no wrapper markup at all.
+
+`media` runs edge to edge and clips to the card's corners, so an image needs
+no inset correction. Set `orientation="horizontal"` to move it alongside the
+header, content, and footer stack rather than above it.
+
+Regions are bare slots with no wrapper element, so an omitted one occupies no
+space without the card having to detect that it is missing. Style slotted
+content directly rather than reaching for a part: a header is whatever
+element you slotted, not a wrapper around it.
 
 #### Properties
 
@@ -630,7 +715,11 @@ Shows one slide of several, with controls to move between them.
 
 Extends `HelixBaseCarousel`.
 
-The track scroll-snaps, so a drag and a trackpad swipe move it with the browser's own momentum and the controls only have to scroll.
+The track scroll-snaps, so a drag and a trackpad swipe move it with the
+browser's own momentum and the controls only have to scroll.
+
+Slides take the full track by default. `per-view` fits more than one across,
+which is what a run of cards wants rather than a run of full-width panels.
 
 #### Properties
 
@@ -689,7 +778,12 @@ A box that is ticked, or not, or neither.
 
 Extends `HelixBaseCheckbox`.
 
-The box is the native input, restyled rather than replaced, so the tick and the indeterminate dash are the browser's own and the control stays a control for anything reading the page.
+The box is the native input, restyled rather than replaced, so the tick and
+the indeterminate dash are the browser's own and the control stays a control
+for anything reading the page.
+
+The label sits beside it and the whole thing is the click target, which is
+what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 #### Properties
 
@@ -761,7 +855,8 @@ Groups related checkboxes, and reports them as one set.
 
 Extends `HelixBaseCheckboxGroup`.
 
-A column by default, which is what a list of choices wants: the eye scans one line per answer rather than hunting along a row.
+A column by default, which is what a list of choices wants: the eye scans one
+line per answer rather than hunting along a row.
 
 #### Properties
 
@@ -816,7 +911,10 @@ A modal window, on the platform's own dialog.
 
 Extends `HelixBaseDialog`.
 
-The panel is `surface-overlay` with a shadow, because that is what it is: a thing over the page rather than on it. The scrim is drawn on `::backdrop`, which is the platform's own element for it and sits in the top layer with the dialog rather than being a div somebody positioned.
+The panel is `surface-overlay` with a shadow, because that is what it is: a
+thing over the page rather than on it. The scrim is drawn on `::backdrop`,
+which is the platform's own element for it and sits in the top layer with the
+dialog rather than being a div somebody positioned.
 
 #### Properties
 
@@ -875,7 +973,10 @@ Separates content into groups with a rule.
 
 Extends `HelixBaseDivider`.
 
-A one-pixel rule in the border color, running the full inline size by default. A vertical divider stretches to its flex parent instead of setting its own height, so it matches whatever it sits beside without being told how tall that is.
+A one-pixel rule in the border color, running the full inline size by
+default. A vertical divider stretches to its flex parent instead of setting
+its own height, so it matches whatever it sits beside without being told how
+tall that is.
 
 #### Properties
 
@@ -905,7 +1006,9 @@ A panel that slides in from an edge.
 
 Extends `HelixBaseDrawer`.
 
-The panel translates and the scrim fades, both on transform and opacity only, which is the one place motion is allowed to carry the work: the surface at rest is flat and the movement is what says something happened.
+The panel translates and the scrim fades, both on transform and opacity only,
+which is the one place motion is allowed to carry the work: the surface at
+rest is flat and the movement is what says something happened.
 
 #### Properties
 
@@ -963,7 +1066,15 @@ A stack of pages, one showing at a time, with a way back.
 
 Extends `HelixBaseDrilldown`.
 
-**The pages slide, and the direction is the point.** Both moves replace one page with another, so with no motion a reader cannot tell whether they went deeper or came back: the panel simply holds different words. Sliding in the direction of travel says which happened, and it is most of the reason this is a component rather than a menu with its trigger removed.
+**The pages slide, and the direction is the point.** Both moves replace one
+page with another, so with no motion a reader cannot tell whether they went
+deeper or came back: the panel simply holds different words. Sliding in the
+direction of travel says which happened, and it is most of the reason this is
+a component rather than a menu with its trigger removed.
+
+An animation rather than a transition, because there is nothing to transition
+from: the page arriving was not in the DOM a frame ago. Under
+`prefers-reduced-motion` it becomes the instant swap `Menu` does.
 
 #### Properties
 
@@ -1012,7 +1123,9 @@ One row of a drill-down, which may hold a page of its own.
 
 Extends `HelixBaseDrilldownItem`.
 
-A row is a full-width band rather than an inset pill, for the reason the select's options are: it reaches both edges of the panel, so a highlight lines up with the edge the eye is already following down the list.
+A row is a full-width band rather than an inset pill, for the reason the
+select's options are: it reaches both edges of the panel, so a highlight
+lines up with the edge the eye is already following down the list.
 
 #### Properties
 
@@ -1067,7 +1180,9 @@ Says that a region has nothing in it, and what to do about it.
 
 Extends `HelixBaseEmpty`.
 
-Centered and given room, because an empty view is the only thing on screen and crowding it against the top edge makes the region look broken rather than empty.
+Centered and given room, because an empty view is the only thing on screen
+and crowding it against the top edge makes the region look broken rather than
+empty.
 
 #### Properties
 
@@ -1099,7 +1214,19 @@ Lays children out in a row or a column.
 
 Extends `HelixElement`.
 
-The host is the flex container itself and the only child is a slot, so the element adds no box of its own: `<helix-flex>` costs exactly the `<div>` it replaces.
+The host is the flex container itself and the only child is a slot, so the
+element adds no box of its own: `<helix-flex>` costs exactly the `<div>` it
+replaces.
+
+There is no separate Stack. A stack is this with `direction="column"`, and a
+second element whose whole definition is one default of the first is a name
+to learn rather than a capability to gain.
+
+Gap takes a space token name rather than a length, so spacing stays on the
+scale. A layout that can say `gap="13px"` is one that will.
+
+Presentation only, so there is no headless tier: the split exists to keep
+behavior separate from styling, and this is entirely styling.
 
 #### Properties
 
@@ -1126,7 +1253,12 @@ Lays children out on a grid.
 
 Extends `HelixElement`.
 
-Two ways to declare columns, and only two. `columns` is a fixed count; `min` fills as many equal columns as fit above that width, which is a responsive layout with no breakpoint to maintain. Setting `min` wins, because a fixed count that also reflows is two intentions in one element.
+Two ways to declare columns, and only two. `columns` is a fixed count;
+`min` fills as many equal columns as fit above that width, which is a
+responsive layout with no breakpoint to maintain. Setting `min` wins, because
+a fixed count that also reflows is two intentions in one element.
+
+Presentation only, so there is no headless tier.
 
 #### Properties
 
@@ -1157,7 +1289,10 @@ Renders a named icon from the Helix set.
 
 Extends `HelixBaseIcon`.
 
-Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the color of the text it sits in and a container can resize it without reaching for a prop. Inside a button that hook is set in `em`, which keeps the icon in proportion as the button's own size changes.
+Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
+color of the text it sits in and a container can resize it without reaching
+for a prop. Inside a button that hook is set in `em`, which keeps the icon in
+proportion as the button's own size changes.
 
 #### Properties
 
@@ -1186,7 +1321,14 @@ A square button whose content is an icon.
 
 Extends `HelixBaseIconButton`.
 
-Top-level rather than `Button.Icon`, because a namespace means composition: `Card.Header` is part of a card, and an icon-only button is not part of a button. It is a button with different content and a different shape, which makes it its own component.
+Top-level rather than `Button.Icon`, because a namespace means composition:
+`Card.Header` is part of a card, and an icon-only button is not part of a
+button. It is a button with different content and a different shape, which
+makes it its own component.
+
+`label` is not optional in practice. An icon-only control with no accessible
+name is announced as "button" and nothing else, which is the single most
+common way a toolbar becomes unusable without sight.
 
 #### Properties
 
@@ -1232,7 +1374,17 @@ A single line of text a reader types into.
 
 Extends `HelixBaseInput`.
 
-The frame is the field rather than the input, so anything slotted at either end sits inside the same box as the text and the focus ring is drawn once, around the whole control, instead of around a smaller box within it.
+The frame is the field rather than the input, so anything slotted at either
+end sits inside the same box as the text and the focus ring is drawn once,
+around the whole control, instead of around a smaller box within it.
+
+The input itself is the native one, stripped rather than replaced, so the
+caret, the selection, the autofill, and the keyboard a phone chooses are all
+the platform's.
+
+Height comes from the region, like every other control: `data-density` on
+whatever holds it, not a `size` here. Invalid styling waits for
+`:user-invalid`, because a field is not wrong before anyone has filled it in.
 
 #### Properties
 
@@ -1301,7 +1453,12 @@ A keyboard key or chord, set inline with text.
 
 Extends `HelixBaseKbd`.
 
-Drawn as a physical key: a hairline, a sunken fill, and one inset shadow along the bottom edge that reads as depth without becoming a picture of a key.
+Drawn as a physical key: a hairline, a sunken fill, and one inset shadow
+along the bottom edge that reads as depth without becoming a picture of a
+key.
+
+Sized in `em`, so it stays proportional to whatever it is set inside rather
+than holding one size and looking wrong in a heading.
 
 #### Slots
 
@@ -1330,7 +1487,10 @@ A set of rows, read as a set.
 
 Extends `HelixBaseList`.
 
-Rules between rows rather than around each one, so a list reads as one object with divisions instead of as a stack of cards. `divided` is off by default, because space alone separates rows perfectly well and a rule at every seam is decoration doing what emptiness already does.
+Rules between rows rather than around each one, so a list reads as one object
+with divisions instead of as a stack of cards. `divided` is off by default,
+because space alone separates rows perfectly well and a rule at every seam is
+decoration doing what emptiness already does.
 
 #### Properties
 
@@ -1357,7 +1517,9 @@ One row of a list.
 
 Extends `HelixBaseListItem`.
 
-A grid rather than a flex row, so the supporting text lines up under the label rather than under the leading icon. The leading and trailing regions hold their own width and the middle takes the rest.
+A grid rather than a flex row, so the supporting text lines up under the
+label rather than under the leading icon. The leading and trailing regions
+hold their own width and the middle takes the rest.
 
 #### Slots
 
@@ -1382,7 +1544,13 @@ A list of options, one or several of which are the answer.
 
 Extends `HelixBaseListbox`.
 
-A framed, scrolling list with the field's three parts around it. The frame is the list rather than the host, so a filter that empties it leaves a box with a message in it rather than a border collapsing to nothing.
+A framed, scrolling list with the field's three parts around it. The frame is
+the list rather than the host, so a filter that empties it leaves a box with
+a message in it rather than a border collapsing to nothing.
+
+`--listbox-max-block-size` is what makes it scroll rather than run down the
+page. The keyboard brings the active option into that box itself, so a long
+list moves under the reader rather than the reader moving to find it.
 
 #### Properties
 
@@ -1456,7 +1624,11 @@ A menu of commands, opened from a trigger.
 
 Extends `HelixBaseMenu`.
 
-The surface is in the top layer, so it needs no `z-index` and cannot be clipped by whatever it sits inside.
+The surface is in the top layer, so it needs no `z-index` and cannot be
+clipped by whatever it sits inside.
+
+A submenu replaces the page rather than opening beside it, so the panel stays
+one panel and reads the same on a phone as on a desk.
 
 #### Properties
 
@@ -1517,7 +1689,9 @@ One row in a menu: a command, a choice, or a way into a submenu.
 
 Extends `HelixBaseMenuItem`.
 
-The tick and the arrow hold their space whether or not they are showing, so the labels in a menu start at one place and the rows read as a column rather than as a ragged list.
+The tick and the arrow hold their space whether or not they are showing, so
+the labels in a menu start at one place and the rows read as a column rather
+than as a ragged list.
 
 #### Properties
 
@@ -1572,7 +1746,10 @@ A set of destinations, with a marker on the current one.
 
 Extends `HelixBaseNavBar`.
 
-One marker that travels, rather than a background that appears on whichever destination is current. A fill that swaps is two things changing at once and reads as a flicker; one that moves is a single object the eye follows, and it says where the current page was as well as where it is.
+One marker that travels, rather than a background that appears on whichever
+destination is current. A fill that swaps is two things changing at once and
+reads as a flicker; one that moves is a single object the eye follows, and it
+says where the current page was as well as where it is.
 
 #### Properties
 
@@ -1608,7 +1785,10 @@ One choice in a listbox.
 
 Extends `HelixBaseOption`.
 
-Two states that look different on purpose: chosen, which is a fact about the value, and active, which is where the keyboard is. A list that draws them the same way leaves a reader arrowing through it unable to tell what they have picked from what they are looking at.
+Two states that look different on purpose: chosen, which is a fact about the
+value, and active, which is where the keyboard is. A list that draws them the
+same way leaves a reader arrowing through it unable to tell what they have
+picked from what they are looking at.
 
 #### Properties
 
@@ -1659,7 +1839,9 @@ A named run of options inside a listbox.
 
 Extends `HelixBaseOptionGroup`.
 
-The heading is set small and quiet, because it is a divider that happens to have words on it: a run of options is read as a list and the heading is what tells you which list, not something to read on its own.
+The heading is set small and quiet, because it is a divider that happens to
+have words on it: a run of options is read as a list and the heading is what
+tells you which list, not something to read on its own.
 
 #### Properties
 
@@ -1689,7 +1871,13 @@ Links to the headings on this page, marking the one being read.
 
 Extends `HelixBasePageNav`.
 
-A rule down the leading edge with the current section lit along it, which is the shape a table of contents has taken since printed marginalia: the line says the list is one thing, and the lit segment says where in it you are.
+A rule down the leading edge with the current section lit along it, which is
+the shape a table of contents has taken since printed marginalia: the line
+says the list is one thing, and the lit segment says where in it you are.
+
+Nesting is the consumer's, expressed as `data-level` on a link. A page-nav
+that read heading levels itself would have to look at the document, and the
+document is not always where the headings are.
 
 #### Properties
 
@@ -1725,7 +1913,15 @@ A panel that opens against a trigger and holds anything.
 
 Extends `HelixBasePopover`.
 
-A surface with an inset and a shadow, and nothing about what goes in it. The inset is the panel's rather than the consumer's, which is the same call `Dialog` and `Drawer` make and for the same reason: everyone was writing it, and everyone was writing the same one.
+A surface with an inset and a shadow, and nothing about what goes in it. The
+inset is the panel's rather than the consumer's, which is the same call
+`Dialog` and `Drawer` make and for the same reason: everyone was writing it,
+and everyone was writing the same one.
+
+It arrives from the side it opened on. `data-placement` is written by the
+positioning, so the panel knows which way it flipped and can animate from the
+trigger rather than from a fixed direction that would be backwards half the
+time.
 
 #### Properties
 
@@ -1784,7 +1980,15 @@ Shows how far along a task is, when that is known.
 
 Extends `HelixBaseProgress`.
 
-A track and the part of it that is done. The height comes from a token rather than from a size property, for the reason the rest of the library gives about controls: how heavy a bar is says something about the region it is in, and a `--progress-size` on that region says it once.
+A track and the part of it that is done. The height comes from a token rather
+than from a size property, for the reason the rest of the library gives about
+controls: how heavy a bar is says something about the region it is in, and a
+`--progress-size` on that region says it once.
+
+The fill transitions, which is worth more here than it looks. Progress
+arrives in steps, often large ones, and a bar that jumps between them reads
+as a series of unrelated states where one that travels reads as a single
+thing advancing.
 
 #### Properties
 
@@ -1820,7 +2024,8 @@ A short quotation, set inline with the text around it.
 
 Extends `HelixBaseQuote`.
 
-Takes the surrounding type rather than a size of its own, because a quotation inside a paragraph is that paragraph's text with marks around it.
+Takes the surrounding type rather than a size of its own, because a quotation
+inside a paragraph is that paragraph's text with marks around it.
 
 #### Properties
 
@@ -1854,7 +2059,14 @@ One choice in a radio group.
 
 Extends `HelixBaseRadio`.
 
-A circle with a dot in it, drawn here rather than by the browser for the reason the checkbox's box is: this is a `<button role="radio">`, so there was never a native control to restyle, and the weight and the motion of the mark are ours either way.
+A circle with a dot in it, drawn here rather than by the browser for the
+reason the checkbox's box is: this is a `<button role="radio">`, so there was
+never a native control to restyle, and the weight and the motion of the mark
+are ours either way.
+
+The dot scales from nothing, like the checkbox's tick, so choosing shows
+something happening. It has no colour, because colour is reserved for state
+and being chosen is an answer rather than a state.
 
 #### Properties
 
@@ -1905,7 +2117,10 @@ A set of choices where exactly one is the answer.
 
 Extends `HelixBaseRadioGroup`.
 
-The field's three parts, laid out the way every other field lays them out: a question over the set, and one line under it that is help until something is wrong. `orientation` lays out the choices and not the field, so a horizontal group keeps its question above the row rather than beside the first choice.
+The field's three parts, laid out the way every other field lays them out: a
+question over the set, and one line under it that is help until something is
+wrong. `orientation` lays out the choices and not the field, so a horizontal
+group keeps its question above the row rather than beside the first choice.
 
 #### Properties
 
@@ -1971,7 +2186,13 @@ A closed list that opens to be chosen from.
 
 Extends `HelixBaseSelect`.
 
-The trigger wears the same frame as an `Input`, because in a form it stands in a row with them and a control that looks like a button among fields reads as an action rather than an answer.
+The trigger wears the same frame as an `Input`, because in a form it stands
+in a row with them and a control that looks like a button among fields reads
+as an action rather than an answer.
+
+The panel is an overlay surface rather than a sunken one: it sits over the
+page instead of on it, which is what its shadow says and what tells it apart
+from the field it came out of.
 
 #### Properties
 
@@ -2049,7 +2270,9 @@ Stands in for content that has not arrived.
 
 Extends `HelixBaseSkeleton`.
 
-A sweep rather than a pulse. A block fading in and out reads as something broken; a highlight travelling across it reads as work in progress, and it is the same one property animating either way.
+A sweep rather than a pulse. A block fading in and out reads as something
+broken; a highlight travelling across it reads as work in progress, and it is
+the same one property animating either way.
 
 #### Properties
 
@@ -2077,7 +2300,15 @@ A value chosen from a range by dragging.
 
 Extends `HelixBaseSlider`.
 
-The track and the thumb are the browser's own, restyled through the range pseudo-elements rather than replaced. What that buys is everything a hand-built slider has to reimplement and usually gets slightly wrong: the drag, the keys, and a hit area sized by the platform for a finger.
+The track and the thumb are the browser's own, restyled through the range
+pseudo-elements rather than replaced. What that buys is everything a
+hand-built slider has to reimplement and usually gets slightly wrong: the
+drag, the keys, and a hit area sized by the platform for a finger.
+
+The filled part of the track is painted with a gradient driven by the
+fraction the headless tier writes, rather than by a second element laid over
+it. One element cannot be half one colour by any other means that survives
+the thumb being dragged.
 
 #### Properties
 
@@ -2143,7 +2374,10 @@ Says that something indeterminate is in progress.
 
 Extends `HelixBaseSpinner`.
 
-Sized in `em`, so it matches whatever text it sits beside without being told. The color is `currentColor` for the same reason: a spinner inside a primary button is on the accent, and one in body copy is not, and neither should have to say so.
+Sized in `em`, so it matches whatever text it sits beside without being told.
+The color is `currentColor` for the same reason: a spinner inside a primary
+button is on the accent, and one in body copy is not, and neither should have
+to say so.
 
 #### Properties
 
@@ -2183,7 +2417,10 @@ One measurement, with the word for what it measures.
 
 Extends `HelixBaseStat`.
 
-The value is set on the display face at a size the type scale does not reach, because a figure is the one place on a page where the number is the design. The label sits above it in the label ramp, quiet and wide-tracked, so the pair reads as one object rather than as two lines of text.
+The value is set on the display face at a size the type scale does not reach,
+because a figure is the one place on a page where the number is the design.
+The label sits above it in the label ramp, quiet and wide-tracked, so the
+pair reads as one object rather than as two lines of text.
 
 #### Slots
 
@@ -2206,7 +2443,10 @@ A row of related measurements.
 
 Extends `HelixBaseStatGroup`.
 
-Wraps rather than scrolls, and each figure keeps its own width instead of every one taking an equal share: a set of figures is read by comparing them, and equal columns make a four-digit number and a two-digit one look like the same quantity.
+Wraps rather than scrolls, and each figure keeps its own width instead of
+every one taking an equal share: a set of figures is read by comparing them,
+and equal columns make a four-digit number and a two-digit one look like the
+same quantity.
 
 #### Properties
 
@@ -2235,7 +2475,22 @@ A control that turns something on, and turns it on when pressed.
 
 Extends `HelixBaseSwitch`.
 
-A thumb travelling in a groove, which is the one place in the library colour is used to say "on". A checkbox does not, because a tick is legible on its own; a switch has no mark, so the fill is the whole of what distinguishes the two states and there is nothing else for it to be.
+A thumb travelling in a groove, which is the one place in the library colour
+is used to say "on". A checkbox does not, because a tick is legible on its
+own; a switch has no mark, so the fill is the whole of what distinguishes the
+two states and there is nothing else for it to be.
+
+The input itself is the hit target and is drawn as the track, stretched over
+it and invisible, so the press, the focus and the label forwarding are all
+the platform's while the picture is ours.
+
+**Its height is `--helix-size-switch`, which is one step above the
+checkbox's** at every density rather than the same as it. A checkbox is a box
+with a mark in it; a switch is a track with a thumb inside it, and at the
+checkbox's height the thumb has two pixels of groove around it and the whole
+control reads as a small dash. The width follows the height, so setting
+`--switch-height` widens it too and the proportion is not something a
+consumer has to keep.
 
 #### Properties
 
@@ -2306,7 +2561,9 @@ Tabular data laid out on a grid.
 
 Extends `HelixBaseTable`.
 
-Hairline rules between rows and no fill, per the rule that depth comes from a single border rather than from elevation. A dense table earns its density by decorating none of it.
+Hairline rules between rows and no fill, per the rule that depth comes from a
+single border rather than from elevation. A dense table earns its density by
+decorating none of it.
 
 #### Properties
 
@@ -2340,7 +2597,9 @@ One cell of a table.
 
 Extends `HelixBaseTableCell`.
 
-Hairline rules between rows and no fill, per the rule that depth comes from a single border rather than from elevation. A dense table earns its density by decorating none of it.
+Hairline rules between rows and no fill, per the rule that depth comes from a
+single border rather than from elevation. A dense table earns its density by
+decorating none of it.
 
 #### Properties
 
@@ -2360,7 +2619,9 @@ One column of a table: its heading, and how wide it is.
 
 Extends `HelixBaseTableColumn`.
 
-Styled as the header cell it is, and it carries the same rule and inset as the cells beneath it so the heading and its column read as one line down the table.
+Styled as the header cell it is, and it carries the same rule and inset as
+the cells beneath it so the heading and its column read as one line down the
+table.
 
 #### Properties
 
@@ -2388,7 +2649,9 @@ One row of a table.
 
 Extends `HelixBaseTableRow`.
 
-Hairline rules between rows and no fill, per the rule that depth comes from a single border rather than from elevation. A dense table earns its density by decorating none of it.
+Hairline rules between rows and no fill, per the rule that depth comes from a
+single border rather than from elevation. A dense table earns its density by
+decorating none of it.
 
 #### Slots
 
@@ -2404,7 +2667,9 @@ A row of tabs and the panel each one shows.
 
 Extends `HelixBaseTabs`.
 
-Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills.
+Selection is marked with a rule under the active tab rather than a filled
+pill, which keeps the row flat and lets the underline animate between tabs as
+a movement instead of two separate fills.
 
 #### Properties
 
@@ -2448,7 +2713,9 @@ The content shown for one tab.
 
 Extends `HelixBaseTabsPanel`.
 
-Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills.
+Selection is marked with a rule under the active tab rather than a filled
+pill, which keeps the row flat and lets the underline animate between tabs as
+a movement instead of two separate fills.
 
 #### Properties
 
@@ -2475,7 +2742,9 @@ One tab in a tab list.
 
 Extends `HelixBaseTabsTab`.
 
-Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills.
+Selection is marked with a rule under the active tab rather than a filled
+pill, which keeps the row flat and lets the underline animate between tabs as
+a movement instead of two separate fills.
 
 #### Properties
 
@@ -2518,7 +2787,9 @@ Labels content with a short piece of metadata.
 
 Extends `HelixBaseTag`.
 
-Five appearances. The fill is a tint of the status color, mixed with `color-mix` rather than held as a token per status, so a theme that changes the status colors gets the tints with them.
+Five appearances. The fill is a tint of the status color, mixed with
+`color-mix` rather than held as a token per status, so a theme that changes
+the status colors gets the tints with them.
 
 #### Properties
 
@@ -2562,7 +2833,32 @@ Text: what element it is, and what it looks like.
 
 Extends `HelixElement`.
 
-Two properties, and they answer different questions. `as` is the element, which decides the document outline and what a screen reader announces. `appearance` is the treatment, which decides size, weight, leading, and tracking together.
+Two properties, and they answer different questions. `as` is the element,
+which decides the document outline and what a screen reader announces.
+`appearance` is the treatment, which decides size, weight, leading, and
+tracking together.
+
+They are separate because they genuinely come apart: a section's second
+heading sometimes has to look smaller without lying about the outline, and a
+`<p>` sometimes has to read as a caption. They default to matching, so the
+common case is `as="h2"` and nothing else.
+
+The pairing is resolved in CSS rather than by computing an attribute, so the
+element writes nothing to its own host: `as="h2"` picks up the heading ramp
+through a selector, and setting `appearance` takes the pairing rule out of
+play. Deriving it in `willUpdate` worked, but it put an attribute on the host
+that the server's markup did not have, which is a hydration mismatch in every
+React consumer.
+
+**Size, weight, and leading are not properties.** Exposing them separately
+offers a few hundred combinations of which a handful are right, and every
+caller then picks one. An appearance is a decision the system already made:
+the ramp is named, and a page built from it is consistent because there was
+nothing else to choose.
+
+`tone` stays separate, because color carries state rather than typography.
+Folding it in would mean `caption-danger` and `label-primary` and the rest of
+the cross product, which is the explosion `appearance` exists to prevent.
 
 #### Properties
 
@@ -2600,7 +2896,10 @@ Several lines of text a reader types into.
 
 Extends `HelixBaseTextarea`.
 
-The same frame an `Input` wears, so a form of mixed fields reads as one set rather than as two kinds of box. What differs is the resize handle, which is the platform's and is left alone on the block axis only: a field that can be dragged wider than the form holding it is a field that breaks the layout.
+The same frame an `Input` wears, so a form of mixed fields reads as one set
+rather than as two kinds of box. What differs is the resize handle, which is
+the platform's and is left alone on the block axis only: a field that can be
+dragged wider than the form holding it is a field that breaks the layout.
 
 #### Properties
 
@@ -2661,7 +2960,18 @@ The region messages arrive in, and the only thing that announces them.
 
 Extends `HelixBaseToast`.
 
-Fixed to the window, and it catches nothing: the region spans a whole edge, so a stack of one message in a corner would otherwise put an invisible bar across everything beside it. The region is transparent to a pointer and the messages take it back.
+Fixed to the window, and it catches nothing: the region spans a whole edge,
+so a stack of one message in a corner would otherwise put an invisible bar
+across everything beside it. The region is transparent to a pointer and the
+messages take it back.
+
+**It belongs at the root of the application.** `position: fixed` is
+positioned against the viewport only while no ancestor carries `transform`,
+`filter`, `perspective` or `contain`, any of which makes that ancestor the
+containing block instead, and it is still clipped by an ancestor with
+`overflow: hidden`. That is a real constraint rather than a style note, and
+it is the same fact that put every other floating surface in this library
+into the top layer.
 
 #### Properties
 
@@ -2701,7 +3011,10 @@ One message in the toast region.
 
 Extends `HelixBaseToastItem`.
 
-A surface with a shadow, because a toast sits over whatever the reader was looking at rather than in it. The severity is a bar down the leading edge and not a fill: a message is text to be read, and a coloured panel behind it costs contrast for something the mark already says.
+A surface with a shadow, because a toast sits over whatever the reader was
+looking at rather than in it. The severity is a bar down the leading edge and
+not a fill: a message is text to be read, and a coloured panel behind it
+costs contrast for something the mark already says.
 
 #### Properties
 
@@ -2757,7 +3070,9 @@ One option in a toggle group.
 
 Extends `HelixBaseToggle`.
 
-Carries no background of its own. The selected look comes from the group's indicator sitting behind it, which is what lets that marker travel instead of one fill appearing as another disappears.
+Carries no background of its own. The selected look comes from the group's
+indicator sitting behind it, which is what lets that marker travel instead of
+one fill appearing as another disappears.
 
 #### Properties
 
@@ -2798,7 +3113,15 @@ A row of options with the selection marked by a moving indicator.
 
 Extends `HelixBaseToggleGroup`.
 
-The indicator travels between items rather than the fill swapping. A fill that appears on one item as it disappears from another is two changes at once and reads as a flicker; one object moving is something the eye follows, and it says where the selection came from as well as where it went.
+The indicator travels between items rather than the fill swapping. A fill
+that appears on one item as it disappears from another is two changes at once
+and reads as a flicker; one object moving is something the eye follows, and
+it says where the selection came from as well as where it went.
+
+It animates `translate` and `inline-size`. Width is a layout property and the
+rule is transform and opacity only, but the indicator is out of flow, so
+animating its width reflows nothing else. Scaling instead would distort the
+corner radius, which is worse than the exception.
 
 #### Properties
 
@@ -2858,7 +3181,8 @@ A group of controls that share one tab stop.
 
 Extends `HelixBaseToolbar`.
 
-No chrome of its own: a toolbar is a place controls sit, and a border around them would be a second frame inside whatever already frames the bar.
+No chrome of its own: a toolbar is a place controls sit, and a border around
+them would be a second frame inside whatever already frames the bar.
 
 #### Properties
 
@@ -2893,7 +3217,11 @@ A short description that appears beside what it describes.
 
 Extends `HelixBaseTooltip`.
 
-The bubble is in the top layer, so it needs no `z-index` and cannot be clipped by whatever it sits inside.
+The bubble is in the top layer, so it needs no `z-index` and cannot be
+clipped by whatever it sits inside.
+
+The arrow is positioned by the same pass that positions the bubble, so it
+still points at the trigger after the bubble has slid along to stay in view.
 
 #### Properties
 
@@ -2955,7 +3283,9 @@ A tree of items, navigable entirely from the keyboard.
 
 Extends `HelixBaseTree`.
 
-Quiet by default: no rules between rows and no fill except on the selected item. A navigation tree is read by scanning, and every line of chrome added to it is one more thing between the reader and the label.
+Quiet by default: no rules between rows and no fill except on the selected
+item. A navigation tree is read by scanning, and every line of chrome added
+to it is one more thing between the reader and the label.
 
 #### Properties
 
@@ -3003,7 +3333,14 @@ One node in a tree.
 
 Extends `HelixBaseTreeItem`.
 
-Indent comes from the `level` the tree sets, as a multiple of one hook, so a node moved to another depth re-indents without any nested selector. Nesting selectors by depth is the usual approach and stops working at whatever depth nobody wrote a rule for.
+Indent comes from the `level` the tree sets, as a multiple of one hook, so a
+node moved to another depth re-indents without any nested selector. Nesting
+selectors by depth is the usual approach and stops working at whatever depth
+nobody wrote a rule for.
+
+The twisty rotates rather than swapping glyphs, so opening a branch is a
+short movement instead of a substitution. Motion carries the state change;
+the row itself stays flat.
 
 #### Properties
 

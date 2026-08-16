@@ -732,12 +732,13 @@ export type HelixBaseCalendarHelixSelectElementEvent =
   HelixBaseCalendarElementEvent<HelixSelectEvent>;
 
 export type HelixBaseCalendarProps = {
-  /** The selected dates, comma separated, as `YYYY-MM-DD`.
+  /** Name the calendar reports under when its form is submitted.
 
-One date in `single`. Two in `range`, the earlier first. Any number in
-`multiple`. One attribute across all three, so a consumer reads and writes
-the same thing whatever the mode is. */
-  value?: HelixBaseCalendar["value"];
+Absent means it submits nothing, which is what makes it safe to put one
+inside something else. `DatePicker` will hold the name and the calendar in
+its panel will stay quiet, the same way `Select` holds the name and the
+`Listbox` inside it does not. */
+  name?: HelixBaseCalendar["name"];
   /** How many dates can be held at once. */
   mode?: HelixBaseCalendar["mode"];
   /** How many months to show, side by side. */
@@ -766,18 +767,31 @@ the same thing whatever the mode is. */
   "first-day-of-week"?: HelixBaseCalendar["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
   firstDayOfWeek?: HelixBaseCalendar["firstDayOfWeek"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseCalendar["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseCalendar["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  value?: HelixBaseCalendar["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  disabled?: HelixBaseCalendar["disabled"];
 
   /** Fired when a date is chosen, with the ISO date. */
   "onhelix-select"?: (e: HelixBaseCalendarHelixSelectElementEvent) => void;
 };
 
 export type HelixBaseCalendarSolidJsProps = {
-  /** The selected dates, comma separated, as `YYYY-MM-DD`.
+  /** Name the calendar reports under when its form is submitted.
 
-One date in `single`. Two in `range`, the earlier first. Any number in
-`multiple`. One attribute across all three, so a consumer reads and writes
-the same thing whatever the mode is. */
-  "prop:value"?: HelixBaseCalendar["value"];
+Absent means it submits nothing, which is what makes it safe to put one
+inside something else. `DatePicker` will hold the name and the calendar in
+its panel will stay quiet, the same way `Select` holds the name and the
+`Listbox` inside it does not. */
+  "prop:name"?: HelixBaseCalendar["name"];
   /** How many dates can be held at once. */
   "prop:mode"?: HelixBaseCalendar["mode"];
   /** How many months to show, side by side. */
@@ -806,6 +820,18 @@ the same thing whatever the mode is. */
   "attr:first-day-of-week"?: HelixBaseCalendar["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
   "prop:firstDayOfWeek"?: HelixBaseCalendar["firstDayOfWeek"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseCalendar["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseCalendar["defaultValue"];
+  /** What the control holds now, and what its form submits. */
+  "prop:value"?: HelixBaseCalendar["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists. */
+  "prop:disabled"?: HelixBaseCalendar["disabled"];
   /** Fired when a date is chosen, with the ISO date. */
   "on:helix-select"?: (e: HelixBaseCalendarHelixSelectElementEvent) => void;
 
@@ -4043,11 +4069,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The selected dates, comma separated, as `YYYY-MM-DD`.
+   * - `name`: Name the calendar reports under when its form is submitted.
    *
-   * One date in `single`. Two in `range`, the earlier first. Any number in
-   * `multiple`. One attribute across all three, so a consumer reads and writes
-   * the same thing whatever the mode is.
+   * Absent means it submits nothing, which is what makes it safe to put one
+   * inside something else. `DatePicker` will hold the name and the calendar in
+   * its panel will stay quiet, the same way `Select` holds the name and the
+   * `Listbox` inside it does not.
    * - `mode`: How many dates can be held at once.
    * - `months`: How many months to show, side by side.
    * - `locale`: Locale for month and day names. Absent uses the runtime's own.
@@ -4059,12 +4086,32 @@ export type CustomElements = {
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when a date is chosen, with the ISO date.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
    *
    * ## CSS Parts
    *
@@ -7788,11 +7835,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The selected dates, comma separated, as `YYYY-MM-DD`.
+   * - `name`: Name the calendar reports under when its form is submitted.
    *
-   * One date in `single`. Two in `range`, the earlier first. Any number in
-   * `multiple`. One attribute across all three, so a consumer reads and writes
-   * the same thing whatever the mode is.
+   * Absent means it submits nothing, which is what makes it safe to put one
+   * inside something else. `DatePicker` will hold the name and the calendar in
+   * its panel will stay quiet, the same way `Select` holds the name and the
+   * `Listbox` inside it does not.
    * - `mode`: How many dates can be held at once.
    * - `months`: How many months to show, side by side.
    * - `locale`: Locale for month and day names. Absent uses the runtime's own.
@@ -7804,12 +7852,32 @@ export type CustomElementsSolidJs = {
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when a date is chosen, with the ISO date.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
    *
    * ## CSS Parts
    *

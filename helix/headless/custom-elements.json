@@ -2779,13 +2779,13 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
+              "name": "name",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "The selected dates, comma separated, as `YYYY-MM-DD`.\n\nOne date in `single`. Two in `range`, the earlier first. Any number in\n`multiple`. One attribute across all three, so a consumer reads and writes\nthe same thing whatever the mode is.",
-              "attribute": "value"
+              "description": "Name the calendar reports under when its form is submitted.\n\nAbsent means it submits nothing, which is what makes it safe to put one\ninside something else. `DatePicker` will hold the name and the calendar in\nits panel will stay quiet, the same way `Select` holds the name and the\n`Listbox` inside it does not.",
+              "attribute": "name"
             },
             {
               "kind": "field",
@@ -2987,7 +2987,7 @@
             },
             {
               "kind": "method",
-              "name": "disabled",
+              "name": "barred",
               "privacy": "private",
               "return": {
                 "type": {
@@ -3002,7 +3002,7 @@
                   }
                 }
               ],
-              "description": "Whether a date is barred, by bound, by weekday, or by name."
+              "description": "Whether a date is barred, by bound, by weekday, or by name.\n\n`barred`, not `disabled`: the calendar is a form control now, and\n`HelixFormElement.disabled` is a boolean about the whole control. A method\nand a flag cannot share a name, and of the two it is the method that should\nmove, because \"disabled\" on a control means one thing everywhere else in\nthe library."
             },
             {
               "kind": "method",
@@ -3067,6 +3067,17 @@
             },
             {
               "kind": "method",
+              "name": "report",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reports the dates to the form, one entry each.\n\n`FormData` rather than the comma-joined string the property holds, because\n`mode=\"multiple\"` is genuinely several answers and a server reading\n`dates=2026-08-04,2026-08-06` has to know to split it on a convention this\nlibrary invented. One entry per date is what every other multi-valued\ncontrol on the platform sends, and `range` sends its two the same way, in\norder, so start and end arrive as the pair they already are.\n\n**Nothing at all without a `name`, and that is the mechanism rather than a\ndetail.** It is what lets a calendar sit inside something that owns the\nform value, which is how `DatePicker` will hold one. The guard has to be\nexplicit here in a way it does not for `Listbox`: a control reporting a\nplain string is skipped by the form when it has no name, but a `FormData`\ncarries its own names and its entries are appended whatever the element is\ncalled, so an unnamed calendar would submit empty-named dates."
+            },
+            {
+              "kind": "method",
               "name": "renderMonth",
               "privacy": "private",
               "return": {
@@ -3088,6 +3099,132 @@
                   }
                 }
               ]
+            },
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
             },
             {
               "kind": "field",
@@ -3171,13 +3308,13 @@
           ],
           "attributes": [
             {
-              "name": "value",
+              "name": "name",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "The selected dates, comma separated, as `YYYY-MM-DD`.\n\nOne date in `single`. Two in `range`, the earlier first. Any number in\n`multiple`. One attribute across all three, so a consumer reads and writes\nthe same thing whatever the mode is.",
-              "fieldName": "value"
+              "description": "Name the calendar reports under when its form is submitted.\n\nAbsent means it submits nothing, which is what makes it safe to put one\ninside something else. `DatePicker` will hold the name and the calendar in\nits panel will stay quiet, the same way `Select` holds the name and the\n`Listbox` inside it does not.",
+              "fieldName": "name"
             },
             {
               "name": "mode",
@@ -3276,10 +3413,55 @@
               "default": "0",
               "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
               "fieldName": "firstDayOfWeek"
+            },
+            {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the control holds now, and what its form submits.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinControllerValue",
+              "package": "@helix-io/core"
             }
           ],
           "superclass": {
-            "name": "HelixElement",
+            "name": "HelixFormElement",
             "package": "@helix-io/core"
           },
           "summary": "Shows a month, and takes a date from it.",

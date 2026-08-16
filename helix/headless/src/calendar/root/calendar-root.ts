@@ -1,8 +1,9 @@
 import {
   customElement,
-  HelixElement,
+  HelixFormElement,
   HelixSelectEvent,
   hostAria,
+  MixinControllerValue,
   requestControlledChange,
 } from '@helix-io/core'
 import { caretLeft, caretRight } from '@helix-io/icons'
@@ -117,16 +118,17 @@ const addMonths = (date: Date, months: number): Date => {
  * @csspart day - The shape inside a cell, which is what a single date paints.
  */
 @customElement('helix-base-calendar')
-export class HelixBaseCalendar extends HelixElement {
+export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
   /**
-   * The selected dates, comma separated, as `YYYY-MM-DD`.
+   * Name the calendar reports under when its form is submitted.
    *
-   * One date in `single`. Two in `range`, the earlier first. Any number in
-   * `multiple`. One attribute across all three, so a consumer reads and writes
-   * the same thing whatever the mode is.
+   * Absent means it submits nothing, which is what makes it safe to put one
+   * inside something else. `DatePicker` will hold the name and the calendar in
+   * its panel will stay quiet, the same way `Select` holds the name and the
+   * `Listbox` inside it does not.
    */
   @property()
-  value = ''
+  name = ''
 
   /** How many dates can be held at once. */
   @property({ reflect: true })
@@ -241,8 +243,16 @@ export class HelixBaseCalendar extends HelixElement {
     )
   }
 
-  /** Whether a date is barred, by bound, by weekday, or by name. */
-  private disabled(date: Date): boolean {
+  /**
+   * Whether a date is barred, by bound, by weekday, or by name.
+   *
+   * `barred`, not `disabled`: the calendar is a form control now, and
+   * `HelixFormElement.disabled` is a boolean about the whole control. A method
+   * and a flag cannot share a name, and of the two it is the method that should
+   * move, because "disabled" on a control means one thing everywhere else in
+   * the library.
+   */
+  private barred(date: Date): boolean {
     const iso = toIso(date)
     if (this.min !== '' && iso < this.min) {
       return true
@@ -276,7 +286,7 @@ export class HelixBaseCalendar extends HelixElement {
    * clicking a chosen date takes it out.
    */
   private select(date: Date): void {
-    if (this.disabled(date)) {
+    if (this.barred(date)) {
       return
     }
     const iso = toIso(date)
@@ -354,6 +364,38 @@ export class HelixBaseCalendar extends HelixElement {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'group' })
     this.internals.ariaInvalid = this.invalid ? 'true' : null
+    this.report()
+  }
+
+  /**
+   * Reports the dates to the form, one entry each.
+   *
+   * `FormData` rather than the comma-joined string the property holds, because
+   * `mode="multiple"` is genuinely several answers and a server reading
+   * `dates=2026-08-04,2026-08-06` has to know to split it on a convention this
+   * library invented. One entry per date is what every other multi-valued
+   * control on the platform sends, and `range` sends its two the same way, in
+   * order, so start and end arrive as the pair they already are.
+   *
+   * **Nothing at all without a `name`, and that is the mechanism rather than a
+   * detail.** It is what lets a calendar sit inside something that owns the
+   * form value, which is how `DatePicker` will hold one. The guard has to be
+   * explicit here in a way it does not for `Listbox`: a control reporting a
+   * plain string is skipped by the form when it has no name, but a `FormData`
+   * carries its own names and its entries are appended whatever the element is
+   * called, so an unnamed calendar would submit empty-named dates.
+   */
+  private report(): void {
+    const dates = this.selected
+    if (this.name === '' || this.disabled || dates.length === 0) {
+      this.internals.setFormValue(null)
+      return
+    }
+    const data = new FormData()
+    for (const date of dates) {
+      data.append(this.name, date)
+    }
+    this.internals.setFormValue(data)
   }
 
   private renderMonth(month: Date, index: number): TemplateResult {
@@ -417,7 +459,7 @@ export class HelixBaseCalendar extends HelixElement {
           (week) => html`<div part="week" role="row">
             ${week.map((date) => {
               const iso = toIso(date)
-              const disabled = this.disabled(date)
+              const disabled = this.barred(date)
               const selected = this.isSelected(iso)
               // The cell is the column track and the day is the shape centred
               // in it. A range paints the track, so it runs continuously

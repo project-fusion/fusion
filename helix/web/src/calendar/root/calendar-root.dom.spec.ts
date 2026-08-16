@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { formValue, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -224,5 +224,80 @@ describe('calendar selection can be refused', () => {
     press(cal, 'August 20')
     expect(seen).toBe('2026-08-20')
     expect(cal.value).toBe('2026-08-14')
+  })
+})
+
+describe('calendar as a form control', () => {
+  /** The dates a submission would carry, in order. */
+  const submitted = (cal: Calendar): string[] => {
+    const reported = formValue(cal as HTMLElement)
+    if (reported === null || reported === undefined) {
+      return []
+    }
+    return [...(reported as FormData).values()].map(String)
+  }
+
+  test('one date submits one entry', async () => {
+    expect(submitted(await calendar('name="when" month="2026-08" value="2026-08-14"'))).toEqual([
+      '2026-08-14',
+    ])
+  })
+
+  test('several dates submit one entry each, not a joined string', async () => {
+    /* `mode="multiple"` is genuinely several answers. A server reading
+       `when=2026-08-04,2026-08-06` has to know to split it on a convention this
+       library invented; one entry per date is what every other multi-valued
+       control on the platform sends. */
+    const cal = await calendar(
+      'mode="multiple" name="when" month="2026-08" value="2026-08-04,2026-08-06"',
+    )
+    expect(submitted(cal)).toEqual(['2026-08-04', '2026-08-06'])
+  })
+
+  test('a range submits its two the same way, in order', async () => {
+    const cal = await calendar(
+      'mode="range" name="when" month="2026-08" value="2026-08-11,2026-08-14"',
+    )
+    expect(submitted(cal)).toEqual(['2026-08-11', '2026-08-14'])
+  })
+
+  test('nothing chosen submits nothing', async () => {
+    expect(formValue((await calendar('name="when" month="2026-08"')) as HTMLElement)).toBeNull()
+  })
+
+  test('no name submits nothing, which is what lets one sit inside something else', async () => {
+    /* The mechanism a `DatePicker` will rest on, the same way `Select` holds
+       the name and the `Listbox` in its panel does not. It has to be explicit
+       here in a way it is not for a control reporting a plain string: a
+       `FormData` carries its own names and its entries are appended whatever
+       the element is called, so an unnamed calendar would otherwise submit
+       empty-named dates. */
+    expect(
+      formValue((await calendar('month="2026-08" value="2026-08-14"')) as HTMLElement),
+    ).toBeNull()
+  })
+
+  test('disabled submits nothing, whatever is chosen', async () => {
+    expect(
+      formValue(
+        (await calendar('disabled name="when" month="2026-08" value="2026-08-14"')) as HTMLElement,
+      ),
+    ).toBeNull()
+  })
+
+  test('a reset returns to the date the markup declared', async () => {
+    const cal = (await calendar(
+      'name="when" month="2026-08" default-value="2026-08-14"',
+    )) as Calendar & { formResetCallback(): void; updateComplete: Promise<boolean> }
+    expect(cal.value).toBe('2026-08-14')
+
+    cal.value = '2026-08-20'
+    await cal.updateComplete
+    expect(submitted(cal)).toEqual(['2026-08-20'])
+
+    cal.formResetCallback()
+    await cal.updateComplete
+    expect(cal.value).toBe('2026-08-14')
+    expect(submitted(cal)).toEqual(['2026-08-14'])
   })
 })
