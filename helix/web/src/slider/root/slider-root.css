@@ -4,7 +4,11 @@
   flex-direction: column;
   gap: var(--helix-space-2xs);
 
-  --_slider-track: 0.25rem;
+  /* The same token the progress bar takes, which is the same object: a
+     horizontal bar a proportion is read off. It was a bare `0.25rem`, so it was
+     both a raw value and half the height of the bar beside it, and at 4px the
+     fill and the rules in a table beside it were the same weight. */
+  --_slider-track: var(--helix-size-progress);
   --_slider-thumb: var(--helix-size-checkbox);
   /* The ring while the thumb is held or focused. The accent at low opacity, so
      it reads as the control's own colour rather than as a second element. */

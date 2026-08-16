@@ -30,6 +30,11 @@
   padding: var(--toast-item-inset, var(--helix-space-sm));
   /* The containing block for the timer, which is placed against this box. */
   position: relative;
+  /* So the timer's square ends are trimmed to the corners rather than sitting
+     proud of them. Nothing here needs to escape: the dismiss control's focus
+     ring is drawn well inside the inset, and a tooltip on a slotted action is
+     in the top layer and clears this regardless. */
+  overflow: hidden;
 }
 
 /* The severity mark.
@@ -142,11 +147,13 @@ slot[name="icon"]::slotted(*) {
 [part="timer"] {
   animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;
   background-color: var(--_toast-severity, var(--helix-color-foreground-muted));
-  block-size: var(--helix-border-thick);
-  border-radius: var(--helix-radii-full);
-  inset-block-end: var(--helix-space-2xs);
-  inset-inline: var(--helix-space-2xs);
-  opacity: 0.5;
+  block-size: var(--helix-space-2xs);
+  /* Along the top edge and edge to edge, so it reads as the message's own
+     border thickening rather than as a bar laid inside it. Square, because the
+     item clips it: a radius here would round the draining end as well, and a
+     corner travelling across the top is a shape rather than a measure. */
+  inset-block-start: 0;
+  inset-inline: 0;
   position: absolute;
   /* Physical, because `transform-origin` has no logical keyword. `:dir()` is
      what puts it at the other end in a right-to-left document, where the bar
