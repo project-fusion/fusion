@@ -96,6 +96,15 @@
  * The padding is not part of the grid track either: the track is sized from the
  * element's own inline size, and the padding is what overflows into the panes.
  */
+/* A hairline, like every other rule in the library. It was `border-thick`, so
+   the one line a reader can actually grab was also the heaviest line on screen:
+   twice the weight of the toolbar's rule under it and the panel's above, which
+   made the seam between the panes read as the loudest thing in the tool.
+ 
+   The grab area is unaffected, because it never came from the width: the
+   padding either side is what a pointer hits, pulled back out with a negative
+   margin so it overflows into the panes without taking a grid track. A thinner
+   line is not a smaller target. */
 [part="separator"] {
   background-clip: content-box;
   background-color: var(--sandbox-separator-color, var(--helix-color-border));
@@ -110,13 +119,13 @@
 :host([orientation="horizontal"]) [part="separator"][data-drag="inline"] {
   box-sizing: content-box;
   cursor: col-resize;
-  inline-size: var(--helix-border-thick);
+  inline-size: var(--helix-border-thin);
   margin-inline: calc(var(--sandbox-grab, var(--helix-space-2xs)) * -1);
   padding-inline: var(--sandbox-grab, var(--helix-space-2xs));
 }
 
 :host([orientation="vertical"]) [part="separator"][data-drag="inline"] {
-  block-size: var(--helix-border-thick);
+  block-size: var(--helix-border-thin);
   box-sizing: content-box;
   cursor: row-resize;
   margin-block: calc(var(--sandbox-grab, var(--helix-space-2xs)) * -1);
@@ -206,7 +215,7 @@
    line the panel used to draw itself: one boundary, one owner, and this is the
    side that can be taken hold of. */
 :host [part="separator"][data-axis="block"] {
-  block-size: var(--helix-border-thick);
+  block-size: var(--helix-border-thin);
   box-sizing: content-box;
   cursor: row-resize;
   grid-column: 1 / -1;
@@ -245,7 +254,7 @@
      part in sizing the tracks. */
   position: absolute;
   touch-action: none;
-  translate: calc(var(--helix-border-thick) / 2 - 50%) calc(var(--helix-border-thick) / 2 - 50%);
+  translate: calc(var(--helix-border-thin) / 2 - 50%) calc(var(--helix-border-thin) / 2 - 50%);
   z-index: var(--helix-layer-raised);
 }
 
