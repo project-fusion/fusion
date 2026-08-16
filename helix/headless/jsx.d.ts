@@ -36,6 +36,7 @@ import type {
   HelixBaseNavBar,
   HelixBaseOption,
   HelixBaseOptionGroup,
+  HelixBasePageNav,
   HelixBasePopover,
   HelixBaseProgress,
   HelixBaseQuote,
@@ -1948,6 +1949,37 @@ export type HelixBaseOptionSolidJsProps = {
   "prop:value"?: HelixBaseOption["value"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBasePageNavProps = {
+  /** Accessible name for the navigation. */
+  label?: HelixBasePageNav["label"];
+  /** How far below the top of the window a heading counts as reached, in pixels.
+
+The reading line. A page with a sticky masthead sets this to its height, or
+a little more: without it the current section changes as a heading slides
+under the chrome rather than as it reaches the top of what can be seen. */
+  offset?: HelixBasePageNav["offset"];
+  /** The id of the section being read, or empty before anything is measured. */
+  current?: HelixBasePageNav["current"];
+};
+
+export type HelixBasePageNavSolidJsProps = {
+  /** Accessible name for the navigation. */
+  "prop:label"?: HelixBasePageNav["label"];
+  /** How far below the top of the window a heading counts as reached, in pixels.
+
+The reading line. A page with a sticky masthead sets this to its height, or
+a little more: without it the current section changes as a heading slides
+under the chrome rather than as it reaches the top of what can be seen. */
+  "prop:offset"?: HelixBasePageNav["offset"];
+  /** The id of the section being read, or empty before anything is measured. */
+  "prop:current"?: HelixBasePageNav["current"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5420,6 +5452,68 @@ export type CustomElements = {
    */
   "helix-base-option": Partial<
     HelixBaseOptionProps & BaseProps<HelixBaseOption> & BaseEvents
+  >;
+
+  /**
+   * A table of contents, named for the job. Three of the obvious names are taken
+   * by things that are not this: `Outline` is a CSS property and the focus ring's
+   * whole vocabulary, `Contents` is `display: contents` and the `content` part
+   * half this library renders, and `TableOfContents` would sit beside `Table` and
+   * `TableColumn` and read as a third part of that family. `PageNav` sits beside
+   * `NavBar`, which is the same job at the other scale: one navigates a site, the
+   * other navigates a document.
+   *
+   * **The links are the consumer's own anchors**, the same as `NavBar`. A router
+   * renders its own `<a>` and cannot render one inside this shadow root, and the
+   * hrefs are fragments the page already knows.
+   *
+   * **What is current is decided by position, not by intersection.** The obvious
+   * build is an `IntersectionObserver` with a thin band near the top of the
+   * window, and it fails in both directions: with headings far apart nothing is
+   * in the band and the marker goes out entirely, and with headings close
+   * together several are and it flickers between them. So the observer is only
+   * the *trigger*, and the answer is computed from where the headings actually
+   * are: the current section is the last one whose top has passed the reading
+   * line, or the first heading before any of them has.
+   *
+   * That rule is what a reader means. Two headings on screen at once are not
+   * ambiguous to a person: they are reading under the upper one.
+   *
+   * **`aria-current="location"`, and it is written onto the consumer's anchor.**
+   * This library does not normally write to light-DOM children, because an
+   * attribute added after upgrade is one a server's markup never had. It is right
+   * here for the reason `Carousel` names its slides: what is current is derived
+   * from scroll position, so no server could have rendered it and there is
+   * nothing for hydration to disagree with. `location` rather than `page`, which
+   * is what `NavBar` uses: `page` means this is the page, and every one of these
+   * is the same page.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the navigation.
+   * - `offset`: How far below the top of the window a heading counts as reached, in pixels.
+   *
+   * The reading line. A page with a sticky masthead sets this to its height, or
+   * a little more: without it the current section changes as a heading slides
+   * under the chrome rather than as it reaches the top of what can be seen.
+   * - `current`: The id of the section being read, or empty before anything is measured. (property only)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The links, as anchors with fragment hrefs.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `nav`: The navigation landmark.
+   */
+  "helix-base-page-nav": Partial<
+    HelixBasePageNavProps & BaseProps<HelixBasePageNav> & BaseEvents
   >;
 
   /**
@@ -9174,6 +9268,71 @@ export type CustomElementsSolidJs = {
     HelixBaseOptionProps &
       HelixBaseOptionSolidJsProps &
       BaseProps<HelixBaseOption> &
+      BaseEvents
+  >;
+
+  /**
+   * A table of contents, named for the job. Three of the obvious names are taken
+   * by things that are not this: `Outline` is a CSS property and the focus ring's
+   * whole vocabulary, `Contents` is `display: contents` and the `content` part
+   * half this library renders, and `TableOfContents` would sit beside `Table` and
+   * `TableColumn` and read as a third part of that family. `PageNav` sits beside
+   * `NavBar`, which is the same job at the other scale: one navigates a site, the
+   * other navigates a document.
+   *
+   * **The links are the consumer's own anchors**, the same as `NavBar`. A router
+   * renders its own `<a>` and cannot render one inside this shadow root, and the
+   * hrefs are fragments the page already knows.
+   *
+   * **What is current is decided by position, not by intersection.** The obvious
+   * build is an `IntersectionObserver` with a thin band near the top of the
+   * window, and it fails in both directions: with headings far apart nothing is
+   * in the band and the marker goes out entirely, and with headings close
+   * together several are and it flickers between them. So the observer is only
+   * the *trigger*, and the answer is computed from where the headings actually
+   * are: the current section is the last one whose top has passed the reading
+   * line, or the first heading before any of them has.
+   *
+   * That rule is what a reader means. Two headings on screen at once are not
+   * ambiguous to a person: they are reading under the upper one.
+   *
+   * **`aria-current="location"`, and it is written onto the consumer's anchor.**
+   * This library does not normally write to light-DOM children, because an
+   * attribute added after upgrade is one a server's markup never had. It is right
+   * here for the reason `Carousel` names its slides: what is current is derived
+   * from scroll position, so no server could have rendered it and there is
+   * nothing for hydration to disagree with. `location` rather than `page`, which
+   * is what `NavBar` uses: `page` means this is the page, and every one of these
+   * is the same page.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the navigation.
+   * - `offset`: How far below the top of the window a heading counts as reached, in pixels.
+   *
+   * The reading line. A page with a sticky masthead sets this to its height, or
+   * a little more: without it the current section changes as a heading slides
+   * under the chrome rather than as it reaches the top of what can be seen.
+   * - `current`: The id of the section being read, or empty before anything is measured. (property only)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The links, as anchors with fragment hrefs.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `nav`: The navigation landmark.
+   */
+  "helix-base-page-nav": Partial<
+    HelixBasePageNavProps &
+      HelixBasePageNavSolidJsProps &
+      BaseProps<HelixBasePageNav> &
       BaseEvents
   >;
 

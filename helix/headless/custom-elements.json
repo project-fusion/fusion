@@ -8051,6 +8051,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/page-nav/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/popover/index.js"
           }
         },
@@ -11865,6 +11873,254 @@
           "declaration": {
             "name": "HelixBaseOption",
             "module": "src/option/root/option-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/page-nav/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/page-nav/root/page-nav-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/page-nav/root/page-nav-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A table of contents, named for the job. Three of the obvious names are taken\nby things that are not this: `Outline` is a CSS property and the focus ring's\nwhole vocabulary, `Contents` is `display: contents` and the `content` part\nhalf this library renders, and `TableOfContents` would sit beside `Table` and\n`TableColumn` and read as a third part of that family. `PageNav` sits beside\n`NavBar`, which is the same job at the other scale: one navigates a site, the\nother navigates a document.\n\n**The links are the consumer's own anchors**, the same as `NavBar`. A router\nrenders its own `<a>` and cannot render one inside this shadow root, and the\nhrefs are fragments the page already knows.\n\n**What is current is decided by position, not by intersection.** The obvious\nbuild is an `IntersectionObserver` with a thin band near the top of the\nwindow, and it fails in both directions: with headings far apart nothing is\nin the band and the marker goes out entirely, and with headings close\ntogether several are and it flickers between them. So the observer is only\nthe *trigger*, and the answer is computed from where the headings actually\nare: the current section is the last one whose top has passed the reading\nline, or the first heading before any of them has.\n\nThat rule is what a reader means. Two headings on screen at once are not\nambiguous to a person: they are reading under the upper one.\n\n**`aria-current=\"location\"`, and it is written onto the consumer's anchor.**\nThis library does not normally write to light-DOM children, because an\nattribute added after upgrade is one a server's markup never had. It is right\nhere for the reason `Carousel` names its slides: what is current is derived\nfrom scroll position, so no server could have rendered it and there is\nnothing for hydration to disagree with. `location` rather than `page`, which\nis what `NavBar` uses: `page` means this is the page, and every one of these\nis the same page.",
+          "name": "HelixBasePageNav",
+          "cssParts": [
+            {
+              "description": "The navigation landmark.",
+              "name": "nav"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The links, as anchors with fragment hrefs.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'On this page'",
+              "description": "Accessible name for the navigation.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "offset",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How far below the top of the window a heading counts as reached, in pixels.\n\nThe reading line. A page with a sticky masthead sets this to its height, or\na little more: without it the current section changes as a heading slides\nunder the chrome rather than as it reaches the top of what can be seen.",
+              "attribute": "offset"
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the section being read, or empty before anything is measured."
+            },
+            {
+              "kind": "field",
+              "name": "observer",
+              "type": {
+                "text": "IntersectionObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "links",
+              "type": {
+                "text": "HTMLAnchorElement[]"
+              },
+              "privacy": "private",
+              "description": "The links, in document order. Empty on the server, which has no tree.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "sections",
+              "type": {
+                "text": "{ link: HTMLAnchorElement; target: Element }[]"
+              },
+              "privacy": "private",
+              "description": "What each link points at, paired with the link, skipping anything missing.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "mark",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Works out which section is being read, and marks its link.\n\nPositional rather than a reading of what intersects, for the reason above.\nThe comparison is against `offset` and not zero, so the reading line is\nwherever the page says the top of the readable area is."
+            },
+            {
+              "kind": "method",
+              "name": "watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Watches every section, and re-marks whenever any of them crosses anything.\n\nThe thresholds are what make the trigger frequent enough: an observer fires\non entering and leaving, and a long section scrolled slowly crosses neither\nfor a long time. Asking for a callback at each quarter of visibility is\ncheap and keeps the marker honest without a scroll listener."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'On this page'",
+              "description": "Accessible name for the navigation.",
+              "fieldName": "label"
+            },
+            {
+              "name": "offset",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How far below the top of the window a heading counts as reached, in pixels.\n\nThe reading line. A page with a sticky masthead sets this to its height, or\na little more: without it the current section changes as a heading slides\nunder the chrome rather than as it reaches the top of what can be seen.",
+              "fieldName": "offset"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Links to the headings on this page, marking the one being read.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/page-nav",
+            "aliases": [
+              "Table of contents",
+              "On this page",
+              "Outline"
+            ],
+            "tier": "headless",
+            "group": "BasePageNav",
+            "part": "Root"
+          },
+          "tagName": "helix-base-page-nav",
+          "customElement": true,
+          "modulePath": "src/page-nav/root/page-nav-root.ts",
+          "definitionPath": "src/page-nav/root/page-nav-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBasePageNav",
+          "declaration": {
+            "name": "HelixBasePageNav",
+            "module": "src/page-nav/root/page-nav-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-page-nav",
+          "declaration": {
+            "name": "HelixBasePageNav",
+            "module": "src/page-nav/root/page-nav-root.ts"
           }
         }
       ]

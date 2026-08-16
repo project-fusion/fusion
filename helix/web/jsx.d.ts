@@ -43,6 +43,7 @@ import type {
   HelixOpenEvent,
   HelixOption,
   HelixOptionGroup,
+  HelixPageNav,
   HelixPopover,
   HelixProgress,
   HelixQuote,
@@ -2154,6 +2155,37 @@ export type HelixOptionSolidJsProps = {
   "prop:value"?: HelixOption["value"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixOptionHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixPageNavProps = {
+  /** Accessible name for the navigation. */
+  label?: HelixPageNav["label"];
+  /** How far below the top of the window a heading counts as reached, in pixels.
+
+The reading line. A page with a sticky masthead sets this to its height, or
+a little more: without it the current section changes as a heading slides
+under the chrome rather than as it reaches the top of what can be seen. */
+  offset?: HelixPageNav["offset"];
+  /** The id of the section being read, or empty before anything is measured. */
+  current?: HelixPageNav["current"];
+};
+
+export type HelixPageNavSolidJsProps = {
+  /** Accessible name for the navigation. */
+  "prop:label"?: HelixPageNav["label"];
+  /** How far below the top of the window a heading counts as reached, in pixels.
+
+The reading line. A page with a sticky masthead sets this to its height, or
+a little more: without it the current section changes as a heading slides
+under the chrome rather than as it reaches the top of what can be seen. */
+  "prop:offset"?: HelixPageNav["offset"];
+  /** The id of the section being read, or empty before anything is measured. */
+  "prop:current"?: HelixPageNav["current"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5686,6 +5718,49 @@ export type CustomElements = {
    */
   "helix-option": Partial<
     HelixOptionProps & BaseProps<HelixOption> & BaseEvents
+  >;
+
+  /**
+   * A rule down the leading edge with the current section lit along it, which is
+   * the shape a table of contents has taken since printed marginalia: the line
+   * says the list is one thing, and the lit segment says where in it you are.
+   *
+   * Nesting is the consumer's, expressed as `data-level` on a link. A page-nav
+   * that read heading levels itself would have to look at the document, and the
+   * document is not always where the headings are.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the navigation.
+   * - `offset`: How far below the top of the window a heading counts as reached, in pixels.
+   *
+   * The reading line. A page with a sticky masthead sets this to its height, or
+   * a little more: without it the current section changes as a heading slides
+   * under the chrome rather than as it reaches the top of what can be seen.
+   * - `current`: The id of the section being read, or empty before anything is measured. (property only)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The links, as anchors with fragment hrefs.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--page-nav-indent`: How far each level is inset from the one above. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `nav`: The navigation landmark.
+   */
+  "helix-page-nav": Partial<
+    HelixPageNavProps & BaseProps<HelixPageNav> & BaseEvents
   >;
 
   /**
@@ -9450,6 +9525,52 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * A rule down the leading edge with the current section lit along it, which is
+   * the shape a table of contents has taken since printed marginalia: the line
+   * says the list is one thing, and the lit segment says where in it you are.
+   *
+   * Nesting is the consumer's, expressed as `data-level` on a link. A page-nav
+   * that read heading levels itself would have to look at the document, and the
+   * document is not always where the headings are.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the navigation.
+   * - `offset`: How far below the top of the window a heading counts as reached, in pixels.
+   *
+   * The reading line. A page with a sticky masthead sets this to its height, or
+   * a little more: without it the current section changes as a heading slides
+   * under the chrome rather than as it reaches the top of what can be seen.
+   * - `current`: The id of the section being read, or empty before anything is measured. (property only)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The links, as anchors with fragment hrefs.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--page-nav-indent`: How far each level is inset from the one above. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `nav`: The navigation landmark.
+   */
+  "helix-page-nav": Partial<
+    HelixPageNavProps &
+      HelixPageNavSolidJsProps &
+      BaseProps<HelixPageNav> &
+      BaseEvents
+  >;
+
+  /**
    * A surface with an inset and a shadow, and nothing about what goes in it. The
    * inset is the panel's rather than the consumer's, which is the same call
    * `Dialog` and `Drawer` make and for the same reason: everyone was writing it,
@@ -11275,6 +11396,8 @@ export type CustomCssProperties = {
   "--nav-bar-gap"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
+  /** How far each level is inset from the one above. */
+  "--page-nav-indent"?: string;
   /** Space between the panel's edge and its contents. */
   "--popover-inset"?: string;
   /** Width of the panel. */

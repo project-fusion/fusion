@@ -1,0 +1,63 @@
+:host {
+  display: block;
+}
+
+/* The rule is a background rather than a border, for the reason the tabs strip
+   learned: a border is part of the element's own box, so a lit segment drawn
+   over it has to cover a box edge exactly, and `overflow` clips the border area
+   away. A gradient is painted inside the box and nothing clips it. */
+[part="nav"] {
+  background-image: linear-gradient(var(--helix-color-border), var(--helix-color-border));
+  background-position: left;
+  background-repeat: repeat-y;
+  background-size: var(--helix-border-thin) 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+::slotted(a) {
+  border-inline-start: var(--helix-border-thick) solid transparent;
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-normal);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+  text-decoration: none;
+  transition:
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+::slotted(a:hover) {
+  color: var(--helix-color-foreground);
+}
+
+/* The one being read. `aria-current` rather than a class, so the thing a screen
+   reader is told and the thing the eye is shown are the same attribute and
+   cannot disagree. */
+::slotted(a[aria-current]) {
+  border-inline-start-color: var(--helix-color-primary);
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-medium);
+}
+
+::slotted(a:focus-visible) {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Nesting, said by the consumer. Multiplied rather than enumerated, so a page
+   with five levels needs no rule adding here. */
+::slotted(a[data-level="2"]) {
+  padding-inline-start: calc(var(--helix-space-sm) + var(--page-nav-indent, var(--helix-space-sm)));
+}
+
+::slotted(a[data-level="3"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    2 *
+    var(--page-nav-indent, var(--helix-space-sm))
+  );
+}
