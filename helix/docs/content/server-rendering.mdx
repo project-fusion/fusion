@@ -1,0 +1,90 @@
+# Server rendering
+
+Every component renders on a server with no DOM. If you are only consuming
+Helix, the practical consequence is small — components work in your server
+components and there is nothing to configure. If you are extending one, the
+rules below are the whole contract.
+
+## There is no DOM, and the failure is silent
+
+Lit's element shim carries attributes. It does not carry a tree. `querySelector`
+is undefined, `this.children` is undefined, and anything that walks the DOM
+throws while rendering.
+
+Two real examples from this library, both found the first time their component
+was given a server spec:
+
+```ts
+// Select. `display` is read during render and reached the render root.
+private get listbox() {
+  return this.renderRoot?.querySelector('[part="listbox"]') ?? null
+}
+
+// Menu item. `hasSubmenu` is read during render and spread its children.
+get hasSubmenu(): boolean {
+  return [...(this.children ?? [])].some((child) => child.slot === 'submenu')
+}
+```
+
+Before those two guards, neither component could be server-rendered at all. Both
+looked correct in every browser, because the client always has a root and always
+has a tree.
+
+**Anything that inspects the tree runs in `firstUpdated` or later**, and is
+therefore a client-side enhancement by definition.
+
+## Never initialise state in `connectedCallback`
+
+SSR does not call it. Derive from properties, or seed in `willUpdate`, which SSR
+does call.
+
+## Guard generated ids
+
+```ts
+if (!this.id) {
+  this.id = `helix-${crypto.randomUUID()}`
+}
+```
+
+The server writes the id into the HTML; the client sees it present and skips
+generating a new one, so both agree. Without the guard they disagree and the
+association breaks on hydration.
+
+## Semantics on the host, presentation in the shadow root
+
+IDREFs do not cross shadow boundaries, so `aria-labelledby` inside a shadow root
+can never resolve to a light-DOM id. Use `ElementInternals`, which writes no
+attribute at all — so the host stays exactly as you wrote it and hydration has
+nothing to disagree about.
+
+Where an id genuinely cannot reach, **element references can**, and they resolve
+outward: an element in a shadow root may point at one in the light DOM.
+`Listbox` uses that for `aria-activedescendant`, because its options are your
+elements and the element that takes focus is in its shadow root. Feature-test
+them — assigning to a property an engine does not implement is a no-op rather
+than an error.
+
+## A child announces itself to its parent
+
+A parent cannot poll for a child that has not upgraded yet. The child dispatches
+a bubbling ready event and the parent listens.
+
+## Writing a server spec
+
+Every component has a `*.ssr.spec.ts`, and there is one rule about them worth
+repeating, because it has produced a false pass twice:
+
+**Never assert structure against the raw SSR string.** Declarative shadow DOM
+inlines the component's stylesheet into the very markup being asserted, and that
+stylesheet names every part, host attribute and token the component uses. So
+`toContain('part="media"')` passes on a *selector*, and
+`not.toContain('data-scrolled')` fails on a `:host([data-scrolled])` *rule* —
+both saying nothing about what rendered.
+
+Use the helpers: `withoutStyles`, `hasPart`, `partTag`, `hostTag`. And match
+attribute bindings with a pattern, since they render across several lines:
+
+```ts
+expect(markup).toMatch(/<a\s+part="button"/) // ✅
+expect(markup).toContain('<a part="button"') // ❌ never matches
+```

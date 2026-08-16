@@ -65,8 +65,22 @@ export const pages: DocPage[] = [
     title: 'Size and density',
   },
   {
-    description: 'Deriving an accessible token set from intent inputs.',
+    description: 'What renders without a DOM, and what has to wait for one.',
+    order: 4,
+    section: 'Patterns',
+    slug: 'server-rendering',
+    title: 'Server rendering',
+  },
+  {
+    description: 'The two layers, the surface ladder, and what is enforced.',
     order: 1,
+    section: 'Theming',
+    slug: 'tokens',
+    title: 'Tokens',
+  },
+  {
+    description: 'Deriving an accessible token set from intent inputs.',
+    order: 2,
     section: 'Theming',
     slug: 'theming',
     title: 'Theming',

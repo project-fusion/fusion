@@ -1,0 +1,80 @@
+# Tokens
+
+Two layers. You see the second.
+
+| Layer | Shape | Who may use it |
+|---|---|---|
+| Primitive | `--_helix-neutral-500` | `@helix-io/styles` only |
+| Semantic | `--helix-color-primary` | everything, including you |
+
+Every semantic token answers *what is this for*, never *what value is it*. There
+are fifteen categories and every token is in exactly one: `color` `space`
+`radii` `font` `text` `weight` `leading` `tracking` `border` `shadow`
+`material` `duration` `easing` `size` `layer`.
+
+The leading underscore is the whole convention: `--_helix-` is private and may
+be renamed or re-spaced without notice. Reaching past the semantic layer is the
+one thing that will break under you.
+
+## The surfaces, which are the ones people get wrong
+
+Depth is distance from the page, in whichever direction there is room. The page
+is white in light and black in dark, so in light there is nothing above white to
+be lifted into: a raised surface goes *down* the ramp, not up.
+
+- **`background`** — the page.
+- **`surface`** — a plane on the page. A card, a panel you own.
+- **`surface-raised`** — something lifted while still *lying on* the page: a
+  selected tab's pill, a hovered row, an option under the pointer. It has the
+  page on all sides, so it is told apart by its fill, which on white has to be a
+  step darker.
+- **`surface-overlay`** — something *over* the page rather than on it: a menu, a
+  popover, a dialog, and the thumb of a switch or a segmented control. It is
+  told apart by its shadow and by what it covers, so on white it is white.
+- **`surface-sunken`** — a well you put a value into: an input's fill, a track, a
+  groove.
+
+**`raised` and `overlay` are the pair worth learning.** They land on the same
+step in dark mode, which is why one token tried to do both jobs for a while. In
+light they want opposite fills: a hovered row must be darker than a white page,
+and a thumb must be lighter than the groove it sits in. If something looks
+almost right in dark and wrong in light, this is usually why.
+
+## Per-component hooks
+
+```css
+helix-card {
+  --card-padding: var(--helix-space-lg);
+}
+```
+
+`--card-padding` is not a Helix token. It is a hook that particular component
+exposes, documented on the component, and it defaults to a semantic token. Use
+them to nudge one component; use the semantic tokens to move everything.
+
+## What is enforced
+
+`bun run check:tokens` fails the build on three things:
+
+1. **A raw value where a token exists.** `#e5e5e5` when a neutral is right there.
+2. **A primitive referenced from outside `@helix-io/styles`.**
+3. **A reference to a token that does not exist.**
+
+The third earns its keep on its own: a renamed token resolves to nothing, the
+property silently falls back to a browser default, and the code looks correct
+while the component is quietly unstyled.
+
+## Theming
+
+Both modes live in one declaration:
+
+```css
+--helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
+```
+
+Which half resolves is decided by `color-scheme` and nothing else, so the colour
+mode is a single attribute and no token is restated to honour it. Set
+`data-color-mode="light"` or `"dark"` on any element to theme that subtree —
+`color-scheme` inherits, so a light preview inside a dark page is one attribute.
+
+Absent, it follows the operating system.
