@@ -13,12 +13,21 @@
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   box-sizing: border-box;
-  color: var(--helix-color-foreground-subtle);
+  /* Muted rather than subtle, and the same size as the cells under it. It was
+     `text-xs` in `foreground-subtle`, which is the treatment for a caption: two
+     steps quieter and a step smaller than the column it names, so the heading
+     read as a footnote to its own data. A column heading is a label, so it
+     recedes, but it is still part of the table and is read as often as anything
+     in it. Weight is what separates it now, not shrinking it. */
+  color: var(--helix-color-foreground-muted);
   display: flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-semibold);
-  min-block-size: var(--helix-size-control-md);
+  /* Taller than a row, because the header is a band rather than the first row
+     of data: at the same height it read as one, and the rule under it as the
+     first of the row separators rather than as the line the table starts at. */
+  min-block-size: var(--helix-size-control-lg);
   min-inline-size: 0;
   padding-inline-end: var(--helix-space-md);
 }
