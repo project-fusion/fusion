@@ -10,7 +10,11 @@
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
+  /* Content, so full foreground. It was `foreground-muted`, which is the colour
+     for chrome around something a reader is looking at, and a table's cells are
+     the thing they are looking at: a whole table set in grey reads as disabled
+     or as a footnote. The rules and the column headings are what recede. */
+  color: var(--helix-color-foreground);
   display: flex;
   font-size: var(--helix-text-sm);
   min-block-size: var(--helix-size-control-md);
@@ -18,10 +22,16 @@
   padding: var(--helix-space-xs) var(--helix-space-md) var(--helix-space-xs) var(--helix-space-none);
 }
 
-/* Weight and color carry the header, not capitals. Uppercase costs
-   legibility and is read letter by letter by some screen readers. */
+/* A *row* header, which is content and not a label: "helix-web" names the row
+   and is one of the things being read. Weight carries it, and it keeps the
+   foreground and the size of the cells beside it, because it is one of them.
+   Not capitals, which cost legibility and are read letter by letter by some
+   screen readers.
+
+   Column headings are the ones that recede, and they are `helix-table-column`
+   now rather than a cell wearing an attribute. Before columns existed this
+   selector had to serve both, so it took the quieter of the two treatments and
+   every row header in every table was small grey text. */
 :host([header]) {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-semibold);
+  font-weight: var(--helix-weight-medium);
 }
