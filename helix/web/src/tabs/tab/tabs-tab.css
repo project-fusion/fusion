@@ -20,7 +20,7 @@
   /* Zero unless the set says otherwise. Only the underline appearance draws a
      rule for a tab's border to meet; the others have nothing below to align to,
      and pulling there would just shift the strip. */
-  margin-block-end: var(--_tab-pull, 0);
+  margin-block-end: var(--_tab-pull, var(--helix-space-none));
   border-radius: var(--_tab-radius, var(--helix-radii-none));
   color: var(--helix-color-foreground-subtle);
   cursor: pointer;
