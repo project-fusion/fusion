@@ -56,6 +56,13 @@
 :host([appearance="underline"]) {
   --_tabs-rule: var(--helix-border-thin) solid var(--helix-color-border);
   --_tab-radius: var(--helix-radii-none);
+  /* The tabs sit *inside* the strip, so a tab's own bottom border lands above
+     the strip's rule rather than on it: two parallel lines, a thick blue one
+     riding a thin grey one. Pulling each tab down by the rule's width puts the
+     two on the same pixels, so the selected tab's border covers the rule for
+     its own width and the rule shows through everywhere else. That is what an
+     underline tab set is: one line, coloured under the current tab. */
+  --_tab-pull: calc(var(--helix-border-thin) * -1);
   --_tab-selected-rule: var(--helix-color-primary);
   --_tab-selected-shadow: none;
   --_tab-selected-surface: transparent;
