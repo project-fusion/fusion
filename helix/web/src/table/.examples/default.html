@@ -1,13 +1,11 @@
-<!-- `columns` is a CSS track list, not a list of headings: a table's columns are
-     rarely equal, and `16rem minmax(0, 1fr) minmax(0, 1fr)` is the common shape
-     that no count expresses. The headings are a row of header cells, which is
-     what a screen reader reads as the column names. -->
-<helix-table columns="16rem minmax(0, 1fr) minmax(0, 1fr)" label="Deployments">
-  <helix-table-row>
-    <helix-table-cell header>Service</helix-table-cell>
-    <helix-table-cell header>Region</helix-table-cell>
-    <helix-table-cell header>Status</helix-table-cell>
-  </helix-table-row>
+<!-- A column declares its heading and its width together, because they are two
+     facts about one thing: add a column and the table has another track, remove
+     one and it does not. A column with no width shares what is left over. -->
+<helix-table label="Deployments">
+  <helix-table-column width="12rem">Service</helix-table-column>
+  <helix-table-column>Region</helix-table-column>
+  <helix-table-column>Status</helix-table-column>
+
   <helix-table-row>
     <helix-table-cell header>helix-web</helix-table-cell>
     <helix-table-cell>us-east-1</helix-table-cell>

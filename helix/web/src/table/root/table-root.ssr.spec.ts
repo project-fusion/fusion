@@ -28,3 +28,19 @@ describe('table server output', () => {
     expect(withoutStyles(markup)).toContain('appearance')
   })
 })
+
+describe('table column server output', () => {
+  test('a column serves its heading', () => {
+    expect(
+      withoutStyles(ssr(html`<helix-table-column width="12rem">Service</helix-table-column>`)),
+    ).toContain('Service')
+  })
+
+  test('the track list is not served, because it is read from children', () => {
+    // The server has no tree to walk, so the table cannot know its columns. The
+    // grid falls back to one track until it upgrades, which is the same trade
+    // the docs describe for anything that inspects the DOM.
+    const markup = ssr(html`<helix-table label="T"></helix-table>`)
+    expect(withoutStyles(markup)).not.toContain('--table-columns')
+  })
+})

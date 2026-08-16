@@ -54,6 +54,7 @@ import type {
   HelixSwitch,
   HelixTable,
   HelixTableCell,
+  HelixTableColumn,
   HelixTableRow,
   HelixTabs,
   HelixTabsPanel,
@@ -2461,21 +2462,58 @@ export type HelixTableCellSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixTableProps = {
-  /** Column track list, as CSS.
+export type HelixTableColumnProps = {
+  /** The track this column takes, as CSS.
 
-A raw track list rather than a count, because a table's columns are rarely
-equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it. */
+A single track value, so anything valid in `grid-template-columns` works:
+`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
+left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
+`1fr` track keeps an automatic minimum and refuses to shrink under a long
+cell, so one unbreakable value pushes the table past its container. */
+  width?: HelixTableColumn["width"];
+};
+
+export type HelixTableColumnSolidJsProps = {
+  /** The track this column takes, as CSS.
+
+A single track value, so anything valid in `grid-template-columns` works:
+`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
+left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
+`1fr` track keeps an automatic minimum and refuses to shrink under a long
+cell, so one unbreakable value pushes the table past its container. */
+  "prop:width"?: HelixTableColumn["width"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixTableProps = {
+  /** Column track list, as CSS. Deprecated: declare columns instead.
+
+Kept for a table that has no `helix-table-column` children, and ignored the
+moment it has one. A raw track list is the right shape for the value and
+the wrong place for it: the headings and the widths were two halves of one
+fact held in two places, and nothing checked that they agreed. Worse, the
+value is CSS, so handing it headings by mistake produced an invalid track
+list, which a grid ignores in silence: the table collapsed to one column
+and said nothing. Columns carry both halves now. */
   columns?: HelixTable["columns"];
   /** Accessible name for the table. */
   label?: HelixTable["label"];
 };
 
 export type HelixTableSolidJsProps = {
-  /** Column track list, as CSS.
+  /** Column track list, as CSS. Deprecated: declare columns instead.
 
-A raw track list rather than a count, because a table's columns are rarely
-equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it. */
+Kept for a table that has no `helix-table-column` children, and ignored the
+moment it has one. A raw track list is the right shape for the value and
+the wrong place for it: the headings and the widths were two halves of one
+fact held in two places, and nothing checked that they agreed. Worse, the
+value is CSS, so handing it headings by mistake produced an invalid track
+list, which a grid ignores in silence: the table collapsed to one column
+and said nothing. Columns carry both halves now. */
   "prop:columns"?: HelixTable["columns"];
   /** Accessible name for the table. */
   "prop:label"?: HelixTable["label"];
@@ -5599,6 +5637,41 @@ export type CustomElements = {
   >;
 
   /**
+   * Styled as the header cell it is, and it carries the same rule and inset as
+   * the cells beneath it so the heading and its column read as one line down the
+   * table.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `width`: The track this column takes, as CSS.
+   *
+   * A single track value, so anything valid in `grid-template-columns` works:
+   * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
+   * left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
+   * `1fr` track keeps an automatic minimum and refuses to shrink under a long
+   * cell, so one unbreakable value pushes the table past its container.
+   * - `isTableColumn`: Marks this as a column a table should count. Cheaper than an instanceof. (property only) (readonly)
+   * - `track`: The track this column contributes, resolved. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The heading.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `column`: The heading cell.
+   */
+  "helix-table-column": Partial<
+    HelixTableColumnProps & BaseProps<HelixTableColumn> & BaseEvents
+  >;
+
+  /**
    * Hairline rules between rows and no fill, per the rule that depth comes from a
    * single border rather than from elevation. A dense table earns its density by
    * decorating none of it.
@@ -5607,11 +5680,17 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `columns`: Column track list, as CSS.
+   * - `columns`: Column track list, as CSS. Deprecated: declare columns instead.
    *
-   * A raw track list rather than a count, because a table's columns are rarely
-   * equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.
+   * Kept for a table that has no `helix-table-column` children, and ignored the
+   * moment it has one. A raw track list is the right shape for the value and
+   * the wrong place for it: the headings and the widths were two halves of one
+   * fact held in two places, and nothing checked that they agreed. Worse, the
+   * value is CSS, so handing it headings by mistake produced an invalid track
+   * list, which a grid ignores in silence: the table collapsed to one column
+   * and said nothing. Columns carry both halves now.
    * - `label`: Accessible name for the table.
+   * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
    *
    * ## Slots
    *
@@ -8920,6 +8999,44 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Styled as the header cell it is, and it carries the same rule and inset as
+   * the cells beneath it so the heading and its column read as one line down the
+   * table.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `width`: The track this column takes, as CSS.
+   *
+   * A single track value, so anything valid in `grid-template-columns` works:
+   * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
+   * left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
+   * `1fr` track keeps an automatic minimum and refuses to shrink under a long
+   * cell, so one unbreakable value pushes the table past its container.
+   * - `isTableColumn`: Marks this as a column a table should count. Cheaper than an instanceof. (property only) (readonly)
+   * - `track`: The track this column contributes, resolved. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The heading.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `column`: The heading cell.
+   */
+  "helix-table-column": Partial<
+    HelixTableColumnProps &
+      HelixTableColumnSolidJsProps &
+      BaseProps<HelixTableColumn> &
+      BaseEvents
+  >;
+
+  /**
    * Hairline rules between rows and no fill, per the rule that depth comes from a
    * single border rather than from elevation. A dense table earns its density by
    * decorating none of it.
@@ -8928,11 +9045,17 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `columns`: Column track list, as CSS.
+   * - `columns`: Column track list, as CSS. Deprecated: declare columns instead.
    *
-   * A raw track list rather than a count, because a table's columns are rarely
-   * equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.
+   * Kept for a table that has no `helix-table-column` children, and ignored the
+   * moment it has one. A raw track list is the right shape for the value and
+   * the wrong place for it: the headings and the widths were two halves of one
+   * fact held in two places, and nothing checked that they agreed. Worse, the
+   * value is CSS, so handing it headings by mistake produced an invalid track
+   * list, which a grid ignores in silence: the table collapsed to one column
+   * and said nothing. Columns carry both halves now.
    * - `label`: Accessible name for the table.
+   * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
    *
    * ## Slots
    *

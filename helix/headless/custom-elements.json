@@ -15126,6 +15126,179 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/table/column/table-column.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A column is a heading and a width, declared together, because they are two\nfacts about one thing and keeping them apart is what went wrong before.\n\n**This replaces a `columns` string on the table.** That property took a CSS\ntrack list, so the headings lived in a row of cells and the widths lived in\nan attribute, and nothing tied the two together: a table with three headings\nand a two-track list rendered without complaint. Worse, handing it the\nheadings instead of a track list produced invalid CSS, which the grid\nsilently ignored, so the whole table collapsed into one column and every cell\nstacked. That happened, in this library's own example, and the failure said\nnothing at all.\n\nNow the column is the source of both. Add one and the table has another\ntrack; remove one and it does not.\n\n**It generates no box of its own**, the same as a row: the heading is a grid\nitem of the table, so it lines up with the cells under it rather than sitting\nin a wrapper that has to be kept the same width.",
+          "name": "HelixBaseTableColumn",
+          "cssParts": [
+            {
+              "description": "The heading cell.",
+              "name": "column"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The heading.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The track this column takes, as CSS.\n\nA single track value, so anything valid in `grid-template-columns` works:\n`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is\nleft over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare\n`1fr` track keeps an automatic minimum and refuses to shrink under a long\ncell, so one unbreakable value pushes the table past its container.",
+              "attribute": "width"
+            },
+            {
+              "kind": "field",
+              "name": "isTableColumn",
+              "type": {
+                "text": "boolean"
+              },
+              "readonly": true,
+              "default": "true",
+              "description": "Marks this as a column a table should count. Cheaper than an instanceof."
+            },
+            {
+              "kind": "field",
+              "name": "track",
+              "type": {
+                "text": "string"
+              },
+              "description": "The track this column contributes, resolved.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The track this column takes, as CSS.\n\nA single track value, so anything valid in `grid-template-columns` works:\n`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is\nleft over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare\n`1fr` track keeps an automatic minimum and refuses to shrink under a long\ncell, so one unbreakable value pushes the table past its container.",
+              "fieldName": "width"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One column of a table: its heading, and how wide it is.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/table",
+            "aliases": [
+              "Column header",
+              "Th"
+            ],
+            "tier": "headless",
+            "group": "BaseTable",
+            "part": "Column"
+          },
+          "tagName": "helix-base-table-column",
+          "customElement": true,
+          "modulePath": "src/table/column/table-column.ts",
+          "definitionPath": "src/table/column/table-column.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTableColumn",
+          "declaration": {
+            "name": "HelixBaseTableColumn",
+            "module": "src/table/column/table-column.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-table-column",
+          "declaration": {
+            "name": "HelixBaseTableColumn",
+            "module": "src/table/column/table-column.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/table/index.ts",
       "declarations": [],
       "exports": [
@@ -15135,6 +15308,14 @@
           "declaration": {
             "name": "*",
             "module": "src/table/cell/table-cell.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/table/column/table-column.js"
           }
         },
         {
@@ -15189,7 +15370,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
+              "description": "Column track list, as CSS. Deprecated: declare columns instead.\n\nKept for a table that has no `helix-table-column` children, and ignored the\nmoment it has one. A raw track list is the right shape for the value and\nthe wrong place for it: the headings and the widths were two halves of one\nfact held in two places, and nothing checked that they agreed. Worse, the\nvalue is CSS, so handing it headings by mistake produced an invalid track\nlist, which a grid ignores in silence: the table collapsed to one column\nand said nothing. Columns carry both halves now.",
               "attribute": "columns"
             },
             {
@@ -15201,6 +15382,31 @@
               "default": "''",
               "description": "Accessible name for the table.",
               "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "tableColumns",
+              "type": {
+                "text": "HelixBaseTableColumn[]"
+              },
+              "description": "The columns declared as children, in the order they are written.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "template",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The track list, from the columns if there are any.\n\nRead from the DOM rather than kept, so adding or removing a column needs\nnothing else to be told. Falls back to the `columns` string for a table\nwritten before columns existed, and to a single track for one that declares\nneither.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -15279,7 +15485,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Column track list, as CSS.\n\nA raw track list rather than a count, because a table's columns are rarely\nequal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.",
+              "description": "Column track list, as CSS. Deprecated: declare columns instead.\n\nKept for a table that has no `helix-table-column` children, and ignored the\nmoment it has one. A raw track list is the right shape for the value and\nthe wrong place for it: the headings and the widths were two halves of one\nfact held in two places, and nothing checked that they agreed. Worse, the\nvalue is CSS, so handing it headings by mistake produced an invalid track\nlist, which a grid ignores in silence: the table collapsed to one column\nand said nothing. Columns carry both halves now.",
               "fieldName": "columns"
             },
             {

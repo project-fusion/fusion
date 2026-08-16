@@ -52,3 +52,52 @@ describe('table structure', () => {
     expect(part(table, 'table')?.getAttribute('style')).toContain('10rem 1fr')
   })
 })
+
+describe('table columns', () => {
+  const table = async (extra = ''): Promise<HTMLElement> =>
+    (await mount(
+      `<helix-table label="Deployments" ${extra}>
+        <helix-table-column width="12rem">Service</helix-table-column>
+        <helix-table-column>Region</helix-table-column>
+        <helix-table-row>
+          <helix-table-cell header>helix-web</helix-table-cell>
+          <helix-table-cell>us-east-1</helix-table-cell>
+        </helix-table-row>
+      </helix-table>`,
+    )) as HTMLElement
+
+  const template = (host: HTMLElement): string =>
+    (part(host, 'table') as HTMLElement).getAttribute('style') ?? ''
+
+  test('the track list comes from the columns', async () => {
+    /* Declared together, because a heading and a width are two facts about one
+       column. Held apart they could disagree, and the old shape could not even
+       report it: `columns` took CSS, so a wrong value was an invalid track list,
+       which a grid ignores in silence. */
+    expect(template(await table())).toContain('12rem minmax(0, 1fr)')
+  })
+
+  test('a column with no width shares what is left', async () => {
+    // `minmax(0, 1fr)` and not `1fr`: a bare `1fr` keeps an automatic minimum
+    // and refuses to shrink, so one long value pushes the table past its box.
+    expect(template(await table())).toContain('minmax(0, 1fr)')
+  })
+
+  test('declared columns win over the deprecated string', async () => {
+    expect(template(await table('columns="1px 2px 3px"'))).not.toContain('1px 2px 3px')
+  })
+
+  test('the string still works for a table with no columns', async () => {
+    const host = (await mount(
+      '<helix-table columns="4rem 5rem" label="T"><helix-table-row></helix-table-row></helix-table>',
+    )) as HTMLElement
+    expect(template(host)).toContain('4rem 5rem')
+  })
+
+  test('a column is a column header, through internals', async () => {
+    const host = await table()
+    const column = host.querySelector('helix-table-column') as HTMLElement
+    expect(role(column)).toBe('columnheader')
+    expect(column.hasAttribute('role')).toBe(false)
+  })
+})

@@ -1,0 +1,24 @@
+/* No box of its own, so the heading is a grid item of the table and lines up
+   with the cells under it. The same reason a row is `display: contents`. */
+:host {
+  display: contents;
+}
+
+/* Weight and colour carry the heading, not capitals: uppercase costs
+   legibility and is read letter by letter by some screen readers.
+
+   The same rule, height and inset as a cell, because the heading is the first
+   line of its column rather than a band above the table. */
+[part="column"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-subtle);
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  min-block-size: var(--helix-size-control-md);
+  min-inline-size: 0;
+  padding-inline-end: var(--helix-space-md);
+}

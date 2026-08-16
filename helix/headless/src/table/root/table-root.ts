@@ -1,6 +1,7 @@
 import { customElement, HelixElement } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import type { HelixBaseTableColumn } from '../column/table-column.js'
 
 /**
  * @summary Tabular data laid out on a grid.
@@ -30,10 +31,15 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-base-table')
 export class HelixBaseTable extends HelixElement {
   /**
-   * Column track list, as CSS.
+   * Column track list, as CSS. Deprecated: declare columns instead.
    *
-   * A raw track list rather than a count, because a table's columns are rarely
-   * equal: `16rem minmax(0, 1fr)` is the common shape and no count expresses it.
+   * Kept for a table that has no `helix-table-column` children, and ignored the
+   * moment it has one. A raw track list is the right shape for the value and
+   * the wrong place for it: the headings and the widths were two halves of one
+   * fact held in two places, and nothing checked that they agreed. Worse, the
+   * value is CSS, so handing it headings by mistake produced an invalid track
+   * list, which a grid ignores in silence: the table collapsed to one column
+   * and said nothing. Columns carry both halves now.
    */
   @property()
   columns = ''
@@ -42,14 +48,45 @@ export class HelixBaseTable extends HelixElement {
   @property()
   label = ''
 
+  /** The columns declared as children, in the order they are written. */
+  get tableColumns(): HelixBaseTableColumn[] {
+    return [...this.children].filter(
+      (child): child is HelixBaseTableColumn =>
+        'isTableColumn' in child && child.isTableColumn === true,
+    )
+  }
+
+  /**
+   * The track list, from the columns if there are any.
+   *
+   * Read from the DOM rather than kept, so adding or removing a column needs
+   * nothing else to be told. Falls back to the `columns` string for a table
+   * written before columns existed, and to a single track for one that declares
+   * neither.
+   */
+  private get template(): string {
+    const declared = this.tableColumns
+    if (declared.length > 0) {
+      return declared.map((column) => column.track).join(' ')
+    }
+    return this.columns
+  }
+
+  /* Columns arrive from the light DOM, which changes no property here, so
+     nothing would schedule the render that reads them. */
+  private readonly handleSlotChange = (): void => {
+    this.requestUpdate()
+  }
+
   protected override render(): TemplateResult {
+    const template = this.template
     return html`<div
       part="table"
       role="table"
       aria-label=${this.label || 'Table'}
-      style=${this.columns ? `--table-columns: ${this.columns}` : ''}
+      style=${template ? `--table-columns: ${template}` : ''}
     >
-      <slot></slot>
+      <slot @slotchange=${this.handleSlotChange}></slot>
     </div>`
   }
 }
