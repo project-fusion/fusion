@@ -89,6 +89,29 @@ for (const family of families) {
     }
   }
 
+  /* And the two have to agree about each other. The markup declares its
+     stylesheet the way a consumer would, `<link rel="stylesheet">` in HTML and
+     an `import` in the TSX the sandbox converts it to, because an example whose
+     CSS arrives invisibly is an example that does not work when it is copied.
+
+     Both directions, because both are silent. A stylesheet with no link is
+     applied in the preview and missing from the file a reader takes away; a
+     link with no stylesheet is a promise to a file that is not there. */
+  for (const file of files) {
+    const linked = /<link\b[^>]*\brel=(["'])stylesheet\1/i.test(
+      readFileSync(join(dir, file), 'utf8'),
+    )
+    const sheet = entries.includes(file.replace(/\.html$/, '.css'))
+    if (sheet && !linked) {
+      problems.push(
+        `${family}/${file}: ships ${file.replace(/\.html$/, '.css')} without linking it`,
+      )
+    }
+    if (linked && !sheet) {
+      problems.push(`${family}/${file}: links a stylesheet that is not beside it`)
+    }
+  }
+
   for (const file of files) {
     const html = readFileSync(join(dir, file), 'utf8')
     const where = `${family}/${file}`

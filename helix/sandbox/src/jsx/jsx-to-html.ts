@@ -79,6 +79,12 @@ const attributes = (source: string): string => {
 
 /** The markup a JSX example stands for. */
 export const jsxToHtml = (jsx: string): string => {
+  /* The import becomes the link again, so switching syntax twice returns the
+     file it started as. Read before the wrapper is stripped, because the strip
+     begins at `return (` and would take it with everything else above. */
+  const stylesheet = jsx.match(/^\s*import\s+['"]\.\/([^'"]+)['"]\s*$/m)
+  const linked = stylesheet ? `<link rel="stylesheet" href="${stylesheet[1]}" />\n\n` : ''
+
   // The component wrapper is scaffolding around the tree, not part of it.
   // `[^\S\n]*` rather than `\s*` at every line end: `\s` includes the newline
   // and would eat the next line's indentation with it, leaving the first line
@@ -97,7 +103,7 @@ export const jsxToHtml = (jsx: string): string => {
   )
   const body = lines.map((line) => line.slice(Number.isFinite(indent) ? indent : 0)).join('\n')
 
-  return `${body
+  return `${linked}${body
     .replace(/\{\/\*([\s\S]*?)\*\/\}/g, (_, text: string) => `<!--${text}-->`)
     .replace(
       /<([a-zA-Z][a-zA-Z0-9-]*)((?:\s+[^>]*?)?)\s*(\/?)>/g,

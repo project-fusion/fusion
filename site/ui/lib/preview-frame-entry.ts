@@ -69,7 +69,21 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
   const { direction = 'ltr', layout = 'padded', source = '', styles = '' } = event.data
   document.documentElement.dir = direction
   host.dataset.layout = layout
-  host.innerHTML = source
+  /* The stylesheet link is for the reader, and it is dropped before the markup
+     is rendered.
+
+     An example that needs CSS says so the way a consumer would, with a `<link>`
+     to the file sitting beside it, because a preview that quietly applied a
+     stylesheet the markup never mentions teaches the example wrong: copy it and
+     nothing is styled, with nothing on screen to say why.
+
+     The frame cannot resolve that href and should not try. It is a sandboxed
+     document with an opaque origin, so a request back to the site is
+     cross-origin and fails, and the file is not at that path anyway. What it
+     would do is log a failed request into the terminal on every render, which
+     is a console the reader is meant to trust. The stylesheet arrives in the
+     same message instead, already read from disk. */
+  host.innerHTML = source.replace(/<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>\s*/gi, '')
 
   let sheet = document.getElementById('preview-styles')
   if (!sheet) {

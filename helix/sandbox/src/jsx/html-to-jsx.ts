@@ -80,9 +80,21 @@ const attributes = (source: string): string => {
   return out.length > 0 ? ` ${out.join(' ')}` : ''
 }
 
+/** A stylesheet an example declares, which each syntax states its own way. */
+const STYLESHEET = /<link\b[^>]*\brel=(["'])stylesheet\1[^>]*\bhref=(["'])([^"']+)\2[^>]*>\s*/i
+
 /** The example's markup, as the body of a React component. */
 export const htmlToJsx = (html: string, name = 'Example'): string => {
+  /* A `<link>` in HTML is an `import` in React, so the example says the same
+     thing in whichever syntax is being read. Both are what that consumer
+     actually writes, which is the point of showing the stylesheet at all: an
+     example whose CSS arrives invisibly is an example that does not work when
+     it is copied. */
+  const stylesheet = html.match(STYLESHEET)
+  const imported = stylesheet ? `import './${stylesheet[3]}'\n\n` : ''
+
   const body = html
+    .replace(STYLESHEET, '')
     .replace(/<!--([\s\S]*?)-->/g, (_, text: string) => `{/*${text}*/}`)
     .replace(
       /<([a-zA-Z][a-zA-Z0-9-]*)((?:\s+[^>]*?)?)\s*(\/?)>/g,
@@ -107,7 +119,7 @@ export const htmlToJsx = (html: string, name = 'Example'): string => {
   const roots = body.match(/^<([a-zA-Z][a-zA-Z0-9-]*)/gm) ?? []
   const fragment = roots.length > 1
 
-  return `export function ${name}() {
+  return `${imported}export function ${name}() {
   return (
 ${fragment ? '    <>\n' : ''}${indented}
 ${fragment ? '    </>\n' : ''}  )

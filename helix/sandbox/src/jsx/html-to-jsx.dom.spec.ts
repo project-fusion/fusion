@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { htmlToJsx } from './html-to-jsx.js'
+import { jsxToHtml } from './jsx-to-html.js'
 
 describe('html to jsx', () => {
   test('wraps the markup in a component', () => {
@@ -68,5 +69,32 @@ describe('html to jsx', () => {
 
   test('the component can be named', () => {
     expect(htmlToJsx('<p>x</p>', 'Badge')).toContain('export function Badge()')
+  })
+})
+
+describe('an example states its stylesheet in the syntax being read', () => {
+  const html = `<link rel="stylesheet" href="styles.css" />
+
+<helix-card class="wide">Body</helix-card>
+`
+
+  test('a link becomes an import, above the component rather than inside it', () => {
+    /* Both are what that consumer actually writes, which is the whole point of
+       showing the stylesheet at all: an example whose CSS arrives invisibly is
+       an example that does not work when it is copied. */
+    const jsx = htmlToJsx(html)
+    expect(jsx).toContain("import './styles.css'")
+    expect(jsx).not.toContain('<link')
+    expect(jsx.indexOf("import './styles.css'")).toBeLessThan(jsx.indexOf('export function'))
+  })
+
+  test('and comes back, so switching syntax twice returns the file', () => {
+    const back = jsxToHtml(htmlToJsx(html))
+    expect(back).toContain('<link rel="stylesheet" href="styles.css" />')
+    expect(back).toContain('<helix-card class="wide">Body</helix-card>')
+  })
+
+  test('an example with no stylesheet gains no import', () => {
+    expect(htmlToJsx('<helix-card>Body</helix-card>\n')).not.toContain('import')
   })
 })
