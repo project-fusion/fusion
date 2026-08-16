@@ -137,6 +137,32 @@ for (const family of families) {
   }
 }
 
+/* The documentation's HTML samples, held to the same rule.
+ *
+ * A reader copies what is in front of them, and a `style` attribute in a code
+ * fence teaches the habit exactly as well as one in an example does. This check
+ * walked `.examples` only, so the prose was the one place a `style` could
+ * survive the sweep, and one did: the composition page's own argument is that
+ * width belongs to the layout, illustrated with an inline style.
+ *
+ * Fenced HTML only. Prose may name the attribute, and a CSS fence may set
+ * properties without any of this applying to it. */
+const DOCS = ['helix/docs/content', 'cortex/docs/content']
+
+for (const dir of DOCS) {
+  if (!existsSync(dir)) {
+    continue
+  }
+  for (const file of readdirSync(dir).filter((entry) => entry.endsWith('.mdx'))) {
+    const text = readFileSync(join(dir, file), 'utf8')
+    for (const [, fence] of text.matchAll(/```html\n([\s\S]*?)```/g)) {
+      for (const [, tag] of fence.matchAll(/<([a-z][a-z0-9-]*)[^>]*\sstyle=/g)) {
+        problems.push(`${dir}/${file}: <${tag}> carries a style attribute in an HTML sample`)
+      }
+    }
+  }
+}
+
 if (problems.length > 0) {
   console.error(`Example violations (${problems.length}):\n`)
   for (const problem of problems) {

@@ -16954,6 +16954,24 @@
             },
             {
               "kind": "method",
+              "name": "watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Watches every tab for a change of size.\n\nCalled again whenever the set changes, because `tabs` reads `this.children`\nand filters on `instanceof`, so it is empty until the tab elements upgrade.\nAt `firstUpdated` it frequently is empty, and observing nothing is silent.\n\n`observe` is idempotent per element, so re-running this costs nothing and\nneeds no bookkeeping about which tabs are already watched."
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The set changed: pair it up, watch it, and measure it.\n\nAll three, where this used to be `sync()` alone, and the missing `place()`\nis why an indicator could stay unplaced for the life of the page. The order\nof events is what does it: the host renders and measures before its tabs\nhave upgraded, so there is no selected tab to measure and `place` refuses;\nthe ResizeObserver's one initial callback lands in that same gap; and then\nthe tabs upgrade, `slotchange` pairs them, nothing measures, and nothing\never will again, because the host's size never changes.\n\nInvisible in every example, because a tab strip that is only tabs is\nexactly as tall as its tabs, so a mark at the top of the strip is a mark on\nthe tab. It showed up where something gives the strip a height of its own."
+            },
+            {
+              "kind": "method",
               "name": "place",
               "privacy": "private",
               "return": {

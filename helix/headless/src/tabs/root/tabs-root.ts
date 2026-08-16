@@ -160,9 +160,44 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
     requestAnimationFrame(() => this.place())
     this.observer = new ResizeObserver(() => this.place())
     this.observer.observe(this)
+    this.watch()
+  }
+
+  /**
+   * Watches every tab for a change of size.
+   *
+   * Called again whenever the set changes, because `tabs` reads `this.children`
+   * and filters on `instanceof`, so it is empty until the tab elements upgrade.
+   * At `firstUpdated` it frequently is empty, and observing nothing is silent.
+   *
+   * `observe` is idempotent per element, so re-running this costs nothing and
+   * needs no bookkeeping about which tabs are already watched.
+   */
+  private watch(): void {
     for (const tab of this.tabs) {
-      this.observer.observe(tab)
+      this.observer?.observe(tab)
     }
+  }
+
+  /**
+   * The set changed: pair it up, watch it, and measure it.
+   *
+   * All three, where this used to be `sync()` alone, and the missing `place()`
+   * is why an indicator could stay unplaced for the life of the page. The order
+   * of events is what does it: the host renders and measures before its tabs
+   * have upgraded, so there is no selected tab to measure and `place` refuses;
+   * the ResizeObserver's one initial callback lands in that same gap; and then
+   * the tabs upgrade, `slotchange` pairs them, nothing measures, and nothing
+   * ever will again, because the host's size never changes.
+   *
+   * Invisible in every example, because a tab strip that is only tabs is
+   * exactly as tall as its tabs, so a mark at the top of the strip is a mark on
+   * the tab. It showed up where something gives the strip a height of its own.
+   */
+  private readonly handleSlotChange = (): void => {
+    this.sync()
+    this.watch()
+    this.place()
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -221,10 +256,10 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
 
   protected override render(): TemplateResult {
     return html`<div part="tabs" role="tablist" aria-label=${this.label}>
-        <slot @slotchange=${() => this.sync()}></slot>
+        <slot @slotchange=${this.handleSlotChange}></slot>
         <span part="indicator" aria-hidden="true"></span>
       </div>
-      <div part="panels"><slot name="panels" @slotchange=${() => this.sync()}></slot></div>`
+      <div part="panels"><slot name="panels" @slotchange=${this.handleSlotChange}></slot></div>`
   }
 }
 

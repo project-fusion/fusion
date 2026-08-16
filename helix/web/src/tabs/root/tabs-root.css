@@ -128,7 +128,20 @@
   inset-inline-start: 0;
   opacity: 0;
   position: absolute;
-  translate: var(--_indicator-x, 0) var(--_indicator-offset, 0);
+  /* Where the tab is, plus where in the tab this mark goes.
+   *
+   * `--_indicator-y` is measured: the selected tab's top within the strip. The
+   * offset is the appearance's own shift from there, nothing for a pill filling
+   * the tab and the tab's height for a bar under it.
+   *
+   * It used to be the offset alone, and the measured `y` was written by
+   * `place()` and read by nothing. That is invisible wherever the tabs fill
+   * their strip, which is every appearance's own layout and every example, and
+   * wrong the moment anything gives the strip height of its own: the sandbox's
+   * panel puts 32px tabs in a 48px row, so the pill drew seven and a half
+   * pixels above the label it was marking. A value computed and never used is
+   * the tell, and it sat there through the whole of the indicator work. */
+  translate: var(--_indicator-x, 0) calc(var(--_indicator-y, 0px) + var(--_indicator-offset, 0px));
   /* It slides and then settles: `emphasized` overshoots slightly and comes
      back, which is the breath. Width and position move together, so a mark
      travelling to a longer tab grows as it goes rather than after it arrives. */

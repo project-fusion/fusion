@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -78,3 +78,51 @@ describe('tree selection can be refused', () => {
     expect(host.value).toBe(started)
   })
 })
+
+if (hasLayout()) {
+  describe('tree alignment', () => {
+    test('a leaf and a branch at one depth start their labels in one place', async () => {
+      /* The gutter a leaf leaves where a chevron would be was sent down from
+         the tree as a whole measurement, and the tree named a different token
+         from the one the item draws with: `--helix-size-icon` against
+         `--helix-size-icon-sm`. Four pixels, which is small enough to look like
+         nothing and large enough that the eye reads two columns where there is
+         one list.
+
+         Only a browser can answer it. The values are custom properties resolved
+         through two shadow boundaries, and the fault was that two resolutions
+         disagreed, so anything short of laying it out and measuring would have
+         been asserting the same arithmetic that was already wrong. */
+      const tree = (await mount(markup)) as HTMLElement
+      const items = [...tree.querySelectorAll('helix-tree-item')]
+      const labelX = (item: Element): number =>
+        (part(item as HTMLElement, 'label') as HTMLElement).getBoundingClientRect().x
+
+      const branch = items.find((item) => item.hasAttribute('expanded'))
+      const leaf = items.find((item) => item.getAttribute('value') === 'cortex')
+      if (!branch || !leaf) {
+        throw new Error('the fixture no longer holds a branch and a leaf at the top level')
+      }
+
+      expect(labelX(branch)).toBeGreaterThan(0)
+      expect(labelX(leaf)).toBe(labelX(branch))
+    })
+
+    test('a child is indented from its parent, so depth is still visible', async () => {
+      /* The other half. Reserving the gutter on every leaf lines the columns up
+         and would line them up just as well if the indent had gone missing
+         entirely, which is a tree that has stopped being one. */
+      const tree = (await mount(markup)) as HTMLElement
+      const items = [...tree.querySelectorAll('helix-tree-item')]
+      const labelX = (item: Element): number =>
+        (part(item as HTMLElement, 'label') as HTMLElement).getBoundingClientRect().x
+
+      const parent = items.find((item) => item.getAttribute('value') === 'helix')
+      const child = items.find((item) => item.getAttribute('value') === 'web')
+      if (!parent || !child) {
+        throw new Error('the fixture no longer holds a parent and a child')
+      }
+      expect(labelX(child)).toBeGreaterThan(labelX(parent))
+    })
+  })
+}

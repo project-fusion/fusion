@@ -46,16 +46,21 @@ describe('announcement', () => {
     const announcement = await mount(
       '<helix-announcement dismiss-label="Close notice" dismissible><span slot="icon">x</span></helix-announcement>',
     )
-    /* On the icon button's own button, not on the host. The dismiss control is
-       a `helix-base-icon-button` now rather than a bare `<button>`, so the name
-       goes in as `label` and comes out as `aria-label` on the element that is
-       actually focused. Asserting the inner one is asserting what a screen
-       reader reads; asserting the host would pass on a name that never
-       reached the control. */
+    /* The name is on the control that is actually focused, which is now the
+       control itself: this was a `helix-base-icon-button` wrapping a button,
+       and the wrapper shipped no styles, so what rendered was the browser's own
+       bordered grey button inside a message bar. A plain `<button>` is what
+       every other in-shadow control in the library renders.
+
+       Asserting the tag as well as the name, because the two failure modes are
+       different and only one of them is visible: a name that never reaches the
+       control is silent to everyone who can see, and a nested component is
+       silent to everyone who cannot. */
     const dismiss = part(announcement, 'dismiss') as HTMLElement
-    expect(dismiss.getAttribute('label')).toBe('Close notice')
-    expect(dismiss.shadowRoot?.querySelector('[part="button"]')?.getAttribute('aria-label')).toBe(
-      'Close notice',
-    )
+    expect(dismiss.tagName.toLowerCase()).toBe('button')
+    expect(dismiss.getAttribute('aria-label')).toBe('Close notice')
+
+    const glyph = dismiss.querySelector('slot[name="icon"]') as HTMLSlotElement | null
+    expect(glyph?.assignedNodes().length).toBeGreaterThan(0)
   })
 })

@@ -89,10 +89,14 @@ stretch-aligned parent does to its children:
 
 To make one hug its label instead, tell the layout:
 
+```css
+.hug {
+  align-self: start;
+}
+```
+
 ```html
-<helix-button appearance="secondary" style="align-self: start">
-  Hugs its label
-</helix-button>
+<helix-button appearance="secondary" class="hug">Hugs its label</helix-button>
 ```
 
 That is the whole of it, and it is worth saying out loud because the default

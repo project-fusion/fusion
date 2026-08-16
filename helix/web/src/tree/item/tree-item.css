@@ -76,13 +76,23 @@
 
    The reservation is the chevron's own fixed width, not `1em`: a parent reads
    at one size and its child at another, and a gutter measured in the row's own
-   type could never line the two up. */
+   type could never line the two up.
+
+   And it is written here, where the chevron's width already is, rather than
+   passed down from the tree. The tree used to send the whole measurement and
+   sent a different one, `--helix-size-icon` against the `--helix-size-icon-sm`
+   drawn here, so every leaf sat four pixels right of every branch beside it.
+   What arrives from above is now `--_tree-reserve`, which is 1 or 0: the tree
+   decides whether there is a gutter, the item decides how wide, and neither can
+   be wrong about the other's half. The gap is added because the row is a flex
+   line and a drawn chevron takes one after it. */
 [part="row"]:not(:has([part="toggle"])) {
   padding-inline-start: calc(
     var(--helix-space-xs) +
     (var(--_tree-level, 1) - 1) *
     var(--tree-indent, var(--helix-space-md)) +
-    var(--_tree-gutter, calc(var(--_tree-chevron) + var(--helix-space-2xs)))
+    var(--_tree-reserve, 1) *
+    (var(--_tree-chevron) + var(--helix-space-2xs))
   );
 }
 

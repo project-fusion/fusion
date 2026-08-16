@@ -170,11 +170,27 @@
 }
 
 /* Over the slide rather than under it, so they need a surface of their own:
-   an arrow drawn straight onto a photograph is legible against about half of
-   one. `overlay` is the token for a thing over the page. */
+ * an arrow drawn straight onto a photograph is legible against about half of
+ * one. `overlay` is the token for a thing over the page.
+ *
+ * And no line around them. The surface and the shadow are what lift a control
+ * off the slide, and a border as well reads as a form control that landed on a
+ * photograph: the thing under it is the page here, not a field.
+ *
+ * `transparent` rather than `none`, because these are sized to a control step
+ * with `box-sizing: border-box`, so dropping the border would give the glyph
+ * two more pixels to sit in and move it. Changing the geometry to change the
+ * colour is how a rule ends up blamed for something it did not do.
+ *
+ * All three, not the two arrows. The rotation toggle is over the same slide
+ * and had neither surface nor shadow, so on a light photograph it was a
+ * bordered box with nothing behind it. It is only visible with `autoplay`,
+ * which is why it stayed wrong. */
 :host([appearance="hero"]) [part="previous"],
-:host([appearance="hero"]) [part="next"] {
+:host([appearance="hero"]) [part="next"],
+:host([appearance="hero"]) [part="rotation"] {
   background-color: var(--helix-color-surface-overlay);
+  border-color: transparent;
   box-shadow: var(--helix-shadow-md);
   pointer-events: auto;
 }
@@ -182,5 +198,4 @@
 /* The rotation toggle stays at the trailing edge, beside the next arrow. */
 :host([appearance="hero"]) [part="rotation"] {
   order: 1;
-  pointer-events: auto;
 }

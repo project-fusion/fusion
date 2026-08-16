@@ -8,17 +8,24 @@
 }
 
 /* Where the chevron goes, said as the two things an item needs to know: which
-   end to put it at, and how much room a row without one has to leave at the
+   end to put it at, and whether a row without one has to leave room at the
    start. Custom properties rather than a selector, because the item draws its
-   own row inside its own shadow root and `::slotted()` stops at the host. */
+   own row inside its own shadow root and `::slotted()` stops at the host.
+
+   Whether, not how much. This said how much, as
+   `calc(var(--helix-size-icon) + var(--helix-space-2xs))`, and the item draws
+   its chevron at `--helix-size-icon-sm`: two declarations naming one
+   measurement, four pixels apart, so every leaf sat four pixels right of every
+   branch at the same depth. The width belongs to whoever draws the thing, and
+   that is the item. All the tree decides is the policy. */
 :host {
   --_tree-chevron-order: 0;
-  --_tree-gutter: calc(var(--helix-size-icon) + var(--helix-space-2xs));
+  --_tree-reserve: 1;
 }
 
 /* At the end there is nothing to reserve: every label starts at the row's own
    inset, and the chevron is what moves. */
 :host([chevron="end"]) {
   --_tree-chevron-order: 2;
-  --_tree-gutter: 0px;
+  --_tree-reserve: 0;
 }

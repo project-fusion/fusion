@@ -1,5 +1,4 @@
 import { customElement, HelixDismissEvent, HelixElement, hostAria } from '@helix-io/core'
-import '../../icon-button/index.js'
 import { x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -72,11 +71,26 @@ export class HelixBaseAnnouncement extends HelixElement {
     return html`<div part="content"><slot></slot></div>
       <div part="actions"><slot name="actions"></slot></div>
       ${
+        /* A plain `<button>`, the way `Menu` renders its way back and every
+           other in-shadow control in the library.
+
+           It was `helix-base-icon-button`, which is the headless tier and
+           therefore ships no CSS at all, so the `<button>` inside it kept the
+           browser's own border and grey fill and the dismiss control read as a
+           form button dropped into a message bar. The styled tier could not
+           reach it: `[part="dismiss"]` selects the host and stops at its shadow
+           boundary, and its rules were already written for a plain button,
+           `all: unset` and all, which is the clue that this element was never
+           meant to be here.
+
+           Nesting a component inside a component's shadow root also makes the
+           parent depend on the child being registered, invisibly, and this was
+           the only place in the library doing it. */
         this.dismissible
-          ? html`<helix-base-icon-button
+          ? html`<button
               part="dismiss"
               type="button"
-              label=${this.dismissLabel}
+              aria-label=${this.dismissLabel}
               @click=${this.handleDismiss}
             >
               <slot name="icon">
@@ -84,7 +98,7 @@ export class HelixBaseAnnouncement extends HelixElement {
                   ${unsafeSVG(x.content)}
                 </svg>
               </slot>
-            </helix-base-icon-button>`
+            </button>`
           : nothing
       }`
   }
