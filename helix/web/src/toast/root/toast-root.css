@@ -17,7 +17,11 @@
 [part="region"] {
   display: flex;
   flex-direction: column;
-  gap: var(--toast-gap, var(--helix-space-xs));
+  /* No `gap`. A message that has gone collapses to nothing, and a flex gap is
+     drawn between items whatever their size, so a dismissed one would leave its
+     spacing behind as a hole in the stack. The spacing is the message's own
+     margin instead, and it collapses with it. */
+  --_toast-gap: var(--toast-gap, var(--helix-space-xs));
 }
 
 ::slotted(*) {
@@ -36,12 +40,20 @@
  * So the bottom keeps the default and the top reverses. Reading order is
  * untouched either way: flex moves boxes, and the live region announces in
  * document order, so the newest is announced whichever end it is drawn at. */
+/* Which way the nearest edge is, told to the messages rather than worked out by
+   them. A message arrives from the border it is anchored to, so a stack at the
+   bottom rises into place and one at the top drops in. Inherited, so the item's
+   own keyframes read it without either component knowing the other's rules. */
 :host([placement^="bottom"]) {
   inset-block-end: var(--_toast-inset);
+
+  --_toast-enter: var(--helix-space-lg);
 }
 
 :host([placement^="top"]) {
   inset-block-start: var(--_toast-inset);
+
+  --_toast-enter: calc(var(--helix-space-lg) * -1);
 }
 
 :host([placement^="top"]) [part="region"] {

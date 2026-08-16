@@ -1,5 +1,23 @@
 :host {
-  display: block;
+  /* A grid of one row, so the row can be transitioned to nothing. `0fr` is the
+     only way to animate a box down to a height it never declared, and it is why
+     this is a grid rather than a block. The message inside carries `min-block-
+     size: 0` and `overflow: hidden`, without which the content refuses to be
+     squeezed below its own intrinsic height and the collapse does nothing. */
+  display: grid;
+  /* `minmax(0, …)` and not a bare `1fr`, which is shorthand for
+     `minmax(auto, 1fr)`: the auto minimum is the row's min-content height, so a
+     bare `0fr` collapses to the content rather than to nothing. Measured: 24px
+     left behind, which is the message's own block padding. */
+  grid-template-rows: minmax(0, 1fr);
+  /* The stack's spacing, held here rather than as the region's flex gap, so it
+     goes when the message goes. */
+  margin-block-start: var(--_toast-gap, var(--helix-space-xs));
+  transition:
+    grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard),
+    margin-block-start var(--helix-duration-normal) var(--helix-easing-standard),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    translate var(--helix-duration-normal) var(--helix-easing-standard);
   /* Dense by nature, and it never said so. A toast is a compact region the same
      way the app header, the toolbar and the announcement are, and every one of
      those declares this on its own host. Without it a slotted `Retry` came out
@@ -17,8 +35,17 @@
 }
 
 [part="item"] {
-  /* Aligned to the top, and then each thing nudged onto the *first line* of
-     the message rather than onto the top of its own box.
+  /* Three columns and two rows: the mark, the message, the close along the
+     first line, and anything to do about it on a row of its own beneath.
+   *
+   * Actions were inline, which is right for "Project saved. [Undo]" and wrong
+   * the moment the message wraps: pinned to the first line they float up beside
+   * the close and compete with it for the corner. On their own row they sit
+   * where the reading finishes, at any message length, and the close keeps the
+   * corner to itself.
+   *
+   * Aligned to the top, and then each thing on the first row nudged onto the
+   * *first line* of the message rather than onto the top of its own box.
    *
    * `center` was right for a one-line message and wrong for every other: the
    * mark and the dismiss floated to the middle of a four-line paragraph, when
@@ -34,16 +61,21 @@
    * mark and the control where the reading starts. */
   align-items: start;
   background-color: var(--helix-color-surface-overlay);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
   color: var(--helix-color-foreground);
-  display: flex;
+  display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   gap: var(--helix-space-sm);
   line-height: var(--helix-leading-normal);
   padding: var(--toast-item-inset, var(--helix-space-sm));
+  /* Both needed for `0fr` to bite: a grid item refuses to go below its own
+     intrinsic height without the first, and shows its overflow without the
+     second. */
+  min-block-size: 0;
   /* The containing block for the timer, which is placed against this box. */
   position: relative;
   /* So the timer's square ends are trimmed to the corners rather than sitting
@@ -69,7 +101,7 @@
 [part="icon"] {
   color: var(--_toast-severity, var(--helix-color-foreground-muted));
   display: inline-flex;
-  flex: 0 0 auto;
+  grid-area: 1 / 1;
   /* Half the difference between the first line and the glyph, so the two share
      a centre however many lines follow. */
   margin-block-start: calc((var(--_toast-line) - var(--helix-size-icon)) / 2);
@@ -91,8 +123,10 @@ slot[name="icon"]::slotted(*) {
   inline-size: var(--helix-size-icon);
 }
 
+/* Column two of the first row, and column two again on the second, so an
+   unmarked message still starts where a marked one does. */
 [part="content"] {
-  flex: 1 1 auto;
+  grid-area: 1 / 2;
   min-inline-size: 0;
 }
 
@@ -100,14 +134,26 @@ slot[name="icon"]::slotted(*) {
    because a control is taller than a line of text: they rise a little above the
    first line rather than hanging below it. The item's inset is what gives them
    room to do that without touching the edge. */
-[part="actions"] {
-  margin-block-start: calc((var(--_toast-line) - var(--helix-size-control-sm)) / 2);
-}
-
+/* Its own row, under the message and lined up with it. Empty it generates no
+   box, because a grid area with nothing in it takes no space, so a message with
+   nothing to do about it is exactly as tall as it was. */
+/* Its own row, under the message and lined up with it.
+ *
+ * The gap sits on what is slotted rather than on this wrapper, and `:empty`
+ * cannot do the job: the wrapper always has a `<slot>` element inside it, so it
+ * is never empty however little is assigned. With the space on the wrapper a
+ * message with nothing to do about it paid 4px for a row that drew nothing.
+ * Moved onto `::slotted`, an unassigned row costs its own zero height and no
+ * more, which is the same reason the house rule prefers a bare slot. */
 [part="actions"] {
   display: flex;
-  flex: 0 0 auto;
   gap: var(--helix-space-2xs);
+  grid-area: 2 / 2;
+  justify-content: flex-end;
+}
+
+[part="actions"] slot::slotted(*) {
+  margin-block-start: var(--helix-space-2xs);
 }
 
 /* Colour on the mark rather than a fill behind the words. A message is text to
@@ -140,6 +186,7 @@ slot[name="icon"]::slotted(*) {
    * 5.5px below the mark and the action it is meant to line up with. Measured,
    * which is the only way that shows. */
   box-sizing: border-box;
+  grid-area: 1 / 3;
   margin-block-start: calc((var(--_toast-line) - var(--helix-size-control-sm)) / 2);
   block-size: var(--helix-size-control-sm);
   border-radius: var(--helix-radii-sm);
@@ -183,6 +230,7 @@ slot[name="icon"]::slotted(*) {
  * The same colour as the severity mark where there is one, so the two things
  * drawn on a message read as one idea rather than two. */
 [part="timer"] {
+  grid-area: 1 / 1 / -1 / -1;
   animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;
   background-color: var(--_toast-severity, var(--helix-color-foreground-muted));
   block-size: var(--helix-space-2xs);
@@ -241,7 +289,9 @@ slot[name="icon"]::slotted(*) {
 @keyframes helix-toast-in {
   from {
     opacity: 0;
-    translate: 0 var(--helix-space-sm);
+    /* From the border it is anchored to. The region sets this; a bottom stack
+       rises into place and a top one drops in. */
+    translate: 0 var(--_toast-enter, var(--helix-space-lg));
   }
 }
 
@@ -256,8 +306,36 @@ slot[name="icon"]::slotted(*) {
  * Here rather than in the headless tier, which has no CSS: what the state means
  * is the component's, how it is drawn is this tier's. A headless consumer reads
  * `data-open` and decides for themselves. */
+/* Gone, and it takes its own space with it.
+ *
+ * `display: none` was instant, so the messages under it jumped up. Collapsing
+ * the row and the margin together means the stack closes at the speed the
+ * message leaves at, and the ones below travel rather than teleport.
+ *
+ * It leaves towards the edge it arrived from, which is the same property the
+ * region sets for the entrance. Still in the tree and still not focusable:
+ * `visibility: hidden` is what takes it out of the accessibility tree once the
+ * height is gone, where `display: none` would have ended the transition before
+ * it started. */
+:host(:not([data-open])) [part="item"] {
+  /* The last thing holding the box open. Padding is inside the border box and
+     survives a zero height, so it has to collapse with the row. */
+  padding-block: 0;
+  transition: padding-block var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
 :host(:not([data-open])) {
-  display: none;
+  grid-template-rows: minmax(0, 0fr);
+  margin-block-start: 0;
+  opacity: 0;
+  translate: 0 var(--_toast-enter, var(--helix-space-lg));
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard),
+    margin-block-start var(--helix-duration-normal) var(--helix-easing-standard),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    translate var(--helix-duration-normal) var(--helix-easing-standard),
+    visibility var(--helix-duration-normal) step-end;
 }
 
 /* Two answers in one file, which is why the check asks whether the question was

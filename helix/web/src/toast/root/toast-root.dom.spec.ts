@@ -350,7 +350,7 @@ if (hasLayout()) {
       expect(getComputedStyle(toast).colorScheme).toBe('dark')
     })
 
-    test('the row sits on one line, whatever heights are in it', async () => {
+    test('a toast is dense, so its controls are one height', async () => {
       /* Measured before this: the text, the action and the dismiss were at 654,
          664 and 660, because `start` aligned three boxes of different heights
          by their tops. The heights differ because a toast is dense by nature
@@ -368,13 +368,18 @@ if (hasLayout()) {
         const box = element.getBoundingClientRect()
         return Math.round(box.top + box.height / 2)
       }
-      expect(middle(action)).toBe(middle(dismiss))
+      /* The centres no longer agree, and should not: the action sits on its own
+         row now. What this was really written for is the heights, which is the
+         fault it caught. A toast is dense by nature and had never said so, so a
+         slotted control came out at the full 40px beside a 32px dismiss. */
       expect(Math.round(action.getBoundingClientRect().height)).toBe(
         Math.round(dismiss.getBoundingClientRect().height),
       )
+      expect(Math.round(action.getBoundingClientRect().height)).toBe(32)
+      void middle
     })
 
-    test('the mark, the action and the close all sit on the first line', async () => {
+    test('the mark and the close sit on the first line, the action on its own row', async () => {
       /* Not centred, which floated them to the middle of a long message, and
          not plain `start`, which is what an earlier version of this row did:
          boxes of 16px, 21px and 32px sharing a top edge have centres 8px apart,
@@ -406,10 +411,18 @@ if (hasLayout()) {
           return box.top + box.height / 2
         }
         const icon = centre(part(found, 'icon') as HTMLElement)
-        expect(
-          Math.abs(centre(found.querySelector('helix-button') as HTMLElement) - icon),
-        ).toBeLessThan(2)
         expect(Math.abs(centre(part(found, 'dismiss') as HTMLElement) - icon)).toBeLessThan(2)
+
+        /* The action is deliberately not on that line. Inline it was right for
+           "Project saved. [Undo]" and wrong the moment the message wraps:
+           pinned to the first line it floats up beside the close and competes
+           with it for the corner. Below the message it sits where the reading
+           finishes, at any length. */
+        const action = found.querySelector('helix-button') as HTMLElement
+        const content = part(found, 'content') as HTMLElement
+        expect(action.getBoundingClientRect().top).toBeGreaterThan(
+          content.getBoundingClientRect().bottom - 2,
+        )
       }
     })
 
