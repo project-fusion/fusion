@@ -81,9 +81,14 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * reads well; there is no such word for a value or an active item, so all
      * four of these mixins now have this shape instead of two shapes.
      *
-     * Not reflected. The attribute is the consumer's input and stays as they
-     * wrote it; `data-open` carries the resolved state for stylesheets, which
-     * is what it has always been for.
+     * **Not reflected, and that is required rather than tidy.** Reflection
+     * writes the resolved state back as an attribute, and writing the attribute
+     * is how a consumer says they own it. So an uncontrolled element that
+     * opened itself would put `open` on its own host and, from the next thing
+     * that read it, be indistinguishable from one the consumer controls:
+     * cloned, serialised for hydration, or diffed by a framework, it would come
+     * back controlled and stop responding. `data-open` carries the resolved
+     * state for stylesheets, which is what it has always been for.
      */
     @property({ type: Boolean })
     get open(): boolean {

@@ -64,3 +64,24 @@ describe('slider markers', () => {
     expect(labels.map((label) => label.textContent?.trim())).toEqual(['0', '50', '100'])
   })
 })
+
+describe('slider seeding', () => {
+  test('a range with no value starts in the middle and still moves', async () => {
+    /* The seed used to be a write to `value`, which under the controlled shape
+       is how a consumer claims it: every range without a value would have
+       declared itself controlled on its first render and frozen the thumb where
+       it started. It seeds `defaultValue` instead, which is where the markup's
+       intent lives, and "no value given" is a fact about the markup. */
+    const host = (await mount(
+      '<helix-slider label="Level" max="10" min="0"></helix-slider>',
+    )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
+    await host.updateComplete
+    expect(host.value).toBe('5')
+
+    const range = host.shadowRoot?.querySelector('input') as HTMLInputElement
+    range.value = '8'
+    range.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(host.value).toBe('8')
+  })
+})

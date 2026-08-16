@@ -1,10 +1,4 @@
-import {
-  customElement,
-  HelixChangeEvent,
-  HelixFormElement,
-  MixinControllerValue,
-  MixinField,
-} from '@helix-io/core'
+import { customElement, HelixFormElement, MixinControllerValue, MixinField } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -90,12 +84,15 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
   private readonly handleInput = (event: Event): void => {
     const control = event.target as HTMLInputElement
     const next = control.value
-    const allowed = this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: next }))
-    if (!allowed) {
+    /* Through the mixin, which announces and then applies only if the value is
+       the element's to move. The native control has already changed either way,
+       so wherever the answer does not follow it has to be put back: that is a
+       refusal, and it is equally a consumer who owns the value and has not
+       given a new one yet. Both are "what is on screen is not the answer". */
+    this.requestValue(next)
+    if (control.value !== this.value) {
       control.value = this.value
-      return
     }
-    this.value = next
   }
 
   /** Relayed, because `change` does not cross a shadow boundary on its own. */

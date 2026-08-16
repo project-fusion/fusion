@@ -136,11 +136,30 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
     event.stopImmediatePropagation()
 
     const wanted = (event as CustomEvent<{ value: string }>).detail.value === 'true'
-    this.value = this.boxes
+    /* Announced before it is written, which is the way round it was not: the
+       group set its value and then dispatched, so `preventDefault()` refused a
+       set that had already changed.
+
+       Hand-rolled rather than through `MixinControllerValue`, and that is the
+       decision rather than an omission. The group is deliberately not
+       form-associated: its boxes are the form controls and each submits itself,
+       so the mixin, which is constrained to `HelixFormElement`, does not apply
+       to it. Its `value` is a derived read of the boxes rather than state it
+       owns, which is also why it is not controllable and why that is written
+       down rather than fixed.
+
+       The boxes have already moved either way. Each answered the reader before
+       this ran, so refusing here stops the group's value from following, and
+       the honest limit of that is recorded with the decision. */
+    const next = this.boxes
       .filter((box) => (box === changed ? wanted : box.checked))
       .map((box) => box.value)
       .join(',')
-    this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: this.value }))
+
+    if (!this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: next }))) {
+      return
+    }
+    this.value = next
   }
 
   override connectedCallback(): void {

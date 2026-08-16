@@ -1,11 +1,4 @@
-import {
-  customElement,
-  HelixFormElement,
-  HelixSelectEvent,
-  hostAria,
-  MixinControllerValue,
-  requestControlledChange,
-} from '@helix-io/core'
+import { customElement, HelixFormElement, hostAria, MixinControllerValue } from '@helix-io/core'
 import { caretLeft, caretRight } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -103,7 +96,14 @@ const addMonths = (date: Date, months: number): Date => {
  * @aliases Date grid, Month view
  * @documentation https://helix.fusion.dev/components/calendar
  *
- * @event {HelixSelectEvent} helix-select - Fired when a date is chosen, with the ISO date.
+ * @event {HelixChangeEvent} helix-change - Fired before the dates change, and cancelable.
+ *
+ * It was `helix-select`, and it moved when the calendar became a form control.
+ * A control whose value changes dispatches `helix-change` here: `Input`,
+ * `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar
+ * submitting a date is the same kind of thing. `helix-select` stays what it is
+ * elsewhere, which is a row or an item being chosen in something that reports
+ * no value at all, such as `Menu` or `Tree`.
  *
  * @csspart months - The run of months.
  * @csspart month - One month, its header and its grid.
@@ -311,14 +311,7 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
        date that had already been chosen. `requestControlledChange` is the one
        audited path its own documentation claims for every stateful change in
        the system, and this was not on it. */
-    requestControlledChange({
-      apply: (value) => {
-        this.value = value
-      },
-      event: (value) => new HelixSelectEvent({ value }),
-      host: this,
-      next: next.join(','),
-    })
+    this.requestValue(next.join(','))
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {

@@ -97,11 +97,7 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
     if (next === this.value) {
       return
     }
-    const allowed = this.requestValue(next)
-    if (!allowed) {
-      return
-    }
-    this.value = next
+    this.requestValue(next)
   }
 
   /** Writes the answer onto the items, and nothing onto the host. */

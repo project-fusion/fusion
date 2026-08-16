@@ -217,6 +217,47 @@ helix-drawer {
   max-inline-size: 68ch;
 }
 
+/* =================================================== component art ======= */
+
+/* The abstract drawing on a family's gallery card, from `lib/component-art`.
+ *
+ * Three declarations, and everything else about how it sits is the card's job.
+ * It is slotted into `media`, which the card pulls out to its own border with a
+ * negative inset and clips to its corner radius, so a width, a background, a
+ * border or a radius stated here would either fight that or draw a second frame
+ * inside the first. Only the ratio is ours, because the card cannot know it.
+ *
+ * **Do not add `inline-size` here.** The card sets `inline-size: calc(100% +
+ * inset * 2)` on the slotted element through `::slotted()`, and a normal
+ * declaration in the outer tree beats an inner tree's `::slotted()` rule at any
+ * specificity. A `100%` here would silently un-bleed every card's art. */
+.componentArt {
+  aspect-ratio: 16 / 10;
+  display: block;
+}
+
+/* The whole palette. Every shape in all forty-nine drawings is one of these two
+   fills at some `fill-opacity`, on a five step ramp: 0.06, 0.12, 0.28, 0.55,
+   0.82. There are no strokes anywhere, so every edge in the set is one fill
+   meeting another, and a shape is visible only when it differs in weight from
+   what it sits on. The minimum readable step is about four points.
+
+   `foreground` rather than a rung on the surface ladder, for the reason the
+   button's own fill gives in `base.css`: a percentage of the foreground is a
+   step away from whatever it sits on in either mode, which a fixed neutral
+   cannot be. */
+.artFg {
+  fill: var(--helix-color-foreground);
+}
+
+/* The page coming back through, for the shapes that have to be lighter than
+   what they sit on: a checkbox tick, a switch knob, the toggle's raised
+   segment, the slider's thumb, the ring holding a badge off what it overlaps,
+   and the panel above a dialog's scrim. Never a lighter grey. */
+.artSurface {
+  fill: var(--helix-color-surface);
+}
+
 /* ============================================================ docs ======= */
 
 /* Three columns: what you can go to, what you are reading, and where you are

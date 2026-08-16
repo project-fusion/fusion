@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getFamilies } from '../../../lib/catalog'
+import { ComponentArt } from '../../../lib/component-art'
 import { findVertical } from '../../verticals'
 import { VerticalPage } from '../vertical-page'
 
@@ -58,6 +59,7 @@ export default function Page() {
         <helix-grid gap="md" min="17rem">
           {families.map((family) => (
             <helix-card appearance="outlined" aria-label={family.label} key={family.slug}>
+              <ComponentArt slug={family.slug} />
               <helix-flex align="center" gap="sm" justify="between" slot="header">
                 <helix-text as="h3" appearance="title">
                   {family.label}

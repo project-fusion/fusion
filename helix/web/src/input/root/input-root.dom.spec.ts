@@ -325,3 +325,67 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('input, controlled and uncontrolled', () => {
+  const control = (host: HTMLElement): HTMLInputElement => {
+    const found = host.shadowRoot?.querySelector('input')
+    if (!found) {
+      throw new Error('the field rendered no input, so there is nothing to type into')
+    }
+    return found
+  }
+
+  const typed = async (host: HTMLElement, text: string): Promise<void> => {
+    const field = control(host)
+    field.value = text
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+  }
+
+  const native = (host: HTMLElement): string => control(host).value
+
+  test('typing does not quietly hand the value to nobody', async () => {
+    /* Writing `value` is how a consumer says they own it, so a control that
+       wrote its own would declare itself controlled on the first keystroke and
+       ignore every request after that.
+
+       Two keystrokes does not see it, which is worth recording: the faulty
+       version overwrote its own claim each time, so the value tracked typing
+       either way and the spec passed on the bug. What a claimed value actually
+       breaks is the next request, so that is what this asks for. */
+    const host = (await mount('<helix-input label="Name"></helix-input>')) as HTMLElement & {
+      requestValue(next: string): boolean
+      updateComplete: Promise<boolean>
+      value: string
+    }
+    await typed(host, 'typed')
+    expect(host.value).toBe('typed')
+
+    host.requestValue('set from outside')
+    await host.updateComplete
+    expect(host.value).toBe('set from outside')
+  })
+
+  test('a controlled input keeps its value and puts the control back', async () => {
+    /* What React does with the same markup: the value belongs to the consumer,
+       so what was typed is undone until they hand back a new one. The native
+       control has already moved by the time this runs, which is why putting it
+       back is a separate act from not applying the change. */
+    const host = (await mount(
+      '<helix-input label="Name" value="fixed"></helix-input>',
+    )) as HTMLElement & { value: string }
+    await typed(host, 'tried')
+    expect(host.value).toBe('fixed')
+    expect(native(host)).toBe('fixed')
+  })
+
+  test('default-value seeds one that owns itself', async () => {
+    const host = (await mount(
+      '<helix-input default-value="seeded" label="Name"></helix-input>',
+    )) as HTMLElement & { value: string }
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    expect(host.value).toBe('seeded')
+    await typed(host, 'changed')
+    expect(host.value).toBe('changed')
+  })
+})

@@ -589,7 +589,7 @@ grid reads as a continuous run of dates.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when a date is chosen, with the ISO date. |
+| `helix-change` | `HelixChangeEvent` | Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`. |
 
 #### Parts
 

@@ -295,9 +295,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   open?: HelixAccordionItem["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixAccordionItem["defaultOpen"];
@@ -350,9 +355,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixAccordionItem["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixAccordionItem["defaultOpen"];
@@ -835,9 +845,9 @@ anything a consumer sets. */
 
 /** `HelixCalendar` component event */
 export type HelixCalendarElementEvent<E = Event> = TypedEvent<HelixCalendar, E>;
-/** `helix-select` event type */
-export type HelixCalendarHelixSelectElementEvent =
-  HelixCalendarElementEvent<HelixSelectEvent>;
+/** `helix-change` event type */
+export type HelixCalendarHelixChangeElementEvent =
+  HelixCalendarElementEvent<HelixChangeEvent>;
 
 export type HelixCalendarProps = {
   /** The value the markup declared, which is where a reset returns to. */
@@ -905,8 +915,8 @@ it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   onValueChange?: HelixCalendar["onValueChange"];
 
-  /** Fired when a date is chosen, with the ISO date. */
-  "onhelix-select"?: (e: HelixCalendarHelixSelectElementEvent) => void;
+  /** Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`. */
+  "onhelix-change"?: (e: HelixCalendarHelixChangeElementEvent) => void;
 };
 
 export type HelixCalendarSolidJsProps = {
@@ -974,8 +984,8 @@ because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   "prop:onValueChange"?: HelixCalendar["onValueChange"];
-  /** Fired when a date is chosen, with the ISO date. */
-  "on:helix-select"?: (e: HelixCalendarHelixSelectElementEvent) => void;
+  /** Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`. */
+  "on:helix-change"?: (e: HelixCalendarHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1322,9 +1332,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   open?: HelixDialog["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixDialog["defaultOpen"];
@@ -1369,9 +1384,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixDialog["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixDialog["defaultOpen"];
@@ -1467,9 +1487,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   open?: HelixDrawer["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixDrawer["defaultOpen"];
@@ -1520,9 +1545,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixDrawer["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixDrawer["defaultOpen"];
@@ -2277,9 +2307,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   open?: HelixMenu["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixMenu["defaultOpen"];
@@ -2326,9 +2361,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixMenu["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixMenu["defaultOpen"];
@@ -2497,9 +2537,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   open?: HelixPopover["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixPopover["defaultOpen"];
@@ -2546,9 +2591,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixPopover["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixPopover["defaultOpen"];
@@ -2832,9 +2882,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   open?: HelixSelect["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixSelect["defaultOpen"];
@@ -2922,9 +2977,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixSelect["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixSelect["defaultOpen"];
@@ -4055,9 +4115,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   open?: HelixTooltip["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "default-open"?: HelixTooltip["defaultOpen"];
@@ -4114,9 +4179,14 @@ property answering the first. That worked for a boolean, where `isOpen`
 reads well; there is no such word for a value or an active item, so all
 four of these mixins now have this shape instead of two shapes.
 
-Not reflected. The attribute is the consumer's input and stays as they
-wrote it; `data-open` carries the resolved state for stylesheets, which
-is what it has always been for. */
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
   "prop:open"?: HelixTooltip["open"];
   /** Initial open state for uncontrolled use. Ignored once `open` is written. */
   "bool:default-open"?: HelixTooltip["defaultOpen"];
@@ -4328,9 +4398,14 @@ export type CustomElements = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `chevron-placement`/`chevronPlacement`: Where the open indicator sits, or whether there is one.
    *
@@ -4973,7 +5048,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when a date is chosen, with the ISO date.
+   * - `helix-change`: Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`.
    *
    * ## Methods
    *
@@ -5377,9 +5452,14 @@ export type CustomElements = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `label`: Accessible name for the dialog.
    * - `persistent`: Whether Escape and the backdrop can close it.
@@ -5506,9 +5586,14 @@ export type CustomElements = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `placement`: Which edge the drawer comes from.
    * - `label`: Accessible name for the panel.
@@ -6324,9 +6409,14 @@ export type CustomElements = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the surface, in pixels.
@@ -6586,9 +6676,14 @@ export type CustomElements = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
@@ -6915,9 +7010,14 @@ export type CustomElements = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -8152,9 +8252,14 @@ export type CustomElements = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `content`: The text shown in the bubble.
    *
@@ -8395,9 +8500,14 @@ export type CustomElementsSolidJs = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `chevron-placement`/`chevronPlacement`: Where the open indicator sits, or whether there is one.
    *
@@ -9078,7 +9188,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when a date is chosen, with the ISO date.
+   * - `helix-change`: Fired before the dates change, and cancelable. It was `helix-select`, and it moved when the calendar became a form control. A control whose value changes dispatches `helix-change` here: `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a calendar submitting a date is the same kind of thing. `helix-select` stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as `Menu` or `Tree`.
    *
    * ## Methods
    *
@@ -9499,9 +9609,14 @@ export type CustomElementsSolidJs = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `label`: Accessible name for the dialog.
    * - `persistent`: Whether Escape and the backdrop can close it.
@@ -9634,9 +9749,14 @@ export type CustomElementsSolidJs = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `placement`: Which edge the drawer comes from.
    * - `label`: Accessible name for the panel.
@@ -10493,9 +10613,14 @@ export type CustomElementsSolidJs = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the surface, in pixels.
@@ -10769,9 +10894,14 @@ export type CustomElementsSolidJs = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
@@ -11117,9 +11247,14 @@ export type CustomElementsSolidJs = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -12420,9 +12555,14 @@ export type CustomElementsSolidJs = {
    * reads well; there is no such word for a value or an active item, so all
    * four of these mixins now have this shape instead of two shapes.
    *
-   * Not reflected. The attribute is the consumer's input and stays as they
-   * wrote it; `data-open` carries the resolved state for stylesheets, which
-   * is what it has always been for.
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use. Ignored once `open` is written.
    * - `content`: The text shown in the bubble.
    *

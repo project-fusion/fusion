@@ -1,10 +1,4 @@
-import {
-  customElement,
-  HelixChangeEvent,
-  HelixFormElement,
-  MixinControllerValue,
-  MixinField,
-} from '@helix-io/core'
+import { customElement, HelixFormElement, MixinControllerValue, MixinField } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -130,12 +124,14 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
   private readonly handleInput = (event: Event): void => {
     const control = event.target as HTMLInputElement
     const next = control.value
-    const allowed = this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: next }))
-    if (!allowed) {
+    /* Through the mixin, like the other native-backed controls. The thumb has
+       already moved either way, so wherever the answer does not follow it has
+       to be put back: a refusal and a consumer who owns the value are the same
+       situation seen from here. */
+    this.requestValue(next)
+    if (control.value !== this.value) {
       control.value = this.value
-      return
     }
-    this.value = next
   }
 
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
@@ -164,7 +160,12 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
        here so the value the form would submit matches the thumb from the first
        render rather than from the first drag. */
     if (!this.hasUpdated && this.value === '') {
-      this.value = String(this.min + (this.max - this.min) / 2)
+      /* Onto `defaultValue`, never onto `value`. Writing `value` is how a
+         consumer says they own it, so seeding through it would have made every
+         range with no value controlled on its first render and frozen the thumb
+         where it started. `defaultValue` is where the markup's intent lives,
+         and "no value given" is exactly a fact about the markup. */
+      this.defaultValue = String(this.min + (this.max - this.min) / 2)
     }
   }
 
