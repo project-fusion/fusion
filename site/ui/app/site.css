@@ -63,8 +63,17 @@
 
 /* The header spans the viewport, so its own centring is turned off and it
    takes the page's inset instead. */
+/* The masthead holds a fixed inset rather than the page's fluid one.
+ *
+ * `--site-inset` is a clamp that opens up to seven rem on a wide screen, which
+ * is right for a column of prose: the measure wants air beside it. A masthead
+ * is not a column. Its contents are a mark at one edge and controls at the
+ * other, and pushing those inward on a wide screen moves them away from the
+ * corners the eye goes to and leaves the bar looking loosely packed.
+ *
+ * So it is `space-2xl`, which is forty eight, at every width. */
 helix-app-header {
-  --app-header-inset: var(--site-inset);
+  --app-header-inset: var(--helix-space-2xl);
   --app-header-max-inline-size: none;
 }
 
