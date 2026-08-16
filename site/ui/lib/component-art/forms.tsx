@@ -110,7 +110,7 @@ export const formsArt: Record<string, ReactNode> = {
    * three specks, and they pushed the card past six shapes for nothing.
    */
   'checkbox-group': (
-    <>
+    <g transform="translate(-8 -4)">
       {[
         { box: 0.44, w: 96, y: 62 },
         { box: 0.09, w: 72, y: 94 },
@@ -137,7 +137,7 @@ export const formsArt: Record<string, ReactNode> = {
           />
         </g>
       ))}
-    </>
+    </g>
   ),
 
   /** Square at the control height, and the glyph is all of it. */
@@ -152,14 +152,14 @@ export const formsArt: Record<string, ReactNode> = {
 
   /** More than one of them is the answer, and only those carry a band. */
   listbox: (
-    <>
+    <g transform="translate(0 -7)">
       <rect className="artFg" fillOpacity="0.09" height="28" rx="4" width="208" x="56" y="44" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="104" x="72" y="54" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="80" x="72" y="90" />
       <rect className="artFg" fillOpacity="0.09" height="28" rx="4" width="208" x="56" y="116" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="120" x="72" y="126" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="88" x="72" y="162" />
-    </>
+    </g>
   ),
 
   /** One choice, on its own. The count is the distinction from Listbox. */

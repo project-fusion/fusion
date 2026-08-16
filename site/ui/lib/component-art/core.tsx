@@ -23,51 +23,51 @@ import type { ReactNode } from 'react'
 export const coreArt: Record<string, ReactNode> = {
   /** Items flush against each other, one hairline between neighbours. */
   accordion: (
-    <>
+    <g transform="translate(0 -7)">
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="88" x="68" y="44" />
       <rect className="artFg" fillOpacity="0.16" height="1" width="224" x="48" y="66" />
       <rect className="artFg" fillOpacity="0.44" height="8" rx="4" width="104" x="68" y="86" />
       <rect className="artFg" fillOpacity="0.09" height="6" rx="3" width="160" x="68" y="112" />
       <rect className="artFg" fillOpacity="0.16" height="1" width="224" x="48" y="142" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="72" x="68" y="162" />
-    </>
+    </g>
   ),
 
   /** A 16 pixel mark pinned at 45 degrees, held off by a ring of the page. */
   badge: (
-    <>
+    <g transform="translate(0 -4)">
       <circle className="artFg" cx="160" cy="104" fillOpacity="0.09" r="40" />
       <circle className="artSurface" cx="188" cy="76" r="12" />
       <circle className="artFg" cx="188" cy="76" fillOpacity="0.44" r="8" />
-    </>
+    </g>
   ),
 
   /** One control at 40, three times, gaining weight as it comes forward. */
   button: (
-    <>
+    <g transform="translate(0 4)">
       <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="120" x="80" y="58" />
       <rect className="artFg" fillOpacity="0.16" height="40" rx="4" width="120" x="100" y="76" />
       <rect className="artFg" fillOpacity="0.44" height="40" rx="4" width="120" x="120" y="94" />
-    </>
+    </g>
   ),
 
   /** Two surfaces at radius 8, and the third tone is their overlap. */
   card: (
-    <>
+    <g transform="translate(0 -8)">
       <rect className="artFg" fillOpacity="0.04" height="104" rx="8" width="176" x="48" y="40" />
       <rect className="artFg" fillOpacity="0.04" height="104" rx="8" width="176" x="96" y="72" />
       <rect className="artFg" fillOpacity="0.28" height="32" rx="4" width="64" x="192" y="128" />
-    </>
+    </g>
   ),
 
   /** A 40 pixel field at radius 4, sunken, with a caret in it. */
   input: (
-    <>
+    <g transform="translate(0 18)">
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="56" x="48" y="52" />
       <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="224" x="48" y="72" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="64" y="88" />
       <rect className="artFg" fillOpacity="0.44" height="20" width="2" x="160" y="82" />
-    </>
+    </g>
   ),
 
   /** Two keys at their real height, with the depth on the inside. */
@@ -112,7 +112,7 @@ export const coreArt: Record<string, ReactNode> = {
    * rather than as something about to be replaced.
    */
   skeleton: (
-    <>
+    <g transform="translate(20 -1)">
       <defs>
         <g id="componentArtSkeleton">
           <circle cx="76" cy="100" r="20" />
@@ -134,7 +134,7 @@ export const coreArt: Record<string, ReactNode> = {
       </defs>
       <use className="artFg" fillOpacity="0.09" href="#componentArtSkeleton" />
       <use fill="url(#componentArtSkeletonSweep)" href="#componentArtSkeleton" />
-    </>
+    </g>
   ),
 
   /**

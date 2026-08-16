@@ -84,7 +84,14 @@ export class HelixBaseOption extends HelixElement {
     this.internals.ariaSelected = String(this.selected)
     this.internals.ariaDisabled = this.disabled ? 'true' : null
 
-    return html`<div part="item">
+    /* A pointer reaches `select()` the way every other choosable row in this
+       library does, from a `@click` in its own template: `Tabs.Tab`,
+       `Tree.Item` and `Menu.Item` all bind one. This had none, and nothing else
+       listened for a click either, so an option could be chosen with the
+       keyboard and not with a mouse. A select was unusable with a pointer for
+       as long as it has existed, which nothing caught because every spec for it
+       chooses by calling `select()` or by pressing a key. */
+    return html`<div part="item" @click=${() => this.select()}>
       <slot name="start"></slot>
       <span part="label"><slot></slot></span>
       <slot name="end"></slot>

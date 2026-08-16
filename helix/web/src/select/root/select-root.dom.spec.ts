@@ -202,3 +202,62 @@ if (hasLayout()) {
     })
   })
 }
+
+if (hasLayout()) {
+  describe('choosing an option with a pointer', () => {
+    /* Browser-only because the chain crosses a slot: the option is the
+       consumer's element, slotted into the listbox inside the select's shadow
+       root, and happy-dom does not propagate an event from slotted content
+       through the `<slot>`. Every existing spec here chooses by setting `value`
+       or by calling `select()`, which is why nothing caught that a select could
+       not be operated with a mouse at all. */
+    const opened = async (attrs = ''): Promise<Updatable & { value: string }> => {
+      const host = (await mount(
+        `<helix-select label="Fruit" name="fruit" ${attrs}>
+          <helix-option value="apple">Apple</helix-option>
+          <helix-option value="pear">Pear</helix-option>
+        </helix-select>`,
+      )) as Updatable & { value: string }
+      await host.updateComplete
+      ;(part(host as HTMLElement, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+      return host
+    }
+
+    const press = async (host: HTMLElement, value: string): Promise<void> => {
+      const option = host.querySelector(`helix-option[value="${value}"]`) as HTMLElement
+      await (option as unknown as { updateComplete: Promise<boolean> }).updateComplete
+      const row = option.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null
+      if (!row) {
+        throw new Error('the option renders no row, so there is nothing to press')
+      }
+      row.click()
+      await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+      await new Promise((done) => setTimeout(done, 20))
+    }
+
+    test('a click chooses the option and the trigger says so', async () => {
+      const host = await opened()
+      await press(host as HTMLElement, 'pear')
+      expect(host.value).toBe('pear')
+      expect((part(host as HTMLElement, 'trigger') as HTMLElement).textContent?.trim()).toBe('Pear')
+    })
+
+    test('and it closes, because the question has been answered', async () => {
+      const host = await opened()
+      await press(host as HTMLElement, 'pear')
+      expect((host as HTMLElement).hasAttribute('data-open')).toBe(false)
+    })
+
+    test('a multiple stays open, and the answers accumulate', async () => {
+      /* A multi-select that shut after each pick is a control the reader has to
+         reopen to use again. */
+      const host = await opened('multiple')
+      await press(host as HTMLElement, 'pear')
+      expect((host as HTMLElement).hasAttribute('data-open')).toBe(true)
+      await press(host as HTMLElement, 'apple')
+      expect(host.value).toBe('pear,apple')
+      expect((host as HTMLElement).hasAttribute('data-open')).toBe(true)
+    })
+  })
+}

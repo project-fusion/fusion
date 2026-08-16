@@ -42,13 +42,13 @@ export const contentArt: Record<string, ReactNode> = {
 
   /** A passage set off by a rule and an indent. */
   blockquote: (
-    <>
+    <g transform="translate(4 0)">
       <rect className="artFg" fillOpacity="0.28" height="80" width="2" x="48" y="60" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="176" x="72" y="64" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="192" x="72" y="84" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="144" x="72" y="104" />
       <rect className="artFg" fillOpacity="0.09" height="6" rx="3" width="64" x="72" y="128" />
-    </>
+    </g>
   ),
 
   /**
@@ -59,7 +59,7 @@ export const contentArt: Record<string, ReactNode> = {
    * it. That asymmetry is the silhouette, and it is why this is a path.
    */
   callout: (
-    <>
+    <g transform="translate(6 0)">
       <path
         className="artFg"
         d="M48 64h204a8 8 0 0 1 8 8v56a8 8 0 0 1-8 8H48z"
@@ -69,18 +69,18 @@ export const contentArt: Record<string, ReactNode> = {
       <rect className="artFg" fillOpacity="0.16" height="20" rx="4" width="20" x="64" y="78" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="120" x="96" y="82" />
       <rect className="artFg" fillOpacity="0.09" height="6" rx="3" width="96" x="96" y="106" />
-    </>
+    </g>
   ),
 
   /** One rule, and the two groups it makes. */
   divider: (
-    <>
+    <g transform="translate(0 -4)">
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="160" x="48" y="60" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="128" x="48" y="80" />
       <rect className="artFg" fillOpacity="0.16" height="1" width="224" x="48" y="100" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="176" x="48" y="120" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="112" x="48" y="140" />
-    </>
+    </g>
   ),
 
   /**
@@ -88,21 +88,21 @@ export const contentArt: Record<string, ReactNode> = {
    * why there is no plane: an empty state drawn inside a box is a box.
    */
   empty: (
-    <>
+    <g transform="translate(0 -14)">
       <rect className="artFg" fillOpacity="0.16" height="20" rx="4" width="20" x="150" y="60" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="80" x="120" y="98" />
       <rect className="artFg" fillOpacity="0.09" height="6" rx="3" width="56" x="132" y="116" />
       <rect className="artFg" fillOpacity="0.16" height="32" rx="4" width="52" x="134" y="136" />
-    </>
+    </g>
   ),
 
   /** One axis. The sizes differ, the gaps do not, and the gap is `space-md`. */
   flex: (
-    <>
+    <g transform="translate(-4 0)">
       <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="48" x="56" y="80" />
       <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="88" x="120" y="80" />
       <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="48" x="224" y="80" />
-    </>
+    </g>
   ),
 
   /** Two axes, and every cell the same as every other. */
@@ -132,13 +132,13 @@ export const contentArt: Record<string, ReactNode> = {
 
   /** Rows read as a set, divided by a rule and nothing else. */
   list: (
-    <>
+    <g transform="translate(0 -4)">
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="140" x="56" y="64" />
       <rect className="artFg" fillOpacity="0.09" height="1" width="224" x="48" y="84" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="104" x="56" y="100" />
       <rect className="artFg" fillOpacity="0.09" height="1" width="224" x="48" y="120" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="164" x="56" y="136" />
-    </>
+    </g>
   ),
 
   /**
@@ -151,11 +151,11 @@ export const contentArt: Record<string, ReactNode> = {
    * to make the card busier would blur that.
    */
   progress: (
-    <>
+    <g transform="translate(0 10)">
       <rect className="artFg" fillOpacity="0.16" height="6" rx="3" width="64" x="48" y="76" />
       <rect className="artFg" fillOpacity="0.09" height="8" rx="4" width="224" x="48" y="96" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="136" x="48" y="96" />
-    </>
+    </g>
   ),
 
   /**
@@ -164,13 +164,13 @@ export const contentArt: Record<string, ReactNode> = {
    * sentence it sits in.
    */
   quote: (
-    <>
+    <g transform="translate(8 6)">
       <rect className="artFg" fillOpacity="0.09" height="8" rx="4" width="88" x="48" y="68" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="112" x="144" y="68" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="72" x="48" y="90" />
       <rect className="artFg" fillOpacity="0.09" height="8" rx="4" width="128" x="128" y="90" />
       <rect className="artFg" fillOpacity="0.09" height="8" rx="4" width="140" x="48" y="112" />
-    </>
+    </g>
   ),
 
   /**
@@ -207,13 +207,13 @@ export const contentArt: Record<string, ReactNode> = {
    * another from reading as `text`.
    */
   stat: (
-    <>
+    <g transform="translate(-4 4)">
       <rect className="artFg" fillOpacity="0.16" height="6" rx="3" width="56" x="48" y="76" />
       <rect className="artFg" fillOpacity="0.44" height="24" rx="4" width="104" x="48" y="92" />
       <rect className="artFg" fillOpacity="0.09" height="48" width="1" x="184" y="72" />
       <rect className="artFg" fillOpacity="0.09" height="6" rx="3" width="44" x="216" y="76" />
       <rect className="artFg" fillOpacity="0.16" height="24" rx="4" width="64" x="216" y="92" />
-    </>
+    </g>
   ),
 
   /**
@@ -222,7 +222,7 @@ export const contentArt: Record<string, ReactNode> = {
    * lines up while each row stays a real element.
    */
   table: (
-    <>
+    <g transform="translate(0 8)">
       {[56, 144, 224].map((x, index) => (
         <rect
           className="artFg"
@@ -253,17 +253,17 @@ export const contentArt: Record<string, ReactNode> = {
           />
         )),
       )}
-    </>
+    </g>
   ),
 
   /** What element it is, and what it looks like: the scale in one picture. */
   text: (
-    <>
+    <g transform="translate(0 -5)">
       <rect className="artFg" fillOpacity="0.44" height="16" rx="4" width="144" x="48" y="56" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="224" x="48" y="88" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="200" x="48" y="106" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="168" x="48" y="124" />
       <rect className="artFg" fillOpacity="0.09" height="6" rx="3" width="96" x="48" y="148" />
-    </>
+    </g>
   ),
 }

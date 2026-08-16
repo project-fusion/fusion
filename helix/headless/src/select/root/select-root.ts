@@ -147,7 +147,19 @@ export class HelixBaseSelect extends MixinControllerOpen(
   }
 
   private readonly handleChange = (event: Event): void => {
-    const next = (event.target as HelixBaseListbox).value
+    /* From the event, not from the listbox.
+     *
+     * The event carries the value being *proposed*, and it is dispatched before
+     * it is applied, which is what makes it refusable. Reading the listbox here
+     * therefore read the value it still held: one choice behind, and on the
+     * first choice nothing at all.
+     *
+     * And the listbox never applies it anyway. The select passes `.value` down,
+     * which is a consumer declaring ownership, so the listbox inside the panel
+     * is controlled by the select and correctly waits to be told. That is the
+     * right arrangement, and it makes reading the listbox's own value the one
+     * thing that can never work. */
+    const next = (event as CustomEvent<{ value: string }>).detail.value
     this.requestValue(next)
     /* Closed on a choice, unless more than one can be made: a multi-select that
        shut after each pick would be a control the reader has to reopen to use

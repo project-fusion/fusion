@@ -82,6 +82,31 @@ body {
   max-inline-size: 100%;
 }
 
+/* The one media that is allowed to be wider than the box it sits in.
+ *
+ * Card's media runs edge to edge: `card-root.css` pulls the slotted element out
+ * to the border with a negative inset and widens it by twice that, and the
+ * host's `overflow: hidden` trims it to the corner radius. The reset above
+ * silently undid half of that. **A normal declaration in the outer tree beats a
+ * `::slotted()` rule in an inner one whatever the specificities are**, so a
+ * zero-specificity `:where()` in this file outranked the component's own sizing
+ * and clamped it back to the content box. The negative margins still applied,
+ * so the media came out shifted one inset to the left and two insets short on
+ * the right: a picture visibly hanging off its own card.
+ *
+ * The fix has to be here for the same reason it broke here. The component
+ * cannot win this from inside its shadow root with a normal declaration, and
+ * the alternative is `!important` in `card-root.css`, which is the cascade
+ * being fought rather than used. This is the pattern the button recipe already
+ * follows: where a rule has to reach a light-DOM element the consumer owns, the
+ * definition lives in the document.
+ *
+ * Only the clamp is lifted. The width itself stays in the component, because
+ * the inset it is derived from is the component's. */
+helix-card > [slot="media"] {
+  max-inline-size: none;
+}
+
 :where(input, button, textarea, select) {
   font: inherit;
 }

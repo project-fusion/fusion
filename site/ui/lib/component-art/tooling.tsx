@@ -20,13 +20,13 @@ export const toolingArt: Record<string, ReactNode> = {
    * only ever increases down the visible rows.
    */
   editor: (
-    <>
+    <g transform="translate(26 0)">
       <rect className="artFg" fillOpacity="0.09" height="112" width="1" x="64" y="44" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="120" x="80" y="52" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="88" x="100" y="76" />
       <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="104" x="100" y="100" />
       <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="64" x="80" y="124" />
-    </>
+    </g>
   ),
 
   /**

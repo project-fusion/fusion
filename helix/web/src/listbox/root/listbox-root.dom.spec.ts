@@ -189,3 +189,33 @@ if (hasLayout()) {
     })
   })
 }
+
+if (hasLayout()) {
+  describe('choosing an option with a pointer', () => {
+    test('a click on an option chooses it', async () => {
+      /* Nothing anywhere listened for a click on an option: not the option,
+         which only had a `select()` method, and not the listbox, which listened
+         for `helix-select` and for keys. So a list could be operated with a
+         keyboard and not with a mouse, for as long as it has existed. Every
+         spec for it chose by key or by method, which is exactly why. */
+      const host = (await mount(
+        `<helix-listbox label="Owner">
+          <helix-option value="one">One</helix-option>
+          <helix-option value="two">Two</helix-option>
+        </helix-listbox>`,
+      )) as Updatable & { value: string }
+      await host.updateComplete
+
+      const option = (host as HTMLElement).querySelector('helix-option[value="two"]') as HTMLElement
+      await (option as unknown as { updateComplete: Promise<boolean> }).updateComplete
+      const row = option.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null
+      if (!row) {
+        throw new Error('the option renders no row, so there is nothing to press')
+      }
+      row.click()
+      await host.updateComplete
+
+      expect(host.value).toBe('two')
+    })
+  })
+}
