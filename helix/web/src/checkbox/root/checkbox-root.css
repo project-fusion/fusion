@@ -61,7 +61,20 @@
 
 [part="control"] {
   appearance: none;
-  background-color: var(--checkbox-background-color, var(--helix-color-surface-sunken));
+  /* The page's own colour, so the box reads as a hole punched through to it
+     rather than as a fill that happens to match.
+
+     It was `surface-sunken`, and that stopped working the moment `sunken` was
+     lightened: at 0.96 it is the same colour as a sunken surface, so a checkbox
+     inside a well had no interior at all, only its border. Measured on the page
+     it separated by 0.04, on a card by 0.025, and in the one place it was for
+     by nothing.
+
+     `background` cannot have that problem. On the page it is the page, which is
+     what a native checkbox looks like there and leaves the border to define the
+     box. On anything raised above the page it is a hole, which is what a box
+     you put a mark in should be. Both hold in dark, where the page is black. */
+  background-color: var(--checkbox-background-color, var(--helix-color-background));
   block-size: var(--_checkbox-size);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
