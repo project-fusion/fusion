@@ -47,6 +47,7 @@ import { property, state } from 'lit/decorators.js'
  * @slot - The links, as anchors with fragment hrefs.
  *
  * @csspart nav - The navigation landmark.
+ * @csspart indicator - The mark that travels to the section being read.
  */
 @customElement('helix-base-page-nav')
 export class HelixBasePageNav extends HelixElement {
@@ -83,6 +84,8 @@ export class HelixBasePageNav extends HelixElement {
   private reading = ''
 
   private observer: IntersectionObserver | undefined
+
+  private resize: ResizeObserver | undefined
 
   /** The links, in document order. Empty on the server, which has no tree. */
   private get links(): HTMLAnchorElement[] {
@@ -152,14 +155,71 @@ export class HelixBasePageNav extends HelixElement {
     this.mark()
   }
 
+  /**
+   * Measures the current link and writes the geometry onto the indicator.
+   *
+   * One mark that travels, rather than a border on each link. The tabs strip
+   * gives the reason: a border can only appear and disappear, and a mark that
+   * moves is what says these are places in one document rather than a column of
+   * separate states. Vertical here, so it is the block axis that is measured
+   * where the strip measures the inline one.
+   *
+   * Height as well as position, because the links are text and a long heading
+   * wraps to two lines. A fixed-height mark would be right for one link in the
+   * list and wrong for its neighbour.
+   */
+  private place(): void {
+    const nav = this.renderRoot?.querySelector<HTMLElement>('[part="nav"]')
+    const indicator = this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]')
+    const current = this.links.find((link) => link.hasAttribute('aria-current'))
+    if (!nav || !indicator || !current) {
+      return
+    }
+    const box = current.getBoundingClientRect()
+    if (box.height === 0) {
+      return
+    }
+    /* Against the nav's padding box, which is where an absolutely positioned
+       child is placed, while `getBoundingClientRect` gives the border box. The
+       same arithmetic the tab strip and the toggle group both do, and the
+       fourth time this repository has met it. */
+    indicator.style.setProperty(
+      '--_indicator-y',
+      `${box.top - nav.getBoundingClientRect().top - nav.clientTop}px`,
+    )
+    indicator.style.setProperty('--_indicator-h', `${box.height}px`)
+    indicator.toggleAttribute('data-placed', true)
+  }
+
+  /**
+   * The set changed: watch it, and measure it.
+   *
+   * Both, for the reason the tab strip records: the host renders before its
+   * links have anything to point at, so the first measurement finds nothing,
+   * and without a second one at `slotchange` the mark stays unplaced for the
+   * life of the page.
+   */
+  private readonly handleSlotChange = (): void => {
+    this.watch()
+    this.place()
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.observer?.disconnect()
     this.observer = undefined
+    this.resize?.disconnect()
+    this.resize = undefined
   }
 
   protected override firstUpdated(): void {
     this.watch()
+    /* The links are text in a column, so anything that changes the column's
+       width rewraps them and moves every one below. Nothing else would notice:
+       the intersection observer watches the sections, and a resize moves the
+       links without moving the page. */
+    this.resize = new ResizeObserver(() => this.place())
+    this.resize.observe(this)
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -171,11 +231,17 @@ export class HelixBasePageNav extends HelixElement {
     if (changed.has('offset')) {
       this.mark()
     }
+    /* After the render that applied the new `aria-current`, not inside `mark()`
+       beside the attribute write. The current link is styled differently, and
+       on a narrow column the extra weight is enough to rewrap it, so measuring
+       before the style lands measures the wrong height. */
+    this.place()
   }
 
   protected override render(): TemplateResult {
     return html`<nav part="nav" aria-label=${this.label}>
-      <slot @slotchange=${() => this.watch()}></slot>
+      <slot @slotchange=${this.handleSlotChange}></slot>
+      <span part="indicator" aria-hidden="true"></span>
     </nav>`
   }
 }

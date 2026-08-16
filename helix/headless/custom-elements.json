@@ -12483,6 +12483,10 @@
             {
               "description": "The navigation landmark.",
               "name": "nav"
+            },
+            {
+              "description": "The mark that travels to the section being read.",
+              "name": "indicator"
             }
           ],
           "slots": [
@@ -12541,6 +12545,14 @@
             },
             {
               "kind": "field",
+              "name": "resize",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
               "name": "links",
               "type": {
                 "text": "HTMLAnchorElement[]"
@@ -12580,6 +12592,24 @@
                 }
               },
               "description": "Watches every section, and re-marks whenever any of them crosses anything.\n\nThe thresholds are what make the trigger frequent enough: an observer fires\non entering and leaving, and a long section scrolled slowly crosses neither\nfor a long time. Asking for a callback at each quarter of visibility is\ncheap and keeps the marker honest without a scroll listener."
+            },
+            {
+              "kind": "method",
+              "name": "place",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Measures the current link and writes the geometry onto the indicator.\n\nOne mark that travels, rather than a border on each link. The tabs strip\ngives the reason: a border can only appear and disappear, and a mark that\nmoves is what says these are places in one document rather than a column of\nseparate states. Vertical here, so it is the block axis that is measured\nwhere the strip measures the inline one.\n\nHeight as well as position, because the links are text and a long heading\nwraps to two lines. A fixed-height mark would be right for one link in the\nlist and wrong for its neighbour."
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The set changed: watch it, and measure it.\n\nBoth, for the reason the tab strip records: the host renders before its\nlinks have anything to point at, so the first measurement finds nothing,\nand without a second one at `slotchange` the mark stays unplaced for the\nlife of the page."
             },
             {
               "kind": "field",

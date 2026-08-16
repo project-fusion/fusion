@@ -1,63 +1,74 @@
 :host {
   display: block;
+
+  /* The gutter the rail and the travelling mark share. Named once: it is both
+     the mark's width and the room every link is pushed clear by, and two copies
+     of a number like that drift.
+   *
+   * Public rather than private, because the rule that reads it for the links is
+   * in the base layer, not in here. Set on `:host`, which is the host element
+   * itself, so the consumer's light-DOM anchors inherit it the same way the
+   * shadow's own indicator does. */
+  --page-nav-rail: var(--helix-border-thick);
 }
 
 /* The rule is a background rather than a border, for the reason the tabs strip
    learned: a border is part of the element's own box, so a lit segment drawn
    over it has to cover a box edge exactly, and `overflow` clips the border area
-   away. A gradient is painted inside the box and nothing clips it. */
+   away. A gradient is painted inside the box and nothing clips it.
+
+   Centred in the gutter rather than at `left`, so the hairline and the mark
+   that covers it share an axis. Off-centre, the mark sat beside the rule it was
+   meant to replace and the pair read as two lines. */
 [part="nav"] {
   background-image: linear-gradient(var(--helix-color-border), var(--helix-color-border));
-  background-position: left;
+  background-position-x: calc((var(--page-nav-rail) - var(--helix-border-thin)) / 2);
   background-repeat: repeat-y;
   background-size: var(--helix-border-thin) 100%;
   display: flex;
   flex-direction: column;
+  /* The containing block for the mark, so it is placed against the column of
+     links rather than against the component. */
+  position: relative;
 }
 
-::slotted(a) {
-  border-inline-start: var(--helix-border-thick) solid transparent;
-  color: var(--helix-color-foreground-muted);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  line-height: var(--helix-leading-normal);
-  padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-sm);
-  text-decoration: none;
+/* The mark that travels.
+ *
+ * One element that moves, rather than a border appearing on each link in turn.
+ * That is the tab strip's argument and it is the same argument: a border can
+ * only be there or not, and something that moves says these are places in one
+ * document rather than a column of separate states. Vertical, so it is the
+ * block axis that is measured and animated where the strip animates the inline
+ * one.
+ *
+ * Hidden until it has been measured, so it fades in where it belongs rather
+ * than sliding down from the top of the list on first paint.
+ */
+[part="indicator"] {
+  background-color: var(--helix-color-primary);
+  block-size: var(--_indicator-h, 0);
+  border-radius: var(--helix-radii-full);
+  inline-size: var(--page-nav-rail);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  position: absolute;
+  translate: 0 var(--_indicator-y, 0);
+  /* It slides and settles: `emphasized` overshoots slightly and comes back.
+     Height moves with position, so a mark travelling to a heading that wraps to
+     two lines grows as it goes rather than after it arrives. */
   transition:
-    border-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    block-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-::slotted(a:hover) {
-  color: var(--helix-color-foreground);
+[part="indicator"][data-placed] {
+  opacity: 1;
 }
 
-/* The one being read. `aria-current` rather than a class, so the thing a screen
-   reader is told and the thing the eye is shown are the same attribute and
-   cannot disagree. */
-::slotted(a[aria-current]) {
-  border-inline-start-color: var(--helix-color-primary);
-  color: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-medium);
-}
-
-::slotted(a:focus-visible) {
-  border-radius: var(--helix-radii-sm);
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
-}
-
-/* Nesting, said by the consumer. Multiplied rather than enumerated, so a page
-   with five levels needs no rule adding here. */
-::slotted(a[data-level="2"]) {
-  padding-inline-start: calc(var(--helix-space-sm) + var(--page-nav-indent, var(--helix-space-sm)));
-}
-
-::slotted(a[data-level="3"]) {
-  padding-inline-start: calc(
-    var(--helix-space-sm) +
-    2 *
-    var(--page-nav-indent, var(--helix-space-sm))
-  );
+@media (prefers-reduced-motion: reduce) {
+  [part="indicator"] {
+    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  }
 }

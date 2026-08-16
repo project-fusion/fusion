@@ -6572,6 +6572,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `nav`: The navigation landmark.
+   * - `indicator`: The mark that travels to the section being read.
    */
   "helix-base-page-nav": Partial<
     HelixBasePageNavProps & BaseProps<HelixBasePageNav> & BaseEvents
@@ -10881,6 +10882,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `nav`: The navigation landmark.
+   * - `indicator`: The mark that travels to the section being read.
    */
   "helix-base-page-nav": Partial<
     HelixBasePageNavProps &

@@ -1907,11 +1907,13 @@ document is not always where the headings are.
 | Part | Description |
 | --- | --- |
 | `nav` | The navigation landmark. |
+| `indicator` | The mark that travels to the section being read. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
+| `--page-nav-rail` | Width of the gutter the rule and the travelling mark share. |
 | `--page-nav-indent` | How far each level is inset from the one above. |
 
 ## Popover

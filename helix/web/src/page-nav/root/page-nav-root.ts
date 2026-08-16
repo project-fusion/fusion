@@ -20,6 +20,8 @@ import { styles } from './page-nav-root.css.js'
  * @aliases Table of contents, On this page, Outline
  * @documentation https://helix.fusion.dev/components/page-nav
  *
+ * @cssproperty --page-nav-rail - Width of the gutter the rule and the travelling mark share.
+ *
  * @cssproperty --page-nav-indent - How far each level is inset from the one above.
  */
 @customElement('helix-page-nav')

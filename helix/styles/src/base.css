@@ -693,6 +693,71 @@ helix-toggle[disabled]::part(item) {
   font-weight: var(--helix-weight-semibold);
 }
 
+/* The page-nav link.
+ *
+ * Here rather than in the component, for the reason the toggle item above
+ * gives and the same one: a `::slotted()` rule loses to any document rule, so
+ * `:where(a)` was painting every contents-page link brand blue and underlined
+ * and the component could not stop it. Measured: `margin-inline-start` and
+ * `font-weight` came through from the shadow, `color` and `text-decoration`
+ * did not, because the outer tree wins for normal declarations whatever the
+ * specificity. The component had said `foreground-muted` since it was written
+ * and no page-nav has ever shown it.
+ *
+ * `--page-nav-rail` is set by the component on its own host, so it inherits
+ * out to these anchors: the gutter the rail and the travelling mark occupy is
+ * one number, named once, in the file that draws them.
+ */
+:where(helix-page-nav a) {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-normal);
+  /* Margin rather than more padding, so the hover fill starts after the rail
+     instead of covering it. A fill that swallowed the hairline made the rule
+     flicker as the pointer went down the list. */
+  margin-inline-start: var(--page-nav-rail, var(--helix-border-thick));
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+  text-decoration: none;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:where(helix-page-nav a):hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
+  color: var(--helix-color-foreground);
+  text-decoration: none;
+}
+
+/* The one being read. `aria-current` rather than a class, so what a screen
+   reader is told and what the eye is shown are the same attribute and cannot
+   disagree.
+ *
+ * No fill of its own: the mark beside it is the one thing marking it, and a
+ * background here as well would leave the current link and a hovered link
+ * competing to look chosen. Weight and full-strength colour carry it before the
+ * mark has been measured, which cannot happen on the server. */
+:where(helix-page-nav a[aria-current]) {
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* Nesting, said by the consumer. Multiplied rather than enumerated, so a page
+   with five levels needs no rule adding here. */
+:where(helix-page-nav a[data-level="2"]) {
+  padding-inline-start: calc(var(--helix-space-sm) + var(--page-nav-indent, var(--helix-space-sm)));
+}
+
+:where(helix-page-nav a[data-level="3"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    2 *
+    var(--page-nav-indent, var(--helix-space-sm))
+  );
+}
+
 /* Above the marker, which sits behind every item. */
 :where([data-nav-item], helix-nav-bar a) {
   position: relative;

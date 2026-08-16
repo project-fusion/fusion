@@ -58,35 +58,30 @@ export default function Page() {
         </helix-text>
         <helix-grid gap="md" min="17rem">
           {families.map((family) => (
-            <helix-card appearance="outlined" aria-label={family.label} key={family.slug}>
-              <ComponentArt slug={family.slug} />
-              <helix-flex align="center" gap="sm" justify="between" slot="header">
-                <helix-text as="h3" appearance="title">
-                  {family.label}
+            <Link
+              aria-label={family.label}
+              className="familyCard"
+              data-card
+              href={`/design/components/${family.slug}`}
+              key={family.slug}
+            >
+              <helix-card appearance="outlined">
+                <ComponentArt slug={family.slug} />
+                <helix-flex align="center" gap="sm" justify="between" slot="header">
+                  <helix-text as="h3" appearance="title">
+                    {family.label}
+                  </helix-text>
+                  {family.status && (
+                    <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'}>
+                      {family.status}
+                    </helix-tag>
+                  )}
+                </helix-flex>
+                <helix-text appearance="caption" tone="muted">
+                  {family.summary}
                 </helix-text>
-                {family.status && (
-                  <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'}>
-                    {family.status}
-                  </helix-tag>
-                )}
-              </helix-flex>
-              <helix-text appearance="caption" tone="muted">
-                {family.summary}
-              </helix-text>
-              <helix-flex data-density="sm" gap="2xs" slot="footer">
-                {family.examples.length > 0 && (
-                  <Link
-                    data-button="tertiary"
-                    href={`/design/sandbox?e=${family.slug}.${family.examples[0]?.slug}`}
-                  >
-                    Sandbox
-                  </Link>
-                )}
-                <Link data-button="tertiary" href={`/design/components/${family.slug}`}>
-                  API
-                </Link>
-              </helix-flex>
-            </helix-card>
+              </helix-card>
+            </Link>
           ))}
         </helix-grid>
       </helix-flex>

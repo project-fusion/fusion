@@ -1,7 +1,34 @@
-<helix-page-nav label="On this page">
-  <a href="#install">Install</a>
-  <a data-level="2" href="#requirements">Requirements</a>
-  <a href="#usage">Usage</a>
-  <a data-level="2" href="#options">Options</a>
-  <a href="#api">API</a>
-</helix-page-nav>
+<link rel="stylesheet" href="default.css">
+
+<div class="layout">
+  <helix-page-nav class="nav" label="On this page">
+    <a href="#install">Install</a>
+    <a data-level="2" href="#requirements">Requirements</a>
+    <a href="#usage">Usage</a>
+    <a data-level="2" href="#options">Options</a>
+    <a href="#api">API</a>
+  </helix-page-nav>
+
+  <div class="prose">
+    <section id="install">
+      <helix-text appearance="title" as="h2">Install</helix-text>
+      <helix-text as="p">Scroll this column. The mark follows what you are reading.</helix-text>
+    </section>
+    <section id="requirements">
+      <helix-text appearance="title" as="h2">Requirements</helix-text>
+      <helix-text as="p">The section being read is the last one whose top has passed the reading line.</helix-text>
+    </section>
+    <section id="usage">
+      <helix-text appearance="title" as="h2">Usage</helix-text>
+      <helix-text as="p">Two headings on screen at once are not ambiguous to a person: they are reading under the upper one.</helix-text>
+    </section>
+    <section id="options">
+      <helix-text appearance="title" as="h2">Options</helix-text>
+      <helix-text as="p">Set <code>offset</code> to the height of a sticky masthead, so the current section changes as a heading reaches the top of what can be seen.</helix-text>
+    </section>
+    <section id="api">
+      <helix-text appearance="title" as="h2">API</helix-text>
+      <helix-text as="p">The links are your own anchors. Nothing is written onto them but <code>aria-current</code>, which no server could have rendered anyway.</helix-text>
+    </section>
+  </div>
+</div>

@@ -219,6 +219,24 @@ helix-drawer {
 
 /* =================================================== component art ======= */
 
+/* A family's whole card is one link to its API page.
+ *
+ * `data-card` in the base layer does the looking-like-a-link-around-a-card
+ * part: the radius, the hover lift, the focus ring tracing the card's own
+ * corner. What it cannot know is that this particular link is a grid item, and
+ * that the row wants square bottoms.
+ *
+ * Both halves are needed. The anchor stretches because `helix-grid` stretches
+ * its items, and the card then has to be told to fill the anchor, because a
+ * card sizes to its content and would otherwise leave the link standing empty
+ * below it. Neither declaration does anything outside a stretched context:
+ * against an auto-height parent a `100%` block-size resolves to `auto`, which
+ * is why this is safe to state unconditionally rather than only in the grid. */
+.familyCard,
+.familyCard helix-card {
+  block-size: 100%;
+}
+
 /* The abstract drawing on a family's gallery card, from `lib/component-art`.
  *
  * `background`, the page's own colour, so the media reads as a window onto a

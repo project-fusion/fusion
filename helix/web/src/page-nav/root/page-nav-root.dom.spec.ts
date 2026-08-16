@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -133,6 +133,38 @@ if (hasLayout()) {
       window.scrollTo(0, (document.getElementById('two') as HTMLElement).offsetTop - 100)
       await settle()
       expect(marked(inset)).toBe('#two')
+    })
+
+    test('the mark travels to the section being read, and is sized to it', async () => {
+      /* A border on each link can only appear and disappear. This is one
+         element that moves, so it has to be measured, and a measurement is
+         something only a browser has. `check:selectors` cannot catch an
+         indicator that renders and never places: the selector matches, the
+         element is there, and it sits at the top of the list forever. */
+      const nav = await build()
+      const mark = part(nav, 'indicator') as HTMLElement
+      const two = document.getElementById('two') as HTMLElement
+
+      window.scrollTo(0, 0)
+      await settle()
+      expect(mark.hasAttribute('data-placed')).toBe(true)
+      const first = mark.style.getPropertyValue('--_indicator-y')
+
+      window.scrollTo(0, two.offsetTop + 20)
+      await settle()
+      expect(marked(nav)).toBe('#two')
+      expect(mark.style.getPropertyValue('--_indicator-y')).not.toBe(first)
+      expect(Number.parseFloat(mark.style.getPropertyValue('--_indicator-h'))).toBeGreaterThan(0)
+    })
+
+    test('the mark is hidden until it has been measured', async () => {
+      // Or it slides down from the top of the list on first paint, which reads
+      // as the component correcting itself rather than as it arriving.
+      const bare = (await mount(
+        '<helix-page-nav label="On this page"><a href="#gone">Gone</a></helix-page-nav>',
+      )) as Nav
+      await bare.updateComplete
+      expect((part(bare, 'indicator') as HTMLElement).hasAttribute('data-placed')).toBe(false)
     })
   })
 }

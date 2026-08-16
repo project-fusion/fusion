@@ -6877,6 +6877,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--page-nav-rail`: Width of the gutter the rule and the travelling mark share. (default: `undefined`)
    * - `--page-nav-indent`: How far each level is inset from the one above. (default: `undefined`)
    *
    * ## CSS Parts
@@ -6884,6 +6885,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `nav`: The navigation landmark.
+   * - `indicator`: The mark that travels to the section being read.
    */
   "helix-page-nav": Partial<
     HelixPageNavProps & BaseProps<HelixPageNav> & BaseEvents
@@ -11189,6 +11191,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--page-nav-rail`: Width of the gutter the rule and the travelling mark share. (default: `undefined`)
    * - `--page-nav-indent`: How far each level is inset from the one above. (default: `undefined`)
    *
    * ## CSS Parts
@@ -11196,6 +11199,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `nav`: The navigation landmark.
+   * - `indicator`: The mark that travels to the section being read.
    */
   "helix-page-nav": Partial<
     HelixPageNavProps &
@@ -13304,6 +13308,8 @@ export type CustomCssProperties = {
   "--nav-bar-gap"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
+  /** Width of the gutter the rule and the travelling mark share. */
+  "--page-nav-rail"?: string;
   /** How far each level is inset from the one above. */
   "--page-nav-indent"?: string;
   /** Space between the panel's edge and its contents. */
