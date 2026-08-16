@@ -1,3498 +1,3056 @@
-# Component Reference
-
-## BaseAccordion
-
-### Root
-
-Groups collapsible sections.
-
-#### Properties
-
-| Property | Attribute | Type                               | Default | Inherited From | Description                    |
-| -------- | --------- | ---------------------------------- | ------- | -------------- | ------------------------------ |
-| `mode`   | `mode`    | `"single" \| "single-collapsible"` | -       | -              | How many sections may be open. |
-
-Absent means multiple. `single` keeps exactly one open and refuses to close the
-last; `single-collapsible` keeps at most one and allows none.
-
-Only direct children take part, so an accordion inside an item's content is a
-separate set.
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ | The items.  |
-
-### Item
-
-A single expandable section.
-
-#### Properties
-
-| Property           | Attribute           | Type                                      | Default | Inherited From        | Description                                       |
-| ------------------ | ------------------- | ----------------------------------------- | ------- | --------------------- | ------------------------------------------------- |
-| `chevronPlacement` | `chevron-placement` | `"start" \| "end" \| "none"`            | -       | -                     | Where the chevron sits. Absent places it at the end. |
-| `disabled`         | `disabled`          | `boolean`                                 | `false` | -                     | Whether the section can be opened.                |
-| `defaultOpen`      | `default-open`      | `boolean`                                 | `false` | `MixinControllerOpen` | Initial state for uncontrolled use.               |
-| `isOpen`           | -                   | `boolean` _(readonly)_                    | -       | `MixinControllerOpen` | The resolved state, in either mode.               |
-| `onOpenChange`     | -                   | `((open: boolean) => void) \| undefined` | -       | `MixinControllerOpen` | Invoked after the state is applied.               |
-| `open`             | `open`              | `boolean \| undefined`                   | -       | `MixinControllerOpen` | Controlled state. Defined enters controlled mode. |
-
-#### Events
-
-| Event         | Type              | Description                        |
-| ------------- | ----------------- | ---------------------------------- |
-| `helix-open`  | `HelixOpenEvent`  | About to open. Cancelable.         |
-| `helix-close` | `HelixCloseEvent` | About to close. Cancelable.        |
-
-Neither bubbles nor is composed.
-
-#### Methods
-
-| Method              | Mixin                 | Description                                                     |
-| ------------------- | --------------------- | --------------------------------------------------------------- |
-| `requestOpen(next)` | `MixinControllerOpen` | Announces, applies if not refused, and returns whether it did.  |
-| `toggleOpen()`      | `MixinControllerOpen` | Requests the opposite of the current state.                     |
-
-#### Slots
-
-| Slot        | Description                         |
-| ----------- | ----------------------------------- |
-| _(default)_ | The revealed content.               |
-| `summary`   | The always-visible trigger content. |
-| `caption`   | Secondary text below the summary.   |
-| `chevron`   | Replaces the disclosure chevron.    |
-| `start`     | Content before the summary.         |
-| `end`       | Content after the summary.          |
-
-#### CSS Parts
-
-| Part            | Description                       |
-| --------------- | --------------------------------- |
-| `trigger`       | The clickable summary row.        |
-| `chevron`       | The default disclosure chevron.   |
-| `content`       | The region whose height animates. |
-| `content-inner` | Padding wrapper inside it.        |
-
-## BaseAnnouncement
-
-### Root
-
-A page-level message, dismissible, announced as a polite live region.
-
-#### Properties
-
-| Property       | Attribute       | Type                                             | Default     | Inherited From | Description                      |
-| -------------- | --------------- | ------------------------------------------------ | ----------- | -------------- | -------------------------------- |
-| `dismissible`  | `dismissible`   | `boolean`                                        | `false`     | -              | Whether the reader can close it. |
-| `dismissLabel` | `dismiss-label` | `string`                                         | `'Dismiss'` | -              | Accessible name for the control. |
-| `severity`     | `severity`      | `"info" \| "success" \| "warning" \| "danger"` | -           | -              | What kind of attention it needs. |
-
-The live region is always polite and is not configurable.
-
-#### Events
-
-| Event           | Type                | Description                               |
-| --------------- | ------------------- | ----------------------------------------- |
-| `helix-dismiss` | `HelixDismissEvent` | The reader asked to close it. Cancelable. |
-
-The announcement does not remove itself. `preventDefault()` refuses the request.
-
-#### Slots
-
-| Slot        | Description                                     |
-| ----------- | ----------------------------------------------- |
-| _(default)_ | The message.                                     |
-| `actions`   | What to do about it, usually a link or a button. |
-| `icon`      | Replaces the glyph inside the dismiss control.   |
-
-#### CSS Parts
-
-| Part      | Description                     |
-| --------- | ------------------------------- |
-| `content` | The message region.             |
-| `actions` | The trailing action region.     |
-| `dismiss` | The control that asks to close. |
-
-## BaseAppHeader
-
-### Root
-
-A page-level banner with three regions. Renders no landmark of its own.
-
-#### Properties
-
-| Property   | Attribute   | Type      | Default | Inherited From | Description                                    |
-| ---------- | ----------- | --------- | ------- | -------------- | ---------------------------------------------- |
-| `navAlign` | `nav-align` | `"start"` | -       | -              | Absent centers the middle region in the banner. |
-
-#### Slots
-
-| Slot        | Description                          |
-| ----------- | ------------------------------------ |
-| `start`     | Leading content, usually a wordmark. |
-| _(default)_ | The middle region.                   |
-| `end`       | Trailing content.                    |
-
-#### CSS Parts
-
-| Part      | Description                         |
-| --------- | ----------------------------------- |
-| `row`     | The centered row inside the banner. |
-| `start`   | The leading region.                 |
-| `content` | The middle region.                  |
-| `end`     | The trailing region.                |
-
-## BaseAppSwitcher
-
-### Root
-
-Headless app-switcher with floating dropdown, search filtering, and view toggle.
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## BaseAvatar
-
-### Root
-
-Represents a person or entity with an image, a slotted fallback, or their
-initials.
-
-#### Properties
-
-| Property | Attribute | Type     | Default | Inherited From | Description                                            |
-| -------- | --------- | -------- | ------- | -------------- | ------------------------------------------------------ |
-| `label`  | `label`   | `string` | `''`    | -              | Accessible name. Falls back to `name`.                 |
-| `name`   | `name`    | `string` | `''`    | -              | The person or entity. Drives the initials.             |
-| `src`    | `src`     | `string` | `''`    | -              | Image to show.                                          |
-
-With `src`, the image is shown until it fails to load. Without one, or after a
-failure, the default slot is shown, and its own fallback is the initials.
-
-The accessible name is `label`, or `name` when there is no label. The `<img>`
-carries an empty `alt`, since the host already announces the name.
-
-#### Events
-
-| Event   | Type    | Description                                |
-| ------- | ------- | ------------------------------------------ |
-| `load`  | `Event` | Relayed from the image once it has loaded. |
-| `error` | `Event` | Relayed from the image when it fails.      |
-
-#### Slots
-
-| Slot        | Description                                                |
-| ----------- | ---------------------------------------------------------- |
-| _(default)_ | Shown when there is no usable image, in place of initials. |
-
-#### CSS Parts
-
-| Part       | Description                                  |
-| ---------- | -------------------------------------------- |
-| `image`    | The image, when one is loading or loaded.    |
-| `initials` | The initials, when there is no usable image. |
-
-## BaseBadge
-
-### Root
-
-Attaches a count or a presence mark to another element, pinned to its corner.
-
-#### Properties
-
-| Property | Attribute | Type                  | Default | Inherited From | Description                                 |
-| -------- | --------- | --------------------- | ------- | -------------- | ------------------------------------------- |
-| `label`  | `label`   | `string`              | `''`    | -              | Accessible name. Required for a dot.        |
-| `max`    | `max`     | `number \| undefined` | -       | -              | Cap for a numeric value. Past it, `{max}+`. |
-| `value`  | `value`   | `string`              | `''`    | -              | The count or short text to show.            |
-
-`value` decides the mark, and there is no property for its shape:
-
-| `value`            | Mark                |
-| ------------------ | ------------------- |
-| absent             | A dot.              |
-| reads as zero      | None.               |
-| anything else      | The value, capped by `max`. |
-
-The dot is the indicator with nothing in it, drawn by
-`[part="indicator"]:empty`. An indicator with no `label` is hidden from
-assistive technology, as is one whose value counts nothing.
-
-The indicator stays mounted when there is nothing to show, carrying `data-blank`
-on the shadow content, so the styled tier transitions it out instead of having
-it disappear between frames.
-
-#### Slots
-
-| Slot        | Description                  |
-| ----------- | ---------------------------- |
-| _(default)_ | The element being decorated. |
-
-#### CSS Parts
-
-| Part        | Description       |
-| ----------- | ----------------- |
-| `indicator` | The count or dot. |
-
-## BaseBreadcrumbs
-
-### Root
-
-Shows the path to the current page.
-
-The host is the landmark, so `aria-label` on it names the trail and no property
-mirrors one. A page may hold more than one navigation, and landmarks are how a
-screen-reader user chooses between them.
-
-#### Properties
-
-None. Semantics are set through `ElementInternals`, so the host carries no
-attribute it was not given.
-
-#### Slots
-
-| Slot        | Description                                        |
-| ----------- | -------------------------------------------------- |
-| _(default)_ | The trail's items, from root to the current page.   |
-
-#### CSS Parts
-
-| Part   | Description       |
-| ------ | ----------------- |
-| `list` | The ordered list. |
-
-`role="list"` is set on the `<ol>` even though it is already a list. Removing
-the markers with `list-style: none` strips list semantics in Safari, and a
-breadcrumb trail always removes its markers.
-
-### Item
-
-One step in a breadcrumb trail. Contributes the separator and the list-item
-role.
-
-**The link is the consumer's own, slotted in.** An anchor rendered into the
-item's shadow root is unreachable to the framework that owns the route, so a
-router's `<a>` has to sit in the light DOM:
-
-```html
-<helix-breadcrumbs aria-label="Breadcrumb">
-  <helix-breadcrumb><a data-link="quiet" href="/">Home</a></helix-breadcrumb>
-  <helix-breadcrumb current>Helix</helix-breadcrumb>
-</helix-breadcrumbs>
-```
-
-```jsx
-<Breadcrumbs aria-label="Breadcrumb">
-  <Breadcrumbs.Item><Link data-link="quiet" href="/">Home</Link></Breadcrumbs.Item>
-  <Breadcrumbs.Item current>Helix</Breadcrumbs.Item>
-</Breadcrumbs>
-```
-
-The link is styled with `data-link="quiet"`, the recipe navigation uses
-everywhere else. The item cannot style it: a slotted anchor belongs to the outer
-tree, where `:where(a)` in the base layer outranks any `::slotted` rule the item
-could write.
-
-#### Properties
-
-| Property  | Attribute | Type      | Default | Inherited From | Description                                 |
-| --------- | --------- | --------- | ------- | -------------- | ------------------------------------------- |
-| `current` | `current` | `boolean` | `false` | -              | Whether this is the page the reader is on.  |
-
-The current page is text, not a link. Linking a page to itself is a known
-screen-reader annoyance, and `aria-current="page"` on the host is what conveys
-position.
-
-#### Slots
-
-| Slot        | Description                                          |
-| ----------- | ---------------------------------------------------- |
-| _(default)_ | The step: a link, or the text of the current page.   |
-| `separator` | Replaces the separator shown before this item.       |
-
-#### CSS Parts
-
-| Part        | Description                        |
-| ----------- | ---------------------------------- |
-| `separator` | The separator preceding the item.  |
-
-Every item draws its own separator and the first hides it with
-`:host(:first-child)`, so the trail needs no index and no coordination from the
-parent.
-
-## BaseButton
-
-### Root
-
-Triggers an action or submits a form.
-
-Renders a real `<button>`, so activation, focus, and the browser's own
-affordances come from the platform rather than from key handlers.
-`delegatesFocus` puts focus on that inner control and serializes into the
-server's markup, so the button is keyboard reachable before any script loads.
-
-**It never renders an anchor.** A router renders its own `<a>` to intercept a
-click and cannot render one inside this shadow root, so a button that could also
-be a link made every such navigation a full page load. A link that looks like a
-button is styling, so it is a recipe in the base layer:
-
-```html
-<a data-button="primary" href="/pricing">See pricing</a>
-```
-
-Form submission is explicit. A `<button type="submit">` inside a shadow root
-submits nothing, because the form is on the other side of the boundary, so the
-inner control is always `type="button"` and this element calls `requestSubmit()`
-on its form. That routes through validation, where `submit()` would not.
-
-#### Properties
-
-| Property    | Attribute  | Type                                | Default    | Inherited From     | Description                                          |
-| ----------- | ---------- | ----------------------------------- | ---------- | ------------------ | ---------------------------------------------------- |
-| `disabled`  | `disabled` | `boolean`                           | `false`    | `HelixFormElement` | Whether the control is inert.                        |
-| `focusable` | -          | `boolean`                           | `true`     | -                  | Whether the button holds its group's tab stop.       |
-| `label`     | `label`    | `string`                            | `''`       | -                  | Accessible name, for a button whose content is not text. |
-| `type`      | `type`     | `'button' \| 'submit' \| 'reset'`  | `'button'` | -                  | What activating the button does to its form.         |
-
-`focusable` has no attribute. A toolbar keeps one tab stop across its children,
-and writing `tabindex` on each of them changes markup the consumer rendered,
-which a React consumer's hydration reports and does not patch up. The parent
-sets this property, and the stop lands on the inner control inside the shadow
-root.
-
-`label` is a property rather than `aria-label` on the host, because it names the
-inner `<button>`. An `aria-label` on the host would name the host, which carries
-no role.
-
-#### Getters
-
-| Getter   | Type                      | Inherited From     | Description                          |
-| -------- | ------------------------- | ------------------ | ------------------------------------ |
-| `form`   | `HTMLFormElement \| null` | `HelixFormElement` | The form this control belongs to.    |
-| `labels` | `NodeList`                | `HelixFormElement` | Labels associated with the control.  |
-
-#### Events
-
-None of its own. `click` is the native event from the inner control and
-retargets to the host, so a consumer listens for it the way they would on any
-button.
-
-#### Slots
-
-| Slot        | Description                              |
-| ----------- | ---------------------------------------- |
-| _(default)_ | The button's label.                      |
-| `start`     | Content before the label, usually an icon. |
-| `end`       | Content after the label.                 |
-
-#### CSS Parts
-
-| Part     | Description        |
-| -------- | ------------------ |
-| `button` | The inner control. |
-
-### Styled
-
-Adds `appearance` (`primary`, `neutral`, `subtle`, `danger`) and `size` (`sm`,
-`md`, `lg`), both reflected and both absent by default. The focus ring is
-declared in the component rather than inherited, because the base layer's
-`:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
-
-## BaseButtonGroup
-
-### Root
-
-Groups related buttons into one control.
-
-The host is the group: `role="group"` sits on it through internals and `label`
-names it. A run of buttons with no name is announced as separate controls,
-which is what the grouping exists to say it is not.
-
-**It manages no focus.** A group is not a toolbar. The APG toolbar pattern asks
-for one tab stop with arrow keys inside it, and that is what Toolbar is for.
-Here every button keeps its own tab stop, which is what a reader expects from
-buttons sitting side by side, and is what Shoelace and WebAwesome do for the
-same component.
-
-Buttons are slotted rather than wrapped, so they stay the consumer's own
-elements and keep whatever appearance and size they were given.
-
-#### Properties
-
-| Property | Attribute | Type     | Default | Inherited From | Description                    |
-| -------- | --------- | -------- | ------- | -------------- | ------------------------------ |
-| `label`  | `label`   | `string` | `''`    | -              | Accessible name for the group. |
-
-An author's `aria-label` on the host still overrides `label`, since the
-property sets the implicit name through `ElementInternals`.
-
-#### Slots
-
-| Slot        | Description              |
-| ----------- | ------------------------ |
-| _(default)_ | The buttons in the group. |
-
-#### CSS Parts
-
-None. The host is the box.
-
-### Styled
-
-The buttons are joined into a single shape: outer corners keep their radius,
-inner ones lose it, and adjacent borders collapse onto one line.
-
-That joining lives in the base layer, paired with `data-button` the way the
-button's own box is. The corner belongs to the control inside each button's
-shadow root, and a rule inside the group cannot reach through a second
-boundary, where `::part` from the document can. The same rule therefore joins a
-consumer's own anchor styled as a button:
-
-```html
-<helix-button-group label="History">
-  <helix-button>Back</helix-button>
-  <a data-button href="/next">Forward</a>
-</helix-button-group>
-```
-
-## BaseCalendar
-
-### Root
-
-Shows a month, and takes a date from it.
-
-A grid of days per the APG date pattern: the whole grid is one tab stop, arrows
-move by day and week, `PageUp` and `PageDown` by month, `Shift` with either by
-a year, and `Home` and `End` to the ends of the week. Only the focused cell is
-in the tab sequence.
-
-Roving `tabindex` is written on the cells, which is free here because they are
-rendered into this shadow root rather than being markup a consumer wrote. That
-is why this needs no `focusable` property, where Toolbar and Tree do.
-
-**Dates are `YYYY-MM-DD` and every calculation is in UTC.** A local-time `Date`
-shifts across a timezone or a daylight-saving boundary, so the same calendar
-would render a different grid depending on where it is read. A month step
-clamps, so the 31st plus a month is the 28th and not the 3rd.
-
-#### Properties
-
-| Property         | Attribute           | Type                       | Default      | Inherited From | Description                                              |
-| ---------------- | ------------------- | -------------------------- | ------------ | -------------- | -------------------------------------------------------- |
-| `disableDates`   | `disable-dates`     | `string`                   | `''`         | -              | Dates that cannot be chosen, comma separated.            |
-| `disableDays`    | `disable-days`      | `string`                   | `''`         | -              | Days of the week that cannot be chosen, `0` to `6`.      |
-| `firstDayOfWeek` | `first-day-of-week` | `number`                   | `0`          | -              | First column of the week, `0` for Sunday.                |
-| `invalid`        | `invalid`           | `boolean`                  | `false`      | -              | Whether the current selection fails validation.          |
-| `label`          | `label`             | `string`                   | `'Calendar'` | -              | Accessible name for the grid.                            |
-| `locale`         | `locale`            | `string`                   | `''`         | -              | Locale for month and day names.                          |
-| `max`            | `max`               | `string`                   | `''`         | -              | Latest selectable date.                                  |
-| `min`            | `min`               | `string`                   | `''`         | -              | Earliest selectable date.                                |
-| `mode`           | `mode`              | `'range' \| 'multiple'`    | -            | -              | How many dates can be held at once.                      |
-| `month`          | `month`             | `string`                   | `''`         | -              | The month on show, as `YYYY-MM`.                         |
-| `months`         | `months`            | `number`                   | `1`          | -              | How many months to show, side by side.                   |
-| `value`          | `value`             | `string`                   | `''`         | -              | The selected dates, comma separated.                     |
-
-**`mode` decides how many dates `value` holds, and all three read the same
-attribute.** Absent takes one. `range` takes two and marks everything between
-them, starting over on the third click rather than replacing an end at random.
-`multiple` toggles, so clicking a chosen date takes it out.
-
-`month` is separate from `value`, so paging through months selects nothing and
-a consumer can drive the view. Left unset it follows the first selected date,
-and then the current month.
-
-**Set `locale` where output is compared across environments.** Left unset,
-month and day names come from the runtime's own locale, and a server and a
-browser need not agree on what that is.
-
-A date is barred by any of four axes, which compose: `min`, `max`,
-`disableDays` by weekday, and `disableDates` by name. A barred date stays in the
-grid, marked `aria-disabled`, rather than being dropped, so the weeks keep
-their shape.
-
-#### Events
-
-| Event          | Type                | Description                                            |
-| -------------- | ------------------- | ------------------------------------------------------ |
-| `helix-select` | `HelixSelectEvent`  | Fired when a date is chosen, carrying the whole `value`. |
-
-#### CSS Parts
-
-| Part       | Description                              |
-| ---------- | ---------------------------------------- |
-| `months`   | The run of months.                       |
-| `month`    | One month, its header and its grid.      |
-| `header`   | The month name and its controls.         |
-| `previous` | The control that moves back a month.     |
-| `next`     | The control that moves on a month.       |
-| `heading`  | The month and year being shown.          |
-| `grid`     | The grid of days.                        |
-| `weekday`  | A column header naming a day of the week. |
-| `week`     | One row of days.                         |
-| `day`      | One day.                                 |
-
-With more than one month, the controls appear once across the run: back on the
-first, forward on the last. A pair per month would offer several ways to make
-the same move.
-
-A day carries `data-outside` when it belongs to a neighbouring month, and
-`data-range-start` or `data-range-end` at the ends of a range.
-
-### Styled
-
-Days are 30 by 30, sized by `--calendar-day-size`, and six week rows always
-render so the grid keeps one height between months. Days from neighbouring
-months stay in place and stay selectable, marked quieter rather than hidden.
-
-## BaseCard
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseCarousel
-
-### Root
-
-Shows one slide of several, with controls to move between them.
-
-The track is a scroller with scroll snapping, so a drag, a trackpad swipe, and
-the browser's own momentum all work without being reimplemented. The controls
-scroll it; they do not drive a transform.
-
-The host is announced as a carousel through `aria-roledescription`, so a reader
-meeting the controls knows what they are for rather than hearing "group".
-
-**Slides are the consumer's own elements.** Each is given `role="group"`,
-`aria-roledescription="slide"`, and a name reading its position in the set. A
-slide that carries its own `aria-label` keeps it.
-
-#### Properties
-
-| Property   | Attribute  | Type      | Default      | Inherited From | Description                                     |
-| ---------- | ---------- | --------- | ------------ | -------------- | ----------------------------------------------- |
-| `autoplay` | `autoplay` | `boolean` | `false`      | -              | Whether the carousel advances on its own.       |
-| `index`    | `index`    | `number`  | `0`          | -              | The slide in view, counted from zero.           |
-| `interval` | `interval` | `number`  | `5000`       | -              | How long each slide is held, in milliseconds.   |
-| `label`    | `label`    | `string`  | `'Carousel'` | -              | Accessible name for the carousel.               |
-| `loop`     | `loop`     | `boolean` | `false`      | -              | Whether moving past either end wraps.           |
-
-#### Methods
-
-| Method            | Description                                              |
-| ----------------- | -------------------------------------------------------- |
-| `goTo(index)`     | Moves to a slide, wrapping only where `loop` says to.     |
-
-#### Getters
-
-| Getter   | Type            | Description                        |
-| -------- | --------------- | ---------------------------------- |
-| `slides` | `HTMLElement[]` | The slides, in light-DOM order.    |
-
-#### Events
-
-| Event          | Type               | Description                                          |
-| -------------- | ------------------ | ---------------------------------------------------- |
-| `helix-select` | `HelixSelectEvent` | Fired when the slide in view changes, with its index. |
-
-Dispatched for a scroll as well as for a control, so a drag that settles on
-another slide reports it.
-
-#### Rotation
-
-`autoplay` adds a control that stops and starts rotation, and it is first in
-the tab order: it is the way out of a moving carousel, so it cannot sit behind
-the slides a reader is trying to escape. Its name states the action it
-performs.
-
-**Rotation stops on hover and on focus, and once stopped it stays stopped.**
-The APG is explicit that it must not resume unless the reader asks, so moving
-the pointer away does not start it again. Only the control does.
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ | The slides. |
-
-#### CSS Parts
-
-| Part       | Description                                     |
-| ---------- | ----------------------------------------------- |
-| `controls` | The row of controls.                            |
-| `rotation` | The control that stops and starts rotation.     |
-| `previous` | The control that moves to the previous slide.   |
-| `next`     | The control that moves to the next slide.       |
-| `track`    | The scroller the slides sit in.                 |
-
-### Styled
-
-Adds `per-view`, how many slides fit across the track, which a run of cards
-wants where a run of full-width panels does not. It has no default value: a
-reflected property with one writes its attribute on upgrade, and the host would
-then carry something the consumer's markup never had. One across is the absent
-attribute.
-
-Each slide takes a share of the track less its share of the gaps, sized from
-the track rather than on the slide, which is the consumer's element.
-
-## BaseCheckbox
-
-### Root
-
-A box that is ticked, or not, or neither.
-
-Extends `HelixFormElement` with `MixinControllerChecked`.
-
-Renders a real `<input type="checkbox">`, so the space key, the focus ring, and
-the indeterminate glyph come from the platform. `delegatesFocus` puts focus on
-it, and it serializes into the server's markup, so the control is reachable
-before any script loads.
-
-**The input inside a shadow root submits nothing**, because the form is on the
-other side of the boundary. The host is form-associated instead and reports its
-own value through `ElementInternals`, which also carries validity and answers a
-form reset.
-
-A checked box submits its `value`; an unchecked one submits nothing at all.
-That is what a native checkbox does, and a form built around one reads the
-absence rather than a `false`.
-
-#### Properties
-
-| Property         | Attribute         | Type                 | Default | Inherited From             | Description                                          |
-| ---------------- | ----------------- | -------------------- | ------- | -------------------------- | ---------------------------------------------------- |
-| `checked`        | `checked`         | `boolean \| undefined` | -     | `MixinControllerChecked`   | Whether it is checked. Setting this controls it.     |
-| `defaultChecked` | `default-checked` | `boolean`            | `false` | `MixinControllerChecked`   | Initial state for uncontrolled use.                  |
-| `disabled`       | `disabled`        | `boolean`            | `false` | `HelixFormElement`         | Whether the control is inert.                        |
-| `indeterminate`  | `indeterminate`   | `boolean`            | `false` | -                          | Shows as neither checked nor unchecked.              |
-| `name`           | `name`            | `string`             | `''`    | -                          | Name submitted with the form.                        |
-| `onCheckedChange`| -                 | `(checked) => void`  | -       | `MixinControllerChecked`   | Called after the state is applied.                   |
-| `required`       | `required`        | `boolean`            | `false` | -                          | Whether the form refuses to submit while unticked.   |
-| `value`          | `value`           | `string`             | `'on'`  | -                          | Value submitted when the box is checked.             |
-
-#### Methods
-
-| Method                  | Inherited From           | Description                                            |
-| ----------------------- | ------------------------ | ------------------------------------------------------ |
-| `requestChecked(next)`  | `MixinControllerChecked` | Requests a change, and reports whether it was applied.  |
-| `toggleChecked()`       | `MixinControllerChecked` | Requests the opposite of the current state.             |
-| `resetChecked()`        | `MixinControllerChecked` | Drops the uncontrolled state, back to `defaultChecked`. |
-
-`resetChecked` is what a form reset needs. Clearing `checked` alone only leaves
-controlled mode: the uncontrolled value the element has been keeping is private
-to the mixin and would still be what `isChecked` reports.
-
-#### Getters
-
-| Getter      | Type      | Inherited From           | Description                        |
-| ----------- | --------- | ------------------------ | ---------------------------------- |
-| `isChecked` | `boolean` | `MixinControllerChecked` | The resolved state, either mode.   |
-
-#### Events
-
-| Event                | Type                    | Description                                       |
-| -------------------- | ----------------------- | ------------------------------------------------- |
-| `helix-change` | `HelixChangeEvent` | Fired before the state changes, and cancelable.    |
-| `change`             | `Event`                 | Relayed from the input once the state has changed. |
-
-Two channels, and both are needed. `helix-change` announces before the
-change so `preventDefault()` refuses it. `change` is the native event under its
-native name, which is what makes `onChange` work for a React consumer, since
-React has already wired that prop to it.
-
-The input flips itself before either fires, so it is put back to whatever the
-element resolves to. Otherwise a refused change leaves the box showing a state
-the element does not hold.
-
-`indeterminate` is presentation and nothing else. It never submits, and the
-first change resolves it: a third state that survives interaction is a control
-nobody can finish.
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ | The label.  |
-
-#### CSS Parts
-
-| Part      | Description          |
-| --------- | -------------------- |
-| `control` | The input.           |
-| `label`   | The label beside it. |
-
-### Styled
-
-Adds `size` (`sm`, `md`). The box is the native input restyled with
-`accent-color` rather than replaced, so the tick and the indeterminate dash are
-the browser's own and the control stays a control for anything reading the page.
-
-## BaseCheckboxGroup
-
-### Root
-
-Groups related checkboxes, and reports them as one set.
-
-The host is the group: `role="group"` sits on it through internals and `label`
-names it. A run of checkboxes with no name is announced as separate controls,
-which is what the grouping exists to say it is not.
-
-**Each checkbox still submits itself.** They are form-associated already, and a
-native group is several inputs sharing a name, so this adds no form value of its
-own: it would submit the same answers twice. What it adds is the grouping, a
-shared `name` so it is written once, and one place to read and write the set.
-
-#### Properties
-
-| Property | Attribute | Type     | Default | Inherited From | Description                                      |
-| -------- | --------- | -------- | ------- | -------------- | ------------------------------------------------ |
-| `label`  | `label`   | `string` | `''`    | -              | Accessible name for the group.                   |
-| `name`   | `name`    | `string` | `''`    | -              | Name given to every box that has none.           |
-| `value`  | `value`   | `string` | `''`    | -              | The checked values, comma separated.             |
-
-`value` is in the order the boxes are written, not the order they were ticked.
-Setting it ticks exactly those and unticks the rest.
-
-`name` is pushed down as a **property**, not written as an attribute: an
-attribute on a box is a change to markup the consumer rendered, which a React
-consumer's hydration reports. A box that names itself keeps its own.
-
-#### Getters
-
-| Getter  | Type                  | Description                        |
-| ------- | --------------------- | ---------------------------------- |
-| `boxes` | `HelixBaseCheckbox[]` | The boxes, in light-DOM order.     |
-
-#### Events
-
-| Event          | Type               | Description                                    |
-| -------------- | ------------------ | ---------------------------------------------- |
-| `helix-change` | `HelixChangeEvent` | Fired when any box changes, with the whole set. |
-
-**One event per change, and it carries the set.** A box's own `helix-change`
-stops at the group with `stopImmediatePropagation`, because a consumer of a
-group puts their listener on the group and would otherwise get the box's lone
-boolean alongside the set.
-
-The group reads the requested state out of the box's event rather than off the
-box. Driving the boxes from `value` makes them controlled, so a controlled box
-applies nothing itself and reports what it was asked for; reading `isChecked`
-would read the state it still holds and nothing would ever move.
-
-Its own listener sits on the host it dispatches from, so it checks the event's
-target and ignores anything that is not one of its boxes. Without that it hears
-itself and answers until the stack gives out.
-
-#### Slots
-
-| Slot        | Description     |
-| ----------- | --------------- |
-| _(default)_ | The checkboxes. |
-
-#### CSS Parts
-
-None. The host is the box.
-
-### Styled
-
-A column by default, which is what a list of choices wants: the eye scans one
-line per answer rather than hunting along a row. `orientation="horizontal"`
-runs them across instead.
-
-## BaseChip(Tag)
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseClock
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseCodeBlock
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseCombobox
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseCopyButton
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseDatePicker
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseDialog
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseDrilldown
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseDropdown
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseEmpty
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseFileUpload
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseFormField
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseIcon
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseIconButton
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseIndicator
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseInput
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseInputPhone
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseInputPin
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseInputSearch
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseList
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseListbox
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseLoader
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseNavBar
-
-### Root
-
-A navigation landmark holding a set of destinations, with a marker on the
-current one.
-
-Renders no links. The consumer supplies them, marked with `aria-current="page"`,
-which is what the marker tracks.
-
-#### Properties
-
-| Property | Attribute | Type     | Default  | Inherited From | Description                       |
-| -------- | --------- | -------- | -------- | -------------- | --------------------------------- |
-| `label`  | `label`   | `string` | `'Main'` | -              | Accessible name for the landmark. |
-
-#### Slots
-
-| Slot        | Description                                    |
-| ----------- | ---------------------------------------------- |
-| _(default)_ | The destinations, as the consumer's own links. |
-
-#### CSS Parts
-
-| Part        | Description                                         |
-| ----------- | --------------------------------------------------- |
-| `nav`       | The navigation landmark.                            |
-| `indicator` | The marker that travels to the current destination. |
-
-## BaseOption
-
-> maybe this goes to select?
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseOptionGroup
-
-> Maybe this goes to select?
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BasePagination
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BasePopup
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseProgressBar
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseRadio
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseRadioGroup
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseSandbox
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseSelect
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseSelector
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseSkeleton
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseSlider
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseStat
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseStatGroup
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseStepper
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseSwitch
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseTable
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseTabs
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseText
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseTextarea
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseTimePicker
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseToast
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseToggle
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseToggleGroup
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseToolbar
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-## BaseTooltip
-
-### Root
-
-A short description that appears beside what it describes.
-
-Extends `HelixElement` with `MixinControllerOpen`, so it announces and can be
-driven like every other overlay here.
-
-The trigger is slotted and stays the consumer's own element. The bubble is
-rendered in the shadow root and put in the top layer through the popover API,
-so it clears any ancestor with `overflow: hidden` without a `z-index` anywhere.
-
-Position comes from `FloatingController`: it flips to another side when the
-preferred one does not fit, slides along to stay in view, and moves the arrow
-with it.
-
-**The description is linked by element reference, not by id.** An IDREF cannot
-cross a shadow boundary, so `aria-describedby` on a slotted trigger pointing at
-a bubble in the shadow root resolves to nothing.
-`ElementInternals.ariaDescribedByElements` takes the element itself, which does
-cross.
-
-#### Properties
-
-| Property      | Attribute    | Type                  | Default | Inherited From        | Description                                    |
-| ------------- | ------------ | --------------------- | ------- | --------------------- | ---------------------------------------------- |
-| `content`     | `content`    | `string`              | `''`    | -                     | The text shown in the bubble.                  |
-| `defaultOpen` | `default-open` | `boolean`           | `false` | `MixinControllerOpen` | Initial state for uncontrolled use.            |
-| `delay`       | `delay`      | `number`              | `400`   | -                     | How long the pointer rests before it appears.  |
-| `delayOut`    | `delay-out`  | `number`              | `100`   | -                     | How long it stays after the pointer leaves.    |
-| `disabled`    | `disabled`   | `boolean`             | `false` | -                     | Whether it never shows.                        |
-| `offset`      | `offset`     | `number`              | `8`     | -                     | Space between trigger and bubble, in pixels.   |
-| `open`        | `open`       | `boolean \| undefined` | -     | `MixinControllerOpen` | Whether it is showing. Setting this controls it. |
-| `placement`   | `placement`  | `Placement`           | `'top'` | -                     | Preferred side. It moves if that side does not fit. |
-
-#### Methods
-
-| Method   | Description                                    |
-| -------- | ---------------------------------------------- |
-| `show()` | Shows the bubble, unless there is nothing to show. |
-| `hide()` | Hides the bubble.                              |
-
-#### Events
-
-| Event         | Type              | Description                                |
-| ------------- | ----------------- | ------------------------------------------ |
-| `helix-open`  | `HelixOpenEvent`  | Fired before the bubble shows, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it hides, and cancelable.     |
-
-Neither bubbles nor composes. Overlays nest, and an inner one's lifecycle must
-never read as the outer one's.
-
-#### Timing
-
-**The pointer waits out `delay`; focus does not.** Sweeping across a row of
-controls would otherwise flash a tooltip for each of them, which is noise
-rather than help. A keyboard reader landing on a control has already committed
-to it.
-
-`delayOut` holds the bubble briefly after the pointer leaves, so crossing the
-gap between trigger and bubble does not close it.
-
-#### Slots
-
-| Slot        | Description  |
-| ----------- | ------------ |
-| _(default)_ | The trigger. |
-
-#### CSS Parts
-
-| Part      | Description                    |
-| --------- | ------------------------------ |
-| `tooltip` | The bubble.                    |
-| `arrow`   | The point aimed at the trigger. |
-
-The bubble carries `data-placement` with the side it actually landed on, which
-is what lets the arrow face the trigger and a styled tier animate from where
-the bubble came from rather than from where it was asked to go.
-
-### Styled
-
-The bubble sits on `--helix-color-surface-inverse`, so it reads as separate
-from the page rather than as part of it, and flips with the colour mode.
-
-The arrow is positioned by the same pass that positions the bubble, so it still
-points at the trigger after the bubble has slid along to stay in view.
-
-## BaseTrend
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-
----
+# Component reference
+
+*Generated from `helix/web/custom-elements.json` by `bun run reference`. Do
+not edit: `bun run check:reference` fails when this file and the manifest
+disagree, and the manifest is regenerated from the source on every build.*
+
+The styled tier, which is what an application writes. Every styled component
+extends a headless one and inherits its API, so anything a base contributes is
+here too, with the base named in the "From" column. The prose behind each of
+these lives on the component itself and is rendered in full at
+`/components/<family>`.
 
 ## Accordion
 
-### Root
+### Root — `helix-accordion`
 
-A set of stacked, expandable sections.
+Groups collapsible sections, one open at a time by default.
+
+Extends `HelixBaseAccordion`.
+
+Items sit in a single bordered stack, sharing one rule between neighbours rather than each drawing its own, so the seam between two items is one pixel and not two.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         |                |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ | content     |
-
-### Item
-
-A single expandable section.
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         |                |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Methods
-
-| Method | Mixin | Description |
-| ------ | ----- | ----------- |
-|        |       |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'outlined' \| 'plain' \| undefined` | - | - | Removes the surrounding surface, leaving only the separating rules. |
+| `items` | - | `HelixBaseAccordionItem[]` | - | `HelixBaseAccordion` | Direct items, in light-DOM order. Client only: the server has no tree. |
+| `mode` | `mode` | `'single' \| 'single-collapsible' \| undefined` | - | `HelixBaseAccordion` | How many sections may be open at once. |
 
 #### Slots
 
 | Slot | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| *(default)* | The accordion's items. |
 
-#### CSS Parts
+#### Parts
 
 | Part | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| `container` | The stack of items. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--accordion-border-color` | Color of the surrounding rule. |
+| `--accordion-radii` | Corner radius of the stack. |
+
+### Item — `helix-accordion-item`
+
+One collapsible section of an accordion.
+
+Extends `HelixBaseAccordionItem`.
+
+The open and close transition animates `grid-template-rows` from `0fr` to `1fr`, which is the only technique that reaches the content's intrinsic height without measuring it in JavaScript. It is disabled under `prefers-reduced-motion`.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `chevronPlacement` | `chevron-placement` | `'auto' \| 'start' \| 'end' \| 'none' \| undefined` | - | `HelixBaseAccordionItem` | Where the open indicator sits, or whether there is one. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `dense` | `dense` | `boolean` | `false` | - | Tightens the trigger for dense layouts. |
+| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focusTrigger()` | `HelixBaseAccordionItem` | Moves focus to this item's trigger. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-open` | `HelixOpenEvent` | Fired when the item opens or closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `summary` | The always-visible trigger content. |
+| *(default)* | The content revealed when open. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `container` | The outer wrapper. |
+| `trigger` | The clickable summary row. |
+| `chevron` | The open and close indicator. |
+| `content` | The revealed region. |
+| `content-inner` | Padding wrapper inside the animated region. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--accordion-item-padding` | Inset of the trigger and content. |
 
 ## Announcement
 
-### Root
+### Root — `helix-announcement`
 
-Description
+A page-level message above the masthead, which can be dismissed.
+
+Extends `HelixBaseAnnouncement`.
+
+Full width and flat, with the severity carried by a tinted fill and a hairline beneath rather than by a border on four sides: an announcement is a band across the top of the page, not a box that happens to be wide.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `dismissible` | `dismissible` | `boolean` | `false` | `HelixBaseAnnouncement` | Whether the reader can close it. |
+| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixBaseAnnouncement` | Accessible name for the dismiss control. |
+| `severity` | `severity` | `'info' \| 'success' \| 'warning' \| 'danger' \| undefined` | - | `HelixBaseAnnouncement` | What kind of attention the message needs. |
 
-## AppHeader
+#### Events
 
-### Root
-
-Headless app header with start, content, and end slot regions.
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when the reader asks to close it. |
 
 #### Slots
 
 | Slot | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| *(default)* | The message. |
+| `actions` | What to do about it, usually a link or a button. |
+| `icon` | Replaces the glyph inside the dismiss control. |
 
-#### CSS Parts
+#### Parts
 
 | Part | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| `content` | The message region. |
+| `actions` | The trailing action region. |
+| `dismiss` | The control that asks to close. |
 
-## AppSwitcher
+#### Custom properties
 
-### Root
+| Property | Description |
+| --- | --- |
+| `--announcement-inset` | Inline padding, matched to the page. |
 
-Headless app-switcher with floating dropdown, search filtering, and view toggle.
+## App Header
+
+### Root — `helix-app-header`
+
+Page-level banner holding brand, navigation, and actions.
+
+Extends `HelixBaseAppHeader`.
+
+Sticky and translucent, drawn on the material tokens so the page content blurs behind it rather than being hidden by an opaque bar. The separating rule and shadow appear only once the page has scrolled, which keeps the bar flat against the hero and lifts it off the content afterwards.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'flat' \| 'material' \| undefined` | - | - | Whether the banner is flat or a pane of material. |
+| `navAlign` | `nav-align` | `'start' \| undefined` | - | `HelixBaseAppHeader` | Where the navigation sits in the bar. |
+| `sticky` | `sticky` | `boolean` | `false` | - | Whether the banner sticks to the top of the viewport. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `brand` | Wordmark or logo, at the inline start. |
+| *(default)* | Primary navigation. |
+| `actions` | Trailing actions, such as a call to action. |
+| `start` | Leading content, usually a wordmark. |
+| `end` | Trailing content. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `content` | The centered row inside the banner. |
+| `nav` | The navigation region. |
+| `row` | The centered row inside the banner. |
+| `start` | The leading region. |
+| `end` | The trailing region. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--app-header-background` | Fill behind the banner. |
+| `--app-header-height` | Height of the banner. |
+| `--app-header-inset` | Inline padding of the banner. |
+| `--app-header-max-inline-size` | Width the content is centered in. |
 
 ## Avatar
 
-### Root
+### Root — `helix-avatar`
 
-Description
+Represents a person or entity with an image or their initials.
+
+Extends `HelixBaseAvatar`.
+
+Initials scale with the avatar rather than being sized per size, because the font size is set in `em` against the avatar's own dimension. One rule covers every size, including one a consumer sets themselves through `--avatar-size`.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `name` | `name` | `string` | `''` | `HelixBaseAvatar` | Name of the person or entity. Used for the label and the initials. |
+| `shape` | `shape` | `'circle' \| 'square' \| undefined` | - | - | Whether the avatar is a circle or a rounded square. |
+| `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Edge length of the avatar. |
+| `src` | `src` | `string` | `''` | `HelixBaseAvatar` | Image to show. Falls back to the slot, or to initials, if it fails. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `load` | `Event` | Relayed from the image once it has loaded. |
+| `error` | `Event` | Relayed from the image when it fails. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | Replaces the image and initials entirely, for an icon. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `avatar` | The avatar body. |
+| `image` | The image, when one is loading or loaded. |
+| `initials` | The initials shown when there is no usable image. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--avatar-background-color` | Fill behind the initials. |
+| `--avatar-size` | Edge length of the avatar. |
+
+### Group — `helix-avatar-group`
+
+Overlapping avatars, with a count for the ones not shown.
+
+Extends `HelixBaseAvatarGroup`.
+
+They overlap by a step of space, which is enough to read as a stack without the faces occluding each other. Each carries a ring in the page's own background colour, because a stack with no separation between its members reads as one shape rather than several: the ring is what makes the edge of each avatar visible against the one behind it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `avatars` | - | `HTMLElement[]` | - | `HelixBaseAvatarGroup` | The avatars, in light-DOM order. Empty on the server, which has no tree. |
+| `label` | `label` | `string` | `''` | `HelixBaseAvatarGroup` | Accessible name for the set, such as "Reviewers". |
+| `max` | `max` | `number` | `0` | `HelixBaseAvatarGroup` | How many avatars are shown before the rest become a count. |
+| `overflow` | - | `number` | - | `HelixBaseAvatarGroup` | How many avatars are past the limit, and so not shown. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The avatars, in the order they should be read. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `overflow` | The count of avatars past `max`. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--avatar-group-overlap` | How far each avatar sits over the one before it. |
+| `--avatar-group-ring-color` | The separation drawn between one avatar and the next. |
 
 ## Badge
 
-### Root
+### Root — `helix-badge`
 
-Description
+Attaches a count or a presence mark to another element.
+
+Extends `HelixBaseBadge`.
+
+The indicator carries a ring in the page's own background color, so it stays legible where it overlaps the thing it is pinned to. Without it a dark badge on a dark icon reads as a bite taken out of the icon.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'danger' \| 'neutral' \| undefined` | - | - | How much attention the mark asks for. |
+| `label` | `label` | `string` | `''` | `HelixBaseBadge` | Accessible name. Required for a dot, which has no text to read. |
+| `max` | `max` | `number \| undefined` | - | `HelixBaseBadge` | Cap for a numeric value. Past it the indicator reads `{max}+`. |
+| `value` | `value` | `string` | `''` | `HelixBaseBadge` | The count or short text to show. Absent shows a dot, zero shows nothing. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The element being decorated. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `indicator` | The count, or the dot when there is no value. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--badge-background-color` | Fill of the indicator. |
+| `--badge-offset` | Pulls the mark in from the corner, along both axes. |
+| `--badge-ring-color` | The ring separating it from what is behind. |
+
+## Blockquote
+
+### Root — `helix-blockquote`
+
+A passage set off from the prose around it.
+
+Extends `HelixBaseBlockquote`.
+
+Set larger than body text on the display face, because a pulled quotation is a change of voice and the type is what says so. No quotation marks are drawn: the size and the space around it already set the passage apart, and marks on top of that are the same thing said twice.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cite` | `cite` | `string` | `''` | `HelixBaseBlockquote` | URL identifying where the passage came from. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The quoted passage. |
+| `attribution` | Who said it, and where. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `blockquote` | The quotation. |
+| `attribution` | The footer carrying the source. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--blockquote-size` | Size of the quoted passage. |
 
 ## Breadcrumbs
 
-### Root
+### Root — `helix-breadcrumbs`
 
-Description
+Shows the path to the current page.
+
+Extends `HelixBaseBreadcrumbs`.
+
+A single wrapping line by default. The trail wraps rather than scrolling, because a truncated path tells the reader less than a two-line one.
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The trail's items, in order from root to current page. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `nav` | The navigation landmark. |
+| `list` | The ordered list. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--breadcrumbs-gap` | Space between items and separators. |
+
+### Breadcrumb — `helix-breadcrumb`
+
+One step in a breadcrumb trail.
+
+Extends `HelixBaseBreadcrumb`.
+
+The separator is hidden on the first item with `:host(:first-child)`, so no item needs to know its own index and the parent needs no coordination.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `current` | `current` | `boolean` | `false` | `HelixBaseBreadcrumb` | Whether this item is the page the reader is on. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The step: a link, or the text of the current page. |
+| `separator` | Replaces the chevron shown before this item. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `separator` | The separator preceding the item. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--breadcrumbs-separator-color` | Color of the chevron. |
+| `--breadcrumb-hover-color` | Fill behind a step under the pointer. |
 
 ## Button
 
-### Root
+### Root — `helix-button`
 
-Description
+Triggers an action, submits a form, or navigates.
 
-#### Properties
+Extends `HelixBaseButton`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## ButtonGroup
-
-### Root
-
-Description
+Four appearances and three sizes, all drawn on one control so a link styled as a button and a real button are indistinguishable to a reader. The focus ring is declared here rather than inherited, because the base layer's `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'primary' \| 'secondary' \| 'tertiary' \| 'danger' \| undefined` | - | - | How much visual weight the button carries. |
+| `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
+| `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The button's label. |
+| `start` | Content before the label, usually an icon. |
+| `end` | Content after the label. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `button` | The inner control. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--button-background-color` | Fill behind the button. |
+| `--button-foreground-color` | Label and icon color. |
+| `--button-radii` | Corner radius of the control. |
+
+## Button Group
+
+### Root — `helix-button-group`
+
+Groups related buttons into one control.
+
+Extends `HelixBaseButtonGroup`.
+
+The buttons are joined into a single shape: the outer corners keep their radius, the inner ones lose it, and adjacent borders collapse into one line.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'joined' \| 'spaced' \| undefined` | - | - | Whether the buttons are one bar or a spaced row. |
+| `label` | `label` | `string` | `''` | `HelixBaseButtonGroup` | Accessible name for the group. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The buttons in the group. |
 
 ## Calendar
 
-### Root
+### Root — `helix-calendar`
 
-Description
+Shows a month, and takes a date from it.
+
+Extends `HelixBaseCalendar`.
+
+Six week rows always, so the grid keeps one height and a month change does not move whatever sits beneath it.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseCalendar` | Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. |
+| `disableDays` | `disable-days` | `string` | `''` | `HelixBaseCalendar` | Days of the week that cannot be chosen, comma separated, `0` to `6`. |
+| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseCalendar` | First column of the week, `0` for Sunday through `6` for Saturday. |
+| `invalid` | `invalid` | `boolean` | `false` | `HelixBaseCalendar` | Whether the current selection fails validation. |
+| `label` | `label` | `string` | `'Calendar'` | `HelixBaseCalendar` | Accessible name for the grid. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseCalendar` | Locale for month and day names. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `''` | `HelixBaseCalendar` | Latest selectable date, as `YYYY-MM-DD`. |
+| `min` | `min` | `string` | `''` | `HelixBaseCalendar` | Earliest selectable date, as `YYYY-MM-DD`. |
+| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseCalendar` | How many dates can be held at once. |
+| `month` | `month` | `string` | `''` | `HelixBaseCalendar` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
+| `months` | `months` | `number` | `1` | `HelixBaseCalendar` | How many months to show, side by side. |
+| `value` | `value` | `string` | `''` | `HelixBaseCalendar` | The selected dates, comma separated, as `YYYY-MM-DD`. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when a date is chosen, with the ISO date. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `months` | The run of months. |
+| `month` | One month, its header and its grid. |
+| `header` | The month name and its controls. |
+| `previous` | The control that moves to the previous month. |
+| `next` | The control that moves to the next month. |
+| `heading` | The month and year being shown. |
+| `grid` | The grid of days. |
+| `weekday` | A column header naming a day of the week. |
+| `week` | One row of days. |
+| `cell` | One column of a row, which is what a range paints. |
+| `day` | The shape inside a cell, which is what a single date paints. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--calendar-day-size` | Width and height of a day. |
+| `--calendar-track-size` | Width of a column, which is what sets the space between days. |
+| `--calendar-row-size` | Height of a week row. |
+| `--calendar-selected-color` | Fill behind a selected day. |
+| `--calendar-range-color` | Band behind the days in a range. |
+
+## Callout
+
+### Root — `helix-callout`
+
+Sets a passage apart as information, a warning, or an error.
+
+Extends `HelixBaseCallout`.
+
+Tinted from the severity's status color with `color-mix`, and marked with a bar on the inline start so the severity survives being read in greyscale or by anyone who does not distinguish the hues.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `severity` | `severity` | `'info' \| 'success' \| 'warning' \| 'danger' \| undefined` | - | `HelixBaseCallout` | What kind of attention the passage needs. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The callout's content. |
+| `icon` | Replaces the icon chosen by `severity`. |
+| `title` | A heading above the content. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `icon` | The icon region. |
+| `content` | The content region. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--callout-background-color` | Fill behind the callout. |
+| `--callout-radii` | Corner radius of the callout. |
 
 ## Card
 
-### Root
+### Root — `helix-card`
 
-Description
+Groups related content and actions into a single surface.
+
+Extends `HelixBaseCard`.
+
+Regions are slots: `media`, `header`, the default slot for content, and `footer`. An omitted region takes no space, so a card with only content needs no wrapper markup at all.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'outlined' \| 'elevated' \| 'plain' \| undefined` | - | - | How the card separates itself from the page. |
+| `dense` | `dense` | `boolean` | `false` | - | Tightens the inset for dense layouts. |
+| `orientation` | `orientation` | `'vertical' \| 'horizontal' \| undefined` | - | - | Whether media sits above the content stack or beside it. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `media` | Image or video that runs edge to edge, outside the inset. |
+| `header` | Title and any actions for the whole card. |
+| *(default)* | The card's main content. |
+| `footer` | Actions that conclude the card. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--card-background-color` | Surface behind the card. |
+| `--card-border-color` | Border color of the surface. |
+| `--card-media-size` | Width of the media column when horizontal. |
+| `--card-padding` | Inset applied to each region. |
+| `--card-radii` | Corner radius of the surface. |
 
 ## Carousel
 
-### Root
+### Root — `helix-carousel`
 
-Description
+Shows one slide of several, with controls to move between them.
+
+Extends `HelixBaseCarousel`.
+
+The track scroll-snaps, so a drag and a trackpad swipe move it with the browser's own momentum and the controls only have to scroll.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'hero' \| undefined` | - | - | Whether the controls sit under the slides or on them. |
+| `autoplay` | `autoplay` | `boolean` | `false` | `HelixBaseCarousel` | Whether the carousel advances on its own. |
+| `index` | `index` | `number` | `0` | `HelixBaseCarousel` | The slide in view, counted from zero. |
+| `interval` | `interval` | `number` | `5000` | `HelixBaseCarousel` | How long each slide is held, in milliseconds. |
+| `label` | `label` | `string` | `'Carousel'` | `HelixBaseCarousel` | Accessible name for the carousel. |
+| `loop` | `loop` | `boolean` | `false` | `HelixBaseCarousel` | Whether moving past either end wraps to the other. |
+| `perView` | `per-view` | `number \| undefined` | - | - | How many slides are shown across the track at once. Absent shows one. |
+| `slides` | - | `HTMLElement[]` | - | `HelixBaseCarousel` | The slides, in light-DOM order. Empty on the server, which has no tree. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `goTo()` | `HelixBaseCarousel` | Moves to a slide, wrapping only where `loop` says to. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the slide in view changes, with its index. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The slides. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `controls` | The row of controls. |
+| `rotation` | The control that stops and starts rotation. |
+| `previous` | The control that moves to the previous slide. |
+| `next` | The control that moves to the next slide. |
+| `track` | The scroller the slides sit in. |
+| `indicators` | The row of controls saying where the reader is. |
+| `indicator` | One of them, and a way to reach that slide. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--carousel-gap` | Space between slides. |
 
 ## Checkbox
 
-### Root
+### Root — `helix-checkbox`
 
-Description
+A box that is ticked, or not, or neither.
 
-#### Properties
+Extends `HelixBaseCheckbox`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## CheckboxGroup
-
-### Root
-
-Description
+The box is the native input, restyled rather than replaced, so the tick and the indeterminate dash are the browser's own and the control stays a control for anything reading the page.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `checked` | `checked` | `boolean \| undefined` | `undefined` | `MixinControllerChecked` | Whether the control is checked. Setting this enters controlled mode. |
+| `defaultChecked` | `default-checked` | `boolean` | `false` | `MixinControllerChecked` | Initial checked state for uncontrolled use. Ignored once `checked` is set. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseCheckbox` | Whether the box shows as neither checked nor unchecked. |
+| `isChecked` | - | `boolean` | - | `MixinControllerChecked` | The resolved checked state, whichever mode the element is in. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixBaseCheckbox` | Name submitted with the form. |
+| `onCheckedChange` | - | `((checked: boolean) => void) \| undefined` | `undefined` | `MixinControllerChecked` | The consumer's callback, invoked after the state is applied. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseCheckbox` | Focus is delegated to the input, so the host is never the focus target. |
+| `value` | `value` | `string` | `'on'` | `HelixBaseCheckbox` | Value submitted when the box is checked. |
 
-## Chip(Tag)
+#### Methods
 
-### Root
+| Method | From | Description |
+| --- | --- | --- |
+| `formResetCallback()` | `HelixBaseCheckbox` | Returns the box to the state its markup declared. |
+| `formStateRestoreCallback()` | `HelixBaseCheckbox` | Restores the box when the browser brings a form back. |
+| `requestChecked()` | `MixinControllerChecked` | Requests a checked change, and reports whether it was applied. |
+| `resetChecked()` | `MixinControllerChecked` | Drops the uncontrolled state, so the control reads `defaultChecked` again. |
+| `toggleChecked()` | `MixinControllerChecked` | Requests the opposite of the current state. |
 
-Description
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired before the state changes, and cancelable. |
+| `change` | `Event` | Relayed from the input once the state has changed. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The label. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `box` | The frame the input is painted as, and the mark sits over. |
+| `control` | The input. |
+| `label` | The label beside it. |
+| `mark` | The tick, or the dash when the box is indeterminate. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--checkbox-size` | Width and height of the box. |
+| `--checkbox-checked-color` | Fill of a ticked box. |
+
+## Checkbox Group
+
+### Root — `helix-checkbox-group`
+
+Groups related checkboxes, and reports them as one set.
+
+Extends `HelixBaseCheckboxGroup`.
+
+A column by default, which is what a list of choices wants: the eye scans one line per answer rather than hunting along a row.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `boxes` | - | `HelixBaseCheckbox[]` | - | `HelixBaseCheckboxGroup` | The boxes, in light-DOM order. Client only: the server has no tree. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseCheckboxGroup` | Whether the whole set is out of play. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `name` | `name` | `string` | `''` | `HelixBaseCheckboxGroup` | Name submitted with the form, given to every box that has none. |
+| `orientation` | `orientation` | `'horizontal' \| undefined` | - | - | Which way the boxes run. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `value` | `value` | `string` | `''` | `HelixBaseCheckboxGroup` | The checked values, comma separated. |
 
-## Clock
+#### Events
 
-### Root
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when any box changes, with the whole set. |
 
-Description
+#### Slots
 
-#### Properties
+| Slot | Description |
+| --- | --- |
+| *(default)* | The checkboxes. |
+| `label` | Richer than a string, where the label is more than one. |
+| `hint` | Richer than a string. |
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+#### Parts
 
-## CodeBlock
+| Part | Description |
+| --- | --- |
+| `label` | The group's name, over the set. |
+| `items` | The list itself, which is what `orientation` lays out. |
+| `hint` | Help under the set. |
+| `feedback` | What is wrong with it. |
 
-### Root
+#### Custom properties
 
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## Combobox
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## CopyButton
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## DatePicker
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Description |
+| --- | --- |
+| `--checkbox-group-gap` | Space between the boxes. |
 
 ## Dialog
 
-### Root
+### Root — `helix-dialog`
 
-Description
+A modal window, on the platform's own dialog.
+
+Extends `HelixBaseDialog`.
+
+The panel is `surface-overlay` with a shadow, because that is what it is: a thing over the page rather than on it. The scrim is drawn on `::backdrop`, which is the platform's own element for it and sits in the top layer with the dialog rather than being a div somebody positioned.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'compact' \| 'wide' \| undefined` | - | - | How wide the panel is allowed to be. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `label` | `label` | `string` | `''` | `HelixBaseDialog` | Accessible name for the dialog. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `persistent` | `persistent` | `boolean` | `false` | `HelixBaseDialog` | Whether Escape and the backdrop can close it. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `close()` | `HelixBaseDialog` | Asks to close, which a consumer may refuse. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `show()` | `HelixBaseDialog` | Moves focus into the dialog and makes the rest of the page inert. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The dialog's content. |
+| `header` | The title, and anything beside it. |
+| `footer` | The actions. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `dialog` | The native dialog element. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--dialog-inline-size` | Width of the panel. |
+| `--dialog-inset` | Padding inside the panel. |
+
+## Divider
+
+### Root — `helix-divider`
+
+Separates content into groups with a rule.
+
+Extends `HelixBaseDivider`.
+
+A one-pixel rule in the border color, running the full inline size by default. A vertical divider stretches to its flex parent instead of setting its own height, so it matches whatever it sits beside without being told how tall that is.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `announced` | `announced` | `boolean` | `false` | `HelixBaseDivider` | Whether the rule is announced as a separator. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseDivider` | Which way the rule runs. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `line` | The rule itself. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--divider-color` | Color of the rule. |
+| `--divider-thickness` | Thickness of the rule. |
+
+## Drawer
+
+### Root — `helix-drawer`
+
+A panel that slides in from an edge.
+
+Extends `HelixBaseDrawer`.
+
+The panel translates and the scrim fades, both on transform and opacity only, which is the one place motion is allowed to carry the work: the surface at rest is flat and the movement is what says something happened.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'surface' \| 'plain' \| undefined` | - | - | Removes the panel's own surface, for a drawer inside another surface. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `label` | `label` | `string` | `''` | `HelixBaseDrawer` | Accessible name for the panel. |
+| `modal` | `modal` | `boolean` | `true` | `HelixBaseDrawer` | Whether the drawer blocks the page behind it. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom' \| undefined` | - | `HelixBaseDrawer` | Which edge the drawer comes from. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-open` | `HelixOpenEvent` | Fired when the drawer opens or closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The drawer's content. |
+| `header` | Content pinned above the scrolling area. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `scrim` | The cover over the page behind. |
+| `panel` | The sliding panel. |
+| `header` | The header region. |
+| `content` | The scrolling content region. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--drawer-size` | Width or height of the panel. |
 
 ## Drilldown
 
-### Root
+### Root — `helix-drilldown`
 
-Description
+A stack of pages, one showing at a time, with a way back.
 
-#### Properties
+Extends `HelixBaseDrilldown`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## Dropdown
-
-### Root
-
-Description
+**The pages slide, and the direction is the point.** Both moves replace one page with another, so with no motion a reader cannot tell whether they went deeper or came back: the panel simply holds different words. Sliding in the direction of travel says which happened, and it is most of the reason this is a component rather than a menu with its trigger removed.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseDrilldown` | What the control returning from a page reads. |
+| `label` | `label` | `string` | `'Menu'` | `HelixBaseDrilldown` | Accessible name for the region. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `back()` | `HelixBaseDrilldown` | Returns one page, and reports whether there was one to return to. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when a row with no page is chosen. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The rows of the top page. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `header` | The bar above a page, holding the way back and its name. |
+| `back` | The control that returns one page. |
+| `title` | The name of the page showing. |
+| `page` | The region the rows are in. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--drilldown-background` | Fill behind the pages. |
+| `--drilldown-inline-size` | Width of the region. |
+
+### Item — `helix-drilldown-item`
+
+One row of a drill-down, which may hold a page of its own.
+
+Extends `HelixBaseDrilldownItem`.
+
+A row is a full-width band rather than an inset pill, for the reason the select's options are: it reaches both edges of the panel, so a highlight lines up with the edge the eye is already following down the list.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether the row can be reached at all. |
+| `isDrilldownItem` | - | `boolean` | `true` | `HelixBaseDrilldownItem` | Marks this as a row a stack should count. Cheaper than an instanceof. |
+| `onPage` | - | `boolean` | `true` | `HelixBaseDrilldownItem` | Whether the page showing is the one this row is on. Written by the stack. |
+| `showingPage` | - | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether this row's own page is the one showing. Written by the stack. |
+| `value` | `value` | `string` | `''` | `HelixBaseDrilldownItem` | Identifies the row to whatever is listening. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focusItem()` | `HelixBaseDrilldownItem` | Moves focus onto the row itself. |
+| `select()` | `HelixBaseDrilldownItem` | Announces that this row was chosen. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the row is chosen. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The words naming this row. |
+| `page` | The rows of the page this one opens. |
+| `start` | Before the words, usually an icon. |
+| `end` | After the words, usually a mark or a count. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `item` | The row itself. |
+| `label` | The words. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--drilldown-item-hover-color` | Fill when a row is under the pointer. |
 
 ## Empty
 
-### Root
+### Root — `helix-empty`
 
-Description
+Says that a region has nothing in it, and what to do about it.
 
-#### Properties
+Extends `HelixBaseEmpty`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## FileUpload
-
-### Root
-
-Description
+Centered and given room, because an empty view is the only thing on screen and crowding it against the top edge makes the region look broken rather than empty.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'outlined' \| undefined` | - | - | Whether the state sits on a surface of its own. |
+| `noAnnounce` | `no-announce` | `boolean` | `false` | `HelixBaseEmpty` | Whether the state is announced when it appears. |
 
-## FormField
+#### Slots
 
-### Root
+| Slot | Description |
+| --- | --- |
+| `icon` | A mark above the heading. |
+| `heading` | What is missing. |
+| *(default)* | Why, and what to do about it. |
+| `actions` | The way out. |
 
-Description
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--empty-inset` | Space around the whole block. |
+
+## Flex
+
+### Root — `helix-flex`
+
+Lays children out in a row or a column.
+
+Extends `HelixElement`.
+
+The host is the flex container itself and the only child is a slot, so the element adds no box of its own: `<helix-flex>` costs exactly the `<div>` it replaces.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `align` | `align` | `'start' \| 'center' \| 'end' \| 'stretch' \| 'baseline' \| undefined` | - | - | Alignment across the direction. |
+| `direction` | `direction` | `'row' \| 'column' \| undefined` | - | - | Whether items run across or down. |
+| `gap` | `gap` | `'none' \| '2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| undefined` | - | - | Space between items, named on the space scale. |
+| `inline` | `inline` | `boolean` | `false` | - | Flows with surrounding text instead of taking the full width. |
+| `justify` | `justify` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| undefined` | - | - | Distribution along the direction. |
+| `wrap` | `wrap` | `boolean` | `false` | - | Whether items wrap onto more lines. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The items to lay out. |
+
+## Grid
+
+### Root — `helix-grid`
+
+Lays children out on a grid.
+
+Extends `HelixElement`.
+
+Two ways to declare columns, and only two. `columns` is a fixed count; `min` fills as many equal columns as fit above that width, which is a responsive layout with no breakpoint to maintain. Setting `min` wins, because a fixed count that also reflows is two intentions in one element.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `align` | `align` | `'start' \| 'center' \| 'end' \| 'stretch' \| undefined` | - | - | Alignment of each cell within its row. |
+| `columns` | `columns` | `number \| undefined` | - | - | Fixed number of equal columns. |
+| `gap` | `gap` | `'none' \| '2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| undefined` | - | - | Space between cells, named on the space scale. |
+| `min` | `min` | `string` | `''` | - | Minimum column width, filling as many as fit. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The items to lay out. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--grid-min` | Column width floor when `min` is set. |
 
 ## Icon
 
-### Root
+### Root — `helix-icon`
 
-Description
+Renders a named icon from the Helix set.
 
-#### Properties
+Extends `HelixBaseIcon`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## IconButton
-
-### Root
-
-Description
+Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the color of the text it sits in and a container can resize it without reaching for a prop. Inside a button that hook is set in `em`, which keeps the icon in proportion as the button's own size changes.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `''` | `HelixBaseIcon` | Accessible name, for an icon that is not decorative. |
+| `name` | `name` | `string` | `''` | `HelixBaseIcon` | Name of the icon in the Helix set. |
 
-## Indicator
+#### Parts
 
-### Root
+| Part | Description |
+| --- | --- |
+| `svg` | The rendered SVG. |
 
-Description
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--icon-size` | Edge length of the icon's box. |
+
+## Icon Button
+
+### Root — `helix-icon-button`
+
+A square button whose content is an icon.
+
+Extends `HelixBaseIconButton`.
+
+Top-level rather than `Button.Icon`, because a namespace means composition: `Card.Header` is part of a card, and an icon-only button is not part of a button. It is a button with different content and a different shape, which makes it its own component.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'primary' \| 'secondary' \| 'tertiary' \| 'danger' \| undefined` | - | - | How much visual weight the button carries. |
+| `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
+| `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The icon. |
+| `start` | Content before the label, usually an icon. |
+| `end` | Content after the label. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `button` | The inner button or anchor. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--icon-button-size` | Edge length of the control. |
 
 ## Input
 
-### Root
+### Root — `helix-input`
 
-Description
+A single line of text a reader types into.
 
-#### Properties
+Extends `HelixBaseInput`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## InputPhone
-
-### Root
-
-Description
+The frame is the field rather than the input, so anything slotted at either end sits inside the same box as the text and the focus ring is drawn once, around the whole control, instead of around a smaller box within it.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixBaseInput` | Name submitted with the form. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInput` | Whether the field refuses input while still submitting its value. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInput` | Focus is delegated to the input, so the host is never the focus target. |
+| `type` | `type` | `InputType` | `'text'` | `HelixBaseInput` | What the field accepts, which decides the keyboard and the validation. |
+| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
-## InputPin
+#### Methods
 
-### Root
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `select()` | `HelixBaseInput` | Selects everything in the field. |
 
-Description
+#### Events
 
-#### Properties
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired as the text changes, and cancelable. |
+| `change` | `Event` | Relayed from the input once the reader has finished. |
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+#### Slots
 
-## InputSearch
+| Slot | Description |
+| --- | --- |
+| `start` | Before the text, for an icon or a prefix. |
+| `end` | After the text, for an icon, a unit, or a clear button. |
 
-### Root
+#### Parts
 
-Description
+| Part | Description |
+| --- | --- |
+| `field` | The box holding everything. |
+| `control` | The input itself. |
 
-#### Properties
+#### Custom properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Description |
+| --- | --- |
+| `--input-size` | Height of the field. |
+| `--input-background-color` | Fill behind the text. |
+
+## Kbd
+
+### Root — `helix-kbd`
+
+A keyboard key or chord, set inline with text.
+
+Extends `HelixBaseKbd`.
+
+Drawn as a physical key: a hairline, a sunken fill, and one inset shadow along the bottom edge that reads as depth without becoming a picture of a key.
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The key's label. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `kbd` | The key. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--kbd-background-color` | Fill of the key. |
+| `--kbd-border-color` | Color of the hairline and the edge. |
 
 ## List
 
-### Root
+### Root — `helix-list`
 
-Description
+A set of rows, read as a set.
+
+Extends `HelixBaseList`.
+
+Rules between rows rather than around each one, so a list reads as one object with divisions instead of as a stack of cards. `divided` is off by default, because space alone separates rows perfectly well and a rule at every seam is decoration doing what emptiness already does.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `divided` | `divided` | `boolean` | `false` | - | Whether a rule sits between rows. |
+| `label` | `label` | `string` | `''` | `HelixBaseList` | Accessible name for the set. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The rows. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--list-gap` | Space between rows. |
+
+### Item — `helix-list-item`
+
+One row of a list.
+
+Extends `HelixBaseListItem`.
+
+A grid rather than a flex row, so the supporting text lines up under the label rather than under the leading icon. The leading and trailing regions hold their own width and the middle takes the rest.
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `start` | Leading content, usually an icon or an avatar. |
+| *(default)* | The label. |
+| `supporting` | Secondary text under the label. |
+| `end` | Trailing content. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--list-item-inset` | Padding inside the row. |
 
 ## Listbox
 
-### Root
+### Root — `helix-listbox`
 
-Description
+A list of options, one or several of which are the answer.
 
-#### Properties
+Extends `HelixBaseListbox`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## Loader
-
-### Root
-
-Description
+A framed, scrolling list with the field's three parts around it. The frame is the list rather than the host, so a filter that empties it leaves a box with a message in it rather than a border collapsing to nothing.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseListbox` | What is shown when a filter has hidden every option. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `filter` | `filter` | `string` | `''` | `HelixBaseListbox` | Text the options are matched against. Empty shows them all. |
+| `filterable` | `filterable` | `boolean` | `false` | `HelixBaseListbox` | Whether the list renders a field for narrowing itself. |
+| `filterLabel` | `filter-label` | `string` | `'Filter'` | `HelixBaseListbox` | Placeholder for the field that narrows the list. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseListbox` | Whether more than one option can be the answer. |
+| `name` | `name` | `string` | `''` | `HelixBaseListbox` | Name the list reports under when its form is submitted. |
+| `options` | - | `HelixBaseOption[]` | - | `HelixBaseListbox` | Every option, in the order a reader meets them. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `values` | - | `string[]` | - | `HelixBaseListbox` | The chosen values, which is a list whether or not `multiple` is set. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the answer changes, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The options, and any groups of them. |
+| `label` | Richer than a string. |
+| `hint` | Richer than a string. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `label` | The question, over the list. |
+| `items` | The list itself. |
+| `empty` | Shown when a filter has hidden everything. |
+| `search` | The region holding the field that narrows the list. |
+| `search-field` | The field itself. |
+| `hint` | Help under the list. |
+| `feedback` | What is wrong with it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--listbox-max-block-size` | How tall it gets before it scrolls. |
+
+## Menu
+
+### Root — `helix-menu`
+
+A menu of commands, opened from a trigger.
+
+Extends `HelixBaseMenu`.
+
+The surface is in the top layer, so it needs no `z-index` and cannot be clipped by whatever it sits inside.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseMenu` | What the row returning from a submenu reads. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `label` | `label` | `string` | `'Menu'` | `HelixBaseMenu` | Accessible name for the surface. |
+| `offset` | `offset` | `number` | `4` | `HelixBaseMenu` | Space between the trigger and the surface, in pixels. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `placement` | `placement` | `Placement` | `'bottom-end'` | `HelixBaseMenu` | Preferred side. It moves if that side does not fit. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `hide()` | `HelixBaseMenu` | Closes the menu, and forgets which page was showing. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `show()` | `HelixBaseMenu` | Opens the menu. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The items. |
+| `trigger` | What opens it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `menu` | The surface. |
+| `header` | The bar above a submenu, holding the way back and its name. |
+| `back` | The control that returns from a submenu. |
+| `title` | The name of the submenu that is showing. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--menu-min-inline-size` | Narrowest the surface gets. |
+| `--menu-background-color` | Fill of the surface. |
+
+### Item — `helix-menu-item`
+
+One row in a menu: a command, a choice, or a way into a submenu.
+
+Extends `HelixBaseMenuItem`.
+
+The tick and the arrow hold their space whether or not they are showing, so the labels in a menu start at one place and the rows read as a column rather than as a ragged list.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `checkable` | `checkable` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row is one of a set of choices. |
+| `checked` | `checked` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row is ticked. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row can be chosen. |
+| `hasSubmenu` | - | `boolean` | - | `HelixBaseMenuItem` | Whether anything was slotted into `submenu`. |
+| `isMenuItem` | - | `boolean` | `true` | `HelixBaseMenuItem` | Marks this as a row a menu should count. Cheaper than an instanceof. |
+| `onPage` | - | `boolean` | `true` | `HelixBaseMenuItem` | Whether this row is on the page currently showing. |
+| `showingSubmenu` | - | `boolean` | `false` | `HelixBaseMenuItem` | Whether this row's submenu is the page showing. |
+| `value` | `value` | `string` | `''` | `HelixBaseMenuItem` | What this row stands for, carried in the event when it is chosen. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseMenuItem` | Moves focus onto the row itself. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the row is chosen. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The label. |
+| `submenu` | Rows this one opens, which makes it a way in. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `item` | The row. |
+| `mark` | The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--menu-item-hover-color` | Fill under the pointer. |
+
+## Nav Bar
+
+### Root — `helix-nav-bar`
+
+A set of destinations, with a marker on the current one.
+
+Extends `HelixBaseNavBar`.
+
+One marker that travels, rather than a background that appears on whichever destination is current. A fill that swaps is two things changing at once and reads as a flicker; one that moves is a single object the eye follows, and it says where the current page was as well as where it is.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `'Main'` | `HelixBaseNavBar` | Accessible name for the landmark. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The destinations, as the consumer's own links. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `nav` | The navigation landmark. |
+| `indicator` | The marker that travels to the current destination. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--nav-bar-indicator-color` | Fill of the traveling marker. |
+| `--nav-bar-gap` | Space between destinations. |
 
 ## Option
 
-> maybe this goes to select?
+### Root — `helix-option`
 
-### Root
+One choice in a listbox.
 
-Description
+Extends `HelixBaseOption`.
 
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## OptionGroup
-
-> Maybe this goes to select?
-
-### Root
-
-Description
+Two states that look different on purpose: chosen, which is a fact about the value, and active, which is where the keyboard is. A list that draws them the same way leaves a reader arrowing through it unable to tell what they have picked from what they are looking at.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `active` | `data-active` | `boolean` | `false` | `HelixBaseOption` | Whether this is the option the keyboard is on. Written by the listbox. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseOption` | Whether this choice can be made. |
+| `selected` | `selected` | `boolean` | `false` | `HelixBaseOption` | Whether this choice is currently chosen. Written by the listbox. |
+| `text` | - | `string` | - | `HelixBaseOption` | The words, for a listbox that has to match text against them. |
+| `value` | `value` | `string` | `''` | `HelixBaseOption` | Identifies this choice, and is what a form submits. |
 
-## Pagination
+#### Methods
 
-### Root
+| Method | From | Description |
+| --- | --- | --- |
+| `select()` | `HelixBaseOption` | Makes this choice and announces it. |
 
-Description
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when this choice is made. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The words naming this choice. |
+| `start` | Before the words, for an icon or an avatar. |
+| `end` | After them, for a shortcut or a count. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `item` | The row. |
+| `label` | The words. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--option-active-color` | Wash behind the option the keyboard is on. |
+
+### Group — `helix-option-group`
+
+A named run of options inside a listbox.
+
+Extends `HelixBaseOptionGroup`.
+
+The heading is set small and quiet, because it is a divider that happens to have words on it: a run of options is read as a list and the heading is what tells you which list, not something to read on its own.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `''` | `HelixBaseOptionGroup` | The heading over the run. |
 
-## Popup
+#### Slots
 
-### Root
+| Slot | Description |
+| --- | --- |
+| *(default)* | The options in this run. |
+| `label` | Richer than a string. |
 
-Description
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `label` | The heading. |
+| `items` | The run itself. |
+
+## Page Nav
+
+### Root — `helix-page-nav`
+
+Links to the headings on this page, marking the one being read.
+
+Extends `HelixBasePageNav`.
+
+A rule down the leading edge with the current section lit along it, which is the shape a table of contents has taken since printed marginalia: the line says the list is one thing, and the lit segment says where in it you are.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `current` | - | `string` | `''` | `HelixBasePageNav` | The id of the section being read, or empty before anything is measured. |
+| `label` | `label` | `string` | `'On this page'` | `HelixBasePageNav` | Accessible name for the navigation. |
+| `offset` | `offset` | `number` | `0` | `HelixBasePageNav` | How far below the top of the window a heading counts as reached, in pixels. |
 
-## ProgressBar
+#### Slots
 
-### Root
+| Slot | Description |
+| --- | --- |
+| *(default)* | The links, as anchors with fragment hrefs. |
 
-Description
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `nav` | The navigation landmark. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--page-nav-indent` | How far each level is inset from the one above. |
+
+## Popover
+
+### Root — `helix-popover`
+
+A panel that opens against a trigger and holds anything.
+
+Extends `HelixBasePopover`.
+
+A surface with an inset and a shadow, and nothing about what goes in it. The inset is the panel's rather than the consumer's, which is the same call `Dialog` and `Drawer` make and for the same reason: everyone was writing it, and everyone was writing the same one.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'plain' \| undefined` | - | - | How the panel is framed. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `label` | `label` | `string` | `'Popover'` | `HelixBasePopover` | Accessible name for the panel. |
+| `offset` | `offset` | `number` | `4` | `HelixBasePopover` | Space between the trigger and the panel, in pixels. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixBasePopover` | Preferred side. It moves if that side does not fit. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `hide()` | `HelixBasePopover` | Closes the panel and puts focus back on the trigger. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `show()` | `HelixBasePopover` | Opens the panel. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | What opens it. |
+| *(default)* | The contents of the panel. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `popover` | The panel. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--popover-inset` | Space between the panel's edge and its contents. |
+| `--popover-inline-size` | Width of the panel. |
+
+## Progress
+
+### Root — `helix-progress`
+
+Shows how far along a task is, when that is known.
+
+Extends `HelixBaseProgress`.
+
+A track and the part of it that is done. The height comes from a token rather than from a size property, for the reason the rest of the library gives about controls: how heavy a bar is says something about the region it is in, and a `--progress-size` on that region says it once.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `fraction` | - | `number` | - | `HelixBaseProgress` | What is done, as a fraction of the whole, between 0 and 1. |
+| `label` | `label` | `string` | `'Progress'` | `HelixBaseProgress` | Accessible name for what is in progress. |
+| `max` | `max` | `number` | `100` | `HelixBaseProgress` | The total the work is measured against. |
+| `tone` | `tone` | `'danger' \| 'success' \| undefined` | - | - | What the fill means. |
+| `value` | `value` | `number` | `0` | `HelixBaseProgress` | What has been done so far, in the same units as `max`. |
+| `valueText` | `value-text` | `string` | `''` | `HelixBaseProgress` | A reading for the value, where the number alone does not say enough. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `track` | The full length the work is measured against. |
+| `indicator` | The part of it that is done. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--progress-size` | Thickness of the bar. |
+| `--progress-color` | Fill of the part that is done. |
+| `--progress-track-color` | Fill of the part that is not. |
+
+## Quote
+
+### Root — `helix-quote`
+
+A short quotation, set inline with the text around it.
+
+Extends `HelixBaseQuote`.
+
+Takes the surrounding type rather than a size of its own, because a quotation inside a paragraph is that paragraph's text with marks around it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cite` | `cite` | `string` | `''` | `HelixBaseQuote` | URL identifying where the quotation came from. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The quoted text. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `quote` | The quotation. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--quote-color` | Color of the quoted text. |
 
 ## Radio
 
-### Root
+### Root — `helix-radio`
 
-Description
+One choice in a radio group.
 
-#### Properties
+Extends `HelixBaseRadio`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## RadioGroup
-
-### Root
-
-Description
+A circle with a dot in it, drawn here rather than by the browser for the reason the checkbox's box is: this is a `<button role="radio">`, so there was never a native control to restyle, and the weight and the motion of the mark are ours either way.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseRadio` | Whether this choice can be made. |
+| `selected` | `selected` | `boolean` | `false` | `HelixBaseRadio` | Whether this is the current choice. Written by the group. |
+| `value` | `value` | `string` | `''` | `HelixBaseRadio` | Identifies this choice to the group, and is what the form submits. |
 
-## Sandbox
+#### Methods
 
-### Root
+| Method | From | Description |
+| --- | --- | --- |
+| `focusItem()` | `HelixBaseRadio` | Moves focus to this choice, for the group's arrow keys. |
+| `select()` | `HelixBaseRadio` | Makes this choice and announces it. |
 
-Description
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when this choice is made. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The words naming this choice. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `item` | The button, which is the whole row. |
+| `box` | The circle. |
+| `mark` | The dot inside it. |
+| `label` | The words beside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--radio-size` | Diameter of the circle. |
+| `--radio-mark-color` | Colour of the dot. |
+
+### Group — `helix-radio-group`
+
+A set of choices where exactly one is the answer.
+
+Extends `HelixBaseRadioGroup`.
+
+The field's three parts, laid out the way every other field lays them out: a question over the set, and one line under it that is help until something is wrong. `orientation` lays out the choices and not the field, so a horizontal group keeps its question above the row rather than beside the first choice.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `items` | - | `HelixBaseRadio[]` | - | `HelixBaseRadioGroup` | The radios, in light-DOM order. Client only: the server has no tree. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixBaseRadioGroup` | Name the group reports under when its form is submitted. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'vertical'` | `HelixBaseRadioGroup` | Which way the choices run. A column reads one line per answer. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the answer changes, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The radios. |
+| `label` | Richer than a string, where the question is more than one. |
+| `hint` | Richer than a string. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `label` | The question, over the set. |
+| `items` | The choices, which is what `orientation` lays out. |
+| `hint` | Help under the set. |
+| `feedback` | What is wrong with it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--radio-group-gap` | Space between the choices. |
 
 ## Select
 
-### Root
+### Root — `helix-select`
 
-Description
+A closed list that opens to be chosen from.
 
-#### Properties
+Extends `HelixBaseSelect`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## Selector
-
-### Root
-
-Description
+The trigger wears the same frame as an `Input`, because in a form it stands in a row with them and a control that looks like a button among fields reads as an action rather than an answer.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `filterable` | `filterable` | `boolean` | `false` | `HelixBaseSelect` | Whether the list can be narrowed by typing. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseSelect` | Whether more than one option can be the answer. |
+| `name` | `name` | `string` | `''` | `HelixBaseSelect` | Name the control reports under when its form is submitted. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `placeholder` | `placeholder` | `string` | `'Choose'` | `HelixBaseSelect` | Shown on the trigger while nothing is chosen. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Relayed from the listbox when the answer changes. |
+| `helix-open` | `HelixOpenEvent` | Fired when the list opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The options, and any groups of them. |
+| `indicator` | The mark on the trigger saying this opens, usually a caret. |
+| `label` | Richer than a string. |
+| `hint` | Richer than a string. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `label` | The question, over the trigger. |
+| `trigger` | The closed control, which says what is chosen. |
+| `surface` | The floating panel. |
+| `listbox` | The list inside it. |
+| `hint` | Help under the trigger. |
+| `feedback` | What is wrong with it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--select-surface-max-block-size` | How tall the panel gets. |
 
 ## Skeleton
 
-### Root
+### Root — `helix-skeleton`
 
-Description
+Stands in for content that has not arrived.
+
+Extends `HelixBaseSkeleton`.
+
+A sweep rather than a pulse. A block fading in and out reads as something broken; a highlight travelling across it reads as work in progress, and it is the same one property animating either way.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `shape` | `shape` | `'text' \| 'circle' \| undefined` | - | - | What the missing content is shaped like. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `skeleton` | The placeholder surface. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--skeleton-size` | Diameter of the circle shape. |
 
 ## Slider
 
-### Root
+### Root — `helix-slider`
 
-Description
+A value chosen from a range by dragging.
+
+Extends `HelixBaseSlider`.
+
+The track and the thumb are the browser's own, restyled through the range pseudo-elements rather than replaced. What that buys is everything a hand-built slider has to reimplement and usually gets slightly wrong: the drag, the keys, and a hit area sized by the platform for a finger.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `markerLabels` | `marker-labels` | `boolean` | `false` | `HelixBaseSlider` | Whether each mark says which value it stands at. |
+| `markers` | `markers` | `number` | `0` | `HelixBaseSlider` | How many marks to draw along the track, evenly spaced, ends included. |
+| `max` | `max` | `number` | `100` | `HelixBaseSlider` | The largest value the reader can choose. |
+| `min` | `min` | `number` | `0` | `HelixBaseSlider` | The smallest value the reader can choose. |
+| `name` | `name` | `string` | `''` | `HelixBaseSlider` | Name submitted with the form. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseSlider` | Focus is delegated to the control, so the host is never the target. |
+| `showValue` | `show-value` | `boolean` | `false` | `HelixBaseSlider` | Whether the chosen value is shown beside the track. |
+| `step` | `step` | `number` | `1` | `HelixBaseSlider` | How far one press of an arrow key moves it. |
+| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `valueAsNumber` | - | `number` | - | `HelixBaseSlider` | The chosen value as a number, for anything doing arithmetic on it. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired as the value changes, and cancelable. |
+| `change` | `Event` | Relayed once the reader has let go. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The row: the control and its readout. |
+| `control` | The range input. |
+| `output` | The current value, shown beside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--slider-thumb-color` | The handle. |
+| `--slider-track-color` | The part not yet chosen. |
+| `--slider-fill-color` | The part behind the thumb. |
+
+## Spinner
+
+### Root — `helix-spinner`
+
+Says that something indeterminate is in progress.
+
+Extends `HelixBaseSpinner`.
+
+Sized in `em`, so it matches whatever text it sits beside without being told. The color is `currentColor` for the same reason: a spinner inside a primary button is on the accent, and one in body copy is not, and neither should have to say so.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `'Loading'` | `HelixBaseSpinner` | Accessible name, announced while the work is outstanding. |
+| `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Diameter relative to the surrounding text. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | A mark to sit still at the centre, usually a logo. Empty by default. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `svg` | The rotating circle pair. |
+| `mark` | The region holding what was slotted at the centre. |
+| `track` | The full circle behind the indicator. |
+| `indicator` | The arc that turns. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--spinner-size` | Diameter. Defaults to 1.5em. |
+| `--spinner-color` | Color of the moving arc. |
+| `--spinner-track-color` | Color of the circle behind it. |
 
 ## Stat
 
-### Root
+### Root — `helix-stat`
 
-Description
+One measurement, with the word for what it measures.
+
+Extends `HelixBaseStat`.
+
+The value is set on the display face at a size the type scale does not reach, because a figure is the one place on a page where the number is the design. The label sits above it in the label ramp, quiet and wide-tracked, so the pair reads as one object rather than as two lines of text.
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The value. |
+| `label` | What the value measures. |
+| `unit` | The unit, set beside the value. |
+| `detail` | A change, comparison, or note under the label. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--stat-value-size` | Size of the figure. |
+
+### Group — `helix-stat-group`
+
+A row of related measurements.
+
+Extends `HelixBaseStatGroup`.
+
+Wraps rather than scrolls, and each figure keeps its own width instead of every one taking an equal share: a set of figures is read by comparing them, and equal columns make a four-digit number and a two-digit one look like the same quantity.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `divided` | `divided` | `boolean` | `false` | - | Whether the figures are separated by a rule as well as by space. |
+| `label` | `label` | `string` | `''` | `HelixBaseStatGroup` | Accessible name for the set. |
 
-## StatGroup
+#### Slots
 
-### Root
+| Slot | Description |
+| --- | --- |
+| *(default)* | The stats. |
 
-Description
+#### Custom properties
 
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## Stepper
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Description |
+| --- | --- |
+| `--stat-group-gap` | Space between figures. |
 
 ## Switch
 
-### Root
+### Root — `helix-switch`
 
-Description
+A control that turns something on, and turns it on when pressed.
+
+Extends `HelixBaseSwitch`.
+
+A thumb travelling in a groove, which is the one place in the library colour is used to say "on". A checkbox does not, because a tick is legible on its own; a switch has no mark, so the fill is the whole of what distinguishes the two states and there is nothing else for it to be.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `checked` | `checked` | `boolean \| undefined` | `undefined` | `MixinControllerChecked` | Whether the control is checked. Setting this enters controlled mode. |
+| `defaultChecked` | `default-checked` | `boolean` | `false` | `MixinControllerChecked` | Initial checked state for uncontrolled use. Ignored once `checked` is set. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isChecked` | - | `boolean` | - | `MixinControllerChecked` | The resolved checked state, whichever mode the element is in. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixBaseSwitch` | Name submitted with the form. |
+| `onCheckedChange` | - | `((checked: boolean) => void) \| undefined` | `undefined` | `MixinControllerChecked` | The consumer's callback, invoked after the state is applied. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `value` | `value` | `string` | `'on'` | `HelixBaseSwitch` | Value submitted when the switch is on. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formResetCallback()` | `HelixBaseSwitch` | Returns the switch to the state its markup declared. |
+| `requestChecked()` | `MixinControllerChecked` | Requests a checked change, and reports whether it was applied. |
+| `resetChecked()` | `MixinControllerChecked` | Drops the uncontrolled state, so the control reads `defaultChecked` again. |
+| `toggleChecked()` | `MixinControllerChecked` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired before the state changes, and cancelable. |
+| `change` | `Event` | Relayed from the input once the state has changed. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The words naming what this turns on. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The row: the track and its label. |
+| `track` | The groove the thumb travels in. |
+| `control` | The input. |
+| `thumb` | The part that moves. |
+| `label` | The words beside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--switch-height` | Height of the track. The width follows it. |
+| `--switch-width` | Length of the track, if not the derived one. |
+| `--switch-on-color` | Fill when it is on. |
 
 ## Table
 
-### Root
+### Root — `helix-table`
 
-Description
+Tabular data laid out on a grid.
+
+Extends `HelixBaseTable`.
+
+Hairline rules between rows and no fill, per the rule that depth comes from a single border rather than from elevation. A dense table earns its density by decorating none of it.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `columns` | `columns` | `string` | `''` | `HelixBaseTable` | Column track list, as CSS. Deprecated: declare columns instead. |
+| `label` | `label` | `string` | `''` | `HelixBaseTable` | Accessible name for the table. |
+| `tableColumns` | - | `HelixBaseTableColumn[]` | - | `HelixBaseTable` | The columns declared as children, in the order they are written. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The table's rows. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `table` | The grid. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--table-columns` | Track list for the columns. |
+
+### Cell — `helix-table-cell`
+
+One cell of a table.
+
+Extends `HelixBaseTableCell`.
+
+Hairline rules between rows and no fill, per the rule that depth comes from a single border rather than from elevation. A dense table earns its density by decorating none of it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `header` | `header` | `boolean` | `false` | `HelixBaseTableCell` | Whether the cell heads its column. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The cell's content. |
+
+### Column — `helix-table-column`
+
+One column of a table: its heading, and how wide it is.
+
+Extends `HelixBaseTableColumn`.
+
+Styled as the header cell it is, and it carries the same rule and inset as the cells beneath it so the heading and its column read as one line down the table.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `isTableColumn` | - | `boolean` | `true` | `HelixBaseTableColumn` | Marks this as a column a table should count. Cheaper than an instanceof. |
+| `track` | - | `string` | - | `HelixBaseTableColumn` | The track this column contributes, resolved. |
+| `width` | `width` | `string` | `''` | `HelixBaseTableColumn` | The track this column takes, as CSS. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The heading. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `column` | The heading cell. |
+
+### Row — `helix-table-row`
+
+One row of a table.
+
+Extends `HelixBaseTableRow`.
+
+Hairline rules between rows and no fill, per the rule that depth comes from a single border rather than from elevation. A dense table earns its density by decorating none of it.
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The row's cells. |
 
 ## Tabs
 
-### Root
+### Root — `helix-tabs`
 
-Description
+A row of tabs and the panel each one shows.
+
+Extends `HelixBaseTabs`.
+
+Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'toggle' \| 'underline' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
+| `label` | `label` | `string` | `'Tabs'` | `HelixBaseTabs` | Accessible name for the tab list. |
+| `manual` | `manual` | `boolean` | `false` | `HelixBaseTabs` | Whether arrowing to a tab also selects it. |
+| `onActiveChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerActive` | The consumer's callback, invoked after the change is applied. |
+| `value` | `value` | `string` | `''` | `MixinControllerActive` | Which item is current, by its `value`. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `requestActive()` | `MixinControllerActive` | Requests a new current item, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The tabs. |
+| `panels` | The panels. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `tabs` | The tab list. |
+| `panels` | The panel container. |
+
+### Panel — `helix-tabs-panel`
+
+The content shown for one tab.
+
+Extends `HelixBaseTabsPanel`.
+
+Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `selected` | `selected` | `boolean` | `false` | `HelixBaseTabsPanel` | Whether this panel is the visible one. |
+| `value` | `value` | `string` | `''` | `HelixBaseTabsPanel` | Pairs the panel with the tab of the same value. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The panel's content. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `panel` | The panel container. |
+
+### Tab — `helix-tabs-tab`
+
+One tab in a tab list.
+
+Extends `HelixBaseTabsTab`.
+
+Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseTabsTab` | Whether the tab can be chosen. |
+| `selected` | `selected` | `boolean` | `false` | `HelixBaseTabsTab` | Whether this tab is the current one. |
+| `value` | `value` | `string` | `''` | `HelixBaseTabsTab` | Identifies the tab, and pairs it with the panel of the same value. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focusTab()` | `HelixBaseTabsTab` | Moves focus to this tab. |
+| `select()` | `HelixBaseTabsTab` | Selects this tab and announces it. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the tab is chosen. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The tab's label. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `tab` | The tab itself. |
+
+## Tag
+
+### Root — `helix-tag`
+
+Labels content with a short piece of metadata.
+
+Extends `HelixBaseTag`.
+
+Five appearances. The fill is a tint of the status color, mixed with `color-mix` rather than held as a token per status, so a theme that changes the status colors gets the tints with them.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'neutral' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| undefined` | - | - | Which status the tag reports. |
+| `dismissible` | `dismissible` | `boolean` | `false` | `HelixBaseTag` | Whether the tag offers a control to remove itself. |
+| `dismissLabel` | `dismiss-label` | `string` | `'Remove'` | `HelixBaseTag` | Accessible name for the dismiss control. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when the reader asks to remove the tag. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The tag's label. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `dismiss` | The remove button, when `dismissible`. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--tag-background-color` | Fill behind the tag. |
+| `--tag-foreground-color` | Label color. |
+| `--tag-radii` | Corner radius of the tag. |
 
 ## Text
 
-### Root
+### Root — `helix-text`
 
-Description
+Text: what element it is, and what it looks like.
+
+Extends `HelixElement`.
+
+Two properties, and they answer different questions. `as` is the element, which decides the document outline and what a screen reader announces. `appearance` is the treatment, which decides size, weight, leading, and tracking together.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `\| 'display'
+    \| 'heading'
+    \| 'subheading'
+    \| 'title'
+    \| 'body'
+    \| 'body-strong'
+    \| 'caption'
+    \| 'label'
+    \| 'code' \| undefined` | - | - | Type treatment. Defaults to the one that matches `as`. |
+| `as` | `as` | `'span' \| 'p' \| 'h1' \| 'h2' \| 'h3' \| 'h4' \| 'h5' \| 'h6' \| 'strong' \| 'em' \| 'code' \| 'label' \| undefined` | - | - | Which element to render. Decides the outline and the semantics. |
+| `tone` | `tone` | `'default' \| 'muted' \| 'subtle' \| 'primary' \| 'danger' \| undefined` | - | - | Color role. Separate from `appearance`, because color carries state. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The text. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `text` | The rendered element. |
 
 ## Textarea
 
-### Root
+### Root — `helix-textarea`
 
-Description
+Several lines of text a reader types into.
 
-#### Properties
+Extends `HelixBaseTextarea`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## TimePicker
-
-### Root
-
-Description
+The same frame an `Input` wears, so a form of mixed fields reads as one set rather than as two kinds of box. What differs is the resize handle, which is the platform's and is left alone on the block axis only: a field that can be dragged wider than the form holding it is a field that breaks the layout.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `autoGrow` | `auto-grow` | `boolean` | `false` | `HelixBaseTextarea` | Whether the box follows its own content rather than scrolling. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixBaseTextarea` | Name submitted with the form. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseTextarea` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseTextarea` | Whether the field refuses input while still submitting its value. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `rows` | `rows` | `number` | `3` | `HelixBaseTextarea` | How many lines the box is before anything is typed. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseTextarea` | Focus is delegated to the control, so the host is never the target. |
+| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseTextarea` | Puts the caret in the field, the way a label pointing at one would. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired as the text changes, and cancelable. |
+| `change` | `Event` | Relayed from the textarea once the reader has finished. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding the control. |
+| `control` | The textarea itself. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--textarea-background-color` | Fill behind the text. |
 
 ## Toast
 
-### Root
+### Root — `helix-toast`
 
-Description
+The region messages arrive in, and the only thing that announces them.
+
+Extends `HelixBaseToast`.
+
+Fixed to the window, and it catches nothing: the region spans a whole edge, so a stack of one message in a corner would otherwise put an invisible bar across everything beside it. The region is transparent to a pointer and the messages take it back.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `'Notifications'` | `HelixBaseToast` | Accessible name for the region, such as "Notifications". |
+| `placement` | `placement` | `\| 'bottom-center'
+    \| 'bottom-end'
+    \| 'bottom-start'
+    \| 'top-center'
+    \| 'top-end'
+    \| 'top-start'` | `'bottom-end'` | `HelixBaseToast` | Which corner or edge the stack sits at. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The messages, as `helix-toast-item` elements. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `region` | The stack the messages are in. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--toast-inset` | Distance from the edges of the window. |
+| `--toast-gap` | Space between one message and the next. |
+| `--toast-inline-size` | Width of a message. |
+
+### Item — `helix-toast-item`
+
+One message in the toast region.
+
+Extends `HelixBaseToastItem`.
+
+A surface with a shadow, because a toast sits over whatever the reader was looking at rather than in it. The severity is a bar down the leading edge and not a fill: a message is text to be read, and a coloured panel behind it costs contrast for something the mark already says.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `dismissible` | `dismissible` | `boolean` | `false` | `HelixBaseToastItem` | Whether the reader can ask for it to go. |
+| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixBaseToastItem` | Accessible name for the dismiss control. |
+| `duration` | `duration` | `number \| undefined` | - | `HelixBaseToastItem` | How long it stays, in milliseconds. Absent means until it is dismissed. |
+| `severity` | `severity` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseToastItem` | What kind of message it is, which picks the mark and its name. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `dismiss()` | `HelixBaseToastItem` | Asks to be taken away, and reports whether the request stood. |
+| `pause()` | `HelixBaseToastItem` | Stops the clock, leaving whatever is left of it. |
+| `resume()` | `HelixBaseToastItem` | Starts it again from where it stopped. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when it asks to go, whether by the control or by its timer. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The message. |
+| `actions` | What to do about it, usually a button or a link. |
+| `icon` | Replaces the glyph inside the dismiss control. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `item` | The message's own surface. |
+| `content` | The message. |
+| `actions` | The region holding what to do about it. |
+| `dismiss` | The control that asks to close. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--toast-item-inset` | Space between the message's edge and its contents. |
 
 ## Toggle
 
-### Root
+### Root — `helix-toggle`
 
-Description
+One option in a toggle group.
 
-#### Properties
+Extends `HelixBaseToggle`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## ToggleGroup
-
-### Root
-
-Description
+Carries no background of its own. The selected look comes from the group's indicator sitting behind it, which is what lets that marker travel instead of one fill appearing as another disappears.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseToggle` | Whether the item can be chosen. |
+| `selected` | `selected` | `boolean` | `false` | `HelixBaseToggle` | Whether this item is the current one. |
+| `value` | `value` | `string` | `''` | `HelixBaseToggle` | Identifies the item to the group. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focusItem()` | `HelixBaseToggle` | Moves focus to this item. |
+| `select()` | `HelixBaseToggle` | Chooses this item and announces it. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The item's label. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `item` | The button or anchor. |
+
+### Group — `helix-toggle-group`
+
+A row of options with the selection marked by a moving indicator.
+
+Extends `HelixBaseToggleGroup`.
+
+The indicator travels between items rather than the fill swapping. A fill that appears on one item as it disappears from another is two changes at once and reads as a flicker; one object moving is something the eye follows, and it says where the selection came from as well as where it went.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'filled' \| 'plain' \| undefined` | - | - | How much chrome the group carries around its items. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixBaseToggleGroup` | Name the group reports under when its form is submitted. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `value` | `value` | `string` | `''` | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The group's items. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `indicator` | The moving marker behind the selected item. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--toggle-group-indicator-color` | Fill of the moving marker. |
 
 ## Toolbar
 
-### Root
+### Root — `helix-toolbar`
 
-Description
+A group of controls that share one tab stop.
+
+Extends `HelixBaseToolbar`.
+
+No chrome of its own: a toolbar is a place controls sit, and a border around them would be a second frame inside whatever already frames the bar.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `'Toolbar'` | `HelixBaseToolbar` | Accessible name for the toolbar. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseToolbar` | Which way the arrow keys move. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The toolbar's controls. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `toolbar` | The toolbar container. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--toolbar-gap` | Space between controls. |
 
 ## Tooltip
 
-### Root
+### Root — `helix-tooltip`
 
-Description
+A short description that appears beside what it describes.
 
-#### Properties
+Extends `HelixBaseTooltip`.
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-## Trend
-
-### Root
-
-Description
+The bubble is in the top layer, so it needs no `z-index` and cannot be clipped by whatever it sits inside.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
----
-
-
-## Family
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `content` | `content` | `string` | `''` | `HelixBaseTooltip` | The text shown in the bubble. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use. Ignored once `open` is set. |
+| `delay` | `delay` | `number` | `400` | `HelixBaseTooltip` | How long the pointer must rest before the bubble appears, in milliseconds. |
+| `delayOut` | `delay-out` | `number` | `100` | `HelixBaseTooltip` | How long the bubble stays after the pointer leaves, in milliseconds. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseTooltip` | Whether the tooltip never shows. |
+| `isOpen` | - | `boolean` | - | `MixinControllerOpen` | The resolved open state, whichever mode the element is in. |
+| `offset` | `offset` | `number` | `8` | `HelixBaseTooltip` | Space between the trigger and the bubble, in pixels. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean \| undefined` | `undefined` | `MixinControllerOpen` | Whether the element is open. Setting this enters controlled mode. |
+| `placement` | `placement` | `Placement` | `'top'` | `HelixBaseTooltip` | Preferred side. It moves if that side does not fit. |
 
 #### Methods
 
-| Method | Mixin | Description |
-| ------ | ----- | ----------- |
-|        |       |             |
+| Method | From | Description |
+| --- | --- | --- |
+| `hide()` | `HelixBaseTooltip` | Hides the bubble. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `show()` | `HelixBaseTooltip` | Shows the bubble, unless there is nothing to show. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
 #### Events
 
 | Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-#### CSS Properties
-
-| Property | Default | Description |
-| -------- | ------- | ----------- |
-|          |         |             |
-
-## ComponentFamily
-
-### Component
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Methods
-
-| Method | Mixin | Description |
-| ------ | ----- | ----------- |
-|        |       |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+| --- | --- | --- |
+| `helix-open` | `HelixOpenEvent` | Fired before the bubble shows, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before it hides, and cancelable. |
 
 #### Slots
 
 | Slot | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| *(default)* | The trigger. |
+| `content` | The bubble's content, when `content` is not enough. Anything slotted here replaces the property, which is this slot's fallback. |
 
-#### CSS Parts
+#### Parts
 
 | Part | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| `tooltip` | The bubble. |
+| `arrow` | The point aimed at the trigger. |
 
-#### CSS Properties
+#### Custom properties
 
-| Property | Default | Description |
-| -------- | ------- | ----------- |
-|          |         |             |
+| Property | Description |
+| --- | --- |
+| `--tooltip-background-color` | Fill of the bubble. |
+| `--tooltip-max-inline-size` | Widest the bubble grows before wrapping. |
 
-## ComponentFamily
+## Tree
 
-### Component
+### Root — `helix-tree`
 
-Description
+A tree of items, navigable entirely from the keyboard.
+
+Extends `HelixBaseTree`.
+
+Quiet by default: no rules between rows and no fill except on the selected item. A navigation tree is read by scanning, and every line of chrome added to it is one more thing between the reader and the label.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `chevron` | `chevron` | `'end' \| undefined` | - | `HelixBaseTree` | Which end of a row the chevron sits at. |
+| `label` | `label` | `string` | `'Tree'` | `HelixBaseTree` | Accessible name for the tree. |
+| `onActiveChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerActive` | The consumer's callback, invoked after the change is applied. |
+| `value` | `value` | `string` | `''` | `MixinControllerActive` | Which item is current, by its `value`. |
 
 #### Methods
 
-| Method | Mixin | Description |
-| ------ | ----- | ----------- |
-|        |       |             |
+| Method | From | Description |
+| --- | --- | --- |
+| `requestActive()` | `MixinControllerActive` | Requests a new current item, and reports whether the request stood. |
 
 #### Events
 
 | Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. |
 
 #### Slots
 
 | Slot | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| *(default)* | The tree's items. |
 
-#### CSS Parts
+#### Parts
 
 | Part | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| `tree` | The tree container. |
 
-#### CSS Properties
+#### Custom properties
 
-| Property | Default | Description |
-| -------- | ------- | ----------- |
-|          |         |             |
+| Property | Description |
+| --- | --- |
+| `--tree-indent` | Indent added per level. |
+| `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
 
-## ComponentFamily
+### Item — `helix-tree-item`
 
-### Component
+One node in a tree.
 
-Description
+Extends `HelixBaseTreeItem`.
+
+Indent comes from the `level` the tree sets, as a multiple of one hook, so a node moved to another depth re-indents without any nested selector. Nesting selectors by depth is the usual approach and stops working at whatever depth nobody wrote a rule for.
 
 #### Properties
 
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `expanded` | `expanded` | `boolean` | `false` | `HelixBaseTreeItem` | Whether a branch is showing its children. |
+| `focusable` | - | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item holds the tree's single tab stop. |
+| `isBranch` | - | `boolean` | - | `HelixBaseTreeItem` | Whether this node has children. |
+| `level` | `level` | `number \| undefined` | - | `HelixBaseTreeItem` | Depth from the root, set by the tree so indentation needs no CSS nesting. |
+| `selected` | `selected` | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item is the current one. |
+| `value` | `value` | `string` | `''` | `HelixBaseTreeItem` | Identifies the item to the consumer, carried in `SelectionChange`. |
 
 #### Methods
 
-| Method | Mixin | Description |
-| ------ | ----- | ----------- |
-|        |       |             |
+| Method | From | Description |
+| --- | --- | --- |
+| `focusItem()` | `HelixBaseTreeItem` | Moves focus to this node. |
+| `select()` | `HelixBaseTreeItem` | Selects this node and announces it. |
 
 #### Events
 
 | Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
 
 #### Slots
 
 | Slot | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| *(default)* | The item's label. |
+| `children` | Nested items, which make this a branch. |
+| `start` | Before the label, after the chevron. A mark about the item. |
+| `end` | After the label, at the row's far side. A count, or a state. |
 
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-#### CSS Properties
-
-| Property | Default | Description |
-| -------- | ------- | ----------- |
-|          |         |             |
-
-## ComponentFamily
-
-### Component
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Methods
-
-| Method | Mixin | Description |
-| ------ | ----- | ----------- |
-|        |       |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot | Description |
-| ---- | ----------- |
-|      |             |
-
-#### CSS Parts
+#### Parts
 
 | Part | Description |
-| ---- | ----------- |
-|      |             |
+| --- | --- |
+| `item` | The node, and the focus target. |
+| `row` | The clickable label row. |
+| `toggle` | The expand and collapse control. |
+| `label` | The label text. |
+| `group` | The container for nested items. |
 
-#### CSS Properties
+#### Custom properties
 
-| Property | Default | Description |
-| -------- | ------- | ----------- |
-|          |         |             |
-
-----
-
-## ComponentFamily
-
-### Component
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Methods
-
-| Method | Mixin | Description |
-| ------ | ----- | ----------- |
-|        |       |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot | Description |
-| ---- | ----------- |
-|      |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-#### CSS Properties
-
-| Property | Default | Description |
-| -------- | ------- | ----------- |
-|          |         |             |
-
----
-
-## BaseFamily
-
-### Root
-
-Description
-
-#### Properties
-
-| Property | Attribute | Type | Default | Inherited From | Description |
-| -------- | --------- | ---- | ------- | -------------- | ----------- |
-|          |           |      |         | -              |             |
-
-#### Methods
-
-| Method | Mixin | Description |
-| ------ | ----- | ----------- |
-|        |       |             |
-
-#### Events
-
-| Event | Type | Description |
-| ----- | ---- | ----------- |
-|       |      |             |
-
-#### Slots
-
-| Slot        | Description |
-| ----------- | ----------- |
-| _(default)_ |             |
-
-#### CSS Parts
-
-| Part | Description |
-| ---- | ----------- |
-|      |             |
-
-#### CSS Properties
-
-| Property | Default | Description |
-| -------- | ------- | ----------- |
-|          |         |             |
+| Property | Description |
+| --- | --- |
+| `--tree-indent` | Indent added per level. |
+| `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
