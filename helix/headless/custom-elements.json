@@ -5771,6 +5771,581 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/drilldown/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/drilldown/item/drilldown-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/drilldown/root/drilldown-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/drilldown/item/drilldown-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A row that opens a page *contains* that page: its rows are this row's own\nchildren, assigned to the `page` slot. The tree is the structure, so there\nare no ids to wire and a consumer who moves a row has moved its page with it.\n\n**It renders one of three things**, and which one is the stack's business\nrather than its own. On the page showing, it is a row. Showing its own page,\nit contributes that page's rows and nothing else, because its row belongs to\nthe page above. On neither, it renders nothing at all: the rows are in the\nlight DOM and come back untouched, so there is no state to keep and nothing\nto hide with an attribute this element would have to write onto itself.\n\nChoosing is announced, never applied. The row dispatches and the stack\ndecides whether that means drilling in or choosing a command.",
+          "name": "HelixBaseDrilldownItem",
+          "cssParts": [
+            {
+              "description": "The row itself.",
+              "name": "item"
+            },
+            {
+              "description": "The words.",
+              "name": "label"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The words naming this row.",
+              "name": ""
+            },
+            {
+              "description": "The rows of the page this one opens.",
+              "name": "page"
+            },
+            {
+              "description": "Before the words, usually an icon.",
+              "name": "start"
+            },
+            {
+              "description": "After the words, usually a mark or a count.",
+              "name": "end"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the row can be reached at all.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies the row to whatever is listening.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "isDrilldownItem",
+              "type": {
+                "text": "boolean"
+              },
+              "readonly": true,
+              "default": "true",
+              "description": "Marks this as a row a stack should count. Cheaper than an instanceof."
+            },
+            {
+              "kind": "field",
+              "name": "onPage",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether the page showing is the one this row is on. Written by the stack."
+            },
+            {
+              "kind": "field",
+              "name": "showingPage",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this row's own page is the one showing. Written by the stack."
+            },
+            {
+              "kind": "method",
+              "name": "focusItem",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Moves focus onto the row itself.",
+              "type": {
+                "text": "focusItem() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces that this row was chosen.",
+              "type": {
+                "text": "select() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when the row is chosen.",
+              "name": "helix-select",
+              "reactProp": "onhelix-select"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the row can be reached at all.",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies the row to whatever is listening.",
+              "fieldName": "value"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One row of a drill-down, which may hold a page of its own.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/drilldown",
+            "aliases": [
+              "Panel item",
+              "Drill row"
+            ],
+            "tier": "headless",
+            "group": "BaseDrilldown",
+            "part": "Item"
+          },
+          "tagName": "helix-base-drilldown-item",
+          "customElement": true,
+          "modulePath": "src/drilldown/item/drilldown-item.ts",
+          "definitionPath": "src/drilldown/item/drilldown-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseDrilldownItem",
+          "declaration": {
+            "name": "HelixBaseDrilldownItem",
+            "module": "src/drilldown/item/drilldown-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-drilldown-item",
+          "declaration": {
+            "name": "HelixBaseDrilldownItem",
+            "module": "src/drilldown/item/drilldown-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/drilldown/root/drilldown-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "One panel that changes rather than panels opening beside each other. That is\nthe right shape wherever there is no room for a second column: a phone has\nnone, and a touch screen has no hover to open one with.\n\n**Not a `Menu`, and the difference is what it is for rather than how it\nlooks.** A menu is a thing that opens from a trigger and closes when it is\ndone; this is a region that sits where it is put, inside a drawer or a\nsidebar or a settings panel. `Menu` drills too, through the same controller,\nbecause a menu deep enough to need pages wants exactly this behaviour without\nbeing this component.\n\n**Navigation, never a value.** Rows are places to go and commands to run, so\nnothing here is form-associated and nothing is submitted. A drill-down that\nreported a value would be a `Listbox` whose options happen to nest, and that\nis the component to reach for instead.\n\n**The tree is the state.** A row that opens a page contains that page, so the\nstack holds one reference and reads the rest from the DOM. See\n`DrilldownController`, which is where this behaviour lives and which `Menu`\nshares.",
+          "name": "HelixBaseDrilldown",
+          "cssParts": [
+            {
+              "description": "The bar above a page, holding the way back and its name.",
+              "name": "header"
+            },
+            {
+              "description": "The control that returns one page.",
+              "name": "back"
+            },
+            {
+              "description": "The name of the page showing.",
+              "name": "title"
+            },
+            {
+              "description": "The region the rows are in.",
+              "name": "page"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The rows of the top page.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Menu'",
+              "description": "Accessible name for the region.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "backLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Back'",
+              "description": "What the control returning from a page reads.",
+              "attribute": "back-label"
+            },
+            {
+              "kind": "field",
+              "name": "direction",
+              "type": {
+                "text": "'back' | 'forward'"
+              },
+              "privacy": "private",
+              "default": "'forward'",
+              "description": "Which way the last move went, for whatever animates the change.\n\nReflected as `data-direction`, because the styled tier cannot know it: both\nmoves replace one page with another, and only the stack knows whether the\nreader went deeper or came back. Without it a slide has to pick one\ndirection and be wrong half the time."
+            },
+            {
+              "kind": "field",
+              "name": "drilldown",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new DrilldownController<HelixBaseDrilldownItem>(this, { isRow: (element: Element): boolean => 'isDrilldownItem' in element && element.isDrilldownItem === true, root: () => [...this.children], slot: 'page', })"
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "HelixBaseDrilldownItem[]"
+              },
+              "privacy": "private",
+              "description": "The rows on the page showing, which is what the keys move over.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "enter",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "HelixBaseDrilldownItem"
+                  }
+                }
+              ],
+              "description": "Shows a row's page, and puts focus on the first row of it."
+            },
+            {
+              "kind": "method",
+              "name": "back",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Returns one page, and reports whether there was one to return to.\n\nFocus lands on the row that opened the page being left, which is why the\nrow is read before going back rather than after: a reader who drills in and\ncomes straight out should be on the row they pressed, not at the top of a\nlist they have already read.",
+              "type": {
+                "text": "back() => boolean"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSelect",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "mark",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "HelixBaseDrilldownItem"
+                  }
+                },
+                {
+                  "name": "page",
+                  "type": {
+                    "text": "HelixBaseDrilldownItem | null"
+                  }
+                },
+                {
+                  "name": "onPage",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Walks the tree marking which rows are on the page showing."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when a row with no page is chosen.",
+              "name": "helix-select",
+              "reactProp": "onhelix-select"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Menu'",
+              "description": "Accessible name for the region.",
+              "fieldName": "label"
+            },
+            {
+              "name": "back-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Back'",
+              "description": "What the control returning from a page reads.",
+              "fieldName": "backLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A stack of pages, one showing at a time, with a way back.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/drilldown",
+            "aliases": [
+              "Panel",
+              "Nested list",
+              "Drill-in"
+            ],
+            "tier": "headless",
+            "group": "BaseDrilldown",
+            "part": "Root"
+          },
+          "tagName": "helix-base-drilldown",
+          "customElement": true,
+          "modulePath": "src/drilldown/root/drilldown-root.ts",
+          "definitionPath": "src/drilldown/root/drilldown-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseDrilldown",
+          "declaration": {
+            "name": "HelixBaseDrilldown",
+            "module": "src/drilldown/root/drilldown-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-drilldown",
+          "declaration": {
+            "name": "HelixBaseDrilldown",
+            "module": "src/drilldown/root/drilldown-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/empty-state/index.ts",
       "declarations": [],
       "exports": [
@@ -6275,6 +6850,14 @@
           "declaration": {
             "name": "*",
             "module": "src/drawer/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/drilldown/index.js"
           }
         },
         {

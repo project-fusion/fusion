@@ -19,6 +19,8 @@ import type {
   HelixBaseCheckboxGroup,
   HelixBaseDivider,
   HelixBaseDrawer,
+  HelixBaseDrilldown,
+  HelixBaseDrilldownItem,
   HelixBaseEmptyState,
   HelixBaseIcon,
   HelixBaseInput,
@@ -1105,6 +1107,86 @@ instead. */
   "prop:onOpenChange"?: HelixBaseDrawer["onOpenChange"];
   /** Fired when the drawer opens or closes. */
   "on:helix-open"?: (e: HelixBaseDrawerHelixOpenElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseDrilldownItem` component event */
+export type HelixBaseDrilldownItemElementEvent<E = Event> = TypedEvent<
+  HelixBaseDrilldownItem,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseDrilldownItemHelixSelectElementEvent =
+  HelixBaseDrilldownItemElementEvent<HelixSelectEvent>;
+
+export type HelixBaseDrilldownItemProps = {
+  /** Whether the row can be reached at all. */
+  disabled?: HelixBaseDrilldownItem["disabled"];
+  /** Identifies the row to whatever is listening. */
+  value?: HelixBaseDrilldownItem["value"];
+  /** Whether the page showing is the one this row is on. Written by the stack. */
+  onPage?: HelixBaseDrilldownItem["onPage"];
+  /** Whether this row's own page is the one showing. Written by the stack. */
+  showingPage?: HelixBaseDrilldownItem["showingPage"];
+
+  /** Fired when the row is chosen. */
+  "onhelix-select"?: (e: HelixBaseDrilldownItemHelixSelectElementEvent) => void;
+};
+
+export type HelixBaseDrilldownItemSolidJsProps = {
+  /** Whether the row can be reached at all. */
+  "prop:disabled"?: HelixBaseDrilldownItem["disabled"];
+  /** Identifies the row to whatever is listening. */
+  "prop:value"?: HelixBaseDrilldownItem["value"];
+  /** Whether the page showing is the one this row is on. Written by the stack. */
+  "prop:onPage"?: HelixBaseDrilldownItem["onPage"];
+  /** Whether this row's own page is the one showing. Written by the stack. */
+  "prop:showingPage"?: HelixBaseDrilldownItem["showingPage"];
+  /** Fired when the row is chosen. */
+  "on:helix-select"?: (
+    e: HelixBaseDrilldownItemHelixSelectElementEvent,
+  ) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseDrilldown` component event */
+export type HelixBaseDrilldownElementEvent<E = Event> = TypedEvent<
+  HelixBaseDrilldown,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseDrilldownHelixSelectElementEvent =
+  HelixBaseDrilldownElementEvent<HelixSelectEvent>;
+
+export type HelixBaseDrilldownProps = {
+  /** Accessible name for the region. */
+  label?: HelixBaseDrilldown["label"];
+  /** What the control returning from a page reads. */
+  "back-label"?: HelixBaseDrilldown["backLabel"];
+  /** What the control returning from a page reads. */
+  backLabel?: HelixBaseDrilldown["backLabel"];
+
+  /** Fired when a row with no page is chosen. */
+  "onhelix-select"?: (e: HelixBaseDrilldownHelixSelectElementEvent) => void;
+};
+
+export type HelixBaseDrilldownSolidJsProps = {
+  /** Accessible name for the region. */
+  "prop:label"?: HelixBaseDrilldown["label"];
+  /** What the control returning from a page reads. */
+  "attr:back-label"?: HelixBaseDrilldown["backLabel"];
+  /** What the control returning from a page reads. */
+  "prop:backLabel"?: HelixBaseDrilldown["backLabel"];
+  /** Fired when a row with no page is chosen. */
+  "on:helix-select"?: (e: HelixBaseDrilldownHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3903,6 +3985,129 @@ export type CustomElements = {
    */
   "helix-base-drawer": Partial<
     HelixBaseDrawerProps & BaseProps<HelixBaseDrawer> & BaseEvents
+  >;
+
+  /**
+   * A row that opens a page *contains* that page: its rows are this row's own
+   * children, assigned to the `page` slot. The tree is the structure, so there
+   * are no ids to wire and a consumer who moves a row has moved its page with it.
+   *
+   * **It renders one of three things**, and which one is the stack's business
+   * rather than its own. On the page showing, it is a row. Showing its own page,
+   * it contributes that page's rows and nothing else, because its row belongs to
+   * the page above. On neither, it renders nothing at all: the rows are in the
+   * light DOM and come back untouched, so there is no state to keep and nothing
+   * to hide with an attribute this element would have to write onto itself.
+   *
+   * Choosing is announced, never applied. The row dispatches and the stack
+   * decides whether that means drilling in or choosing a command.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether the row can be reached at all.
+   * - `value`: Identifies the row to whatever is listening.
+   * - `isDrilldownItem`: Marks this as a row a stack should count. Cheaper than an instanceof. (property only) (readonly)
+   * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
+   * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the row is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this row.
+   * - `page`: The rows of the page this one opens.
+   * - `start`: Before the words, usually an icon.
+   * - `end`: After the words, usually a mark or a count.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus onto the row itself.
+   * - `select() => void`: Announces that this row was chosen.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row itself.
+   * - `label`: The words.
+   */
+  "helix-base-drilldown-item": Partial<
+    HelixBaseDrilldownItemProps & BaseProps<HelixBaseDrilldownItem> & BaseEvents
+  >;
+
+  /**
+   * One panel that changes rather than panels opening beside each other. That is
+   * the right shape wherever there is no room for a second column: a phone has
+   * none, and a touch screen has no hover to open one with.
+   *
+   * **Not a `Menu`, and the difference is what it is for rather than how it
+   * looks.** A menu is a thing that opens from a trigger and closes when it is
+   * done; this is a region that sits where it is put, inside a drawer or a
+   * sidebar or a settings panel. `Menu` drills too, through the same controller,
+   * because a menu deep enough to need pages wants exactly this behaviour without
+   * being this component.
+   *
+   * **Navigation, never a value.** Rows are places to go and commands to run, so
+   * nothing here is form-associated and nothing is submitted. A drill-down that
+   * reported a value would be a `Listbox` whose options happen to nest, and that
+   * is the component to reach for instead.
+   *
+   * **The tree is the state.** A row that opens a page contains that page, so the
+   * stack holds one reference and reads the rest from the DOM. See
+   * `DrilldownController`, which is where this behaviour lives and which `Menu`
+   * shares.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the region.
+   * - `back-label`/`backLabel`: What the control returning from a page reads.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a row with no page is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The rows of the top page.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `back() => boolean`: Returns one page, and reports whether there was one to return to.
+   *
+   * Focus lands on the row that opened the page being left, which is why the
+   * row is read before going back rather than after: a reader who drills in and
+   * comes straight out should be on the row they pressed, not at the top of a
+   * list they have already read.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The bar above a page, holding the way back and its name.
+   * - `back`: The control that returns one page.
+   * - `title`: The name of the page showing.
+   * - `page`: The region the rows are in.
+   */
+  "helix-base-drilldown": Partial<
+    HelixBaseDrilldownProps & BaseProps<HelixBaseDrilldown> & BaseEvents
   >;
 
   /**
@@ -6929,6 +7134,135 @@ export type CustomElementsSolidJs = {
     HelixBaseDrawerProps &
       HelixBaseDrawerSolidJsProps &
       BaseProps<HelixBaseDrawer> &
+      BaseEvents
+  >;
+
+  /**
+   * A row that opens a page *contains* that page: its rows are this row's own
+   * children, assigned to the `page` slot. The tree is the structure, so there
+   * are no ids to wire and a consumer who moves a row has moved its page with it.
+   *
+   * **It renders one of three things**, and which one is the stack's business
+   * rather than its own. On the page showing, it is a row. Showing its own page,
+   * it contributes that page's rows and nothing else, because its row belongs to
+   * the page above. On neither, it renders nothing at all: the rows are in the
+   * light DOM and come back untouched, so there is no state to keep and nothing
+   * to hide with an attribute this element would have to write onto itself.
+   *
+   * Choosing is announced, never applied. The row dispatches and the stack
+   * decides whether that means drilling in or choosing a command.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether the row can be reached at all.
+   * - `value`: Identifies the row to whatever is listening.
+   * - `isDrilldownItem`: Marks this as a row a stack should count. Cheaper than an instanceof. (property only) (readonly)
+   * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
+   * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the row is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this row.
+   * - `page`: The rows of the page this one opens.
+   * - `start`: Before the words, usually an icon.
+   * - `end`: After the words, usually a mark or a count.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus onto the row itself.
+   * - `select() => void`: Announces that this row was chosen.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row itself.
+   * - `label`: The words.
+   */
+  "helix-base-drilldown-item": Partial<
+    HelixBaseDrilldownItemProps &
+      HelixBaseDrilldownItemSolidJsProps &
+      BaseProps<HelixBaseDrilldownItem> &
+      BaseEvents
+  >;
+
+  /**
+   * One panel that changes rather than panels opening beside each other. That is
+   * the right shape wherever there is no room for a second column: a phone has
+   * none, and a touch screen has no hover to open one with.
+   *
+   * **Not a `Menu`, and the difference is what it is for rather than how it
+   * looks.** A menu is a thing that opens from a trigger and closes when it is
+   * done; this is a region that sits where it is put, inside a drawer or a
+   * sidebar or a settings panel. `Menu` drills too, through the same controller,
+   * because a menu deep enough to need pages wants exactly this behaviour without
+   * being this component.
+   *
+   * **Navigation, never a value.** Rows are places to go and commands to run, so
+   * nothing here is form-associated and nothing is submitted. A drill-down that
+   * reported a value would be a `Listbox` whose options happen to nest, and that
+   * is the component to reach for instead.
+   *
+   * **The tree is the state.** A row that opens a page contains that page, so the
+   * stack holds one reference and reads the rest from the DOM. See
+   * `DrilldownController`, which is where this behaviour lives and which `Menu`
+   * shares.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the region.
+   * - `back-label`/`backLabel`: What the control returning from a page reads.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a row with no page is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The rows of the top page.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `back() => boolean`: Returns one page, and reports whether there was one to return to.
+   *
+   * Focus lands on the row that opened the page being left, which is why the
+   * row is read before going back rather than after: a reader who drills in and
+   * comes straight out should be on the row they pressed, not at the top of a
+   * list they have already read.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The bar above a page, holding the way back and its name.
+   * - `back`: The control that returns one page.
+   * - `title`: The name of the page showing.
+   * - `page`: The region the rows are in.
+   */
+  "helix-base-drilldown": Partial<
+    HelixBaseDrilldownProps &
+      HelixBaseDrilldownSolidJsProps &
+      BaseProps<HelixBaseDrilldown> &
       BaseEvents
   >;
 

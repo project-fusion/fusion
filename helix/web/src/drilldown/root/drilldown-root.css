@@ -1,0 +1,99 @@
+/* A region rather than an overlay: it sits where it is put, so it brings a fill
+   and a width and no shadow. Whatever frames it is the consumer's. */
+:host {
+  background-color: var(--drilldown-background, var(--helix-color-surface));
+  block-size: fit-content;
+  display: block;
+  inline-size: var(--drilldown-inline-size, 100%);
+  /* Clipped, because the page arriving starts outside the box and the page
+     leaving would otherwise be visible beside it for the length of the slide. */
+  overflow: hidden;
+}
+
+/* The way back and the name of the page, above the rows. A header rather than a
+   row in the list: going back is not one of the things on this page, and a
+   reader arrowing through the rows should not land on it. */
+[part="header"] {
+  align-items: center;
+  block-size: var(--helix-size-control-sm);
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-2xs);
+}
+
+[part="back"] {
+  all: unset;
+  align-items: center;
+  block-size: var(--helix-size-control-sm);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  inline-size: var(--helix-size-control-sm);
+  justify-content: center;
+}
+
+[part="back"] svg {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+[part="back"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+  color: var(--helix-color-foreground);
+}
+
+[part="back"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="title"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The page slides in from the side it came from. Keyed on the host's
+   `data-direction`, which the stack writes because only it knows: both moves
+   replace one page with another and the styles cannot tell them apart. */
+[part="page"] {
+  padding-block: var(--helix-space-2xs);
+}
+
+:host([data-direction="forward"]) [part="page"] {
+  animation: drilldown-forward var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+:host([data-direction="back"]) [part="page"] {
+  animation: drilldown-back var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+@keyframes drilldown-forward {
+  from {
+    opacity: 0;
+    translate: 12% 0;
+  }
+}
+
+@keyframes drilldown-back {
+  from {
+    opacity: 0;
+    translate: -12% 0;
+  }
+}
+
+/* The instant swap, which is what this did before it moved. A reader who has
+   asked for less motion still gets the header and the title saying where they
+   are, which is the part that carries the meaning. */
+@media (prefers-reduced-motion: reduce) {
+  :host([data-direction]) [part="page"] {
+    animation: none;
+  }
+}

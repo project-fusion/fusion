@@ -22,6 +22,8 @@ import type {
   HelixDismissEvent,
   HelixDivider,
   HelixDrawer,
+  HelixDrilldown,
+  HelixDrilldownItem,
   HelixEmptyState,
   HelixFlex,
   HelixFormElement,
@@ -1185,6 +1187,84 @@ instead. */
   "prop:onOpenChange"?: HelixDrawer["onOpenChange"];
   /** Fired when the drawer opens or closes. */
   "on:helix-open"?: (e: HelixDrawerHelixOpenElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixDrilldownItem` component event */
+export type HelixDrilldownItemElementEvent<E = Event> = TypedEvent<
+  HelixDrilldownItem,
+  E
+>;
+/** `helix-select` event type */
+export type HelixDrilldownItemHelixSelectElementEvent =
+  HelixDrilldownItemElementEvent<HelixSelectEvent>;
+
+export type HelixDrilldownItemProps = {
+  /** Whether the row can be reached at all. */
+  disabled?: HelixDrilldownItem["disabled"];
+  /** Identifies the row to whatever is listening. */
+  value?: HelixDrilldownItem["value"];
+  /** Whether the page showing is the one this row is on. Written by the stack. */
+  onPage?: HelixDrilldownItem["onPage"];
+  /** Whether this row's own page is the one showing. Written by the stack. */
+  showingPage?: HelixDrilldownItem["showingPage"];
+
+  /** Fired when the row is chosen. */
+  "onhelix-select"?: (e: HelixDrilldownItemHelixSelectElementEvent) => void;
+};
+
+export type HelixDrilldownItemSolidJsProps = {
+  /** Whether the row can be reached at all. */
+  "prop:disabled"?: HelixDrilldownItem["disabled"];
+  /** Identifies the row to whatever is listening. */
+  "prop:value"?: HelixDrilldownItem["value"];
+  /** Whether the page showing is the one this row is on. Written by the stack. */
+  "prop:onPage"?: HelixDrilldownItem["onPage"];
+  /** Whether this row's own page is the one showing. Written by the stack. */
+  "prop:showingPage"?: HelixDrilldownItem["showingPage"];
+  /** Fired when the row is chosen. */
+  "on:helix-select"?: (e: HelixDrilldownItemHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixDrilldown` component event */
+export type HelixDrilldownElementEvent<E = Event> = TypedEvent<
+  HelixDrilldown,
+  E
+>;
+/** `helix-select` event type */
+export type HelixDrilldownHelixSelectElementEvent =
+  HelixDrilldownElementEvent<HelixSelectEvent>;
+
+export type HelixDrilldownProps = {
+  /** Accessible name for the region. */
+  label?: HelixDrilldown["label"];
+  /** What the control returning from a page reads. */
+  "back-label"?: HelixDrilldown["backLabel"];
+  /** What the control returning from a page reads. */
+  backLabel?: HelixDrilldown["backLabel"];
+
+  /** Fired when a row with no page is chosen. */
+  "onhelix-select"?: (e: HelixDrilldownHelixSelectElementEvent) => void;
+};
+
+export type HelixDrilldownSolidJsProps = {
+  /** Accessible name for the region. */
+  "prop:label"?: HelixDrilldown["label"];
+  /** What the control returning from a page reads. */
+  "attr:back-label"?: HelixDrilldown["backLabel"];
+  /** What the control returning from a page reads. */
+  "prop:backLabel"?: HelixDrilldown["backLabel"];
+  /** Fired when a row with no page is chosen. */
+  "on:helix-select"?: (e: HelixDrilldownHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4136,6 +4216,121 @@ export type CustomElements = {
    */
   "helix-drawer": Partial<
     HelixDrawerProps & BaseProps<HelixDrawer> & BaseEvents
+  >;
+
+  /**
+   * A row is a full-width band rather than an inset pill, for the reason the
+   * select's options are: it reaches both edges of the panel, so a highlight
+   * lines up with the edge the eye is already following down the list.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether the row can be reached at all.
+   * - `value`: Identifies the row to whatever is listening.
+   * - `isDrilldownItem`: Marks this as a row a stack should count. Cheaper than an instanceof. (property only) (readonly)
+   * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
+   * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the row is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this row.
+   * - `page`: The rows of the page this one opens.
+   * - `start`: Before the words, usually an icon.
+   * - `end`: After the words, usually a mark or a count.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus onto the row itself.
+   * - `select() => void`: Announces that this row was chosen.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--drilldown-item-hover-color`: Fill when a row is under the pointer. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row itself.
+   * - `label`: The words.
+   */
+  "helix-drilldown-item": Partial<
+    HelixDrilldownItemProps & BaseProps<HelixDrilldownItem> & BaseEvents
+  >;
+
+  /**
+   * **The pages slide, and the direction is the point.** Both moves replace one
+   * page with another, so with no motion a reader cannot tell whether they went
+   * deeper or came back: the panel simply holds different words. Sliding in the
+   * direction of travel says which happened, and it is most of the reason this is
+   * a component rather than a menu with its trigger removed.
+   *
+   * An animation rather than a transition, because there is nothing to transition
+   * from: the page arriving was not in the DOM a frame ago. Under
+   * `prefers-reduced-motion` it becomes the instant swap `Menu` does.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the region.
+   * - `back-label`/`backLabel`: What the control returning from a page reads.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a row with no page is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The rows of the top page.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `back() => boolean`: Returns one page, and reports whether there was one to return to.
+   *
+   * Focus lands on the row that opened the page being left, which is why the
+   * row is read before going back rather than after: a reader who drills in and
+   * comes straight out should be on the row they pressed, not at the top of a
+   * list they have already read.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--drilldown-background`: Fill behind the pages. (default: `undefined`)
+   * - `--drilldown-inline-size`: Width of the region. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The bar above a page, holding the way back and its name.
+   * - `back`: The control that returns one page.
+   * - `title`: The name of the page showing.
+   * - `page`: The region the rows are in.
+   */
+  "helix-drilldown": Partial<
+    HelixDrilldownProps & BaseProps<HelixDrilldown> & BaseEvents
   >;
 
   /**
@@ -7263,6 +7458,127 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * A row is a full-width band rather than an inset pill, for the reason the
+   * select's options are: it reaches both edges of the panel, so a highlight
+   * lines up with the edge the eye is already following down the list.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `disabled`: Whether the row can be reached at all.
+   * - `value`: Identifies the row to whatever is listening.
+   * - `isDrilldownItem`: Marks this as a row a stack should count. Cheaper than an instanceof. (property only) (readonly)
+   * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
+   * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the row is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The words naming this row.
+   * - `page`: The rows of the page this one opens.
+   * - `start`: Before the words, usually an icon.
+   * - `end`: After the words, usually a mark or a count.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focusItem() => void`: Moves focus onto the row itself.
+   * - `select() => void`: Announces that this row was chosen.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--drilldown-item-hover-color`: Fill when a row is under the pointer. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The row itself.
+   * - `label`: The words.
+   */
+  "helix-drilldown-item": Partial<
+    HelixDrilldownItemProps &
+      HelixDrilldownItemSolidJsProps &
+      BaseProps<HelixDrilldownItem> &
+      BaseEvents
+  >;
+
+  /**
+   * **The pages slide, and the direction is the point.** Both moves replace one
+   * page with another, so with no motion a reader cannot tell whether they went
+   * deeper or came back: the panel simply holds different words. Sliding in the
+   * direction of travel says which happened, and it is most of the reason this is
+   * a component rather than a menu with its trigger removed.
+   *
+   * An animation rather than a transition, because there is nothing to transition
+   * from: the page arriving was not in the DOM a frame ago. Under
+   * `prefers-reduced-motion` it becomes the instant swap `Menu` does.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the region.
+   * - `back-label`/`backLabel`: What the control returning from a page reads.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a row with no page is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The rows of the top page.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `back() => boolean`: Returns one page, and reports whether there was one to return to.
+   *
+   * Focus lands on the row that opened the page being left, which is why the
+   * row is read before going back rather than after: a reader who drills in and
+   * comes straight out should be on the row they pressed, not at the top of a
+   * list they have already read.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--drilldown-background`: Fill behind the pages. (default: `undefined`)
+   * - `--drilldown-inline-size`: Width of the region. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The bar above a page, holding the way back and its name.
+   * - `back`: The control that returns one page.
+   * - `title`: The name of the page showing.
+   * - `page`: The region the rows are in.
+   */
+  "helix-drilldown": Partial<
+    HelixDrilldownProps &
+      HelixDrilldownSolidJsProps &
+      BaseProps<HelixDrilldown> &
+      BaseEvents
+  >;
+
+  /**
    * Centered and given room, because an empty state is the only thing on screen
    * and crowding it against the top edge makes the region look broken rather than
    * empty.
@@ -9520,6 +9836,12 @@ export type CustomCssProperties = {
   "--divider-thickness"?: string;
   /** Width or height of the panel. */
   "--drawer-size"?: string;
+  /** Fill when a row is under the pointer. */
+  "--drilldown-item-hover-color"?: string;
+  /** Fill behind the pages. */
+  "--drilldown-background"?: string;
+  /** Width of the region. */
+  "--drilldown-inline-size"?: string;
   /** Space around the whole block. */
   "--empty-state-inset"?: string;
   /** Column width floor when `min` is set. */
