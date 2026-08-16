@@ -25,6 +25,30 @@
   padding: var(--dialog-inset, var(--helix-space-lg));
 }
 
+/* The UA hides a closed dialog with `dialog:not([open]) { display: none }`, and
+ * the `display: flex` above silently took that away. Origin beats specificity:
+ * any author declaration outranks every UA one, so a one-word layout rule on
+ * the panel undoes a rule nothing here mentions and nothing warns about.
+ *
+ * What it looked like is worth recording, because it does not look like a CSS
+ * fault. The dialog painted on load, centred across the frame by the UA's own
+ * `margin: auto` and sitting at the top of the flow rather than the middle of
+ * the viewport, with no scrim. That reads as a dialog that opened by itself,
+ * and every control in it was dead, because the buttons close a dialog that was
+ * never opened and `close()` on a closed dialog does nothing. Two bugs to look
+ * for, neither of them real, and the real one in a stylesheet.
+ *
+ * The tell is the missing scrim: `::backdrop` exists only for an element in the
+ * top layer, so a panel with no scrim was never shown modally, whatever it
+ * looks like.
+ *
+ * Tooltip and Menu already carry their version of this, `:not(:popover-open)`
+ * and `[hidden]` respectively, against the same rule in the same stylesheet.
+ * Any part that is a native element the UA hides by state needs it. */
+[part="dialog"]:not([open]) {
+  display: none;
+}
+
 :host([appearance="compact"]) [part="dialog"] {
   --dialog-inline-size: 22rem;
 }

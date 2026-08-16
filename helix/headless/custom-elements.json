@@ -3568,7 +3568,7 @@
               "type": {
                 "text": "HTMLElement[]"
               },
-              "description": "The slides, in light-DOM order. Client only: the server has no tree.",
+              "description": "The slides, in light-DOM order. Empty on the server, which has no tree.",
               "readonly": true
             },
             {

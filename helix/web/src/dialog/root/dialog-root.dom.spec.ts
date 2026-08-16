@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 /* happy-dom before the element, and the import dynamic for it: an element
    registered against the `customElements` happy-dom replaces never upgrades. */
@@ -87,3 +87,36 @@ describe('dialog', () => {
     expect(host.hasAttribute('data-open')).toBe(true)
   })
 })
+
+if (hasLayout()) {
+  describe('dialog geometry', () => {
+    test('a closed dialog paints nothing', async () => {
+      /* Every other spec in this file asserts state, and state was correct
+         while the dialog sat open on the screen: the host said closed, the
+         native element had no `open`, and it rendered anyway, because the
+         panel's own `display: flex` outranks the UA rule that hides it. Origin
+         beats specificity, so nothing about the declaration looks wrong and
+         nothing reports it.
+
+         Only a browser can answer this. happy-dom has no layout and no UA
+         stylesheet, so a closed dialog measures zero there whether or not the
+         bug is present, and the check would pass on the broken build. */
+      const host = await dialog()
+      expect((part(host, 'dialog') as HTMLElement).getBoundingClientRect().height).toBe(0)
+    })
+
+    test('an open one does, and is in the top layer', async () => {
+      /* The pair matters. Hiding a closed dialog is easy to do so thoroughly
+         that an open one is hidden too, and `:modal` is what separates a panel
+         that is merely visible from one the platform has actually raised: the
+         scrim, Escape and inert-behind all follow from it. */
+      const host = await dialog()
+      host.show()
+      await host.updateComplete
+      const native = part(host, 'dialog') as HTMLDialogElement
+      expect(native.getBoundingClientRect().height).toBeGreaterThan(0)
+      expect(native.matches(':modal')).toBe(true)
+      host.close()
+    })
+  })
+}

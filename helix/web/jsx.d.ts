@@ -4037,7 +4037,7 @@ export type CustomElements = {
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
    * - `interval`: How long each slide is held, in milliseconds.
-   * - `slides`: The slides, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `slides`: The slides, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
    *
    * ## Events
    *
@@ -7410,7 +7410,7 @@ export type CustomElementsSolidJs = {
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
    * - `interval`: How long each slide is held, in milliseconds.
-   * - `slides`: The slides, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `slides`: The slides, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
    *
    * ## Events
    *

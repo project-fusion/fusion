@@ -67,9 +67,23 @@ export class HelixBaseCarousel extends HelixElement {
 
   private timer: ReturnType<typeof setInterval> | undefined
 
-  /** The slides, in light-DOM order. Client only: the server has no tree. */
+  /** The slides, in light-DOM order. Empty on the server, which has no tree. */
   get slides(): HTMLElement[] {
-    return [...this.children].filter((child): child is HTMLElement => child instanceof HTMLElement)
+    /* `?? []` is the server, and the comment above it was already right and
+       still did not save it: this said "client only" while `render` read it to
+       count the indicators, so every carousel SSR spec died on an unhandled
+       spread of `undefined`. Third time in this library, after the menu item
+       and the table, and the only one of the three the note was written on.
+       Knowing where a getter must not be reached is not the same as it not
+       being reached, which is what the guard is for.
+
+       Empty is also the honest answer rather than damage control. The
+       indicators are one per slide, the server cannot count children, so they
+       arrive with the upgrade. Nothing moves when they do: the tags are hidden
+       until they are defined. */
+    return [...(this.children ?? [])].filter(
+      (child): child is HTMLElement => child instanceof HTMLElement,
+    )
   }
 
   /**
