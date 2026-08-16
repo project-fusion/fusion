@@ -6,6 +6,9 @@
 
   --_slider-track: 0.25rem;
   --_slider-thumb: var(--helix-size-checkbox);
+  /* The ring while the thumb is held or focused. The accent at low opacity, so
+     it reads as the control's own colour rather than as a second element. */
+  --_slider-halo: color-mix(in oklab, var(--helix-color-primary) 24%, transparent);
 }
 
 [part="field"] {
@@ -140,21 +143,50 @@
  * what a thumb is doing anyway, and it does not compete with the accent fill
  * the track carries on the chosen side.
  *
- * `shadow-sm` is offset downward, so it also stops the thumb reading as
- * floating: it sits on the track rather than over it. The same reasoning the
- * switch uses in reverse, where a border was chosen precisely because a shadow
- * at twenty pixels was too asymmetric to centre. A slider's thumb is larger and
- * moves horizontally, so the asymmetry reads as weight rather than as a
- * mistake. */
+ * `shadow-md` rather than `sm`, because the thumb is white on a track that is
+ * nearly white on the unfilled side: at `sm` there was not enough under it to
+ * separate the two and the thumb dissolved into the track's right half. The
+ * shadow is doing the whole job the border used to, so it has to be worth
+ * seeing.
+ *
+ * It is offset downward, which also stops the thumb reading as floating: it
+ * sits on the track rather than over it. The same reasoning the switch uses in
+ * reverse, where a border was chosen precisely because a shadow at twenty
+ * pixels was too asymmetric to centre. A slider's thumb is larger and moves
+ * horizontally, so the asymmetry reads as weight rather than as a mistake.
+ *
+ * **A halo while it is being moved**, by pointer or by key. The thumb is the
+ * one thing on the control that moves, so what a reader needs while moving it
+ * is confirmation that they have hold of it. A ring drawn as a second shadow
+ * layer rather than an `outline`, because a slider's thumb is a pseudo-element
+ * and an outline on one is clipped by the track's own overflow in Chrome.
+ *
+ * The focus ring is the same halo. `:focus-visible` on the input had `outline:
+ * none` and nothing in its place, so a keyboard reader arrowing along the track
+ * had no indication of which control they were in. */
 [part="control"]::-webkit-slider-thumb {
   appearance: none;
   background-color: var(--helix-color-background);
   block-size: var(--_slider-thumb);
   border: none;
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-sm);
+  box-shadow: var(--helix-shadow-md);
   inline-size: var(--_slider-thumb);
   margin-block-start: calc((var(--_slider-track) - var(--_slider-thumb)) / 2);
+}
+
+[part="control"]:focus-visible::-webkit-slider-thumb,
+[part="control"]:active::-webkit-slider-thumb {
+  box-shadow:
+    var(--helix-shadow-md),
+    0 0 0 var(--helix-space-2xs) var(--_slider-halo);
+}
+
+[part="control"]:focus-visible::-moz-range-thumb,
+[part="control"]:active::-moz-range-thumb {
+  box-shadow:
+    var(--helix-shadow-md),
+    0 0 0 var(--helix-space-2xs) var(--_slider-halo);
 }
 
 [part="control"]::-moz-range-thumb {
@@ -164,7 +196,7 @@
      border, so leaving the declaration out leaves a border rather than none. */
   border: none;
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-sm);
+  box-shadow: var(--helix-shadow-md);
   inline-size: var(--_slider-thumb);
 }
 
