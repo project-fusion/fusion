@@ -7,7 +7,10 @@
 [part="dialog"] {
   background-color: var(--helix-color-surface-overlay);
   border: none;
-  border-radius: var(--helix-radii-lg);
+  /* The house radius. Card wrote the argument down: at anything larger the
+     corner is softer than the controls inside it and the container stops
+     receding, which is the one thing a container should do. */
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
   color: var(--helix-color-foreground);

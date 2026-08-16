@@ -34,7 +34,7 @@
    * mark and the control where the reading starts. */
   align-items: start;
   background-color: var(--helix-color-surface-overlay);
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
   color: var(--helix-color-foreground);
@@ -158,7 +158,12 @@ slot[name="icon"]::slotted(*) {
   inline-size: var(--helix-size-icon);
 }
 
+/* A well under the pointer, not only a brighter glyph. `surface-sunken`
+   resolves through `color-scheme`, so it is darker than the message inside an
+   inverted toast and darker again inside one taking the page's mode: sunken in
+   both, without either being named. */
 [part="dismiss"]:hover {
+  background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
 }
 

@@ -89,7 +89,7 @@
 
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-sm);
   justify-self: start;
   padding: var(--helix-space-2xs);
   inline-size: fit-content;
@@ -194,7 +194,7 @@
 :host([appearance="toggle"]) [part="indicator"] {
   --_indicator-block: var(--_indicator-h, 0);
   --_indicator-color: var(--helix-color-surface-overlay);
-  --_indicator-radius: calc(var(--helix-radii-md) - var(--helix-space-2xs));
+  --_indicator-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
   --_indicator-shadow: var(--helix-shadow-sm);
   --_indicator-offset: 0px;
 }

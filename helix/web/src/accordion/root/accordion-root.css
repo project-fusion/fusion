@@ -6,7 +6,10 @@
    first run. */
 :host {
   border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
-  border-radius: var(--accordion-radii, var(--helix-radii-md));
+  /* The house radius. Card wrote the argument down: at anything larger the
+     corner is softer than the controls inside it and the container stops
+     receding, which is the one thing a container should do. */
+  border-radius: var(--accordion-radii, var(--helix-radii-sm));
   display: block;
   /* Clips each item's square corners to the stack's radius, so no item needs
      to know whether it is first or last. */

@@ -47,7 +47,7 @@
 :host([appearance="filled"]) [part="track"] {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-lg);
+  border-radius: var(--helix-radii-sm);
   padding: var(--helix-space-2xs);
 
   /* Concentric, which is the outer radius less everything between the two
@@ -60,7 +60,7 @@
      visibly rounded track and the two read as unrelated even though the gap
      between them was even the whole way round. A larger outer radius leaves the
      inner one enough to be a curve. */
-  --_toggle-radius: calc(var(--helix-radii-lg) - var(--helix-border-thin) - var(--helix-space-2xs));
+  --_toggle-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
   /* A groove, so the thumb is over it rather than on it. */
   --_indicator-surface: var(--helix-color-surface-overlay);
 }
