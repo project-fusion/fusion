@@ -5402,6 +5402,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--slider-thumb-color`: The handle. (default: `undefined`)
    * - `--slider-track-color`: The part not yet chosen. (default: `undefined`)
    * - `--slider-fill-color`: The part behind the thumb. (default: `undefined`)
    *
@@ -8747,6 +8748,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--slider-thumb-color`: The handle. (default: `undefined`)
    * - `--slider-track-color`: The part not yet chosen. (default: `undefined`)
    * - `--slider-fill-color`: The part behind the thumb. (default: `undefined`)
    *
@@ -9927,6 +9929,8 @@ export type CustomCssProperties = {
   "--select-surface-max-block-size"?: string;
   /** Diameter of the circle shape. */
   "--skeleton-size"?: string;
+  /** The handle. */
+  "--slider-thumb-color"?: string;
   /** The part not yet chosen. */
   "--slider-track-color"?: string;
   /** The part behind the thumb. */

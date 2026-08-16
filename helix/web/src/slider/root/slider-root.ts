@@ -24,6 +24,7 @@ import { styles } from './slider-root.css.js'
  * @aliases Range, Range input
  * @documentation https://helix.fusion.dev/components/slider
  *
+ * @cssproperty --slider-thumb-color - The handle.
  * @cssproperty --slider-track-color - The part not yet chosen.
  * @cssproperty --slider-fill-color - The part behind the thumb.
  */

@@ -9,6 +9,18 @@
   /* The ring while the thumb is held or focused. The accent at low opacity, so
      it reads as the control's own colour rather than as a second element. */
   --_slider-halo: color-mix(in oklab, var(--helix-color-primary) 24%, transparent);
+  /* The unfilled half of the track.
+   *
+   * `border` rather than `surface-sunken`, which is where this started and is
+   * no longer dark enough for the job: `sunken` was lightened twice for the
+   * sake of fields, and the slider's track went with it, until a white thumb on
+   * a 0.96 track had four hundredths to separate it and the shadow was carrying
+   * all of that alone. Reported twice, once as the thumb and once as the shadow,
+   * and both times the thumb was not the thing that had changed.
+   *
+   * A track is a bar rather than a fill, so it takes a line's colour: it is the
+   * same weight of mark as the rules in a table, drawn thicker. */
+  --_slider-track-color: var(--slider-track-color, var(--helix-color-border));
 }
 
 [part="field"] {
@@ -115,8 +127,7 @@
   background: linear-gradient(
     to right,
     var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
-    var(--slider-track-color, var(--helix-color-surface-sunken))
-      calc(var(--_slider-fraction, 0) * 100%)
+    var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
   );
   block-size: var(--_slider-track);
   border-radius: var(--helix-radii-full);
@@ -126,8 +137,7 @@
   background: linear-gradient(
     to right,
     var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
-    var(--slider-track-color, var(--helix-color-surface-sunken))
-      calc(var(--_slider-fraction, 0) * 100%)
+    var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
   );
   block-size: var(--_slider-track);
   border-radius: var(--helix-radii-full);
@@ -166,7 +176,12 @@
  * had no indication of which control they were in. */
 [part="control"]::-webkit-slider-thumb {
   appearance: none;
-  background-color: var(--helix-color-background);
+  /* `overlay`, the token for a thing over the page rather than on it, which is
+     what every other thumb in this library takes: the switch's and the
+     segmented control's both. This was `background`, the page's own colour, so
+     the thumb was white on a white page in light and black on a black one in
+     dark. It had contrast with nothing by construction. */
+  background-color: var(--slider-thumb-color, var(--helix-color-surface-overlay));
   block-size: var(--_slider-thumb);
   border: none;
   border-radius: var(--helix-radii-full);
@@ -190,7 +205,7 @@
 }
 
 [part="control"]::-moz-range-thumb {
-  background-color: var(--helix-color-background);
+  background-color: var(--slider-thumb-color, var(--helix-color-surface-overlay));
   block-size: var(--_slider-thumb);
   /* Stated rather than dropped: Firefox's UA stylesheet gives the thumb a
      border, so leaving the declaration out leaves a border rather than none. */

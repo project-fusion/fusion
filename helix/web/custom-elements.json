@@ -17288,6 +17288,10 @@
           "name": "HelixSlider",
           "cssProperties": [
             {
+              "description": "The handle.",
+              "name": "--slider-thumb-color"
+            },
+            {
               "description": "The part not yet chosen.",
               "name": "--slider-track-color"
             },
