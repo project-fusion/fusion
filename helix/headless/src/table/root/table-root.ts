@@ -50,7 +50,13 @@ export class HelixBaseTable extends HelixElement {
 
   /** The columns declared as children, in the order they are written. */
   get tableColumns(): HelixBaseTableColumn[] {
-    return [...this.children].filter(
+    /* `?? []` is the server. Lit's element shim carries attributes and not a
+       tree, so `children` is undefined there, and this getter is reached from
+       `template`, which is read during `render`: spreading it threw and the
+       whole SSR suite died on an unhandled error. The same fault the menu item
+       had, in code written after it was fixed there, which is the argument for
+       the SSR specs existing at all. */
+    return [...(this.children ?? [])].filter(
       (child): child is HelixBaseTableColumn =>
         'isTableColumn' in child && child.isTableColumn === true,
     )
