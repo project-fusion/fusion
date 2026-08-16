@@ -2,7 +2,12 @@
   --_avatar-size: var(--avatar-size, var(--helix-size-control-md));
 
   align-items: center;
-  background-color: var(--avatar-background-color, var(--helix-color-primary-subtle));
+  /* Grey, not a brand tint. An avatar with no picture is a placeholder for a
+     person, and `primary-subtle` made every one of them look like it meant
+     something. `surface-raised` rather than `sunken`, because sunken is
+     `neutral-950` in dark mode and an avatar on a `neutral-1000` page all but
+     disappeared; raised separates from the page in both directions. */
+  background-color: var(--avatar-background-color, var(--helix-color-surface-raised));
   block-size: var(--_avatar-size);
   border-radius: var(--helix-radii-full);
   color: var(--helix-color-foreground);

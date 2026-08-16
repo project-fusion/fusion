@@ -132,7 +132,14 @@
   /* ------------------------------------------------------- status ------ */
   --_helix-info-500: oklch(0.58 0.16 245);
   --_helix-success-500: oklch(0.58 0.15 155);
-  --_helix-warning-500: oklch(0.72 0.16 75);
+  /* Deeper and more chromatic than it was, which is a contrast fix rather than
+     a taste one. At `l 0.72` it measured 2.54:1 as a border on the page and
+     2.32:1 as an icon on a callout's own tint, both under the 3:1 a non-text
+     mark needs, and it was the only severity that failed. The hue is unmoved at
+     75, so it is the same amber: lightness carries the contrast and the extra
+     chroma keeps it from reading as brown on the way down. Measured after:
+     3.31 on the tint, 3.74 as a border, 3.74 on a light toast. */
+  --_helix-warning-500: oklch(0.62 0.185 75);
   --_helix-danger-500: oklch(0.57 0.21 27);
   /* The dark arms, derived rather than picked, the same `l + 0.12` the brand
      ramp uses. A severity had exactly one value each, which is what a colour
