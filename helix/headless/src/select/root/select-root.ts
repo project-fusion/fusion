@@ -7,8 +7,10 @@ import {
   MixinField,
   PopoverController,
 } from '@helix-io/core'
+import { caretDown } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixBaseListbox } from '../../listbox/root/listbox-root.js'
 import '../../listbox/index.js'
 
@@ -46,6 +48,7 @@ import '../../listbox/index.js'
  *
  * @csspart label - The question, over the trigger.
  * @csspart value - The chosen option's text inside the trigger.
+ * @csspart indicator - The caret saying the control opens. Replaced by slotting one.
  * @csspart trigger - The closed control, which says what is chosen.
  * @csspart surface - The floating panel.
  * @csspart listbox - The list inside it.
@@ -253,7 +256,19 @@ export class HelixBaseSelect extends MixinControllerOpen(
         @keydown=${this.handleTriggerKeydown}
       >
         <span part="value">${this.display}</span>
-        <slot name="indicator"></slot>
+        ${
+          /* The slot has a fallback, and had none: a select written without a
+             hand-slotted icon drew no mark at all saying it opens, and every
+             example in the family passes one, which is what hid it. A caret is
+             the mark, and slotting anything replaces it, which is this
+             library's rule for a content property. */
+          ''
+        }
+        <slot name="indicator">
+          <svg part="indicator" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
+            ${unsafeSVG(caretDown.content)}
+          </svg>
+        </slot>
       </button>
 
       <div part="surface" popover="manual" ?hidden=${!this.open}>

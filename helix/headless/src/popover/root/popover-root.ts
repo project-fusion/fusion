@@ -2,6 +2,7 @@ import {
   anchorElement,
   CommandController,
   customElement,
+  deepActiveElement,
   HelixElement,
   MixinControllerOpen,
   type Placement,
@@ -151,7 +152,11 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
        dismissed by a press somewhere else has not taken focus with it, and
        pulling focus back to the trigger would move a reader who was already
        somewhere else on purpose. */
-    if (this.contains(document.activeElement)) {
+    /* `deepActiveElement`, which walks into shadow roots. `document.activeElement`
+       stops at the outermost host, so a popover living inside another
+       component's shadow root never saw its own focus and never gave it back to
+       the trigger. The util exists for this. */
+    if (this.contains(deepActiveElement())) {
       this.trigger.focus()
     }
   }

@@ -48,7 +48,10 @@ import { HelixBaseDrilldownItem } from '../item/drilldown-item.js'
 export class HelixBaseDrilldown extends HelixElement {
   /** Accessible name for the region. */
   @property()
-  label = 'Menu'
+  /* Not "Menu", which is what it was: this component's own description is built
+     around not being one, and a default accessible name is the one place that
+     claim reaches a reader. */
+  label = 'Navigation'
 
   /** What the control returning from a page reads. */
   @property({ attribute: 'back-label' })

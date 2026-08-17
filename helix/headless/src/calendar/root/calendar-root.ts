@@ -524,15 +524,49 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
     return Math.max(1, Math.floor(this.months) || 1)
   }
 
-  private renderMonth(month: Date, index: number): TemplateResult {
+  /**
+   * The three date formatters, built once per locale rather than per render.
+   *
+   * `Intl.DateTimeFormat` is expensive to construct and these depend on nothing
+   * but `locale`, and they were built inside the per-month render: three
+   * constructions for every month on show, on every update, so a two-month
+   * calendar rebuilt six of them each time an arrow key moved the anchor.
+   * Measured elsewhere at about a quarter of a millisecond apiece, which is not
+   * a crisis and is pure waste.
+   *
+   * Keyed on the locale so a change to it is picked up, which a plain lazy
+   * field would not do.
+   */
+  private cachedFormats:
+    | {
+        full: Intl.DateTimeFormat
+        heading: Intl.DateTimeFormat
+        locale: string
+        weekday: Intl.DateTimeFormat
+      }
+    | undefined
+
+  private get formats(): {
+    full: Intl.DateTimeFormat
+    heading: Intl.DateTimeFormat
+    weekday: Intl.DateTimeFormat
+  } {
+    if (this.cachedFormats?.locale === this.locale) {
+      return this.cachedFormats
+    }
     const locale = this.locale || undefined
-    const heading = new Intl.DateTimeFormat(locale, {
-      month: 'long',
-      timeZone: 'UTC',
-      year: 'numeric',
-    })
-    const weekday = new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short' })
-    const full = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' })
+    const built = {
+      full: new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }),
+      heading: new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC', year: 'numeric' }),
+      locale: this.locale,
+      weekday: new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short' }),
+    }
+    this.cachedFormats = built
+    return built
+  }
+
+  private renderMonth(month: Date, index: number): TemplateResult {
+    const { full, heading, weekday } = this.formats
     const weeks = this.weeksOf(month)
     const anchor = toIso(this.anchor)
     /* Today, which nothing marked at all: not in the accessibility tree, where

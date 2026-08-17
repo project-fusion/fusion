@@ -848,7 +848,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | --- | --- | --- |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `HelixBaseCheckbox` | Returns the box to the state its markup declared. |
-| `formStateRestoreCallback()` | `HelixBaseCheckbox` | Restores the box when the browser brings a form back. |
+| `formStateRestoreCallback()` | `MixinControllerChecked` | Restores the control when the browser brings a form back. |
 | `requestChecked()` | `MixinControllerChecked` | Requests a checked change, and reports whether it was applied. |
 | `resetChecked()` | `MixinControllerChecked` | Drops the uncontrolled state, so the control reads `defaultChecked` again. |
 | `toggleChecked()` | `MixinControllerChecked` | Requests the opposite of the current state. |
@@ -1120,7 +1120,7 @@ from: the page arriving was not in the DOM a frame ago. Under
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseDrilldown` | What the control returning from a page reads. |
-| `label` | `label` | `string` | `'Menu'` | `HelixBaseDrilldown` | Accessible name for the region. |
+| `label` | `label` | `string` | `'Navigation'` | `HelixBaseDrilldown` | Accessible name for the region. |
 
 #### Methods
 
@@ -2331,6 +2331,7 @@ from the field it came out of.
 | --- | --- |
 | `label` | The question, over the trigger. |
 | `value` | The chosen option's text inside the trigger. |
+| `indicator` | The caret saying the control opens. Replaced by slotting one. |
 | `trigger` | The closed control, which says what is chosen. |
 | `surface` | The floating panel. |
 | `listbox` | The list inside it. |
@@ -2608,6 +2609,7 @@ consumer has to keep.
 | --- | --- | --- |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `HelixBaseSwitch` | Returns the switch to the state its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerChecked` | Restores the control when the browser brings a form back. |
 | `requestChecked()` | `MixinControllerChecked` | Requests a checked change, and reports whether it was applied. |
 | `resetChecked()` | `MixinControllerChecked` | Drops the uncontrolled state, so the control reads `defaultChecked` again. |
 | `toggleChecked()` | `MixinControllerChecked` | Requests the opposite of the current state. |

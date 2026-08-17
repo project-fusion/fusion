@@ -240,3 +240,14 @@
     transition: none;
   }
 }
+
+/* The fallback caret, sized. An `<svg>` with no dimensions fills the box it is
+   given, and this one sat in a flex trigger with room to spare: measured at 247
+   pixels wide before this. A slotted `helix-icon` brings its own size, which is
+   why this only showed on the fallback. */
+[part="indicator"] {
+  block-size: var(--helix-size-icon-sm);
+  color: var(--helix-color-foreground-muted);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-sm);
+}

@@ -3302,6 +3302,24 @@
               "readonly": true
             },
             {
+              "kind": "field",
+              "name": "cachedFormats",
+              "type": {
+                "text": "| {\n        full: Intl.DateTimeFormat\n        heading: Intl.DateTimeFormat\n        locale: string\n        weekday: Intl.DateTimeFormat\n      }\n    | undefined"
+              },
+              "privacy": "private",
+              "description": "The three date formatters, built once per locale rather than per render.\n\n`Intl.DateTimeFormat` is expensive to construct and these depend on nothing\nbut `locale`, and they were built inside the per-month render: three\nconstructions for every month on show, on every update, so a two-month\ncalendar rebuilt six of them each time an arrow key moved the anchor.\nMeasured elsewhere at about a quarter of a millisecond apiece, which is not\na crisis and is pure waste.\n\nKeyed on the locale so a change to it is picked up, which a plain lazy\nfield would not do."
+            },
+            {
+              "kind": "field",
+              "name": "formats",
+              "type": {
+                "text": "{\n    full: Intl.DateTimeFormat\n    heading: Intl.DateTimeFormat\n    weekday: Intl.DateTimeFormat\n  }"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
               "kind": "method",
               "name": "renderMonth",
               "privacy": "private",
@@ -5372,27 +5390,6 @@
               }
             },
             {
-              "kind": "method",
-              "name": "formStateRestoreCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "state",
-                  "type": {
-                    "text": "string | null"
-                  }
-                }
-              ],
-              "description": "Restores the box when the browser brings a form back.",
-              "type": {
-                "text": "formStateRestoreCallback(state: string | null) => void"
-              }
-            },
-            {
               "kind": "field",
               "name": "handleLabelChange",
               "privacy": "private",
@@ -5531,6 +5528,31 @@
               },
               "type": {
                 "text": "toggleChecked() => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the control when the browser brings a form back.\n\nHand-written on the checkbox and nowhere else, so `Switch`, the mixin's\nonly other consumer, had no restore at all: a reader who navigated away\nand came back to a restored form found their switch flipped off. The\nmixin owns `checked`, so the mixin owns putting it back.\n\nThrough `checked` rather than the private state, so a controlled consumer\nis asked the same way every other change asks.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
               }
             },
             {
@@ -7515,7 +7537,7 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Menu'",
+              "default": "'Navigation'",
               "description": "Accessible name for the region.",
               "attribute": "label"
             },
@@ -7734,7 +7756,7 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Menu'",
+              "default": "'Navigation'",
               "description": "Accessible name for the region.",
               "fieldName": "label"
             },
@@ -15503,6 +15525,10 @@
               "name": "value"
             },
             {
+              "description": "The caret saying the control opens. Replaced by slotting one.",
+              "name": "indicator"
+            },
+            {
               "description": "The closed control, which says what is chosen.",
               "name": "trigger"
             },
@@ -18383,6 +18409,31 @@
               },
               "type": {
                 "text": "toggleChecked() => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the control when the browser brings a form back.\n\nHand-written on the checkbox and nowhere else, so `Switch`, the mixin's\nonly other consumer, had no restore at all: a reader who navigated away\nand came back to a restored form found their switch flipped off. The\nmixin owns `checked`, so the mixin owns putting it back.\n\nThrough `checked` rather than the private state, so a controlled consumer\nis asked the same way every other change asks.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
               }
             },
             {

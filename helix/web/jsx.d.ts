@@ -6907,6 +6907,15 @@ export type CustomElements = {
    * and waits for the consumer to pass a new `checked`, which is what
    * "controlled" means.
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
+   *
+   * Hand-written on the checkbox and nowhere else, so `Switch`, the mixin's
+   * only other consumer, had no restore at all: a reader who navigated away
+   * and came back to a restored form found their switch flipped off. The
+   * mixin owns `checked`, so the mixin owns putting it back.
+   *
+   * Through `checked` rather than the private state, so a controlled consumer
+   * is asked the same way every other change asks.
    * - `resetChecked() => void`: Drops the uncontrolled state, so the control reads `defaultChecked`
    * again.
    *
@@ -6914,7 +6923,6 @@ export type CustomElements = {
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
    * - `formResetCallback() => void`: Returns the box to the state its markup declared.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the box when the browser brings a form back.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Custom Properties
@@ -8872,6 +8880,7 @@ export type CustomElements = {
    *
    * - `label`: The question, over the trigger.
    * - `value`: The chosen option's text inside the trigger.
+   * - `indicator`: The caret saying the control opens. Replaced by slotting one.
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -9276,6 +9285,15 @@ export type CustomElements = {
    * and waits for the consumer to pass a new `checked`, which is what
    * "controlled" means.
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
+   *
+   * Hand-written on the checkbox and nowhere else, so `Switch`, the mixin's
+   * only other consumer, had no restore at all: a reader who navigated away
+   * and came back to a restored form found their switch flipped off. The
+   * mixin owns `checked`, so the mixin owns putting it back.
+   *
+   * Through `checked` rather than the private state, so a controlled consumer
+   * is asked the same way every other change asks.
    * - `resetChecked() => void`: Drops the uncontrolled state, so the control reads `defaultChecked`
    * again.
    *
@@ -11757,6 +11775,15 @@ export type CustomElementsSolidJs = {
    * and waits for the consumer to pass a new `checked`, which is what
    * "controlled" means.
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
+   *
+   * Hand-written on the checkbox and nowhere else, so `Switch`, the mixin's
+   * only other consumer, had no restore at all: a reader who navigated away
+   * and came back to a restored form found their switch flipped off. The
+   * mixin owns `checked`, so the mixin owns putting it back.
+   *
+   * Through `checked` rather than the private state, so a controlled consumer
+   * is asked the same way every other change asks.
    * - `resetChecked() => void`: Drops the uncontrolled state, so the control reads `defaultChecked`
    * again.
    *
@@ -11764,7 +11791,6 @@ export type CustomElementsSolidJs = {
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
    * - `formResetCallback() => void`: Returns the box to the state its markup declared.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the box when the browser brings a form back.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Custom Properties
@@ -13805,6 +13831,7 @@ export type CustomElementsSolidJs = {
    *
    * - `label`: The question, over the trigger.
    * - `value`: The chosen option's text inside the trigger.
+   * - `indicator`: The caret saying the control opens. Replaced by slotting one.
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -14226,6 +14253,15 @@ export type CustomElementsSolidJs = {
    * and waits for the consumer to pass a new `checked`, which is what
    * "controlled" means.
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
+   *
+   * Hand-written on the checkbox and nowhere else, so `Switch`, the mixin's
+   * only other consumer, had no restore at all: a reader who navigated away
+   * and came back to a restored form found their switch flipped off. The
+   * mixin owns `checked`, so the mixin owns putting it back.
+   *
+   * Through `checked` rather than the private state, so a controlled consumer
+   * is asked the same way every other change asks.
    * - `resetChecked() => void`: Drops the uncontrolled state, so the control reads `defaultChecked`
    * again.
    *

@@ -200,6 +200,21 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     }
 
     /**
+     * Restores the control when the browser brings a form back.
+     *
+     * Hand-written on the checkbox and nowhere else, so `Switch`, the mixin's
+     * only other consumer, had no restore at all: a reader who navigated away
+     * and came back to a restored form found their switch flipped off. The
+     * mixin owns `checked`, so the mixin owns putting it back.
+     *
+     * Through `checked` rather than the private state, so a controlled consumer
+     * is asked the same way every other change asks.
+     */
+    formStateRestoreCallback(state: string | null): void {
+      this.checked = state !== null
+    }
+
+    /**
      * Drops the uncontrolled state, so the control reads `defaultChecked`
      * again.
      *

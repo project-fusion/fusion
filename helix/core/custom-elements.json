@@ -2531,6 +2531,24 @@
             },
             {
               "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the control when the browser brings a form back.\n\nHand-written on the checkbox and nowhere else, so `Switch`, the mixin's\nonly other consumer, had no restore at all: a reader who navigated away\nand came back to a restored form found their switch flipped off. The\nmixin owns `checked`, so the mixin owns putting it back.\n\nThrough `checked` rather than the private state, so a controlled consumer\nis asked the same way every other change asks."
+            },
+            {
+              "kind": "method",
               "name": "resetChecked",
               "return": {
                 "type": {

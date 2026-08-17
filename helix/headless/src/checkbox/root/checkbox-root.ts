@@ -105,11 +105,6 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
     this.resetChecked()
   }
 
-  /** Restores the box when the browser brings a form back. */
-  formStateRestoreCallback(state: string | null): void {
-    this.checked = state !== null
-  }
-
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaRequired = this.required ? 'true' : null
