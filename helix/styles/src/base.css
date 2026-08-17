@@ -827,8 +827,23 @@ helix-toggle[disabled]::part(item) {
   font-weight: var(--helix-weight-semibold);
 }
 
-/* Nesting, said by the consumer. Multiplied rather than enumerated, so a page
-   with five levels needs no rule adding here. */
+/* Nesting, said by the consumer.
+ *
+ * The comment here read "multiplied rather than enumerated, so a page with five
+ * levels needs no rule adding", and the rules under it were enumerated and
+ * stopped at three: `data-level="4"` got no indent at all and sat flush with
+ * the top-level links, which is the one thing the attribute exists to prevent.
+ *
+ * Still enumerated, and the comment is what changed. Typed `attr()` would make
+ * it one rule for every depth and it works: measured in this Chromium,
+ * `CSS.supports` is true and levels one through five came out at 12, 24, 36, 48
+ * and 60 pixels. It is also the newest thing this library would depend on, and
+ * where it is missing the whole `calc()` is invalid and the declaration drops,
+ * so every nested link would lose its indent rather than gaining an approximate
+ * one. Enumeration fails at level seven; that fails everywhere at once.
+ *
+ * Six is the depth of an HTML outline, which is what a contents list is made
+ * of, so there is no seventh level to write. */
 :where(helix-page-nav a[data-level="2"]) {
   padding-inline-start: calc(var(--helix-space-sm) + var(--page-nav-indent, var(--helix-space-sm)));
 }
@@ -837,6 +852,30 @@ helix-toggle[disabled]::part(item) {
   padding-inline-start: calc(
     var(--helix-space-sm) +
     2 *
+    var(--page-nav-indent, var(--helix-space-sm))
+  );
+}
+
+:where(helix-page-nav a[data-level="4"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    3 *
+    var(--page-nav-indent, var(--helix-space-sm))
+  );
+}
+
+:where(helix-page-nav a[data-level="5"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    4 *
+    var(--page-nav-indent, var(--helix-space-sm))
+  );
+}
+
+:where(helix-page-nav a[data-level="6"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    5 *
     var(--page-nav-indent, var(--helix-space-sm))
   );
 }
@@ -944,6 +983,12 @@ helix-toggle[disabled]::part(item) {
  * flush against the border, so the two read as one 3px ring rather than as a
  * ring with a gap in it.
  *
+ * And the ring is the whole signal. There was a `shadow-md` here too, which
+ * put three things on one hover: a coloured ring, a cast shadow, and whatever
+ * the card's own content does. A shadow says "this is above the page", which
+ * the card already was, so it was answering a question nobody asked while the
+ * ring answered the real one.
+ *
  * **Focus still wins, and it has to.** `:where(:focus-visible)` further down
  * this file sets the same property at the same zero specificity, and later
  * wins, so a focused card keeps the focus ring's own 2px offset. That offset is
@@ -953,13 +998,12 @@ helix-toggle[disabled]::part(item) {
  * cannot tell where they are. */
 :where([data-card]):hover {
   --card-border-color: var(--helix-color-primary);
-  --card-shadow: var(--helix-shadow-md);
   outline: 2px solid var(--helix-color-primary);
   outline-offset: 0;
 }
 
 :where([data-card])[aria-current] {
-  --card-border-color: var(--helix-color-border-accent);
+  --card-border-color: var(--helix-color-primary);
 }
 
 /* The toast is the opposite of the page it is over.

@@ -72,6 +72,22 @@
   --_progress-cycle: calc(var(--helix-duration-slow) * 5);
 }
 
+/* The travel is signed, because `translate` is physical and the track is not.
+ *
+ * `:dir(rtl)` flips `transform-origin` above and there is no logical form of
+ * `translate`, so the segment kept moving left-to-right: it grew out of the
+ * inline-start edge, which in a right-to-left document is the right, and then
+ * travelled away from the track instead of across it. One custom property
+ * carries the sign and the keyframes read it, which keeps one set of frames
+ * rather than two that can drift. */
+:host([indeterminate]) [part="indicator"] {
+  --_progress-way: 1;
+}
+
+:host([indeterminate]:dir(rtl)) [part="indicator"] {
+  --_progress-way: -1;
+}
+
 @keyframes helix-progress-indeterminate {
   0% {
     scale: 0 1;
@@ -85,12 +101,12 @@
 
   60% {
     scale: 0.6 1;
-    translate: 40%;
+    translate: calc(40% * var(--_progress-way, 1));
   }
 
   100% {
     scale: 0 1;
-    translate: 100%;
+    translate: calc(100% * var(--_progress-way, 1));
   }
 }
 

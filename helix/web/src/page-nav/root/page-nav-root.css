@@ -27,7 +27,15 @@
    meant to replace and the pair read as two lines. */
 [part="nav"] {
   background-image: linear-gradient(var(--helix-color-border), var(--helix-color-border));
-  background-position-x: calc((var(--page-nav-rail) - var(--helix-border-thin)) / 2);
+  /* Logical, like everything else about this gutter.
+   *
+   * `background-position-x` is physical, and every other half of the same
+   * gutter, the mark's `inset-inline-start`, the links' inline padding, is
+   * logical: in a right-to-left document the hairline sat on the far side of
+   * the component from the mark that is meant to cover it, so the pair read as
+   * two lines with the list between them. `background-position` takes a side
+   * keyword, and `inline-start` is the one that follows the text. */
+  background-position: calc((var(--page-nav-rail) - var(--helix-border-thin)) / 2) 0;
   background-repeat: repeat-y;
   background-size: var(--helix-border-thin) 100%;
   display: flex;

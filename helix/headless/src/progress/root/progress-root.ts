@@ -6,11 +6,15 @@ import { property } from 'lit/decorators.js'
  * @summary Shows how far along a task is, when that is known.
  *
  * @description
- * Determinate only. `Spinner` is what says something is happening without
- * saying how much of it is done, and a bar that fills at a made-up rate to
- * cover the same case is a bar that lies: a reader takes a position along a
- * track as a proportion, and it is the one thing the component is for. A task
- * whose total is unknown wants the spinner.
+ * Determinate by default, and `indeterminate` for a task whose total is not
+ * known yet. `Spinner` is still the right answer where the wait is short or has
+ * no place of its own on the page; a bar earns its width where the work is the
+ * subject of the region it sits in.
+ *
+ * A bar that fills at a made-up rate would be a bar that lies, so the
+ * indeterminate one does not fill: it runs a segment across the track, which
+ * says work is happening and claims no proportion at all. `aria-valuenow` is
+ * omitted with it, which is the platform's own signal for the same thing.
  *
  * **The fill is a percentage of the track, written as a custom property.** It
  * is derived from `value` and `max` rather than measured, so it renders on a
@@ -84,7 +88,15 @@ export class HelixBaseProgress extends HelixElement {
   /** What is done, as a fraction of the whole, between 0 and 1. */
   get fraction(): number {
     const max = this.max > 0 ? this.max : 100
-    return Math.min(Math.max(this.value / max, 0), 1)
+    /* `|| 0` catches the value that is not a number.
+     *
+     * `undefined / 100` is `NaN`, `Math.min(Math.max(NaN, 0), 1)` is `NaN`, and
+     * `NaN` reached CSS as `scale: NaN`, which is an invalid value the
+     * declaration is dropped for: the bar fell back to its unscaled width and
+     * painted COMPLETE for a value nobody had given. `aria-valuenow` announced
+     * the string "NaN" beside it. Empty means nothing done, which is the only
+     * reading that is not a claim. */
+    return Math.min(Math.max(this.value / max, 0), 1) || 0
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -101,9 +113,17 @@ export class HelixBaseProgress extends HelixElement {
        is being updated, which is a different claim. Reporting 0 would announce
        "0 percent" for work that is running, which is worse than saying nothing
        because it is wrong rather than unknown. */
+    /* The clamped value itself, not the fraction multiplied back up.
+     *
+     * Dividing by `max` and then multiplying by it is a round trip through a
+     * float, and for roughly one integer pair in sixteen it does not come back:
+     * `1/3*3` is `0.9999999999999998`, which is what the accessibility tree
+     * carried and what a screen reader read out. Clamping the value directly
+     * says the same thing without the detour. */
+    const ceiling = this.max > 0 ? this.max : 100
     this.internals.ariaValueNow = this.indeterminate
       ? null
-      : String(this.fraction * (this.max > 0 ? this.max : 100))
+      : String(Math.min(Math.max(this.value || 0, 0), ceiling))
     this.internals.ariaValueText = this.valueText || null
   }
 

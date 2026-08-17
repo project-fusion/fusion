@@ -151,7 +151,16 @@ export class HelixBasePageNav extends HelixElement {
    */
   private watch(): void {
     this.observer?.disconnect()
+    /* Nothing to watch yet is not nothing to watch ever.
+     *
+     * This returned when no href resolved at first update, having already
+     * disconnected the observer, and only `slotchange` ever called it again: a
+     * page whose sections arrive after the nav does, which is every page that
+     * renders its content asynchronously, left the component dead for good. The
+     * observer is left disconnected either way, so re-running is the whole of
+     * the fix, and `updated` re-runs it while there is nothing to watch. */
     if (this.sections.length === 0) {
+      this.observer = undefined
       return
     }
     this.observer = new IntersectionObserver(() => this.mark(), {
@@ -184,6 +193,24 @@ export class HelixBasePageNav extends HelixElement {
     this.resize = undefined
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback()
+    /* Both observers are rebuilt on reconnection, and neither was.
+     *
+     * They were created in `firstUpdated`, which runs once for the life of the
+     * element, and torn down in `disconnectedCallback`, which runs every time it
+     * moves. So a page-nav moved in the DOM, which a framework does on any
+     * reorder, came back permanently frozen: `aria-current`, `current` and the
+     * travelling mark all stopped for the rest of the page's life with nothing
+     * to say why. Guarded on `hasUpdated`, because the first connection happens
+     * before the first render and there is nothing to watch yet. */
+    if (this.hasUpdated) {
+      this.watch()
+      this.resize = new ResizeObserver(() => this.indicator.place())
+      this.resize.observe(this)
+    }
+  }
+
   protected override firstUpdated(): void {
     this.watch()
     /* The links are text in a column, so anything that changes the column's
@@ -202,6 +229,12 @@ export class HelixBasePageNav extends HelixElement {
        means rather than whether anything did. */
     if (changed.has('offset')) {
       this.mark()
+    }
+    /* Try again while there is nothing being watched. Cheap: `watch` returns on
+       the first line once it has something, and this is the only path back for
+       a nav whose sections had not rendered when it first looked. */
+    if (!this.observer) {
+      this.watch()
     }
     /* After the render that applied the new `aria-current`, not inside `mark()`
        beside the attribute write. The current link is styled differently, and
