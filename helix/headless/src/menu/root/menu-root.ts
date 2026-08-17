@@ -121,7 +121,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
       return
     }
     this.updateComplete.then(() => {
-      this.panel.show()
+      // Raised in `updated()`, which the state change has just scheduled.
       this.items[0]?.focus()
     })
   }
@@ -247,6 +247,19 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* Put the panel where `open` says, however it got there. `show()` and
+       `hide()` raised and lowered it and nothing else did, so a menu opened by
+       declaring `open` rendered visible, out of the top layer and unanchored:
+       every imperative path worked and every declarative one was half-open. */
+    if (changed.has('open')) {
+      /* Here rather than a microtask later: `updated()` runs after the render,
+         so the panel is no longer `display: none` and `showPopover` is safe. */
+      if (this.open) {
+        this.panel.show()
+      } else {
+        this.panel.hide()
+      }
+    }
     // Every item shows or hides itself: which page is open is this element's
     // business, and where an item belongs is the item's. Set as a property, so
     // nothing is written onto a consumer's element.

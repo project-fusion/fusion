@@ -105,9 +105,8 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
     if (this.open || !this.requestOpen(true)) {
       return
     }
-    // After the render that unhides it: `showPopover` on an element still
-    // `display: none` throws, and measuring one gives zeroes.
-    this.updateComplete.then(() => this.panel.show())
+    // The raising happens in `updated()`, which `requestOpen` has just
+    // scheduled: one path for both the imperative and the declarative case.
   }
 
   /** Closes the panel and puts focus back on the trigger. */
@@ -130,6 +129,38 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
       this.hide()
     } else {
       this.show()
+    }
+  }
+
+  /**
+   * Puts the panel where `open` says it should be, however it got there.
+   *
+   * `show()` and `hide()` raised and lowered it, and nothing else did, so a
+   * panel opened by *declaring* `open` (or `default-open`, or a consumer
+   * assigning the property) rendered visible and was never in the top layer and
+   * never anchored. Every imperative path worked and every declarative one was
+   * quietly half-open: clipped by the first ancestor with `overflow`, and
+   * positioned wherever normal flow left it.
+   *
+   * Driving the controller from the resolved state rather than from the two
+   * methods is what makes the two paths the same path. The controller ignores a
+   * `show()` on something already raised, so this costs nothing when the
+   * methods did the work.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (!changed.has('open')) {
+      return
+    }
+    /* Raised here rather than a microtask later, and `updated()` is what makes
+       that safe: the render has already been written, so the panel is no longer
+       `display: none` and `showPopover` will not throw on it. The old
+       `show()` deferred to `updateComplete` precisely because it ran *before*
+       the render; from here there is nothing left to wait for. */
+    if (this.open) {
+      this.panel.show()
+    } else {
+      this.panel.hide()
     }
   }
 
