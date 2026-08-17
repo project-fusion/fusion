@@ -80,7 +80,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
           </helix-text>
           <helix-flex align="center" data-density="sm" gap="xs" wrap>
             {family.status && (
-              <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'}>
+              <helix-tag tone={family.status === 'stable' ? 'success' : 'warning'}>
                 {startCase(family.status)}
               </helix-tag>
             )}

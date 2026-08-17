@@ -3873,7 +3873,26 @@ export type HelixTagHelixDismissElementEvent =
   HelixTagElementEvent<HelixDismissEvent>;
 
 export type HelixTagProps = {
-  /** Which status the tag reports. */
+  /** Which status the tag reports.
+
+This was called `appearance`, and it never was one. Everywhere else in the
+library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
+`tone` is semantic colour, which is what these five are and what
+`helix-text` already calls them. One axis was wearing the other's name, and
+the axis it should have held did not exist. */
+  tone?: HelixTag["tone"];
+  /** How much of the tone the tag wears.
+
+- `subtle` is the default: a wash of the tone with the label in it, for a
+  tag that labels something rather than warning about it.
+- `solid` fills with the tone and puts the label on top of it, for the one
+  that has to be seen first.
+- `outlined` is the tone at its edge only, for a dense set where filling
+  each of them turns a list into a mosaic.
+
+Independent of `tone` on purpose: an outlined danger tag and a solid danger
+tag are both sensible, and until these were two properties you could ask
+for neither, because colour and fill were welded together. */
   appearance?: HelixTag["appearance"];
   /** Whether it offers a control to take it away. */
   dismissible?: HelixTag["dismissible"];
@@ -3897,7 +3916,26 @@ would catch. */
 };
 
 export type HelixTagSolidJsProps = {
-  /** Which status the tag reports. */
+  /** Which status the tag reports.
+
+This was called `appearance`, and it never was one. Everywhere else in the
+library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
+`tone` is semantic colour, which is what these five are and what
+`helix-text` already calls them. One axis was wearing the other's name, and
+the axis it should have held did not exist. */
+  "prop:tone"?: HelixTag["tone"];
+  /** How much of the tone the tag wears.
+
+- `subtle` is the default: a wash of the tone with the label in it, for a
+  tag that labels something rather than warning about it.
+- `solid` fills with the tone and puts the label on top of it, for the one
+  that has to be seen first.
+- `outlined` is the tone at its edge only, for a dense set where filling
+  each of them turns a list into a mosaic.
+
+Independent of `tone` on purpose: an outlined danger tag and a solid danger
+tag are both sensible, and until these were two properties you could ask
+for neither, because colour and fill were welded together. */
   "prop:appearance"?: HelixTag["appearance"];
   /** Whether it offers a control to take it away. */
   "prop:dismissible"?: HelixTag["dismissible"];
@@ -8219,7 +8257,25 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Which status the tag reports.
+   * - `tone`: Which status the tag reports.
+   *
+   * This was called `appearance`, and it never was one. Everywhere else in the
+   * library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
+   * `tone` is semantic colour, which is what these five are and what
+   * `helix-text` already calls them. One axis was wearing the other's name, and
+   * the axis it should have held did not exist.
+   * - `appearance`: How much of the tone the tag wears.
+   *
+   * - `subtle` is the default: a wash of the tone with the label in it, for a
+   *   tag that labels something rather than warning about it.
+   * - `solid` fills with the tone and puts the label on top of it, for the one
+   *   that has to be seen first.
+   * - `outlined` is the tone at its edge only, for a dense set where filling
+   *   each of them turns a list into a mosaic.
+   *
+   * Independent of `tone` on purpose: an outlined danger tag and a solid danger
+   * tag are both sensible, and until these were two properties you could ask
+   * for neither, because colour and fill were welded together.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
@@ -12681,7 +12737,25 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Which status the tag reports.
+   * - `tone`: Which status the tag reports.
+   *
+   * This was called `appearance`, and it never was one. Everywhere else in the
+   * library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
+   * `tone` is semantic colour, which is what these five are and what
+   * `helix-text` already calls them. One axis was wearing the other's name, and
+   * the axis it should have held did not exist.
+   * - `appearance`: How much of the tone the tag wears.
+   *
+   * - `subtle` is the default: a wash of the tone with the label in it, for a
+   *   tag that labels something rather than warning about it.
+   * - `solid` fills with the tone and puts the label on top of it, for the one
+   *   that has to be seen first.
+   * - `outlined` is the tone at its edge only, for a dense set where filling
+   *   each of them turns a list into a mosaic.
+   *
+   * Independent of `tone` on purpose: an outlined danger tag and a solid danger
+   * tag are both sensible, and until these were two properties you could ask
+   * for neither, because colour and fill were welded together.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *

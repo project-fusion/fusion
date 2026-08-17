@@ -73,7 +73,7 @@ export default function Page() {
                     {family.label}
                   </helix-text>
                   {family.status && (
-                    <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'}>
+                    <helix-tag tone={family.status === 'stable' ? 'success' : 'warning'}>
                       {startCase(family.status)}
                     </helix-tag>
                   )}

@@ -176,9 +176,7 @@ export default function Home() {
                     <helix-text as="h3" class="verticalName">
                       {vertical.name}
                     </helix-text>
-                    <helix-tag appearance={stageAppearance(vertical.stage)}>
-                      {vertical.stage}
-                    </helix-tag>
+                    <helix-tag tone={stageAppearance(vertical.stage)}>{vertical.stage}</helix-tag>
                   </helix-flex>
                   <helix-text tone="muted">{vertical.summary}</helix-text>
                 </helix-flex>

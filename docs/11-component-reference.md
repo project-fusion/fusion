@@ -2825,9 +2825,10 @@ the status colors gets the tints with them.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'neutral' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| undefined` | - | - | Which status the tag reports. |
+| `appearance` | `appearance` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much of the tone the tag wears. |
 | `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
+| `tone` | `tone` | `'danger' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | - | Which status the tag reports. |
 
 #### Methods
 

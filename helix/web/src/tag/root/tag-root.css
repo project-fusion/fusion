@@ -3,14 +3,11 @@
    against a 40px control and a 32px dense one. */
 :host {
   align-items: center;
-  background-color: var(
-    --tag-background-color,
-    color-mix(in oklab, var(--_tag-color) 14%, transparent)
-  );
+  background-color: var(--tag-background-color, var(--_tag-fill));
   block-size: var(--_tag-height);
-  border: var(--helix-border-thin) solid color-mix(in oklab, var(--_tag-color) 28%, transparent);
+  border: var(--helix-border-thin) solid var(--_tag-edge);
   border-radius: var(--tag-radii, var(--helix-radii-sm));
-  color: var(--tag-foreground-color, var(--_tag-color));
+  color: var(--tag-foreground-color, var(--_tag-label));
   display: inline-flex;
   font-size: var(--_tag-text);
   font-weight: var(--helix-weight-medium);
@@ -28,21 +25,55 @@
   --_tag-color: var(--helix-color-foreground-muted);
   --_tag-text: var(--helix-text-xs);
   --_tag-inset: var(--helix-space-xs);
+
+  /* The default treatment, `subtle`, written here rather than behind an
+     attribute selector so a tag with no `appearance` needs no second rule.
+   *
+   * The label is the tone mixed *towards the foreground* rather than the tone
+   * itself. At full strength on a wash of the same hue, four of the five tones
+   * failed 4.5:1 at 12px: primary 3.68, success 3.33, warning 2.24, danger
+   * 4.00, with only neutral passing. That is what colouring text with a hue and
+   * then washing the background with the same hue does, and no choice of hue
+   * fixes it. Darkening the label is what opens the gap back up. */
+  --_tag-fill: color-mix(in oklab, var(--_tag-color) 14%, var(--helix-color-background));
+  --_tag-edge: color-mix(in oklab, var(--_tag-color) 28%, var(--helix-color-background));
+  --_tag-label: color-mix(in oklab, var(--_tag-color) 55%, var(--helix-color-foreground));
 }
 
-:host([appearance="primary"]) {
+/* Filled with the tone, label on top of it. `foreground-inverse` rather than a
+   per-tone choice: every tone at full strength is dark enough in light mode and
+   light enough in dark for the inverse of the page to read on it. */
+/* The fill is the tone taken a step towards the page's own foreground, not the
+   tone itself. At full strength `primary` measured 4.21:1 against an inverse
+   label, under the 4.5 that 12px text needs; every other tone cleared it. One
+   value short is still a failure, and darkening the fill fixes it for all of
+   them without a per-tone exception. */
+:host([appearance="solid"]) {
+  --_tag-fill: color-mix(in oklab, var(--_tag-color) 82%, var(--helix-color-foreground));
+  --_tag-edge: var(--_tag-fill);
+  --_tag-label: var(--helix-color-foreground-inverse);
+}
+
+/* The tone at its edge only. No fill, so a dense set of them stays a list
+   rather than becoming a mosaic. */
+:host([appearance="outlined"]) {
+  --_tag-fill: transparent;
+  --_tag-edge: color-mix(in oklab, var(--_tag-color) 45%, var(--helix-color-background));
+}
+
+:host([tone="primary"]) {
   --_tag-color: var(--helix-color-primary);
 }
 
-:host([appearance="success"]) {
+:host([tone="success"]) {
   --_tag-color: var(--helix-color-success);
 }
 
-:host([appearance="warning"]) {
+:host([tone="warning"]) {
   --_tag-color: var(--helix-color-warning);
 }
 
-:host([appearance="danger"]) {
+:host([tone="danger"]) {
   --_tag-color: var(--helix-color-danger);
 }
 

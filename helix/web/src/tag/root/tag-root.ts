@@ -29,9 +29,34 @@ import { styles } from './tag-root.css.js'
  */
 @customElement('helix-tag')
 export class HelixTag extends HelixBaseTag {
-  /** Which status the tag reports. */
+  /**
+   * Which status the tag reports.
+   *
+   * This was called `appearance`, and it never was one. Everywhere else in the
+   * library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
+   * `tone` is semantic colour, which is what these five are and what
+   * `helix-text` already calls them. One axis was wearing the other's name, and
+   * the axis it should have held did not exist.
+   */
   @property({ reflect: true })
-  appearance?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger'
+  tone?: 'danger' | 'neutral' | 'primary' | 'success' | 'warning'
+
+  /**
+   * How much of the tone the tag wears.
+   *
+   * - `subtle` is the default: a wash of the tone with the label in it, for a
+   *   tag that labels something rather than warning about it.
+   * - `solid` fills with the tone and puts the label on top of it, for the one
+   *   that has to be seen first.
+   * - `outlined` is the tone at its edge only, for a dense set where filling
+   *   each of them turns a list into a mosaic.
+   *
+   * Independent of `tone` on purpose: an outlined danger tag and a solid danger
+   * tag are both sensible, and until these were two properties you could ask
+   * for neither, because colour and fill were welded together.
+   */
+  @property({ reflect: true })
+  appearance?: 'outlined' | 'solid' | 'subtle'
 
   static override styles: CSSResultGroup = styles
 }

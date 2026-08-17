@@ -25019,11 +25019,21 @@
           "members": [
             {
               "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+              },
+              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic colour, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
+              "attribute": "tone",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'neutral' | 'primary' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "Which status the tag reports.",
+              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because colour and fill were welded together.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -25174,11 +25184,19 @@
           ],
           "attributes": [
             {
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+              },
+              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic colour, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
+              "fieldName": "tone"
+            },
+            {
               "name": "appearance",
               "type": {
-                "text": "'neutral' | 'primary' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "Which status the tag reports.",
+              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because colour and fill were welded together.",
               "fieldName": "appearance"
             },
             {

@@ -98,13 +98,18 @@
      outranks. Restored at each site because there is nowhere later to put
      it: any `*` rule loses to the one that did the unsetting. */
   box-sizing: border-box;
-  block-size: var(--helix-size-control-sm);
+  /* The glyph plus a small pad, not a control height. `control-sm` is 32px and
+     the band is about 37px tall, so the control very nearly filled it and read
+     as the loudest thing in a strip that is meant to be chrome. Derived from
+     the icon it contains rather than picked, so it stays proportionate if the
+     icon size moves. */
+  block-size: calc(var(--helix-size-icon) + var(--helix-space-2xs) * 2);
+  inline-size: calc(var(--helix-size-icon) + var(--helix-space-2xs) * 2);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
-  inline-size: var(--helix-size-control-sm);
   place-content: center;
   place-items: center;
   /* Out of flow, so the centred message is centred on the band and not on
