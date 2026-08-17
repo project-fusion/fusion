@@ -7,6 +7,16 @@ export interface PopoverOptions {
   anchor: () => HTMLElement | null | undefined
 
   /**
+   * The element that points at the anchor, where the surface has one.
+   *
+   * Passed through to the floating pass, which positions it against whichever
+   * side the surface ended up on. Optional because most surfaces have none: a
+   * menu and a select are read as belonging to the control they hang off, and
+   * only a bubble has to say which thing it is describing.
+   */
+  arrow?: () => HTMLElement | null | undefined
+
+  /**
    * What counts as inside for the purpose of a press landing elsewhere.
    *
    * Defaults to the surface. A host that draws no box of its own points this at
@@ -81,6 +91,7 @@ export class PopoverController implements ReactiveController {
     this.options = options
     this.floating = new FloatingController(host, {
       anchor: options.anchor,
+      ...(options.arrow === undefined ? {} : { arrow: options.arrow }),
       floating: options.surface,
       ...(options.offset === undefined ? {} : { offset: options.offset }),
       ...(options.placement === undefined ? {} : { placement: options.placement }),

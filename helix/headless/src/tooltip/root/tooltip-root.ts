@@ -1,9 +1,9 @@
 import {
   customElement,
-  FloatingController,
   HelixElement,
   MixinControllerOpen,
   type Placement,
+  PopoverController,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -105,12 +105,23 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     return (assigned[0] as HTMLElement | undefined) ?? this
   }
 
-  private readonly floating = new FloatingController(this, {
+  /* One controller rather than the pair this was: a `FloatingController` beside
+     hand-written `showPopover`/`hidePopover` calls, which is exactly the
+     composition `PopoverController` exists to own. Its own documentation named
+     the controller it was not using.
+   *
+   * The boundary is the host and not the bubble, for the reason `Popover` gives:
+   * the host is `display: contents`, so a press on the trigger is inside the
+   * host and outside the bubble, and a boundary of the bubble alone would treat
+   * the press that opened it as a press outside. */
+  private readonly bubbleLayer = new PopoverController(this, {
     anchor: () => this.trigger,
     arrow: () => this.renderRoot.querySelector<HTMLElement>('[part="arrow"]'),
-    floating: () => this.renderRoot.querySelector<HTMLElement>('[part="tooltip"]'),
+    boundary: () => this,
     offset: () => this.offset,
+    onDismiss: () => this.hide(),
     placement: () => this.placement,
+    surface: () => this.renderRoot.querySelector<HTMLElement>('[part="tooltip"]'),
   })
 
   private get bubble(): HTMLElement | null {
@@ -166,10 +177,8 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     if (!this.requestOpen(true)) {
       return
     }
-    this.updateComplete.then(() => {
-      this.bubble?.showPopover?.()
-      this.floating.start()
-    })
+    // Raised in `updated()`, which the state change has just scheduled: one
+    // path whether the bubble was opened by a pointer or by declaring `open`.
   }
 
   /** Hides the bubble. */
@@ -181,8 +190,7 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     if (!this.requestOpen(false)) {
       return
     }
-    this.bubble?.hidePopover?.()
-    this.floating.stop()
+    this.bubbleLayer.hide()
   }
 
   /** Shows after the pointer has rested for `delay`. */
@@ -228,6 +236,17 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* Raised and lowered from the resolved state, so a bubble opened by
+       declaring `open` takes the same path as one opened by a pointer. Here
+       rather than a microtask later: the render has been written, so the bubble
+       is no longer `display: none` and `showPopover` is safe on it. */
+    if (changed.has('open')) {
+      if (this.open) {
+        this.bubbleLayer.show()
+      } else {
+        this.bubbleLayer.hide()
+      }
+    }
     const bubble = this.bubble
     if (!bubble) {
       return
