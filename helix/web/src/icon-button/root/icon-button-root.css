@@ -44,6 +44,16 @@
   color: var(--helix-color-foreground-on-accent);
 }
 
+/* Named again for hover, for the reason `secondary` two rules down already
+   gives: `[part="button"]:hover` is two selectors' worth of specificity and the
+   appearance rule above is three, so the fill won in every state and the one
+   variant a reader is most likely to press was the one that never answered the
+   pointer. `Button` gets this from the base layer, which is why the difference
+   only shows here. */
+:host([appearance="primary"]) [part="button"]:hover {
+  background-color: var(--helix-color-primary-hover);
+}
+
 /* The filled one. A button that carries a surface and a border rather than
    waiting to be hovered, which is what a control standing beside a field wants:
    the field paints itself and a transparent button next to it reads as a box

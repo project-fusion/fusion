@@ -106,7 +106,12 @@
      for the reason the menu gives: a row's hover should reach the full width
      of the surface rather than stopping short of it. */
   padding: var(--drawer-inset, var(--helix-space-lg));
-  padding-block-start: var(--drawer-inset-block-start, var(--helix-space-2xl));
+  /* The block-start hook falls back to the general one rather than to the
+     token, so `--drawer-inset` governs all four sides as its own comment says
+     it does. It reached three: raising it moved the other three edges and left
+     the top where the close control had put it, which is the one edge a
+     consumer changing the inset is most likely to be looking at. */
+  padding-block-start: var(--drawer-inset-block-start, var(--drawer-inset, var(--helix-space-2xl)));
   display: flex;
   flex-direction: column;
   outline: none;

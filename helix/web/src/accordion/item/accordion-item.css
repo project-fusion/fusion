@@ -16,7 +16,13 @@
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
   inline-size: 100%;
-  justify-content: space-between;
+  /* No `space-between`. It pushed the first child to one end and the last to
+     the other, which is right while the chevron is last and wrong the moment it
+     is first: at `chevron-placement="start"` the glyph pinned to the inline
+     start and the label was flung to the inline end, leaving the trigger's
+     content split across the row. The label takes the room instead, through
+     `flex: 1` on the part below, which reads the same at either placement. */
+  gap: var(--helix-space-xs);
   min-block-size: var(--helix-size-control-md);
   padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -50,8 +56,16 @@
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host([chevron-placement="start"]) [part="chevron"] {
-  margin-inline-end: var(--helix-space-xs);
+/* Pushed to the far end only where it belongs there.
+ *
+ * `space-between` on the trigger did this by pushing the first child one way
+ * and the last the other, which is right while the chevron is last and wrong
+ * the moment it is first: at `chevron-placement="start"` the glyph pinned to
+ * the inline start and the label was flung to the inline end, leaving the
+ * trigger split across the row. The render already puts the chevron on the
+ * correct side, so all that is left is a margin on the end placement. */
+:host(:not([chevron-placement="start"])) [part="chevron"] {
+  margin-inline-start: auto;
 }
 
 :host([data-open]) [part="chevron"] {

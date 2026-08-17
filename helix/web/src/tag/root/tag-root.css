@@ -93,6 +93,13 @@
  * padding puts the visible gap back at the inset on both sides and leaves the
  * control the same size to press. */
 [part="dismiss"] {
+  /* `font: inherit` first, or the `em` below is not the tag's em.
+   *
+   * The glyph is sized in `em` inside a `<button>`, and a button's font is the
+   * UA's rather than the page's: `0.85em` resolved against 13.333px in Chromium
+   * regardless of the tag's own size, so the cross was the same size on a small
+   * tag and a large one and wrong on both. */
+  font: inherit;
   background: none;
   border: none;
   border-radius: var(--helix-radii-sm);
