@@ -62,12 +62,27 @@
   inline-size: var(--helix-size-icon);
 }
 
+/* The mark is monotone, and checked is a step in strength rather than a change
+ * of hue.
+ *
+ * It was `--helix-color-primary`, which is the one colour on a menu that means
+ * "this is the action" and was here meaning "this is on". A row of settings with
+ * three things enabled came out with three brand-coloured ticks down the side,
+ * reading as three recommendations. Nothing else in a dropdown does this:
+ * `Option`'s tick is `currentColor`, so a listbox's answer has always been drawn
+ * in the row's own ink.
+ *
+ * The colour only has to be legible, not comparative: an unchecked row renders
+ * an empty `<span part="mark">` as a spacer rather than a grey tick, so the
+ * mark's *presence* is the whole of the state. `foreground-subtle` stays on the
+ * rule above because the other thing wearing this part is the submenu caret,
+ * which should be quiet. */
 svg[part="mark"] {
   color: var(--helix-color-foreground-subtle);
 }
 
 :host([checked]) svg[part="mark"] {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-foreground);
 }
 
 /* A submenu is shown by the menu, on its own rows, so this element renders
