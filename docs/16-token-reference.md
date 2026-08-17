@@ -65,12 +65,12 @@ The spacing scale, used for gaps, padding and margins alike.
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 101 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 145 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 118 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 119 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 112 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 64 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 65 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 52 |
-| `--helix-space-xl` | `var(--_helix-scale-8)` | 18 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 26 |
+| `--helix-space-xl` | `var(--_helix-scale-8)` | 19 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 27 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 3 |
 
 ## radii

@@ -17486,6 +17486,20 @@
             },
             {
               "kind": "field",
+              "name": "behavior",
+              "type": {
+                "text": "ScrollBehavior"
+              },
+              "default": "'auto'",
+              "description": "How a click on one of these links travels to its section.\n\nThe platform's own vocabulary, because this is the platform's own option:\n`auto` defers to whatever `scroll-behavior` the page has set on its scroll\ncontainer, which is the honest default and means an outline changes nothing\na consumer did not ask it to. `smooth` slides, `instant` jumps.\n\n**`auto` is also the only value that leaves the navigation to the browser.**\nA fragment link does four things: it scrolls, it writes the hash, it pushes\na history entry, and it moves the sequential focus point so the next Tab\ncontinues from the heading rather than from the link. Choosing a behavior\nmeans intercepting the click, and an interception that does only the first\nof those is a keyboard reader stranded in the contents list. So the other\nthree are done by hand here, and only when there is a reason to take over.\n\n`smooth` becomes `instant` under `prefers-reduced-motion: reduce`. That is\nread at the click rather than cached, because a reader can change it while\nthe page is open and this is the only motion in the component that\nJavaScript rather than CSS decides.",
+              "attribute": "behavior",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "current",
               "type": {
                 "text": "string"
@@ -17573,6 +17587,32 @@
                 }
               },
               "description": "Works out which section is being read, and marks its link.\n\nPositional rather than a reading of what intersects, for the reason above.\nThe comparison is against `offset` and not zero, so the reading line is\nwherever the page says the top of the readable area is.",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reach",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Gives every section the same reading line the marker uses.\n\n`offset` described where the top of the readable area is and was read by\nexactly one thing, the marker. Click a link and the browser put the heading\nagainst the very top of the window, underneath the sticky masthead whose\nheight the consumer had just finished measuring for us. So the component\nknew about the chrome when deciding what you were reading and forgot about\nit when taking you somewhere, which is the same number meaning two things.\n\n`scroll-margin-block-start` rather than an interception, because it is the\nproperty the platform provides for exactly this and the UA honours it on\nordinary fragment navigation, on `scrollIntoView`, and on a browser\nrestoring a position. Nothing has to be taken over to get it.\n\nWritten onto the consumer's element, like `aria-current` above and for the\nsame reason: it is derived from a property describing the page's chrome,\nso no server rendered it and there is nothing to disagree with. Cleared\nrather than set to `0px` when there is no offset, so the common case leaves\nno attribute at all.",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Takes a link's click, but only where `auto` would not have done the job.\n\nLeft the platform's wherever it can be: a modified click is a new tab or a\ndownload and none of this applies, a click something else has already\nhandled is not ours, and `auto` is the whole point of `auto`.",
               "inheritedFrom": {
                 "name": "HelixBaseOutline",
                 "module": "src/outline/root/outline-root.ts"
@@ -17744,6 +17784,19 @@
               "default": "0",
               "description": "How far below the top of the window a heading counts as reached, in pixels.\n\nThe reading line. A page with a sticky masthead sets this to its height, or\na little more: without it the current section changes as a heading slides\nunder the chrome rather than as it reaches the top of what can be seen.",
               "fieldName": "offset",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
+              "name": "behavior",
+              "type": {
+                "text": "ScrollBehavior"
+              },
+              "default": "'auto'",
+              "description": "How a click on one of these links travels to its section.\n\nThe platform's own vocabulary, because this is the platform's own option:\n`auto` defers to whatever `scroll-behavior` the page has set on its scroll\ncontainer, which is the honest default and means an outline changes nothing\na consumer did not ask it to. `smooth` slides, `instant` jumps.\n\n**`auto` is also the only value that leaves the navigation to the browser.**\nA fragment link does four things: it scrolls, it writes the hash, it pushes\na history entry, and it moves the sequential focus point so the next Tab\ncontinues from the heading rather than from the link. Choosing a behavior\nmeans intercepting the click, and an interception that does only the first\nof those is a keyboard reader stranded in the contents list. So the other\nthree are done by hand here, and only when there is a reason to take over.\n\n`smooth` becomes `instant` under `prefers-reduced-motion: reduce`. That is\nread at the click rather than cached, because a reader can change it while\nthe page is open and this is the only motion in the component that\nJavaScript rather than CSS decides.",
+              "fieldName": "behavior",
               "inheritedFrom": {
                 "name": "HelixBaseOutline",
                 "module": "src/outline/root/outline-root.ts"

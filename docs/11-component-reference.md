@@ -1950,6 +1950,7 @@ document is not always where the headings are.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `behavior` | `behavior` | `ScrollBehavior` | `'auto'` | `HelixBaseOutline` | How a click on one of these links travels to its section. |
 | `current` | - | `string` | - | `HelixBaseOutline` | The id of the section being read, or empty before anything is measured. |
 | `label` | `label` | `string` | `'On this page'` | `HelixBaseOutline` | Accessible name for the navigation. |
 | `offset` | `offset` | `number` | `0` | `HelixBaseOutline` | How far below the top of the window a heading counts as reached, in pixels. |

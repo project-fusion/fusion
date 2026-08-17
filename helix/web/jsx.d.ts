@@ -3161,6 +3161,26 @@ The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
   offset?: HelixOutline["offset"];
+  /** How a click on one of these links travels to its section.
+
+The platform's own vocabulary, because this is the platform's own option:
+`auto` defers to whatever `scroll-behavior` the page has set on its scroll
+container, which is the honest default and means an outline changes nothing
+a consumer did not ask it to. `smooth` slides, `instant` jumps.
+
+**`auto` is also the only value that leaves the navigation to the browser.**
+A fragment link does four things: it scrolls, it writes the hash, it pushes
+a history entry, and it moves the sequential focus point so the next Tab
+continues from the heading rather than from the link. Choosing a behavior
+means intercepting the click, and an interception that does only the first
+of those is a keyboard reader stranded in the contents list. So the other
+three are done by hand here, and only when there is a reason to take over.
+
+`smooth` becomes `instant` under `prefers-reduced-motion: reduce`. That is
+read at the click rather than cached, because a reader can change it while
+the page is open and this is the only motion in the component that
+JavaScript rather than CSS decides. */
+  behavior?: HelixOutline["behavior"];
 };
 
 export type HelixOutlineSolidJsProps = {
@@ -3172,6 +3192,26 @@ The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
   "prop:offset"?: HelixOutline["offset"];
+  /** How a click on one of these links travels to its section.
+
+The platform's own vocabulary, because this is the platform's own option:
+`auto` defers to whatever `scroll-behavior` the page has set on its scroll
+container, which is the honest default and means an outline changes nothing
+a consumer did not ask it to. `smooth` slides, `instant` jumps.
+
+**`auto` is also the only value that leaves the navigation to the browser.**
+A fragment link does four things: it scrolls, it writes the hash, it pushes
+a history entry, and it moves the sequential focus point so the next Tab
+continues from the heading rather than from the link. Choosing a behavior
+means intercepting the click, and an interception that does only the first
+of those is a keyboard reader stranded in the contents list. So the other
+three are done by hand here, and only when there is a reason to take over.
+
+`smooth` becomes `instant` under `prefers-reduced-motion: reduce`. That is
+read at the click rather than cached, because a reader can change it while
+the page is open and this is the only motion in the component that
+JavaScript rather than CSS decides. */
+  "prop:behavior"?: HelixOutline["behavior"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8334,6 +8374,25 @@ export type CustomElements = {
    * The reading line. A page with a sticky masthead sets this to its height, or
    * a little more: without it the current section changes as a heading slides
    * under the chrome rather than as it reaches the top of what can be seen.
+   * - `behavior`: How a click on one of these links travels to its section.
+   *
+   * The platform's own vocabulary, because this is the platform's own option:
+   * `auto` defers to whatever `scroll-behavior` the page has set on its scroll
+   * container, which is the honest default and means an outline changes nothing
+   * a consumer did not ask it to. `smooth` slides, `instant` jumps.
+   *
+   * **`auto` is also the only value that leaves the navigation to the browser.**
+   * A fragment link does four things: it scrolls, it writes the hash, it pushes
+   * a history entry, and it moves the sequential focus point so the next Tab
+   * continues from the heading rather than from the link. Choosing a behavior
+   * means intercepting the click, and an interception that does only the first
+   * of those is a keyboard reader stranded in the contents list. So the other
+   * three are done by hand here, and only when there is a reason to take over.
+   *
+   * `smooth` becomes `instant` under `prefers-reduced-motion: reduce`. That is
+   * read at the click rather than cached, because a reader can change it while
+   * the page is open and this is the only motion in the component that
+   * JavaScript rather than CSS decides.
    * - `current`: The id of the section being read, or empty before anything is measured.
    *
    * Read-only, and a getter rather than a property for that reason: it is
@@ -13285,6 +13344,25 @@ export type CustomElementsSolidJs = {
    * The reading line. A page with a sticky masthead sets this to its height, or
    * a little more: without it the current section changes as a heading slides
    * under the chrome rather than as it reaches the top of what can be seen.
+   * - `behavior`: How a click on one of these links travels to its section.
+   *
+   * The platform's own vocabulary, because this is the platform's own option:
+   * `auto` defers to whatever `scroll-behavior` the page has set on its scroll
+   * container, which is the honest default and means an outline changes nothing
+   * a consumer did not ask it to. `smooth` slides, `instant` jumps.
+   *
+   * **`auto` is also the only value that leaves the navigation to the browser.**
+   * A fragment link does four things: it scrolls, it writes the hash, it pushes
+   * a history entry, and it moves the sequential focus point so the next Tab
+   * continues from the heading rather than from the link. Choosing a behavior
+   * means intercepting the click, and an interception that does only the first
+   * of those is a keyboard reader stranded in the contents list. So the other
+   * three are done by hand here, and only when there is a reason to take over.
+   *
+   * `smooth` becomes `instant` under `prefers-reduced-motion: reduce`. That is
+   * read at the click rather than cached, because a reader can change it while
+   * the page is open and this is the only motion in the component that
+   * JavaScript rather than CSS decides.
    * - `current`: The id of the section being read, or empty before anything is measured.
    *
    * Read-only, and a getter rather than a property for that reason: it is

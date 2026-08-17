@@ -1,0 +1,29 @@
+/* Two columns, the nav beside the prose, which is the shape this component is
+   for. The nav sticks so it stays in view while the prose scrolls past it. */
+.layout {
+  display: grid;
+  gap: var(--helix-space-xl);
+  grid-template-columns: 12rem minmax(0, 1fr);
+}
+
+.nav {
+  align-self: start;
+  position: sticky;
+  top: var(--helix-space-md);
+}
+
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xl);
+}
+
+/* Tall enough that the sections cross the top of the viewport one at a time,
+   which is the whole thing being demonstrated. A column that all fits on screen
+   would leave the mark on the first heading forever. */
+.prose section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+  min-block-size: 60vh;
+}

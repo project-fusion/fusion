@@ -74,6 +74,30 @@ export class HelixBaseOutline extends HelixElement {
   offset = 0
 
   /**
+   * How a click on one of these links travels to its section.
+   *
+   * The platform's own vocabulary, because this is the platform's own option:
+   * `auto` defers to whatever `scroll-behavior` the page has set on its scroll
+   * container, which is the honest default and means an outline changes nothing
+   * a consumer did not ask it to. `smooth` slides, `instant` jumps.
+   *
+   * **`auto` is also the only value that leaves the navigation to the browser.**
+   * A fragment link does four things: it scrolls, it writes the hash, it pushes
+   * a history entry, and it moves the sequential focus point so the next Tab
+   * continues from the heading rather than from the link. Choosing a behavior
+   * means intercepting the click, and an interception that does only the first
+   * of those is a keyboard reader stranded in the contents list. So the other
+   * three are done by hand here, and only when there is a reason to take over.
+   *
+   * `smooth` becomes `instant` under `prefers-reduced-motion: reduce`. That is
+   * read at the click rather than cached, because a reader can change it while
+   * the page is open and this is the only motion in the component that
+   * JavaScript rather than CSS decides.
+   */
+  @property()
+  behavior: ScrollBehavior = 'auto'
+
+  /**
    * The id of the section being read, or empty before anything is measured.
    *
    * Read-only, and a getter rather than a property for that reason: it is
@@ -142,6 +166,72 @@ export class HelixBaseOutline extends HelixElement {
   }
 
   /**
+   * Gives every section the same reading line the marker uses.
+   *
+   * `offset` described where the top of the readable area is and was read by
+   * exactly one thing, the marker. Click a link and the browser put the heading
+   * against the very top of the window, underneath the sticky masthead whose
+   * height the consumer had just finished measuring for us. So the component
+   * knew about the chrome when deciding what you were reading and forgot about
+   * it when taking you somewhere, which is the same number meaning two things.
+   *
+   * `scroll-margin-block-start` rather than an interception, because it is the
+   * property the platform provides for exactly this and the UA honours it on
+   * ordinary fragment navigation, on `scrollIntoView`, and on a browser
+   * restoring a position. Nothing has to be taken over to get it.
+   *
+   * Written onto the consumer's element, like `aria-current` above and for the
+   * same reason: it is derived from a property describing the page's chrome,
+   * so no server rendered it and there is nothing to disagree with. Cleared
+   * rather than set to `0px` when there is no offset, so the common case leaves
+   * no attribute at all.
+   */
+  private reach(): void {
+    for (const { target } of this.sections) {
+      const element = target as HTMLElement
+      element.style.scrollMarginBlockStart = this.offset > 0 ? `${this.offset}px` : ''
+    }
+  }
+
+  /**
+   * Takes a link's click, but only where `auto` would not have done the job.
+   *
+   * Left the platform's wherever it can be: a modified click is a new tab or a
+   * download and none of this applies, a click something else has already
+   * handled is not ours, and `auto` is the whole point of `auto`.
+   */
+  private readonly handleClick = (event: MouseEvent): void => {
+    if (this.behavior === 'auto' || event.defaultPrevented || event.button !== 0) {
+      return
+    }
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return
+    }
+    const link = (event.target as Element | null)?.closest?.('a[href^="#"]')
+    const section = this.sections.find((one) => one.link === link)
+    if (!section) {
+      return
+    }
+    event.preventDefault()
+    const reduced = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+    section.target.scrollIntoView({
+      behavior: reduced && this.behavior === 'smooth' ? 'instant' : this.behavior,
+      block: 'start',
+    })
+    /* The three things the anchor would have done and the scroll does not. The
+       history entry keeps Back working and the address bar copyable; the focus
+       move is what stops Tab continuing from the contents list. `preventScroll`
+       because the scroll above is already under way and focusing would fight it,
+       instantly, wherever `smooth` was asked for. */
+    globalThis.history?.pushState(null, '', link?.getAttribute('href') ?? '')
+    const target = section.target as HTMLElement
+    if (!target.hasAttribute('tabindex')) {
+      target.setAttribute('tabindex', '-1')
+    }
+    target.focus({ preventScroll: true })
+  }
+
+  /**
    * Watches every section, and re-marks whenever any of them crosses anything.
    *
    * The thresholds are what make the trigger frequent enough: an observer fires
@@ -169,6 +259,7 @@ export class HelixBaseOutline extends HelixElement {
     for (const { target } of this.sections) {
       this.observer.observe(target)
     }
+    this.reach()
     this.mark()
   }
 
@@ -187,6 +278,7 @@ export class HelixBaseOutline extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('click', this.handleClick)
     this.observer?.disconnect()
     this.observer = undefined
     this.resize?.disconnect()
@@ -195,6 +287,7 @@ export class HelixBaseOutline extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('click', this.handleClick)
     /* Both observers are rebuilt on reconnection, and neither was.
      *
      * They were created in `firstUpdated`, which runs once for the life of the
@@ -229,6 +322,7 @@ export class HelixBaseOutline extends HelixElement {
        fires on sections crossing the viewport, and this changes what crossing
        means rather than whether anything did. */
     if (changed.has('offset')) {
+      this.reach()
       this.mark()
     }
     /* Try again while there is nothing being watched. Cheap: `watch` returns on
