@@ -6,7 +6,14 @@
   display: grid;
   /* One grid for the whole table, which is what aligns every column across
      every row. Rows are `display: contents` so their cells land here. */
-  grid-template-columns: var(--table-columns, minmax(0, 1fr));
+  /* The consumer's hook first, then what the columns worked out.
+   *
+   * `--table-columns` is published as a CSS property and was also what the
+   * component wrote inline on the very element that reads it, and an inline
+   * declaration beats any stylesheet: a consumer setting the documented hook
+   * was overruled by the component every render. The derived track list has its
+   * own private name now, and the public one wins where it is set. */
+  grid-template-columns: var(--table-columns, var(--_table-template, minmax(0, 1fr)));
   inline-size: 100%;
 }
 

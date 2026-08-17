@@ -67,11 +67,17 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
   label = ''
 
   /**
-   * Whether Escape and the backdrop can close it.
+   * Whether Escape can close it.
    *
    * Off for a dialog that must be answered. It does not disable the close
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
+   *
+   * This said "Escape and the backdrop", and the family has never dismissed on
+   * a backdrop press: nothing listens for one and the `<dialog>` is not opened
+   * with `closedby`, so the sentence promised a behaviour a consumer would have
+   * written their markup around, and it had shipped into four generated type
+   * entries. Escape is what `persistent` governs.
    */
   @property({ reflect: true, type: Boolean })
   persistent = false

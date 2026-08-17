@@ -1,3 +1,4 @@
+import type { PropertyValues } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixElement } from '../helix-element/helix-element.js'
 
@@ -31,6 +32,11 @@ export class HelixFormElement extends HelixElement {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
@@ -70,6 +76,12 @@ export class HelixFormElement extends HelixElement {
   /** The platform's notice that an ancestor fieldset changed. */
   formDisabledCallback(disabled: boolean): void {
     this.formDisabled = disabled
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    // Off for either reason, and said once for every control in the library.
+    this.internals.ariaDisabled = this.isDisabled ? 'true' : null
   }
 
   /**

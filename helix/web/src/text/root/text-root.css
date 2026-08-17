@@ -25,8 +25,11 @@
    rules are declarations on this element and beat an inherited value. Resetting
    to `inherit` puts the host's computed font back in charge.
 
-   The consequence worth knowing: `Text` now needs `@helix-io/styles/base.css`
-   loaded to look like anything. Every other component only needs the tokens. */
+   The consequence worth knowing: `Text` needs `@helix-io/styles/base.css` loaded
+   to look like anything, and it is not alone in that. `Button`'s entire box
+   lives in the base layer too, paired with the `data-button` recipe, and so do
+   the link, list-item, card and navigation-item recipes. The base layer is not
+   optional for this library; the sentence here used to imply it was. */
 [part="text"] {
   color: inherit;
   font: inherit;

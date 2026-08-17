@@ -1352,7 +1352,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true
             },
@@ -1499,7 +1499,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled"
             },
             {

@@ -2590,7 +2590,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -2804,7 +2804,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -3495,7 +3495,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -3840,7 +3840,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -4059,7 +4059,8 @@
             "aliases": [
               "Admonition",
               "Notice",
-              "Note"
+              "Note",
+              "Alert"
             ],
             "tier": "headless",
             "group": "BaseCallout",
@@ -5786,7 +5787,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -6077,7 +6078,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -6211,7 +6212,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether Escape and the backdrop can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.",
+              "description": "Whether Escape can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.\n\nThis said \"Escape and the backdrop\", and the family has never dismissed on\na backdrop press: nothing listens for one and the `<dialog>` is not opened\nwith `closedby`, so the sentence promised a behaviour a consumer would have\nwritten their markup around, and it had shipped into four generated type\nentries. Escape is what `persistent` governs.",
               "attribute": "persistent",
               "reflects": true
             },
@@ -6499,7 +6500,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether Escape and the backdrop can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.",
+              "description": "Whether Escape can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.\n\nThis said \"Escape and the backdrop\", and the family has never dismissed on\na backdrop press: nothing listens for one and the `<dialog>` is not opened\nwith `closedby`, so the sentence promised a behaviour a consumer would have\nwritten their markup around, and it had shipped into four generated type\nentries. Escape is what `persistent` governs.",
               "fieldName": "persistent"
             },
             {
@@ -8104,7 +8105,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -8286,7 +8287,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -9637,7 +9638,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -9962,7 +9963,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -11257,7 +11258,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -11583,7 +11584,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -14857,7 +14858,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -15131,7 +15132,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -16142,7 +16143,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -16475,7 +16476,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -17264,7 +17265,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -17591,7 +17592,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -18024,7 +18025,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Value first in the markup and label after it, because that is the reading\norder a figure wants: the number is what the eye lands on and the label is\nwhat tells it what it landed on.\n\nBoth are bare slots. An element whose only job is to assign itself a slot on\nconnect gives its own host an attribute after upgrade, which a React\nconsumer's server markup never had.",
+          "description": "Label first in the markup and the value after it, which is the reading order\na screen reader takes and the order a caption sits above a figure. The eye\nlands on the number either way, because the number is the loud thing; a\nreader hearing it needs to know what it counts before hearing how many.\n\nThis paragraph said the opposite, value first and label after, on a render\nthat has always emitted the label slot first: the description was published\nto two tiers and shipped into the generated types, and the component was\nright and the sentence was wrong.\n\nBoth are bare slots. An element whose only job is to assign itself a slot on\nconnect gives its own host an attribute after upgrade, which a React\nconsumer's server markup never had.",
           "name": "HelixBaseStat",
           "slots": [
             {
@@ -18638,7 +18639,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -18920,7 +18921,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -21427,7 +21428,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -21752,7 +21753,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",
@@ -22931,7 +22932,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
@@ -23235,7 +23236,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
               "fieldName": "disabled",
               "inheritedFrom": {
                 "name": "HelixFormElement",

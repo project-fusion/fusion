@@ -131,7 +131,7 @@ export class HelixBaseTable extends HelixElement {
       part="table"
       role="table"
       aria-label=${this.label || 'Table'}
-      style=${template ? `--table-columns: ${template}` : ''}
+      style=${template ? `--_table-template: ${template}` : ''}
     >
       <div part="head" role="row"><slot name="columns"></slot></div>
       <slot @slotchange=${this.handleSlotChange}></slot>

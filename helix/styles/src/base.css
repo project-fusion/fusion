@@ -631,7 +631,6 @@ helix-button[disabled]::part(button) {
  * `::part(item)` covers the radio form the component renders itself, so both
  * forms take one declaration.
  */
-helix-toggle[link] > *,
 helix-toggle::part(item) {
   align-items: center;
   background: none;
@@ -643,8 +642,11 @@ helix-toggle::part(item) {
      thumb and left the items alone.
 
      The fallback is for an item outside a group, which has no control height to
-     inherit and should size to what it holds. */
-  block-size: var(--_toggle-height, 100%);
+     inherit and should size to what it holds. `auto` is what that means, and it
+     read `100%` here, the same value the group sets: the custom property
+     resolved to its own fallback in both branches and changed nothing at all,
+     while this comment credited it with the difference. */
+  block-size: var(--_toggle-height, auto);
   border: none;
   /* The group's, so the item and the thumb behind it draw the same curve. */
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
@@ -671,7 +673,6 @@ helix-toggle::part(item) {
   white-space: nowrap;
 }
 
-helix-toggle[link] > *:hover,
 helix-toggle::part(item):hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);
@@ -690,7 +691,6 @@ helix-toggle::part(item):hover {
  * So hover says its piece in the label, which the rule above already brightens
  * to full strength. A toggle outside a group keeps the wash: there is no thumb
  * there for it to be confused with. */
-helix-toggle-group helix-toggle[link] > *:hover,
 helix-toggle-group helix-toggle::part(item):hover {
   background-color: transparent;
 }
@@ -700,13 +700,11 @@ helix-toggle-group helix-toggle::part(item):hover {
    thumb measures the item it marks. Measured, the same text came out 94.2px
    selected against 92.34 unselected, so choosing a file nudged the row it was
    in. The thumb is the emphasis, and it does not need help. */
-helix-toggle[link][selected] > *,
 helix-toggle[selected]::part(item) {
   background-color: transparent;
   color: var(--helix-color-foreground);
 }
 
-helix-toggle[disabled][link] > *,
 helix-toggle[disabled]::part(item) {
   cursor: not-allowed;
   opacity: 0.5;

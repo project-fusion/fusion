@@ -86,10 +86,13 @@
   justify-content: center;
 }
 
+/* The mark is already still, and this rule used to claim credit for it.
+ *
+ * `rotate: none` is the initial value, so it does nothing, and the mark is a
+ * *sibling* of the animated element rather than a descendant of it: it was
+ * never going to turn. A comment explaining why an inert declaration is
+ * necessary is worse than the declaration, because the next reader believes it. */
 [part="mark"] ::slotted(*) {
   block-size: 100%;
   inline-size: 100%;
-  /* Still, while the arc turns. A mark rotating with the spinner stops reading
-     as a mark and becomes part of the animation. */
-  rotate: none;
 }

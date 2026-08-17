@@ -725,7 +725,12 @@ is the platform's `commandfor`. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseButton["disabled"];
   /** Name submitted with the form.
 
@@ -791,7 +796,12 @@ is the platform's `commandfor`. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseButton["disabled"];
   /** Name submitted with the form.
 
@@ -920,7 +930,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseCalendar["disabled"];
   /** Name submitted with the form.
 
@@ -1033,7 +1048,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseCalendar["disabled"];
   /** Name submitted with the form.
 
@@ -1280,7 +1300,12 @@ wrote it, and `data-checked` carries the resolved state for stylesheets. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseCheckbox["disabled"];
   /** Name submitted with the form.
 
@@ -1348,7 +1373,12 @@ wrote it, and `data-checked` carries the resolved state for stylesheets. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseCheckbox["disabled"];
   /** Name submitted with the form.
 
@@ -1401,11 +1431,17 @@ export type HelixBaseDialogHelixCloseElementEvent =
 export type HelixBaseDialogProps = {
   /** Accessible name for the dialog. */
   label?: HelixBaseDialog["label"];
-  /** Whether Escape and the backdrop can close it.
+  /** Whether Escape can close it.
 
 Off for a dialog that must be answered. It does not disable the close
 control a consumer slots in: refusing to be dismissed is not the same as
-refusing to be closed, and a dialog with no way out at all is a trap. */
+refusing to be closed, and a dialog with no way out at all is a trap.
+
+This said "Escape and the backdrop", and the family has never dismissed on
+a backdrop press: nothing listens for one and the `<dialog>` is not opened
+with `closedby`, so the sentence promised a behaviour a consumer would have
+written their markup around, and it had shipped into four generated type
+entries. Escape is what `persistent` governs. */
   persistent?: HelixBaseDialog["persistent"];
   /** Whether the element is open.
 
@@ -1451,11 +1487,17 @@ instead. */
 export type HelixBaseDialogSolidJsProps = {
   /** Accessible name for the dialog. */
   "prop:label"?: HelixBaseDialog["label"];
-  /** Whether Escape and the backdrop can close it.
+  /** Whether Escape can close it.
 
 Off for a dialog that must be answered. It does not disable the close
 control a consumer slots in: refusing to be dismissed is not the same as
-refusing to be closed, and a dialog with no way out at all is a trap. */
+refusing to be closed, and a dialog with no way out at all is a trap.
+
+This said "Escape and the backdrop", and the family has never dismissed on
+a backdrop press: nothing listens for one and the `<dialog>` is not opened
+with `closedby`, so the sentence promised a behaviour a consumer would have
+written their markup around, and it had shipped into four generated type
+entries. Escape is what `persistent` governs. */
   "prop:persistent"?: HelixBaseDialog["persistent"];
   /** Whether the element is open.
 
@@ -1847,7 +1889,12 @@ is the platform's `commandfor`. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseIconButton["disabled"];
   /** Name submitted with the form.
 
@@ -1913,7 +1960,12 @@ is the platform's `commandfor`. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseIconButton["disabled"];
   /** Name submitted with the form.
 
@@ -2035,7 +2087,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseInput["disabled"];
   /** Name submitted with the form.
 
@@ -2125,7 +2182,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseInput["disabled"];
   /** Name submitted with the form.
 
@@ -2309,7 +2371,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseListbox["disabled"];
   /** Name submitted with the form.
 
@@ -2402,7 +2469,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseListbox["disabled"];
   /** Name submitted with the form.
 
@@ -2999,7 +3071,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseRadioGroup["disabled"];
   /** Name submitted with the form.
 
@@ -3062,7 +3139,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseRadioGroup["disabled"];
   /** Name submitted with the form.
 
@@ -3218,7 +3300,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseSelect["disabled"];
   /** Name submitted with the form.
 
@@ -3329,7 +3416,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseSelect["disabled"];
   /** Name submitted with the form.
 
@@ -3481,7 +3573,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseSlider["disabled"];
   /** Name submitted with the form.
 
@@ -3602,7 +3699,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseSlider["disabled"];
   /** Name submitted with the form.
 
@@ -3718,7 +3820,12 @@ wrote it, and `data-checked` carries the resolved state for stylesheets. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseSwitch["disabled"];
   /** Name submitted with the form.
 
@@ -3782,7 +3889,12 @@ wrote it, and `data-checked` carries the resolved state for stylesheets. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseSwitch["disabled"];
   /** Name submitted with the form.
 
@@ -4219,7 +4331,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseTextarea["disabled"];
   /** Name submitted with the form.
 
@@ -4312,7 +4429,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseTextarea["disabled"];
   /** Name submitted with the form.
 
@@ -4527,7 +4649,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   disabled?: HelixBaseToggleGroup["disabled"];
   /** Name submitted with the form.
 
@@ -4590,7 +4717,12 @@ being four of a kind rather than four of three kinds. */
 
 Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists. */
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
   "prop:disabled"?: HelixBaseToggleGroup["disabled"];
   /** Name submitted with the form.
 
@@ -5690,6 +5822,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -5822,6 +5959,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -6156,6 +6298,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -6270,11 +6417,17 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for the dialog.
-   * - `persistent`: Whether Escape and the backdrop can close it.
+   * - `persistent`: Whether Escape can close it.
    *
    * Off for a dialog that must be answered. It does not disable the close
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
+   *
+   * This said "Escape and the backdrop", and the family has never dismissed on
+   * a backdrop press: nothing listens for one and the `<dialog>` is not opened
+   * with `closedby`, so the sentence promised a behaviour a consumer would have
+   * written their markup around, and it had shipped into four generated type
+   * entries. Escape is what `persistent` governs.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -6704,6 +6857,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -6870,6 +7028,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7130,6 +7293,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7868,6 +8036,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -8082,6 +8255,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -8289,6 +8467,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -8438,9 +8621,15 @@ export type CustomElements = {
   >;
 
   /**
-   * Value first in the markup and label after it, because that is the reading
-   * order a figure wants: the number is what the eye lands on and the label is
-   * what tells it what it landed on.
+   * Label first in the markup and the value after it, which is the reading order
+   * a screen reader takes and the order a caption sits above a figure. The eye
+   * lands on the number either way, because the number is the loud thing; a
+   * reader hearing it needs to know what it counts before hearing how many.
+   *
+   * This paragraph said the opposite, value first and label after, on a render
+   * that has always emitted the label slot first: the description was published
+   * to two tiers and shipped into the generated types, and the component was
+   * right and the sentence was wrong.
    *
    * Both are bare slots. An element whose only job is to assign itself a slot on
    * connect gives its own host an attribute after upgrade, which a React
@@ -8501,6 +8690,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -8997,6 +9191,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -9296,6 +9495,11 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10395,6 +10599,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10530,6 +10739,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10879,6 +11093,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10996,11 +11215,17 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for the dialog.
-   * - `persistent`: Whether Escape and the backdrop can close it.
+   * - `persistent`: Whether Escape can close it.
    *
    * Off for a dialog that must be answered. It does not disable the close
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
+   *
+   * This said "Escape and the backdrop", and the family has never dismissed on
+   * a backdrop press: nothing listens for one and the `<dialog>` is not opened
+   * with `closedby`, so the sentence promised a behaviour a consumer would have
+   * written their markup around, and it had shipped into four generated type
+   * entries. Escape is what `persistent` governs.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -11448,6 +11673,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -11620,6 +11850,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -11892,6 +12127,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -12660,6 +12900,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -12880,6 +13125,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -13093,6 +13343,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -13251,9 +13506,15 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Value first in the markup and label after it, because that is the reading
-   * order a figure wants: the number is what the eye lands on and the label is
-   * what tells it what it landed on.
+   * Label first in the markup and the value after it, which is the reading order
+   * a screen reader takes and the order a caption sits above a figure. The eye
+   * lands on the number either way, because the number is the loud thing; a
+   * reader hearing it needs to know what it counts before hearing how many.
+   *
+   * This paragraph said the opposite, value first and label after, on a render
+   * that has always emitted the label slot first: the description was published
+   * to two tiers and shipped into the generated types, and the component was
+   * right and the sentence was wrong.
    *
    * Both are bare slots. An element whose only job is to assign itself a slot on
    * connect gives its own host an attribute after upgrade, which a React
@@ -13317,6 +13578,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -13840,6 +14106,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
@@ -14148,6 +14419,11 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
    * - `name`: Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects

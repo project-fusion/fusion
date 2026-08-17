@@ -964,7 +964,7 @@ dialog rather than being a div somebody positioned.
 | `label` | `label` | `string` | `''` | `HelixBaseDialog` | Accessible name for the dialog. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `persistent` | `persistent` | `boolean` | `false` | `HelixBaseDialog` | Whether Escape and the backdrop can close it. |
+| `persistent` | `persistent` | `boolean` | `false` | `HelixBaseDialog` | Whether Escape can close it. |
 
 #### Methods
 

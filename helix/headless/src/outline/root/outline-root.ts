@@ -211,7 +211,8 @@ export class HelixBaseOutline extends HelixElement {
     }
   }
 
-  protected override firstUpdated(): void {
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
     this.watch()
     /* The links are text in a column, so anything that changes the column's
        width rewraps them and moves every one below. Nothing else would notice:
