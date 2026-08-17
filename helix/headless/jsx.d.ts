@@ -461,7 +461,10 @@ agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
 
 `neutral` is what an unset announcement already looked like, said out loud
-so a consumer can put a band back to it from markup. */
+so a consumer can put a band back to it from markup, and `surface` is the
+one value that is not a colour: it lifts the band onto the surface step
+instead of the sunken one, for a strip carrying something that is not a
+state at all. */
   tone?: HelixBaseAnnouncement["tone"];
   /** Whether it offers a control to take it away. */
   dismissible?: HelixBaseAnnouncement["dismissible"];
@@ -504,7 +507,10 @@ agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
 
 `neutral` is what an unset announcement already looked like, said out loud
-so a consumer can put a band back to it from markup. */
+so a consumer can put a band back to it from markup, and `surface` is the
+one value that is not a colour: it lifts the band onto the surface step
+instead of the sunken one, for a strip carrying something that is not a
+state at all. */
   "prop:tone"?: HelixBaseAnnouncement["tone"];
   /** Whether it offers a control to take it away. */
   "prop:dismissible"?: HelixBaseAnnouncement["dismissible"];
@@ -5538,7 +5544,10 @@ export type CustomElements = {
    * about the product rather than about a state.
    *
    * `neutral` is what an unset announcement already looked like, said out loud
-   * so a consumer can put a band back to it from markup.
+   * so a consumer can put a band back to it from markup, and `surface` is the
+   * one value that is not a colour: it lifts the band onto the surface step
+   * instead of the sunken one, for a strip carrying something that is not a
+   * state at all.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
@@ -10393,7 +10402,10 @@ export type CustomElementsSolidJs = {
    * about the product rather than about a state.
    *
    * `neutral` is what an unset announcement already looked like, said out loud
-   * so a consumer can put a band back to it from markup.
+   * so a consumer can put a band back to it from markup, and `surface` is the
+   * one value that is not a colour: it lifts the band onto the surface step
+   * instead of the sunken one, for a strip carrying something that is not a
+   * state at all.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *

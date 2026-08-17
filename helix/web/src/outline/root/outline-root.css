@@ -67,12 +67,22 @@
   opacity: 0;
   position: absolute;
   translate: 0 var(--_indicator-y, 0);
-  /* It slides and settles: `emphasized` overshoots slightly and comes back.
-     Height moves with position, so a mark travelling to a heading that wraps to
-     two lines grows as it goes rather than after it arrives. */
+  /* It springs, and the height trails it.
+   *
+   * `--helix-easing-spring` is a `linear()` of thirteen stops that carries past
+   * the target and settles back over three diminishing bounces, which is a real
+   * spring rather than the single overshoot `emphasized` gives. It was declared
+   * in the token file and read by nothing at all, which the token reference
+   * turned up: a curve nobody uses is a curve nobody has judged, and a mark
+   * travelling a list is the thing it was drawn for.
+   *
+   * Two durations, not one. The height used to move on the same curve at the
+   * same rate, so a mark going to a heading that wraps to two lines arrived
+   * already grown. Slower and decelerating, it stretches as it leaves and
+   * catches up after it lands, which is what gives the travel a direction. */
   transition:
-    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
-    block-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    translate var(--helix-duration-normal) var(--helix-easing-spring),
+    block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
     opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 

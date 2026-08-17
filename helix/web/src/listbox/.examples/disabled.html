@@ -1,6 +1,6 @@
 <link
-  rel="stylesheet"
   href="disabled.css"
+  rel="stylesheet"
 >
 
 <helix-flex
@@ -8,11 +8,11 @@
   gap="lg"
 >
   <helix-listbox
+    default-value="two"
     disabled
     hint="Hint"
     label="Written off"
     name="a"
-    default-value="two"
   >
     <helix-option value="one">Option One</helix-option>
     <helix-option value="two">Option Two</helix-option>
@@ -21,10 +21,10 @@
   <!-- The same state, arriving from an ancestor fieldset. -->
   <fieldset disabled>
     <helix-listbox
+      default-value="one"
       hint="Hint"
       label="Off from the fieldset"
       name="b"
-      default-value="one"
     >
       <helix-option value="one">Option One</helix-option>
       <helix-option value="two">Option Two</helix-option>

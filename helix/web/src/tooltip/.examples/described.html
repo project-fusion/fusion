@@ -1,30 +1,30 @@
 <link
-  rel="stylesheet"
   href="described.css"
+  rel="stylesheet"
 >
 
 <div class="row">
   <helix-button
-    id="save"
     aria-describedby="save-tip"
+    id="save"
   >Save</helix-button>
   <helix-tooltip
-    id="save-tip"
-    for="save"
     content="Writes the file to disk"
+    for="save"
+    id="save-tip"
   ></helix-tooltip>
 
   <helix-icon-button
+    aria-describedby="archive-tip"
     id="archive"
     label="Archive"
-    aria-describedby="archive-tip"
   >
     <helix-icon name="archive"></helix-icon>
   </helix-icon-button>
   <helix-tooltip
-    id="archive-tip"
-    for="archive"
     content="Moves it out of the inbox"
+    for="archive"
+    id="archive-tip"
     placement="bottom"
   ></helix-tooltip>
 </div>

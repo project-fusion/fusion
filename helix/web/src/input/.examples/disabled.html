@@ -1,6 +1,6 @@
 <link
-  rel="stylesheet"
   href="disabled.css"
+  rel="stylesheet"
 >
 
 <helix-flex
@@ -8,18 +8,18 @@
   gap="lg"
 >
   <helix-input
+    default-value="Cannot be edited"
     disabled
     hint="Hint"
     label="Written off"
-    default-value="Cannot be edited"
   ></helix-input>
 
   <!-- The same state, arriving from an ancestor fieldset. -->
   <fieldset disabled>
     <helix-input
+      default-value="Also cannot be edited"
       hint="Hint"
       label="Off from the fieldset"
-      default-value="Also cannot be edited"
     ></helix-input>
   </fieldset>
 </helix-flex>

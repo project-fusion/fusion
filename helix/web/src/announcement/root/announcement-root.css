@@ -68,6 +68,19 @@
   border-block-end-color: var(--helix-color-border);
 }
 
+/* A step up off the page rather than a tint of anything.
+ *
+ * `neutral` is the resting band and it is `surface-sunken`, which reads as a
+ * groove the page runs into. `surface` reads as a card laid on it instead, for
+ * a band carrying something that is not a state at all: a product note, a
+ * heading strip, a row of controls. It is the only tone that names no
+ * `--_announcement-color`, because there is no colour in it to carry. */
+:host([tone="surface"]) {
+  background-color: var(--helix-color-surface);
+  background-image: none;
+  border-block-end-color: var(--helix-color-border);
+}
+
 /* The brand, for a band that is about the product rather than about a state.
    `info` and this are the same hue while the seed is blue and are not the same
    thing: `info` is a fixed semantic colour and this follows whatever the theme
@@ -76,7 +89,7 @@
   --_announcement-color: var(--helix-color-primary);
 }
 
-:host([tone]:not([tone="neutral"])) {
+:host([tone]:not([tone="neutral"], [tone="surface"])) {
   background-image: linear-gradient(
     to right,
     color-mix(in oklab, var(--_announcement-color) 18%, var(--helix-color-background)),

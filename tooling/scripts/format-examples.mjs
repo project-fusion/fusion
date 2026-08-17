@@ -15,11 +15,20 @@
  * attribute block reads as a list and the tag's own name and its end line up.
  * `/>` keeps its slash.
  *
+ * **And they are alphabetized**, case-insensitively, which is the same rule this
+ * repository applies to object keys, interface members and exported types. It
+ * was left alone at first on the argument that a reader's own order says
+ * something, and across 159 files it did not: the same element appeared with
+ * `id` first here and `appearance` first there, so there was no order to
+ * preserve, only an absence of one. Alphabetical is the order you can find an
+ * attribute in without reading the others.
+ *
+ * Nothing here is order-sensitive, which is what makes this safe: HTML
+ * attributes are a set, unlike the `exports` conditions in a `package.json`,
+ * which is exactly why `useSortedKeys` is off for those.
+ *
  * **It rewrites open tags and nothing else.** Text, comments and closing tags
- * are copied through untouched, and an attribute value is never re-quoted or
- * re-ordered: attribute order is meaningful to a reader (`appearance` before
- * `id` reads better than alphabetical) and this is a line-breaking pass, not an
- * opinion about which attribute comes first.
+ * are copied through untouched, and an attribute value is never re-quoted.
  *
  * `bun run check` writes; `bun run check:examples` judges. Same split as
  * `biome check --write` against `biome ci`, for the same reason: a step that
@@ -91,7 +100,9 @@ const format = (text) =>
   /* The whole match is not used: every branch rebuilds the tag from its parts.
      Named `_whole` so the position is still readable against the pattern. */
   text.replace(OPEN, (_whole, tag, body, slash, index) => {
-    const parts = attributes(body)
+    const parts = attributes(body).sort((one, two) =>
+      one.toLowerCase().localeCompare(two.toLowerCase()),
+    )
     if (parts.length < 2) {
       /* Nothing to lay out. Collapse whatever whitespace it has, so a tag that
          was wrapped for one attribute comes back to one line. */

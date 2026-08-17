@@ -201,30 +201,46 @@ export class HelixBaseOutline extends HelixElement {
     return Math.ceil(globalThis.scrollY + globalThis.innerHeight) >= doc.scrollHeight - 1
   }
 
-  /** What `atEnd` was last time, so the listener below marks on the edge only. */
-  private wasAtEnd = false
+  /** The frame a mark is already scheduled for, so a scroll asks for one. */
+  private frame = 0
 
   /**
-   * The one thing an `IntersectionObserver` cannot see.
+   * The two things an `IntersectionObserver` cannot see, and one listener for
+   * both.
    *
    * This component's own note said the observer keeps the marker honest without
-   * a scroll listener, and that was true of everything except the bottom.
-   * Arriving at the end of a page changes no intersection: a short last section
-   * is fully visible long before the final pixel, so its ratio reached 1 and
-   * stopped moving, and nothing fired for the scroll that actually ended the
-   * page. No observer can be given a root margin that sees it, because nothing
-   * crosses anything.
+   * a scroll listener. It was wrong twice.
    *
-   * So there is a listener, and it is as small as one can be: passive, and it
-   * compares two numbers and returns unless the answer *changed*. `mark()` runs
-   * on the two frames a reader hits or leaves the bottom, and on no others.
+   * *At the bottom*, arriving at the end of a page changes no intersection: a
+   * short last section is fully visible long before the final pixel, so its
+   * ratio reached 1 and stopped moving. Nothing fires for the scroll that ends
+   * the page.
+   *
+   * *And at the end of a smooth scroll*, which is the one that showed up in
+   * use. Clicking a link in the contents list scrolled to the section and left
+   * the mark where it was. Measured on the shipped example: after clicking
+   * `#usage` the heading sat at 72px, exactly the reading line, and `current`
+   * was still `install`. The observer fires several times during the travel and
+   * the last of them lands a frame or two before the final position, where the
+   * heading has not crossed yet, and no callback follows for the rest of the
+   * way.
+   *
+   * There was a listener already, added for the first of those, and it compared
+   * two numbers and marked only when the answer *changed*. That was too clever
+   * by half: it fixed the bottom and could not fix the settle. Marking once per
+   * animation frame while a scroll is happening covers both and every other case
+   * of the same shape, and the cost is what `mark()` costs, a `getBoundingClientRect`
+   * per section on frames a reader is already scrolling through. Passive, and
+   * coalesced to one call per frame however many events arrive.
    */
   private readonly handleScroll = (): void => {
-    const end = this.atEnd
-    if (end !== this.wasAtEnd) {
-      this.wasAtEnd = end
-      this.mark()
+    if (this.frame !== 0) {
+      return
     }
+    this.frame = globalThis.requestAnimationFrame(() => {
+      this.frame = 0
+      this.mark()
+    })
   }
 
   /**
@@ -342,6 +358,10 @@ export class HelixBaseOutline extends HelixElement {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleClick)
     globalThis.removeEventListener?.('scroll', this.handleScroll)
+    if (this.frame !== 0) {
+      globalThis.cancelAnimationFrame(this.frame)
+      this.frame = 0
+    }
     this.observer?.disconnect()
     this.observer = undefined
     this.resize?.disconnect()

@@ -123,7 +123,7 @@ band across the top of the page, not a box that happens to be wide.
 | --- | --- | --- | --- | --- | --- |
 | `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
-| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseAnnouncement` | Which colour the band wears. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'surface' \| 'warning' \| undefined` | - | `HelixBaseAnnouncement` | Which colour the band wears. |
 
 #### Methods
 

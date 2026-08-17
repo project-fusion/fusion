@@ -164,8 +164,25 @@ helix-card > [slot="media"] {
   text-decoration-thickness: 2px;
 }
 
-/* A link opening a new context says so, rather than surprising the reader. */
-:where(a[target="_blank"])::after {
+/* A link opening a new context says so, rather than surprising the reader.
+ *
+ * **Prose only, and not on a link wearing a button.** The mark is right in a
+ * paragraph, where a reader following a link has no other warning and the glyph
+ * sits in the same type as the words around it. Inside a control it is wrong on
+ * every count: a bare unicode arrow is not from the icon set, it does not follow
+ * `--helix-size-icon`, it lands inside the button's padding as a second label,
+ * and a control that opens something is already a deliberate act rather than a
+ * surprise mid-sentence. `<a data-button>` is the consumer's own element with
+ * no slots to fill, so anyone who does want the mark writes a `<helix-icon>` in
+ * it and gets one that matches everything else.
+ *
+ * Buttons only. `data-link="quiet"` was nearly excluded with them and should
+ * not be: quiet is for navigation, and a navigation row that opens a new tab is
+ * still a link a reader is about to follow.
+ *
+ * `:not()` inside `:where()`, so the whole thing stays at zero specificity and a
+ * consumer's own rule still beats it. */
+:where(a[target="_blank"]:not([data-button]))::after {
   content: "↗";
   font-size: 0.85em;
   margin-inline-start: 0.15em;

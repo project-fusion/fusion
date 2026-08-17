@@ -1,6 +1,6 @@
 <link
-  rel="stylesheet"
   href="disabled.css"
+  rel="stylesheet"
 >
 
 <helix-flex
@@ -8,11 +8,11 @@
   gap="lg"
 >
   <helix-radio-group
+    default-value="one"
     disabled
     hint="Hint"
     label="Written off"
     name="a"
-    default-value="one"
   >
     <helix-radio value="one">Option One</helix-radio>
     <helix-radio value="two">Option Two</helix-radio>
@@ -21,10 +21,10 @@
   <!-- The same state, arriving from an ancestor fieldset. -->
   <fieldset disabled>
     <helix-radio-group
+      default-value="two"
       hint="Hint"
       label="Off from the fieldset"
       name="b"
-      default-value="two"
     >
       <helix-radio value="one">Option One</helix-radio>
       <helix-radio value="two">Option Two</helix-radio>

@@ -509,7 +509,10 @@ agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
 
 `neutral` is what an unset announcement already looked like, said out loud
-so a consumer can put a band back to it from markup. */
+so a consumer can put a band back to it from markup, and `surface` is the
+one value that is not a colour: it lifts the band onto the surface step
+instead of the sunken one, for a strip carrying something that is not a
+state at all. */
   tone?: HelixAnnouncement["tone"];
 
   /** Fired when the reader asks to close it. */
@@ -550,7 +553,10 @@ agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
 
 `neutral` is what an unset announcement already looked like, said out loud
-so a consumer can put a band back to it from markup. */
+so a consumer can put a band back to it from markup, and `surface` is the
+one value that is not a colour: it lifts the band onto the surface step
+instead of the sunken one, for a strip carrying something that is not a
+state at all. */
   "prop:tone"?: HelixAnnouncement["tone"];
   /** Fired when the reader asks to close it. */
   "on:helix-dismiss"?: (e: HelixAnnouncementHelixDismissElementEvent) => void;
@@ -5983,7 +5989,10 @@ export type CustomElements = {
    * about the product rather than about a state.
    *
    * `neutral` is what an unset announcement already looked like, said out loud
-   * so a consumer can put a band back to it from markup.
+   * so a consumer can put a band back to it from markup, and `surface` is the
+   * one value that is not a colour: it lifts the band onto the surface step
+   * instead of the sunken one, for a strip carrying something that is not a
+   * state at all.
    *
    * ## Events
    *
@@ -10862,7 +10871,10 @@ export type CustomElementsSolidJs = {
    * about the product rather than about a state.
    *
    * `neutral` is what an unset announcement already looked like, said out loud
-   * so a consumer can put a band back to it from markup.
+   * so a consumer can put a band back to it from markup, and `surface` is the
+   * one value that is not a colour: it lifts the band onto the surface step
+   * instead of the sunken one, for a strip carrying something that is not a
+   * state at all.
    *
    * ## Events
    *

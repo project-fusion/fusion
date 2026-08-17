@@ -870,9 +870,9 @@
               "kind": "field",
               "name": "tone",
               "type": {
-                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup.",
+              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a colour: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "attribute": "tone",
               "reflects": true,
               "inheritedFrom": {
@@ -1015,9 +1015,9 @@
             {
               "name": "tone",
               "type": {
-                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup.",
+              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a colour: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "fieldName": "tone",
               "inheritedFrom": {
                 "name": "HelixBaseAnnouncement",
@@ -17608,13 +17608,13 @@
             },
             {
               "kind": "field",
-              "name": "wasAtEnd",
+              "name": "frame",
               "type": {
-                "text": "boolean"
+                "text": "number"
               },
               "privacy": "private",
-              "default": "false",
-              "description": "What `atEnd` was last time, so the listener below marks on the edge only.",
+              "default": "0",
+              "description": "The frame a mark is already scheduled for, so a scroll asks for one.",
               "inheritedFrom": {
                 "name": "HelixBaseOutline",
                 "module": "src/outline/root/outline-root.ts"
@@ -17625,7 +17625,7 @@
               "name": "handleScroll",
               "privacy": "private",
               "readonly": true,
-              "description": "The one thing an `IntersectionObserver` cannot see.\n\nThis component's own note said the observer keeps the marker honest without\na scroll listener, and that was true of everything except the bottom.\nArriving at the end of a page changes no intersection: a short last section\nis fully visible long before the final pixel, so its ratio reached 1 and\nstopped moving, and nothing fired for the scroll that actually ended the\npage. No observer can be given a root margin that sees it, because nothing\ncrosses anything.\n\nSo there is a listener, and it is as small as one can be: passive, and it\ncompares two numbers and returns unless the answer *changed*. `mark()` runs\non the two frames a reader hits or leaves the bottom, and on no others.",
+              "description": "The two things an `IntersectionObserver` cannot see, and one listener for\nboth.\n\nThis component's own note said the observer keeps the marker honest without\na scroll listener. It was wrong twice.\n\n*At the bottom*, arriving at the end of a page changes no intersection: a\nshort last section is fully visible long before the final pixel, so its\nratio reached 1 and stopped moving. Nothing fires for the scroll that ends\nthe page.\n\n*And at the end of a smooth scroll*, which is the one that showed up in\nuse. Clicking a link in the contents list scrolled to the section and left\nthe mark where it was. Measured on the shipped example: after clicking\n`#usage` the heading sat at 72px, exactly the reading line, and `current`\nwas still `install`. The observer fires several times during the travel and\nthe last of them lands a frame or two before the final position, where the\nheading has not crossed yet, and no callback follows for the rest of the\nway.\n\nThere was a listener already, added for the first of those, and it compared\ntwo numbers and marked only when the answer *changed*. That was too clever\nby half: it fixed the bottom and could not fix the settle. Marking once per\nanimation frame while a scroll is happening covers both and every other case\nof the same shape, and the cost is what `mark()` costs, a `getBoundingClientRect`\nper section on frames a reader is already scrolling through. Passive, and\ncoalesced to one call per frame however many events arrive.",
               "inheritedFrom": {
                 "name": "HelixBaseOutline",
                 "module": "src/outline/root/outline-root.ts"

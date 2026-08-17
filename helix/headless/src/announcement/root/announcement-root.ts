@@ -62,10 +62,13 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
    * about the product rather than about a state.
    *
    * `neutral` is what an unset announcement already looked like, said out loud
-   * so a consumer can put a band back to it from markup.
+   * so a consumer can put a band back to it from markup, and `surface` is the
+   * one value that is not a colour: it lifts the band onto the surface step
+   * instead of the sunken one, for a strip carrying something that is not a
+   * state at all.
    */
   @property({ reflect: true })
-  tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
+  tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning'
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
