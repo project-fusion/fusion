@@ -930,9 +930,32 @@ helix-toggle[disabled]::part(item) {
   text-decoration: none;
 }
 
+/* Hover goes to the brand, not to a darker grey.
+ *
+ * It was `border-strong`, which is a hairline moving from 0.91 to 0.71: a
+ * twenty point jump that still says nothing except "slightly more". Grey
+ * darkening is the cheapest possible interaction signal and it reads as the
+ * card getting heavier rather than as the card being pointed at. The brand
+ * already means "this one, now" everywhere else in the library.
+ *
+ * Three pixels, made of the card's own one plus two outside it. `outline` is
+ * the second one because it does not participate in layout, so a card cannot
+ * shift by two pixels when a pointer crosses it. `outline-offset: 0` puts it
+ * flush against the border, so the two read as one 3px ring rather than as a
+ * ring with a gap in it.
+ *
+ * **Focus still wins, and it has to.** `:where(:focus-visible)` further down
+ * this file sets the same property at the same zero specificity, and later
+ * wins, so a focused card keeps the focus ring's own 2px offset. That offset is
+ * the entire difference between the two states, since both are drawn in the
+ * same colour: hovered is flush, focused is detached. If the focus ring ever
+ * loses its offset, these two become indistinguishable and a keyboard user
+ * cannot tell where they are. */
 :where([data-card]):hover {
-  --card-border-color: var(--helix-color-border-strong);
+  --card-border-color: var(--helix-color-primary);
   --card-shadow: var(--helix-shadow-md);
+  outline: 2px solid var(--helix-color-primary);
+  outline-offset: 0;
 }
 
 :where([data-card])[aria-current] {

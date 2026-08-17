@@ -16,37 +16,33 @@
 }
 
 /* A fixed count is plain CSS, so it is right in server-rendered markup with no
-   JavaScript. Only `min` needs measuring, and it is applied on upgrade. */
+   JavaScript. Only `min` needs measuring, and it is applied on upgrade.
+
+   Each branch reads the floor first, which is what makes `min` beat `columns`
+   as the documentation has always said it does. These rules set the template
+   outright and the floor arrives as a custom property read by the plain `:host`
+   rule at lower specificity, so an element given both got the fixed count, the
+   exact opposite.
+
+   Through the property rather than a marker attribute on the host. A
+   `data-min` written in `updated()` did win the cascade and was a change to
+   markup React rendered, which it reports on hydration and does not patch up.
+   The template is already a custom property; asking for it here costs nothing
+   and writes nothing. */
 :host([columns="2"]) {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: var(--_grid-template, repeat(2, minmax(0, 1fr)));
 }
 :host([columns="3"]) {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: var(--_grid-template, repeat(3, minmax(0, 1fr)));
 }
 :host([columns="4"]) {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: var(--_grid-template, repeat(4, minmax(0, 1fr)));
 }
 :host([columns="5"]) {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: var(--_grid-template, repeat(5, minmax(0, 1fr)));
 }
 :host([columns="6"]) {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-
-/* `min` beats `columns`, which is what the documentation has always said and
-   what the cascade did not do.
- *
- * The count rules are `:host([columns="3"])` and set `grid-template-columns`
- * outright, where the floor arrives as a custom property read by the plain
- * `:host` rule above at lower specificity. So an element given both got the
- * fixed count, the exact opposite of "setting `min` wins, because a fixed count
- * that also reflows is two intentions in one element".
-
-   Same specificity as the count rules and written after them, which is all it
-   takes, and it keeps both halves in the one sheet rather than depending on
-   where a `<style>` element lands in the cascade. */
-:host([data-min]) {
-  grid-template-columns: var(--_grid-template, minmax(0, 1fr));
+  grid-template-columns: var(--_grid-template, repeat(6, minmax(0, 1fr)));
 }
 
 :host([gap="none"]) {

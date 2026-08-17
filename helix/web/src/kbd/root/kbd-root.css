@@ -1,7 +1,14 @@
 :host {
   display: inline-flex;
   font: inherit;
-  vertical-align: baseline;
+  /* `middle`, not `baseline`. A key is a box a half-em taller than the text it
+     sits in, and a box is centred on a line rather than hung from its baseline.
+     Marginal, and measured as such: reproducing the shipped `rich-content`
+     example at the tooltip's own 12px on a 14.4px line, the key sits 1.25px
+     below the text's middle on `baseline` and 1.07px below on `middle`. Both
+     are a rounding error, so this is the better default rather than the fix for
+     anything visible. */
+  vertical-align: middle;
 
   /* Relative to the surrounding text rather than on the type scale, because a
      key set inside a heading has to be a key-sized thing in that heading. The

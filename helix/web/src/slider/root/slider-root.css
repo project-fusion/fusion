@@ -43,18 +43,18 @@
  * written in the markup and never for one given them as a property. The element
  * mirrors the boolean fact under a `data-` name instead, which is what this
  * wants to know: whether there are marks, not how many. */
-:host([data-markers]) [part="field"] {
+[part="field"][data-markers] {
   display: grid;
   grid-template-columns: 1fr auto;
 }
 
-:host([data-markers]) [part="control"],
-:host([data-markers]) [part="markers"] {
+[part="field"][data-markers] [part="control"],
+[part="field"][data-markers] [part="markers"] {
   grid-column: 1;
   grid-row: 1;
 }
 
-:host([data-markers]) [part="output"] {
+[part="field"][data-markers] [part="output"] {
   grid-column: 2;
   grid-row: 1;
 }

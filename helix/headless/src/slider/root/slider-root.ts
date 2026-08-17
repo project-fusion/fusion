@@ -184,12 +184,11 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.sync()
-    this.toggleAttribute('data-markers', this.markerValues.length > 0)
   }
 
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
-    <div part="field">
+    <div part="field" data-markers=${this.markerValues.length > 0 ? '' : nothing}>
       <input
         part="control"
         id="control"

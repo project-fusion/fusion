@@ -36,11 +36,23 @@
   white-space: nowrap;
 }
 
+/* A wash under the pointer, not a colour change alone.
+ *
+ * Hover only darkened the label, which is the quietest answer a control can
+ * give and is invisible on a tab that is already at full foreground: the
+ * selected tab, and every tab in the sandbox's own chrome, answered the pointer
+ * with nothing at all. The same five percent wash the nav bar uses, so a row of
+ * tabs and a row of navigation behave alike.
+ *
+ * Under the selected rule below, so a selected tab keeps its own surface: it is
+ * already the one you are on and does not need telling twice. */
 [part="tab"]:hover:not(:disabled) {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);
 }
 
-:host([selected]) [part="tab"] {
+:host([selected]) [part="tab"],
+:host([selected]) [part="tab"]:hover {
   background-color: var(--_tab-selected-surface, transparent);
   box-shadow: var(--_tab-selected-shadow, none);
   color: var(--helix-color-foreground);
