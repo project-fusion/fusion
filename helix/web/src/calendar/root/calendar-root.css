@@ -107,6 +107,15 @@
 
 /* Days either side of the month stay in place and stay selectable, so the
    first and last weeks are whole rows rather than ragged ones. */
+/* Today, which is a fact about the calendar rather than about the answer.
+ *
+ * A ring rather than a fill, because a fill is what selection is: the two land
+ * on the same cell whenever the reader is choosing today, and one has to read
+ * through the other. */
+[part="cell"][data-today] [part="day"] {
+  box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border-strong);
+}
+
 [part="cell"][data-outside] [part="day"] {
   color: var(--helix-color-foreground-subtle);
 }

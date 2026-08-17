@@ -165,7 +165,14 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
    */
   @property()
   get month(): string {
-    return this.monthState ?? this.defaultMonth
+    /* What is on show, which is what the tag says it gives.
+     *
+     * It returned `''` while a month was plainly on display, because nothing had
+     * declared one, and `show()` compares against it before moving: the guard
+     * was dead, so the first arrow key wrote `monthState` and from then on the
+     * grid stopped following `value`. A calendar whose consumer moved the value
+     * showed the month the reader had last paged to instead. */
+    return this.monthState ?? (this.defaultMonth || toIso(this.derivedMonth).slice(0, 7))
   }
 
   set month(next: string) {
@@ -173,6 +180,22 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
     this.monthState = next
     this.requestUpdate('month', previous)
   }
+
+  /**
+   * Accessible name for the control that pages back.
+   *
+   * A property because this is the one component in the library that takes a
+   * `locale`, and it carried two hardcoded English names with no way to change
+   * them: a calendar rendering its own month names in Japanese still announced
+   * its controls in English. `attribute:` spelled out, since Lit lowercases a
+   * camelCase name rather than dash-casing it.
+   */
+  @property({ attribute: 'previous-label' })
+  previousLabel = 'Previous month'
+
+  /** Accessible name for the control that pages forward. */
+  @property({ attribute: 'next-label' })
+  nextLabel = 'Next month'
 
   /** Month to open on, where nothing declared one. */
   @property({ attribute: 'default-month' })
@@ -233,10 +256,21 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
 
   /** The month being shown, resolved from `month`, then `value`, then today. */
   private get shown(): Date {
-    const explicit = /^(\d{4})-(\d{2})$/.exec(this.month)
+    const explicit = /^(\d{4})-(\d{2})$/.exec(this.monthState ?? this.defaultMonth)
     if (explicit) {
       return new Date(Date.UTC(Number(explicit[1]), Number(explicit[2]) - 1, 1))
     }
+    return this.derivedMonth
+  }
+
+  /**
+   * The month to open on when nothing has declared one.
+   *
+   * Split out from `shown` so `month` can report what is on display without the
+   * two calling each other: `month` reading `shown` and `shown` reading `month`
+   * is a stack overflow, and the specs found it immediately.
+   */
+  private get derivedMonth(): Date {
     const from = toUtc(this.selected[0] ?? '') ?? new Date()
     return new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), 1))
   }
@@ -478,6 +512,18 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
     this.internals.setFormValue(data)
   }
 
+  /**
+   * How many months are shown, clamped once.
+   *
+   * `months` was clamped at the call site and read raw where the last month is
+   * identified, so a zero, a negative or a non-numeric value rendered nothing
+   * and took the forward control with it: `index === this.months - 1` is never
+   * true for `NaN`. One getter both read.
+   */
+  private get monthCount(): number {
+    return Math.max(1, Math.floor(this.months) || 1)
+  }
+
   private renderMonth(month: Date, index: number): TemplateResult {
     const locale = this.locale || undefined
     const heading = new Intl.DateTimeFormat(locale, {
@@ -489,13 +535,18 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
     const full = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' })
     const weeks = this.weeksOf(month)
     const anchor = toIso(this.anchor)
+    /* Today, which nothing marked at all: not in the accessibility tree, where
+       `aria-current="date"` is the word for it, and not on the cell either, so a
+       consumer could not add the mark from CSS. Computed once per month rather
+       than per cell. */
+    const today = toIso(new Date())
     const range = this.range
 
     // One set of controls across the whole run: back on the first month,
     // forward on the last. A pair per month would offer six ways to make the
     // same move and leave the reader to work out which.
     const first = index === 0
-    const last = index === this.months - 1
+    const last = index === this.monthCount - 1
 
     return html`<div part="month">
       <div part="header">
@@ -504,7 +555,7 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
             ? html`<button
                 part="previous"
                 type="button"
-                aria-label="Previous month"
+                aria-label=${this.previousLabel}
                 @click=${() => this.show(addMonths(this.shown, -1))}
               >
                 <svg fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
@@ -519,7 +570,7 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
             ? html`<button
                 part="next"
                 type="button"
-                aria-label="Next month"
+                aria-label=${this.nextLabel}
                 @click=${() => this.show(addMonths(this.shown, 1))}
               >
                 <svg fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
@@ -549,12 +600,14 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
                 role="gridcell"
                 aria-disabled=${disabled ? 'true' : nothing}
                 aria-label=${full.format(date)}
+                aria-current=${iso === today ? 'date' : nothing}
                 aria-selected=${selected ? 'true' : nothing}
                 data-outside=${sameMonth(date, month) ? nothing : ''}
                 data-range-end=${range && iso === range[1] ? '' : nothing}
                 data-range-middle=${range && iso > range[0] && iso < range[1] ? '' : nothing}
                 data-range-start=${range && iso === range[0] ? '' : nothing}
-                tabindex=${iso === anchor ? '0' : '-1'}
+                data-today=${iso === today ? '' : nothing}
+                tabindex=${sameMonth(date, month) && iso === anchor ? '0' : '-1'}
                 @click=${() => this.select(date)}
                 ><span part="day">${date.getUTCDate()}</span></span
               >`
@@ -567,7 +620,7 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
 
   protected override render(): TemplateResult {
     const shown = this.shown
-    const count = Math.max(1, this.months)
+    const count = this.monthCount
     return html`<div part="months">
       ${Array.from({ length: count }, (_, index) =>
         this.renderMonth(addMonths(shown, index), index),

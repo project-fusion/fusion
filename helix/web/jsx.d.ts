@@ -1076,6 +1076,26 @@ this when the reader paged, so a consumer holding it was overwritten and
 never told. Reading gives the month on show; writing declares it theirs,
 and `default-month` seeds one the calendar owns. */
   month?: HelixCalendar["month"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "previous-label"?: HelixCalendar["previousLabel"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  previousLabel?: HelixCalendar["previousLabel"];
+  /** Accessible name for the control that pages forward. */
+  "next-label"?: HelixCalendar["nextLabel"];
+  /** Accessible name for the control that pages forward. */
+  nextLabel?: HelixCalendar["nextLabel"];
   /** Month to open on, where nothing declared one. */
   "default-month"?: HelixCalendar["defaultMonth"];
   /** Month to open on, where nothing declared one. */
@@ -1169,6 +1189,26 @@ this when the reader paged, so a consumer holding it was overwritten and
 never told. Reading gives the month on show; writing declares it theirs,
 and `default-month` seeds one the calendar owns. */
   "prop:month"?: HelixCalendar["month"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "attr:previous-label"?: HelixCalendar["previousLabel"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "prop:previousLabel"?: HelixCalendar["previousLabel"];
+  /** Accessible name for the control that pages forward. */
+  "attr:next-label"?: HelixCalendar["nextLabel"];
+  /** Accessible name for the control that pages forward. */
+  "prop:nextLabel"?: HelixCalendar["nextLabel"];
   /** Month to open on, where nothing declared one. */
   "attr:default-month"?: HelixCalendar["defaultMonth"];
   /** Month to open on, where nothing declared one. */
@@ -6193,6 +6233,14 @@ export type CustomElements = {
    * this when the reader paged, so a consumer holding it was overwritten and
    * never told. Reading gives the month on show; writing declares it theirs,
    * and `default-month` seeds one the calendar owns.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
+   *
+   * A property because this is the one component in the library that takes a
+   * `locale`, and it carried two hardcoded English names with no way to change
+   * them: a calendar rendering its own month names in Japanese still announced
+   * its controls in English. `attribute:` spelled out, since Lit lowercases a
+   * camelCase name rather than dash-casing it.
+   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
    * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
@@ -10931,6 +10979,14 @@ export type CustomElementsSolidJs = {
    * this when the reader paged, so a consumer holding it was overwritten and
    * never told. Reading gives the month on show; writing declares it theirs,
    * and `default-month` seeds one the calendar owns.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
+   *
+   * A property because this is the one component in the library that takes a
+   * `locale`, and it carried two hardcoded English names with no way to change
+   * them: a calendar rendering its own month names in Japanese still announced
+   * its controls in English. `attribute:` spelled out, since Lit lowercases a
+   * camelCase name rather than dash-casing it.
+   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
    * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.

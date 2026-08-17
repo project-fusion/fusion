@@ -2983,6 +2983,26 @@
             },
             {
               "kind": "field",
+              "name": "previousLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Previous month'",
+              "description": "Accessible name for the control that pages back.\n\nA property because this is the one component in the library that takes a\n`locale`, and it carried two hardcoded English names with no way to change\nthem: a calendar rendering its own month names in Japanese still announced\nits controls in English. `attribute:` spelled out, since Lit lowercases a\ncamelCase name rather than dash-casing it.",
+              "attribute": "previous-label"
+            },
+            {
+              "kind": "field",
+              "name": "nextLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Next month'",
+              "description": "Accessible name for the control that pages forward.",
+              "attribute": "next-label"
+            },
+            {
+              "kind": "field",
               "name": "defaultMonth",
               "type": {
                 "text": "string"
@@ -3120,6 +3140,16 @@
             },
             {
               "kind": "field",
+              "name": "derivedMonth",
+              "type": {
+                "text": "Date"
+              },
+              "privacy": "private",
+              "description": "The month to open on when nothing has declared one.\n\nSplit out from `shown` so `month` can report what is on display without the\ntwo calling each other: `month` reading `shown` and `shown` reading `month`\nis a stack overflow, and the specs found it immediately.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "anchor",
               "type": {
                 "text": "Date"
@@ -3238,6 +3268,16 @@
                 }
               },
               "description": "Reports the dates to the form, one entry each.\n\n`FormData` rather than the comma-joined string the property holds, because\n`mode=\"multiple\"` is genuinely several answers and a server reading\n`dates=2026-08-04,2026-08-06` has to know to split it on a convention this\nlibrary invented. One entry per date is what every other multi-valued\ncontrol on the platform sends, and `range` sends its two the same way, in\norder, so start and end arrive as the pair they already are.\n\n**Nothing at all without a `name`, and that is the mechanism rather than a\ndetail.** It is what lets a calendar sit inside something that owns the\nform value, which is how `DatePicker` will hold one. The guard has to be\nexplicit here in a way it does not for `Listbox`: a control reporting a\nplain string is skipped by the form when it has no name, but a `FormData`\ncarries its own names and its entries are appended whatever the element is\ncalled, so an unnamed calendar would submit empty-named dates."
+            },
+            {
+              "kind": "field",
+              "name": "monthCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many months are shown, clamped once.\n\n`months` was clamped at the call site and read raw where the last month is\nidentified, so a zero, a negative or a non-numeric value rendered nothing\nand took the forward control with it: `index === this.months - 1` is never\ntrue for `NaN`. One getter both read.",
+              "readonly": true
             },
             {
               "kind": "method",
@@ -3683,6 +3723,24 @@
               },
               "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.\n\nSeparate from `value` on purpose, so paging selects nothing and a consumer\ncan drive the view. It said that and could not do it: the calendar wrote\nthis when the reader paged, so a consumer holding it was overwritten and\nnever told. Reading gives the month on show; writing declares it theirs,\nand `default-month` seeds one the calendar owns.",
               "fieldName": "month"
+            },
+            {
+              "name": "previous-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Previous month'",
+              "description": "Accessible name for the control that pages back.\n\nA property because this is the one component in the library that takes a\n`locale`, and it carried two hardcoded English names with no way to change\nthem: a calendar rendering its own month names in Japanese still announced\nits controls in English. `attribute:` spelled out, since Lit lowercases a\ncamelCase name rather than dash-casing it.",
+              "fieldName": "previousLabel"
+            },
+            {
+              "name": "next-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Next month'",
+              "description": "Accessible name for the control that pages forward.",
+              "fieldName": "nextLabel"
             },
             {
               "name": "default-month",

@@ -597,7 +597,9 @@ grid reads as a continuous run of dates.
 | `month` | `month` | `string` | - | `HelixBaseCalendar` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
 | `months` | `months` | `number` | `1` | `HelixBaseCalendar` | How many months to show, side by side. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `nextLabel` | `next-label` | `string` | `'Next month'` | `HelixBaseCalendar` | Accessible name for the control that pages forward. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `previousLabel` | `previous-label` | `string` | `'Previous month'` | `HelixBaseCalendar` | Accessible name for the control that pages back. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
