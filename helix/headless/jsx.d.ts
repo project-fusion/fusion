@@ -1598,7 +1598,12 @@ export type HelixBaseDrawerHelixOpenElementEvent =
   HelixBaseDrawerElementEvent<HelixOpenEvent>;
 
 export type HelixBaseDrawerProps = {
-  /** Which edge the drawer comes from. */
+  /** Which edge the drawer comes from.
+
+Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+beside `:host([placement="end"])` rather than as a value written here: a
+default assigned to the property would reflect onto every host and put a
+`placement="end"` into markup no consumer wrote. */
   placement?: HelixBaseDrawer["placement"];
   /** Accessible name for the panel. */
   label?: HelixBaseDrawer["label"];
@@ -1656,7 +1661,12 @@ instead. */
 };
 
 export type HelixBaseDrawerSolidJsProps = {
-  /** Which edge the drawer comes from. */
+  /** Which edge the drawer comes from.
+
+Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+beside `:host([placement="end"])` rather than as a value written here: a
+default assigned to the property would reflect onto every host and put a
+`placement="end"` into markup no consumer wrote. */
   "prop:placement"?: HelixBaseDrawer["placement"];
   /** Accessible name for the panel. */
   "prop:label"?: HelixBaseDrawer["label"];
@@ -6599,6 +6609,11 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `placement`: Which edge the drawer comes from.
+   *
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
    *
@@ -11468,6 +11483,11 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `placement`: Which edge the drawer comes from.
+   *
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
    *

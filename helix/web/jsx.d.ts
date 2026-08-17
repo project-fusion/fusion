@@ -1907,7 +1907,12 @@ state for stylesheets, which is what it has always been for. */
   "default-open"?: HelixDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixDrawer["defaultOpen"];
-  /** Which edge the drawer comes from. */
+  /** Which edge the drawer comes from.
+
+Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+beside `:host([placement="end"])` rather than as a value written here: a
+default assigned to the property would reflect onto every host and put a
+`placement="end"` into markup no consumer wrote. */
   placement?: HelixDrawer["placement"];
   /** Accessible name for the panel. */
   label?: HelixDrawer["label"];
@@ -1967,7 +1972,12 @@ state for stylesheets, which is what it has always been for. */
   "bool:default-open"?: HelixDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixDrawer["defaultOpen"];
-  /** Which edge the drawer comes from. */
+  /** Which edge the drawer comes from.
+
+Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+beside `:host([placement="end"])` rather than as a value written here: a
+default assigned to the property would reflect onto every host and put a
+`placement="end"` into markup no consumer wrote. */
   "prop:placement"?: HelixDrawer["placement"];
   /** Accessible name for the panel. */
   "prop:label"?: HelixDrawer["label"];
@@ -7160,6 +7170,11 @@ export type CustomElements = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `placement`: Which edge the drawer comes from.
+   *
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
    *
@@ -12055,6 +12070,11 @@ export type CustomElementsSolidJs = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `placement`: Which edge the drawer comes from.
+   *
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
    *

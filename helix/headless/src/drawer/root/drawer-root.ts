@@ -54,7 +54,14 @@ export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
     },
   })
 
-  /** Which edge the drawer comes from. */
+  /**
+   * Which edge the drawer comes from.
+   *
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
+   */
   @property({ reflect: true })
   placement?: 'start' | 'end' | 'top' | 'bottom'
 
