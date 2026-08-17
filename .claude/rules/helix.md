@@ -635,6 +635,26 @@ Two page kinds, kept apart on purpose:
 Examples are `.examples/*.html` beside the component. `default.html` is the
 headline preview and reads as "Preview"; every other slug is a named variant.
 
+**An example shows the component. It never explains it.** Slot content is
+whatever a real page would hold, which usually means a label and lorem, and the
+reference page is where the reasoning goes. Written the other way the copy drifts
+from the prose that is actually maintained, a reader has to pick the component
+out of a paragraph about it, and anyone copying the example takes the essay with
+it. Swept once across all 159: four app-header examples opened with three
+explanatory headings apiece, and card, popover, dialog, drawer, accordion, toast
+and callout each described their own variant in the slot a consumer fills.
+
+A comment about the *example's own scaffolding* is different and stays, cut to a
+line: `<!-- Preview frame: the submit is swallowed. -->` exists so nobody copies
+`onsubmit="event.preventDefault()"` into production. A comment about the
+component does not.
+
+There is no check for this. The line is between prose about the component and
+prose that is merely content, which no word count can see, and the two examples
+that legitimately carry the most text (`app-header`, which needs something to
+scroll, and `outline`, which needs sections to point at) would be the ones a cap
+caught first.
+
 **Names drop the product.** `helix-app-header` displays as "App Header":
 repeating "Helix" on every row inside the Helix site is noise. The tag keeps its
 prefix, because that is a real identifier a consumer types.

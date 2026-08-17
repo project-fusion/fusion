@@ -3,9 +3,7 @@
 <helix-flex direction="column" gap="lg">
   <helix-checkbox default-checked disabled name="a">Ticked and written off</helix-checkbox>
 
-  <!-- And the same state arriving from above. A `<fieldset disabled>` switches
-       every control inside it off, which the platform reports through
-       `formDisabledCallback`: nothing writes an attribute onto anything here. -->
+  <!-- The same state, arriving from an ancestor fieldset. -->
   <fieldset disabled>
     <helix-checkbox name="b">Off from the fieldset</helix-checkbox>
   </fieldset>

@@ -6,9 +6,7 @@
     <helix-checkbox value="two">Option Two</helix-checkbox>
   </helix-checkbox-group>
 
-  <!-- And the same state arriving from above. A `<fieldset disabled>` switches
-       every control inside it off, which the platform reports through
-       `formDisabledCallback`: nothing writes an attribute onto anything here. -->
+  <!-- The same state, arriving from an ancestor fieldset. -->
   <fieldset disabled>
     <helix-checkbox-group hint="Hint" label="Off from the fieldset" name="b" value="two">
       <helix-checkbox value="one">Option One</helix-checkbox>
