@@ -353,10 +353,14 @@
   --helix-size-avatar-md: calc(2rem * var(--_helix-seed-density));
   --helix-size-avatar-lg: calc(2.5rem * var(--_helix-seed-density));
 
+  /* 24, 28, 32. The step was 20/24/28, which put a tag at `lg` below a tag at
+     `md` on the control scale and made the smallest one shorter than the line
+     of text it usually sits in. A four-pixel step throughout, so the three read
+     as one scale rather than as three separate decisions. */
   --helix-size-tag: var(--helix-size-tag-md);
-  --helix-size-tag-lg: calc(1.75rem * var(--_helix-seed-density));
-  --helix-size-tag-md: calc(1.5rem * var(--_helix-seed-density));
-  --helix-size-tag-sm: calc(1.25rem * var(--_helix-seed-density));
+  --helix-size-tag-lg: calc(2rem * var(--_helix-seed-density));
+  --helix-size-tag-md: calc(1.75rem * var(--_helix-seed-density));
+  --helix-size-tag-sm: calc(1.5rem * var(--_helix-seed-density));
   /* How thick a bar reporting a proportion is drawn.
 
      A size rather than a border, which is what it was first: two pixels is a
