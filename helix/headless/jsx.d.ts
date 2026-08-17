@@ -274,6 +274,9 @@ export type HelixBaseAccordionItemElementEvent<E = Event> = TypedEvent<
   HelixBaseAccordionItem,
   E
 >;
+/** `helix-close` event type */
+export type HelixBaseAccordionItemHelixCloseElementEvent =
+  HelixBaseAccordionItemElementEvent<HelixCloseEvent>;
 /** `helix-open` event type */
 export type HelixBaseAccordionItemHelixOpenElementEvent =
   HelixBaseAccordionItemElementEvent<HelixOpenEvent>;
@@ -332,6 +335,8 @@ what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixBaseAccordionItem["onOpenChange"];
 
+  /** Fired before the section closes, and cancelable. */
+  "onhelix-close"?: (e: HelixBaseAccordionItemHelixCloseElementEvent) => void;
   /** Fired when the item opens or closes. */
   "onhelix-open"?: (e: HelixBaseAccordionItemHelixOpenElementEvent) => void;
 };
@@ -389,6 +394,8 @@ which reserves every `on[A-Z]` prop for its own event system and drops
 what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixBaseAccordionItem["onOpenChange"];
+  /** Fired before the section closes, and cancelable. */
+  "on:helix-close"?: (e: HelixBaseAccordionItemHelixCloseElementEvent) => void;
   /** Fired when the item opens or closes. */
   "on:helix-open"?: (e: HelixBaseAccordionItemHelixOpenElementEvent) => void;
 
@@ -859,6 +866,26 @@ this when the reader paged, so a consumer holding it was overwritten and
 never told. Reading gives the month on show; writing declares it theirs,
 and `default-month` seeds one the calendar owns. */
   month?: HelixBaseCalendar["month"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "previous-label"?: HelixBaseCalendar["previousLabel"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  previousLabel?: HelixBaseCalendar["previousLabel"];
+  /** Accessible name for the control that pages forward. */
+  "next-label"?: HelixBaseCalendar["nextLabel"];
+  /** Accessible name for the control that pages forward. */
+  nextLabel?: HelixBaseCalendar["nextLabel"];
   /** Month to open on, where nothing declared one. */
   "default-month"?: HelixBaseCalendar["defaultMonth"];
   /** Month to open on, where nothing declared one. */
@@ -952,6 +979,26 @@ this when the reader paged, so a consumer holding it was overwritten and
 never told. Reading gives the month on show; writing declares it theirs,
 and `default-month` seeds one the calendar owns. */
   "prop:month"?: HelixBaseCalendar["month"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "attr:previous-label"?: HelixBaseCalendar["previousLabel"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "prop:previousLabel"?: HelixBaseCalendar["previousLabel"];
+  /** Accessible name for the control that pages forward. */
+  "attr:next-label"?: HelixBaseCalendar["nextLabel"];
+  /** Accessible name for the control that pages forward. */
+  "prop:nextLabel"?: HelixBaseCalendar["nextLabel"];
   /** Month to open on, where nothing declared one. */
   "attr:default-month"?: HelixBaseCalendar["defaultMonth"];
   /** Month to open on, where nothing declared one. */
@@ -1501,6 +1548,9 @@ export type HelixBaseDrawerElementEvent<E = Event> = TypedEvent<
   HelixBaseDrawer,
   E
 >;
+/** `helix-close` event type */
+export type HelixBaseDrawerHelixCloseElementEvent =
+  HelixBaseDrawerElementEvent<HelixCloseEvent>;
 /** `helix-open` event type */
 export type HelixBaseDrawerHelixOpenElementEvent =
   HelixBaseDrawerElementEvent<HelixOpenEvent>;
@@ -1557,6 +1607,8 @@ what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixBaseDrawer["onOpenChange"];
 
+  /** Fired before the panel closes, and cancelable. */
+  "onhelix-close"?: (e: HelixBaseDrawerHelixCloseElementEvent) => void;
   /** Fired when the drawer opens or closes. */
   "onhelix-open"?: (e: HelixBaseDrawerHelixOpenElementEvent) => void;
 };
@@ -1612,6 +1664,8 @@ which reserves every `on[A-Z]` prop for its own event system and drops
 what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixBaseDrawer["onOpenChange"];
+  /** Fired before the panel closes, and cancelable. */
+  "on:helix-close"?: (e: HelixBaseDrawerHelixCloseElementEvent) => void;
   /** Fired when the drawer opens or closes. */
   "on:helix-open"?: (e: HelixBaseDrawerHelixOpenElementEvent) => void;
 
@@ -3863,6 +3917,9 @@ pattern names one anyway. */
 
 /** `HelixBaseTabs` component event */
 export type HelixBaseTabsElementEvent<E = Event> = TypedEvent<HelixBaseTabs, E>;
+/** `helix-change` event type */
+export type HelixBaseTabsHelixChangeElementEvent =
+  HelixBaseTabsElementEvent<HelixChangeEvent>;
 /** `helix-select` event type */
 export type HelixBaseTabsHelixSelectElementEvent =
   HelixBaseTabsElementEvent<HelixSelectEvent>;
@@ -3908,6 +3965,8 @@ how markup says where to start. */
   /** The consumer's callback, invoked after the change is applied. */
   onActiveChange?: HelixBaseTabs["onActiveChange"];
 
+  /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
+  "onhelix-change"?: (e: HelixBaseTabsHelixChangeElementEvent) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "onhelix-select"?: (e: HelixBaseTabsHelixSelectElementEvent) => void;
 };
@@ -3952,6 +4011,8 @@ how markup says where to start. */
   "prop:defaultActive"?: HelixBaseTabs["defaultActive"];
   /** The consumer's callback, invoked after the change is applied. */
   "prop:onActiveChange"?: HelixBaseTabs["onActiveChange"];
+  /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
+  "on:helix-change"?: (e: HelixBaseTabsHelixChangeElementEvent) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "on:helix-select"?: (e: HelixBaseTabsHelixSelectElementEvent) => void;
 
@@ -4356,6 +4417,9 @@ export type HelixBaseToggleGroupElementEvent<E = Event> = TypedEvent<
   HelixBaseToggleGroup,
   E
 >;
+/** `helix-change` event type */
+export type HelixBaseToggleGroupHelixChangeElementEvent =
+  HelixBaseToggleGroupElementEvent<HelixChangeEvent>;
 /** `helix-select` event type */
 export type HelixBaseToggleGroupHelixSelectElementEvent =
   HelixBaseToggleGroupElementEvent<HelixSelectEvent>;
@@ -4417,6 +4481,8 @@ it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   onValueChange?: HelixBaseToggleGroup["onValueChange"];
 
+  /** Fired before the answer moves, and cancelable. The only way to refuse one. */
+  "onhelix-change"?: (e: HelixBaseToggleGroupHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "onhelix-select"?: (e: HelixBaseToggleGroupHelixSelectElementEvent) => void;
 };
@@ -4477,6 +4543,8 @@ because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   "prop:onValueChange"?: HelixBaseToggleGroup["onValueChange"];
+  /** Fired before the answer moves, and cancelable. The only way to refuse one. */
+  "on:helix-change"?: (e: HelixBaseToggleGroupHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "on:helix-select"?: (e: HelixBaseToggleGroupHelixSelectElementEvent) => void;
 
@@ -4871,6 +4939,9 @@ instead. */
 
 /** `HelixBaseTree` component event */
 export type HelixBaseTreeElementEvent<E = Event> = TypedEvent<HelixBaseTree, E>;
+/** `helix-change` event type */
+export type HelixBaseTreeHelixChangeElementEvent =
+  HelixBaseTreeElementEvent<HelixChangeEvent>;
 /** `helix-select` event type */
 export type HelixBaseTreeHelixSelectElementEvent =
   HelixBaseTreeElementEvent<HelixSelectEvent>;
@@ -4909,6 +4980,8 @@ how markup says where to start. */
   /** The consumer's callback, invoked after the change is applied. */
   onActiveChange?: HelixBaseTree["onActiveChange"];
 
+  /** Fired before the current node moves, and cancelable. The only way to refuse one. */
+  "onhelix-change"?: (e: HelixBaseTreeHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "onhelix-select"?: (e: HelixBaseTreeHelixSelectElementEvent) => void;
 };
@@ -4946,6 +5019,8 @@ how markup says where to start. */
   "prop:defaultActive"?: HelixBaseTree["defaultActive"];
   /** The consumer's callback, invoked after the change is applied. */
   "prop:onActiveChange"?: HelixBaseTree["onActiveChange"];
+  /** Fired before the current node moves, and cancelable. The only way to refuse one. */
+  "on:helix-change"?: (e: HelixBaseTreeHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "on:helix-select"?: (e: HelixBaseTreeHelixSelectElementEvent) => void;
 
@@ -5011,6 +5086,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-close`: Fired before the section closes, and cancelable.
    * - `helix-open`: Fired when the item opens or closes.
    *
    * ## Slots
@@ -5642,6 +5718,14 @@ export type CustomElements = {
    * this when the reader paged, so a consumer holding it was overwritten and
    * never told. Reading gives the month on show; writing declares it theirs,
    * and `default-month` seeds one the calendar owns.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
+   *
+   * A property because this is the one component in the library that takes a
+   * `locale`, and it carried two hardcoded English names with no way to change
+   * them: a calendar rendering its own month names in Japanese still announced
+   * its controls in English. `attribute:` spelled out, since Lit lowercases a
+   * camelCase name rather than dash-casing it.
+   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
    * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
@@ -6073,6 +6157,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `field`: The row the box and its label share, and the surface the card appearance draws.
    * - `box`: The frame the input is painted as, and the mark sits over.
    * - `control`: The input.
    * - `label`: The label beside it.
@@ -6289,6 +6374,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-close`: Fired before the panel closes, and cancelable.
    * - `helix-open`: Fired when the drawer opens or closes.
    *
    * ## Slots
@@ -6659,11 +6745,18 @@ export type CustomElements = {
    * `defaultValue` is what the markup asked for, which is where a reset returns
    * to and is gone the moment anyone types.
    *
-   * **Validity is the platform's.** The type, `required`, `pattern`, `minlength`
-   * and the rest are set on the real input and its `validity` is copied onto the
-   * host, so an email field rejects what the browser says is not an email rather
-   * than what a regular expression here guesses. What this adds is the anchor, so
-   * `reportValidity` points the bubble at the input rather than at the host.
+   * **Validity is the platform's.** The `type` and `required` are set on the real
+   * input and its `validity` is copied onto the host, so an email field rejects
+   * what the browser says is not an email rather than what a regular expression
+   * here guesses. What this adds is the anchor, so `reportValidity` points the
+   * bubble at the input rather than at the host.
+   *
+   * `pattern`, `minlength` and `maxlength` are **not** forwarded, and this
+   * paragraph used to say they were, on the strength of "and the rest": no such
+   * properties exist and nothing binds them, so a consumer following the sentence
+   * wrote an attribute on the host that reached no input and constrained nothing.
+   * They are worth adding and are a change to the API rather than a correction to
+   * a comment, so what is here is the truth about what is forwarded today.
    *
    * ## Attributes & Properties
    *
@@ -7231,6 +7324,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `surface`: The floating panel the menu is drawn on.
    * - `menu`: The surface.
    * - `header`: The bar above a submenu, holding the way back and its name.
    * - `back`: The control that returns from a submenu.
@@ -7540,6 +7634,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `content`: The scrolling region inside the panel.
    * - `popover`: The panel.
    */
   "helix-base-popover": Partial<
@@ -7547,11 +7642,15 @@ export type CustomElements = {
   >;
 
   /**
-   * Determinate only. `Spinner` is what says something is happening without
-   * saying how much of it is done, and a bar that fills at a made-up rate to
-   * cover the same case is a bar that lies: a reader takes a position along a
-   * track as a proportion, and it is the one thing the component is for. A task
-   * whose total is unknown wants the spinner.
+   * Determinate by default, and `indeterminate` for a task whose total is not
+   * known yet. `Spinner` is still the right answer where the wait is short or has
+   * no place of its own on the page; a bar earns its width where the work is the
+   * subject of the region it sits in.
+   *
+   * A bar that fills at a made-up rate would be a bar that lies, so the
+   * indeterminate one does not fill: it runs a segment across the track, which
+   * says work is happening and claims no proportion at all. `aria-valuenow` is
+   * omitted with it, which is the platform's own signal for the same thing.
    *
    * **The fill is a percentage of the track, written as a custom property.** It
    * is derived from `value` and `max` rather than measured, so it renders on a
@@ -7993,6 +8092,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `label`: The question, over the trigger.
+   * - `value`: The chosen option's text inside the trigger.
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -8177,6 +8277,9 @@ export type CustomElements = {
    *
    * - `field`: The row: the control and its readout.
    * - `control`: The range input.
+   * - `markers`: The row of marks along the track.
+   * - `marker`: One mark.
+   * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `output`: The current value, shown beside it.
    */
   "helix-base-slider": Partial<
@@ -8516,6 +8619,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    * - `table`: The grid.
    */
   "helix-base-table": Partial<
@@ -8629,6 +8733,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the current tab moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
    *
    * ## Slots
@@ -8653,6 +8758,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `indicator`: The mark that travels to the selected tab.
    * - `tabs`: The tab list.
    * - `panels`: The panel container.
    */
@@ -9139,6 +9245,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
    *
    * ## Slots
@@ -9173,6 +9280,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `track`: The bar the items sit in.
    * - `indicator`: The moving marker behind the selected item.
    */
   "helix-base-toggle-group": Partial<
@@ -9546,6 +9654,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the current node moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
    *
    * ## Slots
@@ -9632,6 +9741,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-close`: Fired before the section closes, and cancelable.
    * - `helix-open`: Fired when the item opens or closes.
    *
    * ## Slots
@@ -10299,6 +10409,14 @@ export type CustomElementsSolidJs = {
    * this when the reader paged, so a consumer holding it was overwritten and
    * never told. Reading gives the month on show; writing declares it theirs,
    * and `default-month` seeds one the calendar owns.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
+   *
+   * A property because this is the one component in the library that takes a
+   * `locale`, and it carried two hardcoded English names with no way to change
+   * them: a calendar rendering its own month names in Japanese still announced
+   * its controls in English. `attribute:` spelled out, since Lit lowercases a
+   * camelCase name rather than dash-casing it.
+   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
    * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
@@ -10745,6 +10863,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `field`: The row the box and its label share, and the surface the card appearance draws.
    * - `box`: The frame the input is painted as, and the mark sits over.
    * - `control`: The input.
    * - `label`: The label beside it.
@@ -10970,6 +11089,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-close`: Fired before the panel closes, and cancelable.
    * - `helix-open`: Fired when the drawer opens or closes.
    *
    * ## Slots
@@ -11358,11 +11478,18 @@ export type CustomElementsSolidJs = {
    * `defaultValue` is what the markup asked for, which is where a reset returns
    * to and is gone the moment anyone types.
    *
-   * **Validity is the platform's.** The type, `required`, `pattern`, `minlength`
-   * and the rest are set on the real input and its `validity` is copied onto the
-   * host, so an email field rejects what the browser says is not an email rather
-   * than what a regular expression here guesses. What this adds is the anchor, so
-   * `reportValidity` points the bubble at the input rather than at the host.
+   * **Validity is the platform's.** The `type` and `required` are set on the real
+   * input and its `validity` is copied onto the host, so an email field rejects
+   * what the browser says is not an email rather than what a regular expression
+   * here guesses. What this adds is the anchor, so `reportValidity` points the
+   * bubble at the input rather than at the host.
+   *
+   * `pattern`, `minlength` and `maxlength` are **not** forwarded, and this
+   * paragraph used to say they were, on the strength of "and the rest": no such
+   * properties exist and nothing binds them, so a consumer following the sentence
+   * wrote an attribute on the host that reached no input and constrained nothing.
+   * They are worth adding and are a change to the API rather than a correction to
+   * a comment, so what is here is the truth about what is forwarded today.
    *
    * ## Attributes & Properties
    *
@@ -11948,6 +12075,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `surface`: The floating panel the menu is drawn on.
    * - `menu`: The surface.
    * - `header`: The bar above a submenu, holding the way back and its name.
    * - `back`: The control that returns from a submenu.
@@ -12272,6 +12400,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `content`: The scrolling region inside the panel.
    * - `popover`: The panel.
    */
   "helix-base-popover": Partial<
@@ -12282,11 +12411,15 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Determinate only. `Spinner` is what says something is happening without
-   * saying how much of it is done, and a bar that fills at a made-up rate to
-   * cover the same case is a bar that lies: a reader takes a position along a
-   * track as a proportion, and it is the one thing the component is for. A task
-   * whose total is unknown wants the spinner.
+   * Determinate by default, and `indeterminate` for a task whose total is not
+   * known yet. `Spinner` is still the right answer where the wait is short or has
+   * no place of its own on the page; a bar earns its width where the work is the
+   * subject of the region it sits in.
+   *
+   * A bar that fills at a made-up rate would be a bar that lies, so the
+   * indeterminate one does not fill: it runs a segment across the track, which
+   * says work is happening and claims no proportion at all. `aria-valuenow` is
+   * omitted with it, which is the platform's own signal for the same thing.
    *
    * **The fill is a percentage of the track, written as a custom property.** It
    * is derived from `value` and `max` rather than measured, so it renders on a
@@ -12740,6 +12873,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `label`: The question, over the trigger.
+   * - `value`: The chosen option's text inside the trigger.
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -12930,6 +13064,9 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The row: the control and its readout.
    * - `control`: The range input.
+   * - `markers`: The row of marks along the track.
+   * - `marker`: One mark.
+   * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `output`: The current value, shown beside it.
    */
   "helix-base-slider": Partial<
@@ -13290,6 +13427,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    * - `table`: The grid.
    */
   "helix-base-table": Partial<
@@ -13412,6 +13550,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the current tab moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
    *
    * ## Slots
@@ -13436,6 +13575,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `indicator`: The mark that travels to the selected tab.
    * - `tabs`: The tab list.
    * - `panels`: The panel container.
    */
@@ -13940,6 +14080,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
    *
    * ## Slots
@@ -13974,6 +14115,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `track`: The bar the items sit in.
    * - `indicator`: The moving marker behind the selected item.
    */
   "helix-base-toggle-group": Partial<
@@ -14362,6 +14504,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the current node moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
    *
    * ## Slots

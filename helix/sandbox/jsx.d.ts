@@ -329,6 +329,12 @@ export type HelixSandboxPreviewSolidJsProps = {
   textContent?: string | number;
 };
 
+/** `HelixSandbox` component event */
+export type HelixSandboxElementEvent<E = Event> = TypedEvent<HelixSandbox, E>;
+/** `helix-change` event type */
+export type HelixSandboxHelixChangeElementEvent =
+  HelixSandboxElementEvent<HelixChangeEvent>;
+
 export type HelixSandboxProps = {
   /** Whether the panes sit side by side or stacked. */
   orientation?: HelixSandbox["orientation"];
@@ -362,6 +368,9 @@ and only whoever slotted it knows how tall that is. */
   "separator-label"?: HelixSandbox["separatorLabel"];
   /** Accessible name for the divider. */
   separatorLabel?: HelixSandbox["separatorLabel"];
+
+  /** Fired when a divider is let go, with the new arrangement. */
+  "onhelix-change"?: (e: HelixSandboxHelixChangeElementEvent) => void;
 };
 
 export type HelixSandboxSolidJsProps = {
@@ -397,6 +406,8 @@ and only whoever slotted it knows how tall that is. */
   "attr:separator-label"?: HelixSandbox["separatorLabel"];
   /** Accessible name for the divider. */
   "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
+  /** Fired when a divider is let go, with the new arrangement. */
+  "on:helix-change"?: (e: HelixSandboxHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -709,6 +720,12 @@ export type CustomElements = {
    * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
    *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when a divider is let go, with the new arrangement.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -730,6 +747,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `corner`: The handle where the two dividers cross.
    * - `pane`: Either pane.
    * - `separator`: The draggable divider.
    */
@@ -1149,6 +1167,12 @@ export type CustomElementsSolidJs = {
    * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
    *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when a divider is let go, with the new arrangement.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -1170,6 +1194,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `corner`: The handle where the two dividers cross.
    * - `pane`: Either pane.
    * - `separator`: The draggable divider.
    */
