@@ -8144,6 +8144,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--popover-max-block-size`: Tallest the panel grows before it scrolls. (default: `undefined`)
    * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
    * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
    *
@@ -8151,6 +8152,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `content`: The scrolling region inside the panel.
    * - `popover`: The panel.
    */
   "helix-popover": Partial<
@@ -12971,6 +12973,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--popover-max-block-size`: Tallest the panel grows before it scrolls. (default: `undefined`)
    * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
    * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
    *
@@ -12978,6 +12981,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `content`: The scrolling region inside the panel.
    * - `popover`: The panel.
    */
   "helix-popover": Partial<
@@ -15257,6 +15261,8 @@ export type CustomCssProperties = {
   "--page-nav-rail"?: string;
   /** How far each level is inset from the one above. */
   "--page-nav-indent"?: string;
+  /** Tallest the panel grows before it scrolls. */
+  "--popover-max-block-size"?: string;
   /** Space between the panel's edge and its contents. */
   "--popover-inset"?: string;
   /** Width of the panel. */

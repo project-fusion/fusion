@@ -23,6 +23,7 @@ import { styles } from './popover-root.css.js'
  * @aliases Popper, Flyout, Overlay
  * @documentation https://helix.fusion.dev/components/popover
  *
+ * @cssproperty --popover-max-block-size - Tallest the panel grows before it scrolls.
  * @cssproperty --popover-inset - Space between the panel's edge and its contents.
  * @cssproperty --popover-inline-size - Width of the panel.
  */

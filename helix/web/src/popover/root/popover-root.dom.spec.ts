@@ -24,12 +24,20 @@ const popover = async (extra = ''): Promise<Popover> =>
   )) as Popover
 
 describe('popover', () => {
-  test('the name is on the host through internals, not as an attribute', async () => {
+  test('the name is on the panel, which is the thing it names', async () => {
+    /* This asserted the name was on the *host*, through internals, and that is
+       where it was: on an element carrying no role at all, while the panel it
+       is documented to name rendered with neither a role nor a name. A name
+       needs something to be the name of.
+
+       Nothing is written onto the host either way, which is what the old test
+       was really protecting: the panel is inside this shadow root and is not
+       part of the tree a consumer rendered. */
     const host = await popover()
     expect(host.hasAttribute('aria-label')).toBe(false)
-    expect((host as unknown as { internals?: ElementInternals }).internals?.ariaLabel).toBe(
-      'Details',
-    )
+    const panel = part(host, 'popover')
+    expect(panel?.getAttribute('role')).toBe('dialog')
+    expect(panel?.getAttribute('aria-label')).toBe('Details')
   })
 
   test('opening is announced before it happens, so it can be refused', async () => {

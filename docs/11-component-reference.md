@@ -2028,12 +2028,14 @@ time.
 
 | Part | Description |
 | --- | --- |
+| `content` | The scrolling region inside the panel. |
 | `popover` | The panel. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
+| `--popover-max-block-size` | Tallest the panel grows before it scrolls. |
 | `--popover-inset` | Space between the panel's edge and its contents. |
 | `--popover-inline-size` | Width of the panel. |
 

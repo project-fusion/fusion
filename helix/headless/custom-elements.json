@@ -13465,6 +13465,10 @@
           "name": "HelixBasePopover",
           "cssParts": [
             {
+              "description": "The scrolling region inside the panel.",
+              "name": "content"
+            },
+            {
               "description": "The panel.",
               "name": "popover"
             }

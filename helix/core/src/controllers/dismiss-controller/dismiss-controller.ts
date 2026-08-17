@@ -10,6 +10,24 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
  * keeps its own `activeElement`, so descending through them gives the element
  * the reader is really on.
  */
+/**
+ * How deeply nested an overlay's host is, counting shadow boundaries as well.
+ *
+ * The innermost overlay is the one a reader means by Escape, and "innermost" has
+ * to be measured rather than assumed from listener order: every overlay listens
+ * on `document`, so they run in the order they opened, which is not the order
+ * they are nested in.
+ */
+const deepDepth = (node: Element | null): number => {
+  let depth = 0
+  let at: Node | null = node
+  while (at) {
+    at = at.parentNode ?? (at as unknown as { host?: Node }).host ?? null
+    depth += 1
+  }
+  return depth
+}
+
 const deepActiveElement = (): Element | null => {
   let element = document.activeElement
   while (element?.shadowRoot?.activeElement) {
@@ -69,12 +87,28 @@ export class DismissController implements ReactiveController {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape') {
-      // Stops the same press from also closing whatever is behind: the
-      // innermost overlay is the one the reader meant.
-      event.stopPropagation()
-      this.onDismiss()
+    if (event.key !== 'Escape') {
+      return
     }
+    /* One overlay per press, and `stopPropagation` cannot arrange that.
+     *
+     * Every open overlay registers this same listener on `document`, so one
+     * Escape ran all of them: `stopPropagation` stops an event travelling to
+     * *ancestors*, and these are siblings on one node, where the only ordering
+     * is registration. The comment here claimed the innermost was the one the
+     * reader meant and the code closed the lot.
+     *
+     * A marker on the event is what siblings can agree on, and it carries the
+     * depth rather than a bare flag: `document` listeners run in registration
+     * order, which is the order the overlays *opened*, and that is not the order
+     * they are nested in. The deepest host wins, whenever it happens to run. */
+    const taken = event as KeyboardEvent & { helixDismissDepth?: number }
+    const depth = deepDepth(this.host)
+    if (taken.helixDismissDepth !== undefined && taken.helixDismissDepth >= depth) {
+      return
+    }
+    taken.helixDismissDepth = depth
+    this.onDismiss()
   }
 
   /**

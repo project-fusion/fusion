@@ -120,3 +120,19 @@
     scale: 1;
   }
 }
+
+/* The scrolling happens in here, not on the panel.
+ *
+ * The width was capped and the height was not, so a popover taller than the
+ * window ran off the bottom with nothing to scroll, and being in the top layer
+ * the page behind it could not be scrolled to reach the rest either. The
+ * controller measures the room available for exactly this.
+ *
+ * A region inside the panel rather than the panel itself, because the panel has
+ * to stay `overflow: visible` for its arrow, which is drawn deliberately
+ * outside it: a scrolling panel clips the point off and scrolls it away with
+ * the content. */
+[part="content"] {
+  max-block-size: var(--popover-max-block-size, var(--_floating-available-height, none));
+  overflow: auto;
+}

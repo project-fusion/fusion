@@ -3,7 +3,6 @@ import {
   CommandController,
   customElement,
   HelixElement,
-  hostAria,
   MixinControllerOpen,
   type Placement,
   PopoverController,
@@ -44,6 +43,7 @@ import { property } from 'lit/decorators.js'
  * @slot trigger - What opens it.
  * @slot - The contents of the panel.
  *
+ * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.
  *
  * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
@@ -198,13 +198,25 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label })
+    /* The name is the panel's, not the host's.
+     *
+     * `label` is documented as the panel's accessible name and was written to
+     * the host's internals, and the host carries no role at all: the name
+     * landed on a generic element while the panel it names rendered with none.
+     * A `dialog` role goes with it, because a name needs something to be the
+     * name of, and that is what a popover is. */
   }
 
   protected override render(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}></slot>
-      <div part="popover" popover="manual" ?hidden=${!this.open}>
-        <slot></slot>
+      <div
+        part="popover"
+        popover="manual"
+        role="dialog"
+        aria-label=${this.label}
+        ?hidden=${!this.open}
+      >
+        <div part="content"><slot></slot></div>
       </div>`
   }
 }

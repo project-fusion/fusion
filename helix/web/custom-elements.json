@@ -17588,6 +17588,10 @@
           "name": "HelixPopover",
           "cssProperties": [
             {
+              "description": "Tallest the panel grows before it scrolls.",
+              "name": "--popover-max-block-size"
+            },
+            {
               "description": "Space between the panel's edge and its contents.",
               "name": "--popover-inset"
             },
@@ -18048,6 +18052,14 @@
             }
           ],
           "cssParts": [
+            {
+              "description": "The scrolling region inside the panel.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBasePopover",
+                "module": "src/popover/root/popover-root.ts"
+              }
+            },
             {
               "description": "The panel.",
               "name": "popover",
