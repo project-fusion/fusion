@@ -1878,8 +1878,6 @@ export type HelixDrawerHelixCloseElementEvent =
   HelixDrawerElementEvent<HelixCloseEvent>;
 
 export type HelixDrawerProps = {
-  /** Removes the panel's own surface, for a drawer inside another surface. */
-  appearance?: HelixDrawer["appearance"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -1943,8 +1941,6 @@ instead. */
 };
 
 export type HelixDrawerSolidJsProps = {
-  /** Removes the panel's own surface, for a drawer inside another surface. */
-  "prop:appearance"?: HelixDrawer["appearance"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -7145,7 +7141,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Removes the panel's own surface, for a drawer inside another surface.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -12045,7 +12040,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Removes the panel's own surface, for a drawer inside another surface.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the

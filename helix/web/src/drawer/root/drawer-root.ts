@@ -1,7 +1,6 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseDrawer } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { property } from 'lit/decorators.js'
 import { styles } from './drawer-root.css.js'
 
 /**
@@ -33,10 +32,6 @@ import { styles } from './drawer-root.css.js'
  */
 @customElement('helix-drawer')
 export class HelixDrawer extends HelixBaseDrawer {
-  /** Removes the panel's own surface, for a drawer inside another surface. */
-  @property({ reflect: true })
-  appearance?: 'surface' | 'plain'
-
   static override styles: CSSResultGroup = styles
 }
 

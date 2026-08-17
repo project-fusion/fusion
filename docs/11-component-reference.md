@@ -1052,7 +1052,6 @@ rest is flat and the movement is what says something happened.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'surface' \| 'plain' \| undefined` | - | - | Removes the panel's own surface, for a drawer inside another surface. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixBaseDrawer` | Accessible name for the panel. |
 | `modal` | `modal` | `boolean` | `true` | `HelixBaseDrawer` | Whether the drawer blocks the page behind it. |

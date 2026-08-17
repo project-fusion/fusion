@@ -8962,16 +8962,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'surface' | 'plain' | undefined"
-              },
-              "description": "Removes the panel's own surface, for a drawer inside another surface.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "open",
               "type": {
                 "text": "boolean"
@@ -9289,15 +9279,28 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseDrawer",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A panel that slides in from an edge.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/drawer",
+            "aliases": [
+              "Sheet",
+              "Sidebar",
+              "Panel",
+              "Off-canvas"
+            ],
+            "tier": "styled",
+            "group": "Drawer",
+            "part": "Root"
+          },
+          "tagName": "helix-drawer",
+          "customElement": true,
           "attributes": [
-            {
-              "name": "appearance",
-              "type": {
-                "text": "'surface' | 'plain' | undefined"
-              },
-              "description": "Removes the panel's own surface, for a drawer inside another surface.",
-              "fieldName": "appearance"
-            },
             {
               "name": "open",
               "type": {
@@ -9362,27 +9365,6 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseDrawer",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A panel that slides in from an edge.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/drawer",
-            "aliases": [
-              "Sheet",
-              "Sidebar",
-              "Panel",
-              "Off-canvas"
-            ],
-            "tier": "styled",
-            "group": "Drawer",
-            "part": "Root"
-          },
-          "tagName": "helix-drawer",
-          "customElement": true,
           "modulePath": "src/drawer/root/drawer-root.ts",
           "definitionPath": "src/drawer/root/drawer-root.ts"
         }

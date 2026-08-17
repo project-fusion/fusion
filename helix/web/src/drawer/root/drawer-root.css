@@ -61,6 +61,23 @@
   }
 }
 
+/* **No `appearance`, and a drawer is the reason the word does not fit.**
+ *
+ * There was one, `surface` against `plain`, and `plain` painted the panel the
+ * page's own colour. Two things killed it. It was invisible to half of all
+ * readers: `--helix-color-surface-overlay` and `--helix-color-background` are
+ * both `neutral-0` in light mode, so measured, the two appearances rendered the
+ * identical `oklch(1 0 0)` and only dark mode could tell them apart. And what it
+ * was for cannot happen. `plain` said it made the drawer read as part of the
+ * layout rather than as something over it, and a panel opened with `showModal()`
+ * is in the top layer with a scrim between it and the layout: being part of the
+ * page is exactly the one thing it is not. A panel that is genuinely in the page
+ * is in flow and is not this component.
+ *
+ * The siblings are not precedent, because their `plain` means something else.
+ * `Card` is in the page already, so dropping its surface really does leave it
+ * there. `Popover`'s drops the *padding*, for content that brings its own inset.
+ * Neither is asking a surface to stop being one. */
 [part="panel"] {
   /* The house radius, on the two corners that face the page.
    *
@@ -157,19 +174,6 @@
     display var(--helix-duration-normal) allow-discrete,
     overlay var(--helix-duration-normal) allow-discrete;
   z-index: var(--helix-layer-overlay);
-}
-
-/* The page's own colour, which is what this appearance has always claimed and
-   is not what `transparent` means here.
- *
- * A transparent panel over a modal `::backdrop` shows the scrim through itself,
- * so a plain drawer read as though it were rendering *underneath* its own
- * backdrop: measured, the panel's computed fill was `rgba(0, 0, 0, 0)` against
- * a page at `oklch(1 0 0)`, and what a reader saw over it was the 40% overlay.
- * `transparent` is only the page's colour when there is nothing between the two,
- * and a modal drawer always has something between the two. */
-:host([appearance="plain"]) [part="panel"] {
-  background-color: var(--helix-color-background);
 }
 
 :host(:not([placement])) [part="panel"],
