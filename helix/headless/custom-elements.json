@@ -322,6 +322,14 @@
           "events": [
             {
               "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired before the section closes, and cancelable.",
+              "name": "helix-close",
+              "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
                 "text": "HelixOpenEvent"
               },
               "description": "Fired when the item opens or closes.",
@@ -5155,6 +5163,10 @@
           "name": "HelixBaseCheckbox",
           "cssParts": [
             {
+              "description": "The row the box and its label share, and the surface the card appearance draws.",
+              "name": "field"
+            },
+            {
               "description": "The frame the input is painted as, and the mark sits over.",
               "name": "box"
             },
@@ -6938,6 +6950,14 @@
             }
           ],
           "events": [
+            {
+              "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired before the panel closes, and cancelable.",
+              "name": "helix-close",
+              "reactProp": "onhelix-close"
+            },
             {
               "type": {
                 "text": "HelixOpenEvent"
@@ -11792,6 +11812,10 @@
           "name": "HelixBaseMenu",
           "cssParts": [
             {
+              "description": "The floating panel the menu is drawn on.",
+              "name": "surface"
+            },
+            {
               "description": "The surface.",
               "name": "menu"
             },
@@ -15263,6 +15287,10 @@
               "name": "label"
             },
             {
+              "description": "The chosen option's text inside the trigger.",
+              "name": "value"
+            },
+            {
               "description": "The closed control, which says what is chosen.",
               "name": "trigger"
             },
@@ -16487,6 +16515,18 @@
             {
               "description": "The range input.",
               "name": "control"
+            },
+            {
+              "description": "The row of marks along the track.",
+              "name": "markers"
+            },
+            {
+              "description": "One mark.",
+              "name": "marker"
+            },
+            {
+              "description": "The value a mark stands at, when `marker-labels` is set.",
+              "name": "marker-label"
             },
             {
               "description": "The current value, shown beside it.",
@@ -18674,7 +18714,7 @@
             "name": "HelixFormElement",
             "package": "@helix-io/core"
           },
-          "summary": "A control that turns something on, and turns it on when pressed.",
+          "summary": "A control that turns something on or off.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
@@ -19088,6 +19128,10 @@
             }
           ],
           "cssParts": [
+            {
+              "description": "The row the column headings sit in. `display: contents`, so it takes no space.",
+              "name": "head"
+            },
             {
               "description": "The grid.",
               "name": "table"
@@ -19647,6 +19691,10 @@
           "name": "HelixBaseTabs",
           "cssParts": [
             {
+              "description": "The mark that travels to the selected tab.",
+              "name": "indicator"
+            },
+            {
               "description": "The tab list.",
               "name": "tabs"
             },
@@ -19972,6 +20020,14 @@
             }
           ],
           "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the current tab moves, and cancelable. The only way to refuse one.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            },
             {
               "type": {
                 "text": "HelixSelectEvent"
@@ -22123,6 +22179,10 @@
           "name": "HelixBaseToggleGroup",
           "cssParts": [
             {
+              "description": "The bar the items sit in.",
+              "name": "track"
+            },
+            {
               "description": "The moving marker behind the selected item.",
               "name": "indicator"
             }
@@ -22768,6 +22828,14 @@
             }
           ],
           "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the answer moves, and cancelable. The only way to refuse one.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            },
             {
               "type": {
                 "text": "HelixSelectEvent"
@@ -24864,6 +24932,14 @@
             }
           ],
           "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the current node moves, and cancelable. The only way to refuse one.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            },
             {
               "type": {
                 "text": "HelixSelectEvent"

@@ -33,9 +33,11 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'Home', 'End'])
  * @slot - The tabs.
  * @slot panels - The panels.
  *
+ * @csspart indicator - The mark that travels to the selected tab.
  * @csspart tabs - The tab list.
  * @csspart panels - The panel container.
  *
+ * @event {HelixChangeEvent} helix-change - Fired before the current tab moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
  */
 @customElement('helix-base-tabs')

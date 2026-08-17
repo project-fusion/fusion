@@ -37,6 +37,7 @@ import { property } from 'lit/decorators.js'
  * @csspart header - The header region.
  * @csspart content - The scrolling content region.
  *
+ * @event {HelixCloseEvent} helix-close - Fired before the panel closes, and cancelable.
  * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
  */
 @customElement('helix-base-drawer')

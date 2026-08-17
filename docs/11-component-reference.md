@@ -80,6 +80,7 @@ Usable on its own as a disclosure, with no accordion around it.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired when the item opens or closes. |
+| `helix-close` | `HelixCloseEvent` | Fired before the section closes, and cancelable. |
 
 #### Slots
 
@@ -200,7 +201,6 @@ no shadow: the rule is the whole of it.
 | Part | Description |
 | --- | --- |
 | `content` | The centered row inside the banner. |
-| `nav` | The navigation region. |
 | `row` | The centered row inside the banner. |
 | `start` | The leading region. |
 | `end` | The trailing region. |
@@ -253,7 +253,6 @@ every size, including one a consumer sets themselves through
 
 | Part | Description |
 | --- | --- |
-| `avatar` | The avatar body. |
 | `image` | The image, when one is loading or loaded. |
 | `initials` | The initials shown when there is no usable image. |
 
@@ -411,7 +410,6 @@ because a truncated path tells the reader less than a two-line one.
 
 | Part | Description |
 | --- | --- |
-| `nav` | The navigation landmark. |
 | `list` | The ordered list. |
 
 #### Custom properties
@@ -867,6 +865,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 | Part | Description |
 | --- | --- |
+| `field` | The row the box and its label share, and the surface the card appearance draws. |
 | `box` | The frame the input is painted as, and the mark sits over. |
 | `control` | The input. |
 | `label` | The label beside it. |
@@ -1068,6 +1067,7 @@ rest is flat and the movement is what says something happened.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired when the drawer opens or closes. |
+| `helix-close` | `HelixCloseEvent` | Fired before the panel closes, and cancelable. |
 
 #### Slots
 
@@ -1080,7 +1080,6 @@ rest is flat and the movement is what says something happened.
 
 | Part | Description |
 | --- | --- |
-| `scrim` | The cover over the page behind. |
 | `panel` | The sliding panel. |
 | `header` | The header region. |
 | `content` | The scrolling content region. |
@@ -1728,6 +1727,7 @@ one panel and reads the same on a phone as on a desk.
 
 | Part | Description |
 | --- | --- |
+| `surface` | The floating panel the menu is drawn on. |
 | `menu` | The surface. |
 | `header` | The bar above a submenu, holding the way back and its name. |
 | `back` | The control that returns from a submenu. |
@@ -2319,6 +2319,7 @@ from the field it came out of.
 | Part | Description |
 | --- | --- |
 | `label` | The question, over the trigger. |
+| `value` | The chosen option's text inside the trigger. |
 | `trigger` | The closed control, which says what is chosen. |
 | `surface` | The floating panel. |
 | `listbox` | The list inside it. |
@@ -2429,6 +2430,9 @@ the thumb being dragged.
 | --- | --- |
 | `field` | The row: the control and its readout. |
 | `control` | The range input. |
+| `markers` | The row of marks along the track. |
+| `marker` | One mark. |
+| `marker-label` | The value a mark stands at, when `marker-labels` is set. |
 | `output` | The current value, shown beside it. |
 
 #### Custom properties
@@ -2545,7 +2549,7 @@ same quantity.
 
 ### Root — `helix-switch`
 
-A control that turns something on, and turns it on when pressed.
+A control that turns something on or off.
 
 Extends `HelixBaseSwitch`.
 
@@ -2661,6 +2665,7 @@ decorating none of it.
 | Part | Description |
 | --- | --- |
 | `table` | The grid. |
+| `head` | The row the column headings sit in. `display: contents`, so it takes no space. |
 
 #### Custom properties
 
@@ -2769,6 +2774,7 @@ a movement instead of two separate fills.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired before the current tab moves, and cancelable. The only way to refuse one. |
 | `helix-select` | `HelixSelectEvent` | Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. |
 
 #### Slots
@@ -2784,6 +2790,7 @@ a movement instead of two separate fills.
 | --- | --- |
 | `tabs` | The tab list. |
 | `panels` | The panel container. |
+| `indicator` | The mark that travels to the selected tab. |
 
 ### Panel — `helix-tabs-panel`
 
@@ -2915,7 +2922,7 @@ the status colors gets the tints with them.
 
 ### Root — `helix-text`
 
-Text: what element it is, and what it looks like.
+A run of text, with the element and the look chosen separately.
 
 Extends `HelixElement`.
 
@@ -3252,6 +3259,7 @@ corner radius, which is worse than the exception.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired before the answer moves, and cancelable. The only way to refuse one. |
 | `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here. |
 
 #### Slots
@@ -3265,6 +3273,7 @@ corner radius, which is worse than the exception.
 | Part | Description |
 | --- | --- |
 | `indicator` | The moving marker behind the selected item. |
+| `track` | The bar the items sit in. |
 
 #### Custom properties
 
@@ -3406,6 +3415,7 @@ to it is one more thing between the reader and the label.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. |
+| `helix-change` | `HelixChangeEvent` | Fired before the current node moves, and cancelable. The only way to refuse one. |
 
 #### Slots
 

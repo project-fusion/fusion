@@ -77,12 +77,15 @@ const PANEL_MAX = 0.8
  * @aliases Playground, REPL, Editor
  * @documentation https://helix.fusion.dev/sandbox
  *
+ * @event {HelixChangeEvent} helix-change - Fired when a divider is let go, with the new arrangement.
+ *
  * @slot source - The editable source pane.
  * @slot preview - The live preview.
  * @slot toolbar - A bar across the top, spanning both panes.
  * @slot panel - A panel under both panes, usually a terminal.
  * @slot status - A status bar, spanning both panes at the bottom.
  *
+ * @csspart corner - The handle where the two dividers cross.
  * @csspart pane - Either pane.
  * @csspart separator - The draggable divider.
  *

@@ -47,6 +47,7 @@ import type { HelixBaseMenuItem } from '../item/menu-item.js'
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen.
  *
+ * @csspart surface - The floating panel the menu is drawn on.
  * @csspart menu - The surface.
  * @csspart header - The bar above a submenu, holding the way back and its name.
  * @csspart back - The control that returns from a submenu.

@@ -44,6 +44,7 @@ const TRIGGER_ID = 'trigger'
  * @csspart content - The revealed region.
  * @csspart content-inner - The clipping box inside the animated region.
  *
+ * @event {HelixCloseEvent} helix-close - Fired before the section closes, and cancelable.
  * @event {HelixOpenEvent} helix-open - Fired when the item opens or closes.
  */
 @customElement('helix-base-accordion-item')

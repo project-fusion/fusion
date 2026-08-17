@@ -45,6 +45,7 @@ import '../../listbox/index.js'
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  *
  * @csspart label - The question, over the trigger.
+ * @csspart value - The chosen option's text inside the trigger.
  * @csspart trigger - The closed control, which says what is chosen.
  * @csspart surface - The floating panel.
  * @csspart listbox - The list inside it.

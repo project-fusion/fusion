@@ -279,6 +279,9 @@ export type HelixAccordionItemElementEvent<E = Event> = TypedEvent<
 /** `helix-open` event type */
 export type HelixAccordionItemHelixOpenElementEvent =
   HelixAccordionItemElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixAccordionItemHelixCloseElementEvent =
+  HelixAccordionItemElementEvent<HelixCloseEvent>;
 
 export type HelixAccordionItemProps = {
   /** Tightens the trigger for dense layouts. */
@@ -338,6 +341,8 @@ instead. */
 
   /** Fired when the item opens or closes. */
   "onhelix-open"?: (e: HelixAccordionItemHelixOpenElementEvent) => void;
+  /** Fired before the section closes, and cancelable. */
+  "onhelix-close"?: (e: HelixAccordionItemHelixCloseElementEvent) => void;
 };
 
 export type HelixAccordionItemSolidJsProps = {
@@ -397,6 +402,8 @@ instead. */
   "prop:onOpenChange"?: HelixAccordionItem["onOpenChange"];
   /** Fired when the item opens or closes. */
   "on:helix-open"?: (e: HelixAccordionItemHelixOpenElementEvent) => void;
+  /** Fired before the section closes, and cancelable. */
+  "on:helix-close"?: (e: HelixAccordionItemHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1784,6 +1791,9 @@ export type HelixDrawerElementEvent<E = Event> = TypedEvent<HelixDrawer, E>;
 /** `helix-open` event type */
 export type HelixDrawerHelixOpenElementEvent =
   HelixDrawerElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixDrawerHelixCloseElementEvent =
+  HelixDrawerElementEvent<HelixCloseEvent>;
 
 export type HelixDrawerProps = {
   /** Removes the panel's own surface, for a drawer inside another surface. */
@@ -1841,6 +1851,8 @@ instead. */
 
   /** Fired when the drawer opens or closes. */
   "onhelix-open"?: (e: HelixDrawerHelixOpenElementEvent) => void;
+  /** Fired before the panel closes, and cancelable. */
+  "onhelix-close"?: (e: HelixDrawerHelixCloseElementEvent) => void;
 };
 
 export type HelixDrawerSolidJsProps = {
@@ -1898,6 +1910,8 @@ instead. */
   "prop:onOpenChange"?: HelixDrawer["onOpenChange"];
   /** Fired when the drawer opens or closes. */
   "on:helix-open"?: (e: HelixDrawerHelixOpenElementEvent) => void;
+  /** Fired before the panel closes, and cancelable. */
+  "on:helix-close"?: (e: HelixDrawerHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4254,6 +4268,9 @@ pattern names one anyway. */
 
 /** `HelixTabs` component event */
 export type HelixTabsElementEvent<E = Event> = TypedEvent<HelixTabs, E>;
+/** `helix-change` event type */
+export type HelixTabsHelixChangeElementEvent =
+  HelixTabsElementEvent<HelixChangeEvent>;
 /** `helix-select` event type */
 export type HelixTabsHelixSelectElementEvent =
   HelixTabsElementEvent<HelixSelectEvent>;
@@ -4299,6 +4316,8 @@ panels on the way. */
   /** The consumer's callback, invoked after the change is applied. */
   onActiveChange?: HelixTabs["onActiveChange"];
 
+  /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
+  "onhelix-change"?: (e: HelixTabsHelixChangeElementEvent) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "onhelix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
 };
@@ -4343,6 +4362,8 @@ panels on the way. */
   "prop:manual"?: HelixTabs["manual"];
   /** The consumer's callback, invoked after the change is applied. */
   "prop:onActiveChange"?: HelixTabs["onActiveChange"];
+  /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
+  "on:helix-change"?: (e: HelixTabsHelixChangeElementEvent) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "on:helix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
 
@@ -4806,6 +4827,9 @@ export type HelixToggleGroupElementEvent<E = Event> = TypedEvent<
   HelixToggleGroup,
   E
 >;
+/** `helix-change` event type */
+export type HelixToggleGroupHelixChangeElementEvent =
+  HelixToggleGroupElementEvent<HelixChangeEvent>;
 /** `helix-select` event type */
 export type HelixToggleGroupHelixSelectElementEvent =
   HelixToggleGroupElementEvent<HelixSelectEvent>;
@@ -4869,6 +4893,8 @@ it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   onValueChange?: HelixToggleGroup["onValueChange"];
 
+  /** Fired before the answer moves, and cancelable. The only way to refuse one. */
+  "onhelix-change"?: (e: HelixToggleGroupHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "onhelix-select"?: (e: HelixToggleGroupHelixSelectElementEvent) => void;
 };
@@ -4931,6 +4957,8 @@ because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   "prop:onValueChange"?: HelixToggleGroup["onValueChange"];
+  /** Fired before the answer moves, and cancelable. The only way to refuse one. */
+  "on:helix-change"?: (e: HelixToggleGroupHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "on:helix-select"?: (e: HelixToggleGroupHelixSelectElementEvent) => void;
 
@@ -5319,6 +5347,9 @@ export type HelixTreeElementEvent<E = Event> = TypedEvent<HelixTree, E>;
 /** `helix-select` event type */
 export type HelixTreeHelixSelectElementEvent =
   HelixTreeElementEvent<HelixSelectEvent>;
+/** `helix-change` event type */
+export type HelixTreeHelixChangeElementEvent =
+  HelixTreeElementEvent<HelixChangeEvent>;
 
 export type HelixTreeProps = {
   /** Which item is current, by its `value`.
@@ -5356,6 +5387,8 @@ somewhere different from its siblings' would be a mistake, not a choice. */
 
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "onhelix-select"?: (e: HelixTreeHelixSelectElementEvent) => void;
+  /** Fired before the current node moves, and cancelable. The only way to refuse one. */
+  "onhelix-change"?: (e: HelixTreeHelixChangeElementEvent) => void;
 };
 
 export type HelixTreeSolidJsProps = {
@@ -5393,6 +5426,8 @@ somewhere different from its siblings' would be a mistake, not a choice. */
   "prop:onActiveChange"?: HelixTree["onActiveChange"];
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "on:helix-select"?: (e: HelixTreeHelixSelectElementEvent) => void;
+  /** Fired before the current node moves, and cancelable. The only way to refuse one. */
+  "on:helix-change"?: (e: HelixTreeHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5457,6 +5492,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired when the item opens or closes.
+   * - `helix-close`: Fired before the section closes, and cancelable.
    *
    * ## Slots
    *
@@ -5689,7 +5725,6 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `content`: The centered row inside the banner.
-   * - `nav`: The navigation region.
    * - `row`: The centered row inside the banner.
    * - `start`: The leading region.
    * - `end`: The trailing region.
@@ -5790,7 +5825,6 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `avatar`: The avatar body.
    * - `image`: The image, when one is loading or loaded.
    * - `initials`: The initials shown when there is no usable image.
    */
@@ -5930,7 +5964,6 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `nav`: The navigation landmark.
    * - `list`: The ordered list.
    */
   "helix-breadcrumbs": Partial<
@@ -6626,6 +6659,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `field`: The row the box and its label share, and the surface the card appearance draws.
    * - `box`: The frame the input is painted as, and the mark sits over.
    * - `control`: The input.
    * - `label`: The label beside it.
@@ -6828,6 +6862,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired when the drawer opens or closes.
+   * - `helix-close`: Fired before the panel closes, and cancelable.
    *
    * ## Slots
    *
@@ -6861,7 +6896,6 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `scrim`: The cover over the page behind.
    * - `panel`: The sliding panel.
    * - `header`: The header region.
    * - `content`: The scrolling content region.
@@ -7789,6 +7823,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `surface`: The floating panel the menu is drawn on.
    * - `menu`: The surface.
    * - `header`: The bar above a submenu, holding the way back and its name.
    * - `back`: The control that returns from a submenu.
@@ -8518,6 +8553,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `label`: The question, over the trigger.
+   * - `value`: The chosen option's text inside the trigger.
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -8707,6 +8743,9 @@ export type CustomElements = {
    *
    * - `field`: The row: the control and its readout.
    * - `control`: The range input.
+   * - `markers`: The row of marks along the track.
+   * - `marker`: One mark.
+   * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `output`: The current value, shown beside it.
    */
   "helix-slider": Partial<
@@ -9035,6 +9074,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `table`: The grid.
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    */
   "helix-table": Partial<HelixTableProps & BaseProps<HelixTable> & BaseEvents>;
 
@@ -9139,6 +9179,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the current tab moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
    *
    * ## Slots
@@ -9165,6 +9206,7 @@ export type CustomElements = {
    *
    * - `tabs`: The tab list.
    * - `panels`: The panel container.
+   * - `indicator`: The mark that travels to the selected tab.
    */
   "helix-tabs": Partial<HelixTabsProps & BaseProps<HelixTabs> & BaseEvents>;
 
@@ -9657,6 +9699,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
    *
    * ## Slots
@@ -9698,6 +9741,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `indicator`: The moving marker behind the selected item.
+   * - `track`: The bar the items sit in.
    */
   "helix-toggle-group": Partial<
     HelixToggleGroupProps & BaseProps<HelixToggleGroup> & BaseEvents
@@ -10053,6 +10097,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   * - `helix-change`: Fired before the current node moves, and cancelable. The only way to refuse one.
    *
    * ## Slots
    *
@@ -10146,6 +10191,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired when the item opens or closes.
+   * - `helix-close`: Fired before the section closes, and cancelable.
    *
    * ## Slots
    *
@@ -10387,7 +10433,6 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `content`: The centered row inside the banner.
-   * - `nav`: The navigation region.
    * - `row`: The centered row inside the banner.
    * - `start`: The leading region.
    * - `end`: The trailing region.
@@ -10494,7 +10539,6 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `avatar`: The avatar body.
    * - `image`: The image, when one is loading or loaded.
    * - `initials`: The initials shown when there is no usable image.
    */
@@ -10648,7 +10692,6 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `nav`: The navigation landmark.
    * - `list`: The ordered list.
    */
   "helix-breadcrumbs": Partial<
@@ -11367,6 +11410,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `field`: The row the box and its label share, and the surface the card appearance draws.
    * - `box`: The frame the input is painted as, and the mark sits over.
    * - `control`: The input.
    * - `label`: The label beside it.
@@ -11578,6 +11622,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired when the drawer opens or closes.
+   * - `helix-close`: Fired before the panel closes, and cancelable.
    *
    * ## Slots
    *
@@ -11611,7 +11656,6 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `scrim`: The cover over the page behind.
    * - `panel`: The sliding panel.
    * - `header`: The header region.
    * - `content`: The scrolling content region.
@@ -12580,6 +12624,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `surface`: The floating panel the menu is drawn on.
    * - `menu`: The surface.
    * - `header`: The bar above a submenu, holding the way back and its name.
    * - `back`: The control that returns from a submenu.
@@ -13342,6 +13387,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `label`: The question, over the trigger.
+   * - `value`: The chosen option's text inside the trigger.
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -13537,6 +13583,9 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The row: the control and its readout.
    * - `control`: The range input.
+   * - `markers`: The row of marks along the track.
+   * - `marker`: One mark.
+   * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `output`: The current value, shown beside it.
    */
   "helix-slider": Partial<
@@ -13885,6 +13934,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `table`: The grid.
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    */
   "helix-table": Partial<
     HelixTableProps &
@@ -14000,6 +14050,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the current tab moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
    *
    * ## Slots
@@ -14026,6 +14077,7 @@ export type CustomElementsSolidJs = {
    *
    * - `tabs`: The tab list.
    * - `panels`: The panel container.
+   * - `indicator`: The mark that travels to the selected tab.
    */
   "helix-tabs": Partial<
     HelixTabsProps & HelixTabsSolidJsProps & BaseProps<HelixTabs> & BaseEvents
@@ -14538,6 +14590,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
    *
    * ## Slots
@@ -14579,6 +14632,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `indicator`: The moving marker behind the selected item.
+   * - `track`: The bar the items sit in.
    */
   "helix-toggle-group": Partial<
     HelixToggleGroupProps &
@@ -14949,6 +15003,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   * - `helix-change`: Fired before the current node moves, and cancelable. The only way to refuse one.
    *
    * ## Slots
    *

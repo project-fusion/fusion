@@ -34,6 +34,7 @@ import { property } from 'lit/decorators.js'
  * @event {HelixChangeEvent} helix-change - Fired before the state changes, and cancelable.
  * @event {Event} change - Relayed from the input once the state has changed.
  *
+ * @csspart field - The row the box and its label share, and the surface the card appearance draws.
  * @csspart box - The frame the input is painted as, and the mark sits over.
  * @csspart control - The input.
  * @csspart label - The label beside it.

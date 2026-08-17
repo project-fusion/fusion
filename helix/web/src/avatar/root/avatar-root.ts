@@ -20,7 +20,6 @@ import { styles } from './avatar-root.css.js'
  *
  * @slot - Replaces the image and initials entirely, for an icon.
  *
- * @csspart avatar - The avatar body.
  * @csspart image - The image, when one is loading or loaded.
  * @csspart initials - The initials shown when there is no usable image.
  *

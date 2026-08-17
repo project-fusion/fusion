@@ -24,6 +24,7 @@ import type { HelixBaseTableColumn } from '../column/table-column.js'
  *
  * @slot - The table's rows.
  *
+ * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
  * @csspart table - The grid.
  *
  * @cssproperty --table-columns - Track list for the columns.

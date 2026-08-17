@@ -20,7 +20,6 @@ import { styles } from './drawer-root.css.js'
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.
  *
- * @csspart scrim - The cover over the page behind.
  * @csspart panel - The sliding panel.
  * @csspart header - The header region.
  * @csspart content - The scrolling content region.

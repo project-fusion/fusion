@@ -50,8 +50,10 @@ import { HelixBaseToggle } from '../root/toggle-root.js'
  *
  * @slot - The group's items.
  *
+ * @csspart track - The bar the items sit in.
  * @csspart indicator - The moving marker behind the selected item.
  *
+ * @event {HelixChangeEvent} helix-change - Fired before the answer moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here.
  */
 @customElement('helix-base-toggle-group')

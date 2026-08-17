@@ -134,7 +134,7 @@
 
 [part="separator"]:hover,
 :host([data-dragging]) [part="separator"] {
-  background-color: var(--helix-color-border-accent);
+  background-color: var(--helix-color-primary);
 }
 
 /* A divider with nothing on one side of it draws no line.

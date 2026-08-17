@@ -95,7 +95,7 @@
 }
 
 :host(:not(:disabled)) [part="field"]:hover [part="control"] {
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* No color, which is the same rule the segmented control's thumb follows:
@@ -109,7 +109,7 @@
    because it means "some", not "neither". */
 :host([data-checked]) [part="control"],
 :host([indeterminate]) [part="control"] {
-  border-color: var(--checkbox-checked-color, var(--helix-color-border-strong));
+  border-color: var(--checkbox-checked-color, var(--helix-color-primary));
 }
 
 /* The tick and the dash, as masks rather than glyphs, so their weight is ours.
@@ -245,13 +245,13 @@
 }
 
 :host(:not([disabled])[appearance="card"]) [part="field"]:hover {
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* Lifted rather than colored, which is the rule the tick already follows. */
 :host([appearance="card"][data-checked]) [part="field"] {
   background-color: var(--helix-color-surface-raised);
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* The ring goes on the card, because the card is the target. It cannot go on

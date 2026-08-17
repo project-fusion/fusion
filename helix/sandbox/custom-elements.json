@@ -901,6 +901,10 @@
           ],
           "cssParts": [
             {
+              "description": "The handle where the two dividers cross.",
+              "name": "corner"
+            },
+            {
               "description": "Either pane.",
               "name": "pane"
             },
@@ -1352,7 +1356,16 @@
               }
             }
           ],
-          "events": [],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired when a divider is let go, with the new arrangement.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            }
+          ],
           "attributes": [
             {
               "name": "orientation",

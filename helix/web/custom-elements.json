@@ -420,6 +420,18 @@
                 "name": "HelixBaseAccordionItem",
                 "module": "src/accordion/item/accordion-item.ts"
               }
+            },
+            {
+              "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired before the section closes, and cancelable.",
+              "name": "helix-close",
+              "reactProp": "onhelix-close",
+              "inheritedFrom": {
+                "name": "HelixBaseAccordionItem",
+                "module": "src/accordion/item/accordion-item.ts"
+              }
             }
           ],
           "attributes": [
@@ -1158,10 +1170,6 @@
               }
             },
             {
-              "description": "The navigation region.",
-              "name": "nav"
-            },
-            {
               "description": "The centered row inside the banner.",
               "name": "row",
               "inheritedFrom": {
@@ -1725,10 +1733,6 @@
             }
           ],
           "cssParts": [
-            {
-              "description": "The avatar body.",
-              "name": "avatar"
-            },
             {
               "description": "The image, when one is loading or loaded.",
               "name": "image",
@@ -2833,10 +2837,6 @@
             }
           ],
           "cssParts": [
-            {
-              "description": "The navigation landmark.",
-              "name": "nav"
-            },
             {
               "description": "The ordered list.",
               "name": "list",
@@ -7736,6 +7736,14 @@
           ],
           "cssParts": [
             {
+              "description": "The row the box and its label share, and the surface the card appearance draws.",
+              "name": "field",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
               "description": "The frame the input is painted as, and the mark sits over.",
               "name": "box",
               "inheritedFrom": {
@@ -8641,10 +8649,6 @@
           ],
           "cssParts": [
             {
-              "description": "The cover over the page behind.",
-              "name": "scrim"
-            },
-            {
               "description": "The sliding panel.",
               "name": "panel",
               "inheritedFrom": {
@@ -8999,6 +9003,18 @@
               "description": "Fired when the drawer opens or closes.",
               "name": "helix-open",
               "reactProp": "onhelix-open",
+              "inheritedFrom": {
+                "name": "HelixBaseDrawer",
+                "module": "src/drawer/root/drawer-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired before the panel closes, and cancelable.",
+              "name": "helix-close",
+              "reactProp": "onhelix-close",
               "inheritedFrom": {
                 "name": "HelixBaseDrawer",
                 "module": "src/drawer/root/drawer-root.ts"
@@ -15961,6 +15977,14 @@
           ],
           "cssParts": [
             {
+              "description": "The floating panel the menu is drawn on.",
+              "name": "surface",
+              "inheritedFrom": {
+                "name": "HelixBaseMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
               "description": "The surface.",
               "name": "menu",
               "inheritedFrom": {
@@ -20805,6 +20829,14 @@
               }
             },
             {
+              "description": "The chosen option's text inside the trigger.",
+              "name": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
               "description": "The closed control, which says what is chosen.",
               "name": "trigger",
               "inheritedFrom": {
@@ -22094,6 +22126,30 @@
             {
               "description": "The range input.",
               "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "The row of marks along the track.",
+              "name": "markers",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "One mark.",
+              "name": "marker",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "The value a mark stands at, when `marker-labels` is set.",
+              "name": "marker-label",
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
                 "module": "src/slider/root/slider-root.ts"
@@ -23501,7 +23557,7 @@
             "name": "HelixBaseSwitch",
             "package": "@helix-io/headless"
           },
-          "summary": "A control that turns something on, and turns it on when pressed.",
+          "summary": "A control that turns something on or off.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
@@ -24214,6 +24270,14 @@
                 "name": "HelixBaseTable",
                 "module": "src/table/root/table-root.ts"
               }
+            },
+            {
+              "description": "The row the column headings sit in. `display: contents`, so it takes no space.",
+              "name": "head",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
             }
           ],
           "slots": [
@@ -24905,6 +24969,14 @@
                 "name": "HelixBaseTabs",
                 "module": "src/tabs/root/tabs-root.ts"
               }
+            },
+            {
+              "description": "The mark that travels to the selected tab.",
+              "name": "indicator",
+              "inheritedFrom": {
+                "name": "HelixBaseTabs",
+                "module": "src/tabs/root/tabs-root.ts"
+              }
             }
           ],
           "slots": [
@@ -25360,6 +25432,18 @@
             }
           ],
           "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the current tab moves, and cancelable. The only way to refuse one.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseTabs",
+                "module": "src/tabs/root/tabs-root.ts"
+              }
+            },
             {
               "type": {
                 "text": "HelixSelectEvent"
@@ -26202,7 +26286,7 @@
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "Text: what element it is, and what it looks like.",
+          "summary": "A run of text, with the element and the look chosen separately.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
@@ -28120,6 +28204,14 @@
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
               }
+            },
+            {
+              "description": "The bar the items sit in.",
+              "name": "track",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
             }
           ],
           "slots": [
@@ -28947,6 +29039,18 @@
           "tagName": "helix-toggle-group",
           "customElement": true,
           "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the answer moves, and cancelable. The only way to refuse one.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
             {
               "type": {
                 "text": "HelixSelectEvent"
@@ -31442,6 +31546,18 @@
               "description": "Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the current node moves, and cancelable. The only way to refuse one.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
               "inheritedFrom": {
                 "name": "HelixBaseTree",
                 "module": "src/tree/root/tree-root.ts"

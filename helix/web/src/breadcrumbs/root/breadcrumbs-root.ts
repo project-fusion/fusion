@@ -17,7 +17,6 @@ import { styles } from './breadcrumbs-root.css.js'
  *
  * @slot - The trail's items, in order from root to current page.
  *
- * @csspart nav - The navigation landmark.
  * @csspart list - The ordered list.
  *
  * @cssproperty --breadcrumbs-gap - Space between items and separators.

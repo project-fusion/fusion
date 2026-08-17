@@ -40,6 +40,9 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart field - The row: the control and its readout.
  * @csspart control - The range input.
+ * @csspart markers - The row of marks along the track.
+ * @csspart marker - One mark.
+ * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart output - The current value, shown beside it.
  */
 @customElement('helix-base-slider')
