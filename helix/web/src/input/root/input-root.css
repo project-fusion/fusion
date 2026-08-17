@@ -65,7 +65,7 @@
  * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
  */
 :host(:not(:disabled)) [part="field"]:hover {
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* Named with `:hover` as well, which is the whole reason this reads right.
@@ -75,7 +75,7 @@
    focused outranks being pointed at, so it has to say so. */
 :host(:focus-within) [part="field"],
 :host(:focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-border-accent);
+  border-color: var(--helix-color-primary);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }

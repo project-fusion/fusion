@@ -1804,13 +1804,13 @@ than as a ragged list.
 | --- | --- |
 | `--menu-item-hover-color` | Fill under the pointer. |
 
-## Nav Bar
+## Navigation
 
-### Root — `helix-nav-bar`
+### Root — `helix-navigation`
 
 A set of destinations, with a marker on the current one.
 
-Extends `HelixBaseNavBar`.
+Extends `HelixBaseNavigation`.
 
 One marker that travels, rather than a background that appears on whichever
 destination is current. A fill that swaps is two things changing at once and
@@ -1821,7 +1821,7 @@ says where the current page was as well as where it is.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `'Main'` | `HelixBaseNavBar` | Accessible name for the landmark. |
+| `label` | `label` | `string` | `'Main'` | `HelixBaseNavigation` | Accessible name for the landmark. |
 
 #### Slots
 
@@ -1840,8 +1840,8 @@ says where the current page was as well as where it is.
 
 | Property | Description |
 | --- | --- |
-| `--nav-bar-indicator-color` | Fill of the traveling marker. |
-| `--nav-bar-gap` | Space between destinations. |
+| `--navigation-indicator-color` | Fill of the traveling marker. |
+| `--navigation-gap` | Space between destinations. |
 
 ## Option
 
@@ -1930,19 +1930,19 @@ tells you which list, not something to read on its own.
 | `label` | The heading. |
 | `items` | The run itself. |
 
-## Page Nav
+## Outline
 
-### Root — `helix-page-nav`
+### Root — `helix-outline`
 
 Links to the headings on this page, marking the one being read.
 
-Extends `HelixBasePageNav`.
+Extends `HelixBaseOutline`.
 
 A rule down the leading edge with the current section lit along it, which is
 the shape a table of contents has taken since printed marginalia: the line
 says the list is one thing, and the lit segment says where in it you are.
 
-Nesting is the consumer's, expressed as `data-level` on a link. A page-nav
+Nesting is the consumer's, expressed as `data-level` on a link. A outline
 that read heading levels itself would have to look at the document, and the
 document is not always where the headings are.
 
@@ -1950,9 +1950,9 @@ document is not always where the headings are.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `current` | - | `string` | - | `HelixBasePageNav` | The id of the section being read, or empty before anything is measured. |
-| `label` | `label` | `string` | `'On this page'` | `HelixBasePageNav` | Accessible name for the navigation. |
-| `offset` | `offset` | `number` | `0` | `HelixBasePageNav` | How far below the top of the window a heading counts as reached, in pixels. |
+| `current` | - | `string` | - | `HelixBaseOutline` | The id of the section being read, or empty before anything is measured. |
+| `label` | `label` | `string` | `'On this page'` | `HelixBaseOutline` | Accessible name for the navigation. |
+| `offset` | `offset` | `number` | `0` | `HelixBaseOutline` | How far below the top of the window a heading counts as reached, in pixels. |
 
 #### Slots
 
@@ -1971,8 +1971,8 @@ document is not always where the headings are.
 
 | Property | Description |
 | --- | --- |
-| `--page-nav-rail` | Width of the gutter the rule and the travelling mark share. |
-| `--page-nav-indent` | How far each level is inset from the one above. |
+| `--outline-rail` | Width of the gutter the rule and the travelling mark share. |
+| `--outline-indent` | How far each level is inset from the one above. |
 
 ## Popover
 

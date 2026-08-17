@@ -730,14 +730,14 @@ helix-toggle[disabled]::part(item) {
 /* Either the recipe or a link inside a nav bar, which is the same thing said
    two ways so that neither has to be written by script.
  
-   `helix-nav-bar a` is what makes this work on the server. The attribute was
+   `helix-navigation a` is what makes this work on the server. The attribute was
    put onto the anchors by the component after it upgraded, so a server-rendered
    nav arrived unstyled and restyled itself a frame later, and a React consumer
    who wrote the attribute themselves got a hydration mismatch for their
    trouble. A descendant selector needs no script and is true the moment the
    markup is parsed. The recipe stays for a destination that is not in a nav
    bar. */
-:where([data-nav-item], helix-nav-bar a) {
+:where([data-navigation-item], helix-navigation a) {
   align-items: center;
   block-size: 100%;
   border-radius: var(--helix-radii-sm);
@@ -754,7 +754,7 @@ helix-toggle[disabled]::part(item) {
   white-space: nowrap;
 }
 
-:where([data-nav-item], helix-nav-bar a):hover {
+:where([data-navigation-item], helix-navigation a):hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);
 }
@@ -765,12 +765,12 @@ helix-toggle[disabled]::part(item) {
    and a fill here as well would mean two things saying the same thing. Weight
    and full-strength color are what make the current page legible before the
    marker has been measured, which cannot happen on the server. */
-:where([data-nav-item], helix-nav-bar a)[aria-current="page"] {
+:where([data-navigation-item], helix-navigation a)[aria-current="page"] {
   color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-semibold);
 }
 
-/* The page-nav link.
+/* The outline link.
  *
  * Here rather than in the component, for the reason the toggle item above
  * gives and the same one: a `::slotted()` rule loses to any document rule, so
@@ -779,13 +779,13 @@ helix-toggle[disabled]::part(item) {
  * `font-weight` came through from the shadow, `color` and `text-decoration`
  * did not, because the outer tree wins for normal declarations whatever the
  * specificity. The component had said `foreground-muted` since it was written
- * and no page-nav has ever shown it.
+ * and no outline has ever shown it.
  *
- * `--page-nav-rail` is set by the component on its own host, so it inherits
+ * `--outline-rail` is set by the component on its own host, so it inherits
  * out to these anchors: the gutter the rail and the travelling mark occupy is
  * one number, named once, in the file that draws them.
  */
-:where(helix-page-nav a) {
+:where(helix-outline a) {
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
@@ -798,7 +798,7 @@ helix-toggle[disabled]::part(item) {
   /* Margin rather than more padding, so the hover fill starts after the rail
      instead of covering it. A fill that swallowed the hairline made the rule
      flicker as the pointer went down the list. */
-  margin-inline-start: var(--page-nav-rail, var(--helix-border-thick));
+  margin-inline-start: var(--outline-rail, var(--helix-border-thick));
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-sm);
   text-decoration: none;
@@ -807,7 +807,7 @@ helix-toggle[disabled]::part(item) {
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:where(helix-page-nav a):hover {
+:where(helix-outline a):hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);
   text-decoration: none;
@@ -821,7 +821,7 @@ helix-toggle[disabled]::part(item) {
  * background here as well would leave the current link and a hovered link
  * competing to look chosen. Weight and full-strength color carry it before the
  * mark has been measured, which cannot happen on the server. */
-:where(helix-page-nav a[aria-current]) {
+:where(helix-outline a[aria-current]) {
   color: var(--helix-color-foreground);
   /* One step above the rest, which is what it was before the rest moved up. */
   font-weight: var(--helix-weight-semibold);
@@ -844,51 +844,51 @@ helix-toggle[disabled]::part(item) {
  *
  * Six is the depth of an HTML outline, which is what a contents list is made
  * of, so there is no seventh level to write. */
-:where(helix-page-nav a[data-level="2"]) {
-  padding-inline-start: calc(var(--helix-space-sm) + var(--page-nav-indent, var(--helix-space-sm)));
+:where(helix-outline a[data-level="2"]) {
+  padding-inline-start: calc(var(--helix-space-sm) + var(--outline-indent, var(--helix-space-sm)));
 }
 
-:where(helix-page-nav a[data-level="3"]) {
+:where(helix-outline a[data-level="3"]) {
   padding-inline-start: calc(
     var(--helix-space-sm) +
     2 *
-    var(--page-nav-indent, var(--helix-space-sm))
+    var(--outline-indent, var(--helix-space-sm))
   );
 }
 
-:where(helix-page-nav a[data-level="4"]) {
+:where(helix-outline a[data-level="4"]) {
   padding-inline-start: calc(
     var(--helix-space-sm) +
     3 *
-    var(--page-nav-indent, var(--helix-space-sm))
+    var(--outline-indent, var(--helix-space-sm))
   );
 }
 
-:where(helix-page-nav a[data-level="5"]) {
+:where(helix-outline a[data-level="5"]) {
   padding-inline-start: calc(
     var(--helix-space-sm) +
     4 *
-    var(--page-nav-indent, var(--helix-space-sm))
+    var(--outline-indent, var(--helix-space-sm))
   );
 }
 
-:where(helix-page-nav a[data-level="6"]) {
+:where(helix-outline a[data-level="6"]) {
   padding-inline-start: calc(
     var(--helix-space-sm) +
     5 *
-    var(--page-nav-indent, var(--helix-space-sm))
+    var(--outline-indent, var(--helix-space-sm))
   );
 }
 
 /* Above the marker, which sits behind every item. */
-:where([data-nav-item], helix-nav-bar a) {
+:where([data-navigation-item], helix-navigation a) {
   position: relative;
   z-index: var(--helix-layer-raised);
 }
 
 /* The ring turns inward, because the bar has no room to draw it outside.
  *
- * `helix-nav-bar` scrolls horizontally and is exactly one control tall, and its
+ * `helix-navigation` scrolls horizontally and is exactly one control tall, and its
  * links fill it exactly, so an outset ring on a focused destination is drawn
  * outside the scroll container and clipped down to a single stroke along one
  * edge. Reproduced in Chrome from the shipped CSS.
@@ -898,7 +898,7 @@ helix-toggle[disabled]::part(item) {
  * padding on the bar grows it past its one-control height and moves it in the
  * header row it sits in, where an inset ring costs nothing but two pixels of
  * the link's own inset. */
-:where(helix-nav-bar a):focus-visible {
+:where(helix-navigation a):focus-visible {
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
@@ -912,7 +912,7 @@ helix-toggle[disabled]::part(item) {
  *     <a data-list-item href="/one"><helix-list-item>One</helix-list-item></a>
  *   </helix-list>
  *
- * Same reasoning as `data-button` and `data-nav-item`. A router renders its own
+ * Same reasoning as `data-button` and `data-navigation-item`. A router renders its own
  * `<a>` and cannot render it inside a shadow root, so the destination has to be
  * the consumer's element and the styling has to be reachable from here.
  *
@@ -1092,7 +1092,7 @@ helix-toast:not([data-color-mode]) {
 }
 
 /* The dialog's header, here rather than in the component, and for the reason
-   the page-nav links moved: a `::slotted()` rule loses to any document rule
+   the outline links moved: a `::slotted()` rule loses to any document rule
    whatever the specificity, and `h1`-`h6` are styled above. So
    `<h2 slot="header">`, which is the markup the dialog's own example ships,
    came out at 32px where the component asked for `--helix-text-lg`. Measured

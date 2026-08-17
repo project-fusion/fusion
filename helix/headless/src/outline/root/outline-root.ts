@@ -10,11 +10,11 @@ import { property, state } from 'lit/decorators.js'
  * by things that are not this: `Outline` is a CSS property and the focus ring's
  * whole vocabulary, `Contents` is `display: contents` and the `content` part
  * half this library renders, and `TableOfContents` would sit beside `Table` and
- * `TableColumn` and read as a third part of that family. `PageNav` sits beside
- * `NavBar`, which is the same job at the other scale: one navigates a site, the
+ * `TableColumn` and read as a third part of that family. `Outline` sits beside
+ * `Navigation`, which is the same job at the other scale: one navigates a site, the
  * other navigates a document.
  *
- * **The links are the consumer's own anchors**, the same as `NavBar`. A router
+ * **The links are the consumer's own anchors**, the same as `Navigation`. A router
  * renders its own `<a>` and cannot render one inside this shadow root, and the
  * hrefs are fragments the page already knows.
  *
@@ -36,21 +36,21 @@ import { property, state } from 'lit/decorators.js'
  * here for the reason `Carousel` names its slides: what is current is derived
  * from scroll position, so no server could have rendered it and there is
  * nothing for hydration to disagree with. `location` rather than `page`, which
- * is what `NavBar` uses: `page` means this is the page, and every one of these
+ * is what `Navigation` uses: `page` means this is the page, and every one of these
  * is the same page.
  *
  * @since 0.1.0
  * @status experimental
  * @aliases Table of contents, On this page, Outline
- * @documentation https://helix.fusion.dev/components/page-nav
+ * @documentation https://helix.fusion.dev/components/outline
  *
  * @slot - The links, as anchors with fragment hrefs.
  *
  * @csspart nav - The navigation landmark.
  * @csspart indicator - The mark that travels to the section being read.
  */
-@customElement('helix-base-page-nav')
-export class HelixBasePageNav extends HelixElement {
+@customElement('helix-base-outline')
+export class HelixBaseOutline extends HelixElement {
   /* The mark. Vertical, which the controller needs no telling about: it writes
      all four values and the stylesheet uses the two it cares about. */
   private readonly indicator = new IndicatorController(this, {
@@ -199,7 +199,7 @@ export class HelixBasePageNav extends HelixElement {
      *
      * They were created in `firstUpdated`, which runs once for the life of the
      * element, and torn down in `disconnectedCallback`, which runs every time it
-     * moves. So a page-nav moved in the DOM, which a framework does on any
+     * moves. So a outline moved in the DOM, which a framework does on any
      * reorder, came back permanently frozen: `aria-current`, `current` and the
      * travelling mark all stopped for the rest of the page's life with nothing
      * to say why. Guarded on `hasUpdated`, because the first connection happens
@@ -253,6 +253,6 @@ export class HelixBasePageNav extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-page-nav': HelixBasePageNav
+    'helix-base-outline': HelixBaseOutline
   }
 }

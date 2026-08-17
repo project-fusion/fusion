@@ -46,7 +46,7 @@
 }
 
 [part="items"]:focus-visible {
-  border-color: var(--helix-color-border-accent);
+  border-color: var(--helix-color-primary);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }

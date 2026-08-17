@@ -11,7 +11,7 @@ describe('app header', () => {
     const header = await mount(`
       <helix-app-header>
         <span slot="start">Fusion</span>
-        <helix-nav-bar><a href="/work">Work</a></helix-nav-bar>
+        <helix-navigation><a href="/work">Work</a></helix-navigation>
         <helix-button slot="end">Contact</helix-button>
       </helix-app-header>
     `)
@@ -24,7 +24,7 @@ describe('app header', () => {
   })
 
   test('renders no landmark of its own, because a header is not navigation', async () => {
-    // The `<nav>` belongs to `NavBar`, which is what usually goes in the middle
+    // The `<nav>` belongs to `Navigation`, which is what usually goes in the middle
     // but is not what a header inherently is.
     const header = await mount('<helix-app-header></helix-app-header>')
     expect(header.shadowRoot?.querySelector('nav')).toBeNull()

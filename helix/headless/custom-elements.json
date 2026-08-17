@@ -929,7 +929,7 @@
               "name": "start"
             },
             {
-              "description": "The middle region, usually a `NavBar`.",
+              "description": "The middle region, usually a `Navigation`.",
               "name": ""
             },
             {
@@ -8896,7 +8896,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/nav-bar/index.js"
+            "module": "src/navigation/index.js"
           }
         },
         {
@@ -8912,7 +8912,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/page-nav/index.js"
+            "module": "src/outline/index.js"
           }
         },
         {
@@ -10214,7 +10214,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Layout and semantics, and deliberately not a target.\n\n**It does not become a link.** The reference renders an `<a>` when given an\n`href`, which is the thing Button and Toggle both stopped doing: a router\nrenders its own anchor and cannot render it inside this shadow root, so a row\nthat navigates would force a full page load. A row whose label is a\ndestination slots the consumer's own link as that label, and the link is the\ntarget rather than the row around it.\n\nThat is a real constraint rather than an oversight: a whole-row target needs\nthe anchor to wrap the layout, and the layout is what this component is. When\nsomething needs it, it wants a `data-list-item` recipe styling the consumer's\nanchor, the way `data-button` and `data-nav-item` do.",
+          "description": "Layout and semantics, and deliberately not a target.\n\n**It does not become a link.** The reference renders an `<a>` when given an\n`href`, which is the thing Button and Toggle both stopped doing: a router\nrenders its own anchor and cannot render it inside this shadow root, so a row\nthat navigates would force a full page load. A row whose label is a\ndestination slots the consumer's own link as that label, and the link is the\ntarget rather than the row around it.\n\nThat is a real constraint rather than an oversight: a whole-row target needs\nthe anchor to wrap the layout, and the layout is what this component is. When\nsomething needs it, it wants a `data-list-item` recipe styling the consumer's\nanchor, the way `data-button` and `data-navigation-item` do.",
           "name": "HelixBaseListItem",
           "cssParts": [
             {
@@ -12550,7 +12550,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/nav-bar/index.ts",
+      "path": "src/navigation/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -12558,19 +12558,19 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/nav-bar/root/nav-bar-root.js"
+            "module": "src/navigation/root/navigation-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/nav-bar/root/nav-bar-root.ts",
+      "path": "src/navigation/root/navigation-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "Renders a real `<nav>`, which is the landmark a screen-reader user jumps to.\nIt exists as its own component rather than as a region of `AppHeader` because\na header is not inherently navigation, and navigation is not only ever in a\nheader: a footer and a sidebar hold the same thing.\n\n**It renders no links.** The consumer brings them, marked with\n`aria-current=\"page\"` and styled by the `data-nav-item` recipe, for the same\nreason nothing else here renders an anchor: a router renders its own, and\ncannot render it inside this shadow root.\n\nWhat this owns is the marker that travels between them, and that is the whole\nreason it is a component. A marker that moves needs something that knows\nwhere every item is, and reading `aria-current` is how it knows which: the\nthing that makes the page announce correctly is the same thing that puts the\nmarker in the right place.",
-          "name": "HelixBaseNavBar",
+          "description": "Renders a real `<nav>`, which is the landmark a screen-reader user jumps to.\nIt exists as its own component rather than as a region of `AppHeader` because\na header is not inherently navigation, and navigation is not only ever in a\nheader: a footer and a sidebar hold the same thing.\n\n**It renders no links.** The consumer brings them, marked with\n`aria-current=\"page\"` and styled by the `data-navigation-item` recipe, for the same\nreason nothing else here renders an anchor: a router renders its own, and\ncannot render it inside this shadow root.\n\nWhat this owns is the marker that travels between them, and that is the whole\nreason it is a component. A marker that moves needs something that knows\nwhere every item is, and reading `aria-current` is how it knows which: the\nthing that makes the page announce correctly is the same thing that puts the\nmarker in the right place.",
+          "name": "HelixBaseNavigation",
           "cssParts": [
             {
               "description": "The navigation landmark.",
@@ -12731,37 +12731,37 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/nav-bar",
+            "documentation": "https://helix.fusion.dev/components/navigation",
             "aliases": [
               "Nav",
               "NavList",
               "Tabs"
             ],
             "tier": "headless",
-            "group": "BaseNavBar",
+            "group": "BaseNavigation",
             "part": "Root"
           },
-          "tagName": "helix-base-nav-bar",
+          "tagName": "helix-base-navigation",
           "customElement": true,
-          "modulePath": "src/nav-bar/root/nav-bar-root.ts",
-          "definitionPath": "src/nav-bar/root/nav-bar-root.ts"
+          "modulePath": "src/navigation/root/navigation-root.ts",
+          "definitionPath": "src/navigation/root/navigation-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseNavBar",
+          "name": "HelixBaseNavigation",
           "declaration": {
-            "name": "HelixBaseNavBar",
-            "module": "src/nav-bar/root/nav-bar-root.ts"
+            "name": "HelixBaseNavigation",
+            "module": "src/navigation/root/navigation-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-nav-bar",
+          "name": "helix-base-navigation",
           "declaration": {
-            "name": "HelixBaseNavBar",
-            "module": "src/nav-bar/root/nav-bar-root.ts"
+            "name": "HelixBaseNavigation",
+            "module": "src/navigation/root/navigation-root.ts"
           }
         }
       ]
@@ -13211,7 +13211,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/page-nav/index.ts",
+      "path": "src/outline/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -13219,19 +13219,19 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/page-nav/root/page-nav-root.js"
+            "module": "src/outline/root/outline-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/page-nav/root/page-nav-root.ts",
+      "path": "src/outline/root/outline-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "A table of contents, named for the job. Three of the obvious names are taken\nby things that are not this: `Outline` is a CSS property and the focus ring's\nwhole vocabulary, `Contents` is `display: contents` and the `content` part\nhalf this library renders, and `TableOfContents` would sit beside `Table` and\n`TableColumn` and read as a third part of that family. `PageNav` sits beside\n`NavBar`, which is the same job at the other scale: one navigates a site, the\nother navigates a document.\n\n**The links are the consumer's own anchors**, the same as `NavBar`. A router\nrenders its own `<a>` and cannot render one inside this shadow root, and the\nhrefs are fragments the page already knows.\n\n**What is current is decided by position, not by intersection.** The obvious\nbuild is an `IntersectionObserver` with a thin band near the top of the\nwindow, and it fails in both directions: with headings far apart nothing is\nin the band and the marker goes out entirely, and with headings close\ntogether several are and it flickers between them. So the observer is only\nthe *trigger*, and the answer is computed from where the headings actually\nare: the current section is the last one whose top has passed the reading\nline, or the first heading before any of them has.\n\nThat rule is what a reader means. Two headings on screen at once are not\nambiguous to a person: they are reading under the upper one.\n\n**`aria-current=\"location\"`, and it is written onto the consumer's anchor.**\nThis library does not normally write to light-DOM children, because an\nattribute added after upgrade is one a server's markup never had. It is right\nhere for the reason `Carousel` names its slides: what is current is derived\nfrom scroll position, so no server could have rendered it and there is\nnothing for hydration to disagree with. `location` rather than `page`, which\nis what `NavBar` uses: `page` means this is the page, and every one of these\nis the same page.",
-          "name": "HelixBasePageNav",
+          "description": "A table of contents, named for the job. Three of the obvious names are taken\nby things that are not this: `Outline` is a CSS property and the focus ring's\nwhole vocabulary, `Contents` is `display: contents` and the `content` part\nhalf this library renders, and `TableOfContents` would sit beside `Table` and\n`TableColumn` and read as a third part of that family. `Outline` sits beside\n`Navigation`, which is the same job at the other scale: one navigates a site, the\nother navigates a document.\n\n**The links are the consumer's own anchors**, the same as `Navigation`. A router\nrenders its own `<a>` and cannot render one inside this shadow root, and the\nhrefs are fragments the page already knows.\n\n**What is current is decided by position, not by intersection.** The obvious\nbuild is an `IntersectionObserver` with a thin band near the top of the\nwindow, and it fails in both directions: with headings far apart nothing is\nin the band and the marker goes out entirely, and with headings close\ntogether several are and it flickers between them. So the observer is only\nthe *trigger*, and the answer is computed from where the headings actually\nare: the current section is the last one whose top has passed the reading\nline, or the first heading before any of them has.\n\nThat rule is what a reader means. Two headings on screen at once are not\nambiguous to a person: they are reading under the upper one.\n\n**`aria-current=\"location\"`, and it is written onto the consumer's anchor.**\nThis library does not normally write to light-DOM children, because an\nattribute added after upgrade is one a server's markup never had. It is right\nhere for the reason `Carousel` names its slides: what is current is derived\nfrom scroll position, so no server could have rendered it and there is\nnothing for hydration to disagree with. `location` rather than `page`, which\nis what `Navigation` uses: `page` means this is the page, and every one of these\nis the same page.",
+          "name": "HelixBaseOutline",
           "cssParts": [
             {
               "description": "The navigation landmark.",
@@ -13458,37 +13458,37 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/page-nav",
+            "documentation": "https://helix.fusion.dev/components/outline",
             "aliases": [
               "Table of contents",
               "On this page",
               "Outline"
             ],
             "tier": "headless",
-            "group": "BasePageNav",
+            "group": "BaseOutline",
             "part": "Root"
           },
-          "tagName": "helix-base-page-nav",
+          "tagName": "helix-base-outline",
           "customElement": true,
-          "modulePath": "src/page-nav/root/page-nav-root.ts",
-          "definitionPath": "src/page-nav/root/page-nav-root.ts"
+          "modulePath": "src/outline/root/outline-root.ts",
+          "definitionPath": "src/outline/root/outline-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBasePageNav",
+          "name": "HelixBaseOutline",
           "declaration": {
-            "name": "HelixBasePageNav",
-            "module": "src/page-nav/root/page-nav-root.ts"
+            "name": "HelixBaseOutline",
+            "module": "src/outline/root/outline-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-page-nav",
+          "name": "helix-base-outline",
           "declaration": {
-            "name": "HelixBasePageNav",
-            "module": "src/page-nav/root/page-nav-root.ts"
+            "name": "HelixBaseOutline",
+            "module": "src/outline/root/outline-root.ts"
           }
         }
       ]
@@ -22450,7 +22450,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The indicator is one element that travels, not a background that appears on\nwhichever item is current. That difference is the whole point: a fill that\nswaps is two things changing at once and reads as a flicker, while one that\nmoves is a single object the eye follows, and it says where the selection\ncame from as well as where it went.\n\nIts whole box is measured from the selected item and written onto\nthe indicator as custom properties, because labels are different lengths and\nno proportion of the group is the right answer. Measurement is client-side by\nnecessity, so the server renders the indicator hidden and it fades in once it\nhas somewhere to be, which is the harmless direction: it appears rather than\njumping from a wrong place.\n\nA radio group, and only that. Navigation is links marked with `aria-current`\nand styled by the `data-nav-item` recipe: radio semantics would announce a\nset of destinations as a set of choices. A tab controls a panel.\n\nBeing a radio group, it is a form control, and it says so through\n`HelixFormElement`: it reports its value under a `name`, comes back to the\nmarkup's choice on reset, and restores the one a reader made when the browser\nbrings a form back.\n\nThe semantics were already right: the host has carried `role=\"radiogroup\"`\nand the items `role=\"radio\"` from the start. What none of it did was reach a\nform. A button in a shadow root submits nothing whatever its role, so the\nvalue has to be reported by the host, which is the only thing a form can\nsee.",
+          "description": "The indicator is one element that travels, not a background that appears on\nwhichever item is current. That difference is the whole point: a fill that\nswaps is two things changing at once and reads as a flicker, while one that\nmoves is a single object the eye follows, and it says where the selection\ncame from as well as where it went.\n\nIts whole box is measured from the selected item and written onto\nthe indicator as custom properties, because labels are different lengths and\nno proportion of the group is the right answer. Measurement is client-side by\nnecessity, so the server renders the indicator hidden and it fades in once it\nhas somewhere to be, which is the harmless direction: it appears rather than\njumping from a wrong place.\n\nA radio group, and only that. Navigation is links marked with `aria-current`\nand styled by the `data-navigation-item` recipe: radio semantics would announce a\nset of destinations as a set of choices. A tab controls a panel.\n\nBeing a radio group, it is a form control, and it says so through\n`HelixFormElement`: it reports its value under a `name`, comes back to the\nmarkup's choice on reset, and restores the one a reader made when the browser\nbrings a form back.\n\nThe semantics were already right: the host has carried `role=\"radiogroup\"`\nand the items `role=\"radio\"` from the start. What none of it did was reach a\nform. A button in a shadow root submits nothing whatever its role, so the\nvalue has to be reported by the host, which is the only thing a form can\nsee.",
           "name": "HelixBaseToggleGroup",
           "cssParts": [
             {
@@ -23142,7 +23142,7 @@
             "aliases": [
               "SegmentedControl",
               "Segmented",
-              "NavBar",
+              "Navigation",
               "Switcher"
             ],
             "tier": "headless",
@@ -23308,7 +23308,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Renders a `<button role=\"radio\">`. This is a form control and nothing else.\n\nNavigation is not this. It is links marked with `aria-current` and styled by\nthe `data-nav-item` recipe in the base layer, which carries the same look\nwithout radio semantics announcing destinations as choices.",
+          "description": "Renders a `<button role=\"radio\">`. This is a form control and nothing else.\n\nNavigation is not this. It is links marked with `aria-current` and styled by\nthe `data-navigation-item` recipe in the base layer, which carries the same look\nwithout radio semantics announcing destinations as choices.",
           "name": "HelixBaseToggle",
           "cssParts": [
             {

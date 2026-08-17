@@ -29,7 +29,7 @@ import { HelixBaseToggle } from '../root/toggle-root.js'
  * jumping from a wrong place.
  *
  * A radio group, and only that. Navigation is links marked with `aria-current`
- * and styled by the `data-nav-item` recipe: radio semantics would announce a
+ * and styled by the `data-navigation-item` recipe: radio semantics would announce a
  * set of destinations as a set of choices. A tab controls a panel.
  *
  * Being a radio group, it is a form control, and it says so through
@@ -45,7 +45,7 @@ import { HelixBaseToggle } from '../root/toggle-root.js'
  *
  * @since 0.1.0
  * @status experimental
- * @aliases SegmentedControl, Segmented, NavBar, Switcher
+ * @aliases SegmentedControl, Segmented, Navigation, Switcher
  * @documentation https://helix.fusion.dev/components/toggle-group
  *
  * @slot - The group's items.

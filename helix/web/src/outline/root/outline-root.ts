@@ -1,7 +1,7 @@
 import { customElement } from '@helix-io/core'
-import { HelixBasePageNav } from '@helix-io/headless'
+import { HelixBaseOutline } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './page-nav-root.css.js'
+import { styles } from './outline-root.css.js'
 
 /**
  * @summary Links to the headings on this page, marking the one being read.
@@ -11,26 +11,26 @@ import { styles } from './page-nav-root.css.js'
  * the shape a table of contents has taken since printed marginalia: the line
  * says the list is one thing, and the lit segment says where in it you are.
  *
- * Nesting is the consumer's, expressed as `data-level` on a link. A page-nav
+ * Nesting is the consumer's, expressed as `data-level` on a link. A outline
  * that read heading levels itself would have to look at the document, and the
  * document is not always where the headings are.
  *
  * @since 0.1.0
  * @status experimental
  * @aliases Table of contents, On this page, Outline
- * @documentation https://helix.fusion.dev/components/page-nav
+ * @documentation https://helix.fusion.dev/components/outline
  *
- * @cssproperty --page-nav-rail - Width of the gutter the rule and the travelling mark share.
+ * @cssproperty --outline-rail - Width of the gutter the rule and the travelling mark share.
  *
- * @cssproperty --page-nav-indent - How far each level is inset from the one above.
+ * @cssproperty --outline-indent - How far each level is inset from the one above.
  */
-@customElement('helix-page-nav')
-export class HelixPageNav extends HelixBasePageNav {
+@customElement('helix-outline')
+export class HelixOutline extends HelixBaseOutline {
   static override styles: CSSResultGroup = styles
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-page-nav': HelixPageNav
+    'helix-outline': HelixOutline
   }
 }

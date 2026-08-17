@@ -54,13 +54,13 @@
 }
 
 :host(:not([disabled])) [part="item"]:hover [part="box"] {
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* The edge firms up and takes no color, which is the checkbox's rule: color
    is reserved for state, and being chosen is an answer rather than a state. */
 :host([selected]) [part="box"] {
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* A dot rather than a mask, because a circle is a border radius and needs no
@@ -134,7 +134,7 @@
 }
 
 :host(:not([disabled])[appearance="card"]) [part="item"]:hover {
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* Lifted rather than colored, which is this component's own rule about the
@@ -143,7 +143,7 @@
    already animated and already legible without color. */
 :host([appearance="card"][selected]) [part="item"] {
   background-color: var(--helix-color-surface-raised);
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* On the whole card, because in this appearance the card is the target. The

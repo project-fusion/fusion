@@ -1,7 +1,7 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseNavBar } from '@helix-io/headless'
+import { HelixBaseNavigation } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './nav-bar-root.css.js'
+import { styles } from './navigation-root.css.js'
 
 /**
  * @summary A set of destinations, with a marker on the current one.
@@ -15,18 +15,18 @@ import { styles } from './nav-bar-root.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Nav, NavList, Tabs
- * @documentation https://helix.fusion.dev/components/nav-bar
+ * @documentation https://helix.fusion.dev/components/navigation
  *
- * @cssproperty --nav-bar-indicator-color - Fill of the traveling marker.
- * @cssproperty --nav-bar-gap - Space between destinations.
+ * @cssproperty --navigation-indicator-color - Fill of the traveling marker.
+ * @cssproperty --navigation-gap - Space between destinations.
  */
-@customElement('helix-nav-bar')
-export class HelixNavBar extends HelixBaseNavBar {
+@customElement('helix-navigation')
+export class HelixNavigation extends HelixBaseNavigation {
   static override styles: CSSResultGroup = styles
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-nav-bar': HelixNavBar
+    'helix-navigation': HelixNavigation
   }
 }

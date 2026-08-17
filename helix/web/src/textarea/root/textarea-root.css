@@ -29,14 +29,14 @@
  * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
  */
 :host(:not(:disabled)) [part="field"]:hover {
-  border-color: var(--helix-color-border-strong);
+  border-color: var(--helix-color-primary);
 }
 
 /* One edge rather than two rings, the same as the input: the border turns and
    the ring is drawn against it. Named with `:hover` for the same reason too. */
 :host(:focus-within) [part="field"],
 :host(:focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-border-accent);
+  border-color: var(--helix-color-primary);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }

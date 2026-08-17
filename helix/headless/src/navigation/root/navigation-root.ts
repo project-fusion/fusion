@@ -12,7 +12,7 @@ import { property } from 'lit/decorators.js'
  * header: a footer and a sidebar hold the same thing.
  *
  * **It renders no links.** The consumer brings them, marked with
- * `aria-current="page"` and styled by the `data-nav-item` recipe, for the same
+ * `aria-current="page"` and styled by the `data-navigation-item` recipe, for the same
  * reason nothing else here renders an anchor: a router renders its own, and
  * cannot render it inside this shadow root.
  *
@@ -25,15 +25,15 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Nav, NavList, Tabs
- * @documentation https://helix.fusion.dev/components/nav-bar
+ * @documentation https://helix.fusion.dev/components/navigation
  *
  * @slot - The destinations, as the consumer's own links.
  *
  * @csspart nav - The navigation landmark.
  * @csspart indicator - The marker that travels to the current destination.
  */
-@customElement('helix-base-nav-bar')
-export class HelixBaseNavBar extends HelixElement {
+@customElement('helix-base-navigation')
+export class HelixBaseNavigation extends HelixElement {
   /* The mark, and the RTL sign and border correction that came with it. This
      was hand-written and had neither: the distance was measured from the
      physical left and applied from the inline-start edge, so it travelled the
@@ -64,16 +64,16 @@ export class HelixBaseNavBar extends HelixElement {
 
     /* Nothing is written onto the items any more.
      *
-     * `data-nav-item` used to be put here, because the base layer styled a
+     * `data-navigation-item` used to be put here, because the base layer styled a
      * destination with it and forgetting it was silent and total: the links
      * kept working and came out as bare underlined anchors. Writing it fixed
      * that and bought two problems. It happened after upgrade, so a
      * server-rendered nav arrived unstyled and restyled itself a frame later;
      * and a React consumer who wrote the attribute themselves got
-     * `data-nav-item="true"` from JSX, which this then had to be careful not to
+     * `data-navigation-item="true"` from JSX, which this then had to be careful not to
      * overwrite or hydration reported a mismatch.
      *
-     * The base layer selects `helix-nav-bar a` as well now, so the styling is
+     * The base layer selects `helix-navigation a` as well now, so the styling is
      * true the moment the markup is parsed, on the server and on the client,
      * and there is nothing to write or to be careful about. */
     this.indicator.place()
@@ -113,6 +113,6 @@ export class HelixBaseNavBar extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-nav-bar': HelixBaseNavBar
+    'helix-base-navigation': HelixBaseNavigation
   }
 }

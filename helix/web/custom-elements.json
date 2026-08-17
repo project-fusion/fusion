@@ -11977,7 +11977,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/nav-bar/index.js"
+            "module": "src/navigation/index.js"
           }
         },
         {
@@ -11993,7 +11993,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/page-nav/index.js"
+            "module": "src/outline/index.js"
           }
         },
         {
@@ -16371,7 +16371,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/nav-bar/index.ts",
+      "path": "src/navigation/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -16379,14 +16379,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/nav-bar/root/nav-bar-root.js"
+            "module": "src/navigation/root/navigation-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/nav-bar/root/nav-bar-root.css.ts",
+      "path": "src/navigation/root/navigation-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -16399,27 +16399,27 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/nav-bar/root/nav-bar-root.css.ts"
+            "module": "src/navigation/root/navigation-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/nav-bar/root/nav-bar-root.ts",
+      "path": "src/navigation/root/navigation-root.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "One marker that travels, rather than a background that appears on whichever\ndestination is current. A fill that swaps is two things changing at once and\nreads as a flicker; one that moves is a single object the eye follows, and it\nsays where the current page was as well as where it is.",
-          "name": "HelixNavBar",
+          "name": "HelixNavigation",
           "cssProperties": [
             {
               "description": "Fill of the traveling marker.",
-              "name": "--nav-bar-indicator-color"
+              "name": "--navigation-indicator-color"
             },
             {
               "description": "Space between destinations.",
-              "name": "--nav-bar-gap"
+              "name": "--navigation-gap"
             }
           ],
           "members": [
@@ -16430,8 +16430,8 @@
               "readonly": true,
               "default": "new IndicatorController(this, { active: () => this.items.find((item) => item.getAttribute('aria-current') === 'page'), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"nav\"]'), })",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             },
             {
@@ -16444,8 +16444,8 @@
               "description": "Accessible name for the landmark.",
               "attribute": "label",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             },
             {
@@ -16456,8 +16456,8 @@
               },
               "privacy": "private",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             },
             {
@@ -16468,8 +16468,8 @@
               },
               "privacy": "private",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             },
             {
@@ -16482,8 +16482,8 @@
               "description": "The destinations the consumer slotted.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             },
             {
@@ -16497,8 +16497,8 @@
               },
               "description": "Re-measures when the links change, move, or hand over the current page.",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             },
             {
@@ -16572,32 +16572,32 @@
             }
           ],
           "superclass": {
-            "name": "HelixBaseNavBar",
+            "name": "HelixBaseNavigation",
             "package": "@helix-io/headless"
           },
           "summary": "A set of destinations, with a marker on the current one.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/nav-bar",
+            "documentation": "https://helix.fusion.dev/components/navigation",
             "aliases": [
               "Nav",
               "NavList",
               "Tabs"
             ],
             "tier": "styled",
-            "group": "NavBar",
+            "group": "Navigation",
             "part": "Root"
           },
-          "tagName": "helix-nav-bar",
+          "tagName": "helix-navigation",
           "customElement": true,
           "slots": [
             {
               "description": "The destinations, as the consumer's own links.",
               "name": "",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             }
           ],
@@ -16606,16 +16606,16 @@
               "description": "The navigation landmark.",
               "name": "nav",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             },
             {
               "description": "The marker that travels to the current destination.",
               "name": "indicator",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             }
           ],
@@ -16629,30 +16629,30 @@
               "description": "Accessible name for the landmark.",
               "fieldName": "label",
               "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
+                "name": "HelixBaseNavigation",
+                "module": "src/navigation/root/navigation-root.ts"
               }
             }
           ],
-          "modulePath": "src/nav-bar/root/nav-bar-root.ts",
-          "definitionPath": "src/nav-bar/root/nav-bar-root.ts"
+          "modulePath": "src/navigation/root/navigation-root.ts",
+          "definitionPath": "src/navigation/root/navigation-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixNavBar",
+          "name": "HelixNavigation",
           "declaration": {
-            "name": "HelixNavBar",
-            "module": "src/nav-bar/root/nav-bar-root.ts"
+            "name": "HelixNavigation",
+            "module": "src/navigation/root/navigation-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-nav-bar",
+          "name": "helix-navigation",
           "declaration": {
-            "name": "HelixNavBar",
-            "module": "src/nav-bar/root/nav-bar-root.ts"
+            "name": "HelixNavigation",
+            "module": "src/navigation/root/navigation-root.ts"
           }
         }
       ]
@@ -17240,7 +17240,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/page-nav/index.ts",
+      "path": "src/outline/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -17248,14 +17248,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/page-nav/root/page-nav-root.js"
+            "module": "src/outline/root/outline-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/page-nav/root/page-nav-root.css.ts",
+      "path": "src/outline/root/outline-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -17268,27 +17268,27 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/page-nav/root/page-nav-root.css.ts"
+            "module": "src/outline/root/outline-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/page-nav/root/page-nav-root.ts",
+      "path": "src/outline/root/outline-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "A rule down the leading edge with the current section lit along it, which is\nthe shape a table of contents has taken since printed marginalia: the line\nsays the list is one thing, and the lit segment says where in it you are.\n\nNesting is the consumer's, expressed as `data-level` on a link. A page-nav\nthat read heading levels itself would have to look at the document, and the\ndocument is not always where the headings are.",
-          "name": "HelixPageNav",
+          "description": "A rule down the leading edge with the current section lit along it, which is\nthe shape a table of contents has taken since printed marginalia: the line\nsays the list is one thing, and the lit segment says where in it you are.\n\nNesting is the consumer's, expressed as `data-level` on a link. A outline\nthat read heading levels itself would have to look at the document, and the\ndocument is not always where the headings are.",
+          "name": "HelixOutline",
           "cssProperties": [
             {
               "description": "Width of the gutter the rule and the travelling mark share.",
-              "name": "--page-nav-rail"
+              "name": "--outline-rail"
             },
             {
               "description": "How far each level is inset from the one above.",
-              "name": "--page-nav-indent"
+              "name": "--outline-indent"
             }
           ],
           "members": [
@@ -17299,8 +17299,8 @@
               "readonly": true,
               "default": "new IndicatorController(this, { active: () => this.links.find((link) => link.hasAttribute('aria-current')), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"nav\"]'), })",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17313,8 +17313,8 @@
               "description": "Accessible name for the navigation.",
               "attribute": "label",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17327,8 +17327,8 @@
               "description": "How far below the top of the window a heading counts as reached, in pixels.\n\nThe reading line. A page with a sticky masthead sets this to its height, or\na little more: without it the current section changes as a heading slides\nunder the chrome rather than as it reaches the top of what can be seen.",
               "attribute": "offset",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17340,8 +17340,8 @@
               "description": "The id of the section being read, or empty before anything is measured.\n\nRead-only, and a getter rather than a property for that reason: it is\nderived from where the page is scrolled to, so a consumer setting it would\nbe overwritten by the next thing that crossed the reading line. Every other\nwritable property in this library that a component also writes is state a\nconsumer can own; this one cannot be, and saying so with the type is better\nthan saying it in a sentence nobody reads.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17354,8 +17354,8 @@
               "default": "''",
               "description": "What `current` reports, which only `mark` writes.",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17366,8 +17366,8 @@
               },
               "privacy": "private",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17378,8 +17378,8 @@
               },
               "privacy": "private",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17392,8 +17392,8 @@
               "description": "The links, in document order. Empty on the server, which has no tree.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17406,8 +17406,8 @@
               "description": "What each link points at, paired with the link, skipping anything missing.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17421,8 +17421,8 @@
               },
               "description": "Works out which section is being read, and marks its link.\n\nPositional rather than a reading of what intersects, for the reason above.\nThe comparison is against `offset` and not zero, so the reading line is\nwherever the page says the top of the readable area is.",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17436,8 +17436,8 @@
               },
               "description": "Watches every section, and re-marks whenever any of them crosses anything.\n\nThe thresholds are what make the trigger frequent enough: an observer fires\non entering and leaving, and a long section scrolled slowly crosses neither\nfor a long time. Asking for a callback at each quarter of visibility is\ncheap and keeps the marker honest without a scroll listener.",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17447,8 +17447,8 @@
               "readonly": true,
               "description": "The set changed: watch it, and measure it.\n\nBoth, for the reason the tab strip records: the host renders before its\nlinks have anything to point at, so the first measurement finds nothing,\nand without a second one at `slotchange` the mark stays unplaced for the\nlife of the page.",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17522,32 +17522,32 @@
             }
           ],
           "superclass": {
-            "name": "HelixBasePageNav",
+            "name": "HelixBaseOutline",
             "package": "@helix-io/headless"
           },
           "summary": "Links to the headings on this page, marking the one being read.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/page-nav",
+            "documentation": "https://helix.fusion.dev/components/outline",
             "aliases": [
               "Table of contents",
               "On this page",
               "Outline"
             ],
             "tier": "styled",
-            "group": "PageNav",
+            "group": "Outline",
             "part": "Root"
           },
-          "tagName": "helix-page-nav",
+          "tagName": "helix-outline",
           "customElement": true,
           "slots": [
             {
               "description": "The links, as anchors with fragment hrefs.",
               "name": "",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             }
           ],
@@ -17556,16 +17556,16 @@
               "description": "The navigation landmark.",
               "name": "nav",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
               "description": "The mark that travels to the section being read.",
               "name": "indicator",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             }
           ],
@@ -17579,8 +17579,8 @@
               "description": "Accessible name for the navigation.",
               "fieldName": "label",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             },
             {
@@ -17592,30 +17592,30 @@
               "description": "How far below the top of the window a heading counts as reached, in pixels.\n\nThe reading line. A page with a sticky masthead sets this to its height, or\na little more: without it the current section changes as a heading slides\nunder the chrome rather than as it reaches the top of what can be seen.",
               "fieldName": "offset",
               "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
               }
             }
           ],
-          "modulePath": "src/page-nav/root/page-nav-root.ts",
-          "definitionPath": "src/page-nav/root/page-nav-root.ts"
+          "modulePath": "src/outline/root/outline-root.ts",
+          "definitionPath": "src/outline/root/outline-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixPageNav",
+          "name": "HelixOutline",
           "declaration": {
-            "name": "HelixPageNav",
-            "module": "src/page-nav/root/page-nav-root.ts"
+            "name": "HelixOutline",
+            "module": "src/outline/root/outline-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-page-nav",
+          "name": "helix-outline",
           "declaration": {
-            "name": "HelixPageNav",
-            "module": "src/page-nav/root/page-nav-root.ts"
+            "name": "HelixOutline",
+            "module": "src/outline/root/outline-root.ts"
           }
         }
       ]
@@ -29424,7 +29424,7 @@
             "aliases": [
               "SegmentedControl",
               "Segmented",
-              "NavBar",
+              "Navigation",
               "Switcher"
             ],
             "tier": "styled",

@@ -14,7 +14,7 @@
    * when it stopped being drawn as one, and the border scale has two steps with
    * nothing between 2px and nothing: at 2px the mark read as a slightly darker
    * rule rather than as a thing sitting on it. */
-  --page-nav-rail: var(--helix-space-2xs);
+  --outline-rail: var(--helix-space-2xs);
 }
 
 /* The rule is a background rather than a border, for the reason the tabs strip
@@ -35,7 +35,7 @@
    * the component from the mark that is meant to cover it, so the pair read as
    * two lines with the list between them. `background-position` takes a side
    * keyword, and `inline-start` is the one that follows the text. */
-  background-position: calc((var(--page-nav-rail) - var(--helix-border-thin)) / 2) 0;
+  background-position: calc((var(--outline-rail) - var(--helix-border-thin)) / 2) 0;
   background-repeat: repeat-y;
   background-size: var(--helix-border-thin) 100%;
   display: flex;
@@ -61,7 +61,7 @@
   background-color: var(--helix-color-primary);
   block-size: var(--_indicator-h, 0);
   border-radius: var(--helix-radii-full);
-  inline-size: var(--page-nav-rail);
+  inline-size: var(--outline-rail);
   inset-block-start: 0;
   inset-inline-start: 0;
   opacity: 0;

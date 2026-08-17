@@ -40,12 +40,12 @@ import type {
   HelixListbox,
   HelixMenu,
   HelixMenuItem,
-  HelixNavBar,
   HelixNavigateEvent,
+  HelixNavigation,
   HelixOpenEvent,
   HelixOption,
   HelixOptionGroup,
-  HelixPageNav,
+  HelixOutline,
   HelixPopover,
   HelixProgress,
   HelixQuote,
@@ -3002,14 +3002,14 @@ instead. */
   textContent?: string | number;
 };
 
-export type HelixNavBarProps = {
+export type HelixNavigationProps = {
   /** Accessible name for the landmark. */
-  label?: HelixNavBar["label"];
+  label?: HelixNavigation["label"];
 };
 
-export type HelixNavBarSolidJsProps = {
+export type HelixNavigationSolidJsProps = {
   /** Accessible name for the landmark. */
-  "prop:label"?: HelixNavBar["label"];
+  "prop:label"?: HelixNavigation["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3074,26 +3074,26 @@ export type HelixOptionSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixPageNavProps = {
+export type HelixOutlineProps = {
   /** Accessible name for the navigation. */
-  label?: HelixPageNav["label"];
+  label?: HelixOutline["label"];
   /** How far below the top of the window a heading counts as reached, in pixels.
 
 The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
-  offset?: HelixPageNav["offset"];
+  offset?: HelixOutline["offset"];
 };
 
-export type HelixPageNavSolidJsProps = {
+export type HelixOutlineSolidJsProps = {
   /** Accessible name for the navigation. */
-  "prop:label"?: HelixPageNav["label"];
+  "prop:label"?: HelixOutline["label"];
   /** How far below the top of the window a heading counts as reached, in pixels.
 
 The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
-  "prop:offset"?: HelixPageNav["offset"];
+  "prop:offset"?: HelixOutline["offset"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7991,8 +7991,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--nav-bar-indicator-color`: Fill of the traveling marker. (default: `undefined`)
-   * - `--nav-bar-gap`: Space between destinations. (default: `undefined`)
+   * - `--navigation-indicator-color`: Fill of the traveling marker. (default: `undefined`)
+   * - `--navigation-gap`: Space between destinations. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -8001,8 +8001,8 @@ export type CustomElements = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The marker that travels to the current destination.
    */
-  "helix-nav-bar": Partial<
-    HelixNavBarProps & BaseProps<HelixNavBar> & BaseEvents
+  "helix-navigation": Partial<
+    HelixNavigationProps & BaseProps<HelixNavigation> & BaseEvents
   >;
 
   /**
@@ -8097,7 +8097,7 @@ export type CustomElements = {
    * the shape a table of contents has taken since printed marginalia: the line
    * says the list is one thing, and the lit segment says where in it you are.
    *
-   * Nesting is the consumer's, expressed as `data-level` on a link. A page-nav
+   * Nesting is the consumer's, expressed as `data-level` on a link. A outline
    * that read heading levels itself would have to look at the document, and the
    * document is not always where the headings are.
    *
@@ -8130,8 +8130,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--page-nav-rail`: Width of the gutter the rule and the travelling mark share. (default: `undefined`)
-   * - `--page-nav-indent`: How far each level is inset from the one above. (default: `undefined`)
+   * - `--outline-rail`: Width of the gutter the rule and the travelling mark share. (default: `undefined`)
+   * - `--outline-indent`: How far each level is inset from the one above. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -8140,8 +8140,8 @@ export type CustomElements = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The mark that travels to the section being read.
    */
-  "helix-page-nav": Partial<
-    HelixPageNavProps & BaseProps<HelixPageNav> & BaseEvents
+  "helix-outline": Partial<
+    HelixOutlineProps & BaseProps<HelixOutline> & BaseEvents
   >;
 
   /**
@@ -12827,8 +12827,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--nav-bar-indicator-color`: Fill of the traveling marker. (default: `undefined`)
-   * - `--nav-bar-gap`: Space between destinations. (default: `undefined`)
+   * - `--navigation-indicator-color`: Fill of the traveling marker. (default: `undefined`)
+   * - `--navigation-gap`: Space between destinations. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -12837,10 +12837,10 @@ export type CustomElementsSolidJs = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The marker that travels to the current destination.
    */
-  "helix-nav-bar": Partial<
-    HelixNavBarProps &
-      HelixNavBarSolidJsProps &
-      BaseProps<HelixNavBar> &
+  "helix-navigation": Partial<
+    HelixNavigationProps &
+      HelixNavigationSolidJsProps &
+      BaseProps<HelixNavigation> &
       BaseEvents
   >;
 
@@ -12942,7 +12942,7 @@ export type CustomElementsSolidJs = {
    * the shape a table of contents has taken since printed marginalia: the line
    * says the list is one thing, and the lit segment says where in it you are.
    *
-   * Nesting is the consumer's, expressed as `data-level` on a link. A page-nav
+   * Nesting is the consumer's, expressed as `data-level` on a link. A outline
    * that read heading levels itself would have to look at the document, and the
    * document is not always where the headings are.
    *
@@ -12975,8 +12975,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--page-nav-rail`: Width of the gutter the rule and the travelling mark share. (default: `undefined`)
-   * - `--page-nav-indent`: How far each level is inset from the one above. (default: `undefined`)
+   * - `--outline-rail`: Width of the gutter the rule and the travelling mark share. (default: `undefined`)
+   * - `--outline-indent`: How far each level is inset from the one above. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -12985,10 +12985,10 @@ export type CustomElementsSolidJs = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The mark that travels to the section being read.
    */
-  "helix-page-nav": Partial<
-    HelixPageNavProps &
-      HelixPageNavSolidJsProps &
-      BaseProps<HelixPageNav> &
+  "helix-outline": Partial<
+    HelixOutlineProps &
+      HelixOutlineSolidJsProps &
+      BaseProps<HelixOutline> &
       BaseEvents
   >;
 
@@ -15362,17 +15362,17 @@ export type CustomCssProperties = {
   /** Fill of the surface. */
   "--menu-background-color"?: string;
   /** Fill of the traveling marker. */
-  "--nav-bar-indicator-color"?: string;
+  "--navigation-indicator-color"?: string;
   /** Space between destinations. */
-  "--nav-bar-gap"?: string;
+  "--navigation-gap"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
   /** Corner radius of the row. A listbox and a select flatten it. */
   "--option-radii"?: string;
   /** Width of the gutter the rule and the travelling mark share. */
-  "--page-nav-rail"?: string;
+  "--outline-rail"?: string;
   /** How far each level is inset from the one above. */
-  "--page-nav-indent"?: string;
+  "--outline-indent"?: string;
   /** Tallest the panel grows before it scrolls. */
   "--popover-max-block-size"?: string;
   /** Space between the panel's edge and its contents. */

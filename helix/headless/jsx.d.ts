@@ -33,10 +33,10 @@ import type {
   HelixBaseListbox,
   HelixBaseMenu,
   HelixBaseMenuItem,
-  HelixBaseNavBar,
+  HelixBaseNavigation,
   HelixBaseOption,
   HelixBaseOptionGroup,
-  HelixBasePageNav,
+  HelixBaseOutline,
   HelixBasePopover,
   HelixBaseProgress,
   HelixBaseQuote,
@@ -2649,14 +2649,14 @@ instead. */
   textContent?: string | number;
 };
 
-export type HelixBaseNavBarProps = {
+export type HelixBaseNavigationProps = {
   /** Accessible name for the landmark. */
-  label?: HelixBaseNavBar["label"];
+  label?: HelixBaseNavigation["label"];
 };
 
-export type HelixBaseNavBarSolidJsProps = {
+export type HelixBaseNavigationSolidJsProps = {
   /** Accessible name for the landmark. */
-  "prop:label"?: HelixBaseNavBar["label"];
+  "prop:label"?: HelixBaseNavigation["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2724,26 +2724,26 @@ export type HelixBaseOptionSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBasePageNavProps = {
+export type HelixBaseOutlineProps = {
   /** Accessible name for the navigation. */
-  label?: HelixBasePageNav["label"];
+  label?: HelixBaseOutline["label"];
   /** How far below the top of the window a heading counts as reached, in pixels.
 
 The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
-  offset?: HelixBasePageNav["offset"];
+  offset?: HelixBaseOutline["offset"];
 };
 
-export type HelixBasePageNavSolidJsProps = {
+export type HelixBaseOutlineSolidJsProps = {
   /** Accessible name for the navigation. */
-  "prop:label"?: HelixBasePageNav["label"];
+  "prop:label"?: HelixBaseOutline["label"];
   /** How far below the top of the window a heading counts as reached, in pixels.
 
 The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
-  "prop:offset"?: HelixBasePageNav["offset"];
+  "prop:offset"?: HelixBaseOutline["offset"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5353,7 +5353,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `start`: Leading content, usually a wordmark.
-   * - `(default)`: The middle region, usually a `NavBar`.
+   * - `(default)`: The middle region, usually a `Navigation`.
    * - `end`: Trailing content.
    *
    * ## CSS Parts
@@ -6993,7 +6993,7 @@ export type CustomElements = {
    * That is a real constraint rather than an oversight: a whole-row target needs
    * the anchor to wrap the layout, and the layout is what this component is. When
    * something needs it, it wants a `data-list-item` recipe styling the consumer's
-   * anchor, the way `data-button` and `data-nav-item` do.
+   * anchor, the way `data-button` and `data-navigation-item` do.
    *
    * ## Slots
    *
@@ -7425,7 +7425,7 @@ export type CustomElements = {
    * header: a footer and a sidebar hold the same thing.
    *
    * **It renders no links.** The consumer brings them, marked with
-   * `aria-current="page"` and styled by the `data-nav-item` recipe, for the same
+   * `aria-current="page"` and styled by the `data-navigation-item` recipe, for the same
    * reason nothing else here renders an anchor: a router renders its own, and
    * cannot render it inside this shadow root.
    *
@@ -7454,8 +7454,8 @@ export type CustomElements = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The marker that travels to the current destination.
    */
-  "helix-base-nav-bar": Partial<
-    HelixBaseNavBarProps & BaseProps<HelixBaseNavBar> & BaseEvents
+  "helix-base-navigation": Partial<
+    HelixBaseNavigationProps & BaseProps<HelixBaseNavigation> & BaseEvents
   >;
 
   /**
@@ -7561,11 +7561,11 @@ export type CustomElements = {
    * by things that are not this: `Outline` is a CSS property and the focus ring's
    * whole vocabulary, `Contents` is `display: contents` and the `content` part
    * half this library renders, and `TableOfContents` would sit beside `Table` and
-   * `TableColumn` and read as a third part of that family. `PageNav` sits beside
-   * `NavBar`, which is the same job at the other scale: one navigates a site, the
+   * `TableColumn` and read as a third part of that family. `Outline` sits beside
+   * `Navigation`, which is the same job at the other scale: one navigates a site, the
    * other navigates a document.
    *
-   * **The links are the consumer's own anchors**, the same as `NavBar`. A router
+   * **The links are the consumer's own anchors**, the same as `Navigation`. A router
    * renders its own `<a>` and cannot render one inside this shadow root, and the
    * hrefs are fragments the page already knows.
    *
@@ -7587,7 +7587,7 @@ export type CustomElements = {
    * here for the reason `Carousel` names its slides: what is current is derived
    * from scroll position, so no server could have rendered it and there is
    * nothing for hydration to disagree with. `location` rather than `page`, which
-   * is what `NavBar` uses: `page` means this is the page, and every one of these
+   * is what `Navigation` uses: `page` means this is the page, and every one of these
    * is the same page.
    *
    * ## Attributes & Properties
@@ -7622,8 +7622,8 @@ export type CustomElements = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The mark that travels to the section being read.
    */
-  "helix-base-page-nav": Partial<
-    HelixBasePageNavProps & BaseProps<HelixBasePageNav> & BaseEvents
+  "helix-base-outline": Partial<
+    HelixBaseOutlineProps & BaseProps<HelixBaseOutline> & BaseEvents
   >;
 
   /**
@@ -9257,7 +9257,7 @@ export type CustomElements = {
    * jumping from a wrong place.
    *
    * A radio group, and only that. Navigation is links marked with `aria-current`
-   * and styled by the `data-nav-item` recipe: radio semantics would announce a
+   * and styled by the `data-navigation-item` recipe: radio semantics would announce a
    * set of destinations as a set of choices. A tab controls a panel.
    *
    * Being a radio group, it is a form control, and it says so through
@@ -9382,7 +9382,7 @@ export type CustomElements = {
    * Renders a `<button role="radio">`. This is a form control and nothing else.
    *
    * Navigation is not this. It is links marked with `aria-current` and styled by
-   * the `data-nav-item` recipe in the base layer, which carries the same look
+   * the `data-navigation-item` recipe in the base layer, which carries the same look
    * without radio semantics announcing destinations as choices.
    *
    * ## Attributes & Properties
@@ -10034,7 +10034,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `start`: Leading content, usually a wordmark.
-   * - `(default)`: The middle region, usually a `NavBar`.
+   * - `(default)`: The middle region, usually a `Navigation`.
    * - `end`: Trailing content.
    *
    * ## CSS Parts
@@ -11749,7 +11749,7 @@ export type CustomElementsSolidJs = {
    * That is a real constraint rather than an oversight: a whole-row target needs
    * the anchor to wrap the layout, and the layout is what this component is. When
    * something needs it, it wants a `data-list-item` recipe styling the consumer's
-   * anchor, the way `data-button` and `data-nav-item` do.
+   * anchor, the way `data-button` and `data-navigation-item` do.
    *
    * ## Slots
    *
@@ -12196,7 +12196,7 @@ export type CustomElementsSolidJs = {
    * header: a footer and a sidebar hold the same thing.
    *
    * **It renders no links.** The consumer brings them, marked with
-   * `aria-current="page"` and styled by the `data-nav-item` recipe, for the same
+   * `aria-current="page"` and styled by the `data-navigation-item` recipe, for the same
    * reason nothing else here renders an anchor: a router renders its own, and
    * cannot render it inside this shadow root.
    *
@@ -12225,10 +12225,10 @@ export type CustomElementsSolidJs = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The marker that travels to the current destination.
    */
-  "helix-base-nav-bar": Partial<
-    HelixBaseNavBarProps &
-      HelixBaseNavBarSolidJsProps &
-      BaseProps<HelixBaseNavBar> &
+  "helix-base-navigation": Partial<
+    HelixBaseNavigationProps &
+      HelixBaseNavigationSolidJsProps &
+      BaseProps<HelixBaseNavigation> &
       BaseEvents
   >;
 
@@ -12341,11 +12341,11 @@ export type CustomElementsSolidJs = {
    * by things that are not this: `Outline` is a CSS property and the focus ring's
    * whole vocabulary, `Contents` is `display: contents` and the `content` part
    * half this library renders, and `TableOfContents` would sit beside `Table` and
-   * `TableColumn` and read as a third part of that family. `PageNav` sits beside
-   * `NavBar`, which is the same job at the other scale: one navigates a site, the
+   * `TableColumn` and read as a third part of that family. `Outline` sits beside
+   * `Navigation`, which is the same job at the other scale: one navigates a site, the
    * other navigates a document.
    *
-   * **The links are the consumer's own anchors**, the same as `NavBar`. A router
+   * **The links are the consumer's own anchors**, the same as `Navigation`. A router
    * renders its own `<a>` and cannot render one inside this shadow root, and the
    * hrefs are fragments the page already knows.
    *
@@ -12367,7 +12367,7 @@ export type CustomElementsSolidJs = {
    * here for the reason `Carousel` names its slides: what is current is derived
    * from scroll position, so no server could have rendered it and there is
    * nothing for hydration to disagree with. `location` rather than `page`, which
-   * is what `NavBar` uses: `page` means this is the page, and every one of these
+   * is what `Navigation` uses: `page` means this is the page, and every one of these
    * is the same page.
    *
    * ## Attributes & Properties
@@ -12402,10 +12402,10 @@ export type CustomElementsSolidJs = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The mark that travels to the section being read.
    */
-  "helix-base-page-nav": Partial<
-    HelixBasePageNavProps &
-      HelixBasePageNavSolidJsProps &
-      BaseProps<HelixBasePageNav> &
+  "helix-base-outline": Partial<
+    HelixBaseOutlineProps &
+      HelixBaseOutlineSolidJsProps &
+      BaseProps<HelixBaseOutline> &
       BaseEvents
   >;
 
@@ -14109,7 +14109,7 @@ export type CustomElementsSolidJs = {
    * jumping from a wrong place.
    *
    * A radio group, and only that. Navigation is links marked with `aria-current`
-   * and styled by the `data-nav-item` recipe: radio semantics would announce a
+   * and styled by the `data-navigation-item` recipe: radio semantics would announce a
    * set of destinations as a set of choices. A tab controls a panel.
    *
    * Being a radio group, it is a form control, and it says so through
@@ -14237,7 +14237,7 @@ export type CustomElementsSolidJs = {
    * Renders a `<button role="radio">`. This is a form control and nothing else.
    *
    * Navigation is not this. It is links marked with `aria-current` and styled by
-   * the `data-nav-item` recipe in the base layer, which carries the same look
+   * the `data-navigation-item` recipe in the base layer, which carries the same look
    * without radio semantics announcing destinations as choices.
    *
    * ## Attributes & Properties

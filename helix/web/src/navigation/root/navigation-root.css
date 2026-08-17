@@ -6,7 +6,7 @@
   align-items: center;
   block-size: var(--helix-size-control-sm);
   display: flex;
-  gap: var(--nav-bar-gap, var(--helix-space-2xs));
+  gap: var(--navigation-gap, var(--helix-space-2xs));
   /* Long navigation scrolls inside the bar instead of widening the page. */
   min-inline-size: 0;
   overflow-x: auto;
@@ -16,7 +16,7 @@
 
 /* Behind the destinations and out of flow, so animating it reflows nothing. */
 [part="indicator"] {
-  background-color: var(--nav-bar-indicator-color, var(--helix-color-surface-sunken));
+  background-color: var(--navigation-indicator-color, var(--helix-color-surface-sunken));
   block-size: var(--_indicator-h, 0);
   border-radius: var(--helix-radii-sm);
   inline-size: var(--_indicator-w, 0);

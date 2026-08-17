@@ -12,7 +12,7 @@ import { Wordmark } from './wordmark'
 /**
  * Site navigation: the verticals, centered in the masthead.
  *
- * Plain links inside a `NavBar`, marked with `aria-current` and styled by the
+ * Plain links inside a `Navigation`, marked with `aria-current` and styled by the
  * `` recipe. Not tabs, because a tab controls a panel and
  * announces itself inside a `tablist`, and these are routes. Not a toggle group
  * either, which is a radio group and would announce a set of destinations as a
@@ -21,7 +21,7 @@ import { Wordmark } from './wordmark'
  *
  * The header's regions are named for where they are rather than what is in
  * them, so the wordmark is `start` and the actions are `end`. The `<nav>`
- * landmark and the traveling marker belong to `NavBar`.
+ * landmark and the traveling marker belong to `Navigation`.
  *
  * The current item comes from the pathname, so it is right on a cold load of
  * any URL rather than only after a click.
@@ -72,7 +72,7 @@ export function SiteNav() {
         </a>
 
         {!narrow && (
-          <helix-nav-bar label="Verticals">
+          <helix-navigation label="Verticals">
             {VERTICALS.map((vertical) => (
               <Link
                 aria-current={current === vertical.href ? 'page' : undefined}
@@ -82,7 +82,7 @@ export function SiteNav() {
                 {vertical.label}
               </Link>
             ))}
-          </helix-nav-bar>
+          </helix-navigation>
         )}
 
         <helix-tooltip content="Preferences" placement="bottom" slot="end">

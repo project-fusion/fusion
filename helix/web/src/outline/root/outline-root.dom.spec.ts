@@ -14,14 +14,14 @@ describe('page nav', () => {
        points at the old id. Marking nothing is right; failing to render is
        not. */
     const nav = (await mount(
-      `<helix-page-nav label="On this page"><a href="#gone">Gone</a></helix-page-nav>`,
+      `<helix-outline label="On this page"><a href="#gone">Gone</a></helix-outline>`,
     )) as Nav
     await nav.updateComplete
     expect(nav.querySelector('a')?.hasAttribute('aria-current')).toBe(false)
   })
 
   test('nothing is marked before anything has been measured', async () => {
-    const nav = (await mount('<helix-page-nav></helix-page-nav>')) as Nav
+    const nav = (await mount('<helix-outline></helix-outline>')) as Nav
     await nav.updateComplete
     expect(nav.current).toBe('')
   })
@@ -35,11 +35,11 @@ if (hasLayout()) {
        one below it. */
     const build = async (): Promise<Nav> => {
       const nav = (await mount(
-        `<helix-page-nav label="On this page">
+        `<helix-outline label="On this page">
           <a href="#one">One</a>
           <a href="#two">Two</a>
           <a href="#three">Three</a>
-        </helix-page-nav>
+        </helix-outline>
         <div id="one" style="height: 800px">One</div>
         <div id="two" style="height: 800px">Two</div>
         <div id="three" style="height: 800px">Three</div>`,
@@ -161,7 +161,7 @@ if (hasLayout()) {
       // Or it slides down from the top of the list on first paint, which reads
       // as the component correcting itself rather than as it arriving.
       const bare = (await mount(
-        '<helix-page-nav label="On this page"><a href="#gone">Gone</a></helix-page-nav>',
+        '<helix-outline label="On this page"><a href="#gone">Gone</a></helix-outline>',
       )) as Nav
       await bare.updateComplete
       expect((part(bare, 'indicator') as HTMLElement).hasAttribute('data-placed')).toBe(false)

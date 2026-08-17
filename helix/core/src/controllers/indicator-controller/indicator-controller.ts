@@ -24,10 +24,10 @@ export interface IndicatorOptions {
 /**
  * Measures the marked child and writes the geometry onto a travelling mark.
  *
- * **Four components had written this and the copies had diverged.** `NavBar`,
- * `Tabs`, `Toggle.Group` and `PageNav` each measured an active child and wrote
+ * **Four components had written this and the copies had diverged.** `Navigation`,
+ * `Tabs`, `Toggle.Group` and `Outline` each measured an active child and wrote
  * a position onto an indicator, and two of them had bugs the others did not.
- * `PageNav`'s own comment counted the repetition rather than resolving it, and
+ * `Outline`'s own comment counted the repetition rather than resolving it, and
  * the audit found the same shape independently in all four.
  *
  * What the copies disagreed about, and what this settles:
@@ -35,15 +35,15 @@ export interface IndicatorOptions {
  * **The inline axis is signed.** In a right-to-left document the distance is
  * measured from the surface's right edge and applied as a negative translation,
  * because the mark travels from the inline start and the inline start is on the
- * right. `NavBar` measured from the physical left and applied it from the
+ * right. `Navigation` measured from the physical left and applied it from the
  * inline-start edge with an unsigned offset, so its marker went the wrong way
  * in RTL. That is the bug this extraction exists to stop repeating.
  *
  * **The border has to come off both axes.** `getBoundingClientRect` gives the
  * border box and the containing block is the padding box, so a surface with a
  * border of its own puts the mark one border-width out. `Tabs` and
- * `Toggle.Group` each did this arithmetic separately, `PageNav` did the block
- * half with `clientTop`, and `NavBar` did neither. `clientLeft` and `clientTop`
+ * `Toggle.Group` each did this arithmetic separately, `Outline` did the block
+ * half with `clientTop`, and `Navigation` did neither. `clientLeft` and `clientTop`
  * are the border widths, already resolved, which is why they are used here
  * rather than parsing `borderLeftWidth`.
  *

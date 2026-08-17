@@ -35,7 +35,7 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/app-header
  *
  * @slot start - Leading content, usually a wordmark.
- * @slot - The middle region, usually a `NavBar`.
+ * @slot - The middle region, usually a `Navigation`.
  * @slot end - Trailing content.
  *
  * @csspart row - The centered row inside the banner.

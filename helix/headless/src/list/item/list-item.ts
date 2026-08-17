@@ -17,7 +17,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * That is a real constraint rather than an oversight: a whole-row target needs
  * the anchor to wrap the layout, and the layout is what this component is. When
  * something needs it, it wants a `data-list-item` recipe styling the consumer's
- * anchor, the way `data-button` and `data-nav-item` do.
+ * anchor, the way `data-button` and `data-navigation-item` do.
  *
  * @since 0.1.0
  * @status experimental
