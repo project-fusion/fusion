@@ -1890,11 +1890,53 @@ export type HelixBaseListItemSolidJsProps = {
 export type HelixBaseListProps = {
   /** Accessible name for the set. */
   label?: HelixBaseList["label"];
+  /** What kind of list this is, which is a fact about the content.
+
+On the headless tier because it is meaning rather than decoration, the same
+argument `severity` makes on `Callout`. A numbered list is numbered because
+the order carries information; a bulleted one is bulleted because the items
+are a set and the order does not. That distinction is the reader's, and it
+has to survive with the stylesheet turned off.
+
+- `default` is a run of rows and takes no marker. It is what a list of
+  settings or files is: neither ordered nor a set to be counted.
+- `ordered` numbers them, for steps.
+- `unordered` bullets them, for a set.
+- `description` pairs each row's label with its supporting text as a term
+  and what the term means.
+
+**`description` reuses the row's existing slots rather than inventing a
+  second kind of row.** A term and its description is exactly the label and
+  the supporting text `List.Item` already has, so the kind changes how the
+  pair is drawn and nothing about what a consumer writes. A separate
+  `List.Term` element would be a second row shape for one attribute's sake. */
+  kind?: HelixBaseList["kind"];
 };
 
 export type HelixBaseListSolidJsProps = {
   /** Accessible name for the set. */
   "prop:label"?: HelixBaseList["label"];
+  /** What kind of list this is, which is a fact about the content.
+
+On the headless tier because it is meaning rather than decoration, the same
+argument `severity` makes on `Callout`. A numbered list is numbered because
+the order carries information; a bulleted one is bulleted because the items
+are a set and the order does not. That distinction is the reader's, and it
+has to survive with the stylesheet turned off.
+
+- `default` is a run of rows and takes no marker. It is what a list of
+  settings or files is: neither ordered nor a set to be counted.
+- `ordered` numbers them, for steps.
+- `unordered` bullets them, for a set.
+- `description` pairs each row's label with its supporting text as a term
+  and what the term means.
+
+**`description` reuses the row's existing slots rather than inventing a
+  second kind of row.** A term and its description is exactly the label and
+  the supporting text `List.Item` already has, so the kind changes how the
+  pair is drawn and nothing about what a consumer writes. A separate
+  `List.Term` element would be a second row shape for one attribute's sake. */
+  "prop:kind"?: HelixBaseList["kind"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6065,6 +6107,12 @@ export type CustomElements = {
    * - `(default)`: The label.
    * - `supporting`: Secondary text under the label.
    * - `end`: Trailing content.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `row`: The layout, held off the host so the host can carry a marker.
    */
   "helix-base-list-item": Partial<
     HelixBaseListItemProps & BaseProps<HelixBaseListItem> & BaseEvents
@@ -6080,6 +6128,26 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for the set.
+   * - `kind`: What kind of list this is, which is a fact about the content.
+   *
+   * On the headless tier because it is meaning rather than decoration, the same
+   * argument `severity` makes on `Callout`. A numbered list is numbered because
+   * the order carries information; a bulleted one is bulleted because the items
+   * are a set and the order does not. That distinction is the reader's, and it
+   * has to survive with the stylesheet turned off.
+   *
+   * - `default` is a run of rows and takes no marker. It is what a list of
+   *   settings or files is: neither ordered nor a set to be counted.
+   * - `ordered` numbers them, for steps.
+   * - `unordered` bullets them, for a set.
+   * - `description` pairs each row's label with its supporting text as a term
+   *   and what the term means.
+   *
+   * **`description` reuses the row's existing slots rather than inventing a
+   *   second kind of row.** A term and its description is exactly the label and
+   *   the supporting text `List.Item` already has, so the kind changes how the
+   *   pair is drawn and nothing about what a consumer writes. A separate
+   *   `List.Term` element would be a second row shape for one attribute's sake.
    *
    * ## Slots
    *
@@ -10402,6 +10470,12 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The label.
    * - `supporting`: Secondary text under the label.
    * - `end`: Trailing content.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `row`: The layout, held off the host so the host can carry a marker.
    */
   "helix-base-list-item": Partial<
     HelixBaseListItemProps &
@@ -10420,6 +10494,26 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for the set.
+   * - `kind`: What kind of list this is, which is a fact about the content.
+   *
+   * On the headless tier because it is meaning rather than decoration, the same
+   * argument `severity` makes on `Callout`. A numbered list is numbered because
+   * the order carries information; a bulleted one is bulleted because the items
+   * are a set and the order does not. That distinction is the reader's, and it
+   * has to survive with the stylesheet turned off.
+   *
+   * - `default` is a run of rows and takes no marker. It is what a list of
+   *   settings or files is: neither ordered nor a set to be counted.
+   * - `ordered` numbers them, for steps.
+   * - `unordered` bullets them, for a set.
+   * - `description` pairs each row's label with its supporting text as a term
+   *   and what the term means.
+   *
+   * **`description` reuses the row's existing slots rather than inventing a
+   *   second kind of row.** A term and its description is exactly the label and
+   *   the supporting text `List.Item` already has, so the kind changes how the
+   *   pair is drawn and nothing about what a consumer writes. A separate
+   *   `List.Term` element would be a second row shape for one attribute's sake.
    *
    * ## Slots
    *

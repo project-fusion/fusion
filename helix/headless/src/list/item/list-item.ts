@@ -24,6 +24,8 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @aliases Row, Entry
  * @documentation https://helix.fusion.dev/components/list
  *
+ * @csspart row - The layout, held off the host so the host can carry a marker.
+ *
  * @slot start - Leading content, usually an icon or an avatar.
  * @slot - The label.
  * @slot supporting - Secondary text under the label.
@@ -37,10 +39,24 @@ export class HelixBaseListItem extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<slot name="start"></slot>
+    /* One wrapper, and it earns its place rather than breaking the bare-slot
+       rule. That rule is about optional *regions*, which generate an empty box
+       when nothing fills them; this is a single always-present container whose
+       job is to hold the layout somewhere other than the host.
+     *
+     * The host has to be free for `display: list-item`, which is how an ordered
+       or unordered list gets its marker: native numbering, native counters,
+       native RTL, and nothing written by script or counted on the server. But
+       `list-item` cannot combine with `grid`, so a row whose host carried the
+       grid lost it the moment the list asked for a marker. Measured before this
+       wrapper: a row with a leading icon put the icon 32px in instead of 16 and
+       its supporting text beside the label instead of under it. */
+    return html`<div part="row">
+      <slot name="start"></slot>
       <slot></slot>
       <slot name="supporting"></slot>
-      <slot name="end"></slot>`
+      <slot name="end"></slot>
+    </div>`
   }
 }
 

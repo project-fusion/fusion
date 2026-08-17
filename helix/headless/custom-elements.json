@@ -9593,6 +9593,12 @@
           "kind": "class",
           "description": "Layout and semantics, and deliberately not a target.\n\n**It does not become a link.** The reference renders an `<a>` when given an\n`href`, which is the thing Button and Toggle both stopped doing: a router\nrenders its own anchor and cannot render it inside this shadow root, so a row\nthat navigates would force a full page load. A row whose label is a\ndestination slots the consumer's own link as that label, and the link is the\ntarget rather than the row around it.\n\nThat is a real constraint rather than an oversight: a whole-row target needs\nthe anchor to wrap the layout, and the layout is what this component is. When\nsomething needs it, it wants a `data-list-item` recipe styling the consumer's\nanchor, the way `data-button` and `data-nav-item` do.",
           "name": "HelixBaseListItem",
+          "cssParts": [
+            {
+              "description": "The layout, held off the host so the host can carry a marker.",
+              "name": "row"
+            }
+          ],
           "slots": [
             {
               "description": "Leading content, usually an icon or an avatar.",
@@ -9751,6 +9757,16 @@
             },
             {
               "kind": "field",
+              "name": "kind",
+              "type": {
+                "text": "'default' | 'description' | 'ordered' | 'unordered' | undefined"
+              },
+              "description": "What kind of list this is, which is a fact about the content.\n\nOn the headless tier because it is meaning rather than decoration, the same\nargument `severity` makes on `Callout`. A numbered list is numbered because\nthe order carries information; a bulleted one is bulleted because the items\nare a set and the order does not. That distinction is the reader's, and it\nhas to survive with the stylesheet turned off.\n\n- `default` is a run of rows and takes no marker. It is what a list of\n  settings or files is: neither ordered nor a set to be counted.\n- `ordered` numbers them, for steps.\n- `unordered` bullets them, for a set.\n- `description` pairs each row's label with its supporting text as a term\n  and what the term means.\n\n**`description` reuses the row's existing slots rather than inventing a\n  second kind of row.** A term and its description is exactly the label and\n  the supporting text `List.Item` already has, so the kind changes how the\n  pair is drawn and nothing about what a consumer writes. A separate\n  `List.Term` element would be a second row shape for one attribute's sake.",
+              "attribute": "kind",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -9828,6 +9844,14 @@
               "default": "''",
               "description": "Accessible name for the set.",
               "fieldName": "label"
+            },
+            {
+              "name": "kind",
+              "type": {
+                "text": "'default' | 'description' | 'ordered' | 'unordered' | undefined"
+              },
+              "description": "What kind of list this is, which is a fact about the content.\n\nOn the headless tier because it is meaning rather than decoration, the same\nargument `severity` makes on `Callout`. A numbered list is numbered because\nthe order carries information; a bulleted one is bulleted because the items\nare a set and the order does not. That distinction is the reader's, and it\nhas to survive with the stylesheet turned off.\n\n- `default` is a run of rows and takes no marker. It is what a list of\n  settings or files is: neither ordered nor a set to be counted.\n- `ordered` numbers them, for steps.\n- `unordered` bullets them, for a set.\n- `description` pairs each row's label with its supporting text as a term\n  and what the term means.\n\n**`description` reuses the row's existing slots rather than inventing a\n  second kind of row.** A term and its description is exactly the label and\n  the supporting text `List.Item` already has, so the kind changes how the\n  pair is drawn and nothing about what a consumer writes. A separate\n  `List.Term` element would be a second row shape for one attribute's sake.",
+              "fieldName": "kind"
             }
           ],
           "superclass": {

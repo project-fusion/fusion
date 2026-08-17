@@ -9,3 +9,36 @@
 :host([divided]) ::slotted(*:not(:first-child)) {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
 }
+
+/* The markers.
+ *
+ * `display: list-item` on the slotted rows, from out here, which works for the
+ * reason `::slotted` usually cannot: the rows are siblings in the consumer's own
+ * tree, so the implicit `list-item` counter is shared between them and the
+ * numbering needs nothing written by script and nothing counted on the server.
+ *
+ * `list-style-position: inside` so the marker sits within the row's own inset
+ * rather than hanging into the page, which is what an outside marker does to a
+ * row that is also a grid.
+ */
+:host([kind="ordered"]) ::slotted(*),
+:host([kind="unordered"]) ::slotted(*) {
+  display: list-item;
+  list-style-position: inside;
+}
+
+:host([kind="ordered"]) ::slotted(*) {
+  list-style-type: decimal;
+}
+
+:host([kind="unordered"]) ::slotted(*) {
+  list-style-type: disc;
+}
+
+/* A term and what it means. The row already holds a label and its supporting
+   text, so the kind only changes their weight and their order of importance:
+   the term carries the emphasis and the description is ordinary prose under
+   it. Nothing about the markup a consumer writes changes. */
+:host([kind="description"]) ::slotted(*) {
+  --list-item-term-weight: var(--helix-weight-semibold);
+}

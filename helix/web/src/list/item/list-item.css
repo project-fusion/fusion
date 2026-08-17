@@ -2,6 +2,13 @@
    than under the leading icon, which a flex row cannot express without a
    wrapper around the middle. */
 :host {
+  display: block;
+}
+
+/* The layout lives here rather than on the host, so the host is free to be a
+   `list-item` when the list asks for a marker. `list-item` cannot combine with
+   `grid`, and the host cannot be both. */
+[part="row"] {
   align-items: center;
   column-gap: var(--helix-space-sm);
   display: grid;
@@ -26,6 +33,10 @@ slot[name="start"]::slotted(*) {
 slot:not([name]) {
   color: var(--helix-color-foreground);
   font-size: var(--helix-text-sm);
+  /* Set by the list at `kind="description"`, where the label is a term rather
+     than a line of text, and inherited through the flat tree so the row needs
+     to know nothing about which kind it is in. */
+  font-weight: var(--list-item-term-weight, var(--helix-weight-regular));
 }
 
 slot:not([name])::slotted(*) {

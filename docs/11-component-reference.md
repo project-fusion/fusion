@@ -1502,6 +1502,7 @@ decoration doing what emptiness already does.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `divided` | `divided` | `boolean` | `false` | - | Whether a rule sits between rows. |
+| `kind` | `kind` | `'default' \| 'description' \| 'ordered' \| 'unordered' \| undefined` | - | `HelixBaseList` | What kind of list this is, which is a fact about the content. |
 | `label` | `label` | `string` | `''` | `HelixBaseList` | Accessible name for the set. |
 
 #### Slots
@@ -1534,6 +1535,12 @@ hold their own width and the middle takes the rest.
 | *(default)* | The label. |
 | `supporting` | Secondary text under the label. |
 | `end` | Trailing content. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `row` | The layout, held off the host so the host can carry a marker. |
 
 #### Custom properties
 

@@ -12916,6 +12916,16 @@
               }
             }
           ],
+          "cssParts": [
+            {
+              "description": "The layout, held off the host so the host can carry a marker.",
+              "name": "row",
+              "inheritedFrom": {
+                "name": "HelixBaseListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            }
+          ],
           "modulePath": "src/list/item/list-item.ts",
           "definitionPath": "src/list/item/list-item.ts"
         }
@@ -12994,6 +13004,20 @@
               "default": "''",
               "description": "Accessible name for the set.",
               "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseList",
+                "module": "src/list/root/list-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "kind",
+              "type": {
+                "text": "'default' | 'description' | 'ordered' | 'unordered' | undefined"
+              },
+              "description": "What kind of list this is, which is a fact about the content.\n\nOn the headless tier because it is meaning rather than decoration, the same\nargument `severity` makes on `Callout`. A numbered list is numbered because\nthe order carries information; a bulleted one is bulleted because the items\nare a set and the order does not. That distinction is the reader's, and it\nhas to survive with the stylesheet turned off.\n\n- `default` is a run of rows and takes no marker. It is what a list of\n  settings or files is: neither ordered nor a set to be counted.\n- `ordered` numbers them, for steps.\n- `unordered` bullets them, for a set.\n- `description` pairs each row's label with its supporting text as a term\n  and what the term means.\n\n**`description` reuses the row's existing slots rather than inventing a\n  second kind of row.** A term and its description is exactly the label and\n  the supporting text `List.Item` already has, so the kind changes how the\n  pair is drawn and nothing about what a consumer writes. A separate\n  `List.Term` element would be a second row shape for one attribute's sake.",
+              "attribute": "kind",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseList",
                 "module": "src/list/root/list-root.ts"
@@ -13087,6 +13111,18 @@
               "default": "''",
               "description": "Accessible name for the set.",
               "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseList",
+                "module": "src/list/root/list-root.ts"
+              }
+            },
+            {
+              "name": "kind",
+              "type": {
+                "text": "'default' | 'description' | 'ordered' | 'unordered' | undefined"
+              },
+              "description": "What kind of list this is, which is a fact about the content.\n\nOn the headless tier because it is meaning rather than decoration, the same\nargument `severity` makes on `Callout`. A numbered list is numbered because\nthe order carries information; a bulleted one is bulleted because the items\nare a set and the order does not. That distinction is the reader's, and it\nhas to survive with the stylesheet turned off.\n\n- `default` is a run of rows and takes no marker. It is what a list of\n  settings or files is: neither ordered nor a set to be counted.\n- `ordered` numbers them, for steps.\n- `unordered` bullets them, for a set.\n- `description` pairs each row's label with its supporting text as a term\n  and what the term means.\n\n**`description` reuses the row's existing slots rather than inventing a\n  second kind of row.** A term and its description is exactly the label and\n  the supporting text `List.Item` already has, so the kind changes how the\n  pair is drawn and nothing about what a consumer writes. A separate\n  `List.Term` element would be a second row shape for one attribute's sake.",
+              "fieldName": "kind",
               "inheritedFrom": {
                 "name": "HelixBaseList",
                 "module": "src/list/root/list-root.ts"
