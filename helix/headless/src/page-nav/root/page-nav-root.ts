@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, IndicatorController } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -51,6 +51,14 @@ import { property, state } from 'lit/decorators.js'
  */
 @customElement('helix-base-page-nav')
 export class HelixBasePageNav extends HelixElement {
+  /* The mark. Vertical, which the controller needs no telling about: it writes
+     all four values and the stylesheet uses the two it cares about. */
+  private readonly indicator = new IndicatorController(this, {
+    active: () => this.links.find((link) => link.hasAttribute('aria-current')),
+    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
+    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="nav"]'),
+  })
+
   /** Accessible name for the navigation. */
   @property()
   label = 'On this page'
@@ -156,42 +164,6 @@ export class HelixBasePageNav extends HelixElement {
   }
 
   /**
-   * Measures the current link and writes the geometry onto the indicator.
-   *
-   * One mark that travels, rather than a border on each link. The tabs strip
-   * gives the reason: a border can only appear and disappear, and a mark that
-   * moves is what says these are places in one document rather than a column of
-   * separate states. Vertical here, so it is the block axis that is measured
-   * where the strip measures the inline one.
-   *
-   * Height as well as position, because the links are text and a long heading
-   * wraps to two lines. A fixed-height mark would be right for one link in the
-   * list and wrong for its neighbour.
-   */
-  private place(): void {
-    const nav = this.renderRoot?.querySelector<HTMLElement>('[part="nav"]')
-    const indicator = this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]')
-    const current = this.links.find((link) => link.hasAttribute('aria-current'))
-    if (!nav || !indicator || !current) {
-      return
-    }
-    const box = current.getBoundingClientRect()
-    if (box.height === 0) {
-      return
-    }
-    /* Against the nav's padding box, which is where an absolutely positioned
-       child is placed, while `getBoundingClientRect` gives the border box. The
-       same arithmetic the tab strip and the toggle group both do, and the
-       fourth time this repository has met it. */
-    indicator.style.setProperty(
-      '--_indicator-y',
-      `${box.top - nav.getBoundingClientRect().top - nav.clientTop}px`,
-    )
-    indicator.style.setProperty('--_indicator-h', `${box.height}px`)
-    indicator.toggleAttribute('data-placed', true)
-  }
-
-  /**
    * The set changed: watch it, and measure it.
    *
    * Both, for the reason the tab strip records: the host renders before its
@@ -201,7 +173,7 @@ export class HelixBasePageNav extends HelixElement {
    */
   private readonly handleSlotChange = (): void => {
     this.watch()
-    this.place()
+    this.indicator.place()
   }
 
   override disconnectedCallback(): void {
@@ -218,7 +190,7 @@ export class HelixBasePageNav extends HelixElement {
        width rewraps them and moves every one below. Nothing else would notice:
        the intersection observer watches the sections, and a resize moves the
        links without moving the page. */
-    this.resize = new ResizeObserver(() => this.place())
+    this.resize = new ResizeObserver(() => this.indicator.place())
     this.resize.observe(this)
   }
 
@@ -235,7 +207,7 @@ export class HelixBasePageNav extends HelixElement {
        beside the attribute write. The current link is styled differently, and
        on a narrow column the extra weight is enough to rewrap it, so measuring
        before the style lands measures the wrong height. */
-    this.place()
+    this.indicator.place()
   }
 
   protected override render(): TemplateResult {

@@ -15620,6 +15620,17 @@
           "members": [
             {
               "kind": "field",
+              "name": "indicator",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new IndicatorController(this, { active: () => this.items.find((item) => item.getAttribute('aria-current') === 'page'), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"nav\"]'), })",
+              "inheritedFrom": {
+                "name": "HelixBaseNavBar",
+                "module": "src/nav-bar/root/nav-bar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -15665,21 +15676,6 @@
               "privacy": "private",
               "description": "The destinations the consumer slotted.",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseNavBar",
-                "module": "src/nav-bar/root/nav-bar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "place",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Moves the marker to whichever destination is current.\n\nGeometry goes onto the marker inside the shadow root. On the host it would\nbe an inline style the element gives itself after upgrading, which a\nReact consumer's server markup never has.",
               "inheritedFrom": {
                 "name": "HelixBaseNavBar",
                 "module": "src/nav-bar/root/nav-bar-root.ts"
@@ -16489,6 +16485,17 @@
           "members": [
             {
               "kind": "field",
+              "name": "indicator",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new IndicatorController(this, { active: () => this.links.find((link) => link.hasAttribute('aria-current')), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"nav\"]'), })",
+              "inheritedFrom": {
+                "name": "HelixBasePageNav",
+                "module": "src/page-nav/root/page-nav-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -16619,21 +16626,6 @@
                 }
               },
               "description": "Watches every section, and re-marks whenever any of them crosses anything.\n\nThe thresholds are what make the trigger frequent enough: an observer fires\non entering and leaving, and a long section scrolled slowly crosses neither\nfor a long time. Asking for a callback at each quarter of visibility is\ncheap and keeps the marker honest without a scroll listener.",
-              "inheritedFrom": {
-                "name": "HelixBasePageNav",
-                "module": "src/page-nav/root/page-nav-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "place",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Measures the current link and writes the geometry onto the indicator.\n\nOne mark that travels, rather than a border on each link. The tabs strip\ngives the reason: a border can only appear and disappear, and a mark that\nmoves is what says these are places in one document rather than a column of\nseparate states. Vertical here, so it is the block axis that is measured\nwhere the strip measures the inline one.\n\nHeight as well as position, because the links are text and a long heading\nwraps to two lines. A fixed-height mark would be right for one link in the\nlist and wrong for its neighbour.",
               "inheritedFrom": {
                 "name": "HelixBasePageNav",
                 "module": "src/page-nav/root/page-nav-root.ts"
@@ -24289,6 +24281,17 @@
             },
             {
               "kind": "field",
+              "name": "indicator",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new IndicatorController(this, { active: () => this.tabs.find((tab) => tab.selected), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"tabs\"]'), })",
+              "inheritedFrom": {
+                "name": "HelixBaseTabs",
+                "module": "src/tabs/root/tabs-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "appearance",
               "type": {
                 "text": "'toggle' | 'underline' | undefined"
@@ -24425,21 +24428,6 @@
               "privacy": "private",
               "readonly": true,
               "description": "The set changed: pair it up, watch it, and measure it.\n\nAll three, where this used to be `sync()` alone, and the missing `place()`\nis why an indicator could stay unplaced for the life of the page. The order\nof events is what does it: the host renders and measures before its tabs\nhave upgraded, so there is no selected tab to measure and `place` refuses;\nthe ResizeObserver's one initial callback lands in that same gap; and then\nthe tabs upgrade, `slotchange` pairs them, nothing measures, and nothing\never will again, because the host's size never changes.\n\nInvisible in every example, because a tab strip that is only tabs is\nexactly as tall as its tabs, so a mark at the top of the strip is a mark on\nthe tab. It showed up where something gives the strip a height of its own.",
-              "inheritedFrom": {
-                "name": "HelixBaseTabs",
-                "module": "src/tabs/root/tabs-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "place",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Measures the selected tab and writes the geometry onto the indicator.\n\nOne element that travels, rather than a border on each tab. A border can\nonly appear and disappear; a single mark can move, and moving is what says\nthe two tabs are places in one set rather than two separate states.\n\nWritten onto the indicator rather than the host, for the reason the toggle\ngroup gives: geometry is only readable after layout, and anything written\nto the host then is an attribute a server's markup never had.",
               "inheritedFrom": {
                 "name": "HelixBaseTabs",
                 "module": "src/tabs/root/tabs-root.ts"
@@ -27622,6 +27610,32 @@
               }
             },
             {
+              "kind": "method",
+              "name": "sync",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Marks the chosen item, which used to happen inside the placing method.\n\nThey were one method because the geometry needed the active item anyway,\nand that made a selection change look like a layout concern. `resolveActiveItem`\nrather than the first item, because a group opening on a disabled segment\nmarked it as chosen.",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "indicator",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new IndicatorController(this, { active: () => resolveActiveItem(this.value, this.items), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"track\"]'), })",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "name",
               "type": {
@@ -27702,21 +27716,6 @@
               "name": "handleSelection",
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseToggleGroup",
-                "module": "src/toggle/group/toggle-group.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "place",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Measures the selected item and writes the geometry onto the indicator.\n\nOffsets rather than a proportion of the group: labels have different\nlengths, so no fraction is the right answer for all of them.",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"

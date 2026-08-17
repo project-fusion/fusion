@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, IndicatorController } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -34,6 +34,16 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-nav-bar')
 export class HelixBaseNavBar extends HelixElement {
+  /* The mark, and the RTL sign and border correction that came with it. This
+     was hand-written and had neither: the distance was measured from the
+     physical left and applied from the inline-start edge, so it travelled the
+     wrong way in a right-to-left document. */
+  private readonly indicator = new IndicatorController(this, {
+    active: () => this.items.find((item) => item.getAttribute('aria-current') === 'page'),
+    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
+    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="nav"]'),
+  })
+
   /** Accessible name for the landmark. */
   @property()
   label = 'Main'
@@ -45,37 +55,6 @@ export class HelixBaseNavBar extends HelixElement {
   private get items(): HTMLElement[] {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot')
     return (slot?.assignedElements() ?? []) as HTMLElement[]
-  }
-
-  /**
-   * Moves the marker to whichever destination is current.
-   *
-   * Geometry goes onto the marker inside the shadow root. On the host it would
-   * be an inline style the element gives itself after upgrading, which a
-   * React consumer's server markup never has.
-   */
-  private place(): void {
-    const marker = this.renderRoot.querySelector<HTMLElement>('[part="indicator"]')
-    const nav = this.renderRoot.querySelector<HTMLElement>('[part="nav"]')
-    if (!marker || !nav) {
-      return
-    }
-
-    const active = this.items.find((item) => item.getAttribute('aria-current') === 'page')
-    if (!active) {
-      marker.removeAttribute('data-placed')
-      return
-    }
-
-    const box = active.getBoundingClientRect()
-    if (box.width === 0) {
-      return
-    }
-    const own = nav.getBoundingClientRect()
-    marker.style.setProperty('--_nav-indicator-x', `${box.left - own.left}px`)
-    marker.style.setProperty('--_nav-indicator-w', `${box.width}px`)
-    marker.style.setProperty('--_nav-indicator-h', `${box.height}px`)
-    marker.toggleAttribute('data-placed', true)
   }
 
   /** Re-measures when the links change, move, or hand over the current page. */
@@ -97,9 +76,9 @@ export class HelixBaseNavBar extends HelixElement {
      * The base layer selects `helix-nav-bar a` as well now, so the styling is
      * true the moment the markup is parsed, on the server and on the client,
      * and there is nothing to write or to be careful about. */
-    this.place()
+    this.indicator.place()
 
-    this.observer = new ResizeObserver(() => this.place())
+    this.observer = new ResizeObserver(() => this.indicator.place())
     this.observer.observe(this)
     for (const item of this.items) {
       this.observer.observe(item)
@@ -107,7 +86,7 @@ export class HelixBaseNavBar extends HelixElement {
 
     // Client-side routing changes `aria-current` in place rather than
     // reloading, so nothing else would tell the marker to move.
-    this.current = new MutationObserver(() => this.place())
+    this.current = new MutationObserver(() => this.indicator.place())
     for (const item of this.items) {
       this.current.observe(item, { attributeFilter: ['aria-current'] })
     }

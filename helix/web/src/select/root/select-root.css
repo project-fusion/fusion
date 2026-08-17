@@ -123,10 +123,40 @@
    `visibility`, so the panel still has a box for the controller to measure. */
 [part="surface"] {
   opacity: 0;
+  /* The panel was already waiting on placement; this makes the wait visible.
+     0.96 rather than 0: a list of options collapsed to nothing squashes its own
+     rows on the way out and reads as a toy at panel size, where a tooltip at the
+     same figure reads as a mark arriving. */
+  scale: 0.96;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
 }
 
 [part="surface"][data-placed] {
   opacity: 1;
+  scale: 1;
+}
+
+/* Out of the edge it opened against. A select has no arrow, so the fallback
+   applies and it grows from the middle of the near edge. */
+[part="surface"][data-placement^="top"] {
+  transform-origin: var(--floating-arrow-x, 50%) 100%;
+}
+
+[part="surface"][data-placement^="bottom"] {
+  transform-origin: var(--floating-arrow-x, 50%) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="surface"] {
+    scale: 1;
+    transition: none;
+  }
+
+  [part="surface"][data-placed] {
+    scale: 1;
+  }
 }
 
 /* The indicator turns over as the panel opens.

@@ -185,7 +185,18 @@ export class FloatingController implements ReactiveController {
         position: 'fixed',
         // A translate rather than insets, so the position never lands on a
         // subpixel boundary and blurs the text inside it.
-        transform: `translate(${Math.round(x)}px, ${Math.round(y)}px)`,
+        //
+        // **The `translate` property, not `transform`.** They are not
+        // interchangeable here. The individual properties compose ahead of
+        // `transform`, so a panel that also sets `scale` for an entrance ends
+        // up with `scale() translate()`, and a concatenation applies its right
+        // hand side first: the position is computed and *then* multiplied by
+        // the scale factor. A tooltip 600px down the page scaling from 0.9
+        // therefore opens 60px out of place and slides into position, and one
+        // scaling from 0 flies in from the viewport corner. As `translate` it
+        // composes as `translate() scale()`, the offset is applied in the
+        // parent's coordinates, and the scale cannot reach it.
+        translate: `${Math.round(x)}px ${Math.round(y)}px`,
       })
       floating.setAttribute('data-placement', placement)
       /* Placed, and it is a separate fact from shown. `computePosition` is
@@ -208,6 +219,29 @@ export class FloatingController implements ReactiveController {
           insetBlockStart: point.y === undefined ? '' : `${point.y}px`,
           insetInlineStart: point.x === undefined ? '' : `${point.x}px`,
         })
+        /* Where the pointer ended up, as the centre of it, published for
+           anything that has to grow out of the thing it points at.
+         *
+         * A panel scaling in wants its `transform-origin` on its own arrow, and
+         * the arrow is not reliably where the placement says: `top-start` puts
+         * it near one end, and `shift` slides it anywhere along the edge to
+         * keep the panel on screen. Selecting on `data-placement` alone gets
+         * the axis right and the position wrong, which reads as the panel
+         * growing out of a point next to the trigger rather than out of it.
+         *
+         * Only the axis the arrow travels on is written. On a `top` placement
+         * the arrow moves horizontally and its vertical position is the panel's
+         * edge, so `--floating-arrow-y` is left unset and a consumer's fallback
+         * stands. Cleared rather than zeroed when absent, so the fallback in
+         * `var()` is what applies. */
+        floating.style.setProperty(
+          '--floating-arrow-x',
+          point.x === undefined ? '' : `${Math.round(point.x + pointer.offsetWidth / 2)}px`,
+        )
+        floating.style.setProperty(
+          '--floating-arrow-y',
+          point.y === undefined ? '' : `${Math.round(point.y + pointer.offsetHeight / 2)}px`,
+        )
       }
     })
   }

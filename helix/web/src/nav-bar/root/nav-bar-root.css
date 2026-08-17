@@ -17,14 +17,14 @@
 /* Behind the destinations and out of flow, so animating it reflows nothing. */
 [part="indicator"] {
   background-color: var(--nav-bar-indicator-color, var(--helix-color-surface-sunken));
-  block-size: var(--_nav-indicator-h, 0);
+  block-size: var(--_indicator-h, 0);
   border-radius: var(--helix-radii-sm);
-  inline-size: var(--_nav-indicator-w, 0);
+  inline-size: var(--_indicator-w, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;
   opacity: 0;
   position: absolute;
-  translate: var(--_nav-indicator-x, 0) -50%;
+  translate: var(--_indicator-x, 0) -50%;
   transition:
     translate var(--helix-duration-normal) var(--helix-easing-emphasized),
     inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),

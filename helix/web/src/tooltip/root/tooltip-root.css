@@ -23,12 +23,93 @@
   line-height: var(--helix-leading-tight);
   margin: var(--helix-space-none);
   max-inline-size: var(--tooltip-max-inline-size, 16rem);
+  /* Out until placed, and `data-placed` below is what lets it in.
+   *
+   * Not `@starting-style`, which was tried and is a frame too early: it fires
+   * when the element is first rendered, and the controller positions on a
+   * microtask after that, so the entrance began at whatever the stylesheet said
+   * and travelled to the real position. `data-placed` is written once the panel
+   * is measured and placed, cleared when it closes, and left alone while it is
+   * merely repositioned, so it fires exactly once per open and never mid-scroll.
+   * Select already waited on it for the same reason. */
+  opacity: 0;
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   position: fixed;
+  scale: 0;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
 }
 
+[part="tooltip"][data-placed] {
+  opacity: 1;
+  scale: 1;
+}
+
+/* It grows out of the thing it points at, so the origin is the arrow's edge
+   rather than the bubble's middle. A tooltip above its trigger has its arrow
+   underneath it and should expand upward from there; one to the left expands
+   leftward from its right edge. Centre origin was tried and reads as the bubble
+   inflating in place, which says nothing about what it belongs to.
+   **The arrow's own position, not the placement's midpoint.** `--floating-arrow-x`
+   and `--floating-arrow-y` are written by the floating controller as the centre
+   of the pointer it just placed, which is the only thing that knows where the
+   arrow really is: `top-start` puts it near one end, and `shift` slides it
+   anywhere along the edge to keep the panel on screen. Reading the placement
+   alone gets the axis right and the position wrong, and the tooltip grows out
+   of a point beside the trigger rather than out of it. Four rules cover all
+   twelve placements this way, and they stay correct when the panel is nudged.
+
+   `^=` because each pair of names shares an axis, and the axis is all these
+   rules decide: the cross-axis coordinate comes from the variable.
+
+   The fallback is `50%` for the case where there is no arrow at all, which is
+   the middle of the edge and the best guess available.
+
+   Percentages and lengths rather than keywords, because `transform-origin` has
+   no logical ones. `block-end` and `inline-start` do not merely fail, they make
+   the whole declaration invalid and it is dropped at parse time, silently: the
+   tooltip still scales, from its middle, and nothing reports why. */
+[part="tooltip"][data-placement^="top"] {
+  transform-origin: var(--floating-arrow-x, 50%) 100%;
+}
+
+[part="tooltip"][data-placement^="bottom"] {
+  transform-origin: var(--floating-arrow-x, 50%) 0;
+}
+
+[part="tooltip"][data-placement^="left"] {
+  transform-origin: 100% var(--floating-arrow-y, 50%);
+}
+
+[part="tooltip"][data-placement^="right"] {
+  transform-origin: 0 var(--floating-arrow-y, 50%);
+}
+
+/* The UA hides a closed popover with `[popover]:not(:popover-open)`, and the
+   rules above are author declarations that outrank it whatever their
+   specificity. Restated here, the same way Popover and Menu restate theirs. */
 [part="tooltip"]:not(:popover-open) {
   display: none;
+}
+
+/* The whole effect is the movement, so with motion reduced it is not replaced
+   with a slower one: the tooltip simply appears, which is what it did before.
+   Named one selector at a time, because a reduce rule written looser than the
+   rule it answers loses on specificity and does nothing. */
+@media (prefers-reduced-motion: reduce) {
+  /* The scale and the transition go; the opacity gate stays. It is not motion,
+     it is the panel waiting to be positioned before it is looked at, and
+     lifting it here would put back the one-frame jump `data-placed` exists to
+     stop. What is given up is the movement, not the correctness. */
+  [part="tooltip"] {
+    scale: 1;
+    transition: none;
+  }
+
+  [part="tooltip"][data-placed] {
+    scale: 1;
+  }
 }
 
 /* Positioned by the same pass as the bubble, so it still points at the trigger

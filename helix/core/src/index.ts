@@ -23,6 +23,10 @@ export {
 } from './controllers/floating-controller/floating-controller.js'
 export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {
+  IndicatorController,
+  type IndicatorOptions,
+} from './controllers/indicator-controller/indicator-controller.js'
+export {
   KeyboardNavigationController,
   type KeyboardNavigationOptions,
   type NavigableItem,

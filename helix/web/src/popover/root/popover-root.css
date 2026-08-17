@@ -43,44 +43,70 @@
   padding: var(--popover-inset, var(--helix-space-none));
 }
 
-/* It arrives from the side it opened on, which `data-placement` is written for:
-   the panel knows which way it flipped, so the movement reads as coming out of
-   the trigger rather than from a fixed direction that is backwards half the
-   time. */
-@media (prefers-reduced-motion: no-preference) {
-  [part="popover"]:popover-open {
-    animation: helix-popover-in var(--helix-duration-fast) var(--helix-easing-decelerate);
-  }
-
-  [part="popover"][data-placement^="top"] {
-    --_popover-from: var(--helix-space-2xs);
-  }
-
-  [part="popover"][data-placement^="bottom"] {
-    --_popover-from: calc(-1 * var(--helix-space-2xs));
-  }
+/* It grows out of the edge it opened against, which `data-placement` is written
+   for: the panel knows which way it flipped, so the movement reads as coming out
+   of the trigger rather than from a fixed direction that is backwards half the
+   time.
+ *
+ * **This was a keyframe animating `translate`, and it could not stay.** The
+ * floating controller writes the panel's position onto that same property, and
+ * an animation outranks an inline style for as long as it runs, so the keyframe
+ * took the position over and the panel travelled from the viewport corner. The
+ * offset it used to add is now the scale instead, which composes with the
+ * controller's `translate` rather than fighting it.
+ *
+ * Gated on `data-placed` rather than `:popover-open`: the controller positions
+ * on a microtask after the panel is revealed, so keying the entrance to the open
+ * state starts it a frame before anything knows where the panel goes. This is
+ * the same signal Select has always waited on. */
+[part="popover"] {
+  opacity: 0;
+  scale: var(--_popover-from, 0.96);
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
 }
 
-@keyframes helix-popover-in {
-  from {
-    opacity: 0;
-    translate: 0 var(--_popover-from, 0);
-  }
+[part="popover"][data-placed] {
+  opacity: 1;
+  scale: 1;
+}
+
+/* Out of the near edge, and out of the arrow where there is one:
+   `--floating-arrow-x` and `--floating-arrow-y` are the pointer's centre, which
+   is the only thing that knows where it landed once `shift` has slid the panel
+   along to keep it on screen. With no arrow the fallback is the middle of that
+   edge, which is the best guess available. */
+[part="popover"][data-placement^="top"] {
+  transform-origin: var(--floating-arrow-x, 50%) 100%;
+}
+
+[part="popover"][data-placement^="bottom"] {
+  transform-origin: var(--floating-arrow-x, 50%) 0;
+}
+
+[part="popover"][data-placement^="left"] {
+  transform-origin: 100% var(--floating-arrow-y, 50%);
+}
+
+[part="popover"][data-placement^="right"] {
+  transform-origin: 0 var(--floating-arrow-y, 50%);
 }
 
 /* It arrives instantly rather than not at all. The panel still appears, which is
-   the whole point of it; what is given up is the sense of it moving there. */
+   the whole point of it; what is given up is the sense of it moving there. The
+   opacity gate stays, because that is placement rather than motion.
+ *
+ * Named one selector at a time, because a reduce rule written looser than the
+ * rule it answers loses on specificity and does nothing. `check:motion`
+ * compares them, which is what turned this from invisible into mechanical. */
 @media (prefers-reduced-motion: reduce) {
   [part="popover"] {
-    animation: none;
+    scale: 1;
+    transition: none;
   }
-}
 
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. `check:motion`
-   compares them, which is what turned this from invisible into mechanical. */
-@media (prefers-reduced-motion: reduce) {
-  [part="popover"]:popover-open {
-    animation: none;
+  [part="popover"][data-placed] {
+    scale: 1;
   }
 }

@@ -3,6 +3,7 @@ import {
   DisabledCascadeController,
   HelixFormElement,
   hostAria,
+  IndicatorController,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -57,6 +58,28 @@ import { HelixBaseToggle } from '../root/toggle-root.js'
  */
 @customElement('helix-base-toggle-group')
 export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /**
+   * Marks the chosen item, which used to happen inside the placing method.
+   *
+   * They were one method because the geometry needed the active item anyway,
+   * and that made a selection change look like a layout concern. `resolveActiveItem`
+   * rather than the first item, because a group opening on a disabled segment
+   * marked it as chosen.
+   */
+  private sync(): void {
+    const active = resolveActiveItem(this.value, this.items)
+    for (const item of this.items) {
+      item.selected = item === active
+    }
+  }
+
+  /* The mark. The selection sync it used to share a method with is `sync()`. */
+  private readonly indicator = new IndicatorController(this, {
+    active: () => resolveActiveItem(this.value, this.items),
+    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
+    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="track"]'),
+  })
+
   /** Name the group reports under when its form is submitted. */
   @property()
   name = ''
@@ -107,79 +130,6 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
     this.requestValue((event as CustomEvent<{ value: string }>).detail.value)
   }
 
-  /**
-   * Measures the selected item and writes the geometry onto the indicator.
-   *
-   * Offsets rather than a proportion of the group: labels have different
-   * lengths, so no fraction is the right answer for all of them.
-   */
-  private place(): void {
-    const items = this.items
-    /* The shared resolver rather than the line it replaces, which took the
-       first item whatever it was: a group opening on a disabled segment marked
-       it as chosen. Not through `MixinControllerActive`, because this value is
-       submitted and so belongs to `MixinControllerValue`, and a set cannot take
-       both without two properties called `value`. */
-    const active = resolveActiveItem(this.value, items)
-    for (const item of items) {
-      item.selected = item === active
-    }
-    if (!active) {
-      return
-    }
-    const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
-    if (!track) {
-      return
-    }
-    const box = active.getBoundingClientRect()
-    const own = track.getBoundingClientRect()
-    if (box.width === 0) {
-      return
-    }
-
-    // On the indicator rather than the host. The geometry is only readable
-    // after layout, so it is written after the element upgrades, and anything
-    // written to the host at that point is an attribute a React consumer's
-    // server markup never had. The shadow root is invisible to hydration.
-    const indicator = this.renderRoot.querySelector<HTMLElement>('[part="indicator"]')
-    if (!indicator) {
-      return
-    }
-    /* Less the border, because the two boxes are not the same box.
-     *
-     * `getBoundingClientRect` gives the border box, and an absolutely
-     * positioned element is placed against its containing block's *padding*
-     * box, which starts one border in. So an offset measured from the outside
-     * and applied from the inside lands a border-width late on both axes: the
-     * thumb sat a pixel below and a pixel right of the segment it marks, and in
-     * a forty pixel control holding a thirty pixel thumb that is six above and
-     * four below. Even gaps are the whole job of a thing that sits in a groove,
-     * and a two pixel difference is small enough to read as "the spacing is
-     * off" without being obviously a misplacement.
-     *
-     * `clientTop` and `clientLeft` are the border widths, which is exactly the
-     * difference between the two origins.
-     */
-    /* Measured along the inline axis, not along the page's left.
-     *
-     * The indicator is pinned with `inset-inline-start`, which is the right
-     * edge in a right-to-left group, and moved with `translate`, which is
-     * always physical. A distance taken from the left and applied from the
-     * right sends the thumb the wrong way and doubles its own offset getting
-     * there. So the distance is taken from whichever edge the inset resolves
-     * to, and the translate is signed to point inwards from it. */
-    const style = getComputedStyle(track)
-    const rtl = style.direction === 'rtl'
-    const borderStart = Number.parseFloat(rtl ? style.borderRightWidth : style.borderLeftWidth)
-    const inline = rtl ? own.right - box.right - borderStart : box.left - own.left - borderStart
-
-    indicator.style.setProperty('--_indicator-x', `${rtl ? -inline : inline}px`)
-    indicator.style.setProperty('--_indicator-y', `${box.top - own.top - track.clientTop}px`)
-    indicator.style.setProperty('--_indicator-w', `${box.width}px`)
-    indicator.style.setProperty('--_indicator-h', `${box.height}px`)
-    indicator.toggleAttribute('data-placed', true)
-  }
-
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
@@ -193,17 +143,20 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    this.place()
-    // The indicator has to follow a label that rewrapped or a font that loaded
-    // late, neither of which fires an event of its own.
-    this.observer = new ResizeObserver(() => this.place())
+    this.sync()
+    this.indicator.place()
+    /* Per item, not only the host, which is what the controller's own observer
+       covers. An item can change width inside a track that keeps its size, and
+       the host never fires for that. */
+    this.observer = new ResizeObserver(() => this.indicator.place())
     this.watch()
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (changed.has('value')) {
-      this.place()
+      this.sync()
+      this.indicator.place()
     }
     this.validate()
     /* Every update, because the label and the message come and go with the
@@ -267,7 +220,8 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
         <slot
           @slotchange=${() => {
             this.watch()
-            this.place()
+            this.sync()
+            this.indicator.place()
           }}
         ></slot>
       </div>
