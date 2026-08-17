@@ -12,16 +12,6 @@
   --_drawer-size: var(--drawer-size, 20rem);
 }
 
-/* The backdrop's opening frame. `::backdrop` is the platform's element now, so
-   the fade belongs to it rather than to a scrim div this component drew, and
-   `@starting-style` is what gives an element entering the top layer somewhere
-   to come from. */
-@starting-style {
-  [part="panel"]::backdrop {
-    opacity: 0;
-  }
-}
-
 /* Transform and opacity only. The surface at rest is flat; the movement is
    what says something happened.
  *
@@ -36,9 +26,21 @@
    `showModal()`. It was a `<div part="scrim">` in this shadow root, so it sat
    under anything with a higher `z-index` anywhere on the page and had to be
    shown and hidden by hand. */
+/* Out at rest, in when open, and the `@starting-style` *after* both.
+ *
+ * It used to be first in this file, which is the whole bug: a starting style
+ * and an ordinary rule of the same specificity are separated by source order,
+ * so `opacity: 1` below won even for the opening frame and the scrim arrived at
+ * full strength in one frame while the panel was still sliding. Measured, every
+ * sample from 16ms on read 1.00 while the panel travelled 640 to 480. The exit
+ * faded correctly the whole time, which is what made it look like a transition
+ * that only worked one way rather than one that was never starting.
+ *
+ * `[open]` rather than a bare rule, so this reads the same as Dialog's, which
+ * was written second and got it right. */
 [part="panel"]::backdrop {
   background-color: var(--helix-color-overlay);
-  opacity: 1;
+  opacity: 0;
   transition:
     opacity var(--helix-duration-normal) var(--helix-easing-standard),
     display var(--helix-duration-normal) allow-discrete,
@@ -49,8 +51,14 @@
    element is in the top layer, so without `overlay` in the list above the
    backdrop is not faded out, it is deleted: the page behind snaps back to full
    contrast in one frame while the panel is still sliding. */
-[part="panel"]:not([open])::backdrop {
-  opacity: 0;
+[part="panel"][open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  [part="panel"][open]::backdrop {
+    opacity: 0;
+  }
 }
 
 [part="panel"] {
@@ -151,8 +159,17 @@
   z-index: var(--helix-layer-overlay);
 }
 
+/* The page's own colour, which is what this appearance has always claimed and
+   is not what `transparent` means here.
+ *
+ * A transparent panel over a modal `::backdrop` shows the scrim through itself,
+ * so a plain drawer read as though it were rendering *underneath* its own
+ * backdrop: measured, the panel's computed fill was `rgba(0, 0, 0, 0)` against
+ * a page at `oklch(1 0 0)`, and what a reader saw over it was the 40% overlay.
+ * `transparent` is only the page's colour when there is nothing between the two,
+ * and a modal drawer always has something between the two. */
 :host([appearance="plain"]) [part="panel"] {
-  background-color: transparent;
+  background-color: var(--helix-color-background);
 }
 
 :host(:not([placement])) [part="panel"],

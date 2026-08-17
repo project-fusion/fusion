@@ -235,7 +235,10 @@
      inverted toast, danger at 2.85:1 against a 3:1 floor. */
   --helix-color-success: light-dark(var(--_helix-success-500), var(--_helix-success-400));
   --helix-color-warning: light-dark(var(--_helix-warning-500), var(--_helix-warning-400));
-  --helix-color-danger: light-dark(var(--_helix-danger-500), var(--_helix-danger-400));
+  /* The one severity whose two arms are two steps apart rather than one: `600`
+     on a page, `400` on a dark surface. See the primitive, which carries the
+     argument. */
+  --helix-color-danger: light-dark(var(--_helix-danger-600), var(--_helix-danger-400));
 
   /* ======================================================== space ======= */
   --helix-space-none: var(--_helix-scale-0);

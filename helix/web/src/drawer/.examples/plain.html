@@ -1,0 +1,16 @@
+<helix-button appearance="primary" command="--show" commandfor="plain-drawer">
+  Open drawer
+</helix-button>
+
+<helix-drawer appearance="plain" id="plain-drawer" label="Drawer Title" placement="end">
+  <span slot="header">Drawer Title</span>
+  <helix-flex direction="column" gap="md">
+    <helix-text appearance="body">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore.
+    </helix-text>
+    <helix-button appearance="primary" command="--close" commandfor="plain-drawer">
+      Close
+    </helix-button>
+  </helix-flex>
+</helix-drawer>
