@@ -17,7 +17,7 @@ import { HelixBaseDrilldownItem } from '../item/drilldown-item.js'
  * looks.** A menu is a thing that opens from a trigger and closes when it is
  * done; this is a region that sits where it is put, inside a drawer or a
  * sidebar or a settings panel. `Menu` drills too, through the same controller,
- * because a menu deep enough to need pages wants exactly this behaviour without
+ * because a menu deep enough to need pages wants exactly this behavior without
  * being this component.
  *
  * **Navigation, never a value.** Rows are places to go and commands to run, so
@@ -27,7 +27,7 @@ import { HelixBaseDrilldownItem } from '../item/drilldown-item.js'
  *
  * **The tree is the state.** A row that opens a page contains that page, so the
  * stack holds one reference and reads the rest from the DOM. See
- * `DrilldownController`, which is where this behaviour lives and which `Menu`
+ * `DrilldownController`, which is where this behavior lives and which `Menu`
  * shares.
  *
  * @since 0.1.0

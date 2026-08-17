@@ -16,7 +16,7 @@ import { styles } from './slider-root.css.js'
  *
  * The filled part of the track is painted with a gradient driven by the
  * fraction the headless tier writes, rather than by a second element laid over
- * it. One element cannot be half one colour by any other means that survives
+ * it. One element cannot be half one color by any other means that survives
  * the thumb being dragged.
  *
  * @since 0.1.0

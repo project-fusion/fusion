@@ -126,7 +126,7 @@ if (hasLayout()) {
   describe('indeterminate', () => {
     test('it is the same fill the determinate bar draws, not a different one', async () => {
       /* An indeterminate bar is this component in another state, not another
-         component. Same colour, same solid fill; what differs is that it never
+         component. Same color, same solid fill; what differs is that it never
          stops. */
       /* Both in one mount. `mount` assigns `document.body.innerHTML`, so
          mounting the second detaches the first and `getComputedStyle` on a

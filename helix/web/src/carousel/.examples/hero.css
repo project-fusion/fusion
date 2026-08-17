@@ -2,7 +2,7 @@
 
    The ratio is on the slide rather than on the carousel, because a slide is
    whatever the consumer put there: a carousel that imposed one would crop the
-   thing it was given. Three panels of flat colour make the point the arrows and
+   thing it was given. Three panels of flat color make the point the arrows and
    the indicators are here to make, and a photograph would make it no better. */
 .slide {
   aspect-ratio: 16 / 7;

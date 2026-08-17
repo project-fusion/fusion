@@ -159,7 +159,7 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
        nothing: the styled tier's own description claimed the pair behaved like
        a native label wrapping a checkbox, and nothing was doing that work.
 
-       Labelling is behaviour, which is what earns an element here rather than a
+       Labelling is behavior, which is what earns an element here rather than a
        bare slot: the wrapper is not decoration and there is no other way to get
        it. The browser handles the forwarding, so there is no click handler to
        write and none to get wrong.

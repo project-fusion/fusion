@@ -233,7 +233,7 @@ describe('sandbox divider', () => {
   })
 
   test('arrow keys move the split', async () => {
-    // By a step from wherever it was, which is the behaviour. The step is the
+    // By a step from wherever it was, which is the behavior. The step is the
     // component's and the starting point is a default, and a spec that names
     // both fails when either moves for reasons that are not this one.
     const sandbox = (await mount(wired)) as Updatable & { split: number }

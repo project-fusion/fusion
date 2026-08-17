@@ -123,15 +123,15 @@ helix-card > [slot="media"] {
    link inside a `column` flex container stretches, and the shadow ran the full
    width of the container instead of underlining the words.
 
-   What animates is the colour. Measured in Chrome, `text-decoration-thickness`
+   What animates is the color. Measured in Chrome, `text-decoration-thickness`
    snaps straight to its target rather than tweening, and `text-underline-offset`
    does animate — which is exactly why the offset is no longer allowed to
    change. It was the only thing visibly moving, and what it did was carry the
    line down the descenders, so a link answering the pointer looked like the
    rule sliding away from the words rather than settling into them.
 
-   So the line stays where it is and gains weight and colour. The one pixel of
-   thickness snaps and is imperceptible; the colour is what a reader sees. It is
+   So the line stays where it is and gains weight and color. The one pixel of
+   thickness snaps and is imperceptible; the color is what a reader sees. It is
    listed in the transition anyway, in case it becomes animatable. */
 :where(a) {
   color: var(--helix-color-primary);
@@ -619,7 +619,7 @@ helix-toggle-group helix-toggle::part(item):hover {
 }
 
 /* The travelling thumb is behind this item, so the label goes to full strength.
-   Colour only, and no change of weight: a heavier label is a wider one, and the
+   Color only, and no change of weight: a heavier label is a wider one, and the
    thumb measures the item it marks. Measured, the same text came out 94.2px
    selected against 92.34 unselected, so choosing a file nudged the row it was
    in. The thumb is the emphasis, and it does not need help. */
@@ -742,7 +742,7 @@ helix-toggle[disabled]::part(item) {
  *
  * No fill of its own: the mark beside it is the one thing marking it, and a
  * background here as well would leave the current link and a hovered link
- * competing to look chosen. Weight and full-strength colour carry it before the
+ * competing to look chosen. Weight and full-strength color carry it before the
  * mark has been measured, which cannot happen on the server. */
 :where(helix-page-nav a[aria-current]) {
   color: var(--helix-color-foreground);
@@ -850,7 +850,7 @@ helix-toggle[disabled]::part(item) {
  *
  * A message arriving in a corner has to be told apart from the page in the
  * fraction of a second before it is read, and inverting is what does that
- * without a colour that means something. `Tooltip` inverts by naming the
+ * without a color that means something. `Tooltip` inverts by naming the
  * inverse surface directly; a toast cannot, because it holds controls. A
  * consumer's `Retry` button inside a hardcoded inverse surface would resolve
  * the page's own tokens and come out dark on dark. Flipping `color-scheme`

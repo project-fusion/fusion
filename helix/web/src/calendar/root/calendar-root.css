@@ -2,7 +2,7 @@
   display: inline-block;
 
   /* Two sizes, not one. The column track is what the grid is laid out on, and
-     the day is the smaller shape centred in it. The difference is the space
+     the day is the smaller shape centered in it. The difference is the space
      between days, and it belongs to the track rather than to a `gap`, so a
      range can paint the whole track and stay continuous. */
   --_calendar-track: var(--calendar-track-size, 2.5rem);
@@ -79,7 +79,7 @@
   padding-block-end: calc(var(--_calendar-track) / 2);
 }
 
-/* The cell is the whole track and the day is the shape centred in it. A range
+/* The cell is the whole track and the day is the shape centered in it. A range
    paints the cell, so it runs unbroken between days and stops at the ends of a
    row on its own, where a fill painted on the day has to be bridged across the
    space between them and then clipped at the row's edge. */

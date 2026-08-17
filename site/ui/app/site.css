@@ -61,7 +61,7 @@
   padding-block: var(--site-band);
 }
 
-/* The header spans the viewport, so its own centring is turned off and it
+/* The header spans the viewport, so its own centering is turned off and it
    takes the page's inset instead. */
 /* The masthead holds a fixed inset rather than the page's fluid one.
  *
@@ -239,7 +239,7 @@ helix-drawer {
 
 /* The abstract drawing on a family's gallery card, from `lib/component-art`.
  *
- * `background`, the page's own colour, so the media reads as a window onto a
+ * `background`, the page's own color, so the media reads as a window onto a
  * page rather than as a panel on a card. That suits what is drawn on it: every
  * one of these is a picture of page content, and several are literally a page
  * with something on it.
@@ -406,7 +406,7 @@ helix-drawer {
 
 /* Full bleed, and a rule that is always there.
  *
- * The component centres its row in a text column and keeps its hairline
+ * The component centers its row in a text column and keeps its hairline
  * transparent until the page scrolls under it, both right for a marketing page
  * and neither right here: a tool runs to the window, and nothing under this
  * header scrolls the document, so the border would never arrive. Set from the
@@ -415,12 +415,12 @@ helix-drawer {
  *
  * Its gradients were declared against `--logo-color-*` with grey literals as
  * fallbacks, exactly so a theme could retint it without the SVG being touched.
- * `primary` is the brand blue and follows the colour mode on its own.
+ * `primary` is the brand blue and follows the color mode on its own.
  *
  * It was briefly the foreground, on a misreading: the mark is not what needed
- * to change colour, the wordmark beside it was. The mark is the one thing here
+ * to change color, the wordmark beside it was. The mark is the one thing here
  * that carries the brand without words, so it is the one thing that keeps the
- * brand's colour. */
+ * brand's color. */
 .fusionLogo {
   --logo-color-from: var(--helix-color-primary);
   --logo-color-mid: var(--helix-color-primary-hover);
@@ -530,7 +530,7 @@ helix-drawer {
 
 /* The panel is a bar and a console, and the two take opposite sides of a line.
  *
- * The strip is chrome like the toolbar above it: the page's own colour, inset
+ * The strip is chrome like the toolbar above it: the page's own color, inset
  * the same amount on both axes, with a rule under it marking where the chrome
  * stops. Tabs draw no rule by default, which is right for a tab set in a page
  * and wrong for one that is the header of a region.
@@ -540,7 +540,7 @@ helix-drawer {
  * fill sits here rather than on the slot: a fill on the slot took the strip
  * with it. */
 helix-sandbox [slot="panel"]::part(tabs) {
-  /* Centred in a stated height, the same figure the toolbar and the rail header
+  /* Centered in a stated height, the same figure the toolbar and the rail header
      take, rather than however tall the padding around a tab makes it. Derived,
      it came out at fifty-seven against their forty-eight: eight of padding
      either side of a forty pixel tab, plus the rule. Three bars across one tool

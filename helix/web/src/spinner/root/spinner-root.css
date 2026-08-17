@@ -1,7 +1,7 @@
 :host {
   color: inherit;
   /* An inline grid rather than an inline flex, and one cell: both children take
-     `grid-area: 1 / 1`, so a mark is centred over the circles with no offsets
+     `grid-area: 1 / 1`, so a mark is centered over the circles with no offsets
      to keep in step with the size. Still inline, so a spinner beside text sits
      on the line the way it did. */
   display: inline-grid;
@@ -62,7 +62,7 @@
   }
 }
 
-/* The centre. Sized against the spinner rather than stated, so a mark stays in
+/* The center. Sized against the spinner rather than stated, so a mark stays in
    proportion at every size the spinner comes in: `size` survives on this
    component precisely because it is a picture, and a fixed mark inside a
    picture that scales is a mark that is wrong at two of the three sizes.

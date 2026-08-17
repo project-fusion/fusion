@@ -28,7 +28,7 @@
   --_toggle-height: 100%;
   /* No track, so nothing to be concentric with. */
   --_toggle-radius: var(--helix-radii-sm);
-  /* And no groove either, which decides the thumb's colour. Without a track the
+  /* And no groove either, which decides the thumb's color. Without a track the
      marker is a pill lying *on* whatever surface the group was put on, so it
      has to be darker than it: that is `raised`. The grooved appearances below
      take `overlay` instead, because a thumb in a groove has to be lighter than

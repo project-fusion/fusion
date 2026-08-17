@@ -232,7 +232,7 @@ if (hasLayout()) {
       /* It was a ring, offset outside the box, and the picture was a red square
          with a rounded grey box sitting inside it: a box inside a box rather
          than a box that is wrong. A ring is right where a component has no edge
-         of its own to colour, which stopped being true when this stopped
+         of its own to color, which stopped being true when this stopped
          letting the browser paint it. */
       const host = (await mount(
         '<helix-checkbox label="Accept" name="t" required></helix-checkbox>',
@@ -274,7 +274,7 @@ if (hasLayout()) {
          finish theirs: a transition in a document the browser is not painting
          is started and never advanced, so waiting on it hangs. What is asserted
          is that a transition exists on the way in and on the way out, and where
-         it ends up, which is the whole of the behaviour. */
+         it ends up, which is the whole of the behavior. */
       const host = (await mount('<helix-checkbox label="A"></helix-checkbox>')) as Updatable & {
         checked: boolean
       }

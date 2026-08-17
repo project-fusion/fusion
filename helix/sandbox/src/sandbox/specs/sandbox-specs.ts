@@ -68,8 +68,8 @@ interface ResultsMessage {
  * @csspart error - Why it failed.
  * @csspart empty - Shown when there is nothing to report.
  *
- * @cssproperty --specs-pass-color - Colour of a passing test.
- * @cssproperty --specs-fail-color - Colour of a failing one.
+ * @cssproperty --specs-pass-color - Color of a passing test.
+ * @cssproperty --specs-fail-color - Color of a failing one.
  */
 @customElement('helix-sandbox-specs')
 export class HelixSandboxSpecs extends HelixElement {

@@ -68,7 +68,7 @@
    background under it is a band across the page rather than a hint at a target.
    The chevron answers instead, coming up to full strength from the subtle it
    sits at: it is the part of the row that means "this opens", so it is the part
-   worth lighting. Setting the row's own colour would say nothing, the trigger
+   worth lighting. Setting the row's own color would say nothing, the trigger
    already being at full strength. */
 [part="trigger"]:hover [part="chevron"] {
   color: var(--helix-color-foreground);
@@ -119,7 +119,7 @@
  *
  * A bare `<slot>` is `display: contents` and generates no box to put padding
  * on, so it is made a block. Inherited properties set here reach the slotted
- * content through the flattened tree, which is why the colour and the leading
+ * content through the flattened tree, which is why the color and the leading
  * can sit here too rather than needing `::slotted`.
  */
 [part="content-inner"] > slot {

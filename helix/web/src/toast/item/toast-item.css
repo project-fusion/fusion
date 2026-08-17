@@ -22,7 +22,7 @@
      way the app header, the toolbar and the announcement are, and every one of
      those declares this on its own host. Without it a slotted `Retry` came out
      at the full 40px beside a 32px dismiss, so the two controls in one row were
-     different heights: measured, three centre lines at 654, 660 and 664. */
+     different heights: measured, three center lines at 654, 660 and 664. */
   --helix-size-control: var(--helix-size-control-sm);
   /* The height of one line of the message, which is what everything in the row
      is aligned against. Derived from the two tokens that make it, so a theme
@@ -35,8 +35,16 @@
 }
 
 [part="item"] {
-  /* Three columns and two rows: the mark, the message, the close along the
-     first line, and anything to do about it on a row of its own beneath.
+  /* A wrapping row: the mark, the message and anything to do about it, with
+     the close in the corner and out of flow.
+   *
+   * Inline when it fits and on its own row when it does not, and flex gives
+   * that for free rather than needing the line count. Line breaking uses each
+   * item's *hypothetical* main size, which for the message is its max-content
+   * width, so a short message leaves room on the line and the action sits
+   * beside it, while a message that would fill the line pushes the action to
+   * the next one. Nothing measures anything and nothing has to run to find
+   * out.
    *
    * Actions were inline, which is right for "Project saved. [Undo]" and wrong
    * the moment the message wraps: pinned to the first line they float up beside
@@ -52,7 +60,7 @@
    * a mark belongs beside the words it qualifies and a close belongs in the
    * corner. Plain `start` is wrong too, and that is what the earlier note here
    * was reacting to: three boxes of 16px, 21px and 32px sharing a top edge have
-   * their centres 8px apart, so a one-line message came out visibly staggered.
+   * their centers 8px apart, so a one-line message came out visibly staggered.
    *
    * Both are fixed by aligning to the line box instead of to the box top. The
    * offsets are derived, not guessed: the line is the font size times the line
@@ -61,12 +69,12 @@
    * mark and the control where the reading starts. */
   align-items: start;
   background-color: var(--helix-color-surface-overlay);
-  grid-template-columns: auto minmax(0, 1fr);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
   color: var(--helix-color-foreground);
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   /* Column only. As a flex row this was one gap between four things; as a grid
@@ -103,7 +111,7 @@
  *
  * It was a bar down the leading edge, and before that a bar drawn as a border
  * that the corner radius bent. Both were the same mistake in different shapes:
- * a coloured line says *something* is different about this message and never
+ * a colored line says *something* is different about this message and never
  * says what, so a reader who cannot tell green from red is told nothing at all.
  * The icon carries an `aria-label`, so the severity is in the accessibility
  * tree rather than only in the paint.
@@ -115,9 +123,9 @@
 [part="icon"] {
   color: var(--_toast-severity, var(--helix-color-foreground-muted));
   display: inline-flex;
-  grid-area: 1 / 1;
+  flex: 0 0 auto;
   /* Half the difference between the first line and the glyph, so the two share
-     a centre however many lines follow. */
+     a center however many lines follow. */
   margin-block-start: calc((var(--_toast-line) - var(--helix-size-icon)) / 2);
 }
 
@@ -137,10 +145,11 @@ slot[name="icon"]::slotted(*) {
   inline-size: var(--helix-size-icon);
 }
 
-/* Column two of the first row, and column two again on the second, so an
-   unmarked message still starts where a marked one does. */
+/* Grows into whatever the line has left, and shrinks to nothing before the
+   action is pushed off it, which is what makes the wrap depend on the message's
+   own length. */
 [part="content"] {
-  grid-area: 1 / 2;
+  flex: 1 1 auto;
   min-inline-size: 0;
 }
 
@@ -161,17 +170,21 @@ slot[name="icon"]::slotted(*) {
  * more, which is the same reason the house rule prefers a bare slot. */
 [part="actions"] {
   display: flex;
+  flex: 0 0 auto;
   gap: var(--helix-space-2xs);
-  grid-area: 2 / 2;
-  justify-content: flex-start;
 }
 
-[part="actions"] slot::slotted(*) {
-  margin-block-start: var(--helix-space-2xs);
+/* Only the wrapped case needs the gap above it, and `:empty` cannot say which
+   case it is any more than it could say whether anything was slotted. The row
+   gap does: it is drawn between flex lines and only when there are two, so a
+   message with its action beside it pays nothing and one with the action
+   beneath gets the space. */
+[part="item"] {
+  row-gap: var(--helix-space-2xs);
 }
 
-/* Colour on the mark rather than a fill behind the words. A message is text to
-   be read, and a coloured panel costs contrast to say what the icon already
+/* Color on the mark rather than a fill behind the words. A message is text to
+   be read, and a colored panel costs contrast to say what the icon already
    says in words. */
 :host([severity="info"]) {
   --_toast-severity: var(--helix-color-primary);
@@ -249,7 +262,7 @@ slot[name="icon"]::slotted(*) {
  * honest, because the item pauses on hover and focus and the bar has to stop
  * with it rather than merely look like it did.
  *
- * The same colour as the severity mark where there is one, so the two things
+ * The same color as the severity mark where there is one, so the two things
  * drawn on a message read as one idea rather than two. */
 [part="timer"] {
   animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;

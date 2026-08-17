@@ -3,7 +3,7 @@
      the selected tab and nothing at all behind the row.
 
      A lifted surface with a hairline of shadow under it, rather than a fill,
-     because a fill has no colour that works in both modes. What reads in both
+     because a fill has no color that works in both modes. What reads in both
      is the lift.
 
      `raised` is the token for that, and it is decided by what is behind the
@@ -49,7 +49,7 @@
  * overflow. Drawn as a gradient in the last pixel of the content box, the rule
  * lands exactly where a tab's bottom border does, and a child paints over its
  * parent's background: the selected tab covers the rule for its own width and
- * the rule shows through everywhere else. One line, coloured under the current
+ * the rule shows through everywhere else. One line, colored under the current
  * tab, which is what an underline tab set is. */
 [part="tabs"] {
   background-image: var(--_tabs-rule, none);

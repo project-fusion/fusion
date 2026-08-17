@@ -4,7 +4,7 @@
   display: contents;
 }
 
-/* Weight and colour carry the heading, not capitals: uppercase costs
+/* Weight and color carry the heading, not capitals: uppercase costs
    legibility and is read letter by letter by some screen readers.
 
    The same rule, height and inset as a cell, because the heading is the first

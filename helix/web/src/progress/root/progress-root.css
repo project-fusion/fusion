@@ -47,7 +47,7 @@
 /* Running, with no knowable end.
  *
  * The same fill the determinate bar draws, doing the same thing it does, over
- * and over. Same colour, same corner, same track: an indeterminate bar is the
+ * and over. Same color, same corner, same track: an indeterminate bar is the
  * component in a different state, not a different component, and a reader
  * should not have to work out that they are looking at the same control.
  *

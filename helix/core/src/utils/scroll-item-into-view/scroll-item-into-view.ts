@@ -52,7 +52,7 @@ export const scrollItemIntoView = (item: HTMLElement, options: ScrollItemOptions
 
   /* Whichever edge it is past, and nothing when it is past neither. A scroll of
      zero still fires a `scroll` event and still cancels a smooth one already
-     running, so the early return is behaviour rather than an optimisation. */
+     running, so the early return is behavior rather than an optimisation. */
   const inline = before.inline > 0 ? -before.inline : after.inline > 0 ? after.inline : 0
   const block = before.block > 0 ? -before.block : after.block > 0 ? after.block : 0
   if (inline === 0 && block === 0) {

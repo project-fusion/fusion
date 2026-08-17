@@ -68,7 +68,7 @@ ${selector} {
 /* \`align\` is a legacy presentational hint, and a browser applies it to any
  * element it appears on, including one it has never heard of. So a component
  * with an \`align\` property for its own layout silently gets \`text-align\` as
- * well: every \`<helix-flex align="center">\` was centring its text, which is a
+ * well: every \`<helix-flex align="center">\` was centering its text, which is a
  * thing nobody asked for and nothing in the component could be blamed for.
  *
  * Neutralised here rather than in each component, which is where it was. Flex

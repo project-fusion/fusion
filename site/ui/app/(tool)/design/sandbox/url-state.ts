@@ -25,10 +25,10 @@
  * opposite of what it says. Listing what is there has one sense whatever the
  * defaults are.
  *
- * The site's own colour mode is deliberately not here. It is a preference about
+ * The site's own color mode is deliberately not here. It is a preference about
  * how someone reads, held in `localStorage` and applying to every page, and
  * putting it in a shared link would mean handing your eyesight to whoever opens
- * it. The preview's colour mode is here, because that is a property of the
+ * it. The preview's color mode is here, because that is a property of the
  * example being shown rather than of the person looking.
  */
 
@@ -45,7 +45,7 @@ export type Syntax = 'html' | 'tsx'
 export type Section = 'editor' | 'panel' | 'rail' | 'status'
 
 export type SandboxUrlState = {
-  /** Colour mode forced on the preview, or null to follow the page. */
+  /** Color mode forced on the preview, or null to follow the page. */
   colorMode: 'dark' | 'light' | null
   /** Which way the preview reads. */
   direction: Direction

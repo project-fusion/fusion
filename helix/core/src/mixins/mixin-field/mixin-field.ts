@@ -125,7 +125,7 @@ export declare class MixinFieldInterface {
  * fallback.** Measured in Chrome 148, and a newline between the tags is enough,
  * so `<helix-checkbox label="Accept">` closed on the next line renders no label
  * at all. A named slot does not have this problem, because `slot="label"` is an
- * attribute and a text node has none. It is the platform's behaviour rather
+ * attribute and a text node has none. It is the platform's behavior rather
  * than ours, and the same is already true of every slot fallback here.
  *
  * **The ids are fixed rather than generated.** IDREFs resolve within the tree

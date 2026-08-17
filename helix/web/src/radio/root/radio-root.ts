@@ -14,7 +14,7 @@ import { styles } from './radio-root.css.js'
  * are ours either way.
  *
  * The dot scales from nothing, like the checkbox's tick, so choosing shows
- * something happening. It has no colour, because colour is reserved for state
+ * something happening. It has no color, because color is reserved for state
  * and being chosen is an answer rather than a state.
  *
  * @since 0.1.0
@@ -23,7 +23,7 @@ import { styles } from './radio-root.css.js'
  * @documentation https://helix.fusion.dev/components/radio
  *
  * @cssproperty --radio-size - Diameter of the circle.
- * @cssproperty --radio-mark-color - Colour of the dot.
+ * @cssproperty --radio-mark-color - Color of the dot.
  */
 @customElement('helix-radio')
 export class HelixRadio extends HelixBaseRadio {

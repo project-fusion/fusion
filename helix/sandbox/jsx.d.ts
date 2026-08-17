@@ -827,8 +827,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--specs-pass-color`: Colour of a passing test. (default: `undefined`)
-   * - `--specs-fail-color`: Colour of a failing one. (default: `undefined`)
+   * - `--specs-pass-color`: Color of a passing test. (default: `undefined`)
+   * - `--specs-fail-color`: Color of a failing one. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -952,7 +952,7 @@ export type CustomElements = {
    *
    * **Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
    * for the whole group, and it is for a set of controls of the same kind. This
-   * holds a tab list, which owns its own arrow-key behaviour and would lose it.
+   * holds a tab list, which owns its own arrow-key behavior and would lose it.
    * Use `helix-toolbar` where the contents really are a row of buttons.
    *
    * Both slots are bare, so an unfilled one generates no box and costs no gap.
@@ -1273,8 +1273,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--specs-pass-color`: Colour of a passing test. (default: `undefined`)
-   * - `--specs-fail-color`: Colour of a failing one. (default: `undefined`)
+   * - `--specs-pass-color`: Color of a passing test. (default: `undefined`)
+   * - `--specs-fail-color`: Color of a failing one. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -1407,7 +1407,7 @@ export type CustomElementsSolidJs = {
    *
    * **Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
    * for the whole group, and it is for a set of controls of the same kind. This
-   * holds a tab list, which owns its own arrow-key behaviour and would lose it.
+   * holds a tab list, which owns its own arrow-key behavior and would lose it.
    * Use `helix-toolbar` where the contents really are a row of buttons.
    *
    * Both slots are bare, so an unfilled one generates no box and costs no gap.
@@ -1442,9 +1442,9 @@ export type CustomCssProperties = {
   "--sandbox-source-background"?: string;
   /** Minimum height of the pane. */
   "--sandbox-source-min-block-size"?: string;
-  /** Colour of a passing test. */
+  /** Color of a passing test. */
   "--specs-pass-color"?: string;
-  /** Colour of a failing one. */
+  /** Color of a failing one. */
   "--specs-fail-color"?: string;
   /** Color of the bar's text. */
   "--status-bar-color"?: string;

@@ -35,7 +35,7 @@ export interface DrilldownOptions {
  * it, and reset on close; the sandbox's settings dropdown has been a drill-down
  * for as long as it has existed. None of that is about menus. Taking it out is
  * what lets a settings panel, a filter stack or a navigation tree have the same
- * behaviour without one of them being a menu that is pretending.
+ * behavior without one of them being a menu that is pretending.
  *
  * **The tree is the state.** A row's page is its own children, assigned to a
  * slot, so the controller holds one reference, the row currently drilled into,

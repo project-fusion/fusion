@@ -3,7 +3,7 @@
    of it.
 
    The label takes neither `display: block` nor a bottom padding, both of which
-   belong to a label above a control. In a row centred on its items, padding
+   belong to a label above a control. In a row centered on its items, padding
    under the text makes the label's box taller than its ink and the control
    reads as sitting low beside its own words.
 

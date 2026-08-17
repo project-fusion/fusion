@@ -265,7 +265,7 @@ Extends `HelixBaseAvatarGroup`.
 
 They overlap by a step of space, which is enough to read as a stack without
 the faces occluding each other. Each carries a ring in the page's own
-background colour, because a stack with no separation between its members
+background color, because a stack with no separation between its members
 reads as one shape rather than several: the ring is what makes the edge of
 each avatar visible against the one behind it.
 
@@ -545,7 +545,7 @@ Extends `HelixBaseCalendar`.
 Six week rows always, so the grid keeps one height and a month change does
 not move whatever sits beneath it.
 
-The column track is wider than the day, and the day is centred in it. The
+The column track is wider than the day, and the day is centered in it. The
 difference is the space between days, which belongs to the track rather than
 to a `gap`, so a range can paint across the whole track and stay continuous.
 
@@ -2075,7 +2075,7 @@ never a native control to restyle, and the weight and the motion of the mark
 are ours either way.
 
 The dot scales from nothing, like the checkbox's tick, so choosing shows
-something happening. It has no colour, because colour is reserved for state
+something happening. It has no color, because color is reserved for state
 and being chosen is an answer rather than a state.
 
 #### Properties
@@ -2120,7 +2120,7 @@ and being chosen is an answer rather than a state.
 | Property | Description |
 | --- | --- |
 | `--radio-size` | Diameter of the circle. |
-| `--radio-mark-color` | Colour of the dot. |
+| `--radio-mark-color` | Color of the dot. |
 
 ### Group — `helix-radio-group`
 
@@ -2321,7 +2321,7 @@ drag, the keys, and a hit area sized by the platform for a finger.
 
 The filled part of the track is painted with a gradient driven by the
 fraction the headless tier writes, rather than by a second element laid over
-it. One element cannot be half one colour by any other means that survives
+it. One element cannot be half one color by any other means that survives
 the thumb being dragged.
 
 #### Properties
@@ -2406,14 +2406,14 @@ to say so.
 
 | Slot | Description |
 | --- | --- |
-| *(default)* | A mark to sit still at the centre, usually a logo. Empty by default. |
+| *(default)* | A mark to sit still at the center, usually a logo. Empty by default. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `svg` | The rotating circle pair. |
-| `mark` | The region holding what was slotted at the centre. |
+| `mark` | The region holding what was slotted at the center. |
 | `track` | The full circle behind the indicator. |
 | `indicator` | The arc that turns. |
 
@@ -2491,7 +2491,7 @@ A control that turns something on, and turns it on when pressed.
 
 Extends `HelixBaseSwitch`.
 
-A thumb travelling in a groove, which is the one place in the library colour
+A thumb travelling in a groove, which is the one place in the library color
 is used to say "on". A checkbox does not, because a tick is legible on its
 own; a switch has no mark, so the fill is the whole of what distinguishes the
 two states and there is nothing else for it to be.
@@ -3031,7 +3031,7 @@ Extends `HelixBaseToastItem`.
 
 A surface with a shadow, because a toast sits over whatever the reader was
 looking at rather than in it. The severity is a bar down the leading edge and
-not a fill: a message is text to be read, and a coloured panel behind it
+not a fill: a message is text to be read, and a colored panel behind it
 costs contrast for something the mark already says.
 
 #### Properties

@@ -332,7 +332,7 @@ have two. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixAccordionItem["onOpenChange"];
 
@@ -392,7 +392,7 @@ have two. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixAccordionItem["onOpenChange"];
   /** Fired when the item opens or closes. */
@@ -738,7 +738,7 @@ An icon-only button without it is a control a screen reader announces as
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognised as an
+rather than left on the host: only a real button is recognized as an
 invoker, so `commandfor` written on a custom element resolves nothing and
 the trigger silently does nothing at all. A wrapper has to hand them down,
 the same way `label` becomes `aria-label` in there.
@@ -804,7 +804,7 @@ An icon-only button without it is a control a screen reader announces as
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognised as an
+rather than left on the host: only a real button is recognized as an
 invoker, so `commandfor` written on a custom element resolves nothing and
 the trigger silently does nothing at all. A wrapper has to hand them down,
 the same way `label` becomes `aria-label` in there.
@@ -1044,7 +1044,7 @@ export type HelixCardProps = {
   less attention than a shadow: a screen of shadowed cards reads as a stack
   of things floating, none of them settled.
 - `elevated` is lifted off the page instead of framed, for a card on a
-  coloured or busy background, where a line has to compete with whatever is
+  colored or busy background, where a line has to compete with whatever is
   behind it and a shadow does not.
 - `plain` has no frame at all: the card is a layout and whatever it sits in
   is the surface. For a card inside something already bounded, where a
@@ -1063,7 +1063,7 @@ export type HelixCardSolidJsProps = {
   less attention than a shadow: a screen of shadowed cards reads as a stack
   of things floating, none of them settled.
 - `elevated` is lifted off the page instead of framed, for a card on a
-  coloured or busy background, where a line has to compete with whatever is
+  colored or busy background, where a line has to compete with whatever is
   behind it and a shadow does not.
 - `plain` has no frame at all: the card is a layout and whatever it sits in
   is the surface. For a card inside something already bounded, where a
@@ -1314,7 +1314,7 @@ tree, so a screen reader can still announce that the control exists. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the event
+what it does not recognize; the generated wrapper listens for the event
 instead. */
   onCheckedChange?: HelixCheckbox["onCheckedChange"];
 
@@ -1379,7 +1379,7 @@ tree, so a screen reader can still announce that the control exists. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the event
+what it does not recognize; the generated wrapper listens for the event
 instead. */
   "prop:onCheckedChange"?: HelixCheckbox["onCheckedChange"];
   /** Fired before the state changes, and cancelable. */
@@ -1444,7 +1444,7 @@ refusing to be closed, and a dialog with no way out at all is a trap. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixDialog["onOpenChange"];
 
@@ -1496,7 +1496,7 @@ refusing to be closed, and a dialog with no way out at all is a trap. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixDialog["onOpenChange"];
   /** Fired before it opens, and cancelable. */
@@ -1607,7 +1607,7 @@ not, rather than shown or hidden by CSS. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixDrawer["onOpenChange"];
 
@@ -1665,7 +1665,7 @@ not, rather than shown or hidden by CSS. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixDrawer["onOpenChange"];
   /** Fired when the drawer opens or closes. */
@@ -1876,7 +1876,7 @@ An icon-only button without it is a control a screen reader announces as
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognised as an
+rather than left on the host: only a real button is recognized as an
 invoker, so `commandfor` written on a custom element resolves nothing and
 the trigger silently does nothing at all. A wrapper has to hand them down,
 the same way `label` becomes `aria-label` in there.
@@ -1926,7 +1926,7 @@ An icon-only button without it is a control a screen reader announces as
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognised as an
+rather than left on the host: only a real button is recognized as an
 invoker, so `commandfor` written on a custom element resolves nothing and
 the trigger silently does nothing at all. A wrapper has to hand them down,
 the same way `label` becomes `aria-label` in there.
@@ -2446,7 +2446,7 @@ state for stylesheets, which is what it has always been for. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixMenu["onOpenChange"];
 
@@ -2500,7 +2500,7 @@ state for stylesheets, which is what it has always been for. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixMenu["onOpenChange"];
   /** Fired before it opens, and cancelable. */
@@ -2668,7 +2668,7 @@ state for stylesheets, which is what it has always been for. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixPopover["onOpenChange"];
 
@@ -2722,7 +2722,7 @@ state for stylesheets, which is what it has always been for. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixPopover["onOpenChange"];
   /** Fired before it opens, and cancelable. */
@@ -3087,7 +3087,7 @@ tree, so a screen reader can still announce that the control exists. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixSelect["onOpenChange"];
   /** The consumer's callback, invoked after the value is applied.
@@ -3182,7 +3182,7 @@ tree, so a screen reader can still announce that the control exists. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixSelect["onOpenChange"];
   /** The consumer's callback, invoked after the value is applied.
@@ -3475,7 +3475,7 @@ tree, so a screen reader can still announce that the control exists. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the event
+what it does not recognize; the generated wrapper listens for the event
 instead. */
   onCheckedChange?: HelixSwitch["onCheckedChange"];
 
@@ -3523,7 +3523,7 @@ tree, so a screen reader can still announce that the control exists. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the event
+what it does not recognize; the generated wrapper listens for the event
 instead. */
   "prop:onCheckedChange"?: HelixSwitch["onCheckedChange"];
   /** Fired before the state changes, and cancelable. */
@@ -4336,7 +4336,7 @@ keyboard reader arriving on a control has already committed to it. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixTooltip["onOpenChange"];
 
@@ -4400,7 +4400,7 @@ keyboard reader arriving on a control has already committed to it. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixTooltip["onOpenChange"];
   /** Fired before the bubble shows, and cancelable. */
@@ -4463,7 +4463,7 @@ shadow root, which is not part of the tree React hydrates. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   onOpenChange?: HelixTreeItem["onOpenChange"];
   /** Whether this item holds the tree's single tab stop. */
@@ -4516,7 +4516,7 @@ shadow root, which is not part of the tree React hydrates. */
 
 Not an attribute: it is a function. And not reachable from React's JSX,
 which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognise; the generated wrapper listens for the events
+what it does not recognize; the generated wrapper listens for the events
 instead. */
   "prop:onOpenChange"?: HelixTreeItem["onOpenChange"];
   /** Whether this item holds the tree's single tab stop. */
@@ -4665,7 +4665,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -4873,7 +4873,7 @@ export type CustomElements = {
   /**
    * They overlap by a step of space, which is enough to read as a stack without
    * the faces occluding each other. Each carries a ring in the page's own
-   * background colour, because a stack with no separation between its members
+   * background color, because a stack with no separation between its members
    * reads as one shape rather than several: the ring is what makes the edge of
    * each avatar visible against the one behind it.
    *
@@ -5174,7 +5174,7 @@ export type CustomElements = {
    * - `command`: What to send when the button is activated, and what to send it to.
    *
    * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognised as an
+   * rather than left on the host: only a real button is recognized as an
    * invoker, so `commandfor` written on a custom element resolves nothing and
    * the trigger silently does nothing at all. A wrapper has to hand them down,
    * the same way `label` becomes `aria-label` in there.
@@ -5235,7 +5235,7 @@ export type CustomElements = {
    * Six week rows always, so the grid keeps one height and a month change does
    * not move whatever sits beneath it.
    *
-   * The column track is wider than the day, and the day is centred in it. The
+   * The column track is wider than the day, and the day is centered in it. The
    * difference is the space between days, which belongs to the track rather than
    * to a `gap`, so a range can paint across the whole track and stay continuous.
    *
@@ -5419,7 +5419,7 @@ export type CustomElements = {
    *   less attention than a shadow: a screen of shadowed cards reads as a stack
    *   of things floating, none of them settled.
    * - `elevated` is lifted off the page instead of framed, for a card on a
-   *   coloured or busy background, where a line has to compete with whatever is
+   *   colored or busy background, where a line has to compete with whatever is
    *   behind it and a shadow does not.
    * - `plain` has no frame at all: the card is a layout and whatever it sits in
    *   is the surface. For a card inside something already bounded, where a
@@ -5642,7 +5642,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the event
+   * what it does not recognize; the generated wrapper listens for the event
    * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
@@ -5751,7 +5751,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -5892,7 +5892,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -6180,7 +6180,7 @@ export type CustomElements = {
    * - `command`: What to send when the button is activated, and what to send it to.
    *
    * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognised as an
+   * rather than left on the host: only a real button is recognized as an
    * invoker, so `commandfor` written on a custom element resolves nothing and
    * the trigger silently does nothing at all. A wrapper has to hand them down,
    * the same way `label` becomes `aria-label` in there.
@@ -6714,7 +6714,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -6989,7 +6989,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -7237,7 +7237,7 @@ export type CustomElements = {
    * are ours either way.
    *
    * The dot scales from nothing, like the checkbox's tick, so choosing shows
-   * something happening. It has no colour, because colour is reserved for state
+   * something happening. It has no color, because color is reserved for state
    * and being chosen is an answer rather than a state.
    *
    * ## Attributes & Properties
@@ -7284,7 +7284,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--radio-size`: Diameter of the circle. (default: `undefined`)
-   * - `--radio-mark-color`: Colour of the dot. (default: `undefined`)
+   * - `--radio-mark-color`: Color of the dot. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -7368,7 +7368,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
@@ -7489,7 +7489,7 @@ export type CustomElements = {
    *
    * The filled part of the track is painted with a gradient driven by the
    * fraction the headless tier writes, rather than by a second element laid over
-   * it. One element cannot be half one colour by any other means that survives
+   * it. One element cannot be half one color by any other means that survives
    * the thumb being dragged.
    *
    * ## Attributes & Properties
@@ -7617,7 +7617,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: A mark to sit still at the centre, usually a logo. Empty by default.
+   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
    *
    * ## CSS Custom Properties
    *
@@ -7632,7 +7632,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `svg`: The rotating circle pair.
-   * - `mark`: The region holding what was slotted at the centre.
+   * - `mark`: The region holding what was slotted at the center.
    * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
    */
@@ -7693,7 +7693,7 @@ export type CustomElements = {
   "helix-stat": Partial<HelixStatProps & BaseProps<HelixStat> & BaseEvents>;
 
   /**
-   * A thumb travelling in a groove, which is the one place in the library colour
+   * A thumb travelling in a groove, which is the one place in the library color
    * is used to say "on". A checkbox does not, because a tick is legible on its
    * own; a switch has no mark, so the fill is the whole of what distinguishes the
    * two states and there is nothing else for it to be.
@@ -7740,7 +7740,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the event
+   * what it does not recognize; the generated wrapper listens for the event
    * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
@@ -8261,7 +8261,7 @@ export type CustomElements = {
   /**
    * A surface with a shadow, because a toast sits over whatever the reader was
    * looking at rather than in it. The severity is a bar down the leading edge and
-   * not a fill: a message is text to be read, and a coloured panel behind it
+   * not a fill: a message is text to be read, and a colored panel behind it
    * costs contrast for something the mark already says.
    *
    * ## Attributes & Properties
@@ -8619,7 +8619,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -8718,7 +8718,7 @@ export type CustomElements = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    * - `isBranch`: Whether this node has children. (property only) (readonly)
@@ -8897,7 +8897,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -9117,7 +9117,7 @@ export type CustomElementsSolidJs = {
   /**
    * They overlap by a step of space, which is enough to read as a stack without
    * the faces occluding each other. Each carries a ring in the page's own
-   * background colour, because a stack with no separation between its members
+   * background color, because a stack with no separation between its members
    * reads as one shape rather than several: the ring is what makes the edge of
    * each avatar visible against the one behind it.
    *
@@ -9441,7 +9441,7 @@ export type CustomElementsSolidJs = {
    * - `command`: What to send when the button is activated, and what to send it to.
    *
    * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognised as an
+   * rather than left on the host: only a real button is recognized as an
    * invoker, so `commandfor` written on a custom element resolves nothing and
    * the trigger silently does nothing at all. A wrapper has to hand them down,
    * the same way `label` becomes `aria-label` in there.
@@ -9505,7 +9505,7 @@ export type CustomElementsSolidJs = {
    * Six week rows always, so the grid keeps one height and a month change does
    * not move whatever sits beneath it.
    *
-   * The column track is wider than the day, and the day is centred in it. The
+   * The column track is wider than the day, and the day is centered in it. The
    * difference is the space between days, which belongs to the track rather than
    * to a `gap`, so a range can paint across the whole track and stay continuous.
    *
@@ -9695,7 +9695,7 @@ export type CustomElementsSolidJs = {
    *   less attention than a shadow: a screen of shadowed cards reads as a stack
    *   of things floating, none of them settled.
    * - `elevated` is lifted off the page instead of framed, for a card on a
-   *   coloured or busy background, where a line has to compete with whatever is
+   *   colored or busy background, where a line has to compete with whatever is
    *   behind it and a shadow does not.
    * - `plain` has no frame at all: the card is a layout and whatever it sits in
    *   is the surface. For a card inside something already bounded, where a
@@ -9926,7 +9926,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the event
+   * what it does not recognize; the generated wrapper listens for the event
    * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
@@ -10038,7 +10038,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -10185,7 +10185,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -10491,7 +10491,7 @@ export type CustomElementsSolidJs = {
    * - `command`: What to send when the button is activated, and what to send it to.
    *
    * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognised as an
+   * rather than left on the host: only a real button is recognized as an
    * invoker, so `commandfor` written on a custom element resolves nothing and
    * the trigger silently does nothing at all. A wrapper has to hand them down,
    * the same way `label` becomes `aria-label` in there.
@@ -11048,7 +11048,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -11337,7 +11337,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -11599,7 +11599,7 @@ export type CustomElementsSolidJs = {
    * are ours either way.
    *
    * The dot scales from nothing, like the checkbox's tick, so choosing shows
-   * something happening. It has no colour, because colour is reserved for state
+   * something happening. It has no color, because color is reserved for state
    * and being chosen is an answer rather than a state.
    *
    * ## Attributes & Properties
@@ -11646,7 +11646,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--radio-size`: Diameter of the circle. (default: `undefined`)
-   * - `--radio-mark-color`: Colour of the dot. (default: `undefined`)
+   * - `--radio-mark-color`: Color of the dot. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -11735,7 +11735,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
@@ -11862,7 +11862,7 @@ export type CustomElementsSolidJs = {
    *
    * The filled part of the track is painted with a gradient driven by the
    * fraction the headless tier writes, rather than by a second element laid over
-   * it. One element cannot be half one colour by any other means that survives
+   * it. One element cannot be half one color by any other means that survives
    * the thumb being dragged.
    *
    * ## Attributes & Properties
@@ -11993,7 +11993,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: A mark to sit still at the centre, usually a logo. Empty by default.
+   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
    *
    * ## CSS Custom Properties
    *
@@ -12008,7 +12008,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `svg`: The rotating circle pair.
-   * - `mark`: The region holding what was slotted at the centre.
+   * - `mark`: The region holding what was slotted at the center.
    * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
    */
@@ -12077,7 +12077,7 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * A thumb travelling in a groove, which is the one place in the library colour
+   * A thumb travelling in a groove, which is the one place in the library color
    * is used to say "on". A checkbox does not, because a tick is legible on its
    * own; a switch has no mark, so the fill is the whole of what distinguishes the
    * two states and there is nothing else for it to be.
@@ -12124,7 +12124,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the event
+   * what it does not recognize; the generated wrapper listens for the event
    * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
@@ -12677,7 +12677,7 @@ export type CustomElementsSolidJs = {
   /**
    * A surface with a shadow, because a toast sits over whatever the reader was
    * looking at rather than in it. The severity is a bar down the leading edge and
-   * not a fill: a message is text to be read, and a coloured panel behind it
+   * not a fill: a message is text to be read, and a colored panel behind it
    * costs contrast for something the mark already says.
    *
    * ## Attributes & Properties
@@ -13052,7 +13052,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    *
    * ## Events
@@ -13154,7 +13154,7 @@ export type CustomElementsSolidJs = {
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
    * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognise; the generated wrapper listens for the events
+   * what it does not recognize; the generated wrapper listens for the events
    * instead. (property only)
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    * - `isBranch`: Whether this node has children. (property only) (readonly)
@@ -13438,7 +13438,7 @@ export type CustomCssProperties = {
   "--radio-group-gap"?: string;
   /** Diameter of the circle. */
   "--radio-size"?: string;
-  /** Colour of the dot. */
+  /** Color of the dot. */
   "--radio-mark-color"?: string;
   /** How tall the panel gets. */
   "--select-surface-max-block-size"?: string;

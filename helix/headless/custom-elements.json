@@ -161,7 +161,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -201,7 +201,7 @@
                 "text": "((open: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -2419,7 +2419,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognised as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
+              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognized as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
               "attribute": "command"
             },
             {
@@ -2641,7 +2641,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognised as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
+              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognized as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
               "fieldName": "command"
             },
             {
@@ -5163,7 +5163,7 @@
                 "text": "((checked: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the event\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the event\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -5915,7 +5915,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -5955,7 +5955,7 @@
                 "text": "((open: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -6515,7 +6515,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -6555,7 +6555,7 @@
                 "text": "((open: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -7069,7 +7069,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "One panel that changes rather than panels opening beside each other. That is\nthe right shape wherever there is no room for a second column: a phone has\nnone, and a touch screen has no hover to open one with.\n\n**Not a `Menu`, and the difference is what it is for rather than how it\nlooks.** A menu is a thing that opens from a trigger and closes when it is\ndone; this is a region that sits where it is put, inside a drawer or a\nsidebar or a settings panel. `Menu` drills too, through the same controller,\nbecause a menu deep enough to need pages wants exactly this behaviour without\nbeing this component.\n\n**Navigation, never a value.** Rows are places to go and commands to run, so\nnothing here is form-associated and nothing is submitted. A drill-down that\nreported a value would be a `Listbox` whose options happen to nest, and that\nis the component to reach for instead.\n\n**The tree is the state.** A row that opens a page contains that page, so the\nstack holds one reference and reads the rest from the DOM. See\n`DrilldownController`, which is where this behaviour lives and which `Menu`\nshares.",
+          "description": "One panel that changes rather than panels opening beside each other. That is\nthe right shape wherever there is no room for a second column: a phone has\nnone, and a touch screen has no hover to open one with.\n\n**Not a `Menu`, and the difference is what it is for rather than how it\nlooks.** A menu is a thing that opens from a trigger and closes when it is\ndone; this is a region that sits where it is put, inside a drawer or a\nsidebar or a settings panel. `Menu` drills too, through the same controller,\nbecause a menu deep enough to need pages wants exactly this behavior without\nbeing this component.\n\n**Navigation, never a value.** Rows are places to go and commands to run, so\nnothing here is form-associated and nothing is submitted. A drill-down that\nreported a value would be a `Listbox` whose options happen to nest, and that\nis the component to reach for instead.\n\n**The tree is the state.** A row that opens a page contains that page, so the\nstack holds one reference and reads the rest from the DOM. See\n`DrilldownController`, which is where this behavior lives and which `Menu`\nshares.",
           "name": "HelixBaseDrilldown",
           "cssParts": [
             {
@@ -7649,7 +7649,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognised as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
+              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognized as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
               "fieldName": "command",
               "inheritedFrom": {
                 "name": "HelixBaseButton",
@@ -7719,7 +7719,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognised as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
+              "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognized as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
               "attribute": "command",
               "inheritedFrom": {
                 "name": "HelixBaseButton",
@@ -11496,7 +11496,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -11536,7 +11536,7 @@
                 "text": "((open: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -12905,7 +12905,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -12945,7 +12945,7 @@
                 "text": "((open: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -14852,7 +14852,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -14892,7 +14892,7 @@
                 "text": "((open: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -16705,7 +16705,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Two concentric circles rather than one arc: the track is what makes the\nmoving part read as a proportion of a whole rather than as a shape drifting\non its own, and it costs one element.\n\n**The centre is a slot and is empty by default.** A spinner with a mark in\nthe middle is a brand's spinner, and this library does not know whose. The\nslot is the capability; the logo is the application's, put in once wherever\nthe app wraps it. Nothing is rendered when nothing is slotted, so an\nunbranded spinner is still two circles and no extra box.\n\nWhat is slotted does not turn. Only the arc moves, because a mark rotating\nwith it stops reading as a mark and becomes part of the animation, and a\nwordmark upside down twice a second is worse than no wordmark.\n\nThe semantics are on the host through `ElementInternals`, not on an inner\nspan. A `role` written into the shadow root announces correctly but leaves\nthe host itself anonymous to anything walking the light DOM, and a `role`\nwritten onto the host as an attribute is one a React consumer's server markup\nnever had.",
+          "description": "Two concentric circles rather than one arc: the track is what makes the\nmoving part read as a proportion of a whole rather than as a shape drifting\non its own, and it costs one element.\n\n**The center is a slot and is empty by default.** A spinner with a mark in\nthe middle is a brand's spinner, and this library does not know whose. The\nslot is the capability; the logo is the application's, put in once wherever\nthe app wraps it. Nothing is rendered when nothing is slotted, so an\nunbranded spinner is still two circles and no extra box.\n\nWhat is slotted does not turn. Only the arc moves, because a mark rotating\nwith it stops reading as a mark and becomes part of the animation, and a\nwordmark upside down twice a second is worse than no wordmark.\n\nThe semantics are on the host through `ElementInternals`, not on an inner\nspan. A `role` written into the shadow root announces correctly but leaves\nthe host itself anonymous to anything walking the light DOM, and a `role`\nwritten onto the host as an attribute is one a React consumer's server markup\nnever had.",
           "name": "HelixBaseSpinner",
           "cssParts": [
             {
@@ -16713,7 +16713,7 @@
               "name": "svg"
             },
             {
-              "description": "The region holding what was slotted at the centre.",
+              "description": "The region holding what was slotted at the center.",
               "name": "mark"
             },
             {
@@ -16727,7 +16727,7 @@
           ],
           "slots": [
             {
-              "description": "A mark to sit still at the centre, usually a logo. Empty by default.",
+              "description": "A mark to sit still at the center, usually a logo. Empty by default.",
               "name": ""
             }
           ],
@@ -17355,7 +17355,7 @@
                 "text": "((checked: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the event\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the event\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -19742,7 +19742,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A real `<textarea>`, so the caret, the selection, spellcheck, the resize\nhandle and the keyboard a phone chooses are all the platform's, and it\nserializes into the server's markup so the field is usable before any script\nloads.\n\n**Not an Input with a taller box.** The difference is the Enter key: in a\nsingle-line field it submits the form, and here it inserts a line. That is a\nbehavioural difference the platform owns and cannot be styled into existence,\nwhich is why this is its own element rather than `Input` with a property.\n\n`rows` sets the height it starts at, and `auto-grow` lets it follow its own\ncontent. They are not alternatives: `rows` is where an empty field begins and\n`auto-grow` is what happens after, so a field that grows still has to start\nsomewhere.",
+          "description": "A real `<textarea>`, so the caret, the selection, spellcheck, the resize\nhandle and the keyboard a phone chooses are all the platform's, and it\nserializes into the server's markup so the field is usable before any script\nloads.\n\n**Not an Input with a taller box.** The difference is the Enter key: in a\nsingle-line field it submits the form, and here it inserts a line. That is a\nbehavioral difference the platform owns and cannot be styled into existence,\nwhich is why this is its own element rather than `Input` with a property.\n\n`rows` sets the height it starts at, and `auto-grow` lets it follow its own\ncontent. They are not alternatives: `rows` is where an empty field begins and\n`auto-grow` is what happens after, so a field that grows still has to start\nsomewhere.",
           "name": "HelixBaseTextarea",
           "cssParts": [
             {
@@ -20609,7 +20609,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "An element rather than a slot, because it carries a timeout, a severity, a\ndismiss control and a lifetime that pauses: behaviour, state and API, which\nis the test for whether a region becomes an element in this library.\n\n**The timer is the item's own.** Held by the region, one message arriving\nwould restart another's, so a stack of three would go from three seconds each\nto nine for the last one. Each message is on its own clock from the moment it\nis rendered.\n\n**A message is the opposite of the page it is over.** Inverted by default,\nbecause a thing arriving in a corner has to be told apart from the page in\nthe moment before it is read, and inverting does that without spending a\ncolour that means something. It is a flip of `color-scheme` rather than a\nnamed inverse surface: every token in the subtree re-resolves, so a `Retry`\na consumer slots in comes out right without knowing where it is. `Tooltip`\ncan name the inverse surface directly because it holds no controls; this\ncannot. Set `data-color-mode` on the region to take the page's mode instead.\n\n**No duration means it stays.** That is the safe default rather than the\ncommon one: anything carrying an action has to still be there when the reader\ndecides to take it, and a component cannot tell from the outside whether the\nmessage it was given is disposable.\n\n**The clock stops while it is being read.** Hover pauses it, and so does\nfocus landing anywhere inside, which is the case that matters more: a\nkeyboard reader tabbing towards the action in a toast is exactly the person a\ntimer must not race. Both resume where they left off rather than starting\nagain, so a message half-read does not get a full second life every time a\npointer crosses it.\n\n**Going away is a request, never an act.** It dispatches a cancelable\n`helix-dismiss` and does nothing else: the consumer owns the list, so the\nitem removing itself would leave the two disagreeing. Auto-dismiss and the\ndismiss control raise the same event, so a consumer handles one path and not\ntwo.",
+          "description": "An element rather than a slot, because it carries a timeout, a severity, a\ndismiss control and a lifetime that pauses: behavior, state and API, which\nis the test for whether a region becomes an element in this library.\n\n**The timer is the item's own.** Held by the region, one message arriving\nwould restart another's, so a stack of three would go from three seconds each\nto nine for the last one. Each message is on its own clock from the moment it\nis rendered.\n\n**A message is the opposite of the page it is over.** Inverted by default,\nbecause a thing arriving in a corner has to be told apart from the page in\nthe moment before it is read, and inverting does that without spending a\ncolor that means something. It is a flip of `color-scheme` rather than a\nnamed inverse surface: every token in the subtree re-resolves, so a `Retry`\na consumer slots in comes out right without knowing where it is. `Tooltip`\ncan name the inverse surface directly because it holds no controls; this\ncannot. Set `data-color-mode` on the region to take the page's mode instead.\n\n**No duration means it stays.** That is the safe default rather than the\ncommon one: anything carrying an action has to still be there when the reader\ndecides to take it, and a component cannot tell from the outside whether the\nmessage it was given is disposable.\n\n**The clock stops while it is being read.** Hover pauses it, and so does\nfocus landing anywhere inside, which is the case that matters more: a\nkeyboard reader tabbing towards the action in a toast is exactly the person a\ntimer must not race. Both resume where they left off rather than starting\nagain, so a message half-read does not get a full second life every time a\npointer crosses it.\n\n**Going away is a request, never an act.** It dispatches a cancelable\n`helix-dismiss` and does nothing else: the consumer owns the list, so the\nitem removing itself would leave the two disagreeing. Auto-dismiss and the\ndismiss control raise the same event, so a consumer handles one path and not\ntwo.",
           "name": "HelixBaseToastItem",
           "cssParts": [
             {
@@ -22657,7 +22657,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -22697,7 +22697,7 @@
                 "text": "((open: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -23159,7 +23159,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behaviour an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -23199,7 +23199,7 @@
                 "text": "((open: boolean) => void) | undefined"
               },
               "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognise; the generated wrapper listens for the events\ninstead.",
+              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"

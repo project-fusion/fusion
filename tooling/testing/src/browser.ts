@@ -254,7 +254,7 @@ const runThese = async (
   return results
 }
 
-/* The DOM helpers. Same names and same behaviour as the node harness, minus the
+/* The DOM helpers. Same names and same behavior as the node harness, minus the
    parts that only existed to paper over happy-dom. */
 
 /** Nothing to install: this is a browser, and it brought its own DOM. */

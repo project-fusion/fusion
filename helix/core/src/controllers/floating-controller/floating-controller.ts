@@ -76,7 +76,7 @@ export interface FloatingOptions {
  * somewhere else entirely. And an overlay has to clear its nearest *clipping*
  * ancestor, not just the window, or it is placed correctly inside a scrolling
  * panel and clipped out of sight by it. Both are ordinary here, and both are a
- * long tail of browser behaviour rather than a formula.
+ * long tail of browser behavior rather than a formula.
  *
  * `autoUpdate` keeps the position through scrolling on any ancestor, resizes of
  * either element, and layout shifts.

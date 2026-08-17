@@ -50,7 +50,7 @@
 [part="box"] {
   display: grid;
   flex: 0 0 auto;
-  /* One cell, both children in it, so the mark is centred over the input with
+  /* One cell, both children in it, so the mark is centered over the input with
      no offsets to keep in step with the box's size. */
   place-items: center;
 }
@@ -61,11 +61,11 @@
 
 [part="control"] {
   appearance: none;
-  /* The page's own colour, so the box reads as a hole punched through to it
+  /* The page's own color, so the box reads as a hole punched through to it
      rather than as a fill that happens to match.
 
      It was `surface-sunken`, and that stopped working the moment `sunken` was
-     lightened: at 0.96 it is the same colour as a sunken surface, so a checkbox
+     lightened: at 0.96 it is the same color as a sunken surface, so a checkbox
      inside a well had no interior at all, only its border. Measured on the page
      it separated by 0.04, on a card by 0.025, and in the one place it was for
      by nothing.
@@ -90,11 +90,11 @@
   border-color: var(--helix-color-border-strong);
 }
 
-/* No colour, which is the same rule the segmented control's thumb follows:
-   colour is reserved for state, and being ticked is not state, it is an answer.
+/* No color, which is the same rule the segmented control's thumb follows:
+   color is reserved for state, and being ticked is not state, it is an answer.
    The mark is what says so, and a mark is legible on its own. It was a solid
    accent fill, which at the size a checkbox actually is is a small blue tile
-   with a shape punched out of it: the block of colour becomes the thing you
+   with a shape punched out of it: the block of color becomes the thing you
    read and the mark stops being it. The edge only firms up.
 
    Indeterminate is not a third look: the same box with a different mark in it,
@@ -109,7 +109,7 @@
    of what the platform draws and is what the report was about.
 
    `mask` rather than a background image, because the shape is then a stencil
-   and the colour is a token like every other colour here. A data URI cannot
+   and the color is a token like every other color here. A data URI cannot
    carry `var()`. */
 [part="mark"] {
   /* The foreground, like any other mark made of ink. */
@@ -137,7 +137,7 @@
   mask-repeat: no-repeat;
   mask-size: 100%;
   pointer-events: none;
-  /* Nothing to see until there is something to say. Scaled from the centre
+  /* Nothing to see until there is something to say. Scaled from the center
      rather than faded, so the mark arrives with the weight of a thing being
      put there. */
   scale: 0;
@@ -165,7 +165,7 @@
  *
  * It was a ring, offset outside the box, and the picture was a red square with
  * a rounded grey box sitting inside it. A ring is right where a component has
- * no edge of its own to colour, which was true while the browser drew this one
+ * no edge of its own to color, which was true while the browser drew this one
  * and stopped being true the moment we did.
  *
  * The focus ring still outranks it, so a focused invalid box shows the red edge
@@ -176,7 +176,7 @@
   border-color: var(--helix-color-danger);
 }
 
-/* Colour appears here and only here, because this is the one thing about a
+/* Color appears here and only here, because this is the one thing about a
    checkbox that is state. A ticked box that is still wrong takes it too, edge
    and mark together, rather than being half one thing and half the other. */
 :host([data-invalid][data-checked]) [part="control"],
@@ -240,7 +240,7 @@
   border-color: var(--helix-color-border-strong);
 }
 
-/* Lifted rather than coloured, which is the rule the tick already follows. */
+/* Lifted rather than colored, which is the rule the tick already follows. */
 :host([appearance="card"][data-checked]) [part="field"] {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-border-strong);

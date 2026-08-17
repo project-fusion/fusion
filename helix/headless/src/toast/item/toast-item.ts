@@ -15,7 +15,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @description
  * An element rather than a slot, because it carries a timeout, a severity, a
- * dismiss control and a lifetime that pauses: behaviour, state and API, which
+ * dismiss control and a lifetime that pauses: behavior, state and API, which
  * is the test for whether a region becomes an element in this library.
  *
  * **The timer is the item's own.** Held by the region, one message arriving
@@ -26,7 +26,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * **A message is the opposite of the page it is over.** Inverted by default,
  * because a thing arriving in a corner has to be told apart from the page in
  * the moment before it is read, and inverting does that without spending a
- * colour that means something. It is a flip of `color-scheme` rather than a
+ * color that means something. It is a flip of `color-scheme` rather than a
  * named inverse surface: every token in the subtree re-resolves, so a `Retry`
  * a consumer slots in comes out right without knowing where it is. `Tooltip`
  * can name the inverse surface directly because it holds no controls; this

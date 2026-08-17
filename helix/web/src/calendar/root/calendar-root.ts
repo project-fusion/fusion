@@ -10,7 +10,7 @@ import { styles } from './calendar-root.css.js'
  * Six week rows always, so the grid keeps one height and a month change does
  * not move whatever sits beneath it.
  *
- * The column track is wider than the day, and the day is centred in it. The
+ * The column track is wider than the day, and the day is centered in it. The
  * difference is the space between days, which belongs to the track rather than
  * to a `gap`, so a range can paint across the whole track and stay continuous.
  *

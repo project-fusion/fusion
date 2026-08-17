@@ -11,7 +11,7 @@
 }
 
 /* CodeMirror's own structure. Named here rather than left to its theme,
-   because the sandbox's colours are tokens and its theme's are not. */
+   because the sandbox's colors are tokens and its theme's are not. */
 [part="editor"] .cm-editor {
   block-size: 100%;
 }
@@ -50,7 +50,7 @@
 }
 
 /* A read-only pane still shows a cursor, because a reader puts one where they
-   are reading. What it does not show is a caret colour that says "type here". */
+   are reading. What it does not show is a caret color that says "type here". */
 :host([read-only]) [part="editor"] .cm-cursor {
   border-left-color: var(--helix-color-foreground-subtle);
 }

@@ -55,9 +55,9 @@
  *
  * `<helix-flex align="center">` therefore also set `text-align: center` on
  * everything inside it, through a hint no rule here declares and none can see.
- * Measured: an invented tag with `align="center"` computes centred text too, so
- * it is nothing to do with being a known element. It centred the placeholder in
- * every field put in a centred row.
+ * Measured: an invented tag with `align="center"` computes centered text too, so
+ * it is nothing to do with being a known element. It centered the placeholder in
+ * every field put in a centered row.
  *
  * Restoring inheritance is enough to undo it: a presentational hint is ordered
  * before every author rule, so anything at all wins. `inherit` and not a value,

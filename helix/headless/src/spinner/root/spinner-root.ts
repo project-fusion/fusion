@@ -10,7 +10,7 @@ import { property } from 'lit/decorators.js'
  * moving part read as a proportion of a whole rather than as a shape drifting
  * on its own, and it costs one element.
  *
- * **The centre is a slot and is empty by default.** A spinner with a mark in
+ * **The center is a slot and is empty by default.** A spinner with a mark in
  * the middle is a brand's spinner, and this library does not know whose. The
  * slot is the capability; the logo is the application's, put in once wherever
  * the app wraps it. Nothing is rendered when nothing is slotted, so an
@@ -31,10 +31,10 @@ import { property } from 'lit/decorators.js'
  * @aliases Loader, Busy, Activity
  * @documentation https://helix.fusion.dev/components/spinner
  *
- * @slot - A mark to sit still at the centre, usually a logo. Empty by default.
+ * @slot - A mark to sit still at the center, usually a logo. Empty by default.
  *
  * @csspart svg - The rotating circle pair.
- * @csspart mark - The region holding what was slotted at the centre.
+ * @csspart mark - The region holding what was slotted at the center.
  * @csspart track - The full circle behind the indicator.
  * @csspart indicator - The arc that turns.
  */

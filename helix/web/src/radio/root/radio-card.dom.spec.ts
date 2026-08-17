@@ -82,9 +82,9 @@ if (hasLayout()) {
       expect(Number.parseFloat(edge(find('plain'), 'field').borderTopWidth)).toBe(0)
     })
 
-    test('a chosen card is lifted rather than coloured', async () => {
+    test('a chosen card is lifted rather than colored', async () => {
       /* This component's own rule about the dot, restated for the surface:
-         colour is reserved for state, and being chosen is an answer rather than
+         color is reserved for state, and being chosen is an answer rather than
          a state. If someone reaches for an accent border here later, this is
          the decision they are changing. */
       const find = await board(

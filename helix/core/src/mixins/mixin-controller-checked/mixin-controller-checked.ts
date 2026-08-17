@@ -31,7 +31,7 @@ export declare class MixinControllerCheckedInterface {
    * The consumer's callback, invoked after the state is applied.
    *
    * A React consumer cannot pass this through JSX: React reserves every prop
-   * matching `on[A-Z]` and drops the ones it does not recognise. The generated
+   * matching `on[A-Z]` and drops the ones it does not recognize. The generated
    * wrapper listens for `helix-change` instead. This is for a consumer
    * holding a reference, or a framework that assigns properties.
    */
@@ -152,7 +152,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      *
      * Not an attribute: it is a function. And not reachable from React's JSX,
      * which reserves every `on[A-Z]` prop for its own event system and drops
-     * what it does not recognise; the generated wrapper listens for the event
+     * what it does not recognize; the generated wrapper listens for the event
      * instead.
      */
     @property({ attribute: false })

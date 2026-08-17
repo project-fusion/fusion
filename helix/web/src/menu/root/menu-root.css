@@ -45,7 +45,7 @@
   display: flex;
   gap: var(--helix-space-2xs);
   margin-block-end: var(--helix-space-2xs);
-  /* No padding above, one step below, which is what centres it. The surface
+  /* No padding above, one step below, which is what centers it. The surface
      already lays a step of its own block padding over the top of this row, so
      matching it here would be two; the row's own space has to make up the
      difference underneath instead. It was half that, so the title sat high in

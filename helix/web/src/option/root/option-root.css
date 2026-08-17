@@ -55,7 +55,7 @@
    *
    * It was `surface-raised`, which in dark mode is the same neutral as
    * `surface-overlay` — and `surface-overlay` is what the select's panel is
-   * made of. So a hovered option was painted exactly the colour it sat on and
+   * made of. So a hovered option was painted exactly the color it sat on and
    * the highlight vanished, in the one place options are used most.
    *
    * A translucent wash cannot have that problem: it is a step away from
@@ -64,7 +64,7 @@
    * dark, because the same alpha over a dark surface reads as less.
    *
    * `light-dark()` wraps the two mixes rather than the two percentages, which
-   * is not a style choice: it returns a colour, so a percentage inside it is
+   * is not a style choice: it returns a color, so a percentage inside it is
    * invalid, the whole declaration is dropped, and the highlight comes out
    * fully transparent. Which is what happened on the first attempt. */
   background-color: var(

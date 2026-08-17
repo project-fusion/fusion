@@ -9,7 +9,7 @@
  *
  * Two rules:
  *
- *   1. No raw values in properties that have tokens. Colours, spacing, radii,
+ *   1. No raw values in properties that have tokens. Colors, spacing, radii,
  *      durations, font sizes, weights, and z-index must come from
  *      `var(--helix-*)`.
  *   2. No reaching past the semantic layer. `--_helix-*` primitives are

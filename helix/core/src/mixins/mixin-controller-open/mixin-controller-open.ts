@@ -31,7 +31,7 @@ export declare class MixinControllerOpenInterface {
    * The consumer's callback, invoked after the state is applied.
    *
    * A React consumer cannot pass this through JSX: React reserves every prop
-   * matching `on[A-Z]` and drops the ones it does not recognise. The generated
+   * matching `on[A-Z]` and drops the ones it does not recognize. The generated
    * wrapper attaches a listener for `helix-open` and `helix-close` instead.
    * This is for a consumer holding a reference, or a framework that assigns
    * properties.
@@ -118,7 +118,7 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * back holding its `open` boolean.
      *
      * One field and not two. Writing always applies, which is what a native
-     * control does when a script assigns to it, and is the behaviour an
+     * control does when a script assigns to it, and is the behavior an
      * imperative `element.open = true` should have whatever mode the element is
      * in. What the write does *not* do is change which mode that is.
      */
@@ -166,7 +166,7 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      *
      * Not an attribute: it is a function. And not reachable from React's JSX,
      * which reserves every `on[A-Z]` prop for its own event system and drops
-     * what it does not recognise; the generated wrapper listens for the events
+     * what it does not recognize; the generated wrapper listens for the events
      * instead.
      */
     @property({ attribute: false })

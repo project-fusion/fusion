@@ -17,7 +17,7 @@ describe('app header server output', () => {
     expect(markup).toContain('<helix-app-header')
     expect(hostAttributes(markup, 'helix-app-header')).toEqual([])
     expect(withoutStyles(markup)).toContain('<slot name="start">')
-    // The banner is full width and the row inside it is what centres.
+    // The banner is full width and the row inside it is what centers.
     expect(hasPart(markup, 'content')).toBe(true)
   })
 

@@ -249,8 +249,8 @@ if (hasLayout()) {
       expect(getComputedStyle(bar).animationPlayState).toBe('running')
     })
 
-    test('the severity is a named icon, not only a colour', async () => {
-      /* It was a coloured bar, which says *something* is different about this
+    test('the severity is a named icon, not only a color', async () => {
+      /* It was a colored bar, which says *something* is different about this
          message and never says what. A reader who cannot tell green from red
          was told nothing at all. The glyph carries the name. */
       const found = await item('severity="danger"')
@@ -368,7 +368,7 @@ if (hasLayout()) {
         const box = element.getBoundingClientRect()
         return Math.round(box.top + box.height / 2)
       }
-      /* The centres no longer agree, and should not: the action sits on its own
+      /* The centers no longer agree, and should not: the action sits on its own
          row now. What this was really written for is the heights, which is the
          fault it caught. A toast is dense by nature and had never said so, so a
          slotted control came out at the full 40px beside a 32px dismiss. */
@@ -379,12 +379,12 @@ if (hasLayout()) {
       void middle
     })
 
-    test('the mark and the close sit on the first line, the action on its own row', async () => {
-      /* Not centred, which floated them to the middle of a long message, and
+    test('the mark and the close hold the first line, and the action wraps only when it must', async () => {
+      /* Not centered, which floated them to the middle of a long message, and
          not plain `start`, which is what an earlier version of this row did:
-         boxes of 16px, 21px and 32px sharing a top edge have centres 8px apart,
+         boxes of 16px, 21px and 32px sharing a top edge have centers 8px apart,
          so a one-line message came out staggered. Each is offset by half the
-         difference between the line and itself, so one line reproduces centring
+         difference between the line and itself, so one line reproduces centering
          exactly and four leave everything where the reading starts.
        *
          The close needed its offset written *inside* its own rule: `all: unset`
@@ -403,26 +403,25 @@ if (hasLayout()) {
          </helix-toast>`,
       )) as HTMLElement
 
-      for (const id of ['short', 'long']) {
+      for (const id of ['short', 'long'] as const) {
         const found = host.querySelector(`#${id}`) as Item
         await found.updateComplete
-        const centre = (element: Element): number => {
+        const center = (element: Element): number => {
           const box = element.getBoundingClientRect()
           return box.top + box.height / 2
         }
-        const icon = centre(part(found, 'icon') as HTMLElement)
-        expect(Math.abs(centre(part(found, 'dismiss') as HTMLElement) - icon)).toBeLessThan(2)
+        const icon = center(part(found, 'icon') as HTMLElement)
+        expect(Math.abs(center(part(found, 'dismiss') as HTMLElement) - icon)).toBeLessThan(2)
 
-        /* The action is deliberately not on that line. Inline it was right for
-           "Project saved. [Undo]" and wrong the moment the message wraps:
-           pinned to the first line it floats up beside the close and competes
-           with it for the corner. Below the message it sits where the reading
-           finishes, at any length. */
+        /* The action goes where it fits. Flex line breaking uses each item's
+           hypothetical main size, so a short message leaves room and the action
+           sits beside it, and a message that would fill the line pushes it to
+           the next. Nothing counts lines and nothing has to run to find out. */
         const action = found.querySelector('helix-button') as HTMLElement
         const content = part(found, 'content') as HTMLElement
-        expect(action.getBoundingClientRect().top).toBeGreaterThan(
-          content.getBoundingClientRect().bottom - 2,
-        )
+        const beside =
+          Math.abs(action.getBoundingClientRect().top - content.getBoundingClientRect().top) < 8
+        expect(beside).toBe(id === 'short')
       }
     })
 

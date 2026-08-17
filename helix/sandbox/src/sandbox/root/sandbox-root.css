@@ -225,7 +225,7 @@
 }
 
 /* Where the two cross. The grid puts it in the cell the dividers share, which
-   is that point wherever the split has moved to, and the translate centres it
+   is that point wherever the split has moved to, and the translate centers it
    there. `place-self: center` does not: the corner is deliberately larger than
    the two-pixel cell it sits in, and an overflowing grid item falls back to
    safe alignment, which is start. Measured, it sat with its top-left on the
@@ -278,7 +278,7 @@
   display: block;
 }
 
-/* A colour crossfade is not motion in the sense the preference is about, but the
+/* A color crossfade is not motion in the sense the preference is about, but the
    base layer caps every transition in the document for the same reader, and a
    component that kept fading while the page around it stopped would be the odd
    one out. The rule cannot reach in here, so it is restated. */

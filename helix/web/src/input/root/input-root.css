@@ -54,7 +54,7 @@
  * from it, so the two read as a single thicker edge. Offset, they were a blue
  * line, a dark gap, and a second blue line: the field looked double-struck
  * rather than focused. The offset is right where a ring surrounds something
- * that is not itself changing colour, which is most controls, and wrong here
+ * that is not itself changing color, which is most controls, and wrong here
  * because the border is doing the same job at the same moment. */
 :host(:not([disabled])) [part="field"]:hover {
   border-color: var(--helix-color-border-strong);
@@ -84,15 +84,15 @@
    The attribute is written from the same state that decides the message, so the
    two cannot disagree.
 
-   **Every combination is named, and the ring is recoloured with the border.**
+   **Every combination is named, and the ring is recolored with the border.**
    Being wrong outranks being pointed at and outranks being focused, so it has
    to say so twice over, for the same reason the focus rule names `:hover`.
    Unnamed, this was (0,3,0) against hover's (0,4,0), so running a pointer over
    a field with an error in it put the grey border back.
 
    Focus was worse than that, and visibly. The focus rule owns the `outline`,
-   and nothing here was changing its colour, so a focused field with an error
-   came out as a red border inside a blue ring: two edges in two colours, which
+   and nothing here was changing its color, so a focused field with an error
+   came out as a red border inside a blue ring: two edges in two colors, which
    is the double-struck look the focus rule exists to prevent, arriving by a
    different route. The border and the ring are one edge, so when one of them
    turns they both do. */

@@ -34,7 +34,7 @@
  * the panel undoes a rule nothing here mentions and nothing warns about.
  *
  * What it looked like is worth recording, because it does not look like a CSS
- * fault. The dialog painted on load, centred across the frame by the UA's own
+ * fault. The dialog painted on load, centered across the frame by the UA's own
  * `margin: auto` and sitting at the top of the flow rather than the middle of
  * the viewport, with no scrim. That reads as a dialog that opened by itself,
  * and every control in it was dead, because the buttons close a dialog that was
@@ -83,7 +83,7 @@
  *
  * `::backdrop` is a pseudo-element in the top layer and cannot see custom
  * properties declared outside the shadow tree, which is every Helix token.
- * Measured in Chromium: a literal colour applies, a property declared on
+ * Measured in Chromium: a literal color applies, a property declared on
  * `:host` applies, and `--helix-color-overlay` comes out as nothing, so the
  * scrim was fully transparent and the page behind a modal was not dimmed at
  * all. Re-declaring the token onto the host does not help either, because a
@@ -96,13 +96,13 @@
  * `--_helix-neutral-950`, which the backdrop cannot see, so the whole thing
  * resolves to invalid rather than to absent and the fallback never runs.
  *
- * So the value is literal, and it is the only literal colour in this library.
+ * So the value is literal, and it is the only literal color in this library.
  * It is the same mix `--helix-color-overlay` is, written out. The duplication
  * is real and is the platform's price: if that token moves, this moves with it,
  * and there is nothing that will tell you.
  *
  * `light-dark()` wraps the two mixes rather than the two percentages, because
- * it returns a colour: a percentage inside it is invalid. Written the other way
+ * it returns a color: a percentage inside it is invalid. Written the other way
  * round the whole declaration collapsed to a tenth of an alpha, which is a
  * scrim you can barely see rather than an error you can find. The same trap the
  * option's highlight hit, and it caught me twice. */

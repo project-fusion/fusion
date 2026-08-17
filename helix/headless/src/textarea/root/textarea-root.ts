@@ -13,7 +13,7 @@ import { property } from 'lit/decorators.js'
  *
  * **Not an Input with a taller box.** The difference is the Enter key: in a
  * single-line field it submits the form, and here it inserts a line. That is a
- * behavioural difference the platform owns and cannot be styled into existence,
+ * behavioral difference the platform owns and cannot be styled into existence,
  * which is why this is its own element rather than `Input` with a property.
  *
  * `rows` sets the height it starts at, and `auto-grow` lets it follow its own

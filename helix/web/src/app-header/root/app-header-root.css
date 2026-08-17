@@ -36,7 +36,7 @@
 /* The row is what gets centered, so the content lines up with the page while
    the banner behind it runs edge to edge.
 
-   A grid with equal outer tracks, not a flex row. Flex centring puts the
+   A grid with equal outer tracks, not a flex row. Flex centering puts the
    navigation in the middle of whatever space the brand and the actions left,
    which moves the moment either changes width: a longer wordmark shifts the
    nav, and so does swapping a button for a menu at a breakpoint. Equal `1fr`
@@ -110,7 +110,7 @@ slot[name="start"]::slotted(*) {
   justify-content: flex-start;
 }
 
-/* A colour crossfade is not motion in the sense the preference is about, but the
+/* A color crossfade is not motion in the sense the preference is about, but the
    base layer caps every transition in the document for the same reader, and a
    component that kept fading while the page around it stopped would be the odd
    one out. The rule cannot reach in here, so it is restated. */

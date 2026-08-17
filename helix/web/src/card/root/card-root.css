@@ -106,7 +106,7 @@ slot[name="footer"]::slotted(*) {
   position: absolute;
 }
 
-/* A colour crossfade is not motion in the sense the preference is about, but the
+/* A color crossfade is not motion in the sense the preference is about, but the
    base layer caps every transition in the document for the same reader, and a
    component that kept fading while the page around it stopped would be the odd
    one out. The rule cannot reach in here, so it is restated. */

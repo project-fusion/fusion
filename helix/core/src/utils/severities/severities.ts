@@ -14,7 +14,7 @@ export interface SeverityMark {
   /** The glyph. */
   icon: HelixIcon
 
-  /** What a screen reader is told, since the colour says nothing to them. */
+  /** What a screen reader is told, since the color says nothing to them. */
   label: string
 }
 

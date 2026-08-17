@@ -16,7 +16,7 @@
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   /* The popover API puts it in the top layer, where the UA's own inset would
-     centre it in the window and its margin would offset it from wherever the
+     center it in the window and its margin would offset it from wherever the
      positioning put it. Both have to be cleared, not merely overridden. */
   inset: auto;
   margin: var(--helix-space-none);

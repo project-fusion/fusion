@@ -29,7 +29,7 @@ export interface ControlledChangeOptions<T> {
    * A second channel beside the event, for framework consumers. Note that a
    * React consumer cannot supply this through plain JSX: React reserves every
    * prop matching `on[A-Z]` for its own event system and drops the ones it does
-   * not recognise, so `onOpenChange` never reaches the element. The generated
+   * not recognize, so `onOpenChange` never reaches the element. The generated
    * wrapper attaches a real listener instead. This is for a consumer holding a
    * reference, or a framework that assigns properties.
    */

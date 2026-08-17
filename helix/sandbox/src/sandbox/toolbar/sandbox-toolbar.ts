@@ -13,7 +13,7 @@ import { styles } from './sandbox-toolbar.css.js'
  *
  * **Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
  * for the whole group, and it is for a set of controls of the same kind. This
- * holds a tab list, which owns its own arrow-key behaviour and would lose it.
+ * holds a tab list, which owns its own arrow-key behavior and would lose it.
  * Use `helix-toolbar` where the contents really are a row of buttons.
  *
  * Both slots are bare, so an unfilled one generates no box and costs no gap.

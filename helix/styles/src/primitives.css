@@ -13,7 +13,7 @@
  * `bun run check:tokens` fails the build on any component reaching past this
  * line.
  *
- * Colours are authored in OKLCH: equal numeric steps in sRGB are not equal
+ * Colors are authored in OKLCH: equal numeric steps in sRGB are not equal
  * perceptual steps, which makes both ramp generation and contrast math
  * unreliable. See `@helix-io/theme`.
  */
@@ -43,7 +43,7 @@
   /* True black, and the only primitive with no tint in it besides white. The
      page is the one surface with nothing behind it to sit against, so the trace
      of brand hue that makes a card or a bar feel part of the palette has
-     nothing to do there and reads as a colour cast across the whole window.
+     nothing to do there and reads as a color cast across the whole window.
      Every step between these two keeps the hue. */
   --_helix-neutral-1000: oklch(0 0 0);
   --_helix-neutral-50: oklch(
@@ -66,7 +66,7 @@
   /* 0.96, with 100 lifted to 0.97 above it. `surface-sunken` reads this step
      and was reported heavy three times running; each time it moved on its own,
      and by 0.95 it was one hundredth from `raised` and the two were the same
-     colour to any eye.
+     color to any eye.
 
      So the pair moves together. Lifting only this one would have put a field's
      fill lighter than a hovered row, which inverts what the names mean, and
@@ -142,7 +142,7 @@
   --_helix-warning-500: oklch(0.62 0.185 75);
   --_helix-danger-500: oklch(0.57 0.21 27);
   /* The dark arms, derived rather than picked, the same `l + 0.12` the brand
-     ramp uses. A severity had exactly one value each, which is what a colour
+     ramp uses. A severity had exactly one value each, which is what a color
      with no dark arm looks like: measured against an inverted surface, the
      danger mark came out at 2.85:1, under the 3:1 a non-text mark needs. */
   --_helix-success-400: oklch(from var(--_helix-success-500) calc(l + 0.12) c h);
@@ -160,8 +160,8 @@
    *
    * Theirs runs from 0.31 to 0.55 in OKLCH lightness, and the bottom of that is
    * where the complaint came from: a string at #0a3069 is near enough black
-   * that it reads as uncoloured text rather than as a dark blue, and a tag at
-   * #116329 is not far behind. Every one of them was in fact being coloured;
+   * that it reads as uncolored text rather than as a dark blue, and a tag at
+   * #116329 is not far behind. Every one of them was in fact being colored;
    * several were just too dark to look it.
    *
    * The hue and the chroma are theirs and only the lightness is set, so the

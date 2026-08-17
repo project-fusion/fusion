@@ -44,11 +44,11 @@ describe('icon rendering', () => {
     // The set comes from `@phosphor-icons/core` now and its regular weight is
     // one filled path with no paint of its own, so the only thing painting it
     // is the `fill` on the element the component renders around it. The old
-    // assertion was true of the technique rather than of the behaviour, and the
-    // behaviour is what has to hold across both.
+    // assertion was true of the technique rather than of the behavior, and the
+    // behavior is what has to hold across both.
     const icon = await mount('<helix-icon name="check"></helix-icon>')
     expect(svg(icon)?.getAttribute('fill')).toBe('currentColor')
-    // And nothing inside overrides it with a colour of its own, which is the
+    // And nothing inside overrides it with a color of its own, which is the
     // way an icon stops following its text.
     expect(svg(icon)?.innerHTML).not.toMatch(/(?:fill|stroke)="(?!none|currentColor)/)
   })

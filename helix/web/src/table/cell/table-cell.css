@@ -10,7 +10,7 @@
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   box-sizing: border-box;
-  /* Content, so full foreground. It was `foreground-muted`, which is the colour
+  /* Content, so full foreground. It was `foreground-muted`, which is the color
      for chrome around something a reader is looking at, and a table's cells are
      the thing they are looking at: a whole table set in grey reads as disabled
      or as a footnote. The rules and the column headings are what recede. */

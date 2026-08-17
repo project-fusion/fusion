@@ -121,8 +121,8 @@
     inline-size var(--helix-duration-normal) var(--helix-easing-emphasized);
 }
 
-/* The current one lengthens rather than only changing colour, so the set reads
-   at a glance and still reads without colour. */
+/* The current one lengthens rather than only changing color, so the set reads
+   at a glance and still reads without color. */
 [part="indicator"][data-current] {
   background-color: var(--helix-color-primary);
   inline-size: var(--helix-space-lg);
@@ -141,11 +141,11 @@
    edges, over the content, which is what a full-bleed carousel wants: the
    slide is the page and the controls are on it rather than under it.
  *
- * The host becomes the containing block, and the buttons are centred on the
+ * The host becomes the containing block, and the buttons are centered on the
  * track rather than on the host, because the host also holds the indicators
- * underneath: centring on it would put the arrows low by half that row. */
+ * underneath: centering on it would put the arrows low by half that row. */
 /* A grid, so the controls and the track share one cell and the arrows can be
-   centred on the slides rather than on the whole component. Positioning them
+   centered on the slides rather than on the whole component. Positioning them
    against the host does not work: the host holds the indicator row too, so its
    middle is half that row below the track's, and the arrows came out high. */
 :host([appearance="hero"]) {
@@ -180,7 +180,7 @@
  * `transparent` rather than `none`, because these are sized to a control step
  * with `box-sizing: border-box`, so dropping the border would give the glyph
  * two more pixels to sit in and move it. Changing the geometry to change the
- * colour is how a rule ends up blamed for something it did not do.
+ * color is how a rule ends up blamed for something it did not do.
  *
  * All three, not the two arrows. The rotation toggle is over the same slide
  * and had neither surface nor shadow, so on a light photograph it was a

@@ -2,12 +2,12 @@ import { HighlightStyle } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 
 /**
- * How source is coloured, in Helix tokens.
+ * How source is colored, in Helix tokens.
  *
  * CodeMirror ships `defaultHighlightStyle`, which is a fixed set of hex values
- * and therefore one palette in both colour modes: readable on white, wrong on
+ * and therefore one palette in both color modes: readable on white, wrong on
  * anything else. These are `--helix-color-syntax-*`, which resolve through
- * `light-dark()` like every other colour in the system, so the editor follows
+ * `light-dark()` like every other color in the system, so the editor follows
  * the page rather than declaring its own mode.
  *
  * The palette is GitHub's, which is what the sandbox this replaces used, and
@@ -15,7 +15,7 @@ import { tags } from '@lezer/highlight'
  *
  * A tag not named here inherits the editor's foreground. That is deliberate:
  * punctuation, operators and separators are structure a reader skims past, and
- * colouring them competes with the names that carry the meaning.
+ * coloring them competes with the names that carry the meaning.
  */
 export const highlightStyle: HighlightStyle = HighlightStyle.define([
   {

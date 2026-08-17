@@ -9,7 +9,7 @@ import { styles } from './toast-item.css.js'
  * @description
  * A surface with a shadow, because a toast sits over whatever the reader was
  * looking at rather than in it. The severity is a bar down the leading edge and
- * not a fill: a message is text to be read, and a coloured panel behind it
+ * not a fill: a message is text to be read, and a colored panel behind it
  * costs contrast for something the mark already says.
  *
  * @since 0.1.0

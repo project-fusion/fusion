@@ -526,7 +526,7 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
               const iso = toIso(date)
               const disabled = this.barred(date)
               const selected = this.isSelected(iso)
-              // The cell is the column track and the day is the shape centred
+              // The cell is the column track and the day is the shape centered
               // in it. A range paints the track, so it runs continuously
               // between days and stops at the ends of a row on its own.
               return html`<span

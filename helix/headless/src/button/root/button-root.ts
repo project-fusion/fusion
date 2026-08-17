@@ -61,7 +61,7 @@ export class HelixBaseButton extends HelixFormElement {
    * What to send when the button is activated, and what to send it to.
    *
    * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognised as an
+   * rather than left on the host: only a real button is recognized as an
    * invoker, so `commandfor` written on a custom element resolves nothing and
    * the trigger silently does nothing at all. A wrapper has to hand them down,
    * the same way `label` becomes `aria-label` in there.

@@ -61,8 +61,8 @@
   border-color: transparent;
 }
 
-/* Colour, and this is the one control that needs it. A checkbox says "on" with
-   a tick, which is legible without colour; a switch has no mark at all, so the
+/* Color, and this is the one control that needs it. A checkbox says "on" with
+   a tick, which is legible without color; a switch has no mark at all, so the
    fill is the whole difference between the two states. */
 :host([data-checked]) [part="track"] {
   background-color: var(--switch-on-color, var(--helix-color-primary));
@@ -87,7 +87,7 @@
  
    A hairline rather than a shadow, and the reason is that a shadow is not
    symmetric. `shadow-sm` is offset a pixel downward, which fills the gap under
-   the thumb and leaves the one above it empty: measured, the thumb is centred
+   the thumb and leaves the one above it empty: measured, the thumb is centered
    to the pixel, two above and two below, and it still read as sitting high. At
    this size the shadow was only ever doing the separating a border does
    honestly. */
@@ -99,7 +99,7 @@
      light and a step up from it in dark, which is what `overlay` does and what
      `raised` on a white page cannot.
 
-     It was `background`, the page's own colour, which works in light and
+     It was `background`, the page's own color, which works in light and
      disappears in dark: the page is black and the groove is a step up from it,
      so the thumb came out darker than the track it sits in and read as a hole
      punched through rather than a thing lying on top. */
@@ -117,8 +117,8 @@
      had already been reckoned from the outside. The thumb read as overshooting
      its own track.
  
-     The vertical does not need this because it is centred rather than inset,
-     and centring is symmetric whichever box it is done in. This is the same
+     The vertical does not need this because it is centered rather than inset,
+     and centering is symmetric whichever box it is done in. This is the same
      arithmetic the segmented control's indicator does with `clientTop`. */
   inset-inline-start: calc(var(--_switch-inset) - var(--helix-border-thin));
   pointer-events: none;
@@ -128,7 +128,7 @@
 }
 
 :host([data-checked]) [part="thumb"] {
-  /* On the accent now rather than on the groove, so it takes the colour meant
+  /* On the accent now rather than on the groove, so it takes the color meant
      to sit on it. `raised` against the brand is a dark thumb on a mid blue in
      dark mode, which is the same disappearing act the other way round. */
   background-color: var(--switch-thumb-color, var(--helix-color-foreground-on-accent));

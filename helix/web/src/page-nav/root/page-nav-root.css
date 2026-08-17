@@ -22,8 +22,8 @@
    over it has to cover a box edge exactly, and `overflow` clips the border area
    away. A gradient is painted inside the box and nothing clips it.
 
-   Centred in the gutter rather than at `left`, so the hairline and the mark
-   that covers it share an axis. Off-centre, the mark sat beside the rule it was
+   Centered in the gutter rather than at `left`, so the hairline and the mark
+   that covers it share an axis. Off-center, the mark sat beside the rule it was
    meant to replace and the pair read as two lines. */
 [part="nav"] {
   background-image: linear-gradient(var(--helix-color-border), var(--helix-color-border));

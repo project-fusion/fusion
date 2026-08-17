@@ -13,7 +13,7 @@ describe('textarea', () => {
   test('is a real textarea, which is what makes Enter insert a line', async () => {
     /* The whole reason this is not an Input with a taller box: in a single-line
        field Enter submits the form and here it inserts a line, and that is
-       behaviour the platform owns. */
+       behavior the platform owns. */
     const host = await mount('<helix-textarea label="A"></helix-textarea>')
     expect(control(host).tagName).toBe('TEXTAREA')
   })

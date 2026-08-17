@@ -61,7 +61,7 @@
    *
    * It was not. Moving the page to the ends of the ramp left `background`,
    * `surface` and `surface-raised` all sitting on `neutral-0` in light mode:
-   * three tokens, one colour, and a card on a page with nothing between them.
+   * three tokens, one color, and a card on a page with nothing between them.
    *
    * **The dark page is black, and the ladder moves around it.** It was briefly
    * near-black instead, to make room underneath for `sunken`, and that is the
@@ -108,7 +108,7 @@
      it is what pinned this token down at a depth nothing else wanted.
 
      In dark there is nothing under black. It was at neutral-1000 with the page
-     there too, which is the same colour: every sunken thing lying on the page
+     there too, which is the same color: every sunken thing lying on the page
      was painted the page and vanished. Reported on the breadcrumb's hover, and
      never only that, because the announcement, the nav bar's marker, a `<kbd>`
      and an input's fill are all sunken and all sit on the page. The answer is
@@ -120,7 +120,7 @@
      the complaint before. Its shadow is doing the rest of that work now, and
      the component has `--toggle-group-indicator-color` if it needs more: a
      component reaching for a different rung is a normal thing, whereas a page
-     that is not the colour it was chosen to be is not. */
+     that is not the color it was chosen to be is not. */
   --helix-color-surface-sunken: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950));
   --helix-color-overlay: color-mix(
     in oklab,
@@ -197,8 +197,8 @@
 
   /* Status. */
   --helix-color-info: var(--_helix-info-500);
-  /* Both arms, like every other colour here. These were single values, so a
-     severity mark kept its light-mode colour on a dark surface: measured on an
+  /* Both arms, like every other color here. These were single values, so a
+     severity mark kept its light-mode color on a dark surface: measured on an
      inverted toast, danger at 2.85:1 against a 3:1 floor. */
   --helix-color-success: light-dark(var(--_helix-success-500), var(--_helix-success-400));
   --helix-color-warning: light-dark(var(--_helix-warning-500), var(--_helix-warning-400));

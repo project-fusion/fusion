@@ -300,7 +300,7 @@ export function SandboxWorkbench({ families }: Props) {
       setLayout(option as 'padded' | 'centered' | 'fullscreen')
     } else if (setting === 'direction' && option) {
       setDirection(option as 'ltr' | 'rtl')
-    } else if (setting === 'colour' && option) {
+    } else if (setting === 'color' && option) {
       setPreviewTheme(option === 'site' ? null : (option as 'dark' | 'light'))
     } else if (setting === 'editor') {
       setShowEditor((was) => !was)
@@ -787,13 +787,13 @@ export function SandboxWorkbench({ families }: Props) {
                   ))}
                 </helix-menu-item>
 
-                <helix-menu-item value="colour">
+                <helix-menu-item value="color">
                   Color mode
                   <helix-menu-item
                     checkable
                     checked={previewTheme === null ? true : undefined}
                     slot="submenu"
-                    value="colour:site"
+                    value="color:site"
                   >
                     Follow the site
                   </helix-menu-item>
@@ -801,7 +801,7 @@ export function SandboxWorkbench({ families }: Props) {
                     checkable
                     checked={previewTheme === 'light' ? true : undefined}
                     slot="submenu"
-                    value="colour:light"
+                    value="color:light"
                   >
                     Light
                   </helix-menu-item>
@@ -809,7 +809,7 @@ export function SandboxWorkbench({ families }: Props) {
                     checkable
                     checked={previewTheme === 'dark' ? true : undefined}
                     slot="submenu"
-                    value="colour:dark"
+                    value="color:dark"
                   >
                     Dark
                   </helix-menu-item>
@@ -906,8 +906,8 @@ export function SandboxWorkbench({ families }: Props) {
           ></helix-sandbox-preview>
 
           {/* The panel's tabs are `helix-tabs`, not a second tab set built
-              into the sandbox: tabs are the only behaviour the region has, and
-              that behaviour already exists.
+              into the sandbox: tabs are the only behavior the region has, and
+              that behavior already exists.
 
               Dense, like the toolbar. A bar of the tool says so once and the
               controls in it follow; this one did not, so its tabs took the

@@ -7,7 +7,7 @@
    the position written by the controller is measured from the border box. */
 /* A row, so anything slotted in sits on the middle line rather than on the
    baseline of a text run it is not part of. A plain string is one anonymous
-   item and centres against itself, which is where it already was; an icon
+   item and centers against itself, which is where it already was; an icon
    beside a word, or a heading over a line of detail, is what moves. */
 [part="tooltip"] {
   align-items: center;

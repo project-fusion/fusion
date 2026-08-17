@@ -206,7 +206,7 @@ export const overlaysArt: Record<string, ReactNode> = {
    *
    * The hairline down the left is the component's own: it is a repeating
    * background rather than a border, and each item carries a transparent
-   * `border-inline-start` at `border-thick` that the current one colours in.
+   * `border-inline-start` at `border-thick` that the current one colors in.
    * So the marker sits *on* the rule rather than beside it, and the indents are
    * heading depth rather than tree depth.
    */

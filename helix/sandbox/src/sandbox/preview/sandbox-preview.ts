@@ -242,7 +242,7 @@ export class HelixSandboxPreview extends HelixElement {
      * does not.
      *
      * A frame is short enough to feel immediate and long enough that a burst of
-     * keystrokes is one render. Layout, direction and the colour mode go
+     * keystrokes is one render. Layout, direction and the color mode go
      * straight out: they arrive one at a time from a menu, there is nothing to
      * coalesce, and a delay there is a delay a reader can see. */
     if (changed.has('source') || changed.has('styles')) {

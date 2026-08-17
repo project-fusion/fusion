@@ -11,7 +11,7 @@
   --_slider-track: var(--helix-size-progress);
   --_slider-thumb: var(--helix-size-checkbox);
   /* The ring while the thumb is held or focused. The accent at low opacity, so
-     it reads as the control's own colour rather than as a second element. */
+     it reads as the control's own color rather than as a second element. */
   --_slider-halo: color-mix(in oklab, var(--helix-color-primary) 24%, transparent);
   /* The unfilled half of the track.
    *
@@ -22,7 +22,7 @@
    * all of that alone. Reported twice, once as the thumb and once as the shadow,
    * and both times the thumb was not the thing that had changed.
    *
-   * A track is a bar rather than a fill, so it takes a line's colour: it is the
+   * A track is a bar rather than a fill, so it takes a line's color: it is the
    * same weight of mark as the rules in a table, drawn thicker. */
   --_slider-track-color: var(--slider-track-color, var(--helix-color-border));
 }
@@ -68,7 +68,7 @@
    so anything under it is under it. `pointer-events: none` is what keeps the
    drag the input's, since the marks now lie across the thing being dragged.
  
-   Inset by half a thumb at each end, because that is where the thumb's centre
+   Inset by half a thumb at each end, because that is where the thumb's center
    can actually reach: a mark at the very edge of the track would be a mark the
    thumb can never sit on, which is the one thing a mark must not be. */
 [part="markers"] {
@@ -87,7 +87,7 @@
 }
 
 /* The label hangs off the mark rather than being laid out beside it, so the
-   marks stay where the values are and the text follows. Centred on its own
+   marks stay where the values are and the text follows. Centered on its own
    mark, which is what puts the first and last labels half off the ends: they
    belong to marks that sit on the ends, and moving them in would put them
    under the wrong place on the track. */
@@ -108,7 +108,7 @@
   border-radius: var(--helix-radii-full);
   inline-size: var(--helix-border-thick);
   inset-block-start: 0;
-  /* Centred on its own position rather than starting at it, so the first and
+  /* Centered on its own position rather than starting at it, so the first and
      last marks sit on the ends instead of hanging off them. */
   inset-inline-start: var(--_marker-at, 0%);
   position: absolute;
@@ -124,7 +124,7 @@
 }
 
 /* Filled with a gradient rather than by a second element over it. One element
-   cannot be half one colour any other way that survives the thumb moving, and
+   cannot be half one color any other way that survives the thumb moving, and
    the stop is the fraction the headless tier wrote, so the fill is arithmetic
    rather than a measurement of where the platform drew the thumb. */
 [part="control"]::-webkit-slider-runnable-track {
@@ -147,8 +147,8 @@
   border-radius: var(--helix-radii-full);
 }
 
-/* Centred on the track by hand, because a WebKit thumb is laid out from the top
-   of the runnable track rather than centred in it. */
+/* Centered on the track by hand, because a WebKit thumb is laid out from the top
+   of the runnable track rather than centered in it. */
 /* No border, and the shadow is what separates it.
  *
  * The border was `border-strong`, a hairline drawn all the way round a circle
@@ -166,7 +166,7 @@
  * It is offset downward, which also stops the thumb reading as floating: it
  * sits on the track rather than over it. The same reasoning the switch uses in
  * reverse, where a border was chosen precisely because a shadow at twenty
- * pixels was too asymmetric to centre. A slider's thumb is larger and moves
+ * pixels was too asymmetric to center. A slider's thumb is larger and moves
  * horizontally, so the asymmetry reads as weight rather than as a mistake.
  *
  * **A halo while it is being moved**, by pointer or by key. The thumb is the
@@ -182,7 +182,7 @@
   appearance: none;
   /* `overlay`, the token for a thing over the page rather than on it, which is
      what every other thumb in this library takes: the switch's and the
-     segmented control's both. This was `background`, the page's own colour, so
+     segmented control's both. This was `background`, the page's own color, so
      the thumb was white on a white page in light and black on a black one in
      dark. It had contrast with nothing by construction. */
   background-color: var(--slider-thumb-color, var(--helix-color-surface-overlay));

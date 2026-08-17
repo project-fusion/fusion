@@ -104,7 +104,7 @@ describe('dialog invokers', () => {
   }
 
   /* The inner control, because that is what a reader's pointer lands on: the
-     host has no activation behaviour of its own, and a click dispatched at it
+     host has no activation behavior of its own, and a click dispatched at it
      runs none. Measured, and it is the difference between this spec meaning
      something and this spec passing on a button nobody can press. */
   const press = (trigger: HTMLElement): void => {

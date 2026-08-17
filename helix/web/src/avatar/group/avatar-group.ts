@@ -9,7 +9,7 @@ import { styles } from './avatar-group.css.js'
  * @description
  * They overlap by a step of space, which is enough to read as a stack without
  * the faces occluding each other. Each carries a ring in the page's own
- * background colour, because a stack with no separation between its members
+ * background color, because a stack with no separation between its members
  * reads as one shape rather than several: the ring is what makes the edge of
  * each avatar visible against the one behind it.
  *
