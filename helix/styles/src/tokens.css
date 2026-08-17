@@ -229,7 +229,7 @@
   );
 
   /* Status. */
-  --helix-color-info: var(--_helix-info-500);
+  --helix-color-info: light-dark(var(--_helix-info-500), var(--_helix-info-400));
   /* Both arms, like every other color here. These were single values, so a
      severity mark kept its light-mode color on a dark surface: measured on an
      inverted toast, danger at 2.85:1 against a 3:1 floor. */

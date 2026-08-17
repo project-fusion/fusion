@@ -45,7 +45,10 @@
 
 [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+  /* The offset token negated, not the ring-width token. They happen to be the
+     same number and they are different ideas: this is the only place in the
+     repo that inset a ring by its own thickness. */
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 :host([disabled]) [part="item"] {

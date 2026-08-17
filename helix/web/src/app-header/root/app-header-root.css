@@ -8,6 +8,11 @@
      without being told, so a row cannot end up with one member the wrong height
      because somebody added it later and forgot. */
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  /* The icon step with it. A container that is dense by nature declares the
+     control size and stopped there, so an icon in the banner drew at the `md` step
+     inside `sm` controls: 20 pixels in a 32 pixel row, which is what the
+     shipped examples render. `Menu` is the only one that already did both. */
+  --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
 

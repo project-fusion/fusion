@@ -10,11 +10,18 @@
 
 :host([shape="circle"]) {
   aspect-ratio: 1 / 1;
-  inline-size: var(--skeleton-size, 2.5rem);
+  /* The control step, which is the number this was: `2.5rem` is
+     `--helix-size-control-md` undensified, so a circle skeleton standing in for
+     an avatar kept its size inside a `data-density` region while the thing it
+     was standing in for shrank. */
+  inline-size: var(--skeleton-size, var(--helix-size-control));
 }
 
 [part="skeleton"] {
-  animation: helix-skeleton-sweep 1.4s ease-in-out infinite;
+  /* Derived, like five of the seven animating sheets in this tier. A raw
+     duration in a shorthand is a theme that slows its motion and leaves this
+     one behind. */
+  animation: helix-skeleton-sweep calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   background-image: linear-gradient(
     90deg,

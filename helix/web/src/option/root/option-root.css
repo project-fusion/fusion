@@ -28,14 +28,23 @@
      two pixels reads as a list nobody measured. `control-sm` because a row in a
      panel is a small control, and it is the token that moves with density
      rather than a number that does not. */
-  block-size: var(--helix-size-control-sm);
+  /* A floor, not a fixed height. The `start` slot is documented for an avatar,
+     and an avatar at its default size is taller than a dense row: fixed, it
+     overflowed into the rows above and below. */
+  min-block-size: var(--helix-size-control-sm);
   box-sizing: border-box;
   padding-block: var(--helix-space-2xs);
   /* Twelve, matching the drilldown's rows and the select's own trigger. A row
      that reaches both edges of its panel needs its words held further in than
      one that sits inside a padded box: the inset is doing the work the box used
      to. */
-  padding-inline: var(--helix-space-sm);
+  /* The trigger's inset, which the comment claimed and the number did not: the
+     trigger insets by `xs` and this by `sm`, so the chosen answer shifted
+     sideways between the closed control and the row it came from. */
+  padding-inline: var(--helix-space-xs);
+  /* A picker, not prose. Its three sibling chooseable rows all say this;
+     without it, dragging across a list selects the labels. */
+  user-select: none;
 }
 
 [part="label"] {

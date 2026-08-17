@@ -157,6 +157,11 @@
      ramp uses. A severity had exactly one value each, which is what a color
      with no dark arm looks like: measured against an inverted surface, the
      danger mark came out at 2.85:1, under the 3:1 a non-text mark needs. */
+  /* `info` was left out of this pass and two component comments said otherwise.
+     Three severities lightened in dark mode and the fourth, which is Callout's
+     default, stayed at its light value: the one severity a reader meets most
+     often was the one that did not follow the mode. */
+  --_helix-info-400: oklch(from var(--_helix-info-500) calc(l + 0.12) c h);
   --_helix-success-400: oklch(from var(--_helix-success-500) calc(l + 0.12) c h);
   --_helix-warning-400: oklch(from var(--_helix-warning-500) calc(l + 0.12) c h);
   --_helix-danger-400: oklch(from var(--_helix-danger-500) calc(l + 0.12) c h);

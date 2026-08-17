@@ -23,6 +23,11 @@
      those declares this on its own host. Without it a slotted `Retry` came out
      at the full 40px beside a 32px dismiss, so the two controls in one row were
      different heights: measured, three center lines at 654, 660 and 664. */
+  /* The icon step with it. A container that is dense by nature declares the
+     control size and stopped there, so an icon in the message drew at the `md` step
+     inside `sm` controls: 20 pixels in a 32 pixel row, which is what the
+     shipped examples render. `Menu` is the only one that already did both. */
+  --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
   /* The height of one line of the message, which is what everything in the row
      is aligned against. Derived from the two tokens that make it, so a theme

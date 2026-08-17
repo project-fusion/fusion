@@ -34,8 +34,15 @@
    * carries a badge, the corner is outside the shape and the mark floats off
    * it. There was an example whose whole subject was setting this by hand; it
    * is gone, because the value it demonstrated is now what you get. */
-  inset-block-start: var(--badge-offset, 9px);
-  inset-inline-end: var(--badge-offset, 9px);
+  /* The pullback, as a proportion of the mark rather than a number.
+   *
+   * It was a bare `9px`, the one unexplained length in a file that explains
+   * every other number, and it was absolute where the thing it positions is
+   * not: a badge whose size followed the density stayed pinned nine pixels in
+   * whatever it had become. A quarter of the mark keeps the overlap looking the
+   * same at every size, which is what the number was reaching for. */
+  inset-block-start: var(--badge-offset, calc(var(--_badge-size) / -4));
+  inset-inline-end: var(--badge-offset, calc(var(--_badge-size) / -4));
   justify-content: center;
   line-height: 1;
   /* Square at minimum, so a single digit is a circle rather than a sliver. */
