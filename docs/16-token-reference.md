@@ -38,7 +38,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 21 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 92 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 94 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 87 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 7 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |

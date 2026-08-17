@@ -398,25 +398,34 @@ helix-text[tone="danger"] {
 [data-button],
 helix-button::part(button) {
   align-items: center;
-  /* A wash of the foreground, and no visible border.
+  /* A wash of the foreground, inside a hairline.
    *
-   * It was `surface` inside a hairline, which on a white page is fifteen
-   * thousandths off the paper: the fill was doing nothing and the line was the
-   * whole button. Taking the line away means the fill has to be a fill, so it
-   * is a percentage of the foreground rather than a rung on the surface ladder.
-   * That is a step away from whatever it sits on, in either mode, which a fixed
-   * neutral cannot be: the same button drops onto a page, a card and a panel.
+   * The wash is unchanged and the reasoning for it stands: it was `surface`
+   * once, which on a white page is fifteen thousandths off the paper, so the
+   * fill was doing nothing. A percentage of the foreground is a step away from
+   * whatever it sits on in either mode, which a fixed neutral cannot be, and
+   * the same button drops onto a page, a card and a panel.
    *
-   * The border stays in the box as `transparent`, because the geometry is the
-   * same either way and `primary`, `danger` and `tertiary` all speak to
-   * `border-color`. A button that lost the property would need each of them to
-   * grow a width as well. */
+   * **The line is back, and a footer row is what asked for it.** Secondary and
+   * tertiary were separated by six points of the same wash and nothing else, so
+   * with all three appearances beside each other the row read as one solid
+   * button and two ghosts of slightly different faintness. Rendered side by side
+   * in both modes: giving the middle tier an edge separates the three by *kind*,
+   * nothing against a line against a fill, where six points of a wash separates
+   * them only by degree. Tried the other way too, a resting wash on tertiary,
+   * and it is worse: two near-identical grey boxes where there had been one.
+   *
+   * The property was already here as `transparent`, which is what makes this
+   * cost no layout at all, and `primary`, `danger` and `tertiary` each speak to
+   * `border-color` already. Button groups were the thing to check and they are
+   * fine: the group pulls its members together by exactly the border width, so
+   * the seams measured -1.0px before and after and no edge is drawn twice. */
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
   );
   block-size: var(--helix-size-control);
-  border: var(--helix-border-thin) solid transparent;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--button-radii, var(--helix-radii-sm));
   color: var(--button-foreground-color, var(--helix-color-foreground));
   cursor: pointer;
