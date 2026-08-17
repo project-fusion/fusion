@@ -216,31 +216,71 @@
   }
 }
 
+/* Below a phone's width it is a sheet, and this is the one breakpoint in the
+ * file.
+ *
+ * The rest of the box is deliberately breakpoint-free: `inline-size` is
+ * `min(step, calc(100vw - space-xl))`, which holds at every width, and measured
+ * inside a resizing frame it tracks it exactly, 900 to 704, 600 to 564, 420 to
+ * 384, 360 to 324. So the panel was already responsive; what it was not was
+ * *different*. Every size is identical below about 406px, and what a reader gets
+ * there is a slightly narrower centred card, which is the desktop shape shrunk
+ * rather than the shape a phone wants.
+ *
+ * That is what earns the query. The rule this file has followed is that `min()`
+ * beats a breakpoint because there is no width at which the panel changes
+ * character. Here there is one, and the change *is* the character: a sheet is
+ * anchored to the edge a thumb can reach, takes the full width because there is
+ * none to spare, and arrives from the edge it is pinned to rather than fading
+ * into the middle of the screen. None of that is expressible as a clamp.
+ *
+ * `30rem`, above every phone in portrait (430px is the widest in wide use) and
+ * below any tablet, so nothing lands in it by accident.
+ *
+ * No opt-out, which is the point: a consumer writes one dialog and it is right
+ * in both places. `size` still decides the width above the breakpoint and is
+ * simply not a question below it, where there is one answer. */
+@media (width < 30rem) {
+  [part="dialog"] {
+    /* Pinned rather than centred. A `<dialog>` is `position: fixed` with
+       `inset: 0` and `margin: auto` from the UA, so taking the block-end margin
+       to zero is the whole of what moves it down. */
+    margin-block-end: var(--helix-space-none);
+    margin-block-start: auto;
+    inline-size: 100vw;
+    max-inline-size: 100vw;
+    /* Room above, so the page is still visibly there behind it. A sheet that
+       fills the screen is a page, and a reader loses any sense of what they are
+       coming back to. */
+    max-block-size: calc(100dvh - var(--helix-space-3xl));
+    /* Square where it meets the window, curved where it meets the page, the
+       same pair Drawer draws for the same reason. */
+    border-start-start-radius: var(--helix-radii-sm);
+    border-start-end-radius: var(--helix-radii-sm);
+    border-end-start-radius: var(--helix-radii-none);
+    border-end-end-radius: var(--helix-radii-none);
+    /* Up from the edge it is pinned to. A centred panel rises by a hair because
+       it is arriving in place; a sheet travels its own height, because where it
+       came from is the thing being said. */
+    translate: 0 100%;
+  }
+
+  @starting-style {
+    [part="dialog"][open] {
+      translate: 0 100%;
+    }
+  }
+}
+
+/* Two `animation: none` blocks stood here answering the keyframes this panel
+   used to arrive on. The keyframes went when the entrance became a transition
+   so it could also leave, and the reduce rules for them stayed, naming a
+   property nothing sets. `check:motion` compares reduce rules against the rules
+   that move and cannot see one that answers nothing. */
+
 @media (prefers-reduced-motion: reduce) {
   [part="dialog"],
   [part="dialog"]::backdrop {
     transition: none;
-  }
-}
-
-/* It arrives instantly rather than not at all. The panel still appears, which is
-   the whole point of it; what is given up is the sense of it moving there. */
-@media (prefers-reduced-motion: reduce) {
-  [part="dialog"],
-  [part="dialog"]::backdrop {
-    animation: none;
-  }
-}
-
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. `check:motion`
-   compares them, which is what turned this from invisible into mechanical. */
-@media (prefers-reduced-motion: reduce) {
-  [part="dialog"][open] {
-    animation: none;
-  }
-
-  [part="dialog"][open]::backdrop {
-    animation: none;
   }
 }

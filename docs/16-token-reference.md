@@ -63,7 +63,7 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 99 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 101 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 145 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 118 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 112 |
@@ -71,7 +71,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 52 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 18 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 26 |
-| `--helix-space-3xl` | `var(--_helix-scale-16)` | 1 |
+| `--helix-space-3xl` | `var(--_helix-scale-16)` | 3 |
 
 ## radii
 
@@ -79,8 +79,8 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-radii-none` | `0` | 34 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 92 |
+| `--helix-radii-none` | `0` | 38 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 96 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 8 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
 | `--helix-radii-full` | `9999px` | 46 |
