@@ -421,6 +421,48 @@ helix-button::part(button):hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
 }
 
+/* How much of the room available to it the button takes.
+ *
+ * Paired like everything else here, and it had to move to be pairable: `fill`
+ * was the one part of the button's box declared inside the shadow root, as
+ * `:host([fill])`, so a `<Link data-button="primary">` and a `<helix-button>`
+ * were the same control at every width except the one a dialog's button row is
+ * built on. Measured side by side with the pairing in place: 200 and 200 at
+ * `standard`, 600 and 600 at `full`, 65 and 65 unset, and 120 and 120 inside a
+ * 120px column.
+ *
+ * A host is reachable from here, which is what makes moving it possible at
+ * all. `helix-button[fill="standard"]` is an ordinary type-and-attribute
+ * selector on a light-DOM element, and the outer tree wins over the inner one,
+ * so a rule in this file beats `:host([fill="standard"])` whatever their
+ * specificities. Verified by asking for a width the shadow never declares.
+ *
+ * On the host rather than on `::part(button)`, because the host is the box a
+ * layout sees. Widening only the control inside leaves a host still as wide as
+ * its label, which reads as the button not growing at all. The part is already
+ * `inline-size: 100%`, so it follows on its own.
+ *
+ * `data-button-fill` rather than a bare `data-fill`, following `data-link-size`:
+ * a second axis on a recipe carries the recipe's name. It cannot ride in the
+ * `data-button` value either, because that value is the appearance and the
+ * rules above match it exactly.
+ */
+[data-button][data-button-fill="standard"],
+helix-button[fill="standard"] {
+  inline-size: var(--button-inline-size, var(--helix-size-button));
+  /* Never wider than the room it has. A standard width is a floor for tidiness,
+     not a promise to overflow a narrow column to keep it. */
+  max-inline-size: 100%;
+}
+
+/* Block-level, not the recipe's `inline-flex`. A control that fills its
+   container should not be able to share a line with anything beside it. */
+[data-button][data-button-fill="full"],
+helix-button[fill="full"] {
+  display: flex;
+  inline-size: 100%;
+}
+
 [data-button="primary"],
 helix-button[appearance="primary"]::part(button) {
   background-color: var(--helix-color-primary);

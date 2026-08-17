@@ -9,5 +9,12 @@
     <helix-button appearance="tertiary" fill="standard">Cancel</helix-button>
   </helix-flex>
 
+  <!-- A consumer's own anchor takes the same width as `data-button-fill`, so a
+       link and a button line up in one row. -->
+  <helix-flex gap="sm">
+    <helix-button appearance="primary" fill="standard">Save</helix-button>
+    <a data-button="tertiary" data-button-fill="standard" href="#cancel">Cancel</a>
+  </helix-flex>
+
   <helix-button appearance="primary" fill="full">Full width</helix-button>
 </helix-flex>

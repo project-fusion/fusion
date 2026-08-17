@@ -1,24 +1,18 @@
 /* The box lives in the base layer, paired with the `data-button` recipe so one
    declaration serves both this control and a consumer's own anchor. What stays
-   here is what a document rule cannot reach: the host, and the slotted icon. */
+   here is what a document rule cannot reach: inside the shadow root.
+ *
+ * The host is not on that list, which is a correction: this comment used to
+ * claim it was, and `fill` sat here as `:host([fill])` on the strength of it.
+ * `helix-button[fill="standard"]` is an ordinary selector on a light-DOM
+ * element, so the base layer can reach the host and now does, which is what
+ * lets `data-button-fill` be the same declaration rather than a second copy.
+ *
+ * `display` stays because it is the host's resting state rather than a variant,
+ * and nothing pairs with it: an anchor is already `inline-flex` from the recipe
+ * that made it a button in the first place. */
 :host {
   display: inline-flex;
-}
-
-/* On the host, because the host is the box a layout sees. Setting it on
-   `[part="button"]` alone would widen the control inside a host that stayed as
-   wide as its label, which is the shape a consumer would report as the button
-   not growing at all. */
-:host([fill="standard"]) {
-  inline-size: var(--button-inline-size, var(--helix-size-button));
-  /* Never wider than the room it has. A standard width is a floor for tidiness,
-     not a promise to overflow a narrow column to keep it. */
-  max-inline-size: 100%;
-}
-
-:host([fill="full"]) {
-  display: flex;
-  inline-size: 100%;
 }
 
 /* `all: unset` first, so the UA's own button styling is gone before the base

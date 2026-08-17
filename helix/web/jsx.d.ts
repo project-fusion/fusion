@@ -759,7 +759,20 @@ button says "this one matters" far louder than eight more pixels would. */
 Width and not weight. `appearance` says how much a button matters and this
 says how much room it takes, and the two are independent: a `tertiary
 standard` Cancel beside a `primary standard` Save is exactly the pairing
-a dialog wants. */
+a dialog wants.
+
+**A consumer's own anchor takes it as `data-button-fill`**, the way it
+takes the appearance as `data-button`:
+
+```html
+<a data-button="primary" data-button-fill="standard" href="/save">Save</a>
+```
+
+Both are one declaration in the base layer. They were not, and that was a
+real gap rather than a missing convenience: this class promises a link
+styled as a button and a real button are indistinguishable, and a dialog's
+button row is built on `standard`, so the one place the promise mattered
+most was the one place it did not hold. */
   fill?: HelixButton["fill"];
   /** What activating the button does to its form. */
   type?: HelixButton["type"];
@@ -839,7 +852,20 @@ button says "this one matters" far louder than eight more pixels would. */
 Width and not weight. `appearance` says how much a button matters and this
 says how much room it takes, and the two are independent: a `tertiary
 standard` Cancel beside a `primary standard` Save is exactly the pairing
-a dialog wants. */
+a dialog wants.
+
+**A consumer's own anchor takes it as `data-button-fill`**, the way it
+takes the appearance as `data-button`:
+
+```html
+<a data-button="primary" data-button-fill="standard" href="/save">Save</a>
+```
+
+Both are one declaration in the base layer. They were not, and that was a
+real gap rather than a missing convenience: this class promises a link
+styled as a button and a real button are indistinguishable, and a dialog's
+button row is built on `standard`, so the one place the promise mattered
+most was the one place it did not hold. */
   "prop:fill"?: HelixButton["fill"];
   /** What activating the button does to its form. */
   "prop:type"?: HelixButton["type"];
@@ -5325,6 +5351,19 @@ export type CustomElements = {
    * says how much room it takes, and the two are independent: a `tertiary
    * standard` Cancel beside a `primary standard` Save is exactly the pairing
    * a dialog wants.
+   *
+   * **A consumer's own anchor takes it as `data-button-fill`**, the way it
+   * takes the appearance as `data-button`:
+   *
+   * ```html
+   * <a data-button="primary" data-button-fill="standard" href="/save">Save</a>
+   * ```
+   *
+   * Both are one declaration in the base layer. They were not, and that was a
+   * real gap rather than a missing convenience: this class promises a link
+   * styled as a button and a real button are indistinguishable, and a dialog's
+   * button row is built on `standard`, so the one place the promise mattered
+   * most was the one place it did not hold.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
@@ -9663,6 +9702,19 @@ export type CustomElementsSolidJs = {
    * says how much room it takes, and the two are independent: a `tertiary
    * standard` Cancel beside a `primary standard` Save is exactly the pairing
    * a dialog wants.
+   *
+   * **A consumer's own anchor takes it as `data-button-fill`**, the way it
+   * takes the appearance as `data-button`:
+   *
+   * ```html
+   * <a data-button="primary" data-button-fill="standard" href="/save">Save</a>
+   * ```
+   *
+   * Both are one declaration in the base layer. They were not, and that was a
+   * real gap rather than a missing convenience: this class promises a link
+   * styled as a button and a real button are indistinguishable, and a dialog's
+   * button row is built on `standard`, so the one place the promise mattered
+   * most was the one place it did not hold.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
