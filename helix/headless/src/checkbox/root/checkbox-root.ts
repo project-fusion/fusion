@@ -182,7 +182,7 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
           type="checkbox"
           .checked=${this.checked}
           .indeterminate=${this.indeterminate}
-          ?disabled=${this.disabled}
+          ?disabled=${this.isDisabled}
           ?required=${this.required}
           aria-describedby=${this.describedBy ?? nothing}
           @change=${this.handleChange}

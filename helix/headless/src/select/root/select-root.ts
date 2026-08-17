@@ -229,7 +229,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
         aria-haspopup="listbox"
         aria-expanded=${this.open ? 'true' : 'false'}
         aria-describedby=${this.describedBy ?? nothing}
-        ?disabled=${this.disabled}
+        ?disabled=${this.isDisabled}
         @click=${() => this.toggleOpen()}
         @keydown=${this.handleTriggerKeydown}
       >

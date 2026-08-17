@@ -1,4 +1,4 @@
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { HelixElement } from '../helix-element/helix-element.js'
 
 /**
@@ -34,6 +34,43 @@ export class HelixFormElement extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * Whether an ancestor `<fieldset disabled>` has switched this control off.
+   *
+   * The platform tells a form-associated element through `formDisabledCallback`
+   * and nothing here implemented it, so a control inside a disabled fieldset
+   * stayed fully typeable and announced itself as enabled. Measured: a
+   * `helix-input` in one accepted text, reported `disabled` as false, and
+   * carried no `aria-disabled`.
+   *
+   * What the platform already did on its own is the submission half. The same
+   * measurement showed the fieldset's controls absent from the form's entry
+   * list and the host matching `:disabled`, so the value never went anywhere.
+   * What was missing is everything a reader can see or touch.
+   *
+   * State rather than the `disabled` property. Writing that would reflect an
+   * attribute the consumer's server markup does not have, which React reports
+   * on hydration and does not patch up, and it would also silently overwrite
+   * what the consumer set.
+   */
+  @state()
+  protected formDisabled = false
+
+  /**
+   * Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote.
+   */
+  get isDisabled(): boolean {
+    return this.disabled || this.formDisabled
+  }
+
+  /** The platform's notice that an ancestor fieldset changed. */
+  formDisabledCallback(disabled: boolean): void {
+    this.formDisabled = disabled
+  }
 
   /** The form this control belongs to, if any. */
   get form(): HTMLFormElement | null {

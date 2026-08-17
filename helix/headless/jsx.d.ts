@@ -5168,6 +5168,10 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -5178,6 +5182,12 @@ export type CustomElements = {
    * - `(default)`: The button's label.
    * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -5267,6 +5277,10 @@ export type CustomElements = {
    * because React reserves the latter for its own synthetic system and wires
    * it to the native `change`, so a Helix event named `Change` would never
    * fire at all. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -5297,6 +5311,7 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -5586,6 +5601,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -5622,6 +5641,7 @@ export type CustomElements = {
    * A form reset has to return a control to what its markup declared, and
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -6108,6 +6128,10 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -6118,6 +6142,12 @@ export type CustomElements = {
    * - `(default)`: The icon.
    * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -6233,6 +6263,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -6272,6 +6306,7 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -6478,6 +6513,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -6517,6 +6556,7 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -7184,6 +7224,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -7221,6 +7265,7 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -7382,6 +7427,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -7430,6 +7479,7 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -7562,6 +7612,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -7592,6 +7646,7 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -7749,6 +7804,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -7784,6 +7843,7 @@ export type CustomElements = {
    * A form reset has to return a control to what its markup declared, and
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -8214,6 +8274,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -8245,6 +8309,7 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -8492,6 +8557,10 @@ export type CustomElements = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -8527,6 +8596,7 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -9563,6 +9633,10 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -9573,6 +9647,12 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The button's label.
    * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -9665,6 +9745,10 @@ export type CustomElementsSolidJs = {
    * because React reserves the latter for its own synthetic system and wires
    * it to the native `change`, so a Helix event named `Change` would never
    * fire at all. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -9695,6 +9779,7 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -9999,6 +10084,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -10035,6 +10124,7 @@ export type CustomElementsSolidJs = {
    * A form reset has to return a control to what its markup declared, and
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -10542,6 +10632,10 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -10552,6 +10646,12 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The icon.
    * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -10673,6 +10773,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -10712,6 +10816,7 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -10930,6 +11035,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -10969,6 +11078,7 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -11666,6 +11776,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -11703,6 +11817,7 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -11870,6 +11985,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -11918,6 +12037,7 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -12056,6 +12176,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -12086,6 +12210,7 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -12255,6 +12380,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -12290,6 +12419,7 @@ export type CustomElementsSolidJs = {
    * A form reset has to return a control to what its markup declared, and
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -12747,6 +12877,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -12778,6 +12912,7 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *
@@ -13034,6 +13169,10 @@ export type CustomElementsSolidJs = {
    * One at a time, because only one of the two is ever rendered. Naming both
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -13069,6 +13208,7 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Parts
    *

@@ -204,7 +204,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
         step=${this.step}
         name=${this.name || nothing}
         aria-describedby=${this.describedBy ?? nothing}
-        ?disabled=${this.disabled}
+        ?disabled=${this.isDisabled}
         @input=${this.handleInput}
         @change=${this.handleChange}
       />

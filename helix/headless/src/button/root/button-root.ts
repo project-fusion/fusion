@@ -201,7 +201,7 @@ export class HelixBaseButton extends HelixFormElement {
       aria-label=${this.label || nothing}
       command=${this.command || nothing}
       tabindex=${stop}
-      ?disabled=${this.disabled}
+      ?disabled=${this.isDisabled}
       @click=${this.handleClick}
     >
       ${label}

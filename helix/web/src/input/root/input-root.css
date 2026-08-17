@@ -56,7 +56,15 @@
  * rather than focused. The offset is right where a ring surrounds something
  * that is not itself changing color, which is most controls, and wrong here
  * because the border is doing the same job at the same moment. */
-:host(:not([disabled])) [part="field"]:hover {
+/* `:host(:disabled)`, not `:host([disabled])`.
+ *
+ * The pseudo-class matches on the element's own attribute *and* on an ancestor
+ * `<fieldset disabled>`, where the attribute selector only ever sees the first.
+ * Measured: a control inside a disabled fieldset matched `:disabled` from
+ * inside its own shadow root while carrying no attribute at all, so this needs
+ * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
+ */
+:host(:not(:disabled)) [part="field"]:hover {
   border-color: var(--helix-color-border-strong);
 }
 
@@ -136,7 +144,7 @@ slot[name="end"]::slotted(*) {
   flex: 0 0 auto;
 }
 
-:host([disabled]) [part="field"] {
+:host(:disabled) [part="field"] {
   cursor: not-allowed;
   opacity: 0.5;
 }

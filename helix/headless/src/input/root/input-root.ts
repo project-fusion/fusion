@@ -149,7 +149,7 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
         aria-describedby=${this.describedBy ?? nothing}
-        ?disabled=${this.disabled}
+        ?disabled=${this.isDisabled}
         ?readonly=${this.readOnly}
         ?required=${this.required}
         @input=${this.handleInput}

@@ -28,7 +28,15 @@
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host(:not([disabled])) [part="trigger"]:hover {
+/* `:host(:disabled)`, not `:host([disabled])`.
+ *
+ * The pseudo-class matches on the element's own attribute *and* on an ancestor
+ * `<fieldset disabled>`, where the attribute selector only ever sees the first.
+ * Measured: a control inside a disabled fieldset matched `:disabled` from
+ * inside its own shadow root while carrying no attribute at all, so this needs
+ * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
+ */
+:host(:not(:disabled)) [part="trigger"]:hover {
   border-color: var(--helix-color-border-strong);
 }
 
@@ -46,7 +54,7 @@
   outline-color: var(--helix-color-danger);
 }
 
-:host([disabled]) [part="trigger"] {
+:host(:disabled) [part="trigger"] {
   cursor: not-allowed;
   opacity: 0.5;
 }

@@ -544,7 +544,7 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
                 placeholder=${this.filterLabel}
                 aria-label=${this.filterLabel}
                 aria-controls="items"
-                ?disabled=${this.disabled}
+                ?disabled=${this.isDisabled}
                 @input=${this.handleFilter}
                 @keydown=${this.handleFilterKeydown}
               />

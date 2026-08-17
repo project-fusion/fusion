@@ -107,7 +107,7 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
           type="checkbox"
           role="switch"
           .checked=${this.checked}
-          ?disabled=${this.disabled}
+          ?disabled=${this.isDisabled}
           ?required=${this.required}
           aria-describedby=${this.describedBy ?? nothing}
           @change=${this.handleChange}

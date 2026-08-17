@@ -21,11 +21,19 @@
   gap: var(--helix-space-xs);
 }
 
-:host([disabled]) [part="field"] {
+/* `:host(:disabled)`, not `:host([disabled])`.
+ *
+ * The pseudo-class matches on the element's own attribute *and* on an ancestor
+ * `<fieldset disabled>`, where the attribute selector only ever sees the first.
+ * Measured: a control inside a disabled fieldset matched `:disabled` from
+ * inside its own shadow root while carrying no attribute at all, so this needs
+ * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
+ */
+:host(:disabled) [part="field"] {
   cursor: default;
 }
 
-:host([disabled]) {
+:host(:disabled) {
   opacity: 0.5;
 }
 
@@ -86,7 +94,7 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host(:not([disabled])) [part="field"]:hover [part="control"] {
+:host(:not(:disabled)) [part="field"]:hover [part="control"] {
   border-color: var(--helix-color-border-strong);
 }
 

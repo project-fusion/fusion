@@ -1,4 +1,7 @@
 :host {
+  /* The tick drawn beside a chosen option, as a stencil so the color is a
+     token like every other color here. A data URI cannot carry `var()`. */
+  --_option-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E");
   display: block;
 }
 
@@ -49,6 +52,31 @@
    draws the two the same way leaves a reader arrowing through it unable to tell
    what they have picked from what they are looking at, which is the whole
    difference between a listbox and a menu. */
+/* The chosen option, which nothing anywhere drew.
+ *
+ * `selected` reflects and no rule in the repo selected on it, so a listbox
+ * announced its answer and never showed it: every row looked the same and the
+ * only way to know what was chosen was to listen. The one visible state was the
+ * keyboard cursor below, which is a different thing entirely.
+ *
+ * A tick rather than a fill. The cursor already owns the row's background, so a
+ * second background would either fight it or be hidden under it whenever the two
+ * land on the same row, which for a listbox opening on its own answer is
+ * immediately and always. A mark beside the label is legible under both.
+ */
+:host([selected]) [part="item"]::after {
+  content: "";
+  background-color: currentColor;
+  block-size: var(--helix-size-icon-sm);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-sm);
+  margin-inline-start: auto;
+  mask-image: var(--_option-check);
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
 :host([data-active]) [part="item"],
 :host(:not([disabled])) [part="item"]:hover {
   /* A wash of the foreground rather than a step on the surface ladder.
