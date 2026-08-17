@@ -172,3 +172,16 @@
     animation: none;
   }
 }
+
+/* Named one selector at a time, because a reduce rule written looser than the
+   rule it answers loses on specificity and does nothing. `check:motion`
+   compares them, which is what turned this from invisible into mechanical. */
+@media (prefers-reduced-motion: reduce) {
+  [part="dialog"][open] {
+    animation: none;
+  }
+
+  [part="dialog"][open]::backdrop {
+    animation: none;
+  }
+}

@@ -391,3 +391,26 @@ slot[name="icon"]::slotted(*) {
     transition: none;
   }
 }
+
+/* Four moving selectors, and they do not get the same answer, which is why the
+   check asks whether each was named rather than what was done about it.
+ *
+ * The arrival and the collapse stop: a message sliding in and a stack closing
+ * under the pointer are the movement the preference is about.
+ *
+ * The timer keeps running, and is named here to say so rather than by omission.
+ * It is the only thing telling a reader how long is left, and a 2px rule
+ * crossing once over the message's own lifetime is nearer a clock than an
+ * animation. Restated rather than left out, because left out is
+ * indistinguishable from forgotten. */
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  :host(:not([data-open])),
+  :host(:not([data-open])) [part="item"] {
+    transition: none;
+  }
+
+  [part="timer"] {
+    animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;
+  }
+}

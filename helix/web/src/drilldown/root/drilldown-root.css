@@ -105,3 +105,16 @@
     animation: none;
   }
 }
+
+/* Named one selector at a time, because a reduce rule written looser than the
+   rule it answers loses on specificity and does nothing. `check:motion`
+   compares them, which is what turned this from invisible into mechanical. */
+@media (prefers-reduced-motion: reduce) {
+  :host([data-direction="forward"]) [part="page"] {
+    animation: none;
+  }
+
+  :host([data-direction="back"]) [part="page"] {
+    animation: none;
+  }
+}

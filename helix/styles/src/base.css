@@ -477,14 +477,24 @@ helix-button[appearance="danger"]::part(button) {
 }
 
 /* Type and inset follow the density the button is in, the same way its height
-   does. They were three rules keyed on a `size` that no longer exists. */
-[data-density="sm"] :is([data-button], helix-button::part(button)),
+   does. They were three rules keyed on a `size` that no longer exists.
+ *
+ * Listed rather than grouped with `:is()`. A pseudo-element is not valid inside
+ * `:is()`, and the list is forgiving, so writing it that way dropped the
+ * `::part` branch silently and left the component behind while the recipe
+ * worked. Measured: a `helix-button` in a `[data-density="sm"]` region kept
+ * 14px type and 16px insets while an `<a data-button>` beside it correctly took
+ * 12px and 12px. Only the height moved, because that travels as a custom
+ * property and never went through this rule. */
+[data-density="sm"] [data-button],
+[data-density="sm"] helix-button::part(button),
 [data-density="sm"][data-button] {
   font-size: var(--helix-text-xs);
   padding-inline: var(--helix-space-sm);
 }
 
-[data-density="lg"] :is([data-button], helix-button::part(button)),
+[data-density="lg"] [data-button],
+[data-density="lg"] helix-button::part(button),
 [data-density="lg"][data-button] {
   font-size: var(--helix-text-md);
   padding-inline: var(--helix-space-lg);
@@ -915,4 +925,32 @@ helix-toast:not([data-color-mode]) {
     transition-duration: 0.01ms !important;
   }
   /* biome-ignore-end lint/complexity/noImportantStyles: user preference must win over author styles */
+}
+
+/* The two moving declarations this file writes *into* shadow trees.
+ *
+ * A component cannot turn these off for itself: an outer-tree `::part` rule
+ * beats an inner-tree `:host` rule for normal declarations, so a
+ * `transition: none` in `button-root.css` or `toggle-root.css` would be a rule
+ * that never applies. `check:motion` cannot see them either until it scans this
+ * directory, which it now does. */
+@media (prefers-reduced-motion: reduce) {
+  helix-button::part(button),
+  helix-toggle::part(item) {
+    transition: none;
+  }
+}
+
+/* The dialog's header, here rather than in the component, and for the reason
+   the page-nav links moved: a `::slotted()` rule loses to any document rule
+   whatever the specificity, and `h1`-`h6` are styled above. So
+   `<h2 slot="header">`, which is the markup the dialog's own example ships,
+   came out at 32px where the component asked for `--helix-text-lg`. Measured
+   beside a `<span>` in the same slot at 18px, which is what made it look
+   correct in every other example. */
+:where(helix-dialog [slot="header"]) {
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-semibold);
+  line-height: var(--helix-leading-tight);
+  margin: var(--helix-space-none);
 }
