@@ -262,7 +262,7 @@ export const overlaysArt: Record<string, ReactNode> = {
   ),
 
   /** A two pixel marker, where Tabs has a pill. */
-  'nav-bar': (
+  navigation: (
     <>
       {[
         { on: false, w: 40, x: 56 },
@@ -300,7 +300,7 @@ export const overlaysArt: Record<string, ReactNode> = {
    * `border-inline-start` that the current one colours in. So the marker sits
    * *on* the rule rather than beside it.
    */
-  'page-nav': (
+  outline: (
     <>
       <rect className="artRule" height="112" width="1" x="64" y="44" />
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="88" x="80" y="48" />
