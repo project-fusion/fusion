@@ -3,7 +3,10 @@ import { partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const markup = ssr(html`<helix-tabs value="one">
+/* `default-active`, not `value`. The fixture set `value="one"`, which is not an
+   attribute this component has: the line was inert, so every assertion below it
+   was made against a set with nothing current at all and still passed. */
+const markup = ssr(html`<helix-tabs default-active="one">
   <helix-tabs-tab selected value="one">One</helix-tabs-tab>
   <helix-tabs-panel selected slot="panels" value="one">First</helix-tabs-panel>
   <helix-tabs-panel slot="panels" value="two">Second</helix-tabs-panel>

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr } from '@fusion-io/testing/ssr'
+import { hostAttributes, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -24,8 +24,9 @@ describe('card server output', () => {
     // The host is the surface, so there is no container part to find: the
     // shadow root is slots and nothing else.
     expect(hostAttributes(markup, 'helix-card')).toEqual(['aria-labelledby'])
+    const structure = withoutStyles(markup)
     for (const name of ['media', 'header', 'footer']) {
-      expect(markup, name).toContain(`<slot name="${name}">`)
+      expect(structure, name).toContain(`<slot name="${name}">`)
     }
   })
 
@@ -38,10 +39,15 @@ describe('card server output', () => {
         Body
       </helix-card>
     `)
+    const structure = withoutStyles(horizontal)
     for (const name of ['media', 'header', 'footer']) {
-      expect(horizontal, name).toContain(`<slot name="${name}">`)
+      expect(structure, name).toContain(`<slot name="${name}">`)
     }
-    expect(horizontal).toMatch(/orientation="horizontal"/)
+    /* The host, not the string. `toMatch(/orientation="horizontal"/)` against
+       the whole document passed on `:host([orientation="horizontal"])` in the
+       card's own inlined stylesheet, which is there whatever the card was
+       given: the assertion could not have failed. */
+    expect(hostAttributes(horizontal, 'helix-card')).toContain('orientation')
   })
 
   test('slotted content reaches the markup', () => {
