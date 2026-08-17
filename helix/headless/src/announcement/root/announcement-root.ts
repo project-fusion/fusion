@@ -18,7 +18,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * whatever is being read, which is right for something that appears mid-session
  * and wrong for something that was in the served HTML: an assertive
  * announcement would cut across a screen-reader user on every page load, before
- * they had read anything. Politeness costs a moment and is never wrong; the severity
+ * they had read anything. Politeness costs a moment and is never wrong; the tone
  * does not change that, because an error that was always there is still not an
  * interruption.
  *
@@ -44,9 +44,28 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-base-announcement')
 export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
-  /** What kind of attention the message needs. */
+  /**
+   * Which colour the band wears.
+   *
+   * **This was `severity` and it was claiming more than it did.** Severity is a
+   * judgement about the message, and elsewhere in this library it carries one:
+   * `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
+   * puts a mark beside the text and names it to a screen reader. Here it did
+   * none of that. It set a colour, the live region stayed polite either way, and
+   * nothing about the announcement's semantics moved. A property that only
+   * changes the paint should say so.
+   *
+   * `tone` is the word this library already uses for exactly that, and `Tag`
+   * made the identical rename for the identical reason: `appearance` is a
+   * treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+   * agree, with `neutral` as the resting value and `primary` for a band that is
+   * about the product rather than about a state.
+   *
+   * `neutral` is what an unset announcement already looked like, said out loud
+   * so a consumer can put a band back to it from markup.
+   */
   @property({ reflect: true })
-  severity?: 'info' | 'success' | 'warning' | 'danger'
+  tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

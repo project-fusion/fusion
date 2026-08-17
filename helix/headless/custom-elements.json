@@ -604,7 +604,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Chrome rather than content. An announcement sits above the header and speaks\nfor the whole page: a trial ending, a service degraded, a change of terms. A\npassage that interrupts a document to set itself apart is a `Callout`, which\nis read where it sits and cannot be dismissed. Neither is a variant of the\nother.\n\n**Always a polite live region.** `role=\"alert\"` is assertive and interrupts\nwhatever is being read, which is right for something that appears mid-session\nand wrong for something that was in the served HTML: an assertive\nannouncement would cut across a screen-reader user on every page load, before\nthey had read anything. Politeness costs a moment and is never wrong; the severity\ndoes not change that, because an error that was always there is still not an\ninterruption.\n\nDismissing is a request. The announcement does not remove itself, because the\nconsumer owns the markup and taking the node out from under them would put\ntheir state and the document out of step. `preventDefault()` on the\n`helix-dismiss` is a refusal.",
+          "description": "Chrome rather than content. An announcement sits above the header and speaks\nfor the whole page: a trial ending, a service degraded, a change of terms. A\npassage that interrupts a document to set itself apart is a `Callout`, which\nis read where it sits and cannot be dismissed. Neither is a variant of the\nother.\n\n**Always a polite live region.** `role=\"alert\"` is assertive and interrupts\nwhatever is being read, which is right for something that appears mid-session\nand wrong for something that was in the served HTML: an assertive\nannouncement would cut across a screen-reader user on every page load, before\nthey had read anything. Politeness costs a moment and is never wrong; the tone\ndoes not change that, because an error that was always there is still not an\ninterruption.\n\nDismissing is a request. The announcement does not remove itself, because the\nconsumer owns the markup and taking the node out from under them would put\ntheir state and the document out of step. `preventDefault()` on the\n`helix-dismiss` is a refusal.",
           "name": "HelixBaseAnnouncement",
           "cssParts": [
             {
@@ -637,12 +637,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "severity",
+              "name": "tone",
               "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of attention the message needs.",
-              "attribute": "severity",
+              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup.",
+              "attribute": "tone",
               "reflects": true
             },
             {
@@ -799,12 +799,12 @@
           ],
           "attributes": [
             {
-              "name": "severity",
+              "name": "tone",
               "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of attention the message needs.",
-              "fieldName": "severity"
+              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup.",
+              "fieldName": "tone"
             },
             {
               "name": "dismissible",

@@ -868,12 +868,12 @@
             },
             {
               "kind": "field",
-              "name": "severity",
+              "name": "tone",
               "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of attention the message needs.",
-              "attribute": "severity",
+              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup.",
+              "attribute": "tone",
               "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseAnnouncement",
@@ -1013,12 +1013,12 @@
               }
             },
             {
-              "name": "severity",
+              "name": "tone",
               "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of attention the message needs.",
-              "fieldName": "severity",
+              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup.",
+              "fieldName": "tone",
               "inheritedFrom": {
                 "name": "HelixBaseAnnouncement",
                 "module": "src/announcement/root/announcement-root.ts"
@@ -26616,7 +26616,7 @@
               "kind": "field",
               "name": "tone",
               "type": {
-                "text": "'danger' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
               "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic colour, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
               "attribute": "tone",
@@ -26781,7 +26781,7 @@
             {
               "name": "tone",
               "type": {
-                "text": "'danger' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
               "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic colour, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
               "fieldName": "tone"

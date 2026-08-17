@@ -12,7 +12,7 @@ describe('announcement', () => {
     // a screen-reader user on every page load for an announcement that was in the
     // served HTML. Politeness costs a moment and is never wrong.
     const announcement = (await mount(
-      '<helix-announcement severity="danger">Down</helix-announcement>',
+      '<helix-announcement tone="danger">Down</helix-announcement>',
     )) as HTMLElement & {
       internals?: ElementInternals
     }

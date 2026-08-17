@@ -18,7 +18,7 @@ describe('announcement server output', () => {
   test('the host carries only what the consumer wrote', () => {
     // The role and the live region go through `ElementInternals`, which writes
     // no attribute at all.
-    const markup = ssr(html`<helix-announcement severity="warning">x</helix-announcement>`)
-    expect(hostAttributes(markup, 'helix-announcement')).toEqual(['severity'])
+    const markup = ssr(html`<helix-announcement tone="warning">x</helix-announcement>`)
+    expect(hostAttributes(markup, 'helix-announcement')).toEqual(['tone'])
   })
 })

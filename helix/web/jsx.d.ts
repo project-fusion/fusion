@@ -492,8 +492,25 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   dismissLabel?: HelixAnnouncement["dismissLabel"];
-  /** What kind of attention the message needs. */
-  severity?: HelixAnnouncement["severity"];
+  /** Which colour the band wears.
+
+**This was `severity` and it was claiming more than it did.** Severity is a
+judgement about the message, and elsewhere in this library it carries one:
+`Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
+puts a mark beside the text and names it to a screen reader. Here it did
+none of that. It set a colour, the live region stayed polite either way, and
+nothing about the announcement's semantics moved. A property that only
+changes the paint should say so.
+
+`tone` is the word this library already uses for exactly that, and `Tag`
+made the identical rename for the identical reason: `appearance` is a
+treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+agree, with `neutral` as the resting value and `primary` for a band that is
+about the product rather than about a state.
+
+`neutral` is what an unset announcement already looked like, said out loud
+so a consumer can put a band back to it from markup. */
+  tone?: HelixAnnouncement["tone"];
 
   /** Fired when the reader asks to close it. */
   "onhelix-dismiss"?: (e: HelixAnnouncementHelixDismissElementEvent) => void;
@@ -516,8 +533,25 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   "prop:dismissLabel"?: HelixAnnouncement["dismissLabel"];
-  /** What kind of attention the message needs. */
-  "prop:severity"?: HelixAnnouncement["severity"];
+  /** Which colour the band wears.
+
+**This was `severity` and it was claiming more than it did.** Severity is a
+judgement about the message, and elsewhere in this library it carries one:
+`Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
+puts a mark beside the text and names it to a screen reader. Here it did
+none of that. It set a colour, the live region stayed polite either way, and
+nothing about the announcement's semantics moved. A property that only
+changes the paint should say so.
+
+`tone` is the word this library already uses for exactly that, and `Tag`
+made the identical rename for the identical reason: `appearance` is a
+treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+agree, with `neutral` as the resting value and `primary` for a band that is
+about the product rather than about a state.
+
+`neutral` is what an unset announcement already looked like, said out loud
+so a consumer can put a band back to it from markup. */
+  "prop:tone"?: HelixAnnouncement["tone"];
   /** Fired when the reader asks to close it. */
   "on:helix-dismiss"?: (e: HelixAnnouncementHelixDismissElementEvent) => void;
 
@@ -5932,7 +5966,24 @@ export type CustomElements = {
    * derive one rather than dash-casing it, so this would otherwise be
    * reachable only as `dismisslabel`, which nobody would guess and no linter
    * would catch.
-   * - `severity`: What kind of attention the message needs.
+   * - `tone`: Which colour the band wears.
+   *
+   * **This was `severity` and it was claiming more than it did.** Severity is a
+   * judgement about the message, and elsewhere in this library it carries one:
+   * `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
+   * puts a mark beside the text and names it to a screen reader. Here it did
+   * none of that. It set a colour, the live region stayed polite either way, and
+   * nothing about the announcement's semantics moved. A property that only
+   * changes the paint should say so.
+   *
+   * `tone` is the word this library already uses for exactly that, and `Tag`
+   * made the identical rename for the identical reason: `appearance` is a
+   * treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+   * agree, with `neutral` as the resting value and `primary` for a band that is
+   * about the product rather than about a state.
+   *
+   * `neutral` is what an unset announcement already looked like, said out loud
+   * so a consumer can put a band back to it from markup.
    *
    * ## Events
    *
@@ -10795,7 +10846,24 @@ export type CustomElementsSolidJs = {
    * derive one rather than dash-casing it, so this would otherwise be
    * reachable only as `dismisslabel`, which nobody would guess and no linter
    * would catch.
-   * - `severity`: What kind of attention the message needs.
+   * - `tone`: Which colour the band wears.
+   *
+   * **This was `severity` and it was claiming more than it did.** Severity is a
+   * judgement about the message, and elsewhere in this library it carries one:
+   * `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
+   * puts a mark beside the text and names it to a screen reader. Here it did
+   * none of that. It set a colour, the live region stayed polite either way, and
+   * nothing about the announcement's semantics moved. A property that only
+   * changes the paint should say so.
+   *
+   * `tone` is the word this library already uses for exactly that, and `Tag`
+   * made the identical rename for the identical reason: `appearance` is a
+   * treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+   * agree, with `neutral` as the resting value and `primary` for a band that is
+   * about the product rather than about a state.
+   *
+   * `neutral` is what an unset announcement already looked like, said out loud
+   * so a consumer can put a band back to it from markup.
    *
    * ## Events
    *

@@ -30,23 +30,23 @@
   position: relative;
 }
 
-:host([severity="info"]) {
+:host([tone="info"]) {
   --_announcement-color: var(--helix-color-info);
 }
 
-:host([severity="success"]) {
+:host([tone="success"]) {
   --_announcement-color: var(--helix-color-success);
 }
 
-:host([severity="warning"]) {
+:host([tone="warning"]) {
   --_announcement-color: var(--helix-color-warning);
 }
 
-:host([severity="danger"]) {
+:host([tone="danger"]) {
   --_announcement-color: var(--helix-color-danger);
 }
 
-/* The severity colours the band rather than the text, which has to stay
+/* The tone colours the band rather than the text, which has to stay
    readable at body size across the full width.
  *
  * **Opaque, and mixed against the page rather than into it.** These were
@@ -59,7 +59,24 @@
  * The gradient is a small tilt of the same colour, lighter at the start of the
  * inline axis, so a band the width of a page has some direction to it rather
  * than reading as a flat slab. Two steps of the one colour, not two colours. */
-:host([severity]) {
+/* Said as well as defaulted, so a band can be put back to neutral from markup
+   rather than by removing an attribute. It resolves to the resting fill above,
+   which is why it names no colour of its own: the rule below is keyed on
+   `[tone]` matching *any* value, so neutral has to opt back out of the tint. */
+:host([tone="neutral"]) {
+  background-image: none;
+  border-block-end-color: var(--helix-color-border);
+}
+
+/* The brand, for a band that is about the product rather than about a state.
+   `info` and this are the same hue while the seed is blue and are not the same
+   thing: `info` is a fixed semantic colour and this follows whatever the theme
+   is seeded with. */
+:host([tone="primary"]) {
+  --_announcement-color: var(--helix-color-primary);
+}
+
+:host([tone]:not([tone="neutral"])) {
   background-image: linear-gradient(
     to right,
     color-mix(in oklab, var(--_announcement-color) 18%, var(--helix-color-background)),
