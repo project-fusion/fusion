@@ -51,8 +51,13 @@
 
 [part="control"] {
   all: unset;
-  /* `all: unset` takes `box-sizing` with it, back to `content-box`. */
+  /* `all: unset` takes `box-sizing` with it, back to `content-box`, and takes
+     the wrapping the UA gives every `<textarea>` with it too. Without that, an
+     unbreakable string, a URL or a token, runs past the frame instead of
+     wrapping, and under `auto-grow` it is clipped by the `overflow: hidden` the
+     growing depends on with no way to scroll to it. */
   box-sizing: border-box;
+  overflow-wrap: break-word;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);

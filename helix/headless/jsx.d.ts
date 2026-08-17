@@ -720,6 +720,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseButton["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -768,6 +786,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseButton["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -799,13 +835,6 @@ export type HelixBaseCalendarHelixNavigateElementEvent =
   HelixBaseCalendarElementEvent<HelixNavigateEvent>;
 
 export type HelixBaseCalendarProps = {
-  /** Name the calendar reports under when its form is submitted.
-
-Absent means it submits nothing, which is what makes it safe to put one
-inside something else. `DatePicker` will hold the name and the calendar in
-its panel will stay quiet, the same way `Select` holds the name and the
-`Listbox` inside it does not. */
-  name?: HelixBaseCalendar["name"];
   /** How many dates can be held at once. */
   mode?: HelixBaseCalendar["mode"];
   /** How many months to show, side by side. */
@@ -866,6 +895,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseCalendar["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseCalendar["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -881,13 +928,6 @@ fire at all. */
 };
 
 export type HelixBaseCalendarSolidJsProps = {
-  /** Name the calendar reports under when its form is submitted.
-
-Absent means it submits nothing, which is what makes it safe to put one
-inside something else. `DatePicker` will hold the name and the calendar in
-its panel will stay quiet, the same way `Select` holds the name and the
-`Listbox` inside it does not. */
-  "prop:name"?: HelixBaseCalendar["name"];
   /** How many dates can be held at once. */
   "prop:mode"?: HelixBaseCalendar["mode"];
   /** How many months to show, side by side. */
@@ -948,6 +988,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseCalendar["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseCalendar["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -1142,8 +1200,6 @@ export type HelixBaseCheckboxHelixChangeElementEvent =
   HelixBaseCheckboxElementEvent<HelixChangeEvent>;
 
 export type HelixBaseCheckboxProps = {
-  /** Name submitted with the form. */
-  name?: HelixBaseCheckbox["name"];
   /** Value submitted when the box is checked. */
   value?: HelixBaseCheckbox["value"];
   /** Whether the box shows as neither checked nor unchecked.
@@ -1179,6 +1235,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseCheckbox["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseCheckbox["name"];
   /** The consumer's callback, invoked after the state is applied.
 
 Not an attribute: it is a function. And not reachable from React's JSX,
@@ -1194,8 +1268,6 @@ instead. */
 };
 
 export type HelixBaseCheckboxSolidJsProps = {
-  /** Name submitted with the form. */
-  "prop:name"?: HelixBaseCheckbox["name"];
   /** Value submitted when the box is checked. */
   "prop:value"?: HelixBaseCheckbox["value"];
   /** Whether the box shows as neither checked nor unchecked.
@@ -1231,6 +1303,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseCheckbox["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseCheckbox["name"];
   /** The consumer's callback, invoked after the state is applied.
 
 Not an attribute: it is a function. And not reachable from React's JSX,
@@ -1705,6 +1795,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseIconButton["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseIconButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -1753,6 +1861,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseIconButton["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseIconButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -1800,8 +1926,6 @@ export type HelixBaseInputHelixChangeElementEvent =
   HelixBaseInputElementEvent<HelixChangeEvent>;
 
 export type HelixBaseInputProps = {
-  /** Name submitted with the form. */
-  name?: HelixBaseInput["name"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   placeholder?: HelixBaseInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
@@ -1840,6 +1964,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseInput["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseInput["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -1855,8 +1997,6 @@ fire at all. */
 };
 
 export type HelixBaseInputSolidJsProps = {
-  /** Name submitted with the form. */
-  "prop:name"?: HelixBaseInput["name"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixBaseInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
@@ -1895,6 +2035,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseInput["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseInput["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -2027,8 +2185,6 @@ to prevent. */
   filterLabel?: HelixBaseListbox["filterLabel"];
   /** Whether more than one option can be the answer. */
   multiple?: HelixBaseListbox["multiple"];
-  /** Name the list reports under when its form is submitted. */
-  name?: HelixBaseListbox["name"];
   /** What is shown when a filter has hidden every option. */
   "empty-text"?: HelixBaseListbox["emptyText"];
   /** What is shown when a filter has hidden every option. */
@@ -2063,6 +2219,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseListbox["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseListbox["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -2104,8 +2278,6 @@ to prevent. */
   "prop:filterLabel"?: HelixBaseListbox["filterLabel"];
   /** Whether more than one option can be the answer. */
   "prop:multiple"?: HelixBaseListbox["multiple"];
-  /** Name the list reports under when its form is submitted. */
-  "prop:name"?: HelixBaseListbox["name"];
   /** What is shown when a filter has hidden every option. */
   "attr:empty-text"?: HelixBaseListbox["emptyText"];
   /** What is shown when a filter has hidden every option. */
@@ -2140,6 +2312,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseListbox["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseListbox["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -2687,8 +2877,6 @@ export type HelixBaseRadioGroupHelixChangeElementEvent =
   HelixBaseRadioGroupElementEvent<HelixChangeEvent>;
 
 export type HelixBaseRadioGroupProps = {
-  /** Name the group reports under when its form is submitted. */
-  name?: HelixBaseRadioGroup["name"];
   /** Which way the choices run. A column reads one line per answer. */
   orientation?: HelixBaseRadioGroup["orientation"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -2721,6 +2909,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseRadioGroup["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseRadioGroup["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -2734,8 +2940,6 @@ fire at all. */
 };
 
 export type HelixBaseRadioGroupSolidJsProps = {
-  /** Name the group reports under when its form is submitted. */
-  "prop:name"?: HelixBaseRadioGroup["name"];
   /** Which way the choices run. A column reads one line per answer. */
   "prop:orientation"?: HelixBaseRadioGroup["orientation"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -2768,6 +2972,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseRadioGroup["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseRadioGroup["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -2847,8 +3069,6 @@ because a consumer sets it and believes it. */
   filterable?: HelixBaseSelect["filterable"];
   /** Whether more than one option can be the answer. */
   multiple?: HelixBaseSelect["multiple"];
-  /** Name the control reports under when its form is submitted. */
-  name?: HelixBaseSelect["name"];
   /** Shown on the trigger while nothing is chosen. */
   placeholder?: HelixBaseSelect["placeholder"];
   /** Whether the element is open.
@@ -2908,6 +3128,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseSelect["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseSelect["name"];
   /** The consumer's callback, invoked after the state is applied.
 
 Not an attribute: it is a function. And not reachable from React's JSX,
@@ -2942,8 +3180,6 @@ because a consumer sets it and believes it. */
   "prop:filterable"?: HelixBaseSelect["filterable"];
   /** Whether more than one option can be the answer. */
   "prop:multiple"?: HelixBaseSelect["multiple"];
-  /** Name the control reports under when its form is submitted. */
-  "prop:name"?: HelixBaseSelect["name"];
   /** Shown on the trigger while nothing is chosen. */
   "prop:placeholder"?: HelixBaseSelect["placeholder"];
   /** Whether the element is open.
@@ -3003,6 +3239,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseSelect["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseSelect["name"];
   /** The consumer's callback, invoked after the state is applied.
 
 Not an attribute: it is a function. And not reachable from React's JSX,
@@ -3053,8 +3307,6 @@ export type HelixBaseSliderProps = {
   max?: HelixBaseSlider["max"];
   /** The smallest value the reader can choose. */
   min?: HelixBaseSlider["min"];
-  /** Name submitted with the form. */
-  name?: HelixBaseSlider["name"];
   /** Whether the chosen value is shown beside the track. */
   "show-value"?: HelixBaseSlider["showValue"];
   /** Whether the chosen value is shown beside the track. */
@@ -3139,6 +3391,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseSlider["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseSlider["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -3158,8 +3428,6 @@ export type HelixBaseSliderSolidJsProps = {
   "prop:max"?: HelixBaseSlider["max"];
   /** The smallest value the reader can choose. */
   "prop:min"?: HelixBaseSlider["min"];
-  /** Name submitted with the form. */
-  "prop:name"?: HelixBaseSlider["name"];
   /** Whether the chosen value is shown beside the track. */
   "bool:show-value"?: HelixBaseSlider["showValue"];
   /** Whether the chosen value is shown beside the track. */
@@ -3244,6 +3512,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseSlider["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseSlider["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -3311,8 +3597,6 @@ export type HelixBaseSwitchHelixChangeElementEvent =
   HelixBaseSwitchElementEvent<HelixChangeEvent>;
 
 export type HelixBaseSwitchProps = {
-  /** Name submitted with the form. */
-  name?: HelixBaseSwitch["name"];
   /** Value submitted when the switch is on. */
   value?: HelixBaseSwitch["value"];
   /** Whether the control is checked.
@@ -3344,6 +3628,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseSwitch["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseSwitch["name"];
   /** The consumer's callback, invoked after the state is applied.
 
 Not an attribute: it is a function. And not reachable from React's JSX,
@@ -3359,8 +3661,6 @@ instead. */
 };
 
 export type HelixBaseSwitchSolidJsProps = {
-  /** Name submitted with the form. */
-  "prop:name"?: HelixBaseSwitch["name"];
   /** Value submitted when the switch is on. */
   "prop:value"?: HelixBaseSwitch["value"];
   /** Whether the control is checked.
@@ -3392,6 +3692,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseSwitch["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseSwitch["name"];
   /** The consumer's callback, invoked after the state is applied.
 
 Not an attribute: it is a function. And not reachable from React's JSX,
@@ -3748,8 +4066,6 @@ export type HelixBaseTextareaProps = {
   "auto-grow"?: HelixBaseTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
   autoGrow?: HelixBaseTextarea["autoGrow"];
-  /** Name submitted with the form. */
-  name?: HelixBaseTextarea["name"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   placeholder?: HelixBaseTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
@@ -3788,6 +4104,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseTextarea["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseTextarea["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -3807,8 +4141,6 @@ export type HelixBaseTextareaSolidJsProps = {
   "bool:auto-grow"?: HelixBaseTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
   "prop:autoGrow"?: HelixBaseTextarea["autoGrow"];
-  /** Name submitted with the form. */
-  "prop:name"?: HelixBaseTextarea["name"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixBaseTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
@@ -3847,6 +4179,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseTextarea["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseTextarea["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -4011,8 +4361,6 @@ export type HelixBaseToggleGroupHelixSelectElementEvent =
   HelixBaseToggleGroupElementEvent<HelixSelectEvent>;
 
 export type HelixBaseToggleGroupProps = {
-  /** Name the group reports under when its form is submitted. */
-  name?: HelixBaseToggleGroup["name"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -4043,6 +4391,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   disabled?: HelixBaseToggleGroup["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseToggleGroup["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -4056,8 +4422,6 @@ fire at all. */
 };
 
 export type HelixBaseToggleGroupSolidJsProps = {
-  /** Name the group reports under when its form is submitted. */
-  "prop:name"?: HelixBaseToggleGroup["name"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixBaseToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -4088,6 +4452,24 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists. */
   "prop:disabled"?: HelixBaseToggleGroup["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseToggleGroup["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -5158,6 +5540,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `focusable`: Whether the button holds its group's tab stop.
    *
    * A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -5230,12 +5629,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name the calendar reports under when its form is submitted.
-   *
-   * Absent means it submits nothing, which is what makes it safe to put one
-   * inside something else. `DatePicker` will hold the name and the calendar in
-   * its panel will stay quiet, the same way `Select` holds the name and the
-   * `Listbox` inside it does not.
    * - `mode`: How many dates can be held at once.
    * - `months`: How many months to show, side by side.
    * - `locale`: Locale for month and day names. Absent uses the runtime's own.
@@ -5271,6 +5664,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
    * Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -5564,7 +5974,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name submitted with the form.
    * - `value`: Value submitted when the box is checked.
    * - `indeterminate`: Whether the box shows as neither checked nor unchecked.
    *
@@ -5589,6 +5998,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -6118,6 +6544,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `focusable`: Whether the button holds its group's tab stop.
    *
    * A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -6226,7 +6669,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name submitted with the form.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
@@ -6251,6 +6693,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
    * Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -6472,7 +6931,6 @@ export type CustomElements = {
    * to prevent.
    * - `filter-label`/`filterLabel`: Placeholder for the field that narrows the list.
    * - `multiple`: Whether more than one option can be the answer.
-   * - `name`: Name the list reports under when its form is submitted.
    * - `empty-text`/`emptyText`: What is shown when a filter has hidden every option.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -6495,6 +6953,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `options`: Every option, in the order a reader meets them.
    *
    * Descendants rather than children, because a group puts a level between the
@@ -7188,7 +7663,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name the group reports under when its form is submitted.
    * - `orientation`: Which way the choices run. A column reads one line per answer.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -7211,6 +7685,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
@@ -7363,7 +7854,6 @@ export type CustomElements = {
    * rendered a field. API that does nothing is worse than API that is missing,
    * because a consumer sets it and believes it.
    * - `multiple`: Whether more than one option can be the answer.
-   * - `name`: Name the control reports under when its form is submitted.
    * - `placeholder`: Shown on the trigger while nothing is chosen.
    * - `open`: Whether the element is open.
    *
@@ -7409,6 +7899,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -7546,7 +8053,6 @@ export type CustomElements = {
    *
    * - `max`: The largest value the reader can choose.
    * - `min`: The smallest value the reader can choose.
-   * - `name`: Name submitted with the form.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
    * - `markers`: How many marks to draw along the track, evenly spaced, ends included.
    *
@@ -7599,6 +8105,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
@@ -7770,7 +8293,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name submitted with the form.
    * - `value`: Value submitted when the switch is on.
    * - `checked`: Whether the control is checked.
    *
@@ -7792,6 +8314,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -8237,7 +8776,6 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
-   * - `name`: Name submitted with the form.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
@@ -8262,6 +8800,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
    * Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -8523,7 +9078,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name the group reports under when its form is submitted.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -8545,6 +9099,23 @@ export type CustomElements = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
    * Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -9623,6 +10194,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `focusable`: Whether the button holds its group's tab stop.
    *
    * A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -9698,12 +10286,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name the calendar reports under when its form is submitted.
-   *
-   * Absent means it submits nothing, which is what makes it safe to put one
-   * inside something else. `DatePicker` will hold the name and the calendar in
-   * its panel will stay quiet, the same way `Select` holds the name and the
-   * `Listbox` inside it does not.
    * - `mode`: How many dates can be held at once.
    * - `months`: How many months to show, side by side.
    * - `locale`: Locale for month and day names. Absent uses the runtime's own.
@@ -9739,6 +10321,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
    * Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -10047,7 +10646,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name submitted with the form.
    * - `value`: Value submitted when the box is checked.
    * - `indeterminate`: Whether the box shows as neither checked nor unchecked.
    *
@@ -10072,6 +10670,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -10622,6 +11237,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `focusable`: Whether the button holds its group's tab stop.
    *
    * A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -10736,7 +11368,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name submitted with the form.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
@@ -10761,6 +11392,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
    * Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -10994,7 +11642,6 @@ export type CustomElementsSolidJs = {
    * to prevent.
    * - `filter-label`/`filterLabel`: Placeholder for the field that narrows the list.
    * - `multiple`: Whether more than one option can be the answer.
-   * - `name`: Name the list reports under when its form is submitted.
    * - `empty-text`/`emptyText`: What is shown when a filter has hidden every option.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -11017,6 +11664,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `options`: Every option, in the order a reader meets them.
    *
    * Descendants rather than children, because a group puts a level between the
@@ -11740,7 +12404,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name the group reports under when its form is submitted.
    * - `orientation`: Which way the choices run. A column reads one line per answer.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -11763,6 +12426,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
@@ -11921,7 +12601,6 @@ export type CustomElementsSolidJs = {
    * rendered a field. API that does nothing is worse than API that is missing,
    * because a consumer sets it and believes it.
    * - `multiple`: Whether more than one option can be the answer.
-   * - `name`: Name the control reports under when its form is submitted.
    * - `placeholder`: Shown on the trigger while nothing is chosen.
    * - `open`: Whether the element is open.
    *
@@ -11967,6 +12646,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -12110,7 +12806,6 @@ export type CustomElementsSolidJs = {
    *
    * - `max`: The largest value the reader can choose.
    * - `min`: The smallest value the reader can choose.
-   * - `name`: Name submitted with the form.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
    * - `markers`: How many marks to draw along the track, evenly spaced, ends included.
    *
@@ -12163,6 +12858,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
@@ -12346,7 +13058,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name submitted with the form.
    * - `value`: Value submitted when the switch is on.
    * - `checked`: Whether the control is checked.
    *
@@ -12368,6 +13079,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
    *
    * Not an attribute: it is a function. And not reachable from React's JSX,
@@ -12840,7 +13568,6 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
-   * - `name`: Name submitted with the form.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
@@ -12865,6 +13592,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
    * Not an attribute: it is a function. `onValueChange` and not `onChange`,
@@ -13135,7 +13879,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name the group reports under when its form is submitted.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -13157,6 +13900,23 @@ export type CustomElementsSolidJs = {
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `onValueChange`: The consumer's callback, invoked after the value is applied.
    *
    * Not an attribute: it is a function. `onValueChange` and not `onChange`,

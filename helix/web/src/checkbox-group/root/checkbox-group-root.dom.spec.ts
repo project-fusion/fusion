@@ -47,12 +47,25 @@ describe('checkbox group', () => {
     ])
   })
 
-  test('the name is shared down as a property, not written onto the markup', async () => {
-    // An attribute written onto a box is a change to markup the consumer
-    // rendered, which a React consumer's hydration reports.
+  test('the shared name reaches the attribute, because that is what submits', async () => {
+    /* This asserted the opposite, that the name was pushed down as a property
+       and never written onto the markup, on the grounds that an attribute
+       written onto a box is a change a React consumer's hydration reports.
+       That reasoning is right about hydration and wrong about what it costs.
+
+       The platform builds a form's entry list from the `name` *content
+       attribute*. Measured against the shipped build: a checked, form-associated
+       host named only by property contributed nothing at all to a `FormData`,
+       while an attribute-named one beside it did. So every box in every group
+       submitted nameless, and this spec was the reason nobody found it.
+
+       `name` reflects from `HelixFormElement` now, so setting the property is
+       what writes the attribute. The hydration cost is real and is the smaller
+       of the two: a warning in development against a form that silently drops
+       the answer in production. */
     const g = await group()
     expect(g.boxes.map((b) => b.name)).toEqual(['verticals', 'verticals', 'verticals'])
-    expect((g.boxes[0] as HTMLElement).hasAttribute('name')).toBe(false)
+    expect((g.boxes[0] as HTMLElement).getAttribute('name')).toBe('verticals')
   })
 
   test('a box that names itself keeps its own', async () => {

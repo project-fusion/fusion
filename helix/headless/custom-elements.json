@@ -2622,6 +2622,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -2765,6 +2780,19 @@
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
               }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
             }
           ],
           "superclass": {
@@ -2875,16 +2903,6 @@
             }
           ],
           "members": [
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the calendar reports under when its form is submitted.\n\nAbsent means it submits nothing, which is what makes it safe to put one\ninside something else. `DatePicker` will hold the name and the calendar in\nits panel will stay quiet, the same way `Select` holds the name and the\n`Listbox` inside it does not.",
-              "attribute": "name"
-            },
             {
               "kind": "field",
               "name": "mode",
@@ -3469,6 +3487,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -3582,15 +3615,6 @@
             }
           ],
           "attributes": [
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the calendar reports under when its form is submitted.\n\nAbsent means it submits nothing, which is what makes it safe to put one\ninside something else. `DatePicker` will hold the name and the calendar in\nits panel will stay quiet, the same way `Select` holds the name and the\n`Listbox` inside it does not.",
-              "fieldName": "name"
-            },
             {
               "name": "mode",
               "type": {
@@ -3730,6 +3754,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -5143,16 +5180,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
               "name": "value",
               "type": {
                 "text": "string"
@@ -5690,6 +5717,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -5804,15 +5846,6 @@
           ],
           "attributes": [
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "fieldName": "name"
-            },
-            {
               "name": "value",
               "type": {
                 "text": "string"
@@ -5915,6 +5948,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -7925,6 +7971,19 @@
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
               }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
             }
           ],
           "members": [
@@ -8146,6 +8205,21 @@
               },
               "type": {
                 "text": "formDisabledCallback(disabled: boolean) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
               }
             },
             {
@@ -8902,16 +8976,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
               "name": "placeholder",
               "type": {
                 "text": "string"
@@ -9468,6 +9532,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -9582,15 +9661,6 @@
           ],
           "attributes": [
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "fieldName": "name"
-            },
-            {
               "name": "placeholder",
               "type": {
                 "text": "string"
@@ -9702,6 +9772,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -10395,16 +10478,6 @@
             },
             {
               "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the list reports under when its form is submitted.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
               "name": "emptyText",
               "type": {
                 "text": "string"
@@ -11054,6 +11127,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -11212,15 +11300,6 @@
               "fieldName": "multiple"
             },
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the list reports under when its form is submitted.",
-              "fieldName": "name"
-            },
-            {
               "name": "empty-text",
               "type": {
                 "text": "string"
@@ -11314,6 +11393,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -13245,14 +13337,23 @@
               "name": "panel",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, /* The host, not the panel. `display: contents` leaves it without a box, so a press on the trigger is inside the host and outside the panel, and a boundary of the panel alone would close on the very press that opened it. */ boundary: () => this, offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"popover\"]'), })"
+              "default": "new PopoverController(this, { anchor: () => this.trigger, /* The host, not the panel. `display: contents` leaves it without a box, so a press on the trigger is inside the host and outside the panel, and a boundary of the panel alone would close on the very press that opened it. */ /* The host *and* whatever invoked it. An outside press is measured against this, and a `--toggle` button outside the host is part of the control by any reading a reader would give it: pressing it while the panel is open should close it once, not close it on `pointerdown` and reopen it on the `click` that follows. */ boundary: (): (HTMLElement | undefined)[] => [this, this.invoker], offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"popover\"]'), })"
+            },
+            {
+              "kind": "field",
+              "name": "invoker",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private",
+              "description": "The invoker that last opened the panel, when a command did.\n\nThe handlers discarded the `source` the controller hands them, which cost\ntwo things at once. The panel was positioned against the host, and the\nstyled tier makes the host a boxless `display: contents` element, so a\npopover opened by a command outside it opened against the window origin.\nAnd the outside-press dismissal had no way to know the invoker was part of\nthe control: the press fires on `pointerdown`, the command arrives on the\n`click` after it, so a `--toggle` button outside the host closed the panel\nand immediately reopened it, for ever."
             },
             {
               "kind": "field",
               "name": "commands",
               "privacy": "protected",
               "readonly": true,
-              "default": "new CommandController(this, { commands: { '--close': () => this.hide(), '--show': () => this.show(), '--toggle': () => (this.open ? this.hide() : this.show()), }, })"
+              "default": "new CommandController(this, { commands: { '--close': () => this.hide(), '--show': (source: Element | null) => { this.invoker = source instanceof HTMLElement ? source : undefined this.show() }, '--toggle': (source: Element | null) => { this.invoker = source instanceof HTMLElement ? source : undefined if (this.open) { this.hide() } else { this.show() } }, }, })"
             },
             {
               "kind": "field",
@@ -14075,16 +14176,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the group reports under when its form is submitted.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
               "name": "orientation",
               "type": {
                 "text": "'horizontal' | 'vertical'"
@@ -14593,6 +14684,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -14699,15 +14805,6 @@
           ],
           "attributes": [
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the group reports under when its form is submitted.",
-              "fieldName": "name"
-            },
-            {
               "name": "orientation",
               "type": {
                 "text": "'horizontal' | 'vertical'"
@@ -14801,6 +14898,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -15213,16 +15323,6 @@
               "description": "Whether more than one option can be the answer.",
               "attribute": "multiple",
               "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the control reports under when its form is submitted.",
-              "attribute": "name"
             },
             {
               "kind": "field",
@@ -15865,6 +15965,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -16005,15 +16120,6 @@
               "fieldName": "multiple"
             },
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the control reports under when its form is submitted.",
-              "fieldName": "name"
-            },
-            {
               "name": "placeholder",
               "type": {
                 "text": "string"
@@ -16132,6 +16238,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -16394,16 +16513,6 @@
               "default": "0",
               "description": "The smallest value the reader can choose.",
               "attribute": "min"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "attribute": "name"
             },
             {
               "kind": "field",
@@ -16947,6 +17056,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -17079,15 +17203,6 @@
               "fieldName": "min"
             },
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "fieldName": "name"
-            },
-            {
               "name": "show-value",
               "type": {
                 "text": "boolean"
@@ -17208,6 +17323,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -17814,16 +17942,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
               "name": "value",
               "type": {
                 "text": "string"
@@ -18301,6 +18419,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -18415,15 +18548,6 @@
           ],
           "attributes": [
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "fieldName": "name"
-            },
-            {
               "name": "value",
               "type": {
                 "text": "string"
@@ -18517,6 +18641,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -20475,16 +20612,6 @@
             },
             {
               "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
               "name": "placeholder",
               "type": {
                 "text": "string"
@@ -20557,6 +20684,15 @@
                 }
               },
               "description": "Follows the content, by measuring rather than by counting.\n\n`scrollHeight` is what the text actually needs, which no arithmetic over\nline count and line height gets right: a wrapped line, a pasted paragraph\nand a font that has not loaded yet all break the arithmetic and none of\nthem break the measurement.\n\nReset to `auto` first, because `scrollHeight` of an element already sized to\nits content is that size, so without the reset the box can only ever grow."
+            },
+            {
+              "kind": "field",
+              "name": "resize",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private",
+              "description": "Re-measures when the box changes rather than only when a property does.\n\nThe height was computed on Lit updates alone, and nothing about a container\nnarrowing, a font swapping, or the field finally gaining a layout box is a\nproperty change here. A field that wrapped to three lines at one width kept\na three-line height at half the width and clipped the rest behind\n`overflow: hidden`, with no way for a reader to reach it.\n\nObserving the control also covers the zero case above from the other side:\na `ResizeObserver` fires when an element gains a box, so a field that was\nhidden when it first tried to grow measures itself the moment it is shown."
             },
             {
               "kind": "method",
@@ -21038,6 +21174,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -21161,15 +21312,6 @@
               "fieldName": "autoGrow"
             },
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.",
-              "fieldName": "name"
-            },
-            {
               "name": "placeholder",
               "type": {
                 "text": "string"
@@ -21281,6 +21423,19 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -21999,16 +22154,6 @@
             },
             {
               "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the group reports under when its form is submitted.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
               "name": "observer",
               "type": {
                 "text": "ResizeObserver | undefined"
@@ -22513,6 +22658,21 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -22617,16 +22777,38 @@
               "reactProp": "onhelix-select"
             }
           ],
-          "attributes": [
+          "mixins": [
             {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name the group reports under when its form is submitted.",
-              "fieldName": "name"
+              "name": "MixinControllerValue",
+              "package": "@helix-io/core"
             },
+            {
+              "name": "MixinField",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixFormElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A row of options with the selection marked by a moving indicator.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toggle-group",
+            "aliases": [
+              "SegmentedControl",
+              "Segmented",
+              "NavBar",
+              "Switcher"
+            ],
+            "tier": "headless",
+            "group": "BaseToggle",
+            "part": "Group"
+          },
+          "tagName": "helix-base-toggle-group",
+          "customElement": true,
+          "attributes": [
             {
               "name": "default-value",
               "type": {
@@ -22716,39 +22898,21 @@
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
               }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "MixinControllerValue",
-              "package": "@helix-io/core"
             },
             {
-              "name": "MixinField",
-              "package": "@helix-io/core"
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
             }
           ],
-          "superclass": {
-            "name": "HelixFormElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "A row of options with the selection marked by a moving indicator.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/toggle-group",
-            "aliases": [
-              "SegmentedControl",
-              "Segmented",
-              "NavBar",
-              "Switcher"
-            ],
-            "tier": "headless",
-            "group": "BaseToggle",
-            "part": "Group"
-          },
-          "tagName": "helix-base-toggle-group",
-          "customElement": true,
           "modulePath": "src/toggle/group/toggle-group.ts",
           "definitionPath": "src/toggle/group/toggle-group.ts"
         }

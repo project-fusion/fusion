@@ -1,6 +1,14 @@
 /* A grid rather than a stack, so the unit sits on the value's baseline and the
    label and detail span the full width above and below it. */
 :host {
+  /* Rows that line up across a group.
+   *
+   * The figure is a grid of auto rows and the group's flex line stretches it to
+   * the tallest figure beside it, which without this shares the extra out
+   * between every row equally: a two-line label next to a one-line label pushed
+   * its own value down and the numbers in a row stopped meeting. Packed to the
+   * start, the extra collects at the bottom where nothing is. */
+  align-content: start;
   display: grid;
   gap: var(--helix-space-2xs);
   grid-template-columns: auto 1fr;

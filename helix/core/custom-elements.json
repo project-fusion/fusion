@@ -228,7 +228,7 @@
               "kind": "field",
               "name": "boundary",
               "type": {
-                "text": "(() => Element | null | undefined) | undefined"
+                "text": "| (() => Element | readonly (Element | null | undefined)[] | null | undefined)\n    | undefined"
               },
               "privacy": "private",
               "readonly": true,
@@ -1395,6 +1395,17 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "form",
               "type": {
                 "text": "HTMLFormElement | null"
@@ -1490,6 +1501,15 @@
               "default": "false",
               "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.",
               "fieldName": "disabled"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name"
             }
           ],
           "superclass": {
@@ -2056,6 +2076,14 @@
           "declaration": {
             "name": "resolveActiveItem",
             "module": "./utils/resolve-active-item/resolve-active-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "restoreValue",
+          "declaration": {
+            "name": "restoreValue",
+            "module": "./utils/restore-value/restore-value.js"
           }
         },
         {
@@ -3875,6 +3903,46 @@
           "declaration": {
             "name": "resolveActiveItem",
             "module": "src/utils/resolve-active-item/resolve-active-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/restore-value/restore-value.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "restoreValue",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "control",
+              "type": {
+                "text": "TextControl"
+              }
+            },
+            {
+              "name": "next",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Puts a value back into a text control without moving the reader's caret.\n\nA controlled input has to restore what the element holds whenever the native\ncontrol has moved and the answer has not followed, which is a refusal or a\nconsumer who owns the value and has not answered yet. Assigning `value` is\nhow that is done, and per spec assigning a *different* string moves the text\nentry cursor to the end. Measured: caret at index three in `abcdef`, assign\n`abcXdef`, caret at seven. Assigning the same string leaves it alone, which\nis why this was invisible until a consumer was slow.\n\nSo a React consumer holding the value in state, which commits after the\nevent, put the caret at the end of the field after every single keystroke.\nTyping in the middle of a word was impossible, and the class JSDoc claimed\nthe caret was the platform's business.\n\nThe offset is adjusted by the length difference rather than clamped, because\nthe common case is exactly one character wide: the reader typed, the element\nrestored the shorter previous string, and the caret belongs one place back.\nClamping alone would leave it one to the right of where the reader was, which\nis the same bug at a smaller size.\n\nNothing is restored when the value already matches, since the assignment\nitself is what moves the caret and there is nothing to assign."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "restoreValue",
+          "declaration": {
+            "name": "restoreValue",
+            "module": "src/utils/restore-value/restore-value.ts"
           }
         }
       ]

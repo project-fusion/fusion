@@ -32,9 +32,28 @@ const next = (cal: Calendar): void => {
 const stop = (cal: Calendar): string | null =>
   cal.shadowRoot?.querySelector('[part="cell"][tabindex="0"]')?.getAttribute('aria-label') ?? null
 
+/* From the grid, which is where a reader's presses come from.
+ *
+ * These were dispatched at the host, which is also where the previous and next
+ * buttons live, and the handler could not tell the two apart: Enter on the
+ * "next month" button was read as "choose the focused day" and then
+ * `preventDefault`ed, so the month never moved. The handler asks where the
+ * press came from now, and so does this. */
 const press = async (cal: Calendar, key: string, shiftKey = false): Promise<void> => {
-  cal.dispatchEvent(
-    new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key, shiftKey }),
+  const grid = (cal as unknown as { renderRoot: ShadowRoot }).renderRoot.querySelector(
+    '[part="grid"]',
+  )
+  if (!grid) {
+    throw new Error('the calendar no longer renders a grid')
+  }
+  grid.dispatchEvent(
+    new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+      shiftKey,
+    }),
   )
   await (cal as unknown as { updateComplete: Promise<unknown> }).updateComplete
 }

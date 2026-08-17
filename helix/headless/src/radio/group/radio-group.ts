@@ -53,10 +53,6 @@ import { HelixBaseRadio } from '../root/radio-root.js'
  */
 @customElement('helix-base-radio-group')
 export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
-  /** Name the group reports under when its form is submitted. */
-  @property()
-  name = ''
-
   /** Which way the choices run. A column reads one line per answer. */
   @property({ reflect: true })
   orientation: 'horizontal' | 'vertical' = 'vertical'

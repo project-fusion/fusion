@@ -41,10 +41,6 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-checkbox')
 export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
-  /** Name submitted with the form. */
-  @property()
-  name = ''
-
   /** Value submitted when the box is checked. */
   @property()
   value = 'on'

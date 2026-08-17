@@ -61,6 +61,15 @@
 :host([gap="sm"]) {
   gap: var(--helix-space-sm);
 }
+/* `md` was the one step with no rule, because it used to be the `:host`
+   default and so had never needed one. Changing that default to `none` turned
+   every `gap="md"` in the codebase into a grid with no gap at all: valid
+   markup, a documented value, matching nothing, falling through to zero. The
+   gallery of fifty-four component cards went flush. Flex has always carried all
+   seven steps, which is what the two being consistent is worth. */
+:host([gap="md"]) {
+  gap: var(--helix-space-md);
+}
 :host([gap="lg"]) {
   gap: var(--helix-space-lg);
 }

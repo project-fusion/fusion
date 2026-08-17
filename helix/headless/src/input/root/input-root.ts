@@ -1,4 +1,10 @@
-import { customElement, HelixFormElement, MixinControllerValue, MixinField } from '@helix-io/core'
+import {
+  customElement,
+  HelixFormElement,
+  MixinControllerValue,
+  MixinField,
+  restoreValue,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -46,10 +52,6 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  */
 @customElement('helix-base-input')
 export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormElement)) {
-  /** Name submitted with the form. */
-  @property()
-  name = ''
-
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   @property()
   placeholder = ''
@@ -90,9 +92,7 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
        refusal, and it is equally a consumer who owns the value and has not
        given a new one yet. Both are "what is on screen is not the answer". */
     this.requestValue(next)
-    if (control.value !== this.value) {
-      control.value = this.value
-    }
+    restoreValue(control, this.value)
   }
 
   /** Relayed, because `change` does not cross a shadow boundary on its own. */

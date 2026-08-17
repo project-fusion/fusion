@@ -22,7 +22,7 @@ export interface PopoverOptions {
    * Defaults to the surface. A host that draws no box of its own points this at
    * itself instead, so a press on its trigger is inside rather than out.
    */
-  boundary?: () => Element | null | undefined
+  boundary?: () => Element | readonly (Element | null | undefined)[] | null | undefined
 
   /** Space between the anchor and the surface, in pixels. */
   offset?: number | (() => number)

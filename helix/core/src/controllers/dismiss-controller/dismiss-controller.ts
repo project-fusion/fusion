@@ -28,7 +28,7 @@ export interface DismissOptions {
    * to a reader. Measured against the host, that press is inside the composed
    * path and the overlay never closes. A drawer points this at its panel.
    */
-  boundary?: () => Element | null | undefined
+  boundary?: () => Element | readonly (Element | null | undefined)[] | null | undefined
 
   /** Called when the reader asks to close. */
   onDismiss: () => void
@@ -55,7 +55,9 @@ export interface DismissOptions {
  */
 export class DismissController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
-  private readonly boundary: (() => Element | null | undefined) | undefined
+  private readonly boundary:
+    | (() => Element | readonly (Element | null | undefined)[] | null | undefined)
+    | undefined
   private readonly onDismiss: () => void
   private active = false
 
@@ -95,8 +97,18 @@ export class DismissController implements ReactiveController {
   private readonly handlePointerDown = (event: PointerEvent): void => {
     // `composedPath` rather than `target`, so a press inside the overlay's own
     // shadow root is still recognized as inside it.
+    /* More than one thing can be inside.
+     *
+     * A control is not always one element: a popover opened by an invoker
+     * somewhere else on the page has that invoker as part of it, and a press on
+     * it is not a press outside. Treating it as outside closed the panel on
+     * `pointerdown` and the invoker's own `--toggle` reopened it on the `click`
+     * that followed, so the panel could never be closed by the button that
+     * opened it. */
     const inside = this.boundary?.() ?? this.host
-    if (!event.composedPath().includes(inside)) {
+    const boundaries = (Array.isArray(inside) ? inside : [inside]).filter(Boolean) as Element[]
+    const path = event.composedPath()
+    if (!boundaries.some((element) => path.includes(element))) {
       this.onDismiss()
     }
   }

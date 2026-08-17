@@ -847,6 +847,22 @@ helix-toggle[disabled]::part(item) {
   z-index: var(--helix-layer-raised);
 }
 
+/* The ring turns inward, because the bar has no room to draw it outside.
+ *
+ * `helix-nav-bar` scrolls horizontally and is exactly one control tall, and its
+ * links fill it exactly, so an outset ring on a focused destination is drawn
+ * outside the scroll container and clipped down to a single stroke along one
+ * edge. Reproduced in Chrome from the shipped CSS.
+ *
+ * The house answer is to invert the offset rather than to add padding, which is
+ * what the five other components that draw a control inside a scroller do:
+ * padding on the bar grows it past its one-control height and moves it in the
+ * header row it sits in, where an inset ring costs nothing but two pixels of
+ * the link's own inset. */
+:where(helix-nav-bar a):focus-visible {
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 /* The clickable-row recipe.
  *
  * `List` deliberately does not become a link. A whole-row target needs the

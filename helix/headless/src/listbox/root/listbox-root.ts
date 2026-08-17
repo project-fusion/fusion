@@ -129,10 +129,6 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
   @property({ reflect: true, type: Boolean })
   multiple = false
 
-  /** Name the list reports under when its form is submitted. */
-  @property()
-  name = ''
-
   /** What is shown when a filter has hidden every option. */
   @property({ attribute: 'empty-text' })
   emptyText = 'No matches'

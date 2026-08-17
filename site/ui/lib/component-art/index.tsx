@@ -46,6 +46,13 @@ const art: Record<string, ReactNode> = {
  * No background, no border and no radius of its own. The media region runs edge
  * to edge inside the card and the card's `overflow: hidden` clips it to the
  * corner, so anything stated here would be a second frame inside the first.
+ *
+ * The shadow filter lives here rather than in each drawing. A `<filter>` has to
+ * be in the same document fragment as the shape referencing it, and every card
+ * gets its own `<svg>`, so a single shared definition is impossible: the honest
+ * choice is one identical `defs` per card, written once here. Its id is the same
+ * in all of them, which is legal because each is scoped to its own SVG, and
+ * `url(#helixArtShadow)` resolves within the one it is written in.
  */
 export function ComponentArt({ slug }: { slug: string }) {
   const body = art[slug]
@@ -54,6 +61,47 @@ export function ComponentArt({ slug }: { slug: string }) {
   }
   return (
     <svg aria-hidden="true" className="componentArt" slot="media" viewBox="0 0 320 200">
+      <defs>
+        <filter
+          className="artShadow"
+          height="200%"
+          id="helixArtShadow"
+          width="200%"
+          x="-50%"
+          y="-50%"
+        >
+          <feDropShadow dx="0" dy="4" stdDeviation="5" />
+        </filter>
+        {/* Offset to the cell centre rather than its corner. On the corner the
+            dots land on 48, 64, 80 — the same coordinates the drawings start
+            and end on — so every panel edge would have a dot sitting half under
+            it. At the centre they fall in the gaps and read as the field the
+            geometry was measured against. */}
+        {/* Radius 1, not 0.75. The card renders at about three quarters of the
+            viewBox, so a 0.75 dot lands near a single device pixel and most of
+            its alpha goes to antialiasing: it measured at the stated strength
+            and read at roughly half of it. A radius of 1 survives the
+            downscale, which is what let the opacity come back down. */}
+        <pattern height="16" id="helixArtGrid" patternUnits="userSpaceOnUse" width="16">
+          <circle className="artGridDot" cx="8" cy="8" r="1" />
+        </pattern>
+        <radialGradient cx="0.5" cy="0.5" id="helixArtFade" r="0.5">
+          <stop offset="0" stopColor="#fff" stopOpacity="1" />
+          <stop offset="0.65" stopColor="#fff" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <mask id="helixArtGridMask">
+          <rect fill="url(#helixArtFade)" height="200" width="320" x="0" y="0" />
+        </mask>
+      </defs>
+      <rect
+        fill="url(#helixArtGrid)"
+        height="200"
+        mask="url(#helixArtGridMask)"
+        width="320"
+        x="0"
+        y="0"
+      />
       {body}
     </svg>
   )

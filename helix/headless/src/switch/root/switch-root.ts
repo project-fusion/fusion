@@ -40,10 +40,6 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-switch')
 export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {
-  /** Name submitted with the form. */
-  @property()
-  name = ''
-
   /** Value submitted when the switch is on. */
   @property()
   value = 'on'

@@ -489,6 +489,7 @@ ring is declared here rather than inherited, because the base layer's
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
 
@@ -597,7 +598,7 @@ grid reads as a continuous run of dates.
 | `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseCalendar` | How many dates can be held at once. |
 | `month` | `month` | `string` | - | `HelixBaseCalendar` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
 | `months` | `months` | `number` | `1` | `HelixBaseCalendar` | How many months to show, side by side. |
-| `name` | `name` | `string` | `''` | `HelixBaseCalendar` | Name the calendar reports under when its form is submitted. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
@@ -831,7 +832,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `name` | `name` | `string` | `''` | `HelixBaseCheckbox` | Name submitted with the form. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onCheckedChange` | - | `((checked: boolean) => void) \| undefined` | `undefined` | `MixinControllerChecked` | The consumer's callback, invoked after the state is applied. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
@@ -1373,6 +1374,7 @@ common way a toolbar becomes unusable without sight.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
 
@@ -1436,7 +1438,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `name` | `name` | `string` | `''` | `HelixBaseInput` | Name submitted with the form. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInput` | Whether the field refuses input while still submitting its value. |
@@ -1620,7 +1622,7 @@ list moves under the reader rather than the reader moving to find it.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseListbox` | Whether more than one option can be the answer. |
-| `name` | `name` | `string` | `''` | `HelixBaseListbox` | Name the list reports under when its form is submitted. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `options` | - | `HelixBaseOption[]` | - | `HelixBaseListbox` | Every option, in the order a reader meets them. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
@@ -2197,7 +2199,7 @@ group keeps its question above the row rather than beside the first choice.
 | `items` | - | `HelixBaseRadio[]` | - | `HelixBaseRadioGroup` | The radios, in light-DOM order. Client only: the server has no tree. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `name` | `name` | `string` | `''` | `HelixBaseRadioGroup` | Name the group reports under when its form is submitted. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'vertical'` | `HelixBaseRadioGroup` | Which way the choices run. A column reads one line per answer. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
@@ -2275,7 +2277,7 @@ from the field it came out of.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseSelect` | Whether more than one option can be the answer. |
-| `name` | `name` | `string` | `''` | `HelixBaseSelect` | Name the control reports under when its form is submitted. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
@@ -2395,7 +2397,7 @@ the thumb being dragged.
 | `markers` | `markers` | `number` | `0` | `HelixBaseSlider` | How many marks to draw along the track, evenly spaced, ends included. |
 | `max` | `max` | `number` | `100` | `HelixBaseSlider` | The largest value the reader can choose. |
 | `min` | `min` | `number` | `0` | `HelixBaseSlider` | The smallest value the reader can choose. |
-| `name` | `name` | `string` | `''` | `HelixBaseSlider` | Name submitted with the form. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
@@ -2579,7 +2581,7 @@ consumer has to keep.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `name` | `name` | `string` | `''` | `HelixBaseSwitch` | Name submitted with the form. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onCheckedChange` | - | `((checked: boolean) => void) \| undefined` | `undefined` | `MixinControllerChecked` | The consumer's callback, invoked after the state is applied. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
@@ -3000,7 +3002,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `name` | `name` | `string` | `''` | `HelixBaseTextarea` | Name submitted with the form. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseTextarea` | Shown while the field is empty. Not a label: it goes when typing starts. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseTextarea` | Whether the field refuses input while still submitting its value. |
@@ -3231,7 +3233,7 @@ corner radius, which is worse than the exception.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `name` | `name` | `string` | `''` | `HelixBaseToggleGroup` | Name the group reports under when its form is submitted. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |

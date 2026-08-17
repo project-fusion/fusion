@@ -99,6 +99,7 @@ export {
   type ActivatableItem,
   resolveActiveItem,
 } from './utils/resolve-active-item/resolve-active-item.js'
+export { restoreValue } from './utils/restore-value/restore-value.js'
 export {
   type ScrollItemOptions,
   scrollItemIntoView,

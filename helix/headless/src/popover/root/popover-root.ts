@@ -77,26 +77,58 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
        a press on the trigger is inside the host and outside the panel, and a
        boundary of the panel alone would close on the very press that opened
        it. */
-    boundary: () => this,
+    /* The host *and* whatever invoked it. An outside press is measured against
+       this, and a `--toggle` button outside the host is part of the control by
+       any reading a reader would give it: pressing it while the panel is open
+       should close it once, not close it on `pointerdown` and reopen it on the
+       `click` that follows. */
+    boundary: (): (HTMLElement | undefined)[] => [this, this.invoker],
     offset: () => this.offset,
     onDismiss: () => this.hide(),
     placement: () => this.placement,
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="popover"]'),
   })
 
+  /**
+   * The invoker that last opened the panel, when a command did.
+   *
+   * The handlers discarded the `source` the controller hands them, which cost
+   * two things at once. The panel was positioned against the host, and the
+   * styled tier makes the host a boxless `display: contents` element, so a
+   * popover opened by a command outside it opened against the window origin.
+   * And the outside-press dismissal had no way to know the invoker was part of
+   * the control: the press fires on `pointerdown`, the command arrives on the
+   * `click` after it, so a `--toggle` button outside the host closed the panel
+   * and immediately reopened it, for ever.
+   */
+  private invoker: HTMLElement | undefined
+
   protected readonly commands = new CommandController(this, {
     commands: {
       '--close': () => this.hide(),
-      '--show': () => this.show(),
-      '--toggle': () => (this.open ? this.hide() : this.show()),
+      '--show': (source: Element | null) => {
+        this.invoker = source instanceof HTMLElement ? source : undefined
+        this.show()
+      },
+      '--toggle': (source: Element | null) => {
+        this.invoker = source instanceof HTMLElement ? source : undefined
+        if (this.open) {
+          this.hide()
+        } else {
+          this.show()
+        }
+      },
     },
   })
 
   /** The element the panel opens against. */
   private get trigger(): HTMLElement {
-    return anchorElement(
-      this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]'),
-      this,
+    /* The invoker first, where there is one: a command names the element the
+       reader actually pressed, and it is a better anchor than a slotted trigger
+       the consumer may not have provided at all. */
+    return (
+      this.invoker ??
+      anchorElement(this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]'), this)
     )
   }
 

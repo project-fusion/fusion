@@ -636,9 +636,22 @@ helix-drawer {
   }
 }
 
-/* perpetual — the two that move at rest, at the component's own timings rather
-   than at illustration pace, because here the motion *is* the component. */
-.artSweep {
+/* perpetual — the two whose motion *is* the component, at the component's own
+ * timings rather than at illustration pace.
+ *
+ * Gated on hover like everything else, which is the opposite of what this
+ * archetype originally said. The argument for running them at rest was that a
+ * spinner which does not spin is not a spinner. True of a spinner on a page,
+ * false of a spinner in a gallery: in a grid of fifty-four still cards, two
+ * that move on their own do not read as alive, they read as the only two that
+ * are broken, and a rotating disc pulls the eye off whatever the reader was
+ * actually looking at. Both are still recognisable frozen. Eight marks around a
+ * ring with a fading trail is a spinner sitting still, and a skeleton without
+ * its sweep is exactly what a skeleton looks like between sweeps.
+ *
+ * Skeleton goes with it rather than being left as the one perpetual card. The
+ * inconsistency is the whole problem; halving it is not fixing it. */
+.familyCard:hover .artSweep {
   animation: helixArtSweep 1.4s ease-in-out infinite;
 }
 
@@ -653,9 +666,12 @@ helix-drawer {
 }
 
 .artSpin {
-  animation: helixArtSpin 3.4s linear infinite;
   transform-box: fill-box;
   transform-origin: center;
+}
+
+.familyCard:hover .artSpin {
+  animation: helixArtSpin 3.4s linear infinite;
 }
 
 @keyframes helixArtSpin {
@@ -668,8 +684,8 @@ helix-drawer {
    answers loses on specificity and does nothing, which is the trap
    `check:motion` exists to catch in the library. */
 @media (prefers-reduced-motion: reduce) {
-  .artSweep,
-  .artSpin,
+  .familyCard:hover .artSweep,
+  .familyCard:hover .artSpin,
   .familyCard:hover .artOpen,
   .familyCard:hover .artEdgeIn,
   .familyCard:hover .artRow,

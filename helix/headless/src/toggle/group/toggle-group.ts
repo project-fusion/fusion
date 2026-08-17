@@ -9,7 +9,6 @@ import {
   MixinField,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
 import { HelixBaseToggle } from '../root/toggle-root.js'
 
 /**
@@ -98,10 +97,6 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
     indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="track"]'),
   })
-
-  /** Name the group reports under when its form is submitted. */
-  @property()
-  name = ''
 
   private observer: ResizeObserver | undefined
 

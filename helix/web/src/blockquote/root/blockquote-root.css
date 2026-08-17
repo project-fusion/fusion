@@ -2,10 +2,17 @@
   display: block;
 }
 
+/* Block, not flex. The default slot is where a consumer writes the words, and a
+   flex container blockifies every one of its items: a single `<em>` in an
+   otherwise plain quote became a full-width flex item on a line of its own, so
+   one sixty-six pixel line came out as a hundred and fifty-five pixel stack of
+   three. A quote is prose and lays out as prose.
+
+   The gap goes with it. It was spacing a column of blocks that a plain quote
+   never has; where a consumer does write blocks, `<p>` margins are what space
+   them, which is what the base layer already sets. */
 [part="blockquote"] {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-md);
+  display: block;
   margin: var(--helix-space-none);
 }
 

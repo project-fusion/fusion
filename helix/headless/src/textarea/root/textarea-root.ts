@@ -1,4 +1,10 @@
-import { customElement, HelixFormElement, MixinControllerValue, MixinField } from '@helix-io/core'
+import {
+  customElement,
+  HelixFormElement,
+  MixinControllerValue,
+  MixinField,
+  restoreValue,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -38,10 +44,6 @@ export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixForm
   @property({ attribute: 'auto-grow', reflect: true, type: Boolean })
   autoGrow = false
 
-  /** Name submitted with the form. */
-  @property()
-  name = ''
-
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   @property()
   placeholder = ''
@@ -80,9 +82,7 @@ export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixForm
        refusal, and it is equally a consumer who owns the value and has not
        given a new one yet. Both are "what is on screen is not the answer". */
     this.requestValue(next)
-    if (control.value !== this.value) {
-      control.value = this.value
-    }
+    restoreValue(control, this.value)
     this.grow()
   }
 
@@ -109,8 +109,40 @@ export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixForm
       return
     }
     control.style.blockSize = 'auto'
-    control.style.blockSize = `${control.scrollHeight}px`
+    /* Zero is not a height, it is the absence of a layout box.
+     *
+     * An element with `display: none` anywhere above it reports `scrollHeight`
+     * as zero, and this wrote that straight back as a fixed `block-size`. The
+     * field then had a real inline height of zero pixels and stayed there:
+     * every later call measured a control pinned to zero and measured zero
+     * again. A textarea inside a tab panel, an accordion, or anything else that
+     * renders shut and opens later came out as a hairline with the text hidden
+     * behind it. `tabs-root` refuses zero for the same reason.
+     *
+     * The reset to `auto` above has already been written by this point, which
+     * is the right state to leave it in: an ungrown auto-grow field is the
+     * browser's own height, not a stale number from the last time it had one. */
+    const next = control.scrollHeight
+    if (next === 0) {
+      return
+    }
+    control.style.blockSize = `${next}px`
   }
+
+  /**
+   * Re-measures when the box changes rather than only when a property does.
+   *
+   * The height was computed on Lit updates alone, and nothing about a container
+   * narrowing, a font swapping, or the field finally gaining a layout box is a
+   * property change here. A field that wrapped to three lines at one width kept
+   * a three-line height at half the width and clipped the rest behind
+   * `overflow: hidden`, with no way for a reader to reach it.
+   *
+   * Observing the control also covers the zero case above from the other side:
+   * a `ResizeObserver` fires when an element gains a box, so a field that was
+   * hidden when it first tried to grow measures itself the moment it is shown.
+   */
+  private resize: ResizeObserver | undefined
 
   /** Puts the caret in the field, the way a label pointing at one would. */
   override focus(options?: FocusOptions): void {
@@ -128,6 +160,21 @@ export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixForm
     // the anchor so a validity bubble points at the text and not at the host.
     this.internals.setValidity(control.validity, control.validationMessage, control)
     this.refreshFeedback()
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.resize?.disconnect()
+    this.resize = undefined
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    const control = this.control
+    if (control) {
+      this.resize = new ResizeObserver(() => this.grow())
+      this.resize.observe(control)
+    }
   }
 
   protected override updated(changed: PropertyValues): void {

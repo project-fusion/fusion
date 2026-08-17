@@ -71,10 +71,6 @@ export class HelixBaseSelect extends MixinControllerOpen(
   @property({ reflect: true, type: Boolean })
   multiple = false
 
-  /** Name the control reports under when its form is submitted. */
-  @property()
-  name = ''
-
   /** Shown on the trigger while nothing is chosen. */
   @property()
   placeholder = 'Choose'

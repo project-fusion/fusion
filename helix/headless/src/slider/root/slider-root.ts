@@ -52,10 +52,6 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
   @property({ type: Number })
   min = 0
 
-  /** Name submitted with the form. */
-  @property()
-  name = ''
-
   /** Whether the chosen value is shown beside the track. */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false

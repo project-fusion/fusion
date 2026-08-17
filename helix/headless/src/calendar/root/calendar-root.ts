@@ -130,17 +130,6 @@ const addMonths = (date: Date, months: number): Date => {
  */
 @customElement('helix-base-calendar')
 export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
-  /**
-   * Name the calendar reports under when its form is submitted.
-   *
-   * Absent means it submits nothing, which is what makes it safe to put one
-   * inside something else. `DatePicker` will hold the name and the calendar in
-   * its panel will stay quiet, the same way `Select` holds the name and the
-   * `Listbox` inside it does not.
-   */
-  @property()
-  name = ''
-
   /** How many dates can be held at once. */
   @property({ reflect: true })
   mode?: 'range' | 'multiple'
@@ -316,6 +305,9 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
    * which is the point of them holding it.
    */
   private show(date: Date): void {
+    if (this.disabled) {
+      return
+    }
     const next = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
     if (next === this.month) {
       return
@@ -354,6 +346,13 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
    * clicking a chosen date takes it out.
    */
   private select(date: Date): void {
+    /* `disabled` meant nothing here beyond dropping the value at submit time:
+       days still took a click, the keyboard still moved through the grid, and
+       nothing said the control was off. Refused at the source rather than at
+       each cell, so every path in is covered by one check. */
+    if (this.disabled) {
+      return
+    }
     if (this.barred(date)) {
       return
     }
@@ -383,7 +382,19 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!KEYS.has(event.key)) {
+    if (!KEYS.has(event.key) || this.disabled) {
+      return
+    }
+    /* Grid keys, from the grid.
+     *
+     * The listener is on the host and the host holds the previous and next
+     * buttons as well, so Enter and Space pressed on one of those were read as
+     * "choose the focused day" and then `preventDefault()`ed: the button's own
+     * activation was cancelled and the month never moved. Every arrow was taken
+     * from them too. */
+    const path = event.composedPath()
+    const grid = this.renderRoot?.querySelector('[part="grid"]')
+    if (!grid || !path.includes(grid)) {
       return
     }
     const from = this.anchor
@@ -428,6 +439,10 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
       this.monthMode = this.monthState !== undefined
     }
     hostAria(this.internals, { label: this.label, role: 'group' })
+    /* Announced as off, not merely inert. Removing it from the accessibility
+       tree would take the dates with it; this says the control exists and
+       cannot be used, which is the same call `HelixFormElement` documents. */
+    this.internals.ariaDisabled = this.disabled ? 'true' : null
     this.internals.ariaInvalid = this.invalid ? 'true' : null
     this.report()
   }

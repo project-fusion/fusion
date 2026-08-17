@@ -72,6 +72,40 @@ export class HelixFormElement extends HelixElement {
     this.formDisabled = disabled
   }
 
+  /**
+   * Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   */
+  @property({
+    /* Empty means absent, which plain reflection cannot say. `name = ''` is the
+       default and Lit reflects it as `name=""`, so every button, switch and
+       calendar in the library shipped an empty name attribute the consumer
+       never wrote, and six SSR specs said so. Returning `null` removes the
+       attribute instead. Same trap `hostAria` exists for: a name of no
+       characters is not the absence of one. */
+    converter: {
+      fromAttribute: (value: string | null): string => value ?? '',
+      toAttribute: (value: string): string | null => (value === '' ? null : value),
+    },
+    reflect: true,
+  })
+  name = ''
+
   /** The form this control belongs to, if any. */
   get form(): HTMLFormElement | null {
     return this.internals.form

@@ -1,134 +1,150 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 
 /**
- * Gallery art for the form controls.
+ * Gallery art for the form controls. The system is documented at the top of
+ * `core.tsx`.
  *
- * The system is documented at the top of `core.tsx`. What separates these
- * thirteen from each other, since they are all small boxes:
+ * What separates these from each other, since they are all small boxes:
  *
  * - **Squares are checkboxes, circles are radios.** Nothing else in the set may
- *   use a small square with a mark punched out of it.
- * - **A tick or a knob is `artSurface`**, the page coming back through a dark
- *   fill, never a lighter grey. That is what makes a mark read as cut out
- *   rather than drawn on.
+ *   use a small square with a mark cut out of it.
+ * - **A tick, a knob or a raised segment is a real surface token**, not a
+ *   lighter grey: `surface-overlay` for a thing sitting on top, `background` for
+ *   the page coming back through. That is what makes them read as cut out.
  * - **Count carries meaning.** One row is Option, rows on selection bands are
  *   Listbox, rows with squares are Checkbox Group.
  *
- * There is no `field` entry. `Field` is a real part of the library but it is
- * not a family in the catalog, so a drawing for it would never be rendered:
- * the registry is keyed by the slugs `getFamilies` returns, and a key nothing
- * looks up is dead art nobody will notice has gone stale.
+ * There is no `field` entry. Field is a real part of the library but not a
+ * family in the catalog, so a drawing for it would never be rendered.
  */
 export const formsArt: Record<string, ReactNode> = {
   /**
-   * The inner corners go flat and the outer ones keep their radius.
-   *
-   * This is the one card whose idea is quieter than it should be. At a true 4
-   * pixel radius the difference is about three device pixels at card size; it
-   * read before only because the radius was drawn two and a half times too
-   * large. The answer is a different idea for this card, not a bigger radius.
+   * Separate controls, one shape: the inner corners go flat and the outer ones
+   * keep their radius. At a true 4 pixel radius that is a quiet idea, and it is
+   * quiet in the component too.
    */
   'button-group': (
     <>
-      <path
-        className="artFg"
-        d="M56 80h68v40H56a4 4 0 0 1-4-4V84a4 4 0 0 1 4-4z"
-        fillOpacity="0.09"
-      />
-      <path className="artFg" d="M124 80h72v40h-72z" fillOpacity="0.09" />
-      <path
-        className="artFg"
-        d="M196 80h68a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4h-68z"
-        fillOpacity="0.09"
-      />
-      {[74, 146, 218].map((x) => (
-        <rect
-          className="artFg"
-          fillOpacity="0.28"
-          height="8"
-          key={x}
-          rx="4"
-          width="28"
-          x={x}
-          y="96"
-        />
-      ))}
+      <g className="artMotion artLift">
+        <g className="artLiftShadow" filter="url(#helixArtShadow)">
+          <rect className="artSurface" height="40" rx="4" width="216" x="52" y="80" />
+        </g>
+        <path className="artSurface" d="M56 80h68v40H56a4 4 0 0 1-4-4V84a4 4 0 0 1 4-4z" />
+        <path className="artSurface" d="M124 80h72v40h-72z" />
+        <path className="artSurface" d="M196 80h68a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4h-68z" />
+        <rect className="artEdge" height="39" rx="4" width="215" x="52.5" y="80.5" />
+        <rect className="artRule" height="40" width="1" x="124" y="80" />
+        <rect className="artRule" height="40" width="1" x="196" y="80" />
+        {[74, 146, 218].map((x) => (
+          <rect
+            className="artInk"
+            fillOpacity="0.55"
+            height="8"
+            key={x}
+            rx="4"
+            width="28"
+            x={x}
+            y="96"
+          />
+        ))}
+      </g>
     </>
   ),
 
   /**
    * Seven columns, starting where the month starts, and one date taken.
    *
-   * Repetition is the subject, so the six shape cap does not apply, but the
-   * cells sit at 6% and there is no header row: at 28 pixels they read as a
-   * month without any furniture. The offset first row is what separates this
-   * from `grid`, which is uniform by definition.
+   * The offset first row is what separates this from `grid`, which is uniform
+   * by definition. Rows arrive in order, because a month reads down.
    */
   calendar: (
     <>
-      {[40, 72, 104, 136].map((y, row) =>
-        [50, 82, 114, 146, 178, 210, 242].map((x, column) =>
-          (row === 0 && column < 3) || (row === 3 && column > 4) ? null : (
-            <rect
-              className="artFg"
-              fillOpacity={row === 1 && column === 3 ? 0.44 : 0.04}
-              height="28"
-              key={`${x}-${y}`}
-              rx="4"
-              width="28"
-              x={x}
-              y={y}
-            />
-          ),
-        ),
-      )}
+      {[40, 72, 104, 136].map((y, row) => (
+        <g className="artMotion artRow" key={y} style={{ '--art-i': row } as CSSProperties}>
+          {[50, 82, 114, 146, 178, 210, 242].map((x, column) => {
+            if ((row === 0 && column < 3) || (row === 3 && column > 4)) {
+              return null
+            }
+            const selected = row === 1 && column === 3
+            return (
+              <rect
+                className={selected ? 'artSolid' : 'artSunken'}
+                height="28"
+                key={x}
+                rx="4"
+                width="28"
+                x={x}
+                y={y}
+              />
+            )
+          })}
+        </g>
+      ))}
     </>
   ),
 
   /**
-   * Ticked, not ticked, and neither, at twenty pixels.
+   * One box and the thing it is an answer to, at twenty pixels.
    *
-   * The tick is drawn at two units thick, not three and a half. The jog at the
-   * elbow is what sets it: an offset of 1.4 on each axis is a perpendicular
-   * distance of two across a 45 degree arm, and the first version's 2.5 came
-   * out at three and a half, which is a seventh of the box it sits in.
+   * Ticked, unticked and mixed once, side by side. That is a state table, and a
+   * state table belongs on the API page: three boxes in a row read as a set of
+   * three checkboxes, which is Checkbox Group. One box with a label beside it is
+   * the component, and the label is what separates the two cards.
    */
   checkbox: (
     <>
-      <rect className="artFg" fillOpacity="0.09" height="20" rx="4" width="20" x="110" y="90" />
-      <rect className="artFg" fillOpacity="0.44" height="20" rx="4" width="20" x="150" y="90" />
-      <path className="artSurface" d="M154 100l3.5 3.5 7-7.5 1.4 1.4-8.4 8.9-4.9-4.9z" />
-      <rect className="artFg" fillOpacity="0.44" height="20" rx="4" width="20" x="190" y="90" />
-      <rect className="artSurface" height="3" rx="1.5" width="10" x="195" y="98.5" />
+      {/* No edge on a filled control. `artEdge` is a `non-scaling-stroke`, so it
+          renders one device pixel wide whatever the card is scaled to, which
+          here is wider than the one unit it is inset by: the stroke spilled past
+          the fill it was tracing and the page showed through between the two.
+          A checked box has no border in the component either. The border
+          belongs to the empty state, and the empty state is not drawn. */}
+      <rect className="artSolid artMotion artOn" height="20" rx="4" width="20" x="94" y="90" />
+      <path
+        className="artOnSolid artMotion artMark"
+        d="M98 100l3.5 3.5 7-7.5 1.4 1.4-8.4 8.9-4.9-4.9z"
+      />
+      <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="96" x="130" y="96" />
     </>
   ),
 
-  /**
-   * Related boxes, reported as one set.
-   *
-   * Checked is alpha rather than a tick: at twenty pixels three ticks were
-   * three specks, and they pushed the card past six shapes for nothing.
-   */
+  /** Related boxes, reported as one set. */
   'checkbox-group': (
-    <g transform="translate(-8 -4)">
+    <>
       {[
-        { box: 0.44, w: 96, y: 62 },
-        { box: 0.09, w: 72, y: 94 },
-        { box: 0.44, w: 84, y: 126 },
+        { on: true, w: 96, y: 62 },
+        { on: false, w: 72, y: 94 },
+        { on: true, w: 84, y: 126 },
       ].map((row) => (
         <g key={row.y}>
+          <rect className="artSunken" height="20" rx="4" width="20" x="104" y={row.y} />
+          {row.on && (
+            <rect
+              className="artSolid artMotion artOn"
+              height="20"
+              rx="4"
+              width="20"
+              x="104"
+              y={row.y}
+            />
+          )}
+          {!row.on && (
+            <rect className="artEdge" height="19" rx="4" width="19" x="104.5" y={row.y + 0.5} />
+          )}
+          {row.on && (
+            <path
+              className="artOnSolid artMotion artMark"
+              d={`M108 ${row.y + 10}l3.5 3.5 7-7.5 1.4 1.4-8.4 8.9-4.9-4.9z`}
+            />
+          )}
+          {/* 0.55, matching Checkbox and Radio. A control's label is a control's
+              label whether there is one of them or three, and these sat at 0.28
+              while the single checkbox next to them sat at 0.55, so the same
+              text read at two weights across two adjacent cards. Nothing about
+              being in a group makes a label secondary. */}
           <rect
-            className="artFg"
-            fillOpacity={row.box}
-            height="20"
-            rx="4"
-            width="20"
-            x="104"
-            y={row.y}
-          />
-          <rect
-            className="artFg"
-            fillOpacity="0.16"
+            className="artInk"
+            fillOpacity="0.55"
             height="8"
             rx="4"
             width={row.w}
@@ -137,87 +153,156 @@ export const formsArt: Record<string, ReactNode> = {
           />
         </g>
       ))}
-    </g>
+    </>
   ),
 
-  /** Square at the control height, and the glyph is all of it. */
+  /**
+   * Square at the control height, and the glyph is all of it.
+   *
+   * The glyph was three stacked bars, which is not a glyph, it is *the* menu
+   * icon: the card read as a hamburger button and the subject became what the
+   * button opens rather than what the button is. Three dots is the one mark in
+   * common use that means "this control's content is an icon, and the icon is
+   * not the point", and nothing else in the gallery uses it.
+   */
   'icon-button': (
     <>
-      <rect className="artFg" fillOpacity="0.44" height="40" rx="4" width="40" x="140" y="80" />
-      {[90, 98.75, 107.5].map((y) => (
-        <rect className="artSurface" height="2.5" key={y} rx="1.25" width="20" x="150" y={y} />
-      ))}
+      <g className="artMotion artLift">
+        <g className="artLiftShadow" filter="url(#helixArtShadow)">
+          <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
+        </g>
+        <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
+        {[150, 160, 170].map((cx) => (
+          <circle className="artOnSolid" cx={cx} cy="100" key={cx} r="2" />
+        ))}
+      </g>
     </>
   ),
 
   /** More than one of them is the answer, and only those carry a band. */
   listbox: (
-    <g transform="translate(0 -7)">
-      <rect className="artFg" fillOpacity="0.09" height="28" rx="4" width="208" x="56" y="44" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="104" x="72" y="54" />
-      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="80" x="72" y="90" />
-      <rect className="artFg" fillOpacity="0.09" height="28" rx="4" width="208" x="56" y="116" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="120" x="72" y="126" />
-      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="88" x="72" y="162" />
-    </g>
+    <>
+      {[
+        { on: true, w: 104, y: 44 },
+        { on: false, w: 80, y: 80 },
+        { on: true, w: 120, y: 116 },
+        { on: false, w: 88, y: 152 },
+      ].map((row, index) => (
+        <g className="artMotion artRow" key={row.y} style={{ '--art-i': index } as CSSProperties}>
+          {row.on && <rect className="artRaised" height="28" rx="4" width="208" x="56" y={row.y} />}
+          <rect
+            className="artInk"
+            fillOpacity={row.on ? 0.55 : 0.28}
+            height="8"
+            rx="4"
+            width={row.w}
+            x="72"
+            y={row.y + 10}
+          />
+        </g>
+      ))}
+    </>
   ),
 
   /** One choice, on its own. The count is the distinction from Listbox. */
   option: (
     <>
-      <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="192" x="64" y="80" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="88" x="80" y="96" />
-      <path className="artFg" d="M224 100l4 4 9-10 1.4 1.4-10.4 11.4-5.4-5.4z" fillOpacity="0.28" />
-    </>
-  ),
-
-  /** One choice, and the one it is an answer to. */
-  radio: (
-    <>
-      <circle className="artFg" cx="136" cy="100" fillOpacity="0.09" r="10" />
-      <circle className="artFg" cx="184" cy="100" fillOpacity="0.44" r="10" />
-      <circle className="artSurface" cx="184" cy="100" r="4" />
+      <rect className="artRaised" height="40" rx="4" width="192" x="64" y="80" />
+      <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="88" x="80" y="96" />
+      <path
+        className="artSolid artMotion artMark"
+        d="M224 100l4 4 9-10 1.4 1.4-10.4 11.4-5.4-5.4z"
+      />
     </>
   ),
 
   /**
-   * A closed list, opened. The indicator is what says it was ever closed.
+   * One choice, and the one it is an answer to.
    *
-   * A chevron rather than a filled caret, and the same one the breadcrumbs use
-   * turned a quarter: the component flips its indicator across the x-axis when
-   * the panel opens, which only makes sense for a mark that is symmetric about
-   * that axis, and it names the chevron as the shape that is.
+   * Laid out to exactly Checkbox's measurements, on purpose: same 20 pixel
+   * control on the same left edge, same label at the same offset. The only
+   * difference in the frame is round against square, which is the only
+   * difference that matters and the one thing a reader has to catch.
+   */
+  radio: (
+    <>
+      <circle className="artSolid artMotion artOn" cx="104" cy="100" r="10" />
+      <circle className="artOnSolid artMotion artMark" cx="104" cy="100" r="4" />
+      <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="96" x="130" y="96" />
+    </>
+  ),
+
+  /**
+   * A closed list, opened. The indicator is what says it was ever closed, and
+   * the panel grows out of the edge it is anchored to rather than its middle.
    */
   select: (
     <>
-      <rect className="artFg" fillOpacity="0.09" height="40" rx="4" width="208" x="56" y="36" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="72" x="72" y="52" />
-      <path className="artFg" d="M236.5 54l5.5 5.5 5.5-5.5-1.5-1.5-4 4-4-4z" fillOpacity="0.16" />
-      <rect className="artFg" fillOpacity="0.04" height="80" rx="8" width="208" x="56" y="88" />
-      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="88" x="76" y="108" />
-      <rect className="artFg" fillOpacity="0.28" height="8" rx="4" width="104" x="76" y="140" />
+      <rect className="artSunken" height="40" rx="4" width="208" x="56" y="36" />
+      <rect className="artEdge" height="39" rx="4" width="207" x="56.5" y="36.5" />
+      <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="72" x="72" y="52" />
+      <path className="artInk" d="M236.5 54l5.5 5.5 5.5-5.5-1.5-1.5-4 4-4-4z" fillOpacity="0.28" />
+      <g className="artMotion artOpen" style={{ transformOrigin: 'center top' } as CSSProperties}>
+        <g filter="url(#helixArtShadow)">
+          <rect className="artOverlay" height="80" rx="4" width="208" x="56" y="88" />
+        </g>
+        <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="88" x="76" y="104" />
+        <rect className="artRaised" height="24" rx="4" width="192" x="64" y="120" />
+        <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="104" x="76" y="128" />
+        <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="72" x="76" y="150" />
+      </g>
     </>
   ),
 
-  /** Width is height times 1.75, exactly, which is what the component computes. */
+  /**
+   * Width is height times 1.75, exactly, which is what the component computes.
+   *
+   * One switch, drawn on, and the hover replays the crossing from off. Off and
+   * on side by side was a state table: two tracks reads as two settings, and
+   * the whole point of a switch is that it is *one* thing in one of two states.
+   * The motion carries the second state, which is what motion is for here.
+   */
   switch: (
     <>
-      <rect className="artFg" fillOpacity="0.09" height="24" rx="12" width="42" x="88" y="88" />
-      <circle className="artSurface" cx="100" cy="100" r="8" />
-      <rect className="artFg" fillOpacity="0.44" height="24" rx="12" width="42" x="190" y="88" />
-      <circle className="artSurface" cx="220" cy="100" r="8" />
+      <rect className="artSolid artMotion artOn" height="24" rx="12" width="42" x="139" y="88" />
+      <g className="artMotion artKnob" style={{ '--art-to': '20px' } as CSSProperties}>
+        <g filter="url(#helixArtShadow)">
+          <circle className="artOverlay" cx="169" cy="100" r="8" />
+        </g>
+      </g>
     </>
   ),
 
-  /** Several lines, and a corner to pull. */
+  /**
+   * Several lines, and a corner to pull.
+   *
+   * The lines arrive in order, which is the one thing that separates this from
+   * a picture of a tall empty field: a textarea is the control that grows a
+   * line at a time. The grip does not move, because the corner is always there.
+   */
   textarea: (
     <>
-      <rect className="artFg" fillOpacity="0.09" height="104" rx="4" width="224" x="48" y="48" />
-      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="160" x="64" y="66" />
-      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="176" x="64" y="84" />
-      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="112" x="64" y="102" />
-      <rect className="artFg" fillOpacity="0.16" height="4" rx="1" width="4" x="256" y="134" />
-      <rect className="artFg" fillOpacity="0.16" height="4" rx="1" width="4" x="250" y="140" />
+      <rect className="artSunken" height="104" rx="4" width="224" x="48" y="48" />
+      <rect className="artEdge" height="103" rx="4" width="223" x="48.5" y="48.5" />
+      {[
+        { w: 160, y: 66 },
+        { w: 176, y: 84 },
+        { w: 112, y: 102 },
+      ].map((line, index) => (
+        <g className="artMotion artRow" key={line.y} style={{ '--art-i': index } as CSSProperties}>
+          <rect
+            className="artInk"
+            fillOpacity="0.28"
+            height="8"
+            rx="4"
+            width={line.w}
+            x="64"
+            y={line.y}
+          />
+        </g>
+      ))}
+      <rect className="artInk" fillOpacity="0.28" height="4" rx="1" width="4" x="256" y="134" />
+      <rect className="artInk" fillOpacity="0.28" height="4" rx="1" width="4" x="250" y="140" />
     </>
   ),
 
@@ -227,11 +312,16 @@ export const formsArt: Record<string, ReactNode> = {
    */
   toggle: (
     <>
-      <rect className="artFg" fillOpacity="0.09" height="40" rx="12" width="192" x="64" y="80" />
-      <rect className="artSurface" height="32" rx="4" width="60" x="68" y="84" />
-      <rect className="artFg" fillOpacity="0.44" height="8" rx="4" width="28" x="84" y="96" />
-      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="28" x="146" y="96" />
-      <rect className="artFg" fillOpacity="0.16" height="8" rx="4" width="28" x="210" y="96" />
+      <rect className="artSunken" height="40" rx="12" width="192" x="64" y="80" />
+      <rect className="artEdge" height="39" rx="11.5" width="191" x="64.5" y="80.5" />
+      <g className="artMotion artTravel" style={{ '--art-to': '64px' } as CSSProperties}>
+        <g filter="url(#helixArtShadow)">
+          <rect className="artOverlay" height="32" rx="4" width="60" x="68" y="84" />
+        </g>
+      </g>
+      <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="28" x="84" y="96" />
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="28" x="146" y="96" />
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="28" x="210" y="96" />
     </>
   ),
 }

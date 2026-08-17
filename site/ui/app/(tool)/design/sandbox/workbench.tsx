@@ -119,6 +119,7 @@ export function SandboxWorkbench({ families }: Props) {
      element moved. See the note there: on a phone the tree was bound to the
      detached wide-viewport copy and every row in it was dead. */
   const [tree, setTree] = useElementRef<HelixTree>()
+  const [filterField, setFilterField] = useElementRef<HelixInput>()
   const [rail, setRail] = useElementRef<HelixDrawer>()
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
@@ -268,6 +269,20 @@ export function SandboxWorkbench({ families }: Props) {
   // Bound through an effect, not an `onhelix-select` prop. React does not
   // attach custom-element listeners when it hydrates, so the prop form leaves
   // both of these dead on a freshly loaded page. See `useHelixEvent`.
+  /* The proposed value, off the event, not `event.target.value` off the host.
+   *
+   * `value` makes this field controlled, and a controlled element reports the
+   * value the consumer holds rather than the one the reader just typed: reading
+   * the host set the filter to what it already was, the element put the text
+   * back, and the field could not be typed into at all. The sandbox's own
+   * examples were unfilterable in the sandbox.
+   *
+   * `useHelixEvent` rather than a prop, for the reason the rules give: an
+   * `onhelix-*` prop is recorded and never bound on a hydrated page. */
+  useHelixEvent(filterField, 'helix-change', (event) => {
+    setFilter(event.detail.value)
+  })
+
   useHelixEvent(files, 'helix-select', (event) => {
     setPane(event.detail.value as Pane)
   })
@@ -610,8 +625,8 @@ export function SandboxWorkbench({ families }: Props) {
       <helix-flex align="center" class="examplesHeader" data-density="sm" gap="2xs">
         <helix-input
           class="examplesFilter"
+          ref={setFilterField}
           aria-label="Filter examples"
-          onInput={(event: Event) => setFilter((event.target as HelixInput).value)}
           placeholder="Filter"
           type="search"
           value={filter}
