@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { startCase } from '@/lib/naming'
 import { getFamilies } from '../../../lib/catalog'
 import { ComponentArt } from '../../../lib/component-art'
 import { findVertical } from '../../verticals'
@@ -72,10 +71,18 @@ export default function Page() {
                   <helix-text as="h3" appearance="title">
                     {family.label}
                   </helix-text>
-                  {family.status && (
-                    <helix-tag tone={family.status === 'stable' ? 'success' : 'warning'}>
-                      {startCase(family.status)}
-                    </helix-tag>
+                  {/* A mark rather than a word. Every component in this list is
+                      experimental, so a tag on each of them is a column of
+                      identical yellow labels that says nothing by being
+                      everywhere, and it competes with the name it sits beside.
+                      The icon carries its own accessible name, so a reader who
+                      cannot see it is told the same thing a pointer user gets
+                      from the tooltip. Same mark and same words as the
+                      sandbox's own tree. */}
+                  {family.status === 'experimental' && (
+                    <helix-tooltip content="Experimental. The API can change." placement="top">
+                      <helix-icon label="Experimental" name="flask"></helix-icon>
+                    </helix-tooltip>
                   )}
                 </helix-flex>
                 <helix-text appearance="caption" tone="muted">
