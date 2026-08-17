@@ -322,6 +322,12 @@
      control asking for its own size reads the scale directly. */
   --helix-size-control: var(--helix-size-control-md);
   --helix-size-control-lg: calc(3rem * var(--_helix-seed-density));
+  /* How wide a button is when it is asked to take a standard width rather than
+     its label's. A real decision rather than a convenience: a row of actions
+     whose widths follow their words has one button per word length, and the eye
+     reads the raggedness as disorder rather than as information. Multiplied by
+     the density seed like every other size, so a compact theme narrows it. */
+  --helix-size-button: calc(12.5rem * var(--_helix-seed-density));
   /* A mark pinned to something else, so it is sized against that rather than
      against a control. */
   --helix-size-badge: calc(1rem * var(--_helix-seed-density));

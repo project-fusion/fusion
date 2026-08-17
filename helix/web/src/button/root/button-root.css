@@ -5,6 +5,22 @@
   display: inline-flex;
 }
 
+/* On the host, because the host is the box a layout sees. Setting it on
+   `[part="button"]` alone would widen the control inside a host that stayed as
+   wide as its label, which is the shape a consumer would report as the button
+   not growing at all. */
+:host([fill="standard"]) {
+  inline-size: var(--button-inline-size, var(--helix-size-button));
+  /* Never wider than the room it has. A standard width is a floor for tidiness,
+     not a promise to overflow a narrow column to keep it. */
+  max-inline-size: 100%;
+}
+
+:host([fill="full"]) {
+  display: flex;
+  inline-size: 100%;
+}
+
 /* `all: unset` first, so the UA's own button styling is gone before the base
    layer's `::part` rules land on it. Without it the UA border and background
    win on properties the recipe does not name. */

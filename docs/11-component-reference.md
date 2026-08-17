@@ -475,6 +475,7 @@ ring is declared here rather than inherited, because the base layer's
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `fill` | `fill` | `'auto' \| 'full' \| 'standard' \| undefined` | - | - | How much of the space available to it the button takes. |
 | `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |

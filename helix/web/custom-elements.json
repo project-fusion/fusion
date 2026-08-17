@@ -3272,6 +3272,16 @@
             },
             {
               "kind": "field",
+              "name": "fill",
+              "type": {
+                "text": "'auto' | 'full' | 'standard' | undefined"
+              },
+              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the two are independent: a `tertiary\nstandard` Cancel beside a `primary standard` Save is exactly the pairing\na dialog wants.",
+              "attribute": "fill",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "type",
               "type": {
                 "text": "'button' | 'submit' | 'reset'"
@@ -3542,6 +3552,14 @@
               },
               "description": "How much visual weight the button carries.\n\n- `primary` is the one action a region is for, and there should be one. Two\n  primary buttons are two things claiming to be the most important, and the\n  reader has to work out which of you meant it.\n- `secondary` is an action that is real but not the point, which is most\n  buttons on most pages. A page whose every button is primary has said\n  nothing about which one matters.\n- `tertiary` is quiet enough to sit in a row of them without the row\n  becoming loud: for actions that are available rather than suggested.\n  Cancel, dismiss, the contents of a toolbar.\n- `danger` says the action is destructive before the confirmation does. The\n  shape of the control is what a reader recognises at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThis is also where emphasis comes from, rather than size: a filled primary\nbutton says \"this one matters\" far louder than eight more pixels would.",
               "fieldName": "appearance"
+            },
+            {
+              "name": "fill",
+              "type": {
+                "text": "'auto' | 'full' | 'standard' | undefined"
+              },
+              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the two are independent: a `tertiary\nstandard` Cancel beside a `primary standard` Save is exactly the pairing\na dialog wants.",
+              "fieldName": "fill"
             },
             {
               "name": "type",

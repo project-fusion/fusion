@@ -125,12 +125,17 @@
   margin: var(--helix-space-none);
 }
 
-/* Actions at the trailing edge, which is where a reader looks for the way out
-   of something modal. */
+/* Actions from the leading edge, where the reading starts.
+ *
+ * They were at the trailing edge on the reasoning that a reader looks there for
+ * the way out. That is true of a title bar's close, which is chrome; these are
+ * the answer to the question the dialog just asked, and an answer belongs under
+ * the question rather than opposite it. It also puts them at a predictable
+ * place at any dialog width, where a trailing row moves as the panel does. */
 ::slotted([slot="footer"]) {
   display: flex;
   gap: var(--helix-space-xs);
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 /* It arrives rather than appearing. A modal that snaps in gives no sense of

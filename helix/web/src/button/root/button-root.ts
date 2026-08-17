@@ -51,6 +51,24 @@ export class HelixButton extends HelixBaseButton {
   @property({ reflect: true })
   appearance?: 'primary' | 'secondary' | 'tertiary' | 'danger'
 
+  /**
+   * How much of the space available to it the button takes.
+   *
+   * - `auto` is the default and is never written: the button is as wide as its
+   *   label, which is what a control in a toolbar or beside a field should be.
+   * - `standard` is one width for every button that takes it, so a column or
+   *   row of actions lines up instead of following the length of each word.
+   * - `full` fills the container, for a single action at the foot of a form or
+   *   a card, and on a phone where a control is a target before it is a label.
+   *
+   * Width and not weight. `appearance` says how much a button matters and this
+   * says how much room it takes, and the two are independent: a `tertiary
+   * standard` Cancel beside a `primary standard` Save is exactly the pairing
+   * a dialog wants.
+   */
+  @property({ reflect: true })
+  fill?: 'auto' | 'full' | 'standard'
+
   static override styles: CSSResultGroup = styles
 }
 

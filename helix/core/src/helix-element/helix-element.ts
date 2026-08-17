@@ -25,16 +25,30 @@ const BOX_SIZING = css`
  *
  * Here rather than in each sheet, for the reason `box-sizing` is here: it is a
  * fact about every component, and fifty-seven copies is fifty-seven chances to
- * forget the fifty-eighth. `:host([hidden])` is one specificity step above a
- * bare `:host`, so it wins wherever it is injected and a component that
- * genuinely needs to override it still can.
+ * forget the fifty-eighth.
+ *
+ * **The selector is (0,3,0) on purpose, and the obvious (0,2,0) is not enough.**
+ * A bare `:host([hidden])` beats a bare `:host`, which is what the first version
+ * of this rule assumed and it was wrong: six components set their `display` from
+ * an attribute selector at the *same* (0,2,0) and win on source order because
+ * they are injected after this. Measured, all five still rendered while hidden:
+ * `flex[inline]` at `inline-flex`, `divider[orientation="vertical"]` at
+ * `inline-block`, and `text[as]`, `checkbox[appearance="card"]` and
+ * `radio[appearance="card"]` at `block`. The `:not()` lifts it a step and it
+ * wins from first position, so the rule can stay prepended.
+ *
+ * **And the `:not()` is load-bearing beyond specificity.** `hidden="until-found"`
+ * is how the platform lets find-in-page reveal collapsed content: the browser
+ * removes the attribute when a match is inside. Hiding it with `display: none`
+ * makes it unfindable, so the one form of `hidden` that is *meant* to be
+ * searchable is the one form this must not touch.
  *
  * `!important` is deliberately not used. A component with a real reason to stay
  * laid out while hidden should be able to say so, and none of them can if this
  * is unanswerable.
  */
 const HIDDEN = css`
-  :host([hidden]) {
+  :host([hidden]:not([hidden='until-found'])) {
     display: none;
   }
 `

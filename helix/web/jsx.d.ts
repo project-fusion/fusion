@@ -727,6 +727,20 @@ export type HelixButtonProps = {
 This is also where emphasis comes from, rather than size: a filled primary
 button says "this one matters" far louder than eight more pixels would. */
   appearance?: HelixButton["appearance"];
+  /** How much of the space available to it the button takes.
+
+- `auto` is the default and is never written: the button is as wide as its
+  label, which is what a control in a toolbar or beside a field should be.
+- `standard` is one width for every button that takes it, so a column or
+  row of actions lines up instead of following the length of each word.
+- `full` fills the container, for a single action at the foot of a form or
+  a card, and on a phone where a control is a target before it is a label.
+
+Width and not weight. `appearance` says how much a button matters and this
+says how much room it takes, and the two are independent: a `tertiary
+standard` Cancel beside a `primary standard` Save is exactly the pairing
+a dialog wants. */
+  fill?: HelixButton["fill"];
   /** What activating the button does to its form. */
   type?: HelixButton["type"];
   /** Accessible name, for a button whose content is not text.
@@ -793,6 +807,20 @@ export type HelixButtonSolidJsProps = {
 This is also where emphasis comes from, rather than size: a filled primary
 button says "this one matters" far louder than eight more pixels would. */
   "prop:appearance"?: HelixButton["appearance"];
+  /** How much of the space available to it the button takes.
+
+- `auto` is the default and is never written: the button is as wide as its
+  label, which is what a control in a toolbar or beside a field should be.
+- `standard` is one width for every button that takes it, so a column or
+  row of actions lines up instead of following the length of each word.
+- `full` fills the container, for a single action at the foot of a form or
+  a card, and on a phone where a control is a target before it is a label.
+
+Width and not weight. `appearance` says how much a button matters and this
+says how much room it takes, and the two are independent: a `tertiary
+standard` Cancel beside a `primary standard` Save is exactly the pairing
+a dialog wants. */
+  "prop:fill"?: HelixButton["fill"];
   /** What activating the button does to its form. */
   "prop:type"?: HelixButton["type"];
   /** Accessible name, for a button whose content is not text.
@@ -5207,6 +5235,19 @@ export type CustomElements = {
    *
    * This is also where emphasis comes from, rather than size: a filled primary
    * button says "this one matters" far louder than eight more pixels would.
+   * - `fill`: How much of the space available to it the button takes.
+   *
+   * - `auto` is the default and is never written: the button is as wide as its
+   *   label, which is what a control in a toolbar or beside a field should be.
+   * - `standard` is one width for every button that takes it, so a column or
+   *   row of actions lines up instead of following the length of each word.
+   * - `full` fills the container, for a single action at the foot of a form or
+   *   a card, and on a phone where a control is a target before it is a label.
+   *
+   * Width and not weight. `appearance` says how much a button matters and this
+   * says how much room it takes, and the two are independent: a `tertiary
+   * standard` Cancel beside a `primary standard` Save is exactly the pairing
+   * a dialog wants.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
@@ -9500,6 +9541,19 @@ export type CustomElementsSolidJs = {
    *
    * This is also where emphasis comes from, rather than size: a filled primary
    * button says "this one matters" far louder than eight more pixels would.
+   * - `fill`: How much of the space available to it the button takes.
+   *
+   * - `auto` is the default and is never written: the button is as wide as its
+   *   label, which is what a control in a toolbar or beside a field should be.
+   * - `standard` is one width for every button that takes it, so a column or
+   *   row of actions lines up instead of following the length of each word.
+   * - `full` fills the container, for a single action at the foot of a form or
+   *   a card, and on a phone where a control is a target before it is a label.
+   *
+   * Width and not weight. `appearance` says how much a button matters and this
+   * says how much room it takes, and the two are independent: a `tertiary
+   * standard` Cancel beside a `primary standard` Save is exactly the pairing
+   * a dialog wants.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
    *
