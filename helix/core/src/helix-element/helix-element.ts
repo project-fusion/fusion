@@ -14,6 +14,32 @@ const BOX_SIZING = css`
 `
 
 /**
+ * Makes `hidden` work, which it does not otherwise.
+ *
+ * The UA stylesheet's `[hidden] { display: none }` is user-agent origin, so any
+ * author declaration beats it, and a component whose `:host` sets a `display`
+ * is doing exactly that. `<helix-grid hidden>` stayed visible; so did
+ * `<helix-empty hidden>`, `<helix-flex hidden>` and fifty-four others. The
+ * audit found three of them and the real count was fifty-seven, because every
+ * component that lays itself out has the same fault and nothing connects them.
+ *
+ * Here rather than in each sheet, for the reason `box-sizing` is here: it is a
+ * fact about every component, and fifty-seven copies is fifty-seven chances to
+ * forget the fifty-eighth. `:host([hidden])` is one specificity step above a
+ * bare `:host`, so it wins wherever it is injected and a component that
+ * genuinely needs to override it still can.
+ *
+ * `!important` is deliberately not used. A component with a real reason to stay
+ * laid out while hidden should be able to say so, and none of them can if this
+ * is unanswerable.
+ */
+const HIDDEN = css`
+  :host([hidden]) {
+    display: none;
+  }
+`
+
+/**
  * @summary Base class every Helix element extends.
  *
  * @description
@@ -86,6 +112,6 @@ export class HelixElement extends LitElement {
   protected static override finalizeStyles(
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
-    return [BOX_SIZING, ...LitElement.finalizeStyles(styles)]
+    return [BOX_SIZING, HIDDEN, ...LitElement.finalizeStyles(styles)]
   }
 }
