@@ -17,6 +17,12 @@
   color: var(--helix-color-foreground);
   display: flex;
   font-size: var(--helix-text-sm);
+  /* A step up from body weight, on the host beside the size for the same
+     reason: a band is chrome rather than prose, it is read in passing, and at
+     regular weight small text across the full width of a page recedes into the
+     surface it sits on. Anything slotted that sets its own weight, which is
+     every control, is unaffected. */
+  font-weight: var(--helix-weight-medium);
   inline-size: 100%;
   padding-block: var(--helix-space-xs);
   padding-inline: var(--announcement-inset, var(--helix-space-lg));

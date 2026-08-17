@@ -48,6 +48,14 @@ slot:not([name])::slotted(*) {
 [part="attribution"] {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
+  /* Room to be a separate thing. The footer is inside the `<blockquote>` and in
+     normal flow, so with no margin it sat on the quote's last line with only
+     the leading between them, and `leading-tight` on a display-sized quote
+     makes that gap smaller than the one inside the quote itself. A line that
+     belongs to a different voice needs more space above it than the quote's own
+     lines have between them, or it reads as a third line of the quote set
+     small. */
+  margin-block-start: var(--helix-space-sm);
 }
 
 /* Nothing said it, so no footer and no gap under the quote. Only a box that is
