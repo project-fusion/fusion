@@ -2858,7 +2858,7 @@ a movement instead of two separate fills.
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focusTab()` | `HelixBaseTabsTab` | Moves focus to this tab. |
+| `focusItem()` | `HelixBaseTabsTab` | Moves focus to this tab, for the list's arrow keys. |
 | `select()` | `HelixBaseTabsTab` | Selects this tab and announces it. |
 
 #### Events

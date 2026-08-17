@@ -2,6 +2,15 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
 /** What a controller needs of an item to move to it and choose it. */
 export interface NavigableItem {
+  /**
+   * Whether the press came from inside this item, for `origin: 'focus'`.
+   *
+   * Every item that uses this is an element, so this is `Node.contains` and
+   * nothing has to implement it. It is declared because the controller depends
+   * on it, and a structural interface that leaves out what it calls is a
+   * `NavigableItem` a component can satisfy and still break.
+   */
+  contains(node: Node | null): boolean
   /** Whether the item can be reached at all. Skipped when it cannot. */
   disabled: boolean
   /** Moves focus to the item. */
@@ -16,6 +25,28 @@ export interface NavigableItem {
 export interface KeyboardNavigationOptions {
   /** The items, in the order a reader moves through them. */
   items: () => NavigableItem[]
+  /**
+   * Where a move starts from.
+   *
+   * `selection` is the radio-group reading and the default: the set has one
+   * answer, focus is always on it, and the two never diverge.
+   *
+   * `focus` is for a set where they can. Tabs is the case: in `manual` mode a
+   * reader arrows without choosing, so after one press focus is no longer on
+   * the selection, and starting from the selection walks from the same place
+   * every time. It is also the only reading that can tell a press on a tab from
+   * a press somewhere else in the component, which matters wherever the host
+   * holds more than the set (a tab panel is a tab stop of its own).
+   */
+  origin?: 'focus' | 'selection'
+  /**
+   * Whether arriving also chooses.
+   *
+   * A function rather than a flag: Tabs takes it from `manual`, which a
+   * consumer can change at any time, and a value read once in the constructor
+   * would be the value the element happened to have when it upgraded.
+   */
+  selects?: () => boolean
   /**
    * Whether the ends join up. Radio groups wrap; a list of commands does not.
    */
@@ -47,20 +78,35 @@ const KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 
  * down to the order of the branches. The second copy is what makes it a
  * controller: one is a component's own business, two is a pattern, and the two
  * had not diverged only because nothing had touched them yet.
+ *
+ * **`Tabs` is the third, and it is what `origin` and `selects` are for.** It had
+ * diverged, which is the case the paragraph above was worried about: it started
+ * from focus rather than from the selection, and it moved without choosing when
+ * `manual` was set. Both are real and neither is a tabs-only idea, so they are
+ * options here rather than a reason to keep a fourth copy. What it does *not*
+ * keep is its own key set: it bound the horizontal pair only, and both axes is
+ * the house position, argued two paragraphs up. A reader on a tab who presses
+ * Down now moves along the row instead of getting nothing.
  */
 export class KeyboardNavigationController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
 
   private readonly items: () => NavigableItem[]
 
+  private readonly origin: 'focus' | 'selection'
+
+  private readonly selects: () => boolean
+
   private readonly wrap: boolean
 
   constructor(
     host: ReactiveControllerHost & HTMLElement,
-    { items, wrap = true }: KeyboardNavigationOptions,
+    { items, origin = 'selection', selects = () => true, wrap = true }: KeyboardNavigationOptions,
   ) {
     this.host = host
     this.items = items
+    this.origin = origin
+    this.selects = selects
     this.wrap = wrap
     host.addController(this)
   }
@@ -74,11 +120,25 @@ export class KeyboardNavigationController implements ReactiveController {
       return
     }
 
-    /* `-1` when nothing is chosen, which the arithmetic below relies on: a
-       forward step from it lands on the first item and a backward step on the
-       last, both of which are where a reader entering an unanswered set expects
-       to arrive. */
-    const current = items.findIndex((item) => item.selected)
+    /* `-1` means two different things and only one of them is a starting point.
+     *
+       Starting from the selection, `-1` is "nothing is chosen", and the
+       arithmetic below relies on it: a forward step lands on the first item and
+       a backward step on the last, both of which are where a reader entering an
+       unanswered set expects to arrive.
+
+       Starting from focus, `-1` is "the press did not come from the set", and
+       there is nothing to move. The listener is on the host, not on the items,
+       and a host can hold more than the set: a tab panel is `tabindex="0"`, so
+       an arrow pressed while reading a panel used to move the tabs out from
+       under the reader. */
+    const current =
+      this.origin === 'focus'
+        ? items.findIndex((item) => item.contains(event.target as Node))
+        : items.findIndex((item) => item.selected)
+    if (this.origin === 'focus' && current === -1) {
+      return
+    }
     const last = items.length - 1
 
     let next = current
@@ -103,7 +163,9 @@ export class KeyboardNavigationController implements ReactiveController {
     event.preventDefault()
     const target = items[next]
     target?.focusItem()
-    target?.select()
+    if (this.selects()) {
+      target?.select()
+    }
   }
 
   hostConnected(): void {

@@ -38,8 +38,8 @@ export class HelixBaseTabsTab extends HelixElement {
   @property({ reflect: true, type: Boolean })
   disabled = false
 
-  /** Moves focus to this tab. */
-  focusTab(): void {
+  /** Moves focus to this tab, for the list's arrow keys. */
+  focusItem(): void {
     this.renderRoot.querySelector<HTMLElement>('[part="tab"]')?.focus()
   }
 

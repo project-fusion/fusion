@@ -25818,6 +25818,17 @@
             },
             {
               "kind": "field",
+              "name": "keys",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new KeyboardNavigationController(this, { items: () => this.tabs, origin: 'focus', selects: () => !this.manual, })",
+              "inheritedFrom": {
+                "name": "HelixBaseTabs",
+                "module": "src/tabs/root/tabs-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "indicator",
               "privacy": "private",
               "readonly": true,
@@ -25929,16 +25940,6 @@
                 }
               },
               "description": "Pushes the current value down to whichever tab and panel own it.",
-              "inheritedFrom": {
-                "name": "HelixBaseTabs",
-                "module": "src/tabs/root/tabs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseTabs",
                 "module": "src/tabs/root/tabs-root.ts"
@@ -26264,15 +26265,15 @@
             },
             {
               "kind": "method",
-              "name": "focusTab",
+              "name": "focusItem",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Moves focus to this tab.",
+              "description": "Moves focus to this tab, for the list's arrow keys.",
               "type": {
-                "text": "focusTab() => void"
+                "text": "focusItem() => void"
               },
               "inheritedFrom": {
                 "name": "HelixBaseTabsTab",

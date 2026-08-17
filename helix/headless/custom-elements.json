@@ -20260,7 +20260,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Selection is coordinated by event, the same shape the accordion and the tree\nuse: a tab dispatches `SelectionChange` and the root pairs it with the panel\nof the same value. Nothing registers with anything, so tabs added later work\nwithout the root being told.\n\nThe tab list is a single tab stop, moved with the arrow keys. Selection\nfollows focus, which is the right default for a small set where showing a\npanel is cheap; a set where it is not should use `manual`.",
+          "description": "Selection is coordinated by event, the same shape the accordion and the tree\nuse: a tab dispatches `SelectionChange` and the root pairs it with the panel\nof the same value. Nothing registers with anything, so tabs added later work\nwithout the root being told.\n\nThe tab list is a single tab stop, moved with the arrow keys through\n`KeyboardNavigationController`, the same one the radio and toggle groups use.\nSelection follows focus, which is the right default for a small set where\nshowing a panel is cheap; a set where it is not should use `manual`.",
           "name": "HelixBaseTabs",
           "cssParts": [
             {
@@ -20287,6 +20287,13 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "keys",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new KeyboardNavigationController(this, { items: () => this.tabs, origin: 'focus', selects: () => !this.manual, })"
+            },
             {
               "kind": "field",
               "name": "indicator",
@@ -20368,12 +20375,6 @@
                 }
               },
               "description": "Pushes the current value down to whichever tab and panel own it."
-            },
-            {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true
             },
             {
               "kind": "method",
@@ -20766,15 +20767,15 @@
             },
             {
               "kind": "method",
-              "name": "focusTab",
+              "name": "focusItem",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Moves focus to this tab.",
+              "description": "Moves focus to this tab, for the list's arrow keys.",
               "type": {
-                "text": "focusTab() => void"
+                "text": "focusItem() => void"
               }
             },
             {

@@ -78,11 +78,21 @@ describe('tabs selection', () => {
 })
 
 describe('tabs keyboard', () => {
-  const press = (host: HTMLElement, key: string) => {
+  /* From a named element, not from "whichever is selected".
+   *
+   * The helper used to find the selected tab and press from there, which made
+   * the manual-mode spec below pass without touching what it is about: in
+   * `manual` focus and selection diverge after the first press, so pressing
+   * from the selection every time re-runs the first press forever. Traversal
+   * being impossible in `manual` was a real bug, and this is the only shape of
+   * helper that can see it. */
+  const pressFrom = (from: HTMLElement, key: string) => {
     const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
-    ;(tabs(host).find((tab) => tab.hasAttribute('selected')) as HTMLElement).dispatchEvent(event)
+    from.dispatchEvent(event)
     return event
   }
+  const press = (host: HTMLElement, key: string) =>
+    pressFrom(tabs(host).find((tab) => tab.hasAttribute('selected')) as HTMLElement, key)
 
   test('arrows move selection and wrap past the ends', async () => {
     const host = (await mount(markup)) as Updatable
@@ -92,6 +102,21 @@ describe('tabs keyboard', () => {
 
     // Three is disabled, so right from two wraps to one rather than stopping.
     press(host, 'ArrowRight')
+    await host.updateComplete
+    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+  })
+
+  test('both axes move the row, not only the one it is laid out on', async () => {
+    /* The tab list bound Left and Right alone until it moved onto
+       `KeyboardNavigationController`, which binds both axes on purpose: a
+       reader who guesses the wrong axis gets nothing, and `appearance` is
+       presentation. Down reads as Right, Up as Left. */
+    const host = (await mount(markup)) as Updatable
+    press(host, 'ArrowDown')
+    await host.updateComplete
+    expect(tabs(host)[1]?.hasAttribute('selected')).toBe(true)
+
+    press(host, 'ArrowUp')
     await host.updateComplete
     expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
   })
@@ -113,6 +138,47 @@ describe('tabs keyboard', () => {
     await host.updateComplete
     // Focus moved; selection did not.
     expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+  })
+
+  test('manual can be traversed, because a move starts from focus', async () => {
+    /* Two presses from where focus actually is. Starting from the selection
+       instead, the second press would compute from tab one again and land on
+       tab two a second time, so the set past the first neighbour is
+       unreachable by keyboard. */
+    const host = (await mount(markup.replace('<helix-tabs ', '<helix-tabs manual '))) as Updatable
+    /* Focus is what moves in `manual`, and selection is what does not, so the
+       assertion has to be on focus. Recorded rather than read back from
+       `activeElement`, which cannot see into a shadow root here. */
+    const reached: string[] = []
+    for (const tab of tabs(host)) {
+      ;(tab as unknown as { focusItem: () => void }).focusItem = () => {
+        reached.push(tab.getAttribute('value') ?? '')
+      }
+    }
+
+    pressFrom(tabs(host)[0] as HTMLElement, 'ArrowRight')
+    await host.updateComplete
+    pressFrom(tabs(host)[1] as HTMLElement, 'ArrowRight')
+    await host.updateComplete
+
+    // Two moves, and the second wrapped past the disabled third.
+    expect(reached).toEqual(['two', 'one'])
+    // And nothing was chosen on the way.
+    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+    expect(tabs(host)[1]?.hasAttribute('selected')).toBe(false)
+  })
+
+  test('an arrow pressed while reading a panel leaves the tabs alone', async () => {
+    /* A panel is its own tab stop and the listener is on the whole component,
+       so a press from inside one used to move the row out from under the
+       reader. `origin: 'focus'` is what makes it identifiable: the press came
+       from no tab, so there is nothing to move. */
+    const host = (await mount(markup)) as Updatable
+    const event = pressFrom(panels(host)[0] as HTMLElement, 'ArrowRight')
+    await host.updateComplete
+
+    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+    expect(event.defaultPrevented).toBe(false)
   })
 
   test('an unrelated key is left to the page', async () => {

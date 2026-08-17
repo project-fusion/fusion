@@ -2,15 +2,13 @@ import {
   customElement,
   HelixElement,
   IndicatorController,
+  KeyboardNavigationController,
   MixinControllerActive,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseTabsPanel } from '../panel/tabs-panel.js'
 import { HelixBaseTabsTab } from '../tab/tabs-tab.js'
-
-/** Keys the tab list handles, per the APG tabs pattern. */
-const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'Home', 'End'])
 
 /**
  * @summary A row of tabs and the panel each one shows.
@@ -21,9 +19,10 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'Home', 'End'])
  * of the same value. Nothing registers with anything, so tabs added later work
  * without the root being told.
  *
- * The tab list is a single tab stop, moved with the arrow keys. Selection
- * follows focus, which is the right default for a small set where showing a
- * panel is cheap; a set where it is not should use `manual`.
+ * The tab list is a single tab stop, moved with the arrow keys through
+ * `KeyboardNavigationController`, the same one the radio and toggle groups use.
+ * Selection follows focus, which is the right default for a small set where
+ * showing a panel is cheap; a set where it is not should use `manual`.
  *
  * @since 0.1.0
  * @status experimental
@@ -42,6 +41,20 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'Home', 'End'])
  */
 @customElement('helix-base-tabs')
 export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
+  /* Arrow keys, Home and End. Same controller as the radio group and the toggle
+     group, which is what the audit asked for once the indicator controller had
+     landed, and this is the traversal that had to grow it: `origin: 'focus'`
+     because `manual` lets focus and selection diverge, and `selects` because
+     `manual` is what decides whether arriving chooses.
+
+     Roughly thirty lines of index arithmetic went, and with them the last copy
+     of a wrap that had to be right in four places. */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () => this.tabs,
+    origin: 'focus',
+    selects: () => !this.manual,
+  })
+
   /* The mark. Same controller as the nav bar, the toggle group and the page nav. */
   private readonly indicator = new IndicatorController(this, {
     active: () => this.tabs.find((tab) => tab.selected),
@@ -120,54 +133,14 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
     }
   }
 
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!KEYS.has(event.key)) {
-      return
-    }
-    const tabs = this.tabs.filter((tab) => !tab.disabled)
-    /* Where the press came from, and it has to be a tab.
-     *
-     * This read the selected tab instead and never asked where the event was,
-     * which is two faults at once. A panel is `tabindex="0"` and this listener
-     * is on the whole component, so an arrow pressed while reading a panel
-     * moved the tabs out from under the reader. And in `manual` mode focus
-     * moves without selecting, so after one press the selected tab is no longer
-     * where the reader is: every further press walked from the selection again
-     * rather than from focus, and the set could not be traversed at all. */
-    const current = tabs.findIndex((tab) => tab.contains(event.target as Node))
-    if (current === -1) {
-      return
-    }
-
-    let next = current
-    if (event.key === 'ArrowRight') {
-      next = (current + 1) % tabs.length
-    } else if (event.key === 'ArrowLeft') {
-      next = (current - 1 + tabs.length) % tabs.length
-    } else if (event.key === 'Home') {
-      next = 0
-    } else {
-      next = tabs.length - 1
-    }
-
-    event.preventDefault()
-    const target = tabs[next]
-    target?.focusTab()
-    if (!this.manual) {
-      target?.select()
-    }
-  }
-
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
-    this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
-    this.removeEventListener('keydown', this.handleKeydown)
     this.observer?.disconnect()
     this.observer = undefined
   }

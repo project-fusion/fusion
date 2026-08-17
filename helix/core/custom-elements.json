@@ -769,7 +769,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Moves through a set of items with the arrow keys, and chooses as it goes.\n\n**Moving and choosing are one act here, not two.** That is the radio group\npattern and it is the difference from a listbox: moving focus without\nchoosing leaves a keyboard reader sitting on an item they have not selected,\nwith nothing on screen saying which of the two is true. A pointer user\nchooses by arriving, so a keyboard user does too.\n\n**Both axes, always.** A vertical set still answers left and right, and a\nhorizontal one still answers up and down. Binding only the axis the items\nhappen to be laid out on means a reader who guesses wrong gets nothing, and\n`orientation` is presentation: the same set of choices reads the same way\nwhichever direction it runs.\n\nDisabled items are skipped rather than stopped at, so a set with a gap in it\nstill moves in one press.\n\nWritten because `Radio.Group` and `Toggle.Group` had this twice, identically,\ndown to the order of the branches. The second copy is what makes it a\ncontroller: one is a component's own business, two is a pattern, and the two\nhad not diverged only because nothing had touched them yet.",
+          "description": "Moves through a set of items with the arrow keys, and chooses as it goes.\n\n**Moving and choosing are one act here, not two.** That is the radio group\npattern and it is the difference from a listbox: moving focus without\nchoosing leaves a keyboard reader sitting on an item they have not selected,\nwith nothing on screen saying which of the two is true. A pointer user\nchooses by arriving, so a keyboard user does too.\n\n**Both axes, always.** A vertical set still answers left and right, and a\nhorizontal one still answers up and down. Binding only the axis the items\nhappen to be laid out on means a reader who guesses wrong gets nothing, and\n`orientation` is presentation: the same set of choices reads the same way\nwhichever direction it runs.\n\nDisabled items are skipped rather than stopped at, so a set with a gap in it\nstill moves in one press.\n\nWritten because `Radio.Group` and `Toggle.Group` had this twice, identically,\ndown to the order of the branches. The second copy is what makes it a\ncontroller: one is a component's own business, two is a pattern, and the two\nhad not diverged only because nothing had touched them yet.\n\n**`Tabs` is the third, and it is what `origin` and `selects` are for.** It had\ndiverged, which is the case the paragraph above was worried about: it started\nfrom focus rather than from the selection, and it moved without choosing when\n`manual` was set. Both are real and neither is a tabs-only idea, so they are\noptions here rather than a reason to keep a fourth copy. What it does *not*\nkeep is its own key set: it bound the horizontal pair only, and both axes is\nthe house position, argued two paragraphs up. A reader on a tab who presses\nDown now moves along the row instead of getting nothing.",
           "name": "KeyboardNavigationController",
           "members": [
             {
@@ -791,6 +791,26 @@
               "privacy": "private",
               "readonly": true,
               "default": "items"
+            },
+            {
+              "kind": "field",
+              "name": "origin",
+              "type": {
+                "text": "'focus' | 'selection'"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "origin"
+            },
+            {
+              "kind": "field",
+              "name": "selects",
+              "type": {
+                "text": "() => boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "selects"
             },
             {
               "kind": "field",

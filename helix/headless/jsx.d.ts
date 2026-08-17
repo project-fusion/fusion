@@ -8985,9 +8985,10 @@ export type CustomElements = {
    * of the same value. Nothing registers with anything, so tabs added later work
    * without the root being told.
    *
-   * The tab list is a single tab stop, moved with the arrow keys. Selection
-   * follows focus, which is the right default for a small set where showing a
-   * panel is cheap; a set where it is not should use `manual`.
+   * The tab list is a single tab stop, moved with the arrow keys through
+   * `KeyboardNavigationController`, the same one the radio and toggle groups use.
+   * Selection follows focus, which is the right default for a small set where
+   * showing a panel is cheap; a set where it is not should use `manual`.
    *
    * ## Attributes & Properties
    *
@@ -9094,7 +9095,7 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `focusTab() => void`: Moves focus to this tab.
+   * - `focusItem() => void`: Moves focus to this tab, for the list's arrow keys.
    * - `select() => void`: Selects this tab and announces it.
    *
    * ## CSS Parts
@@ -13909,9 +13910,10 @@ export type CustomElementsSolidJs = {
    * of the same value. Nothing registers with anything, so tabs added later work
    * without the root being told.
    *
-   * The tab list is a single tab stop, moved with the arrow keys. Selection
-   * follows focus, which is the right default for a small set where showing a
-   * panel is cheap; a set where it is not should use `manual`.
+   * The tab list is a single tab stop, moved with the arrow keys through
+   * `KeyboardNavigationController`, the same one the radio and toggle groups use.
+   * Selection follows focus, which is the right default for a small set where
+   * showing a panel is cheap; a set where it is not should use `manual`.
    *
    * ## Attributes & Properties
    *
@@ -14021,7 +14023,7 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `focusTab() => void`: Moves focus to this tab.
+   * - `focusItem() => void`: Moves focus to this tab, for the list's arrow keys.
    * - `select() => void`: Selects this tab and announces it.
    *
    * ## CSS Parts

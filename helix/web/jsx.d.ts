@@ -9586,7 +9586,7 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `focusTab() => void`: Moves focus to this tab.
+   * - `focusItem() => void`: Moves focus to this tab, for the list's arrow keys.
    * - `select() => void`: Selects this tab and announces it.
    *
    * ## CSS Parts
@@ -14577,7 +14577,7 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `focusTab() => void`: Moves focus to this tab.
+   * - `focusItem() => void`: Moves focus to this tab, for the list's arrow keys.
    * - `select() => void`: Selects this tab and announces it.
    *
    * ## CSS Parts
