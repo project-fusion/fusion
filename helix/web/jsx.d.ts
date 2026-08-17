@@ -447,13 +447,21 @@ export type HelixAnnouncementHelixDismissElementEvent =
   HelixAnnouncementElementEvent<HelixDismissEvent>;
 
 export type HelixAnnouncementProps = {
-  /** What kind of attention the message needs. */
-  severity?: HelixAnnouncement["severity"];
-  /** Whether the reader can close it. */
+  /** Whether it offers a control to take it away. */
   dismissible?: HelixAnnouncement["dismissible"];
-  /** Accessible name for the dismiss control. */
+  /** Accessible name for that control.
+
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
   "dismiss-label"?: HelixAnnouncement["dismissLabel"];
-  /** Accessible name for the dismiss control. */
+  /** Accessible name for that control.
+
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
   dismissLabel?: HelixAnnouncement["dismissLabel"];
 
   /** Fired when the reader asks to close it. */
@@ -461,13 +469,21 @@ export type HelixAnnouncementProps = {
 };
 
 export type HelixAnnouncementSolidJsProps = {
-  /** What kind of attention the message needs. */
-  "prop:severity"?: HelixAnnouncement["severity"];
-  /** Whether the reader can close it. */
+  /** Whether it offers a control to take it away. */
   "prop:dismissible"?: HelixAnnouncement["dismissible"];
-  /** Accessible name for the dismiss control. */
+  /** Accessible name for that control.
+
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
   "attr:dismiss-label"?: HelixAnnouncement["dismissLabel"];
-  /** Accessible name for the dismiss control. */
+  /** Accessible name for that control.
+
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
   "prop:dismissLabel"?: HelixAnnouncement["dismissLabel"];
   /** Fired when the reader asks to close it. */
   "on:helix-dismiss"?: (e: HelixAnnouncementHelixDismissElementEvent) => void;
@@ -3855,27 +3871,21 @@ export type HelixTagHelixDismissElementEvent =
 export type HelixTagProps = {
   /** Which status the tag reports. */
   appearance?: HelixTag["appearance"];
-  /** Whether the tag offers a control to remove itself. */
+  /** Whether it offers a control to take it away. */
   dismissible?: HelixTag["dismissible"];
-  /** Accessible name for the dismiss control.
+  /** Accessible name for that control.
 
-A property rather than text read from the tag, because naming the button
-"Remove Draft" would mean reading `textContent` and the server has no tree
-to read it from.
-
-The attribute is named explicitly. Lit lowercases a property name to get an
-attribute rather than dash-casing it, so this would otherwise be reachable
-only as `removelabel`, which nobody would guess and no linter would catch. */
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
   "dismiss-label"?: HelixTag["dismissLabel"];
-  /** Accessible name for the dismiss control.
+  /** Accessible name for that control.
 
-A property rather than text read from the tag, because naming the button
-"Remove Draft" would mean reading `textContent` and the server has no tree
-to read it from.
-
-The attribute is named explicitly. Lit lowercases a property name to get an
-attribute rather than dash-casing it, so this would otherwise be reachable
-only as `removelabel`, which nobody would guess and no linter would catch. */
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
   dismissLabel?: HelixTag["dismissLabel"];
 
   /** Fired when the reader asks to remove the tag. */
@@ -3885,27 +3895,21 @@ only as `removelabel`, which nobody would guess and no linter would catch. */
 export type HelixTagSolidJsProps = {
   /** Which status the tag reports. */
   "prop:appearance"?: HelixTag["appearance"];
-  /** Whether the tag offers a control to remove itself. */
+  /** Whether it offers a control to take it away. */
   "prop:dismissible"?: HelixTag["dismissible"];
-  /** Accessible name for the dismiss control.
+  /** Accessible name for that control.
 
-A property rather than text read from the tag, because naming the button
-"Remove Draft" would mean reading `textContent` and the server has no tree
-to read it from.
-
-The attribute is named explicitly. Lit lowercases a property name to get an
-attribute rather than dash-casing it, so this would otherwise be reachable
-only as `removelabel`, which nobody would guess and no linter would catch. */
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
   "attr:dismiss-label"?: HelixTag["dismissLabel"];
-  /** Accessible name for the dismiss control.
+  /** Accessible name for that control.
 
-A property rather than text read from the tag, because naming the button
-"Remove Draft" would mean reading `textContent` and the server has no tree
-to read it from.
-
-The attribute is named explicitly. Lit lowercases a property name to get an
-attribute rather than dash-casing it, so this would otherwise be reachable
-only as `removelabel`, which nobody would guess and no linter would catch. */
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
   "prop:dismissLabel"?: HelixTag["dismissLabel"];
   /** Fired when the reader asks to remove the tag. */
   "on:helix-dismiss"?: (e: HelixTagHelixDismissElementEvent) => void;
@@ -4077,12 +4081,22 @@ export type HelixToastItemHelixDismissElementEvent =
   HelixToastItemElementEvent<HelixDismissEvent>;
 
 export type HelixToastItemProps = {
-  /** Accessible name for the dismiss control. */
-  "dismiss-label"?: HelixToastItem["dismissLabel"];
-  /** Accessible name for the dismiss control. */
-  dismissLabel?: HelixToastItem["dismissLabel"];
-  /** Whether the reader can ask for it to go. */
+  /** Whether it offers a control to take it away. */
   dismissible?: HelixToastItem["dismissible"];
+  /** Accessible name for that control.
+
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
+  "dismiss-label"?: HelixToastItem["dismissLabel"];
+  /** Accessible name for that control.
+
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
+  dismissLabel?: HelixToastItem["dismissLabel"];
   /** How long it stays, in milliseconds. Absent means until it is dismissed.
 
 Read once when the item is first rendered. Changing it afterwards does not
@@ -4115,12 +4129,22 @@ attribute nobody can use. */
 };
 
 export type HelixToastItemSolidJsProps = {
-  /** Accessible name for the dismiss control. */
-  "attr:dismiss-label"?: HelixToastItem["dismissLabel"];
-  /** Accessible name for the dismiss control. */
-  "prop:dismissLabel"?: HelixToastItem["dismissLabel"];
-  /** Whether the reader can ask for it to go. */
+  /** Whether it offers a control to take it away. */
   "prop:dismissible"?: HelixToastItem["dismissible"];
+  /** Accessible name for that control.
+
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
+  "attr:dismiss-label"?: HelixToastItem["dismissLabel"];
+  /** Accessible name for that control.
+
+`attribute` is spelled out because Lit lowercases a property name to
+derive one rather than dash-casing it, so this would otherwise be
+reachable only as `dismisslabel`, which nobody would guess and no linter
+would catch. */
+  "prop:dismissLabel"?: HelixToastItem["dismissLabel"];
   /** How long it stays, in milliseconds. Absent means until it is dismissed.
 
 Read once when the item is first rendered. Changing it afterwards does not
@@ -4841,9 +4865,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `severity`: What kind of attention the message needs.
-   * - `dismissible`: Whether the reader can close it.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `dismissible`: Whether it offers a control to take it away.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
+   *
+   * `attribute` is spelled out because Lit lowercases a property name to
+   * derive one rather than dash-casing it, so this would otherwise be
+   * reachable only as `dismisslabel`, which nobody would guess and no linter
+   * would catch.
    *
    * ## Events
    *
@@ -4858,6 +4886,12 @@ export type CustomElements = {
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a link or a button.
    * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
    *
    * ## CSS Custom Properties
    *
@@ -8181,16 +8215,13 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: Which status the tag reports.
-   * - `dismissible`: Whether the tag offers a control to remove itself.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `dismissible`: Whether it offers a control to take it away.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
-   * A property rather than text read from the tag, because naming the button
-   * "Remove Draft" would mean reading `textContent` and the server has no tree
-   * to read it from.
-   *
-   * The attribute is named explicitly. Lit lowercases a property name to get an
-   * attribute rather than dash-casing it, so this would otherwise be reachable
-   * only as `removelabel`, which nobody would guess and no linter would catch.
+   * `attribute` is spelled out because Lit lowercases a property name to
+   * derive one rather than dash-casing it, so this would otherwise be
+   * reachable only as `dismisslabel`, which nobody would guess and no linter
+   * would catch.
    *
    * ## Events
    *
@@ -8203,6 +8234,12 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The tag's label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
    *
    * ## CSS Custom Properties
    *
@@ -8377,8 +8414,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
-   * - `dismissible`: Whether the reader can ask for it to go.
+   * - `dismissible`: Whether it offers a control to take it away.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
+   *
+   * `attribute` is spelled out because Lit lowercases a property name to
+   * derive one rather than dash-casing it, so this would otherwise be
+   * reachable only as `dismisslabel`, which nobody would guess and no linter
+   * would catch.
    * - `duration`: How long it stays, in milliseconds. Absent means until it is dismissed.
    *
    * Read once when the item is first rendered. Changing it afterwards does not
@@ -8422,12 +8464,7 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `dismiss() => boolean`: Asks to be taken away, and reports whether the request stood.
-   *
-   * Announced before anything happens, so `preventDefault()` is a refusal and
-   * the message stays. The event still carries the label, because a consumer
-   * removing this from their own state has to know which one went, and that is
-   * true whether or not the item hid itself first.
+   * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
    * - `pause() => void`: Stops the clock, leaving whatever is left of it.
    * - `resume() => void`: Starts it again from where it stopped.
    *
@@ -9118,9 +9155,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `severity`: What kind of attention the message needs.
-   * - `dismissible`: Whether the reader can close it.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `dismissible`: Whether it offers a control to take it away.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
+   *
+   * `attribute` is spelled out because Lit lowercases a property name to
+   * derive one rather than dash-casing it, so this would otherwise be
+   * reachable only as `dismisslabel`, which nobody would guess and no linter
+   * would catch.
    *
    * ## Events
    *
@@ -9135,6 +9176,12 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a link or a button.
    * - `icon`: Replaces the glyph inside the dismiss control.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
    *
    * ## CSS Custom Properties
    *
@@ -12629,16 +12676,13 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: Which status the tag reports.
-   * - `dismissible`: Whether the tag offers a control to remove itself.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `dismissible`: Whether it offers a control to take it away.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
-   * A property rather than text read from the tag, because naming the button
-   * "Remove Draft" would mean reading `textContent` and the server has no tree
-   * to read it from.
-   *
-   * The attribute is named explicitly. Lit lowercases a property name to get an
-   * attribute rather than dash-casing it, so this would otherwise be reachable
-   * only as `removelabel`, which nobody would guess and no linter would catch.
+   * `attribute` is spelled out because Lit lowercases a property name to
+   * derive one rather than dash-casing it, so this would otherwise be
+   * reachable only as `dismisslabel`, which nobody would guess and no linter
+   * would catch.
    *
    * ## Events
    *
@@ -12651,6 +12695,12 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The tag's label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
    *
    * ## CSS Custom Properties
    *
@@ -12832,8 +12882,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
-   * - `dismissible`: Whether the reader can ask for it to go.
+   * - `dismissible`: Whether it offers a control to take it away.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
+   *
+   * `attribute` is spelled out because Lit lowercases a property name to
+   * derive one rather than dash-casing it, so this would otherwise be
+   * reachable only as `dismisslabel`, which nobody would guess and no linter
+   * would catch.
    * - `duration`: How long it stays, in milliseconds. Absent means until it is dismissed.
    *
    * Read once when the item is first rendered. Changing it afterwards does not
@@ -12877,12 +12932,7 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `dismiss() => boolean`: Asks to be taken away, and reports whether the request stood.
-   *
-   * Announced before anything happens, so `preventDefault()` is a refusal and
-   * the message stays. The event still carries the label, because a consumer
-   * removing this from their own state has to know which one went, and that is
-   * true whether or not the item hid itself first.
+   * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
    * - `pause() => void`: Stops the clock, leaving whatever is left of it.
    * - `resume() => void`: Starts it again from where it stopped.
    *

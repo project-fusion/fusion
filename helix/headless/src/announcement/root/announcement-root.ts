@@ -1,7 +1,6 @@
-import { customElement, HelixDismissEvent, HelixElement, hostAria } from '@helix-io/core'
+import { customElement, HelixElement, hostAria, MixinDismissible } from '@helix-io/core'
 import { x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
@@ -43,23 +42,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to close it.
  */
 @customElement('helix-base-announcement')
-export class HelixBaseAnnouncement extends HelixElement {
-  /** What kind of attention the message needs. */
-  @property({ reflect: true })
-  severity?: 'info' | 'success' | 'warning' | 'danger'
-
-  /** Whether the reader can close it. */
-  @property({ reflect: true, type: Boolean })
-  dismissible = false
-
-  /** Accessible name for the dismiss control. */
-  @property({ attribute: 'dismiss-label' })
-  dismissLabel = 'Dismiss'
-
-  private readonly handleDismiss = (): void => {
-    this.dispatchEvent(new HelixDismissEvent({ label: this.textContent?.trim() ?? '' }))
-  }
-
+export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, and always polite. See the note above on `role="alert"`.
@@ -91,7 +74,7 @@ export class HelixBaseAnnouncement extends HelixElement {
               part="dismiss"
               type="button"
               aria-label=${this.dismissLabel}
-              @click=${this.handleDismiss}
+              @click=${() => this.dismiss()}
             >
               <slot name="icon">
                 <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">

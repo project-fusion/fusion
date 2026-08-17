@@ -1871,6 +1871,22 @@
         },
         {
           "kind": "js",
+          "name": "DismissibleElement",
+          "declaration": {
+            "name": "DismissibleElement",
+            "module": "./mixins/mixin-dismissible/mixin-dismissible.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinDismissible",
+          "declaration": {
+            "name": "MixinDismissible",
+            "module": "./mixins/mixin-dismissible/mixin-dismissible.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "MixinField",
           "declaration": {
             "name": "MixinField",
@@ -2929,6 +2945,152 @@
           "declaration": {
             "name": "MixinControllerValue",
             "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/mixins/mixin-dismissible/mixin-dismissible.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The API a dismissible surface has, as TypeScript sees it.",
+          "name": "DismissibleElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether it offers a control to take it away."
+            },
+            {
+              "kind": "field",
+              "name": "dismissLabel",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name for that control."
+            },
+            {
+              "kind": "method",
+              "name": "dismiss",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Announces that it should go, and reports whether the request stood."
+            },
+            {
+              "kind": "method",
+              "name": "dismissEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "HelixDismissEvent"
+                }
+              },
+              "description": "The event, built but not dispatched, for a caller that owns the timing."
+            }
+          ],
+          "helix": {}
+        },
+        {
+          "kind": "mixin",
+          "description": "Grafts `dismissible`, its label, and the event that says so.\n\nThree surfaces had written this: `Announcement`, `Tag` and `Toast.Item`, each\nwith the same two properties, the same event, and the same expression for the\nlabel. They had not diverged, which is the argument for extracting rather than\nagainst it, because the fourth would have.\n\n**The label reads the default slot, not the whole element**, and that is a bug\nfix rather than a move. Every copy said `this.textContent`, which is every\nlight-DOM descendant including the ones assigned elsewhere. On `Announcement`\nand `Tag` that is the same thing, because they have one slot. On `Toast.Item`\nit swept in the actions: a message reading \"Could not reach the server\" with a\n`Retry` button announced itself as \"Could not reach the server Retry\", and the\nconsumer removing it from their list got that string to match on.\n\n**`dismissEvent()` is separate from `dismiss()` for the one that needs it.**\n`Announcement` and `Tag` dispatch and are done: they own no state, so a\nrefusal is the whole of the consumer's answer. `Toast.Item` holds an `open`\nit may or may not own, so its event has to go through the controlled-change\npath with an `apply` beside it. Giving it the event rather than the method\nlets it keep the contract and skip the default.",
+          "name": "MixinDismissible",
+          "members": [
+            {
+              "kind": "field",
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it offers a control to take it away.",
+              "attribute": "dismissible",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "dismissLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for that control.\n\n`attribute` is spelled out because Lit lowercases a property name to\nderive one rather than dash-casing it, so this would otherwise be\nreachable only as `dismisslabel`, which nobody would guess and no linter\nwould catch.",
+              "attribute": "dismiss-label"
+            },
+            {
+              "kind": "method",
+              "name": "dismissEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "HelixDismissEvent"
+                }
+              },
+              "description": "The event, built and not dispatched.\n\nReading text is safe here: nothing calls this on a server, because the\nonly things that do are a press and a timer."
+            },
+            {
+              "kind": "method",
+              "name": "dismiss",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Announces that it should go, and reports whether the request stood."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it offers a control to take it away.",
+              "fieldName": "dismissible"
+            },
+            {
+              "name": "dismiss-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for that control.\n\n`attribute` is spelled out because Lit lowercases a property name to\nderive one rather than dash-casing it, so this would otherwise be\nreachable only as `dismisslabel`, which nobody would guess and no linter\nwould catch.",
+              "fieldName": "dismissLabel"
+            }
+          ],
+          "parameters": [
+            {
+              "name": "Base",
+              "type": {
+                "text": "T"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DismissibleElement",
+          "declaration": {
+            "name": "DismissibleElement",
+            "module": "src/mixins/mixin-dismissible/mixin-dismissible.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinDismissible",
+          "declaration": {
+            "name": "MixinDismissible",
+            "module": "src/mixins/mixin-dismissible/mixin-dismissible.ts"
           }
         }
       ]

@@ -72,6 +72,10 @@ export {
   MixinControllerValue,
   type MixinControllerValueInterface,
 } from './mixins/mixin-controller-value/mixin-controller-value.js'
+export {
+  type DismissibleElement,
+  MixinDismissible,
+} from './mixins/mixin-dismissible/mixin-dismissible.js'
 export { MixinField, type MixinFieldInterface } from './mixins/mixin-field/mixin-field.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'

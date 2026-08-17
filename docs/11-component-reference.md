@@ -125,9 +125,14 @@ band across the top of the page, not a box that happens to be wide.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `dismissible` | `dismissible` | `boolean` | `false` | `HelixBaseAnnouncement` | Whether the reader can close it. |
-| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixBaseAnnouncement` | Accessible name for the dismiss control. |
-| `severity` | `severity` | `'info' \| 'success' \| 'warning' \| 'danger' \| undefined` | - | `HelixBaseAnnouncement` | What kind of attention the message needs. |
+| `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
+| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `dismiss()` | `MixinDismissible` | Announces that it should go, and reports whether the request stood. |
 
 #### Events
 
@@ -2820,8 +2825,14 @@ the status colors gets the tints with them.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'neutral' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| undefined` | - | - | Which status the tag reports. |
-| `dismissible` | `dismissible` | `boolean` | `false` | `HelixBaseTag` | Whether the tag offers a control to remove itself. |
-| `dismissLabel` | `dismiss-label` | `string` | `'Remove'` | `HelixBaseTag` | Accessible name for the dismiss control. |
+| `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
+| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `dismiss()` | `MixinDismissible` | Announces that it should go, and reports whether the request stood. |
 
 #### Events
 
@@ -3046,8 +3057,8 @@ costs contrast for something the mark already says.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `dismissible` | `dismissible` | `boolean` | `false` | `HelixBaseToastItem` | Whether the reader can ask for it to go. |
-| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixBaseToastItem` | Accessible name for the dismiss control. |
+| `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
+| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
 | `duration` | `duration` | `number \| undefined` | - | `HelixBaseToastItem` | How long it stays, in milliseconds. Absent means until it is dismissed. |
 | `open` | `open` | `boolean` | - | `HelixBaseToastItem` | Whether the message is still showing. |
 | `severity` | `severity` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseToastItem` | What kind of message it is, which picks the mark and its name. |
@@ -3056,7 +3067,7 @@ costs contrast for something the mark already says.
 
 | Method | From | Description |
 | --- | --- | --- |
-| `dismiss()` | `HelixBaseToastItem` | Asks to be taken away, and reports whether the request stood. |
+| `dismiss()` | `MixinDismissible` | Announces that it should go, and reports whether the request stood. |
 | `pause()` | `HelixBaseToastItem` | Stops the clock, leaving whatever is left of it. |
 | `resume()` | `HelixBaseToastItem` | Starts it again from where it stopped. |
 

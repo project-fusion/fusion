@@ -1,7 +1,6 @@
-import { customElement, HelixDismissEvent, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, MixinDismissible } from '@helix-io/core'
 import { x } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
@@ -29,29 +28,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  */
 @customElement('helix-base-tag')
-export class HelixBaseTag extends HelixElement {
-  /** Whether the tag offers a control to remove itself. */
-  @property({ reflect: true, type: Boolean })
-  dismissible = false
-
-  /**
-   * Accessible name for the dismiss control.
-   *
-   * A property rather than text read from the tag, because naming the button
-   * "Remove Draft" would mean reading `textContent` and the server has no tree
-   * to read it from.
-   *
-   * The attribute is named explicitly. Lit lowercases a property name to get an
-   * attribute rather than dash-casing it, so this would otherwise be reachable
-   * only as `removelabel`, which nobody would guess and no linter would catch.
-   */
-  @property({ attribute: 'dismiss-label' })
-  dismissLabel = 'Remove'
-
-  private readonly handleDismiss = (): void => {
-    // Reading text is safe here: a click only ever happens in a browser.
-    this.dispatchEvent(new HelixDismissEvent({ label: this.textContent?.trim() ?? '' }))
-  }
+export class HelixBaseTag extends MixinDismissible(HelixElement) {
+  /* "Remove" rather than the mixin's "Dismiss". A tag is taken out of a set,
+     which is a different act from closing a message, and the control's name is
+     what a screen-reader user hears. */
+  override dismissLabel = 'Remove'
 
   protected override render(): TemplateResult {
     return html`<slot></slot>
@@ -61,7 +42,7 @@ export class HelixBaseTag extends HelixElement {
             part="dismiss"
             type="button"
             aria-label=${this.dismissLabel}
-            @click=${this.handleDismiss}
+            @click=${() => this.dismiss()}
           >
             <svg fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">
               ${unsafeSVG(x.content)}

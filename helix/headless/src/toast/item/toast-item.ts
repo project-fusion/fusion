@@ -1,7 +1,7 @@
 import {
   customElement,
-  HelixDismissEvent,
   HelixElement,
+  MixinDismissible,
   requestControlledChange,
   severityMark,
 } from '@helix-io/core'
@@ -72,15 +72,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer.
  */
 @customElement('helix-base-toast-item')
-export class HelixBaseToastItem extends HelixElement {
-  /** Accessible name for the dismiss control. */
-  @property({ attribute: 'dismiss-label' })
-  dismissLabel = 'Dismiss'
-
-  /** Whether the reader can ask for it to go. */
-  @property({ reflect: true, type: Boolean })
-  dismissible = false
-
+export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
   /**
    * How long it stays, in milliseconds. Absent means until it is dismissed.
    *
@@ -151,7 +143,7 @@ export class HelixBaseToastItem extends HelixElement {
    * removing this from their own state has to know which one went, and that is
    * true whether or not the item hid itself first.
    */
-  dismiss(): boolean {
+  override dismiss(): boolean {
     if (!this.open) {
       return true
     }
@@ -170,7 +162,7 @@ export class HelixBaseToastItem extends HelixElement {
         this.requestUpdate('open', previous)
       },
       controlled: this.openIsControlled,
-      event: () => new HelixDismissEvent({ label: this.textContent?.trim() ?? '' }),
+      event: () => this.dismissEvent(),
       host: this,
       label: 'open',
       next: false,
