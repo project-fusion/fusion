@@ -1,5 +1,5 @@
 :host {
-  --_avatar-size: var(--avatar-size, var(--helix-size-control-md));
+  --_avatar-size: var(--avatar-size, var(--helix-size-avatar));
 
   align-items: center;
   /* Grey, not a brand tint. An avatar with no picture is a placeholder for a
@@ -19,11 +19,11 @@
 }
 
 :host([size="sm"]) {
-  --_avatar-size: var(--avatar-size, var(--helix-size-control-sm));
+  --_avatar-size: var(--avatar-size, var(--helix-size-avatar-sm));
 }
 
 :host([size="lg"]) {
-  --_avatar-size: var(--avatar-size, var(--helix-size-control-lg));
+  --_avatar-size: var(--avatar-size, var(--helix-size-avatar-lg));
 }
 
 :host([shape="square"]) {

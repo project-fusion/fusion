@@ -65,7 +65,15 @@
 /* The current page reads as where you are, not as somewhere you can go. It is
    text with no element to select, so this is on the host: color and weight
    inherit into it, where a selector has nothing to match. */
+/* A trail is scanned rather than read, so it carries a step more weight than
+   body copy throughout, and the current step a step above that. At `regular`
+   against `foreground-muted` the whole row sat back far enough that the current
+   crumb was doing all the work of saying there was a trail there. */
+:host {
+  font-weight: var(--helix-weight-medium);
+}
+
 :host([current]) {
   color: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-medium);
+  font-weight: var(--helix-weight-semibold);
 }
