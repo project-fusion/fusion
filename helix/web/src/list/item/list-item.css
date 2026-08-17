@@ -30,31 +30,63 @@ slot[name="start"]::slotted(*) {
   grid-row: 1 / span 2;
 }
 
-/* The inherited half on the slot, the rest on what was slotted.
+/* The two text slots are the grid items, which is the only placement a bare
+ * text label can have.
  *
- * `::slotted()` matches elements and nothing else, so a value written as bare
- * text between the tags got none of this. Inherited properties set on a slot
- * reach its assigned nodes through the flattened tree, text nodes included;
- * anything that is not inherited has to stay on the element, because a text
- * node has no box to put it on. The blockquote had the same fault and it is
- * the same fix. */
+ * **`display: block` on the slot, and the placement on the slot rather than on
+ * `::slotted(*)`.** A `<slot>` is `display: contents` in the UA sheet, so it
+ * generates no box and whatever is assigned to it becomes the grid item
+ * directly. That is fine for an element and impossible for text: a bare run
+ * between the tags becomes an *anonymous* grid item, and no selector can reach
+ * an anonymous box, so `grid-column: 2` never applied to it and it auto-placed.
+ *
+ * Measured, `<helix-list-item>Bare text<span slot="supporting">Caption</span>`
+ * with nothing in `start`: the label landed in column 1 at x=32 and the
+ * supporting text, explicitly placed in column 2, sat beside it at x=102 on the
+ * same line rather than under it. The identical row with the label wrapped in a
+ * `<span>` stacked correctly at x=44 and x=44. It looked right in every example
+ * only because every example has a leading icon, which fills column 1 and makes
+ * auto-placement land on the right cell by accident.
+ *
+ * The two heights disagreed as well, 65px bare against 63px wrapped, since one
+ * was a text run in an anonymous box and the other an element.
+ *
+ * This is not something to solve in the consumer's markup. `@slot - The label`
+ * takes content, and the rule below this one exists *because* that content is
+ * usually bare text: it puts the inherited half of the typography on the slot
+ * so a text node picks it up through the flattened tree. A component whose two
+ * label rules disagree about whether text is allowed is the fault, not the
+ * markup that trips over it.
+ *
+ * The bare-slot rule in the area notes says a region with no behavior is a bare
+ * `<slot>` and never a wrapped one, because an empty wrapper paints an inset
+ * band. That is about a *wrapper element* the component renders. This adds no
+ * element: the slot is the box, and an unfilled one is a zero-height cell in a
+ * row whose height comes from its siblings. */
 slot:not([name]) {
   color: var(--helix-color-foreground);
+  display: block;
   font-size: var(--helix-text-sm);
   /* Set by the list at `kind="description"`, where the label is a term rather
      than a line of text, and inherited through the flat tree so the row needs
      to know nothing about which kind it is in. */
   font-weight: var(--list-item-term-weight, var(--helix-weight-regular));
+  grid-column: 2;
+  grid-row: 1;
 }
 
-slot:not([name])::slotted(*) {
-  grid-column: 2;
-  margin: var(--helix-space-none);
-}
-slot[name="supporting"]::slotted(*) {
+slot[name="supporting"] {
   color: var(--helix-color-foreground-muted);
+  display: block;
   font-size: var(--helix-text-xs);
   grid-column: 2;
+  grid-row: 2;
+}
+
+/* Margins only. Placement is the slot's now, and a slotted `<p>` still arrives
+   with the base layer's block margins on it. */
+slot:not([name])::slotted(*),
+slot[name="supporting"]::slotted(*) {
   margin: var(--helix-space-none);
 }
 

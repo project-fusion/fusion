@@ -472,12 +472,23 @@
   --helix-size-focus-ring: var(--helix-border-thick);
   --helix-size-focus-offset: 2px;
 
-  /* ======================================================== layer ======= */
+  /* ======================================================== layer =======
+     Positions in a stack, not components. Every rung answers "how far above the
+     page does this sit", which is a question a consumer's own element asks as
+     readily as one of ours.
+
+     `--helix-layer-popover` was here at 1100 and is gone. It was the last
+     component-named rung, and it had no reader at all: every floating surface
+     is in the top layer now, where `z-index` does not apply and the stack is
+     ordered by which one opened last. So the token could only ever have been
+     read by a consumer trying to sit *between* two of ours, and the number it
+     offered them was wrong the moment `popover` stopped using it. A dead rung
+     named after a component is worse than an absent one: it reads as a
+     guarantee about where that component sits. */
   --helix-layer-base: 0;
   --helix-layer-raised: 10;
   --helix-layer-sticky: 100;
   --helix-layer-overlay: 1000;
-  --helix-layer-popover: 1100;
   --helix-layer-toast: 1200;
 }
 
