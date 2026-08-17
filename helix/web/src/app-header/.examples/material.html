@@ -1,10 +1,46 @@
-<helix-app-header appearance="material">
-  <span slot="start">Logo</span>
-  <helix-nav-bar label="Sections">
-    <a aria-current="page" href="#one">Item One</a>
-    <a href="#two">Item Two</a>
-  </helix-nav-bar>
-  <helix-icon-button label="Settings" slot="end">
-    <helix-icon name="gear"></helix-icon>
-  </helix-icon-button>
-</helix-app-header>
+<link rel="stylesheet" href="material.css">
+
+<div class="page">
+  <helix-app-header appearance="material" sticky>
+    <span slot="start">Logo</span>
+    <helix-nav-bar label="Sections">
+      <a aria-current="page" href="#one">Item One</a>
+      <a href="#two">Item Two</a>
+    </helix-nav-bar>
+    <helix-icon-button label="Settings" slot="end">
+      <helix-icon name="gear"></helix-icon>
+    </helix-icon-button>
+  </helix-app-header>
+
+  <div class="band">
+    <helix-text appearance="display" as="h1">Scroll this page</helix-text>
+    <helix-text as="p">
+      The bar stays put and the page runs under it. What you can see through it
+      is the difference between the two appearances.
+    </helix-text>
+  </div>
+
+  <div class="prose">
+    <helix-text appearance="title" as="h2">Translucency</helix-text>
+    <helix-text as="p">
+      The banner is a pane of material rather than a lid. Content passing
+      beneath it stays visible and goes soft, so the page reads as one surface
+      with a bar floating over it.
+    </helix-text>
+
+    <helix-text appearance="title" as="h2">The cost</helix-text>
+    <helix-text as="p">
+      A backdrop filter makes the header a containing block for anything
+      positioned fixed inside it, so an overlay rendered in the bar is placed
+      against the bar rather than the window. Flat is the default for that
+      reason as much as for the quieter look.
+    </helix-text>
+
+    <helix-text appearance="title" as="h2">The separating rule</helix-text>
+    <helix-text as="p">
+      Both appearances start flat against the top of the page and draw their
+      rule only once something has scrolled underneath, which is why this
+      example is tall enough to scroll.
+    </helix-text>
+  </div>
+</div>
