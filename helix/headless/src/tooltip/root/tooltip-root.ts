@@ -1,12 +1,17 @@
 import {
+  anchorElement,
   customElement,
   HelixElement,
+  hostAria,
   MixinControllerOpen,
   type Placement,
   PopoverController,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+
+/** Tags that exist to hold something, and say nothing when they hold nothing. */
+const GENERIC = new Set(['div', 'p', 'section', 'span'])
 
 /**
  * @summary A short description that appears beside what it describes.
@@ -67,7 +72,15 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   @property()
   placement: Placement = 'top'
 
-  /** Space between the trigger and the bubble, in pixels. */
+  /**
+   * Space between the trigger and the bubble, in pixels.
+   *
+   * Eight, which is not arbitrary: it is the size of the arrow the styled tier
+   * draws, so the point reaches the trigger and the bubble does not. A consumer
+   * changing this and keeping the arrow gets a point that falls short or one
+   * that overlaps what it is pointing at, which is worth knowing before
+   * changing it rather than after.
+   */
   @property({ type: Number })
   offset = 8
 
@@ -92,6 +105,17 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   private timer: ReturnType<typeof setTimeout> | undefined
 
   /**
+   * What is currently keeping the bubble up.
+   *
+   * The pointer and focus are two holders and they shared one timer with
+   * nothing counting them, so whichever left last won: moving the pointer off a
+   * control that still had keyboard focus scheduled a hide and took the bubble
+   * away from under the reader. The same fault the toast timer had, and the
+   * same answer.
+   */
+  private readonly holds = new Set<'focus' | 'pointer'>()
+
+  /**
    * The element the bubble points at.
    *
    * The trigger, not the host. The host is `display: contents` so it wraps
@@ -100,9 +124,12 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
    * of the viewport rather than against the button.
    */
   private get trigger(): HTMLElement {
-    const slot = this.renderRoot.querySelector('slot:not([name])') as HTMLSlotElement | null
-    const assigned = slot?.assignedElements({ flatten: true }) ?? []
-    return (assigned[0] as HTMLElement | undefined) ?? this
+    /* Through the util, which was written from a measurement of this component
+       and then not used by it. Its extra is the descent: the first assigned
+       element may itself draw nothing, and an icon button wrapped in a
+       `display: contents` span was the case that took the bubble to the corner
+       of the window. */
+    return anchorElement(this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])'), this)
   }
 
   /* One controller rather than the pair this was: a `FloatingController` beside
@@ -150,9 +177,28 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     }
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="content"]')
     return (slot?.assignedNodes() ?? []).some((node) => {
-      const holdsElement =
-        node.nodeType === Node.ELEMENT_NODE && (node as Element).childElementCount > 0
-      return holdsElement || node.textContent?.trim() !== ''
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return node.textContent?.trim() !== ''
+      }
+      /* A wrapper is empty when it holds nothing; anything else draws.
+       *
+       * The test was children-or-text for every element, which reads as careful
+       * and refused the exact case this getter's own paragraph calls the whole
+       * point of slotting. `<helix-icon slot="content">` has no children and no
+       * text, so `hasContent` was false, `show()` returned early, and a tooltip
+       * whose bubble is an icon could not be opened at all. Measured in a
+       * browser: `open` stayed false through a direct `show()`.
+       *
+       * The spec beside this one is the other half, and it is why the answer is
+       * not simply "an element is content": `<span slot="content">   </span>`
+       * is an element too and says nothing. In the light DOM those two are
+       * identical, so nothing can separate them by shape and the tag is what
+       * is left. A generic wrapper is asked to hold something; everything else,
+       * an icon, an image, an svg, a component, draws on its own. */
+      const element = node as Element
+      return GENERIC.has(element.localName)
+        ? element.childElementCount > 0 || element.textContent?.trim() !== ''
+        : true
     })
   }
 
@@ -195,20 +241,50 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
 
   /** Shows after the pointer has rested for `delay`. */
   private readonly showLater = (): void => {
+    this.holds.add('pointer')
     clearTimeout(this.timer)
     this.timer = setTimeout(() => this.show(), this.delay)
   }
 
   /** Hides after `delayOut`, so crossing the gap to the bubble does not close it. */
   private readonly hideLater = (): void => {
+    this.holds.delete('pointer')
     clearTimeout(this.timer)
-    this.timer = setTimeout(() => this.hide(), this.delayOut)
+    this.timer = setTimeout(() => this.release(), this.delayOut)
   }
 
+  private readonly showNow = (): void => {
+    this.holds.add('focus')
+    this.show()
+  }
+
+  private readonly releaseFocus = (): void => {
+    this.holds.delete('focus')
+    this.release()
+  }
+
+  /** Hides only once nothing is holding the bubble up. */
+  private release(): void {
+    if (this.holds.size === 0) {
+      this.hide()
+    }
+  }
+
+  /**
+   * Escape closes the bubble from wherever the reader is.
+   *
+   * On the document, not on the host, which is where it was: a tooltip opened
+   * by hover has focus somewhere else entirely, so the press never reached this
+   * element and Escape worked only for the one case that needed it least. That
+   * is the case the pattern names, a reader escaping a tooltip obscuring what
+   * is under it, and it was the case that did nothing.
+   *
+   * Not stopped from propagating: a tooltip is not what the reader was trying
+   * to escape if it sits inside something else that also closes.
+   */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape' && this.open) {
-      // Not stopped from propagating: a tooltip is not what the reader was
-      // trying to escape if it sits inside something else that also closes.
+      this.holds.clear()
       this.hide()
     }
   }
@@ -219,18 +295,19 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     this.addEventListener('pointerleave', this.hideLater)
     // Focus opens at once: a keyboard reader landing on a control has already
     // committed to it, where a pointer crossing one has not.
-    this.addEventListener('focusin', this.show)
-    this.addEventListener('focusout', this.hide)
-    this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('focusin', this.showNow)
+    this.addEventListener('focusout', this.releaseFocus)
+    document.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('pointerenter', this.showLater)
     this.removeEventListener('pointerleave', this.hideLater)
-    this.removeEventListener('focusin', this.show)
-    this.removeEventListener('focusout', this.hide)
-    this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('focusin', this.showNow)
+    this.removeEventListener('focusout', this.releaseFocus)
+    document.removeEventListener('keydown', this.handleKeydown)
+    this.holds.clear()
     clearTimeout(this.timer)
   }
 
@@ -251,12 +328,27 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     if (!bubble) {
       return
     }
-    // By element rather than by id, which cannot cross the shadow boundary.
-    const internals = this.internals as ElementInternals & {
-      ariaDescribedByElements?: Element[] | null
-    }
-    if ('ariaDescribedByElements' in internals) {
-      internals.ariaDescribedByElements = this.hasContent ? [bubble] : null
+    /* The reference goes on the host, and the host is not what a reader is on.
+     *
+     * The host is `display: contents` and carries no role; the thing that takes
+     * focus is the consumer's trigger inside it, and a description on an
+     * ancestor is not announced with it. So the trigger has to be described
+     * too, and it cannot be described by reference: measured, assigning
+     * `trigger.ariaDescribedByElements = [bubble]` reads back as an empty array,
+     * a reference being valid only into the same tree or a shadow-including
+     * ancestor of it. The bubble's tree is neither, it is inward.
+     *
+     * A string crosses anything, and `aria-description` is what a string
+     * description is called. Same shape as the tabs panel: where the reference
+     * cannot reach, the name goes instead of the pointer to it.
+     *
+     * The host keeps its reference as well, which costs nothing and is what
+     * describes the tooltip where the trigger *is* the host, the case
+     * `anchorElement` falls back to. */
+    hostAria(this.internals, { describedBy: this.hasContent ? [bubble] : [] })
+    const trigger = this.trigger
+    if (trigger !== this && 'ariaDescription' in trigger) {
+      trigger.ariaDescription = this.hasContent ? bubble.textContent?.trim() || null : null
     }
   }
 

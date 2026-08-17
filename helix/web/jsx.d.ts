@@ -4630,7 +4630,13 @@ of using fallback content rather than rendering whichever is present. */
   content?: HelixTooltip["content"];
   /** Preferred side. It moves if that side does not fit. */
   placement?: HelixTooltip["placement"];
-  /** Space between the trigger and the bubble, in pixels. */
+  /** Space between the trigger and the bubble, in pixels.
+
+Eight, which is not arbitrary: it is the size of the arrow the styled tier
+draws, so the point reaches the trigger and the bubble does not. A consumer
+changing this and keeping the arrow gets a point that falls short or one
+that overlaps what it is pointing at, which is worth knowing before
+changing it rather than after. */
   offset?: HelixTooltip["offset"];
   /** Whether the tooltip never shows. */
   disabled?: HelixTooltip["disabled"];
@@ -4694,7 +4700,13 @@ of using fallback content rather than rendering whichever is present. */
   "prop:content"?: HelixTooltip["content"];
   /** Preferred side. It moves if that side does not fit. */
   "prop:placement"?: HelixTooltip["placement"];
-  /** Space between the trigger and the bubble, in pixels. */
+  /** Space between the trigger and the bubble, in pixels.
+
+Eight, which is not arbitrary: it is the size of the arrow the styled tier
+draws, so the point reaches the trigger and the bubble does not. A consumer
+changing this and keeping the arrow gets a point that falls short or one
+that overlaps what it is pointing at, which is worth knowing before
+changing it rather than after. */
   "prop:offset"?: HelixTooltip["offset"];
   /** Whether the tooltip never shows. */
   "prop:disabled"?: HelixTooltip["disabled"];
@@ -9074,6 +9086,12 @@ export type CustomElements = {
    * of using fallback content rather than rendering whichever is present.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
+   *
+   * Eight, which is not arbitrary: it is the size of the arrow the styled tier
+   * draws, so the point reaches the trigger and the bubble does not. A consumer
+   * changing this and keeping the arrow gets a point that falls short or one
+   * that overlaps what it is pointing at, which is worth knowing before
+   * changing it rather than after.
    * - `disabled`: Whether the tooltip never shows.
    * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
    *
@@ -13665,6 +13683,12 @@ export type CustomElementsSolidJs = {
    * of using fallback content rather than rendering whichever is present.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
+   *
+   * Eight, which is not arbitrary: it is the size of the arrow the styled tier
+   * draws, so the point reaches the trigger and the bubble does not. A consumer
+   * changing this and keeping the arrow gets a point that falls short or one
+   * that overlaps what it is pointing at, which is worth knowing before
+   * changing it rather than after.
    * - `disabled`: Whether the tooltip never shows.
    * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
    *

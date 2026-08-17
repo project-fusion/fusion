@@ -9,7 +9,17 @@
    baseline of a text run it is not part of. A plain string is one anonymous
    item and centers against itself, which is where it already was; an icon
    beside a word, or a heading over a line of detail, is what moves. */
+/* The UA's own `[popover]` rule sets `overflow: auto`, which makes the surface a
+   scroll container, and anything positioned outside a scroll container is
+   clipped. The arrow is drawn deliberately outside it. Measured on a bare
+   popover with a child hanging four pixels past the edge: `scrollHeight`
+   exceeded `clientHeight`, so the box was overflowing and trimming rather than
+   letting the point show.
+
+   Nothing in these surfaces scrolls, so `visible` costs nothing and is what a
+   bubble with a point on it wants. */
 [part="tooltip"] {
+  overflow: visible;
   align-items: center;
   display: flex;
   gap: var(--helix-space-2xs);

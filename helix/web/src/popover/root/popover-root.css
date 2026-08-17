@@ -4,7 +4,17 @@
   display: contents;
 }
 
+/* The UA's own `[popover]` rule sets `overflow: auto`, which makes the surface a
+   scroll container, and anything positioned outside a scroll container is
+   clipped. The arrow is drawn deliberately outside it. Measured on a bare
+   popover with a child hanging four pixels past the edge: `scrollHeight`
+   exceeded `clientHeight`, so the box was overflowing and trimming rather than
+   letting the point show.
+
+   Nothing in these surfaces scrolls, so `visible` costs nothing and is what a
+   bubble with a point on it wants. */
 [part="popover"] {
+  overflow: visible;
   background-color: var(--helix-color-surface-overlay);
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
      `border: solid`, so dropping the declaration leaves a three-pixel medium

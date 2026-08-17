@@ -29160,7 +29160,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "Space between the trigger and the bubble, in pixels.",
+              "description": "Space between the trigger and the bubble, in pixels.\n\nEight, which is not arbitrary: it is the size of the arrow the styled tier\ndraws, so the point reaches the trigger and the bubble does not. A consumer\nchanging this and keeping the arrow gets a point that falls short or one\nthat overlaps what it is pointing at, which is worth knowing before\nchanging it rather than after.",
               "attribute": "offset",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
@@ -29217,6 +29217,18 @@
                 "text": "ReturnType<typeof setTimeout> | undefined"
               },
               "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "holds",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new Set<'focus' | 'pointer'>()",
+              "description": "What is currently keeping the bubble up.\n\nThe pointer and focus are two holders and they shared one timer with\nnothing counting them, so whichever left last won: moving the pointer off a\ncontrol that still had keyboard focus scheduled a hide and took the bubble\naway from under the reader. The same fault the toast timer had, and the\nsame answer.",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -29343,9 +29355,45 @@
             },
             {
               "kind": "field",
+              "name": "showNow",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "releaseFocus",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "release",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Hides only once nothing is holding the bubble up.",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true,
+              "description": "Escape closes the bubble from wherever the reader is.\n\nOn the document, not on the host, which is where it was: a tooltip opened\nby hover has focus somewhere else entirely, so the press never reached this\nelement and Escape worked only for the one case that needed it least. That\nis the case the pattern names, a reader escaping a tooltip obscuring what\nis under it, and it was the case that did nothing.\n\nNot stopped from propagating: a tooltip is not what the reader was trying\nto escape if it sits inside something else that also closes.",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -29498,7 +29546,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "Space between the trigger and the bubble, in pixels.",
+              "description": "Space between the trigger and the bubble, in pixels.\n\nEight, which is not arbitrary: it is the size of the arrow the styled tier\ndraws, so the point reaches the trigger and the bubble does not. A consumer\nchanging this and keeping the arrow gets a point that falls short or one\nthat overlaps what it is pointing at, which is worth knowing before\nchanging it rather than after.",
               "fieldName": "offset",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
