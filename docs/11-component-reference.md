@@ -18,15 +18,16 @@ Groups collapsible sections, one open at a time by default.
 
 Extends `HelixBaseAccordion`.
 
-Items sit in a single bordered stack, sharing one rule between neighbours
-rather than each drawing its own, so the seam between two items is one pixel
-and not two.
+Items share one rule between neighbours rather than each drawing its own, so
+the seam between two items is one pixel and not two. Those seams are what
+carry the grouping, which is why the surrounding frame is opt-in rather than
+the default: an accordion is a list, where a card is a surface.
 
 #### Properties
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'outlined' \| 'plain' \| undefined` | - | - | Removes the surrounding surface, leaving only the separating rules. |
+| `appearance` | `appearance` | `'outlined' \| 'plain' \| undefined` | - | - | Whether the stack is framed. |
 | `items` | - | `HelixBaseAccordionItem[]` | - | `HelixBaseAccordion` | Direct items, in light-DOM order. Client only: the server has no tree. |
 | `mode` | `mode` | `'single' \| 'single-collapsible' \| undefined` | - | `HelixBaseAccordion` | How many sections may be open at once. |
 
@@ -36,18 +37,12 @@ and not two.
 | --- | --- |
 | *(default)* | The accordion's items. |
 
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `container` | The stack of items. |
-
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--accordion-border-color` | Color of the surrounding rule. |
-| `--accordion-radii` | Corner radius of the stack. |
+| `--accordion-border-color` | Color of the seams, and of the frame when outlined. |
+| `--accordion-radii` | Corner radius of the stack, when outlined. |
 
 ### Item — `helix-accordion-item`
 

@@ -405,7 +405,18 @@ instead. */
 };
 
 export type HelixAccordionProps = {
-  /** Removes the surrounding surface, leaving only the separating rules. */
+  /** Whether the stack is framed.
+
+- `plain` is the default and is what an application usually wants: the
+  seams between items already say the items are one set, so a frame is a
+  second statement of the same thing. Inside a card, a panel, a dialog or a
+  sidebar, it is a line and no meaning.
+- `outlined` frames the stack, for an accordion sitting directly on the
+  page where nothing else says where it starts and stops. A marketing
+  page's FAQ is the case it is for.
+
+Both are writable, so a generated page can say which it means rather than
+relying on the absence of an attribute. */
   appearance?: HelixAccordion["appearance"];
   /** How many sections may be open at once.
 
@@ -419,7 +430,18 @@ A union rather than a mode plus a `collapsible` boolean, which would make
 };
 
 export type HelixAccordionSolidJsProps = {
-  /** Removes the surrounding surface, leaving only the separating rules. */
+  /** Whether the stack is framed.
+
+- `plain` is the default and is what an application usually wants: the
+  seams between items already say the items are one set, so a frame is a
+  second statement of the same thing. Inside a card, a panel, a dialog or a
+  sidebar, it is a line and no meaning.
+- `outlined` frames the stack, for an accordion sitting directly on the
+  page where nothing else says where it starts and stops. A marketing
+  page's FAQ is the case it is for.
+
+Both are writable, so a generated page can say which it means rather than
+relying on the absence of an attribute. */
   "prop:appearance"?: HelixAccordion["appearance"];
   /** How many sections may be open at once.
 
@@ -4882,15 +4904,27 @@ export type CustomElements = {
   >;
 
   /**
-   * Items sit in a single bordered stack, sharing one rule between neighbours
-   * rather than each drawing its own, so the seam between two items is one pixel
-   * and not two.
+   * Items share one rule between neighbours rather than each drawing its own, so
+   * the seam between two items is one pixel and not two. Those seams are what
+   * carry the grouping, which is why the surrounding frame is opt-in rather than
+   * the default: an accordion is a list, where a card is a surface.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Removes the surrounding surface, leaving only the separating rules.
+   * - `appearance`: Whether the stack is framed.
+   *
+   * - `plain` is the default and is what an application usually wants: the
+   *   seams between items already say the items are one set, so a frame is a
+   *   second statement of the same thing. Inside a card, a panel, a dialog or a
+   *   sidebar, it is a line and no meaning.
+   * - `outlined` frames the stack, for an accordion sitting directly on the
+   *   page where nothing else says where it starts and stops. A marketing
+   *   page's FAQ is the case it is for.
+   *
+   * Both are writable, so a generated page can say which it means rather than
+   * relying on the absence of an attribute.
    * - `mode`: How many sections may be open at once.
    *
    * Absent is `multiple`, so nothing closes unexpectedly and the default costs
@@ -4911,14 +4945,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--accordion-border-color`: Color of the surrounding rule. (default: `undefined`)
-   * - `--accordion-radii`: Corner radius of the stack. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The stack of items.
+   * - `--accordion-border-color`: Color of the seams, and of the frame when outlined. (default: `undefined`)
+   * - `--accordion-radii`: Corner radius of the stack, when outlined. (default: `undefined`)
    */
   "helix-accordion": Partial<
     HelixAccordionProps & BaseProps<HelixAccordion> & BaseEvents
@@ -9217,15 +9245,27 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Items sit in a single bordered stack, sharing one rule between neighbours
-   * rather than each drawing its own, so the seam between two items is one pixel
-   * and not two.
+   * Items share one rule between neighbours rather than each drawing its own, so
+   * the seam between two items is one pixel and not two. Those seams are what
+   * carry the grouping, which is why the surrounding frame is opt-in rather than
+   * the default: an accordion is a list, where a card is a surface.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Removes the surrounding surface, leaving only the separating rules.
+   * - `appearance`: Whether the stack is framed.
+   *
+   * - `plain` is the default and is what an application usually wants: the
+   *   seams between items already say the items are one set, so a frame is a
+   *   second statement of the same thing. Inside a card, a panel, a dialog or a
+   *   sidebar, it is a line and no meaning.
+   * - `outlined` frames the stack, for an accordion sitting directly on the
+   *   page where nothing else says where it starts and stops. A marketing
+   *   page's FAQ is the case it is for.
+   *
+   * Both are writable, so a generated page can say which it means rather than
+   * relying on the absence of an attribute.
    * - `mode`: How many sections may be open at once.
    *
    * Absent is `multiple`, so nothing closes unexpectedly and the default costs
@@ -9246,14 +9286,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--accordion-border-color`: Color of the surrounding rule. (default: `undefined`)
-   * - `--accordion-radii`: Corner radius of the stack. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `container`: The stack of items.
+   * - `--accordion-border-color`: Color of the seams, and of the frame when outlined. (default: `undefined`)
+   * - `--accordion-radii`: Corner radius of the stack, when outlined. (default: `undefined`)
    */
   "helix-accordion": Partial<
     HelixAccordionProps &
@@ -13654,9 +13688,9 @@ export type CustomElementsSolidJs = {
 export type CustomCssProperties = {
   /** Inset of the trigger and content. */
   "--accordion-item-padding"?: string;
-  /** Color of the surrounding rule. */
+  /** Color of the seams, and of the frame when outlined. */
   "--accordion-border-color"?: string;
-  /** Corner radius of the stack. */
+  /** Corner radius of the stack, when outlined. */
   "--accordion-radii"?: string;
   /** Inline padding, matched to the page. */
   "--announcement-inset"?: string;

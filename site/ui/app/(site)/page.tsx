@@ -194,7 +194,8 @@ export default function Home() {
           <helix-text as="h2" class="sectionTitle measure">
             Questions
           </helix-text>
-          <helix-accordion>
+          {/* Framed, because this one sits directly on the page. */}
+          <helix-accordion appearance="outlined">
             {questions.map((entry) => (
               <helix-accordion-item key={entry.question}>
                 <helix-text appearance="body-strong" slot="summary">

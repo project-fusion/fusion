@@ -539,22 +539,16 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Items sit in a single bordered stack, sharing one rule between neighbours\nrather than each drawing its own, so the seam between two items is one pixel\nand not two.",
+          "description": "Items share one rule between neighbours rather than each drawing its own, so\nthe seam between two items is one pixel and not two. Those seams are what\ncarry the grouping, which is why the surrounding frame is opt-in rather than\nthe default: an accordion is a list, where a card is a surface.",
           "name": "HelixAccordion",
           "cssProperties": [
             {
-              "description": "Color of the surrounding rule.",
+              "description": "Color of the seams, and of the frame when outlined.",
               "name": "--accordion-border-color"
             },
             {
-              "description": "Corner radius of the stack.",
+              "description": "Corner radius of the stack, when outlined.",
               "name": "--accordion-radii"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The stack of items.",
-              "name": "container"
             }
           ],
           "slots": [
@@ -574,7 +568,7 @@
               "type": {
                 "text": "'outlined' | 'plain' | undefined"
               },
-              "description": "Removes the surrounding surface, leaving only the separating rules.",
+              "description": "Whether the stack is framed.\n\n- `plain` is the default and is what an application usually wants: the\n  seams between items already say the items are one set, so a frame is a\n  second statement of the same thing. Inside a card, a panel, a dialog or a\n  sidebar, it is a line and no meaning.\n- `outlined` frames the stack, for an accordion sitting directly on the\n  page where nothing else says where it starts and stops. A marketing\n  page's FAQ is the case it is for.\n\nBoth are writable, so a generated page can say which it means rather than\nrelying on the absence of an attribute.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -691,7 +685,7 @@
               "type": {
                 "text": "'outlined' | 'plain' | undefined"
               },
-              "description": "Removes the surrounding surface, leaving only the separating rules.",
+              "description": "Whether the stack is framed.\n\n- `plain` is the default and is what an application usually wants: the\n  seams between items already say the items are one set, so a frame is a\n  second statement of the same thing. Inside a card, a panel, a dialog or a\n  sidebar, it is a line and no meaning.\n- `outlined` frames the stack, for an accordion sitting directly on the\n  page where nothing else says where it starts and stops. A marketing\n  page's FAQ is the case it is for.\n\nBoth are writable, so a generated page can say which it means rather than\nrelying on the absence of an attribute.",
               "fieldName": "appearance"
             },
             {

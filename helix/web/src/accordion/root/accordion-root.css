@@ -1,29 +1,60 @@
-/* On the host, which is the box. These named `[part="container"]`, a wrapper
-   this component does not render: its markup is a bare slot. So the accordion
-   had no border and no corner radius, and `appearance="plain"` did nothing,
-   which is the same fault the card had and neither showed up as anything but a
-   component quietly not looking like itself. Found by `check:selectors` on its
-   first run. */
+/* Plain by default: a stack of rules and nothing around it.
+ *
+ * It was framed by default, and the frame is a second statement of a grouping
+ * the seams already make. An accordion is a list, where a card is a surface: a
+ * card without its border stops being a card, and an accordion without one is
+ * still obviously one accordion, because the rules between its items say so.
+ *
+ * Which leaves the frame doing its work only in the case it is actually for, an
+ * accordion sitting directly on the page with nothing else saying where it
+ * starts and stops. Inside a card, a panel, a dialog or a sidebar, which is
+ * where an application puts one, it was a line and no meaning. That is Card's
+ * own argument for its `plain`, applied to the more common case rather than the
+ * rarer one.
+ *
+ * The same tie-break `AppHeader` used for `flat`: the quieter default is also
+ * the one that does not surprise. Adding a frame is one attribute; removing one
+ * nobody asked for means first discovering that `plain` exists.
+ *
+ * On the host, which is the box. These rules named `[part="container"]`, a
+ * wrapper this component does not render: its markup is a bare slot. So the
+ * accordion had no border and no corner radius at all, and `appearance="plain"`
+ * did nothing, which is the same fault the card had and neither showed up as
+ * anything but a component quietly not looking like itself. Found by
+ * `check:selectors` on its first run.
+ */
 :host {
+  display: block;
+}
+
+/* Framed, for an accordion with nothing around it.
+ *
+ * This rule did not exist. `appearance` declared `outlined` and no selector
+ * anywhere matched it, and it looked correct only because the frame was on
+ * `:host` and therefore on everything: writing `outlined` and writing nothing
+ * gave the same picture for the same reason a broken switch on an already-lit
+ * lamp looks like it works. Flipping the default is what made it a real value.
+ */
+:host([appearance="outlined"]) {
   border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
   /* The house radius. Card wrote the argument down: at anything larger the
      corner is softer than the controls inside it and the container stops
      receding, which is the one thing a container should do. */
   border-radius: var(--accordion-radii, var(--helix-radii-sm));
-  display: block;
-  /* Clips each item's square corners to the stack's radius, so no item needs
-     to know whether it is first or last. */
+  /* Clips each item's square corners to the stack's radius, so no item needs to
+     know whether it is first or last. Here rather than on the host, because
+     there is no radius to clip to without the frame, and an `overflow: hidden`
+     with nothing to do still trims the focus ring off the first and last
+     triggers. */
   overflow: hidden;
-}
-
-:host([appearance="plain"]) {
-  border-color: transparent;
-  border-radius: var(--helix-radii-none);
 }
 
 /* One rule between neighbours rather than one per item, so the seam is a single
    pixel. `+` reaches slotted siblings because they are siblings in the light
-   DOM, which is the tree the selector runs against. */
+   DOM, which is the tree the selector runs against.
+
+   Unconditional, which is what carries the grouping in both appearances and is
+   why the frame is not needed to say the items belong together. */
 ::slotted(* + *) {
   border-block-start: var(--helix-border-thin) solid
     var(--accordion-border-color, var(--helix-color-border));
