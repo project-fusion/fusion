@@ -5837,10 +5837,50 @@
               }
             },
             {
+              "kind": "method",
+              "name": "runTimer",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Owns the timer, from the state rather than from the call site.\n\n`start()` and `stop()` each held the interval and `connectedCallback`\nstarted one, which the rules forbid: a DOM move re-ran connect and restarted\nrotation the reader had stopped, and the server, which never runs connect at\nall, rendered the control saying the opposite of what it would do. The\nstate is what is declared and the timer follows it, which also means one\nplace clears it.",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "handleScroll",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "stopped",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the reader has stopped it, as opposed to something pausing it.\n\nThe two were one flag and the difference matters: `focusin` bubbles, so\nevery focus move inside the carousel re-ran `stop()`, and a reader who\npressed Start had it undone by their very next Tab. Pausing on hover and on\nfocus is right; forgetting that the reader asked it to stop is not, and the\nAPG is explicit that rotation resumes only when the reader asks.",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pause",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Pauses without forgetting that the reader wanted it running.",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"

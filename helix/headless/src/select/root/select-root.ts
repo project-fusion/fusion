@@ -157,7 +157,17 @@ export class HelixBaseSelect extends MixinControllerOpen(
      * right arrangement, and it makes reading the listbox's own value the one
      * thing that can never work. */
     const next = (event as CustomEvent<{ value: string }>).detail.value
-    this.requestValue(next)
+    /* Nothing happens on a refusal, and everything did.
+     *
+     * The panel closed and a native `change` went out whether or not the change
+     * was taken, so a consumer calling `preventDefault()` on `helix-change`
+     * kept the old value, watched the select shut as though it had been chosen,
+     * and told the form it had moved. Refusing a change should leave the
+     * control exactly where it was. */
+    if (!this.requestValue(next)) {
+      event.stopPropagation()
+      return
+    }
     /* Closed on a choice, unless more than one can be made: a multi-select that
        shut after each pick would be a control the reader has to reopen to use
        again. `helix-change` is left to travel, since it came from the listbox
@@ -210,10 +220,22 @@ export class HelixBaseSelect extends MixinControllerOpen(
          mean anything. It reached the listbox element and stopped there, that
          element not being focusable, so focus stayed on the trigger and every
          arrow press went to the page. The listbox delegates focus now, so this
-         lands on the list inside it. */
-      this.listbox?.focus()
+         lands on the list inside it.
+       *
+       * Only on the update that opened it. `updated` runs for any change while
+       * the panel is up, a filter keystroke or a value arriving, and moving
+       * focus on each of those is a focus thief: harmless while the listbox was
+       * unfocusable, and a real one the moment it was made to work. */
+      if (changed.has('open')) {
+        this.listbox?.focus()
+      }
     } else {
       this.panel.hide()
+      /* And the filter goes with it. A filterable select reopened still narrowed
+         with the old needle in its search box, and `hidden` still written on the
+         options it had ruled out, so the second use of the control started from
+         the first one's leftovers. Closing is where a search ends. */
+      this.listbox?.requestFilter('')
     }
   }
 

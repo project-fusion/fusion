@@ -191,7 +191,17 @@ export class HelixBaseCarousel extends HelixElement {
     if (!slide || !track) {
       return
     }
-    track.scrollTo({ behavior: 'smooth', left: slide.offsetLeft - track.offsetLeft })
+    /* The preference is read here, because this is where the motion is.
+     *
+     * `scroll-behavior: auto` in a reduce block does nothing: it restates the
+     * initial value, and the scroll that actually animates is this call, which
+     * names `smooth` outright and overrides the property either way. A reader
+     * who asked not to be moved was moved. */
+    const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    track.scrollTo({
+      behavior: still ? 'instant' : 'smooth',
+      left: slide.offsetLeft - track.offsetLeft,
+    })
   }
 
   /**
@@ -203,14 +213,31 @@ export class HelixBaseCarousel extends HelixElement {
    * exists to escape.
    */
   private stop(): void {
+    this.stopped = true
     this.rotating = false
-    clearInterval(this.timer)
-    this.timer = undefined
   }
 
   private start(): void {
-    this.stop()
+    this.stopped = false
     this.rotating = true
+  }
+
+  /**
+   * Owns the timer, from the state rather than from the call site.
+   *
+   * `start()` and `stop()` each held the interval and `connectedCallback`
+   * started one, which the rules forbid: a DOM move re-ran connect and restarted
+   * rotation the reader had stopped, and the server, which never runs connect at
+   * all, rendered the control saying the opposite of what it would do. The
+   * state is what is declared and the timer follows it, which also means one
+   * place clears it.
+   */
+  private runTimer(): void {
+    clearInterval(this.timer)
+    this.timer = undefined
+    if (!this.rotating || this.slides.length < 2) {
+      return
+    }
     this.timer = setInterval(() => this.goTo(this.index + 1), this.interval)
   }
 
@@ -241,20 +268,36 @@ export class HelixBaseCarousel extends HelixElement {
     }
   }
 
+  /**
+   * Whether the reader has stopped it, as opposed to something pausing it.
+   *
+   * The two were one flag and the difference matters: `focusin` bubbles, so
+   * every focus move inside the carousel re-ran `stop()`, and a reader who
+   * pressed Start had it undone by their very next Tab. Pausing on hover and on
+   * focus is right; forgetting that the reader asked it to stop is not, and the
+   * APG is explicit that rotation resumes only when the reader asks.
+   */
+  private stopped = false
+
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('focusin', this.stop)
-    this.addEventListener('pointerenter', this.stop)
-    if (this.autoplay) {
-      this.start()
-    }
+    this.addEventListener('focusin', this.pause)
+    this.addEventListener('pointerenter', this.pause)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('focusin', this.stop)
-    this.removeEventListener('pointerenter', this.stop)
-    this.stop()
+    this.removeEventListener('focusin', this.pause)
+    this.removeEventListener('pointerenter', this.pause)
+    clearInterval(this.timer)
+    this.timer = undefined
+  }
+
+  /** Pauses without forgetting that the reader wanted it running. */
+  private readonly pause = (): void => {
+    if (!this.stopped) {
+      this.rotating = false
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -262,6 +305,12 @@ export class HelixBaseCarousel extends HelixElement {
     // Only the first time, before anything reads it. See `MixinControllerOpen`.
     if (this.indexMode === undefined) {
       this.indexMode = this.indexState !== undefined
+    }
+    /* Seeded from the markup rather than started on connect, so the server and
+       the client agree about whether it is running. A reader's stop survives a
+       reconnection because `stopped` outlives it. */
+    if (!this.hasUpdated) {
+      this.rotating = this.autoplay
     }
     hostAria(this.internals, { label: this.label, role: 'group' })
     // Announced as a carousel rather than as a bare group, so a reader knows
@@ -281,6 +330,19 @@ export class HelixBaseCarousel extends HelixElement {
      * caller. Here it is one place and it covers all of them. */
     if (changed.has('index')) {
       this.scrollToIndex()
+    }
+    this.runTimer()
+    /* Back inside the set when the set shrinks.
+     *
+     * Nothing re-clamped `index`, and the indicators carry a roving tab stop
+     * keyed on it, so a carousel whose slides were removed under it was left
+     * with no tab stop, no current dot and a focus restore pointing at nothing.
+     * In `updated` rather than `willUpdate` because `slides` is empty on the
+     * server, and through `goTo` so a controlled consumer is told rather than
+     * overwritten. */
+    const count = this.slides.length
+    if (count > 0 && this.index > count - 1) {
+      this.goTo(count - 1)
     }
     // Named on the slides themselves rather than on wrappers, so each is the
     // consumer's own element and keeps whatever it already carried.
@@ -342,14 +404,28 @@ export class HelixBaseCarousel extends HelixElement {
       </div>
       ${
         this.slides.length > 1
-          ? html`<div part="indicators" role="tablist" aria-label=${`${this.label} slides`}>
+          ? html`<div part="indicators" role="group" aria-label=${`${this.label} slides`}>
+              ${
+                /* Plain buttons, not a half-built tablist.
+                 *
+                 * They were `role="tab"` inside `role="tablist"` with no
+                 * `aria-controls`, while the slides were `role="group"` rather
+                 * than tabpanels: the APG has two carousel patterns and this
+                 * was the announcement of one over the structure of the other,
+                 * so a reader was told to expect panels that do not exist.
+                 *
+                 * The basic pattern is what this is: buttons that move the
+                 * carousel, with the current one marked. `aria-current` is the
+                 * right word for "the one you are on" where nothing is being
+                 * selected. */
+                ''
+              }
               ${this.slides.map(
                 (_slide, at) => html`<button
                   part="indicator"
                   type="button"
-                  role="tab"
                   aria-label=${`Slide ${at + 1}`}
-                  aria-selected=${at === this.index ? 'true' : 'false'}
+                  aria-current=${at === this.index ? 'true' : nothing}
                   tabindex=${at === this.index ? '0' : '-1'}
                   ?data-current=${at === this.index}
                   @keydown=${this.handleIndicatorKeydown}

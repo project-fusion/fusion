@@ -93,9 +93,17 @@
   --_carousel-per-view: 4;
 }
 
+/* The track is not what moves.
+ *
+ * This block asserted `scroll-behavior: auto` on the scroller, which restates
+ * the initial value and does nothing, while the scroll that animates is issued
+ * from JavaScript with `behavior: 'smooth'` named outright, which overrides the
+ * property whatever it says. The component reads the preference at that call
+ * now, and what is left here is the one thing on this element that really is a
+ * transition: the indicator, which three sibling components already drop. */
 @media (prefers-reduced-motion: reduce) {
-  [part="track"] {
-    scroll-behavior: auto;
+  [part="indicator"] {
+    transition: none;
   }
 }
 
@@ -128,8 +136,12 @@
   inline-size: var(--helix-space-lg);
 }
 
+/* Neutral, not brand. This is the one `border-strong` in the library that was
+   never a border: it is the fill of an inactive dot. Brand is taken, by
+   `[data-current]` directly above, so a hovered dot in brand would be the same
+   colour as the current one and the set would read as having two. */
 [part="indicator"]:hover {
-  background-color: var(--helix-color-border-strong);
+  background-color: var(--helix-color-foreground-muted);
 }
 
 [part="indicator"]:focus-visible {
