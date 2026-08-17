@@ -1,6 +1,9 @@
 <!-- Preview frame: the submit is swallowed. -->
 <form onsubmit="event.preventDefault()">
-  <helix-flex direction="column" gap="sm">
+  <helix-flex
+    direction="column"
+    gap="sm"
+  >
     <helix-input
       hint="We only use this to reply"
       label="Email"
@@ -9,6 +12,9 @@
       required
       type="email"
     ></helix-input>
-    <helix-button appearance="primary" type="submit">Submit</helix-button>
+    <helix-button
+      appearance="primary"
+      type="submit"
+    >Submit</helix-button>
   </helix-flex>
 </form>

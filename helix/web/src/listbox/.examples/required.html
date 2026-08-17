@@ -1,10 +1,21 @@
 <!-- Preview frame: the submit is swallowed. -->
 <form onsubmit="event.preventDefault()">
-  <helix-flex direction="column" gap="sm">
-    <helix-listbox hint="What they will be able to do" label="Role" name="role" required>
+  <helix-flex
+    direction="column"
+    gap="sm"
+  >
+    <helix-listbox
+      hint="What they will be able to do"
+      label="Role"
+      name="role"
+      required
+    >
       <helix-option value="viewer">Viewer</helix-option>
       <helix-option value="editor">Editor</helix-option>
     </helix-listbox>
-    <helix-button appearance="primary" type="submit">Invite</helix-button>
+    <helix-button
+      appearance="primary"
+      type="submit"
+    >Invite</helix-button>
   </helix-flex>
 </form>

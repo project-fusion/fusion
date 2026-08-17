@@ -1,13 +1,26 @@
-<helix-button appearance="primary" command="--show" commandfor="large-dialog">
+<helix-button
+  appearance="primary"
+  command="--show"
+  commandfor="large-dialog"
+>
   Open dialog
 </helix-button>
 
-<helix-dialog id="large-dialog" label="Dialog Title" size="lg">
+<helix-dialog
+  id="large-dialog"
+  label="Dialog Title"
+  size="lg"
+>
   <h2 slot="header">Dialog Title</h2>
   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
   incididunt ut labore et dolore magna aliqua.
   <helix-flex slot="footer">
-    <helix-button appearance="primary" fill="standard" command="--close" commandfor="large-dialog">
+    <helix-button
+      appearance="primary"
+      fill="standard"
+      command="--close"
+      commandfor="large-dialog"
+    >
       Done
     </helix-button>
   </helix-flex>

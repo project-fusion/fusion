@@ -49,7 +49,7 @@
 }
 
 [part="back"]:hover {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 

@@ -530,9 +530,26 @@ helix-button[appearance="tertiary"]::part(button) {
   border-color: transparent;
 }
 
+/* A wash of the foreground, not a fixed surface.
+ *
+ * `--helix-color-surface-sunken` is an absolute value, and every one of these
+ * sits on a surface whose own lightness is not. Measured on a tertiary button
+ * inside a dialog: sunken is `oklch(0.15)` in dark mode against a panel at
+ * `oklch(0.29)`, so the hover was a 1.39 step *darker* than the surface it was
+ * on, which on a raised panel reads as a hole rather than as a press. On the
+ * page, where the same token was chosen, the step is 1.11 and correct.
+ *
+ * A translucent mix composites against whatever is behind it, so one value is
+ * right on every surface and there is nothing to keep in sync. Secondary
+ * buttons have always worked this way, which is why they measured identically
+ * on both panels while tertiary did not, and `IconButton` was moved to it
+ * earlier for the same reason. 8% wherever the resting state is transparent. */
 [data-button="tertiary"]:hover,
 helix-button[appearance="tertiary"]::part(button):hover {
-  background-color: var(--button-background-color, var(--helix-color-surface-sunken));
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
   border-color: transparent;
 }
 

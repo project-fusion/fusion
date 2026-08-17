@@ -40,7 +40,10 @@
 }
 
 :host(:not([disabled])) [part="item"]:hover {
-  background-color: var(--drilldown-item-hover-color, var(--helix-color-surface-sunken));
+  background-color: var(
+    --drilldown-item-hover-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
 }
 
 [part="item"]:focus-visible {

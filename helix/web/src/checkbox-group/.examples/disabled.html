@@ -1,14 +1,31 @@
-<link rel="stylesheet" href="disabled.css">
+<link
+  rel="stylesheet"
+  href="disabled.css"
+>
 
-<helix-flex direction="column" gap="lg">
-  <helix-checkbox-group disabled hint="Hint" label="Written off" name="a" value="one">
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-checkbox-group
+    disabled
+    hint="Hint"
+    label="Written off"
+    name="a"
+    value="one"
+  >
     <helix-checkbox value="one">Option One</helix-checkbox>
     <helix-checkbox value="two">Option Two</helix-checkbox>
   </helix-checkbox-group>
 
   <!-- The same state, arriving from an ancestor fieldset. -->
   <fieldset disabled>
-    <helix-checkbox-group hint="Hint" label="Off from the fieldset" name="b" value="two">
+    <helix-checkbox-group
+      hint="Hint"
+      label="Off from the fieldset"
+      name="b"
+      value="two"
+    >
       <helix-checkbox value="one">Option One</helix-checkbox>
       <helix-checkbox value="two">Option Two</helix-checkbox>
     </helix-checkbox-group>

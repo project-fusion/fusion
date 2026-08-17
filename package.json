@@ -7,9 +7,9 @@
   "scripts": {
     "analyze": "turbo run analyze",
     "build": "turbo run build",
-    "check": "bun run order && biome check --write . && bun run check:tokens",
+    "check": "bun run order && biome check --write . && node tooling/scripts/format-examples.mjs --write && bun run check:tokens",
     "check:events": "node tooling/scripts/check-events.mjs",
-    "check:examples": "node tooling/scripts/check-examples.mjs",
+    "check:examples": "node tooling/scripts/check-examples.mjs && node tooling/scripts/format-examples.mjs",
     "check:hooks": "node tooling/scripts/check-hooks.mjs",
     "check:parts": "node tooling/scripts/check-parts.mjs",
     "check:reference": "node tooling/scripts/build-reference.mjs --check",

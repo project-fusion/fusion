@@ -1,15 +1,30 @@
-<helix-button appearance="primary" command="--show" commandfor="panel">
+<helix-button
+  appearance="primary"
+  command="--show"
+  commandfor="panel"
+>
   Open drawer
 </helix-button>
 
-<helix-drawer id="panel" label="Drawer Title" placement="end">
+<helix-drawer
+  id="panel"
+  label="Drawer Title"
+  placement="end"
+>
   <span slot="header">Drawer Title</span>
-  <helix-flex direction="column" gap="md">
+  <helix-flex
+    direction="column"
+    gap="md"
+  >
     <helix-text appearance="body">
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
       tempor incididunt ut labore.
     </helix-text>
-    <helix-button appearance="primary" command="--close" commandfor="panel">
+    <helix-button
+      appearance="primary"
+      command="--close"
+      commandfor="panel"
+    >
       Close
     </helix-button>
   </helix-flex>

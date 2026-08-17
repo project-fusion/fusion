@@ -245,12 +245,12 @@ slot[name="icon"]::slotted(*) {
   inline-size: var(--helix-size-icon);
 }
 
-/* A well under the pointer, not only a brighter glyph. `surface-sunken`
-   resolves through `color-scheme`, so it is darker than the message inside an
-   inverted toast and darker again inside one taking the page's mode: sunken in
-   both, without either being named. */
+/* A well under the pointer, not only a brighter glyph, and mixed from the
+   foreground rather than taken from `surface-sunken`. The toast is an overlay
+   surface and an inverted toast is a second one, so an absolute value was
+   wrong on both: it darkened past whichever surface it landed on. */
 [part="dismiss"]:hover {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 

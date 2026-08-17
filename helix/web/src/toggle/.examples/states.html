@@ -1,11 +1,24 @@
-<helix-flex direction="column" gap="lg">
-  <helix-toggle-group hint="Hint" label="Label" default-value="one">
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-toggle-group
+    hint="Hint"
+    label="Label"
+    default-value="one"
+  >
     <helix-toggle value="one">Chosen</helix-toggle>
     <helix-toggle value="two">Not chosen</helix-toggle>
-    <helix-toggle disabled value="three">Disabled</helix-toggle>
+    <helix-toggle
+      disabled
+      value="three"
+    >Disabled</helix-toggle>
   </helix-toggle-group>
 
-  <helix-toggle-group aria-label="Label" default-value="two">
+  <helix-toggle-group
+    aria-label="Label"
+    default-value="two"
+  >
     <helix-toggle value="one">Option One</helix-toggle>
     <helix-toggle value="two">Option Two</helix-toggle>
   </helix-toggle-group>

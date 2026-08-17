@@ -1,10 +1,25 @@
-<link rel="stylesheet" href="disabled.css">
+<link
+  rel="stylesheet"
+  href="disabled.css"
+>
 
-<helix-flex direction="column" gap="lg">
-  <helix-input disabled hint="Hint" label="Written off" default-value="Cannot be edited"></helix-input>
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-input
+    disabled
+    hint="Hint"
+    label="Written off"
+    default-value="Cannot be edited"
+  ></helix-input>
 
   <!-- The same state, arriving from an ancestor fieldset. -->
   <fieldset disabled>
-    <helix-input hint="Hint" label="Off from the fieldset" default-value="Also cannot be edited"></helix-input>
+    <helix-input
+      hint="Hint"
+      label="Off from the fieldset"
+      default-value="Also cannot be edited"
+    ></helix-input>
   </fieldset>
 </helix-flex>

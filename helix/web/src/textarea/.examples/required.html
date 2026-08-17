@@ -1,6 +1,9 @@
 <!-- Preview frame: the submit is swallowed. -->
 <form onsubmit="event.preventDefault()">
-  <helix-flex direction="column" gap="sm">
+  <helix-flex
+    direction="column"
+    gap="sm"
+  >
     <helix-textarea
       hint="We read every one"
       label="What happened"
@@ -8,6 +11,9 @@
       placeholder="Start with what you expected"
       required
     ></helix-textarea>
-    <helix-button appearance="primary" type="submit">Send</helix-button>
+    <helix-button
+      appearance="primary"
+      type="submit"
+    >Send</helix-button>
   </helix-flex>
 </form>

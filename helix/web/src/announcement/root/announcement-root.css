@@ -132,11 +132,12 @@
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* A well under the pointer, the same one the toast's control gets.
-   `surface-sunken` resolves through `color-scheme`, so it darkens against the
-   band in either mode without either being named. */
+/* A well under the pointer, the same one the toast's control gets. Mixed from
+   the foreground, because the band's own fill *is* `surface-sunken` on an
+   unsevered announcement: the well was the identical colour to what it sat on
+   and there was no well at all. */
 [part="dismiss"]:hover {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 

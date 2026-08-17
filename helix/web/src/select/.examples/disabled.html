@@ -1,14 +1,31 @@
-<link rel="stylesheet" href="disabled.css">
+<link
+  rel="stylesheet"
+  href="disabled.css"
+>
 
-<helix-flex direction="column" gap="lg">
-  <helix-select disabled hint="Hint" label="Written off" name="a" default-value="two">
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-select
+    disabled
+    hint="Hint"
+    label="Written off"
+    name="a"
+    default-value="two"
+  >
     <helix-option value="one">Option One</helix-option>
     <helix-option value="two">Option Two</helix-option>
   </helix-select>
 
   <!-- The same state, arriving from an ancestor fieldset. -->
   <fieldset disabled>
-    <helix-select hint="Hint" label="Off from the fieldset" name="b" default-value="one">
+    <helix-select
+      hint="Hint"
+      label="Off from the fieldset"
+      name="b"
+      default-value="one"
+    >
       <helix-option value="one">Option One</helix-option>
       <helix-option value="two">Option Two</helix-option>
     </helix-select>

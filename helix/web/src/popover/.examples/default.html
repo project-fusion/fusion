@@ -1,11 +1,24 @@
-<helix-popover id="details" label="Details">
-  <helix-button appearance="secondary" slot="trigger">Details</helix-button>
-  <helix-flex direction="column" gap="xs">
+<helix-popover
+  id="details"
+  label="Details"
+>
+  <helix-button
+    appearance="secondary"
+    slot="trigger"
+  >Details</helix-button>
+  <helix-flex
+    direction="column"
+    gap="xs"
+  >
     <helix-text appearance="body">
       Anything can go in here. The panel is in the top layer, so it clears a
       scrolling parent without a z-index.
     </helix-text>
-    <helix-button appearance="tertiary" command="--close" commandfor="details">
+    <helix-button
+      appearance="tertiary"
+      command="--close"
+      commandfor="details"
+    >
       Close
     </helix-button>
   </helix-flex>
