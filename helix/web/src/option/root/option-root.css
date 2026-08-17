@@ -12,7 +12,7 @@
      inset or full-bleed and only a row with space around it has corners worth
      rounding. A listbox on its own insets its rows and keeps the radius; the
      select's panel runs them edge to edge and sets this to none. */
-  border-radius: var(--option-radius, var(--helix-radii-sm));
+  border-radius: var(--option-radii, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: flex;

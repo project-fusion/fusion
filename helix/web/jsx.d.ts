@@ -5306,6 +5306,12 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The buttons in the group.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--button-group-gap`: Space between the buttons, when `spaced`. (default: `undefined`)
    */
   "helix-button-group": Partial<
     HelixButtonGroupProps & BaseProps<HelixButtonGroup> & BaseEvents
@@ -5418,6 +5424,7 @@ export type CustomElements = {
    *
    * - `--button-background-color`: Fill behind the button. (default: `undefined`)
    * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
+   * - `--button-inline-size`: Width taken by `fill="standard"`. (default: `undefined`)
    * - `--button-radii`: Corner radius of the control. (default: `undefined`)
    *
    * ## CSS Parts
@@ -5892,6 +5899,9 @@ export type CustomElements = {
    *
    * - `--checkbox-size`: Width and height of the box. (default: `undefined`)
    * - `--checkbox-checked-color`: Fill of a ticked box. (default: `undefined`)
+   * - `--checkbox-background-color`: Fill of an unticked box. (default: `undefined`)
+   * - `--checkbox-mark-color`: Ink the tick is drawn in. (default: `undefined`)
+   * - `--checkbox-card-padding`: Inset of the card appearance. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -6125,6 +6135,8 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
+   * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
+   * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -6346,12 +6358,6 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The items to lay out.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--grid-min`: Column width floor when `min` is set. (default: `undefined`)
    */
   "helix-grid": Partial<HelixGridProps & BaseProps<HelixGrid> & BaseEvents>;
 
@@ -6619,6 +6625,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
+   * - `--list-item-term-weight`: Weight of a description list's term. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -7100,6 +7107,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
+   * - `--option-radii`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -7510,6 +7518,8 @@ export type CustomElements = {
    *
    * - `--radio-size`: Diameter of the circle. (default: `undefined`)
    * - `--radio-mark-color`: Color of the dot. (default: `undefined`)
+   * - `--radio-background-color`: Fill of an unselected circle. (default: `undefined`)
+   * - `--radio-card-padding`: Inset of the card appearance. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -7812,6 +7822,7 @@ export type CustomElements = {
    * - `--slider-thumb-color`: The handle. (default: `undefined`)
    * - `--slider-track-color`: The part not yet chosen. (default: `undefined`)
    * - `--slider-fill-color`: The part behind the thumb. (default: `undefined`)
+   * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -8016,6 +8027,7 @@ export type CustomElements = {
    * - `--switch-height`: Height of the track. The width follows it. (default: `undefined`)
    * - `--switch-width`: Length of the track, if not the derived one. (default: `undefined`)
    * - `--switch-on-color`: Fill when it is on. (default: `undefined`)
+   * - `--switch-thumb-color`: The handle, in both states. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -9005,6 +9017,8 @@ export type CustomElements = {
    *
    * - `--tree-indent`: Indent added per level. (default: `undefined`)
    * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
+   * - `--tree-gap`: Space between rows. (default: `undefined`)
+   * - `--tree-row-size`: Least height of a row, so rows with and without an icon match. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -9084,6 +9098,8 @@ export type CustomElements = {
    *
    * - `--tree-indent`: Indent added per level. (default: `undefined`)
    * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
+   * - `--tree-gap`: Space between rows. (default: `undefined`)
+   * - `--tree-row-size`: Least height of a row, so rows with and without an icon match. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -9654,6 +9670,12 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The buttons in the group.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--button-group-gap`: Space between the buttons, when `spaced`. (default: `undefined`)
    */
   "helix-button-group": Partial<
     HelixButtonGroupProps &
@@ -9769,6 +9791,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--button-background-color`: Fill behind the button. (default: `undefined`)
    * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
+   * - `--button-inline-size`: Width taken by `fill="standard"`. (default: `undefined`)
    * - `--button-radii`: Corner radius of the control. (default: `undefined`)
    *
    * ## CSS Parts
@@ -10260,6 +10283,9 @@ export type CustomElementsSolidJs = {
    *
    * - `--checkbox-size`: Width and height of the box. (default: `undefined`)
    * - `--checkbox-checked-color`: Fill of a ticked box. (default: `undefined`)
+   * - `--checkbox-background-color`: Fill of an unticked box. (default: `undefined`)
+   * - `--checkbox-mark-color`: Ink the tick is drawn in. (default: `undefined`)
+   * - `--checkbox-card-padding`: Inset of the card appearance. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -10502,6 +10528,8 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
+   * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
+   * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -10739,12 +10767,6 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The items to lay out.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--grid-min`: Column width floor when `min` is set. (default: `undefined`)
    */
   "helix-grid": Partial<
     HelixGridProps & HelixGridSolidJsProps & BaseProps<HelixGrid> & BaseEvents
@@ -11026,6 +11048,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
+   * - `--list-item-term-weight`: Weight of a description list's term. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -11526,6 +11549,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
+   * - `--option-radii`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -11956,6 +11980,8 @@ export type CustomElementsSolidJs = {
    *
    * - `--radio-size`: Diameter of the circle. (default: `undefined`)
    * - `--radio-mark-color`: Color of the dot. (default: `undefined`)
+   * - `--radio-background-color`: Fill of an unselected circle. (default: `undefined`)
+   * - `--radio-card-padding`: Inset of the card appearance. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -12269,6 +12295,7 @@ export type CustomElementsSolidJs = {
    * - `--slider-thumb-color`: The handle. (default: `undefined`)
    * - `--slider-track-color`: The part not yet chosen. (default: `undefined`)
    * - `--slider-fill-color`: The part behind the thumb. (default: `undefined`)
+   * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -12484,6 +12511,7 @@ export type CustomElementsSolidJs = {
    * - `--switch-height`: Height of the track. The width follows it. (default: `undefined`)
    * - `--switch-width`: Length of the track, if not the derived one. (default: `undefined`)
    * - `--switch-on-color`: Fill when it is on. (default: `undefined`)
+   * - `--switch-thumb-color`: The handle, in both states. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -13525,6 +13553,8 @@ export type CustomElementsSolidJs = {
    *
    * - `--tree-indent`: Indent added per level. (default: `undefined`)
    * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
+   * - `--tree-gap`: Space between rows. (default: `undefined`)
+   * - `--tree-row-size`: Least height of a row, so rows with and without an icon match. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -13607,6 +13637,8 @@ export type CustomElementsSolidJs = {
    *
    * - `--tree-indent`: Indent added per level. (default: `undefined`)
    * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
+   * - `--tree-gap`: Space between rows. (default: `undefined`)
+   * - `--tree-row-size`: Least height of a row, so rows with and without an icon match. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -13658,10 +13690,14 @@ export type CustomCssProperties = {
   "--breadcrumb-hover-color"?: string;
   /** Space between items and separators. */
   "--breadcrumbs-gap"?: string;
+  /** Space between the buttons, when `spaced`. */
+  "--button-group-gap"?: string;
   /** Fill behind the button. */
   "--button-background-color"?: string;
   /** Label and icon color. */
   "--button-foreground-color"?: string;
+  /** Width taken by `fill="standard"`. */
+  "--button-inline-size"?: string;
   /** Corner radius of the control. */
   "--button-radii"?: string;
   /** Width and height of a day. */
@@ -13698,6 +13734,12 @@ export type CustomCssProperties = {
   "--checkbox-size"?: string;
   /** Fill of a ticked box. */
   "--checkbox-checked-color"?: string;
+  /** Fill of an unticked box. */
+  "--checkbox-background-color"?: string;
+  /** Ink the tick is drawn in. */
+  "--checkbox-mark-color"?: string;
+  /** Inset of the card appearance. */
+  "--checkbox-card-padding"?: string;
   /** Width of the panel. */
   "--dialog-inline-size"?: string;
   /** Padding inside the panel. */
@@ -13708,6 +13750,10 @@ export type CustomCssProperties = {
   "--divider-thickness"?: string;
   /** Width or height of the panel. */
   "--drawer-size"?: string;
+  /** Padding inside the panel. */
+  "--drawer-inset"?: string;
+  /** Padding above the content, which clears the close control. */
+  "--drawer-inset-block-start"?: string;
   /** Fill when a row is under the pointer. */
   "--drilldown-item-hover-color"?: string;
   /** Fill behind the pages. */
@@ -13716,8 +13762,6 @@ export type CustomCssProperties = {
   "--drilldown-inline-size"?: string;
   /** Space around the whole block. */
   "--empty-inset"?: string;
-  /** Column width floor when `min` is set. */
-  "--grid-min"?: string;
   /** Edge length of the control. */
   "--icon-button-size"?: string;
   /** Edge length of the icon's box. */
@@ -13732,6 +13776,8 @@ export type CustomCssProperties = {
   "--kbd-border-color"?: string;
   /** Padding inside the row. */
   "--list-item-inset"?: string;
+  /** Weight of a description list's term. */
+  "--list-item-term-weight"?: string;
   /** Space between rows. */
   "--list-gap"?: string;
   /** How tall it gets before it scrolls. */
@@ -13748,6 +13794,8 @@ export type CustomCssProperties = {
   "--nav-bar-gap"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
+  /** Corner radius of the row. A listbox and a select flatten it. */
+  "--option-radii"?: string;
   /** Width of the gutter the rule and the travelling mark share. */
   "--page-nav-rail"?: string;
   /** How far each level is inset from the one above. */
@@ -13770,6 +13818,10 @@ export type CustomCssProperties = {
   "--radio-size"?: string;
   /** Color of the dot. */
   "--radio-mark-color"?: string;
+  /** Fill of an unselected circle. */
+  "--radio-background-color"?: string;
+  /** Inset of the card appearance. */
+  "--radio-card-padding"?: string;
   /** How tall the panel gets. */
   "--select-surface-max-block-size"?: string;
   /** Diameter of the circle shape. */
@@ -13780,6 +13832,8 @@ export type CustomCssProperties = {
   "--slider-track-color"?: string;
   /** The part behind the thumb. */
   "--slider-fill-color"?: string;
+  /** The ticks along the track. */
+  "--slider-marker-color"?: string;
   /** Diameter. Defaults to 1.5em. */
   "--spinner-size"?: string;
   /** Color of the moving arc. */
@@ -13796,6 +13850,8 @@ export type CustomCssProperties = {
   "--switch-width"?: string;
   /** Fill when it is on. */
   "--switch-on-color"?: string;
+  /** The handle, in both states. */
+  "--switch-thumb-color"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
   /** Fill behind the tag. */
@@ -13826,6 +13882,10 @@ export type CustomCssProperties = {
   "--tree-indent"?: string;
   /** Size of the chevron, and the gutter a leaf reserves. */
   "--tree-chevron-size"?: string;
+  /** Space between rows. */
+  "--tree-gap"?: string;
+  /** Least height of a row, so rows with and without an icon match. */
+  "--tree-row-size"?: string;
 };
 
 declare module "react" {

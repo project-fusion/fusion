@@ -25,6 +25,7 @@ import { styles } from './button-root.css.js'
  *
  * @cssproperty --button-background-color - Fill behind the button.
  * @cssproperty --button-foreground-color - Label and icon color.
+ * @cssproperty --button-inline-size - Width taken by `fill="standard"`.
  * @cssproperty --button-radii - Corner radius of the control.
  */
 @customElement('helix-button')

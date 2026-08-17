@@ -24,6 +24,8 @@ import { styles } from './button-group-root.css.js'
  * @property appearance - Whether the buttons are one bar or a spaced row.
  *
  * @slot - The buttons in the group.
+ *
+ * @cssproperty --button-group-gap - Space between the buttons, when `spaced`.
  */
 @customElement('helix-button-group')
 export class HelixButtonGroup extends HelixBaseButtonGroup {

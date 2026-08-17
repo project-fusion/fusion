@@ -24,6 +24,8 @@ import { styles } from './tree-root.css.js'
  *
  * @cssproperty --tree-indent - Indent added per level.
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
+ * @cssproperty --tree-gap - Space between rows.
+ * @cssproperty --tree-row-size - Least height of a row, so rows with and without an icon match.
  */
 @customElement('helix-tree')
 export class HelixTree extends HelixBaseTree {

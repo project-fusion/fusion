@@ -55,8 +55,8 @@ export interface FloatingOptions {
   /**
    * Whether to cap the floating element to the space available.
    *
-   * On by default, written as `--floating-available-height` and
-   * `--floating-available-width` rather than as a height. A list decides for
+   * On by default, written as `--_floating-available-height` and
+   * `--_floating-available-width` rather than as a height. A list decides for
    * itself whether to scroll or to shrink; a controller that sets the height
    * has decided that for every element it places.
    */
@@ -143,11 +143,11 @@ export class FloatingController implements ReactiveController {
         size({
           apply: ({ availableHeight, availableWidth, elements, rects }) => {
             elements.floating.style.setProperty(
-              '--floating-available-height',
+              '--_floating-available-height',
               `${Math.round(availableHeight)}px`,
             )
             elements.floating.style.setProperty(
-              '--floating-available-width',
+              '--_floating-available-width',
               `${Math.round(availableWidth)}px`,
             )
             /* The anchor's width, which a panel that has to match the control
@@ -158,7 +158,7 @@ export class FloatingController implements ReactiveController {
                edge. It looked like a positioning fault and was a percentage
                resolving against something the CSS could not see. */
             elements.floating.style.setProperty(
-              '--floating-anchor-width',
+              '--_floating-anchor-width',
               `${Math.round(rects.reference.width)}px`,
             )
           },
@@ -231,15 +231,15 @@ export class FloatingController implements ReactiveController {
          *
          * Only the axis the arrow travels on is written. On a `top` placement
          * the arrow moves horizontally and its vertical position is the panel's
-         * edge, so `--floating-arrow-y` is left unset and a consumer's fallback
+         * edge, so `--_floating-arrow-y` is left unset and a consumer's fallback
          * stands. Cleared rather than zeroed when absent, so the fallback in
          * `var()` is what applies. */
         floating.style.setProperty(
-          '--floating-arrow-x',
+          '--_floating-arrow-x',
           point.x === undefined ? '' : `${Math.round(point.x + pointer.offsetWidth / 2)}px`,
         )
         floating.style.setProperty(
-          '--floating-arrow-y',
+          '--_floating-arrow-y',
           point.y === undefined ? '' : `${Math.round(point.y + pointer.offsetHeight / 2)}px`,
         )
       }

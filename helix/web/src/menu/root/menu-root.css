@@ -59,19 +59,19 @@
 }
 
 [part="menu"][data-placement^="top"] {
-  transform-origin: var(--floating-arrow-x, 50%) 100%;
+  transform-origin: var(--_floating-arrow-x, 50%) 100%;
 }
 
 [part="menu"][data-placement^="bottom"] {
-  transform-origin: var(--floating-arrow-x, 50%) 0;
+  transform-origin: var(--_floating-arrow-x, 50%) 0;
 }
 
 [part="menu"][data-placement^="left"] {
-  transform-origin: 100% var(--floating-arrow-y, 50%);
+  transform-origin: 100% var(--_floating-arrow-y, 50%);
 }
 
 [part="menu"][data-placement^="right"] {
-  transform-origin: 0 var(--floating-arrow-y, 50%);
+  transform-origin: 0 var(--_floating-arrow-y, 50%);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -9,6 +9,7 @@
     "build": "turbo run build",
     "check": "bun run order && biome check --write . && bun run check:tokens",
     "check:examples": "node tooling/scripts/check-examples.mjs",
+    "check:hooks": "node tooling/scripts/check-hooks.mjs",
     "check:reference": "node tooling/scripts/build-reference.mjs --check",
     "check:selectors": "node tooling/scripts/check-selectors.mjs",
     "check:tokens": "node tooling/scripts/check-tokens.mjs",
@@ -30,7 +31,7 @@
     "styles": "turbo run styles",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run check:reference && bun run check:selectors && bun run check:motion && bun run test && bun run rs:check && bun run rs:test",
+    "verify": "biome ci . && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run check:reference && bun run check:selectors && bun run check:motion && bun run check:hooks && bun run test && bun run rs:check && bun run rs:test",
     "check:motion": "node tooling/scripts/check-motion.mjs"
   },
   "devDependencies": {

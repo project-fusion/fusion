@@ -3018,6 +3018,12 @@
           "kind": "class",
           "description": "The buttons are joined into a single shape: the outer corners keep their\nradius, the inner ones lose it, and adjacent borders collapse into one line.\n\nThat joining is in the base layer, paired with `data-button` the way the\nbutton's own box is, because the corner belongs to the control inside each\nbutton's shadow root and a rule in here cannot reach it. The same rule\ntherefore serves a consumer's own anchor styled as a button.",
           "name": "HelixButtonGroup",
+          "cssProperties": [
+            {
+              "description": "Space between the buttons, when `spaced`.",
+              "name": "--button-group-gap"
+            }
+          ],
           "slots": [
             {
               "description": "The buttons in the group.",
@@ -3239,6 +3245,10 @@
             {
               "description": "Label and icon color.",
               "name": "--button-foreground-color"
+            },
+            {
+              "description": "Width taken by `fill=\"standard\"`.",
+              "name": "--button-inline-size"
             },
             {
               "description": "Corner radius of the control.",
@@ -6705,6 +6715,18 @@
             {
               "description": "Fill of a ticked box.",
               "name": "--checkbox-checked-color"
+            },
+            {
+              "description": "Fill of an unticked box.",
+              "name": "--checkbox-background-color"
+            },
+            {
+              "description": "Ink the tick is drawn in.",
+              "name": "--checkbox-mark-color"
+            },
+            {
+              "description": "Inset of the card appearance.",
+              "name": "--checkbox-card-padding"
             }
           ],
           "members": [
@@ -8412,6 +8434,14 @@
             {
               "description": "Width or height of the panel.",
               "name": "--drawer-size"
+            },
+            {
+              "description": "Padding inside the panel.",
+              "name": "--drawer-inset"
+            },
+            {
+              "description": "Padding above the content, which clears the close control.",
+              "name": "--drawer-inset-block-start"
             }
           ],
           "cssParts": [
@@ -10291,12 +10321,6 @@
           "kind": "class",
           "description": "Two ways to declare columns, and only two. `columns` is a fixed count;\n`min` fills as many equal columns as fit above that width, which is a\nresponsive layout with no breakpoint to maintain. Setting `min` wins, because\na fixed count that also reflows is two intentions in one element.\n\nPresentation only, so there is no headless tier.",
           "name": "HelixGrid",
-          "cssProperties": [
-            {
-              "description": "Column width floor when `min` is set.",
-              "name": "--grid-min"
-            }
-          ],
           "slots": [
             {
               "description": "The items to lay out.",
@@ -12837,6 +12861,10 @@
             {
               "description": "Padding inside the row.",
               "name": "--list-item-inset"
+            },
+            {
+              "description": "Weight of a description list's term.",
+              "name": "--list-item-term-weight"
             }
           ],
           "members": [
@@ -16142,6 +16170,10 @@
             {
               "description": "Wash behind the option the keyboard is on.",
               "name": "--option-active-color"
+            },
+            {
+              "description": "Corner radius of the row. A listbox and a select flatten it.",
+              "name": "--option-radii"
             }
           ],
           "members": [
@@ -18862,6 +18894,14 @@
             {
               "description": "Color of the dot.",
               "name": "--radio-mark-color"
+            },
+            {
+              "description": "Fill of an unselected circle.",
+              "name": "--radio-background-color"
+            },
+            {
+              "description": "Inset of the card appearance.",
+              "name": "--radio-card-padding"
             }
           ],
           "members": [
@@ -20562,6 +20602,10 @@
             {
               "description": "The part behind the thumb.",
               "name": "--slider-fill-color"
+            },
+            {
+              "description": "The ticks along the track.",
+              "name": "--slider-marker-color"
             }
           ],
           "members": [
@@ -22237,6 +22281,10 @@
             {
               "description": "Fill when it is on.",
               "name": "--switch-on-color"
+            },
+            {
+              "description": "The handle, in both states.",
+              "name": "--switch-thumb-color"
             }
           ],
           "members": [
@@ -29503,6 +29551,14 @@
             {
               "description": "Size of the chevron, and the gutter a leaf reserves.",
               "name": "--tree-chevron-size"
+            },
+            {
+              "description": "Space between rows.",
+              "name": "--tree-gap"
+            },
+            {
+              "description": "Least height of a row, so rows with and without an icon match.",
+              "name": "--tree-row-size"
             }
           ],
           "cssParts": [
@@ -30059,6 +30115,14 @@
             {
               "description": "Size of the chevron, and the gutter a leaf reserves.",
               "name": "--tree-chevron-size"
+            },
+            {
+              "description": "Space between rows.",
+              "name": "--tree-gap"
+            },
+            {
+              "description": "Least height of a row, so rows with and without an icon match.",
+              "name": "--tree-row-size"
             }
           ],
           "cssParts": [

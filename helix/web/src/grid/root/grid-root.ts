@@ -21,8 +21,7 @@ import { styles } from './grid-root.css.js'
  * @documentation https://helix.fusion.dev/components/grid
  *
  * @slot - The items to lay out.
- *
- * @cssproperty --grid-min - Column width floor when `min` is set.
+
  */
 @customElement('helix-grid')
 export class HelixGrid extends HelixElement {

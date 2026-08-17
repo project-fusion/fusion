@@ -17,6 +17,7 @@ import { styles } from './list-item.css.js'
  * @documentation https://helix.fusion.dev/components/list
  *
  * @cssproperty --list-item-inset - Padding inside the row.
+ * @cssproperty --list-item-term-weight - Weight of a description list's term.
  */
 @customElement('helix-list-item')
 export class HelixListItem extends HelixBaseListItem {

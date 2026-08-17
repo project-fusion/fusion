@@ -375,6 +375,25 @@ helix-text[tone="danger"] {
  * lives: `Button` renders no anchor, because a router renders its own `<a>` and
  * cannot render it inside a shadow root. `<Link data-button="primary">` is the
  * same control.
+ *
+ * **The three hooks are read here, in every appearance and every state.**
+ * `Button` documented `--button-background-color`, `--button-foreground-color`
+ * and `--button-radii` and no rule read any of them: they were declared in the
+ * shadow, the box moved to this file, and the rules that read them went with
+ * the box. Three published hooks did nothing, silently, while the API page went
+ * on listing them.
+ *
+ * A named fill wins outright, hover included, which is why `:hover` reads the
+ * hook as well. A consumer who names an exact colour and then watches it change
+ * under the pointer has been given a hook that half works. Wanting a different
+ * colour on hover is one line and it is the same hook:
+ *
+ * ```css
+ * helix-button:hover { --button-background-color: rebeccapurple; }
+ * ```
+ *
+ * That works because the hook is a custom property on the host, and a custom
+ * property crosses into the shadow tree where a rule cannot.
  */
 [data-button],
 helix-button::part(button) {
@@ -392,11 +411,14 @@ helix-button::part(button) {
    * same either way and `primary`, `danger` and `tertiary` all speak to
    * `border-color`. A button that lost the property would need each of them to
    * grow a width as well. */
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+  );
   block-size: var(--helix-size-control);
   border: var(--helix-border-thin) solid transparent;
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground);
+  border-radius: var(--button-radii, var(--helix-radii-sm));
+  color: var(--button-foreground-color, var(--helix-color-foreground));
   cursor: pointer;
   display: inline-flex;
   font-family: var(--helix-font-sans);
@@ -418,7 +440,10 @@ helix-button::part(button) {
 /* Hover deepens the wash rather than drawing a line that was not there. */
 [data-button]:hover,
 helix-button::part(button):hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+  );
 }
 
 /* How much of the room available to it the button takes.
@@ -465,14 +490,14 @@ helix-button[fill="full"] {
 
 [data-button="primary"],
 helix-button[appearance="primary"]::part(button) {
-  background-color: var(--helix-color-primary);
+  background-color: var(--button-background-color, var(--helix-color-primary));
   border-color: transparent;
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
 }
 
 [data-button="primary"]:hover,
 helix-button[appearance="primary"]::part(button):hover {
-  background-color: var(--helix-color-primary-hover);
+  background-color: var(--button-background-color, var(--helix-color-primary-hover));
   border-color: transparent;
 }
 
@@ -501,21 +526,21 @@ helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
 
 [data-button="tertiary"],
 helix-button[appearance="tertiary"]::part(button) {
-  background-color: transparent;
+  background-color: var(--button-background-color, transparent);
   border-color: transparent;
 }
 
 [data-button="tertiary"]:hover,
 helix-button[appearance="tertiary"]::part(button):hover {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(--button-background-color, var(--helix-color-surface-sunken));
   border-color: transparent;
 }
 
 [data-button="danger"],
 helix-button[appearance="danger"]::part(button) {
-  background-color: var(--helix-color-danger);
+  background-color: var(--button-background-color, var(--helix-color-danger));
   border-color: transparent;
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
 }
 
 /* Type and inset follow the density the button is in, the same way its height

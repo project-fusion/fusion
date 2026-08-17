@@ -24,6 +24,8 @@ import { styles } from './radio-root.css.js'
  *
  * @cssproperty --radio-size - Diameter of the circle.
  * @cssproperty --radio-mark-color - Color of the dot.
+ * @cssproperty --radio-background-color - Fill of an unselected circle.
+ * @cssproperty --radio-card-padding - Inset of the card appearance.
  */
 @customElement('helix-radio')
 export class HelixRadio extends HelixBaseRadio {

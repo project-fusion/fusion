@@ -510,6 +510,7 @@ ring is declared here rather than inherited, because the base layer's
 | --- | --- |
 | `--button-background-color` | Fill behind the button. |
 | `--button-foreground-color` | Label and icon color. |
+| `--button-inline-size` | Width taken by `fill="standard"`. |
 | `--button-radii` | Corner radius of the control. |
 
 ## Button Group
@@ -540,6 +541,12 @@ therefore serves a consumer's own anchor styled as a button.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The buttons in the group. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--button-group-gap` | Space between the buttons, when `spaced`. |
 
 ## Calendar
 
@@ -858,6 +865,9 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | --- | --- |
 | `--checkbox-size` | Width and height of the box. |
 | `--checkbox-checked-color` | Fill of a ticked box. |
+| `--checkbox-background-color` | Fill of an unticked box. |
+| `--checkbox-mark-color` | Ink the tick is drawn in. |
+| `--checkbox-card-padding` | Inset of the card appearance. |
 
 ## Checkbox Group
 
@@ -1067,6 +1077,8 @@ rest is flat and the movement is what says something happened.
 | Property | Description |
 | --- | --- |
 | `--drawer-size` | Width or height of the panel. |
+| `--drawer-inset` | Padding inside the panel. |
+| `--drawer-inset-block-start` | Padding above the content, which clears the close control. |
 
 ## Drilldown
 
@@ -1284,12 +1296,6 @@ Presentation only, so there is no headless tier.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The items to lay out. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--grid-min` | Column width floor when `min` is set. |
 
 ## Icon
 
@@ -1554,6 +1560,7 @@ hold their own width and the middle takes the rest.
 | Property | Description |
 | --- | --- |
 | `--list-item-inset` | Padding inside the row. |
+| `--list-item-term-weight` | Weight of a description list's term. |
 
 ## Listbox
 
@@ -1855,6 +1862,7 @@ picked from what they are looking at.
 | Property | Description |
 | --- | --- |
 | `--option-active-color` | Wash behind the option the keyboard is on. |
+| `--option-radii` | Corner radius of the row. A listbox and a select flatten it. |
 
 ### Group — `helix-option-group`
 
@@ -2135,6 +2143,8 @@ and being chosen is an answer rather than a state.
 | --- | --- |
 | `--radio-size` | Diameter of the circle. |
 | `--radio-mark-color` | Color of the dot. |
+| `--radio-background-color` | Fill of an unselected circle. |
+| `--radio-card-padding` | Inset of the card appearance. |
 
 ### Group — `helix-radio-group`
 
@@ -2395,6 +2405,7 @@ the thumb being dragged.
 | `--slider-thumb-color` | The handle. |
 | `--slider-track-color` | The part not yet chosen. |
 | `--slider-fill-color` | The part behind the thumb. |
+| `--slider-marker-color` | The ticks along the track. |
 
 ## Spinner
 
@@ -2581,6 +2592,7 @@ consumer has to keep.
 | `--switch-height` | Height of the track. The width follows it. |
 | `--switch-width` | Length of the track, if not the derived one. |
 | `--switch-on-color` | Fill when it is on. |
+| `--switch-thumb-color` | The handle, in both states. |
 
 ## Table
 
@@ -3371,6 +3383,8 @@ to it is one more thing between the reader and the label.
 | --- | --- |
 | `--tree-indent` | Indent added per level. |
 | `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
+| `--tree-gap` | Space between rows. |
+| `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
 
 ### Item — `helix-tree-item`
 
@@ -3440,3 +3454,5 @@ the row itself stays flat.
 | --- | --- |
 | `--tree-indent` | Indent added per level. |
 | `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
+| `--tree-gap` | Space between rows. |
+| `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
