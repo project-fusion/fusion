@@ -36,12 +36,10 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * here guesses. What this adds is the anchor, so `reportValidity` points the
  * bubble at the input rather than at the host.
  *
- * `pattern`, `minlength` and `maxlength` are **not** forwarded, and this
- * paragraph used to say they were, on the strength of "and the rest": no such
- * properties exist and nothing binds them, so a consumer following the sentence
- * wrote an attribute on the host that reached no input and constrained nothing.
- * They are worth adding and are a change to the API rather than a correction to
- * a comment, so what is here is the truth about what is forwarded today.
+ * `pattern`, `minlength` and `maxlength` are forwarded with them. They were
+ * promised by this paragraph and did not exist, so a consumer following the
+ * sentence wrote an attribute on the host that reached no input and constrained
+ * nothing: the field looked as though it were checked and was not.
  *
  * @since 0.1.0
  * @status experimental
@@ -140,6 +138,29 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
     this.sync()
   }
 
+  /**
+   * A regular expression the value has to match, as the platform reads it.
+   *
+   * The class documentation promised `pattern` and `minlength` "and the rest"
+   * were set on the real input, and no such properties existed: a consumer
+   * following that sentence wrote an attribute on the host, it reached no input,
+   * and the field constrained nothing while looking as though it did.
+   *
+   * Forwarded rather than checked here, which is the whole reason validity is
+   * the platform's: the browser knows what a `pattern` means, anchors it at both
+   * ends, and produces the message in the reader's own language.
+   */
+  @property()
+  pattern = ''
+
+  /** Fewest characters the value may have. */
+  @property({ attribute: 'minlength', type: Number })
+  minLength?: number
+
+  /** Most characters the value may have. */
+  @property({ attribute: 'maxlength', type: Number })
+  maxLength?: number
+
   protected override render(): TemplateResult {
     /* Label, field, and one line under it.
        The hint and the feedback share that line rather than stacking, so a
@@ -155,6 +176,9 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
         type=${this.type}
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
+        pattern=${this.pattern || nothing}
+        minlength=${this.minLength ?? nothing}
+        maxlength=${this.maxLength ?? nothing}
         aria-describedby=${this.describedBy ?? nothing}
         ?disabled=${this.isDisabled}
         ?readonly=${this.readOnly}

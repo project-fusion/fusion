@@ -1988,6 +1988,25 @@ export type HelixBaseInputProps = {
   readOnly?: HelixBaseInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation. */
   type?: HelixBaseInput["type"];
+  /** A regular expression the value has to match, as the platform reads it.
+
+The class documentation promised `pattern` and `minlength` "and the rest"
+were set on the real input, and no such properties existed: a consumer
+following that sentence wrote an attribute on the host, it reached no input,
+and the field constrained nothing while looking as though it did.
+
+Forwarded rather than checked here, which is the whole reason validity is
+the platform's: the browser knows what a `pattern` means, anchors it at both
+ends, and produces the message in the reader's own language. */
+  pattern?: HelixBaseInput["pattern"];
+  /** Fewest characters the value may have. */
+  minlength?: HelixBaseInput["minLength"];
+  /** Fewest characters the value may have. */
+  minLength?: HelixBaseInput["minLength"];
+  /** Most characters the value may have. */
+  maxlength?: HelixBaseInput["maxLength"];
+  /** Most characters the value may have. */
+  maxLength?: HelixBaseInput["maxLength"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -2059,6 +2078,25 @@ export type HelixBaseInputSolidJsProps = {
   "prop:readOnly"?: HelixBaseInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation. */
   "prop:type"?: HelixBaseInput["type"];
+  /** A regular expression the value has to match, as the platform reads it.
+
+The class documentation promised `pattern` and `minlength` "and the rest"
+were set on the real input, and no such properties existed: a consumer
+following that sentence wrote an attribute on the host, it reached no input,
+and the field constrained nothing while looking as though it did.
+
+Forwarded rather than checked here, which is the whole reason validity is
+the platform's: the browser knows what a `pattern` means, anchors it at both
+ends, and produces the message in the reader's own language. */
+  "prop:pattern"?: HelixBaseInput["pattern"];
+  /** Fewest characters the value may have. */
+  "attr:minlength"?: HelixBaseInput["minLength"];
+  /** Fewest characters the value may have. */
+  "prop:minLength"?: HelixBaseInput["minLength"];
+  /** Most characters the value may have. */
+  "attr:maxlength"?: HelixBaseInput["maxLength"];
+  /** Most characters the value may have. */
+  "prop:maxLength"?: HelixBaseInput["maxLength"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixBaseInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -4135,6 +4173,24 @@ export type HelixBaseTextareaProps = {
   readOnly?: HelixBaseTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
   rows?: HelixBaseTextarea["rows"];
+  /** Fewest characters the value may have.
+
+Forwarded to the real `<textarea>` rather than checked here, which is what
+makes the message the browser's and therefore the reader's own language.
+No `pattern`: the platform does not give a textarea one, and inventing it
+would be this library guessing where the point is to stop guessing. */
+  minlength?: HelixBaseTextarea["minLength"];
+  /** Fewest characters the value may have.
+
+Forwarded to the real `<textarea>` rather than checked here, which is what
+makes the message the browser's and therefore the reader's own language.
+No `pattern`: the platform does not give a textarea one, and inventing it
+would be this library guessing where the point is to stop guessing. */
+  minLength?: HelixBaseTextarea["minLength"];
+  /** Most characters the value may have. */
+  maxlength?: HelixBaseTextarea["maxLength"];
+  /** Most characters the value may have. */
+  maxLength?: HelixBaseTextarea["maxLength"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseTextarea["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -4210,6 +4266,24 @@ export type HelixBaseTextareaSolidJsProps = {
   "prop:readOnly"?: HelixBaseTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
   "prop:rows"?: HelixBaseTextarea["rows"];
+  /** Fewest characters the value may have.
+
+Forwarded to the real `<textarea>` rather than checked here, which is what
+makes the message the browser's and therefore the reader's own language.
+No `pattern`: the platform does not give a textarea one, and inventing it
+would be this library guessing where the point is to stop guessing. */
+  "attr:minlength"?: HelixBaseTextarea["minLength"];
+  /** Fewest characters the value may have.
+
+Forwarded to the real `<textarea>` rather than checked here, which is what
+makes the message the browser's and therefore the reader's own language.
+No `pattern`: the platform does not give a textarea one, and inventing it
+would be this library guessing where the point is to stop guessing. */
+  "prop:minLength"?: HelixBaseTextarea["minLength"];
+  /** Most characters the value may have. */
+  "attr:maxlength"?: HelixBaseTextarea["maxLength"];
+  /** Most characters the value may have. */
+  "prop:maxLength"?: HelixBaseTextarea["maxLength"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixBaseTextarea["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -6751,12 +6825,10 @@ export type CustomElements = {
    * here guesses. What this adds is the anchor, so `reportValidity` points the
    * bubble at the input rather than at the host.
    *
-   * `pattern`, `minlength` and `maxlength` are **not** forwarded, and this
-   * paragraph used to say they were, on the strength of "and the rest": no such
-   * properties exist and nothing binds them, so a consumer following the sentence
-   * wrote an attribute on the host that reached no input and constrained nothing.
-   * They are worth adding and are a change to the API rather than a correction to
-   * a comment, so what is here is the truth about what is forwarded today.
+   * `pattern`, `minlength` and `maxlength` are forwarded with them. They were
+   * promised by this paragraph and did not exist, so a consumer following the
+   * sentence wrote an attribute on the host that reached no input and constrained
+   * nothing: the field looked as though it were checked and was not.
    *
    * ## Attributes & Properties
    *
@@ -6765,6 +6837,18 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
+   * - `pattern`: A regular expression the value has to match, as the platform reads it.
+   *
+   * The class documentation promised `pattern` and `minlength` "and the rest"
+   * were set on the real input, and no such properties existed: a consumer
+   * following that sentence wrote an attribute on the host, it reached no input,
+   * and the field constrained nothing while looking as though it did.
+   *
+   * Forwarded rather than checked here, which is the whole reason validity is
+   * the platform's: the browser knows what a `pattern` means, anchors it at both
+   * ends, and produces the message in the reader's own language.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -8885,6 +8969,13 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   *
+   * Forwarded to the real `<textarea>` rather than checked here, which is what
+   * makes the message the browser's and therefore the reader's own language.
+   * No `pattern`: the platform does not give a textarea one, and inventing it
+   * would be this library guessing where the point is to stop guessing.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -11484,12 +11575,10 @@ export type CustomElementsSolidJs = {
    * here guesses. What this adds is the anchor, so `reportValidity` points the
    * bubble at the input rather than at the host.
    *
-   * `pattern`, `minlength` and `maxlength` are **not** forwarded, and this
-   * paragraph used to say they were, on the strength of "and the rest": no such
-   * properties exist and nothing binds them, so a consumer following the sentence
-   * wrote an attribute on the host that reached no input and constrained nothing.
-   * They are worth adding and are a change to the API rather than a correction to
-   * a comment, so what is here is the truth about what is forwarded today.
+   * `pattern`, `minlength` and `maxlength` are forwarded with them. They were
+   * promised by this paragraph and did not exist, so a consumer following the
+   * sentence wrote an attribute on the host that reached no input and constrained
+   * nothing: the field looked as though it were checked and was not.
    *
    * ## Attributes & Properties
    *
@@ -11498,6 +11587,18 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
+   * - `pattern`: A regular expression the value has to match, as the platform reads it.
+   *
+   * The class documentation promised `pattern` and `minlength` "and the rest"
+   * were set on the real input, and no such properties existed: a consumer
+   * following that sentence wrote an attribute on the host, it reached no input,
+   * and the field constrained nothing while looking as though it did.
+   *
+   * Forwarded rather than checked here, which is the whole reason validity is
+   * the platform's: the browser knows what a `pattern` means, anchors it at both
+   * ends, and produces the message in the reader's own language.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -13711,6 +13812,13 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   *
+   * Forwarded to the real `<textarea>` rather than checked here, which is what
+   * makes the message the browser's and therefore the reader's own language.
+   * No `pattern`: the platform does not give a textarea one, and inventing it
+   * would be this library guessing where the point is to stop guessing.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *

@@ -1442,8 +1442,11 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `maxLength` | `maxlength` | `number \| undefined` | - | `HelixBaseInput` | Most characters the value may have. |
+| `minLength` | `minlength` | `number \| undefined` | - | `HelixBaseInput` | Fewest characters the value may have. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `pattern` | `pattern` | `string` | `''` | `HelixBaseInput` | A regular expression the value has to match, as the platform reads it. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
@@ -3017,6 +3020,8 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `maxLength` | `maxlength` | `number \| undefined` | - | `HelixBaseTextarea` | Most characters the value may have. |
+| `minLength` | `minlength` | `number \| undefined` | - | `HelixBaseTextarea` | Fewest characters the value may have. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseTextarea` | Shown while the field is empty. Not a label: it goes when typing starts. |

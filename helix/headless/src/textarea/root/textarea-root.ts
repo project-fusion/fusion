@@ -183,6 +183,21 @@ export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixForm
     this.grow()
   }
 
+  /**
+   * Fewest characters the value may have.
+   *
+   * Forwarded to the real `<textarea>` rather than checked here, which is what
+   * makes the message the browser's and therefore the reader's own language.
+   * No `pattern`: the platform does not give a textarea one, and inventing it
+   * would be this library guessing where the point is to stop guessing.
+   */
+  @property({ attribute: 'minlength', type: Number })
+  minLength?: number
+
+  /** Most characters the value may have. */
+  @property({ attribute: 'maxlength', type: Number })
+  maxLength?: number
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
     <div part="field">
@@ -193,6 +208,8 @@ export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixForm
         rows=${this.rows}
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
+        minlength=${this.minLength ?? nothing}
+        maxlength=${this.maxLength ?? nothing}
         aria-describedby=${this.describedBy ?? nothing}
         ?disabled=${this.isDisabled}
         ?readonly=${this.readOnly}

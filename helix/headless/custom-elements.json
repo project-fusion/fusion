@@ -9090,7 +9090,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the\npassword manager, and the on-screen keyboard a phone chooses all come from the\nplatform. `delegatesFocus` puts focus on it, and it serializes into the\nserver's markup, so the field is usable before any script loads.\n\n**The input inside a shadow root submits nothing**, because the form is on the\nother side of the boundary. The host is form-associated instead and reports\nits own value through `ElementInternals`, which is also what carries validity\nand what answers a form reset.\n\n`value` and `defaultValue` are separate for the reason `checked` and\n`defaultChecked` are: `value` is what is in the field now and\n`defaultValue` is what the markup asked for, which is where a reset returns\nto and is gone the moment anyone types.\n\n**Validity is the platform's.** The `type` and `required` are set on the real\ninput and its `validity` is copied onto the host, so an email field rejects\nwhat the browser says is not an email rather than what a regular expression\nhere guesses. What this adds is the anchor, so `reportValidity` points the\nbubble at the input rather than at the host.\n\n`pattern`, `minlength` and `maxlength` are **not** forwarded, and this\nparagraph used to say they were, on the strength of \"and the rest\": no such\nproperties exist and nothing binds them, so a consumer following the sentence\nwrote an attribute on the host that reached no input and constrained nothing.\nThey are worth adding and are a change to the API rather than a correction to\na comment, so what is here is the truth about what is forwarded today.",
+          "description": "Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the\npassword manager, and the on-screen keyboard a phone chooses all come from the\nplatform. `delegatesFocus` puts focus on it, and it serializes into the\nserver's markup, so the field is usable before any script loads.\n\n**The input inside a shadow root submits nothing**, because the form is on the\nother side of the boundary. The host is form-associated instead and reports\nits own value through `ElementInternals`, which is also what carries validity\nand what answers a form reset.\n\n`value` and `defaultValue` are separate for the reason `checked` and\n`defaultChecked` are: `value` is what is in the field now and\n`defaultValue` is what the markup asked for, which is where a reset returns\nto and is gone the moment anyone types.\n\n**Validity is the platform's.** The `type` and `required` are set on the real\ninput and its `validity` is copied onto the host, so an email field rejects\nwhat the browser says is not an email rather than what a regular expression\nhere guesses. What this adds is the anchor, so `reportValidity` points the\nbubble at the input rather than at the host.\n\n`pattern`, `minlength` and `maxlength` are forwarded with them. They were\npromised by this paragraph and did not exist, so a consumer following the\nsentence wrote an attribute on the host that reached no input and constrained\nnothing: the field looked as though it were checked and was not.",
           "name": "HelixBaseInput",
           "cssParts": [
             {
@@ -9223,6 +9223,34 @@
               "type": {
                 "text": "select() => void"
               }
+            },
+            {
+              "kind": "field",
+              "name": "pattern",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A regular expression the value has to match, as the platform reads it.\n\nThe class documentation promised `pattern` and `minlength` \"and the rest\"\nwere set on the real input, and no such properties existed: a consumer\nfollowing that sentence wrote an attribute on the host, it reached no input,\nand the field constrained nothing while looking as though it did.\n\nForwarded rather than checked here, which is the whole reason validity is\nthe platform's: the browser knows what a `pattern` means, anchors it at both\nends, and produces the message in the reader's own language.",
+              "attribute": "pattern"
+            },
+            {
+              "kind": "field",
+              "name": "minLength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Fewest characters the value may have.",
+              "attribute": "minlength"
+            },
+            {
+              "kind": "field",
+              "name": "maxLength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Most characters the value may have.",
+              "attribute": "maxlength"
             },
             {
               "kind": "field",
@@ -9825,6 +9853,31 @@
               "default": "'text'",
               "description": "What the field accepts, which decides the keyboard and the validation.",
               "fieldName": "type"
+            },
+            {
+              "name": "pattern",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A regular expression the value has to match, as the platform reads it.\n\nThe class documentation promised `pattern` and `minlength` \"and the rest\"\nwere set on the real input, and no such properties existed: a consumer\nfollowing that sentence wrote an attribute on the host, it reached no input,\nand the field constrained nothing while looking as though it did.\n\nForwarded rather than checked here, which is the whole reason validity is\nthe platform's: the browser knows what a `pattern` means, anchors it at both\nends, and produces the message in the reader's own language.",
+              "fieldName": "pattern"
+            },
+            {
+              "name": "minlength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Fewest characters the value may have.",
+              "fieldName": "minLength"
+            },
+            {
+              "name": "maxlength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Most characters the value may have.",
+              "fieldName": "maxLength"
             },
             {
               "name": "default-value",
@@ -20973,6 +21026,24 @@
             },
             {
               "kind": "field",
+              "name": "minLength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Fewest characters the value may have.\n\nForwarded to the real `<textarea>` rather than checked here, which is what\nmakes the message the browser's and therefore the reader's own language.\nNo `pattern`: the platform does not give a textarea one, and inventing it\nwould be this library guessing where the point is to stop guessing.",
+              "attribute": "minlength"
+            },
+            {
+              "kind": "field",
+              "name": "maxLength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Most characters the value may have.",
+              "attribute": "maxlength"
+            },
+            {
+              "kind": "field",
               "name": "defaultValue",
               "type": {
                 "text": "string"
@@ -21581,6 +21652,22 @@
               "default": "3",
               "description": "How many lines the box is before anything is typed.",
               "fieldName": "rows"
+            },
+            {
+              "name": "minlength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Fewest characters the value may have.\n\nForwarded to the real `<textarea>` rather than checked here, which is what\nmakes the message the browser's and therefore the reader's own language.\nNo `pattern`: the platform does not give a textarea one, and inventing it\nwould be this library guessing where the point is to stop guessing.",
+              "fieldName": "minLength"
+            },
+            {
+              "name": "maxlength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Most characters the value may have.",
+              "fieldName": "maxLength"
             },
             {
               "name": "default-value",

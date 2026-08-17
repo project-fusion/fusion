@@ -2367,6 +2367,25 @@ being four of a kind rather than four of three kinds. */
   readOnly?: HelixInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation. */
   type?: HelixInput["type"];
+  /** A regular expression the value has to match, as the platform reads it.
+
+The class documentation promised `pattern` and `minlength` "and the rest"
+were set on the real input, and no such properties existed: a consumer
+following that sentence wrote an attribute on the host, it reached no input,
+and the field constrained nothing while looking as though it did.
+
+Forwarded rather than checked here, which is the whole reason validity is
+the platform's: the browser knows what a `pattern` means, anchors it at both
+ends, and produces the message in the reader's own language. */
+  pattern?: HelixInput["pattern"];
+  /** Fewest characters the value may have. */
+  minlength?: HelixInput["minLength"];
+  /** Fewest characters the value may have. */
+  minLength?: HelixInput["minLength"];
+  /** Most characters the value may have. */
+  maxlength?: HelixInput["maxLength"];
+  /** Most characters the value may have. */
+  maxLength?: HelixInput["maxLength"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -2438,6 +2457,25 @@ being four of a kind rather than four of three kinds. */
   "prop:readOnly"?: HelixInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation. */
   "prop:type"?: HelixInput["type"];
+  /** A regular expression the value has to match, as the platform reads it.
+
+The class documentation promised `pattern` and `minlength` "and the rest"
+were set on the real input, and no such properties existed: a consumer
+following that sentence wrote an attribute on the host, it reached no input,
+and the field constrained nothing while looking as though it did.
+
+Forwarded rather than checked here, which is the whole reason validity is
+the platform's: the browser knows what a `pattern` means, anchors it at both
+ends, and produces the message in the reader's own language. */
+  "prop:pattern"?: HelixInput["pattern"];
+  /** Fewest characters the value may have. */
+  "attr:minlength"?: HelixInput["minLength"];
+  /** Fewest characters the value may have. */
+  "prop:minLength"?: HelixInput["minLength"];
+  /** Most characters the value may have. */
+  "attr:maxlength"?: HelixInput["maxLength"];
+  /** Most characters the value may have. */
+  "prop:maxLength"?: HelixInput["maxLength"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4609,6 +4647,24 @@ being four of a kind rather than four of three kinds. */
   readOnly?: HelixTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
   rows?: HelixTextarea["rows"];
+  /** Fewest characters the value may have.
+
+Forwarded to the real `<textarea>` rather than checked here, which is what
+makes the message the browser's and therefore the reader's own language.
+No `pattern`: the platform does not give a textarea one, and inventing it
+would be this library guessing where the point is to stop guessing. */
+  minlength?: HelixTextarea["minLength"];
+  /** Fewest characters the value may have.
+
+Forwarded to the real `<textarea>` rather than checked here, which is what
+makes the message the browser's and therefore the reader's own language.
+No `pattern`: the platform does not give a textarea one, and inventing it
+would be this library guessing where the point is to stop guessing. */
+  minLength?: HelixTextarea["minLength"];
+  /** Most characters the value may have. */
+  maxlength?: HelixTextarea["maxLength"];
+  /** Most characters the value may have. */
+  maxLength?: HelixTextarea["maxLength"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4684,6 +4740,24 @@ being four of a kind rather than four of three kinds. */
   "prop:readOnly"?: HelixTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
   "prop:rows"?: HelixTextarea["rows"];
+  /** Fewest characters the value may have.
+
+Forwarded to the real `<textarea>` rather than checked here, which is what
+makes the message the browser's and therefore the reader's own language.
+No `pattern`: the platform does not give a textarea one, and inventing it
+would be this library guessing where the point is to stop guessing. */
+  "attr:minlength"?: HelixTextarea["minLength"];
+  /** Fewest characters the value may have.
+
+Forwarded to the real `<textarea>` rather than checked here, which is what
+makes the message the browser's and therefore the reader's own language.
+No `pattern`: the platform does not give a textarea one, and inventing it
+would be this library guessing where the point is to stop guessing. */
+  "prop:minLength"?: HelixTextarea["minLength"];
+  /** Most characters the value may have. */
+  "attr:maxlength"?: HelixTextarea["maxLength"];
+  /** Most characters the value may have. */
+  "prop:maxLength"?: HelixTextarea["maxLength"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7345,6 +7419,18 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
+   * - `pattern`: A regular expression the value has to match, as the platform reads it.
+   *
+   * The class documentation promised `pattern` and `minlength` "and the rest"
+   * were set on the real input, and no such properties existed: a consumer
+   * following that sentence wrote an attribute on the host, it reached no input,
+   * and the field constrained nothing while looking as though it did.
+   *
+   * Forwarded rather than checked here, which is the whole reason validity is
+   * the platform's: the browser knows what a `pattern` means, anchors it at both
+   * ends, and produces the message in the reader's own language.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -9456,6 +9542,13 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   *
+   * Forwarded to the real `<textarea>` rather than checked here, which is what
+   * makes the message the browser's and therefore the reader's own language.
+   * No `pattern`: the platform does not give a textarea one, and inventing it
+   * would be this library guessing where the point is to stop guessing.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -12142,6 +12235,18 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
+   * - `pattern`: A regular expression the value has to match, as the platform reads it.
+   *
+   * The class documentation promised `pattern` and `minlength` "and the rest"
+   * were set on the real input, and no such properties existed: a consumer
+   * following that sentence wrote an attribute on the host, it reached no input,
+   * and the field constrained nothing while looking as though it did.
+   *
+   * Forwarded rather than checked here, which is the whole reason validity is
+   * the platform's: the browser knows what a `pattern` means, anchors it at both
+   * ends, and produces the message in the reader's own language.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -14350,6 +14455,13 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   *
+   * Forwarded to the real `<textarea>` rather than checked here, which is what
+   * makes the message the browser's and therefore the reader's own language.
+   * No `pattern`: the platform does not give a textarea one, and inventing it
+   * would be this library guessing where the point is to stop guessing.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to

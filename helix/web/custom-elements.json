@@ -12728,6 +12728,46 @@
             },
             {
               "kind": "field",
+              "name": "pattern",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A regular expression the value has to match, as the platform reads it.\n\nThe class documentation promised `pattern` and `minlength` \"and the rest\"\nwere set on the real input, and no such properties existed: a consumer\nfollowing that sentence wrote an attribute on the host, it reached no input,\nand the field constrained nothing while looking as though it did.\n\nForwarded rather than checked here, which is the whole reason validity is\nthe platform's: the browser knows what a `pattern` means, anchors it at both\nends, and produces the message in the reader's own language.",
+              "attribute": "pattern",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "minLength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Fewest characters the value may have.",
+              "attribute": "minlength",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "maxLength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Most characters the value may have.",
+              "attribute": "maxlength",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "formAssociated",
               "type": {
                 "text": "boolean"
@@ -13051,6 +13091,43 @@
               "default": "'text'",
               "description": "What the field accepts, which decides the keyboard and the validation.",
               "fieldName": "type",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "pattern",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A regular expression the value has to match, as the platform reads it.\n\nThe class documentation promised `pattern` and `minlength` \"and the rest\"\nwere set on the real input, and no such properties existed: a consumer\nfollowing that sentence wrote an attribute on the host, it reached no input,\nand the field constrained nothing while looking as though it did.\n\nForwarded rather than checked here, which is the whole reason validity is\nthe platform's: the browser knows what a `pattern` means, anchors it at both\nends, and produces the message in the reader's own language.",
+              "fieldName": "pattern",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "minlength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Fewest characters the value may have.",
+              "fieldName": "minLength",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "maxlength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Most characters the value may have.",
+              "fieldName": "maxLength",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -27187,6 +27264,32 @@
             },
             {
               "kind": "field",
+              "name": "minLength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Fewest characters the value may have.\n\nForwarded to the real `<textarea>` rather than checked here, which is what\nmakes the message the browser's and therefore the reader's own language.\nNo `pattern`: the platform does not give a textarea one, and inventing it\nwould be this library guessing where the point is to stop guessing.",
+              "attribute": "minlength",
+              "inheritedFrom": {
+                "name": "HelixBaseTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "maxLength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Most characters the value may have.",
+              "attribute": "maxlength",
+              "inheritedFrom": {
+                "name": "HelixBaseTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "formAssociated",
               "type": {
                 "text": "boolean"
@@ -27522,6 +27625,30 @@
               "default": "3",
               "description": "How many lines the box is before anything is typed.",
               "fieldName": "rows",
+              "inheritedFrom": {
+                "name": "HelixBaseTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "name": "minlength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Fewest characters the value may have.\n\nForwarded to the real `<textarea>` rather than checked here, which is what\nmakes the message the browser's and therefore the reader's own language.\nNo `pattern`: the platform does not give a textarea one, and inventing it\nwould be this library guessing where the point is to stop guessing.",
+              "fieldName": "minLength",
+              "inheritedFrom": {
+                "name": "HelixBaseTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "name": "maxlength",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Most characters the value may have.",
+              "fieldName": "maxLength",
               "inheritedFrom": {
                 "name": "HelixBaseTextarea",
                 "module": "src/textarea/root/textarea-root.ts"
