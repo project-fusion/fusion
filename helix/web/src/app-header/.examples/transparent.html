@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="transparent.css">
+
+<div class="page">
+  <helix-app-header appearance="transparent" data-color-mode="dark" sticky>
+    <span slot="start">Logo</span>
+    <helix-nav-bar label="Sections">
+      <a aria-current="page" href="#one">Item One</a>
+      <a href="#two">Item Two</a>
+    </helix-nav-bar>
+    <helix-icon-button label="Settings" slot="end">
+      <helix-icon name="gear"></helix-icon>
+    </helix-icon-button>
+  </helix-app-header>
+
+  <div class="band">
+    <helix-text appearance="display" as="h1">Scroll this page</helix-text>
+    <helix-text as="p">
+      No fill at all while the hero is behind it. Scroll, and it takes the flat
+      one the moment it has to be legible over something moving.
+    </helix-text>
+  </div>
+
+  <div class="prose">
+    <helix-text appearance="title" as="h2">Nothing, then something</helix-text>
+    <helix-text as="p">
+      A hero should reach the top of the window, and a bar over one should be a
+      wordmark and some navigation rather than a band across the art. That only
+      holds while the art is there.
+    </helix-text>
+
+    <helix-text appearance="title" as="h2">The colour is yours</helix-text>
+    <helix-text as="p">
+      The bar inherits the page's foreground, so a pale wordmark over a dark
+      hero is `data-color-mode` on the header, which is what this example does.
+    </helix-text>
+
+    <helix-text appearance="title" as="h2">The separating rule</helix-text>
+    <helix-text as="p">
+      Both appearances start flat against the top of the page and draw their
+      rule only once something has scrolled underneath, which is why this
+      example is tall enough to scroll.
+    </helix-text>
+  </div>
+</div>

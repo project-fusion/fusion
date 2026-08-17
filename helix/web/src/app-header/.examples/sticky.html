@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="sticky.css">
+
+<div class="page">
+  <helix-app-header sticky>
+    <span slot="start">Logo</span>
+    <helix-nav-bar label="Sections">
+      <a aria-current="page" href="#one">Item One</a>
+      <a href="#two">Item Two</a>
+    </helix-nav-bar>
+    <helix-icon-button label="Settings" slot="end">
+      <helix-icon name="gear"></helix-icon>
+    </helix-icon-button>
+  </helix-app-header>
+
+  <div class="prose">
+    <helix-text appearance="title" as="h2">It follows the reader</helix-text>
+    <helix-text as="p">
+      Opt in, because a bar that follows the reader is a decision about the page
+      rather than about the bar. Without it the banner scrolls away with
+      everything else, which is right for a page read once and wrong for an
+      application whose navigation has to stay reachable.
+    </helix-text>
+
+    <helix-text appearance="title" as="h2">It is what the other appearances need</helix-text>
+    <helix-text as="p">
+      A bar that does not stick is only ever over the top of the page, so
+      `material` has nothing to be translucent against and `transparent` never
+      has to become opaque. Both are about what passes underneath, and nothing
+      passes underneath a bar that goes with it.
+    </helix-text>
+
+    <helix-text appearance="title" as="h2">The separating rule</helix-text>
+    <helix-text as="p">
+      It appears once the page has scrolled, which keeps the banner flat against
+      whatever it starts over and lifts it off the content afterwards.
+    </helix-text>
+  </div>
+</div>

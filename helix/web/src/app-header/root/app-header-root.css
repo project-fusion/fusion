@@ -23,6 +23,30 @@
   backdrop-filter: blur(var(--helix-material-blur-md));
 }
 
+/* Nothing behind it at all, until there is something to be legible over.
+ *
+ * For a banner over a hero: the art reaches the top of the window and the bar
+ * is only the wordmark and the navigation sitting on it. The moment anything
+ * has scrolled under it, it takes the flat fill, because a bar over moving
+ * content has to be readable and a hero is the one thing it is guaranteed not
+ * to still be over.
+ *
+ * That switch is the whole reason this is worth an appearance rather than a
+ * consumer writing `--app-header-background: transparent`: the hook is one
+ * value and this is two, keyed on a state only the component knows. The hook
+ * still wins where it is set, in both states, which is how a consumer tints a
+ * scrolled bar to match their hero.
+ *
+ * Content colour is the consumer's. A pale wordmark over a dark hero is
+ * `data-color-mode` on the header, the same way the toast inverts itself. */
+:host([appearance="transparent"]) {
+  background-color: var(--app-header-background, transparent);
+}
+
+:host([appearance="transparent"][data-scrolled]) {
+  background-color: var(--app-header-background, var(--helix-color-background));
+}
+
 :host([data-scrolled]) {
   border-block-end-color: var(--helix-color-border);
 }

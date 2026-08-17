@@ -39,21 +39,42 @@ import { styles } from './app-header-root.css.js'
 @customElement('helix-app-header')
 export class HelixAppHeader extends HelixBaseAppHeader {
   /**
-   * Whether the banner is flat or a pane of material.
+   * How much of what is behind the banner shows through it.
    *
-   * Flat by default. Material is translucency plus blur, and a filter makes the
-   * header a containing block for `position: fixed` descendants, so any overlay
-   * rendered inside it is positioned against the header rather than the
-   * viewport. Opt in knowing that.
+   * One axis, three points, and `flat` is the default and the absent attribute.
+   *
+   * - `flat` is opaque. The page stops at the bar, which is what an application
+   *   wants: the bar is chrome and chrome does not need to be interesting.
+   * - `material` is translucent and blurred, so content passing underneath
+   *   stays visible and goes soft. The page reads as one surface with a bar
+   *   floating over it.
+   * - `transparent` has no fill at all until something has scrolled under it,
+   *   and then it takes the flat one. For a banner over a hero, where the art
+   *   should reach the top of the window and the bar should only become a
+   *   surface once it has to be legible over moving content.
+   *
+   * **`material` makes the header a containing block for `position: fixed`
+   * descendants**, which is worth knowing and is narrower than it sounds. Every
+   * overlay in this library goes into the top layer through the popover API or
+   * `<dialog>`, and the top layer is not laid out against its DOM ancestors:
+   * measured, a popover inside a blurred bar opens at the window origin while a
+   * plain `position: fixed` child of the same bar opens at the bar's. So a
+   * menu, a tooltip or a select in a material header is unaffected, and what is
+   * caught is a consumer's own hand-positioned element.
    */
   @property({ reflect: true })
-  appearance?: 'flat' | 'material'
+  appearance?: 'flat' | 'material' | 'transparent'
 
   /**
    * Whether the banner sticks to the top of the viewport.
    *
-   * Opt in, because a reflected `true` writes an attribute the server's markup
-   * does not have. Every default here is the absent attribute.
+   * Opt in, because following the reader is a decision about the page rather
+   * than about the bar, and because a reflected `true` writes an attribute the
+   * server's markup does not have. Every default here is the absent attribute.
+   *
+   * It pairs with `appearance`: a bar that does not stick is only ever over the
+   * top of the page, so `material` and `transparent` have nothing to be
+   * translucent against and `data-scrolled` never lands.
    */
   @property({ reflect: true, type: Boolean })
   sticky = false

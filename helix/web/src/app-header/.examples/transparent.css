@@ -1,0 +1,78 @@
+/* The bar needs something behind it before the two appearances differ at all,
+   and bare, they did not: a 72% white pane over a white page is an opaque white
+   pane. Neither example scrolled either, so neither ever drew its separating
+   rule. Three things fix it, and `flat.css` is the same file so that flipping
+   between the two examples changes one attribute and nothing else.
+
+   The scroller is the frame's own document, which is the one the component
+   listens to: `data-scrolled` is set from `window.scrollY`, so a bar inside an
+   overflowing div would never lift. */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 240vh;
+}
+
+/* Ruled rather than plain, because blur is only visible on detail: a smooth
+   gradient blurs to itself, so a band of flat colour would show the
+   translucency and none of the blur. The heading is set large for the same
+   reason, so its strokes pass under the bar rather than beside it.
+
+   Pulled up by the height of the bar and padded back down by it, so the band
+   starts *behind* the banner rather than below it. Without that, the two
+   appearances are the same picture until the reader scrolls, which is the
+   thing that made these two examples indistinguishable in the first place. It
+   is also what a page with a material header actually does with its hero. */
+.band {
+  align-content: center;
+  margin-block-start: calc(var(--helix-size-header) * -1);
+  background-color: var(--helix-color-primary);
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      transparent 0 3rem,
+      color-mix(in oklab, var(--helix-color-foreground-on-accent) 24%, transparent) 3rem 3.0625rem
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 3rem,
+      color-mix(in oklab, var(--helix-color-foreground-on-accent) 24%, transparent) 3rem 3.0625rem
+    );
+  display: grid;
+  gap: var(--helix-space-sm);
+  min-block-size: 60vh;
+  padding: var(--helix-space-2xl);
+  padding-block-start: calc(var(--helix-size-header) + var(--helix-space-2xl));
+}
+
+.band helix-text {
+  color: var(--helix-color-foreground-on-accent);
+}
+
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-lg);
+  padding: var(--helix-space-2xl);
+}
+
+/* A dark hero, so the bar has something to be transparent *over* rather than
+   merely over nothing, and so `data-color-mode="dark"` on the header is the
+   right answer rather than a decoration: a wordmark in the page's own
+   foreground would be black on a dark band until the reader scrolled.
+
+   Dark rather than the accent the other two use. An inverted bar over a
+   mid-tone hero is the worst of both: the wordmark reads as pale-on-blue and
+   the current navigation item comes out as a black pill, because a raised
+   surface in a dark scheme is a dark surface. The colour behind a transparent
+   bar is the consumer's decision and the bar has to be told which way it went;
+   picking a hero that is actually dark is what makes that legible here.
+
+   No `color-scheme` on the band itself, which was the first attempt and turned
+   it light grey: `--helix-color-surface-inverse` is a `light-dark()` pair, so
+   declaring a dark scheme on the element flipped the very token being used to
+   make it dark. The header carries `data-color-mode="dark"` instead, which is
+   the half that needed telling. */
+.band {
+  background-color: var(--helix-color-surface-inverse);
+}
