@@ -30,10 +30,54 @@
   inline-size: var(--spinner-size, var(--_spinner-size));
 }
 
+/* The ring breathes while the indicator turns.
+ *
+ * The turn alone is one thing moving at one rate, and at the small sizes this
+ * is usually drawn it reads as a mechanism rather than as work happening. A
+ * slow swell underneath it gives the middle of the spinner something to do
+ * between the passes of the arc, and it is deliberately out of step with the
+ * turn: 2.4s against 0.8s, so the two never line up and the pair never settles
+ * into a single beat.
+ *
+ * On the track's opacity rather than on a shape of its own, because the ring is
+ * already there and already the quiet half. Between 0.12 and 0.24, either side
+ * of the 0.18 it held: shallow enough that a still frame looks unchanged and
+ * only the movement is new. */
 [part="track"] {
+  animation: helix-spinner-breathe 2.4s ease-in-out infinite;
   opacity: 0.18;
   stroke: var(--spinner-track-color, currentColor);
   stroke-width: 2;
+}
+
+/* And whatever is slotted into the middle breathes with it, in step, so a
+   spinner carrying a count or a glyph is one thing rather than a still mark
+   inside a moving ring. Nothing is slotted in the common case and this animates
+   an empty box, which costs nothing. */
+[part="mark"] {
+  animation: helix-spinner-breathe-mark 2.4s ease-in-out infinite;
+}
+
+@keyframes helix-spinner-breathe {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+
+  50% {
+    opacity: 0.24;
+  }
+}
+
+@keyframes helix-spinner-breathe-mark {
+  0%,
+  100% {
+    scale: 0.94;
+  }
+
+  50% {
+    scale: 1;
+  }
 }
 
 /* A gap in the dash is what makes the rotation visible. A full circle turning
@@ -56,6 +100,16 @@
    as busy. Scaled from a token instead of a raw duration, and it has to be
    declared here at all because the base layer's blanket rule is a document rule
    and does not reach into a shadow root. */
+/* The swell is the first thing to go: it says nothing the turn does not, and a
+   reader who asked not to be moved should not be given two motions where one
+   was already a concession. */
+@media (prefers-reduced-motion: reduce) {
+  [part="track"],
+  [part="mark"] {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [part="svg"] {
     animation-duration: calc(var(--helix-duration-slow) * 12);

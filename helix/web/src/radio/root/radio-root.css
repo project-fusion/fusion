@@ -53,14 +53,20 @@
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* The edge firms up and takes no colour, which is what the paragraph below has
+   said since it was written and what the two rules under it did not do: both
+   named `--helix-color-primary`, so the comment and the code disagreed and the
+   code won. A circle that turns brand-blue on hover is the loudest thing in a
+   form, and it says "recommended" about whichever option a pointer happens to
+   be over. */
 :host(:not([disabled])) [part="item"]:hover [part="box"] {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-foreground-muted);
 }
 
 /* The edge firms up and takes no color, which is the checkbox's rule: color
    is reserved for state, and being chosen is an answer rather than a state. */
 :host([selected]) [part="box"] {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-foreground);
 }
 
 /* A dot rather than a mask, because a circle is a border radius and needs no
@@ -134,16 +140,27 @@
 }
 
 :host(:not([disabled])[appearance="card"]) [part="item"]:hover {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-foreground-muted);
 }
 
 /* Lifted rather than colored, which is this component's own rule about the
    mark restated for the surface: color is reserved for state, and being chosen
    is an answer rather than a state. The dot is what says which one, and it is
    already animated and already legible without color. */
+/* The card is where the brand colour belongs, because here the whole surface is
+ * the answer rather than a mark inside it, and one card in a column being
+ * chosen is exactly what a colour is for.
+ *
+ * Three pixels of it, and there is no three-pixel token because a border and a
+ * ring are different things: the 1px border stays, and `box-shadow` lays two
+ * more outside it. Drawn rather than widened, so nothing about the card's box
+ * moves when it is chosen and a column of them does not jump as the answer
+ * changes. `--helix-border-thick` is the ring, so a theme that thickens its
+ * rules thickens this with them. */
 :host([appearance="card"][selected]) [part="item"] {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-primary);
+  box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
 }
 
 /* On the whole card, because in this appearance the card is the target. The

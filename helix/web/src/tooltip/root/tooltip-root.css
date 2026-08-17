@@ -67,44 +67,42 @@
   scale: 1;
 }
 
-/* It grows out of the thing it points at, so the origin is the arrow's edge
-   rather than the bubble's middle. A tooltip above its trigger has its arrow
-   underneath it and should expand upward from there; one to the left expands
-   leftward from its right edge. Centre origin was tried and reads as the bubble
-   inflating in place, which says nothing about what it belongs to.
-   **The arrow's own position, not the placement's midpoint.** `--_floating-arrow-x`
-   and `--_floating-arrow-y` are written by the floating controller as the centre
-   of the pointer it just placed, which is the only thing that knows where the
-   arrow really is: `top-start` puts it near one end, and `shift` slides it
-   anywhere along the edge to keep the panel on screen. Reading the placement
-   alone gets the axis right and the position wrong, and the tooltip grows out
-   of a point beside the trigger rather than out of it. Four rules cover all
-   twelve placements this way, and they stay correct when the panel is nudged.
+/* It grows out of the edge that faces the trigger, so a tooltip above one
+   expands upward from its own bottom edge and one to the left expands leftward
+   from its right. A centre origin was tried and reads as the bubble inflating in
+   place, which says nothing about what it belongs to.
+
+   **The midpoint of that edge, now that there is no arrow.** These read
+   `--_floating-arrow-x` and `--_floating-arrow-y`, which the floating controller
+   writes as the centre of the pointer it has just placed, because the pointer was
+   the only thing that knew where along the edge the tooltip actually attached:
+   `top-start` puts it near one end and `shift` slides it anywhere. With the arrow
+   removed the controller is passed no pointer and writes neither property, so
+   every one of those `var()`s was resolving to its fallback and the four rules
+   had quietly become the four they are now. Written out, because a variable that
+   is never set is a rule nobody can read.
 
    `^=` because each pair of names shares an axis, and the axis is all these
-   rules decide: the cross-axis coordinate comes from the variable.
-
-   The fallback is `50%` for the case where there is no arrow at all, which is
-   the middle of the edge and the best guess available.
+   rules decide.
 
    Percentages and lengths rather than keywords, because `transform-origin` has
    no logical ones. `block-end` and `inline-start` do not merely fail, they make
    the whole declaration invalid and it is dropped at parse time, silently: the
    tooltip still scales, from its middle, and nothing reports why. */
 [part="tooltip"][data-placement^="top"] {
-  transform-origin: var(--_floating-arrow-x, 50%) 100%;
+  transform-origin: 50% 100%;
 }
 
 [part="tooltip"][data-placement^="bottom"] {
-  transform-origin: var(--_floating-arrow-x, 50%) 0;
+  transform-origin: 50% 0;
 }
 
 [part="tooltip"][data-placement^="left"] {
-  transform-origin: 100% var(--_floating-arrow-y, 50%);
+  transform-origin: 100% 50%;
 }
 
 [part="tooltip"][data-placement^="right"] {
-  transform-origin: 0 var(--_floating-arrow-y, 50%);
+  transform-origin: 0 50%;
 }
 
 /* The UA hides a closed popover with `[popover]:not(:popover-open)`, and the
@@ -131,30 +129,4 @@
   [part="tooltip"][data-placed] {
     scale: 1;
   }
-}
-
-/* Positioned by the same pass as the bubble, so it still points at the trigger
-   after the bubble has slid along to stay in view. */
-[part="arrow"] {
-  background-color: inherit;
-  block-size: 0.5rem;
-  inline-size: 0.5rem;
-  position: absolute;
-  rotate: 45deg;
-}
-
-[part="tooltip"][data-placement^="top"] [part="arrow"] {
-  inset-block-end: -0.25rem;
-}
-
-[part="tooltip"][data-placement^="bottom"] [part="arrow"] {
-  inset-block-start: -0.25rem;
-}
-
-[part="tooltip"][data-placement^="left"] [part="arrow"] {
-  inset-inline-end: -0.25rem;
-}
-
-[part="tooltip"][data-placement^="right"] [part="arrow"] {
-  inset-inline-start: -0.25rem;
 }

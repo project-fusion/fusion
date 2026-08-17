@@ -4957,11 +4957,11 @@ why this does not reflect and nothing styles on it. */
   placement?: HelixBaseTooltip["placement"];
   /** Space between the trigger and the bubble, in pixels.
 
-Eight, which is not arbitrary: it is the size of the arrow the styled tier
-draws, so the point reaches the trigger and the bubble does not. A consumer
-changing this and keeping the arrow gets a point that falls short or one
-that overlaps what it is pointing at, which is worth knowing before
-changing it rather than after. */
+Eight, which used to be the size of the arrow the styled tier drew so the
+point could reach the trigger while the bubble did not. **The arrow is
+gone**, and the number stays: it is now simply the gap, and eight is what
+reads as beside rather than attached at every placement. Nothing depends on
+it any more, so a consumer changing it changes the gap and nothing else. */
   offset?: HelixBaseTooltip["offset"];
   /** Whether the tooltip never shows. */
   disabled?: HelixBaseTooltip["disabled"];
@@ -5045,11 +5045,11 @@ why this does not reflect and nothing styles on it. */
   "prop:placement"?: HelixBaseTooltip["placement"];
   /** Space between the trigger and the bubble, in pixels.
 
-Eight, which is not arbitrary: it is the size of the arrow the styled tier
-draws, so the point reaches the trigger and the bubble does not. A consumer
-changing this and keeping the arrow gets a point that falls short or one
-that overlaps what it is pointing at, which is worth knowing before
-changing it rather than after. */
+Eight, which used to be the size of the arrow the styled tier drew so the
+point could reach the trigger while the bubble did not. **The arrow is
+gone**, and the number stays: it is now simply the gap, and eight is what
+reads as beside rather than attached at every placement. Nothing depends on
+it any more, so a consumer changing it changes the gap and nothing else. */
   "prop:offset"?: HelixBaseTooltip["offset"];
   /** Whether the tooltip never shows. */
   "prop:disabled"?: HelixBaseTooltip["disabled"];
@@ -9930,11 +9930,11 @@ export type CustomElements = {
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    *
-   * Eight, which is not arbitrary: it is the size of the arrow the styled tier
-   * draws, so the point reaches the trigger and the bubble does not. A consumer
-   * changing this and keeping the arrow gets a point that falls short or one
-   * that overlaps what it is pointing at, which is worth knowing before
-   * changing it rather than after.
+   * Eight, which used to be the size of the arrow the styled tier drew so the
+   * point could reach the trigger while the bubble did not. **The arrow is
+   * gone**, and the number stays: it is now simply the gap, and eight is what
+   * reads as beside rather than attached at every placement. Nothing depends on
+   * it any more, so a consumer changing it changes the gap and nothing else.
    * - `disabled`: Whether the tooltip never shows.
    * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
    *
@@ -10006,7 +10006,6 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `tooltip`: The bubble.
-   * - `arrow`: The point aimed at the trigger.
    */
   "helix-base-tooltip": Partial<
     HelixBaseTooltipProps & BaseProps<HelixBaseTooltip> & BaseEvents
@@ -14969,11 +14968,11 @@ export type CustomElementsSolidJs = {
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    *
-   * Eight, which is not arbitrary: it is the size of the arrow the styled tier
-   * draws, so the point reaches the trigger and the bubble does not. A consumer
-   * changing this and keeping the arrow gets a point that falls short or one
-   * that overlaps what it is pointing at, which is worth knowing before
-   * changing it rather than after.
+   * Eight, which used to be the size of the arrow the styled tier drew so the
+   * point could reach the trigger while the bubble did not. **The arrow is
+   * gone**, and the number stays: it is now simply the gap, and eight is what
+   * reads as beside rather than attached at every placement. Nothing depends on
+   * it any more, so a consumer changing it changes the gap and nothing else.
    * - `disabled`: Whether the tooltip never shows.
    * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
    *
@@ -15045,7 +15044,6 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `tooltip`: The bubble.
-   * - `arrow`: The point aimed at the trigger.
    */
   "helix-base-tooltip": Partial<
     HelixBaseTooltipProps &

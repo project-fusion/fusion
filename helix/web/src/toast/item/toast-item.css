@@ -73,21 +73,30 @@
    * itself. On one line that reproduces `center` exactly; on four it leaves the
    * mark and the control where the reading starts. */
   align-items: start;
+  /* Two columns, the mark and everything it qualifies, and the actions in the
+     second of them on a row of their own.
+   *
+   * It was a wrapping flex, which put the actions beside the message when both
+   * fit on one line and under the *mark* when they did not. Both readings were
+   * wrong for the same reason: an action is a thing to do about the message, so
+   * it belongs under the words rather than beside them or under the icon. And
+   * inline, the action was the tallest thing on the line, so a one-line toast
+   * had its text and its mark centred against a 32px control instead of sitting
+   * on their own line.
+   *
+   * Column one is `auto`, so with no mark it is zero wide and the message
+   * starts at the inset. The gap that would otherwise still be drawn beside an
+   * absent mark is on the mark itself, which is the same reason the row's
+   * spacing is on what is slotted into it. */
+  display: grid;
+  grid-template-columns: auto 1fr;
   background-color: var(--helix-color-surface-overlay);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
   color: var(--helix-color-foreground);
-  display: flex;
-  flex-wrap: wrap;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
-  /* Column only. As a flex row this was one gap between four things; as a grid
-     it also became a row gap, drawn between the message and the actions row
-     whether or not that row holds anything. Measured: 12px under every message
-     with nothing to do about it. The row's own spacing is on what is slotted
-     into it, which is nothing when nothing is. */
-  column-gap: var(--helix-space-sm);
   line-height: var(--helix-leading-normal);
   padding: var(--toast-item-inset, var(--helix-space-sm));
   /* Room for the close, which is out of flow. Reserved here rather than by a
@@ -128,7 +137,11 @@
 [part="icon"] {
   color: var(--_toast-severity, var(--helix-color-foreground-muted));
   display: inline-flex;
-  flex: 0 0 auto;
+  grid-area: 1 / 1;
+  /* Its own trailing gap, so an absent mark costs nothing. A `column-gap` on
+     the grid is drawn beside a zero-width column just the same, and every
+     message without a severity would have started eight pixels in. */
+  margin-inline-end: var(--helix-space-sm);
   /* Half the difference between the first line and the glyph, so the two share
      a center however many lines follow. */
   margin-block-start: calc((var(--_toast-line) - var(--helix-size-icon)) / 2);
@@ -154,38 +167,26 @@ slot[name="icon"]::slotted(*) {
    action is pushed off it, which is what makes the wrap depend on the message's
    own length. */
 [part="content"] {
-  flex: 1 1 auto;
+  grid-area: 1 / 2;
   min-inline-size: 0;
 }
 
-/* The controls take the same treatment, and their difference is negative
-   because a control is taller than a line of text: they rise a little above the
-   first line rather than hanging below it. The item's inset is what gives them
-   room to do that without touching the edge. */
-/* Its own row, under the message and lined up with it. Empty it generates no
-   box, because a grid area with nothing in it takes no space, so a message with
-   nothing to do about it is exactly as tall as it was. */
-/* Its own row, under the message and lined up with it.
+/* Its own row, in the message's column, so it starts where the words start and
+   the space under the mark is a gutter rather than a place to put a button.
  *
- * The gap sits on what is slotted rather than on this wrapper, and `:empty`
- * cannot do the job: the wrapper always has a `<slot>` element inside it, so it
- * is never empty however little is assigned. With the space on the wrapper a
- * message with nothing to do about it paid 4px for a row that drew nothing.
- * Moved onto `::slotted`, an unassigned row costs its own zero height and no
- * more, which is the same reason the house rule prefers a bare slot. */
+ * The gap above sits on what is slotted rather than on this wrapper, and
+ * `:empty` cannot do the job: the wrapper always holds a `<slot>` element, so it
+ * is never empty however little is assigned. On the wrapper, or as the grid's
+ * `row-gap`, a message with nothing to do about it paid for a row that drew
+ * nothing. Measured at 12px before this moved. */
 [part="actions"] {
   display: flex;
-  flex: 0 0 auto;
   gap: var(--helix-space-2xs);
+  grid-area: 2 / 2;
 }
 
-/* Only the wrapped case needs the gap above it, and `:empty` cannot say which
-   case it is any more than it could say whether anything was slotted. The row
-   gap does: it is drawn between flex lines and only when there are two, so a
-   message with its action beside it pays nothing and one with the action
-   beneath gets the space. */
-[part="item"] {
-  row-gap: var(--helix-space-2xs);
+[part="actions"] slot::slotted(*) {
+  margin-block-start: var(--helix-space-xs);
 }
 
 /* Color on the mark rather than a fill behind the words. A message is text to

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, type Updatable } from '@fusion-io/testing/dom'
+import { formValue, part, registerDom, type Updatable } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()

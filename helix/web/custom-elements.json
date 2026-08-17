@@ -30878,7 +30878,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "Space between the trigger and the bubble, in pixels.\n\nEight, which is not arbitrary: it is the size of the arrow the styled tier\ndraws, so the point reaches the trigger and the bubble does not. A consumer\nchanging this and keeping the arrow gets a point that falls short or one\nthat overlaps what it is pointing at, which is worth knowing before\nchanging it rather than after.",
+              "description": "Space between the trigger and the bubble, in pixels.\n\nEight, which used to be the size of the arrow the styled tier drew so the\npoint could reach the trigger while the bubble did not. **The arrow is\ngone**, and the number stays: it is now simply the gap, and eight is what\nreads as beside rather than attached at every placement. Nothing depends on\nit any more, so a consumer changing it changes the gap and nothing else.",
               "attribute": "offset",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
@@ -30985,7 +30985,7 @@
               "name": "bubbleLayer",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), /* Annotated, because without it the array's element type is inferred from `this`, whose own type depends on this controller, and TypeScript stops at the cycle. */ boundary: (): readonly (Element | null)[] => [this, this.named], offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.trigger, /* Annotated, because without it the array's element type is inferred from `this`, whose own type depends on this controller, and TypeScript stops at the cycle. */ boundary: (): readonly (Element | null)[] => [this, this.named], offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -31376,7 +31376,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "Space between the trigger and the bubble, in pixels.\n\nEight, which is not arbitrary: it is the size of the arrow the styled tier\ndraws, so the point reaches the trigger and the bubble does not. A consumer\nchanging this and keeping the arrow gets a point that falls short or one\nthat overlaps what it is pointing at, which is worth knowing before\nchanging it rather than after.",
+              "description": "Space between the trigger and the bubble, in pixels.\n\nEight, which used to be the size of the arrow the styled tier drew so the\npoint could reach the trigger while the bubble did not. **The arrow is\ngone**, and the number stays: it is now simply the gap, and eight is what\nreads as beside rather than attached at every placement. Nothing depends on\nit any more, so a consumer changing it changes the gap and nothing else.",
               "fieldName": "offset",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
@@ -31445,14 +31445,6 @@
             {
               "description": "The bubble.",
               "name": "tooltip",
-              "inheritedFrom": {
-                "name": "HelixBaseTooltip",
-                "module": "src/tooltip/root/tooltip-root.ts"
-              }
-            },
-            {
-              "description": "The point aimed at the trigger.",
-              "name": "arrow",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"

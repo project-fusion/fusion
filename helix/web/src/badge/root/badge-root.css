@@ -40,9 +40,18 @@
    * every other number, and it was absolute where the thing it positions is
    * not: a badge whose size followed the density stayed pinned nine pixels in
    * whatever it had become. A quarter of the mark keeps the overlap looking the
-   * same at every size, which is what the number was reaching for. */
-  inset-block-start: var(--badge-offset, calc(var(--_badge-size) / -4));
-  inset-inline-end: var(--badge-offset, calc(var(--_badge-size) / -4));
+   * same at every size, which is what the number was reaching for.
+   *
+   * **And it was the wrong sign, so the pullback pushed out.** A negative inset
+   * moves the mark away from the corner, which is the opposite of what the
+   * paragraph above asks for and what a reader sees: measured on an avatar, a
+   * button and an icon button, the mark's centre landed 4px *outside* the
+   * corner in both axes, and on a 32px circle that is well clear of the shape,
+   * so the badge floated beside the avatar rather than sitting on it. Positive
+   * now: the centre sits 4px inside the corner, which on that circle is within
+   * a pixel of where its edge crosses the diagonal. */
+  inset-block-start: var(--badge-offset, calc(var(--_badge-size) / 4));
+  inset-inline-end: var(--badge-offset, calc(var(--_badge-size) / 4));
   justify-content: center;
   line-height: 1;
   /* Square at minimum, so a single digit is a circle rather than a sliver. */

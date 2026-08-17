@@ -3390,7 +3390,6 @@ still points at the trigger after the bubble has slid along to stay in view.
 | Part | Description |
 | --- | --- |
 | `tooltip` | The bubble. |
-| `arrow` | The point aimed at the trigger. |
 
 #### Custom properties
 

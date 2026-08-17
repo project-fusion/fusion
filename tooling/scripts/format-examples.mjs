@@ -88,7 +88,9 @@ const attributes = (body) => {
 const OPEN = /<([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*?)(\/?)>/g
 
 const format = (text) =>
-  text.replace(OPEN, (whole, tag, body, slash, index) => {
+  /* The whole match is not used: every branch rebuilds the tag from its parts.
+     Named `_whole` so the position is still readable against the pattern. */
+  text.replace(OPEN, (_whole, tag, body, slash, index) => {
     const parts = attributes(body)
     if (parts.length < 2) {
       /* Nothing to lay out. Collapse whatever whitespace it has, so a tag that

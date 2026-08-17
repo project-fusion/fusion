@@ -83,7 +83,6 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @event {HelixCloseEvent} helix-close - Fired before it hides, and cancelable.
  *
  * @csspart tooltip - The bubble.
- * @csspart arrow - The point aimed at the trigger.
  */
 @customElement('helix-base-tooltip')
 export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
@@ -126,11 +125,11 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   /**
    * Space between the trigger and the bubble, in pixels.
    *
-   * Eight, which is not arbitrary: it is the size of the arrow the styled tier
-   * draws, so the point reaches the trigger and the bubble does not. A consumer
-   * changing this and keeping the arrow gets a point that falls short or one
-   * that overlaps what it is pointing at, which is worth knowing before
-   * changing it rather than after.
+   * Eight, which used to be the size of the arrow the styled tier drew so the
+   * point could reach the trigger while the bubble did not. **The arrow is
+   * gone**, and the number stays: it is now simply the gap, and eight is what
+   * reads as beside rather than attached at every placement. Nothing depends on
+   * it any more, so a consumer changing it changes the gap and nothing else.
    */
   @property({ type: Number })
   offset = 8
@@ -217,7 +216,6 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
    * the press that opened it as a press outside. */
   private readonly bubbleLayer = new PopoverController(this, {
     anchor: () => this.trigger,
-    arrow: () => this.renderRoot.querySelector<HTMLElement>('[part="arrow"]'),
     /* Annotated, because without it the array's element type is inferred from
        `this`, whose own type depends on this controller, and TypeScript stops
        at the cycle. */
@@ -576,7 +574,6 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
         <slot name="content" @slotchange=${this.handleContentChange}
           >${this.content}</slot
         >
-        <div part="arrow"></div>
       </div>`
   }
 }
