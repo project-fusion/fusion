@@ -1,0 +1,8 @@
+<!-- `onsubmit` because a form that validates is a form that eventually submits,
+     and this one is in a preview frame. -->
+<form onsubmit="event.preventDefault()">
+  <helix-flex direction="column" gap="sm">
+    <helix-switch hint="Required before the workspace can be created" label="I accept the terms" name="terms" required></helix-switch>
+    <helix-button appearance="primary" type="submit">Create workspace</helix-button>
+  </helix-flex>
+</form>

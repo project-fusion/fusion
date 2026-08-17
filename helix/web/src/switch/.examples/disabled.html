@@ -1,0 +1,12 @@
+<link rel="stylesheet" href="disabled.css">
+
+<helix-flex direction="column" gap="lg">
+  <helix-switch default-checked disabled hint="Hint" label="On and written off" name="a"></helix-switch>
+
+  <!-- And the same state arriving from above. A `<fieldset disabled>` switches
+       every control inside it off, which the platform reports through
+       `formDisabledCallback`: nothing writes an attribute onto anything here. -->
+  <fieldset disabled>
+    <helix-switch hint="Hint" label="Off from the fieldset" name="b"></helix-switch>
+  </fieldset>
+</helix-flex>
