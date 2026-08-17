@@ -81,7 +81,9 @@ export default function Page() {
                       sandbox's own tree. */}
                   {family.status === 'experimental' && (
                     <helix-tooltip content="Experimental. The API can change." placement="top">
-                      <helix-icon label="Experimental" name="flask"></helix-icon>
+                      <helix-tag className="statusMark" tone="warning">
+                        <helix-icon label="Experimental" name="flask"></helix-icon>
+                      </helix-tag>
                     </helix-tooltip>
                   )}
                 </helix-flex>
