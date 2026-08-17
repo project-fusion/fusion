@@ -12,10 +12,11 @@
   color: var(--helix-color-foreground);
   display: flex;
   font-size: var(--helix-text-sm);
-  gap: var(--helix-space-md);
   inline-size: 100%;
   padding-block: var(--helix-space-xs);
   padding-inline: var(--announcement-inset, var(--helix-space-lg));
+  /* The containing block for the dismiss, which is out of flow. */
+  position: relative;
 }
 
 :host([severity="info"]) {
@@ -34,16 +35,53 @@
   --_announcement-color: var(--helix-color-danger);
 }
 
-/* The severity tints the band rather than coloring the text, which has to stay
-   readable at body size across the full width. */
+/* The severity colours the band rather than the text, which has to stay
+   readable at body size across the full width.
+ *
+ * **Opaque, and mixed against the page rather than into it.** These were
+ * `color-mix(... , transparent)`, so the band was a translucent film: whatever
+ * sat behind it came through, and two announcements over different content were
+ * two different colours. Mixed with `--helix-color-background` instead, the
+ * result is a real colour that renders the same wherever it is, and it still
+ * follows the theme because both halves are tokens.
+ *
+ * The gradient is a small tilt of the same colour, lighter at the start of the
+ * inline axis, so a band the width of a page has some direction to it rather
+ * than reading as a flat slab. Two steps of the one colour, not two colours. */
 :host([severity]) {
-  background-color: color-mix(in oklab, var(--_announcement-color) 12%, transparent);
-  border-block-end-color: color-mix(in oklab, var(--_announcement-color) 40%, transparent);
+  background-image: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--_announcement-color) 18%, var(--helix-color-background)),
+    color-mix(in oklab, var(--_announcement-color) 10%, var(--helix-color-background))
+  );
+  border-block-end-color: color-mix(
+    in oklab,
+    var(--_announcement-color) 40%,
+    var(--helix-color-background)
+  );
 }
 
+/* Centred, and the dismiss is out of flow so it stays centred.
+ *
+ * A band across the whole page has no left edge to read from: the text starts
+ * wherever the viewport happens to be wide, which at 1400px is a sentence
+ * marooned against the corner. Centred it sits where the eye already is.
+ *
+ * The control is absolutely positioned rather than a flex sibling, because a
+ * sibling with width would push the centre off by half its own size, and the
+ * text would shift as soon as a message became dismissible. */
 [part="content"] {
   flex: 1 1 auto;
   min-inline-size: 0;
+  text-align: center;
+}
+
+/* The gap sits on what is slotted rather than on this region, because the
+   region always holds a `<slot>` element and is therefore never `:empty`
+   however little is assigned. With the gap on the row, a band with no actions
+   still reserved it, and the centred message came out 8px left of centre. */
+[part="actions"] slot::slotted(*) {
+  margin-inline-start: var(--helix-space-md);
 }
 
 [part="actions"] {
@@ -69,16 +107,26 @@
   inline-size: var(--helix-size-control-sm);
   place-content: center;
   place-items: center;
-  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+  /* Out of flow, so the centred message is centred on the band and not on
+     whatever is left after the control. */
+  position: absolute;
+  inset-inline-end: var(--announcement-inset, var(--helix-space-lg));
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* A well under the pointer, the same one the toast's control gets.
+   `surface-sunken` resolves through `color-scheme`, so it darkens against the
+   band in either mode without either being named. */
+[part="dismiss"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+  color: var(--helix-color-foreground);
 }
 
 [part="dismiss"] svg {
   block-size: var(--helix-size-icon);
   inline-size: var(--helix-size-icon);
-}
-
-[part="dismiss"]:hover {
-  color: var(--helix-color-foreground);
 }
 
 [part="dismiss"]:focus-visible {
