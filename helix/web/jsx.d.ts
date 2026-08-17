@@ -5137,10 +5137,16 @@ export type CustomElements = {
   >;
 
   /**
-   * Sticky and translucent, drawn on the material tokens so the page content
-   * blurs behind it rather than being hidden by an opaque bar. The separating
-   * rule and shadow appear only once the page has scrolled, which keeps the bar
-   * flat against the hero and lifts it off the content afterwards.
+   * Flat, opaque, and in the flow. Both of the interesting things a banner can do
+   * are opt-in: `sticky` because following the reader is a decision about the
+   * page rather than about the bar, and `appearance="material"` because a
+   * backdrop filter makes the header a containing block for `position: fixed`
+   * descendants, so an overlay rendered inside a material header is placed
+   * against the header rather than the viewport.
+   *
+   * The separating rule appears only once the page has scrolled, which keeps the
+   * banner flat against a hero and lifts it off the content afterwards. There is
+   * no shadow: the rule is the whole of it.
    *
    * ## Attributes & Properties
    *
@@ -9530,10 +9536,16 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Sticky and translucent, drawn on the material tokens so the page content
-   * blurs behind it rather than being hidden by an opaque bar. The separating
-   * rule and shadow appear only once the page has scrolled, which keeps the bar
-   * flat against the hero and lifts it off the content afterwards.
+   * Flat, opaque, and in the flow. Both of the interesting things a banner can do
+   * are opt-in: `sticky` because following the reader is a decision about the
+   * page rather than about the bar, and `appearance="material"` because a
+   * backdrop filter makes the header a containing block for `position: fixed`
+   * descendants, so an overlay rendered inside a material header is placed
+   * against the header rather than the viewport.
+   *
+   * The separating rule appears only once the page has scrolled, which keeps the
+   * banner flat against a hero and lifts it off the content afterwards. There is
+   * no shadow: the rule is the whole of it.
    *
    * ## Attributes & Properties
    *

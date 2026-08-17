@@ -288,10 +288,28 @@
     light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%,
     transparent
   );
-  --helix-material-border: color-mix(
-    in oklab,
-    var(--_helix-neutral-0) light-dark(40%, 12%),
-    transparent
+  /* Two whole colors, for both reasons the overlay above gives, and it is the
+     same bug: `light-dark()` in `color-mix()`'s percentage slot, sitting two
+     tokens below the comment explaining why that cannot work. It only appears
+     to work because Lightning CSS rewrites `light-dark()` into its own
+     custom-property shim before a browser sees it. Written by hand it collapses
+     to the inherited value, so every material header would lose its rule the
+     day that transpile stopped.
+
+     And the value was wrong in the direction that mattered. It was white in
+     both modes, 40% in light and 12% in dark, which is a specular highlight:
+     right along the top edge of a dark pane and useless along the bottom edge
+     of a light one. The material header draws its scrolled rule with this, so
+     in light mode the rule was white on a white page and the bar never lifted
+     at all, while the flat appearance beside it lifted correctly.
+
+     It goes the way every other border in this file goes: dark on light, light
+     on dark. Slightly stronger than `--helix-color-border` in light, because it
+     is drawn over a translucent pane rather than an opaque one and has the
+     content behind it to compete with. */
+  --helix-material-border: light-dark(
+    color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent),
+    color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent)
   );
 
   /* ======================================================== motion ====== */

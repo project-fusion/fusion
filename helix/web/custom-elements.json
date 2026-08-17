@@ -1128,7 +1128,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Sticky and translucent, drawn on the material tokens so the page content\nblurs behind it rather than being hidden by an opaque bar. The separating\nrule and shadow appear only once the page has scrolled, which keeps the bar\nflat against the hero and lifts it off the content afterwards.",
+          "description": "Flat, opaque, and in the flow. Both of the interesting things a banner can do\nare opt-in: `sticky` because following the reader is a decision about the\npage rather than about the bar, and `appearance=\"material\"` because a\nbackdrop filter makes the header a containing block for `position: fixed`\ndescendants, so an overlay rendered inside a material header is placed\nagainst the header rather than the viewport.\n\nThe separating rule appears only once the page has scrolled, which keeps the\nbanner flat against a hero and lifts it off the content afterwards. There is\nno shadow: the rule is the whole of it.",
           "name": "HelixAppHeader",
           "cssProperties": [
             {
