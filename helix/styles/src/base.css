@@ -302,9 +302,9 @@ helix-text[appearance="body"] {
 
 [data-text="body-strong"],
 helix-text[appearance="body-strong"],
-helix-text:not([appearance])[as="h5"],
-helix-text:not([appearance])[as="h6"],
-helix-text:not([appearance])[as="strong"] {
+:where(helix-text:not([appearance])[as="h5"]),
+:where(helix-text:not([appearance])[as="h6"]),
+:where(helix-text:not([appearance])[as="strong"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
@@ -323,7 +323,7 @@ helix-text[appearance="caption"] {
 
 [data-text="label"],
 helix-text[appearance="label"],
-helix-text:not([appearance])[as="label"] {
+:where(helix-text:not([appearance])[as="label"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
@@ -333,7 +333,7 @@ helix-text:not([appearance])[as="label"] {
 
 [data-text="code"],
 helix-text[appearance="code"],
-helix-text:not([appearance])[as="code"] {
+:where(helix-text:not([appearance])[as="code"]) {
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-regular);

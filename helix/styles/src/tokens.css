@@ -416,17 +416,36 @@
   --helix-size-switch-lg: calc(1.75rem * var(--_helix-seed-density));
   --helix-size-switch-md: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-switch-sm: calc(1.25rem * var(--_helix-seed-density));
+  /* 16, 24, 32. It was 16, 24, 40: the only scale in this file whose two gaps
+     disagree, eight then sixteen, so `lg` was two steps away from `md` while
+     `md` was one step from `sm`. Every other scale here steps evenly, avatar by
+     eight and tag by four, and a spinner is read beside those. `lg` is what
+     moved, since the small end is a spinner inside a control and is fixed by
+     what it sits in. */
   --helix-size-spinner-md: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-spinner-sm: calc(1rem * var(--_helix-seed-density));
-  --helix-size-spinner-lg: calc(2.5rem * var(--_helix-seed-density));
+  --helix-size-spinner-lg: calc(2rem * var(--_helix-seed-density));
   --helix-size-header: calc(3.5rem * var(--_helix-seed-density));
   /* The current step, which density moves, and the scale it moves along. An
      icon is chrome: in a dense row it has to come down with the rest of it, or
      a 20px mark sits beside 12px text and reads as the loudest thing there. */
+  /* Seeded, like every other size in this file, and this was the one scale that
+     was not.
+
+     It changes nothing today and that is the point. The seed is a single global
+     knob for rescaling the whole system and it sits at `1`; nothing overrides
+     it. An unseeded scale is one that would not move when it does, so the fault
+     is latent rather than live, and it is only visible by reading the file.
+
+     Not to be confused with density, which was how this was first written up.
+     `data-density` switches which *step* is current, and `--helix-size-icon` has
+     always been in that list beside control, checkbox, switch and tag: icons
+     already follow the region they are in. Measured before changing anything,
+     to be sure of which of the two was actually missing. */
   --helix-size-icon: var(--helix-size-icon-md);
-  --helix-size-icon-lg: 1.5rem;
-  --helix-size-icon-md: 1.25rem;
-  --helix-size-icon-sm: 1rem;
+  --helix-size-icon-lg: calc(1.5rem * var(--_helix-seed-density));
+  --helix-size-icon-md: calc(1.25rem * var(--_helix-seed-density));
+  --helix-size-icon-sm: calc(1rem * var(--_helix-seed-density));
   --helix-size-focus-ring: var(--helix-border-thick);
   --helix-size-focus-offset: 2px;
 
