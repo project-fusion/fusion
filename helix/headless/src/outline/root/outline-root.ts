@@ -154,7 +154,28 @@ export class HelixBaseOutline extends HelixElement {
     const passed = sections.filter(
       ({ target }) => target.getBoundingClientRect().top - this.offset <= 1,
     )
-    const active = passed.at(-1) ?? sections[0]
+    /* At the end of the page the last section is what is being read, whether or
+       not its top ever reached the reading line.
+     *
+     * The positional rule has one blind spot and it is at the bottom: a section
+     * is current once its top passes the line, and a section near the end of the
+     * document may not have enough page beneath it to get there. Measured on
+     * three sections with a short last one, scrolled fully to the end, 910 of
+     * 910: the third heading sat at 530px, plainly on screen and plainly the
+     * thing being read, and the marker stayed on the second. The last item in a
+     * contents list was unreachable by scrolling.
+     *
+     * The same fault has no mirror at the top, where `passed` is empty and the
+     * first section is already the fallback. Asked, because the shape suggests
+     * one: the first heading's top starts *at* the line rather than below it,
+     * so there is nothing for it to fail to reach.
+     *
+     * What this cannot do is tell trailing sections apart. If the last three
+     * share the final screenful, none of them can reach the line and the page
+     * has no scroll left to distinguish them, so all three collapse into "you
+     * are at the end". That is a fact about the page rather than a choice made
+     * here: the component cannot invent room to scroll. */
+    const active = this.atEnd ? sections.at(-1) : (passed.at(-1) ?? sections[0])
     for (const { link, target } of sections) {
       if (target === active?.target) {
         link.setAttribute('aria-current', 'location')
@@ -163,6 +184,47 @@ export class HelixBaseOutline extends HelixElement {
       }
     }
     this.reading = active?.target.id ?? ''
+  }
+
+  /**
+   * Whether the page has no more scroll left.
+   *
+   * `Math.ceil` and a pixel of slack, because a fractional device pixel ratio
+   * leaves `scrollY + innerHeight` a hair under `scrollHeight` at the very
+   * bottom and an exact comparison never fires.
+   */
+  private get atEnd(): boolean {
+    const doc = globalThis.document?.documentElement
+    if (!doc) {
+      return false
+    }
+    return Math.ceil(globalThis.scrollY + globalThis.innerHeight) >= doc.scrollHeight - 1
+  }
+
+  /** What `atEnd` was last time, so the listener below marks on the edge only. */
+  private wasAtEnd = false
+
+  /**
+   * The one thing an `IntersectionObserver` cannot see.
+   *
+   * This component's own note said the observer keeps the marker honest without
+   * a scroll listener, and that was true of everything except the bottom.
+   * Arriving at the end of a page changes no intersection: a short last section
+   * is fully visible long before the final pixel, so its ratio reached 1 and
+   * stopped moving, and nothing fired for the scroll that actually ended the
+   * page. No observer can be given a root margin that sees it, because nothing
+   * crosses anything.
+   *
+   * So there is a listener, and it is as small as one can be: passive, and it
+   * compares two numbers and returns unless the answer *changed*. `mark()` runs
+   * on the two frames a reader hits or leaves the bottom, and on no others.
+   */
+  private readonly handleScroll = (): void => {
+    const end = this.atEnd
+    if (end !== this.wasAtEnd) {
+      this.wasAtEnd = end
+      this.mark()
+    }
   }
 
   /**
@@ -279,6 +341,7 @@ export class HelixBaseOutline extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleClick)
+    globalThis.removeEventListener?.('scroll', this.handleScroll)
     this.observer?.disconnect()
     this.observer = undefined
     this.resize?.disconnect()
@@ -288,6 +351,7 @@ export class HelixBaseOutline extends HelixElement {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('click', this.handleClick)
+    globalThis.addEventListener?.('scroll', this.handleScroll, { passive: true })
     /* Both observers are rebuilt on reconnection, and neither was.
      *
      * They were created in `firstUpdated`, which runs once for the life of the

@@ -17593,6 +17593,45 @@
               }
             },
             {
+              "kind": "field",
+              "name": "atEnd",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether the page has no more scroll left.\n\n`Math.ceil` and a pixel of slack, because a fractional device pixel ratio\nleaves `scrollY + innerHeight` a hair under `scrollHeight` at the very\nbottom and an exact comparison never fires.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "wasAtEnd",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "What `atEnd` was last time, so the listener below marks on the edge only.",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The one thing an `IntersectionObserver` cannot see.\n\nThis component's own note said the observer keeps the marker honest without\na scroll listener, and that was true of everything except the bottom.\nArriving at the end of a page changes no intersection: a short last section\nis fully visible long before the final pixel, so its ratio reached 1 and\nstopped moving, and nothing fired for the scroll that actually ended the\npage. No observer can be given a root margin that sees it, because nothing\ncrosses anything.\n\nSo there is a listener, and it is as small as one can be: passive, and it\ncompares two numbers and returns unless the answer *changed*. `mark()` runs\non the two frames a reader hits or leaves the bottom, and on no others.",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "reach",
               "privacy": "private",

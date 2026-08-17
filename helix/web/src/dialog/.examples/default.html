@@ -2,9 +2,7 @@
   appearance="primary"
   command="--show"
   commandfor="confirm"
->
-  Delete project
-</helix-button>
+>Delete project</helix-button>
 
 <helix-dialog
   id="confirm"
@@ -12,22 +10,19 @@
 >
   <h2 slot="header">Delete project</h2>
   This removes the project and everything in it. It cannot be undone.
-  <helix-flex slot="footer">
-    <helix-button
-      appearance="tertiary"
-      fill="standard"
-      command="--close"
-      commandfor="confirm"
-    >
-      Cancel
-    </helix-button>
+  <helix-flex
+    gap="sm"
+    slot="footer"
+  >
     <helix-button
       appearance="danger"
-      fill="standard"
       command="--close"
       commandfor="confirm"
-    >
-      Delete
-    </helix-button>
+    >Delete</helix-button>
+    <helix-button
+      appearance="secondary"
+      command="--close"
+      commandfor="confirm"
+    >Cancel</helix-button>
   </helix-flex>
 </helix-dialog>

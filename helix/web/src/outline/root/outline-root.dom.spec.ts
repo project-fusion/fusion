@@ -162,6 +162,28 @@ if (hasLayout()) {
       expect(Number.parseFloat(mark.style.getPropertyValue('--_indicator-h'))).toBeGreaterThan(0)
     })
 
+    test('the end of the page marks the last section, reachable or not', async () => {
+      /* The positional rule's one blind spot: a section near the end may not
+         have enough page beneath it for its top to reach the reading line, so
+         the last item in a contents list was unreachable by scrolling. */
+      const nav = (await mount(
+        `<div>
+          <helix-outline label="On this page">
+            <a href="#a">A</a><a href="#b">B</a><a href="#c">C</a>
+          </helix-outline>
+          <section id="a" style="min-block-size:120vh"><h2>A</h2></section>
+          <section id="b" style="min-block-size:120vh"><h2>B</h2></section>
+          <section id="c" style="min-block-size:40px"><h2>C</h2></section>
+        </div>`,
+      )) as HTMLElement
+      const outline = nav.querySelector('helix-outline') as Nav
+      await outline.updateComplete
+
+      window.scrollTo(0, document.documentElement.scrollHeight)
+      await settle()
+      expect(outline.current).toBe('c')
+    })
+
     test('the mark is hidden until it has been measured', async () => {
       // Or it slides down from the top of the list on first paint, which reads
       // as the component correcting itself rather than as it arriving.
