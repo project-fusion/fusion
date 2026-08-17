@@ -4,9 +4,14 @@ import { html } from 'lit'
 import '../index.js'
 
 describe('drawer server output', () => {
-  test('renders closed and inert, which is what a fresh load shows', () => {
+  test('renders a shut dialog, which is what a fresh load shows', () => {
+    /* No `inert` any more: the panel is a real `<dialog>`, and a shut one is
+       already out of the tab order and the accessibility tree. The server
+       cannot call `showModal()`, so what ships is the element without `open`,
+       and the client opens it on the first update. */
     const markup = ssr(html`<helix-drawer label="Examples">Content</helix-drawer>`)
-    expect(partTag(markup, 'panel')).toContain('inert')
+    expect(partTag(markup, 'panel')).toMatch(/<dialog/)
+    expect(partTag(markup, 'panel')).not.toContain('inert')
     expect(hostTag(markup, 'helix-drawer')).not.toContain('data-open')
   })
 
@@ -15,12 +20,14 @@ describe('drawer server output', () => {
     // into place after hydration.
     const markup = ssr(html`<helix-drawer default-open label="Examples">Content</helix-drawer>`)
     expect(hostTag(markup, 'helix-drawer')).toContain('data-open')
-    expect(partTag(markup, 'panel')).not.toContain('inert')
   })
 
-  test('the dialog role and name ship with it', () => {
+  test('the name ships with it, and the role is the element', () => {
+    /* No `role="dialog"` written by hand: a `<dialog>` has it. The name still
+       has to be stated, because a dialog has no accessible name of its own. */
     const markup = ssr(html`<helix-drawer label="Examples">Content</helix-drawer>`)
-    expect(partTag(markup, 'panel')).toContain('role="dialog"')
+    expect(partTag(markup, 'panel')).toMatch(/<dialog/)
+    expect(partTag(markup, 'panel')).not.toContain('role=')
     expect(partTag(markup, 'panel')).toContain('aria-label="Examples"')
   })
 

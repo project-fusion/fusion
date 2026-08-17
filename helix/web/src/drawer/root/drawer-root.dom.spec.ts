@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -19,44 +19,59 @@ const markup = `
   </helix-drawer>`
 
 describe('drawer', () => {
-  test('is a modal dialog by default', async () => {
+  test('the panel is a real dialog, so the platform owns the modality', async () => {
+    /* It was a `<div>` with `role="dialog"`, `aria-modal`, `inert`, a scrim
+       div, a `FocusTrapController` and a `DismissController`. `showModal()`
+       carries every one of those, and each hand-written version was a thing
+       that could drift from what the element actually did. */
     const drawer = await mount(markup)
-    const panel = part(drawer, 'panel')
-    expect(panel?.getAttribute('role')).toBe('dialog')
-    expect(panel?.getAttribute('aria-modal')).toBe('true')
-    expect(panel?.getAttribute('aria-label')).toBe('Examples')
+    const panel = part(drawer, 'panel') as HTMLElement
+    expect(panel.tagName).toBe('DIALOG')
+    expect(panel.getAttribute('aria-label')).toBe('Examples')
+    // Nothing hand-written left to drift.
+    expect(panel.hasAttribute('role')).toBe(false)
+    expect(panel.hasAttribute('aria-modal')).toBe(false)
+    expect(part(drawer, 'scrim')).toBeNull()
   })
 
-  test('content stays mounted and inert while closed', async () => {
-    // Mounted so it is in the served markup and can animate; inert so it is
-    // out of the tab order and the accessibility tree without losing its box.
+  test('content stays mounted while closed, and the dialog is what hides it', async () => {
+    // Mounted so it is in the served markup and can animate. A shut `<dialog>`
+    // is already out of the tab order and the accessibility tree, which is what
+    // the hand-written `inert` was for.
     const drawer = await mount(markup)
-    expect(part(drawer, 'panel')?.hasAttribute('inert')).toBe(true)
+    expect((part(drawer, 'panel') as HTMLDialogElement).open).toBe(false)
     expect(drawer.textContent).toContain('Inside')
   })
 
-  test('opening clears inert and shows the scrim', async () => {
+  test('opening puts it in the top layer', async () => {
     const drawer = (await mount(markup)) as Updatable
     drawer.requestOpen(true)
     await drawer.updateComplete
 
     expect(drawer.open).toBe(true)
-    expect(part(drawer, 'panel')?.hasAttribute('inert')).toBe(false)
-    expect(part(drawer, 'scrim')?.hasAttribute('hidden')).toBe(false)
+    const panel = part(drawer, 'panel') as HTMLDialogElement
+    expect(panel.open).toBe(true)
+    if (hasLayout()) {
+      // The reason for all of this: a modal that is merely visible is still
+      // clipped by the first ancestor with `overflow`.
+      expect(panel.matches(':modal')).toBe(true)
+    }
   })
 
-  test('modal off drops the scrim and the dialog role together', async () => {
-    // One decision, not two: trapping without covering strands the reader, and
-    // covering without trapping lets them tab behind the cover.
-    const drawer = (await mount(
-      markup.replace('<helix-drawer ', '<helix-drawer modal="false" '),
-    )) as Updatable
+  test('modal off still reaches the top layer, without the backdrop', async () => {
+    /* One decision, not two: `showModal` brings a backdrop, a focus trap and
+       `inert` behind it, and `show` brings none of them. Both raise the panel,
+       which is what a drawer needs either way. */
+    const drawer = (await mount(markup)) as Updatable
     drawer.modal = false
     drawer.requestOpen(true)
     await drawer.updateComplete
 
-    expect(part(drawer, 'panel')?.getAttribute('role')).toBe('region')
-    expect(part(drawer, 'scrim')?.hasAttribute('hidden')).toBe(true)
+    const panel = part(drawer, 'panel') as HTMLDialogElement
+    expect(panel.open).toBe(true)
+    if (hasLayout()) {
+      expect(panel.matches(':modal')).toBe(false)
+    }
   })
 
   test('announces its own open changes, like every other open component', async () => {
@@ -70,9 +85,14 @@ describe('drawer', () => {
   })
 
   test('opening moves focus into the panel', async () => {
-    // The trap engages on `open`, not on which property changed: uncontrolled
-    // state does not live on `open`, so watching that property meant the trap
-    // never engaged for the common case.
+    /* Browser-only now, and that is the migration showing. Focus-on-open was a
+       `FocusTrapController` calling `focus()` itself, which happy-dom could
+       run. It is `showModal()` doing it now, and happy-dom implements the
+       method as a no-op, so the only place this can be observed is a browser
+       that actually has a top layer. */
+    if (!hasLayout()) {
+      return
+    }
     const drawer = (await mount(markup)) as Updatable
     drawer.requestOpen(true)
     await drawer.updateComplete
@@ -82,13 +102,32 @@ describe('drawer', () => {
     expect(drawer.contains(document.activeElement) || document.activeElement === inside).toBe(true)
   })
 
-  test('Escape closes it', async () => {
+  test('Escape closes it, and comes back through the request', async () => {
+    /* `cancel` rather than a keydown on the document. Escape is the platform's
+       now, not a `DismissController`'s, and a native dialog fires `cancel` for
+       it. Intercepted rather than left alone, because a dialog left to close
+       itself shuts while the consumer's state still says open, which is the
+       bug that makes a modal impossible to reopen. */
     const drawer = (await mount(markup)) as Updatable
     drawer.requestOpen(true)
     await drawer.updateComplete
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+    const panel = part(drawer, 'panel') as HTMLDialogElement
+    panel.dispatchEvent(new Event('cancel', { cancelable: true }))
     await drawer.updateComplete
     expect(drawer.open).toBe(false)
+  })
+
+  test('a refused Escape leaves it open', async () => {
+    const drawer = (await mount(markup)) as Updatable
+    drawer.requestOpen(true)
+    await drawer.updateComplete
+
+    drawer.addEventListener('helix-close', (event) => event.preventDefault())
+    ;(part(drawer, 'panel') as HTMLDialogElement).dispatchEvent(
+      new Event('cancel', { cancelable: true }),
+    )
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
   })
 })

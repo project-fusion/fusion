@@ -6440,10 +6440,6 @@
           "name": "HelixBaseDrawer",
           "cssParts": [
             {
-              "description": "The cover over the page behind.",
-              "name": "scrim"
-            },
-            {
               "description": "The sliding panel.",
               "name": "panel"
             },
@@ -6506,27 +6502,34 @@
             },
             {
               "kind": "field",
-              "name": "trap",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new FocusTrapController(this)"
-            },
-            {
-              "kind": "field",
-              "name": "dismisser",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new DismissController(this, { // The panel, not the host. The scrim is in this shadow root, so a press on // it is inside the host's composed path: measured against the host, the one // gesture that most obviously means \"close\" never closed anything. boundary: () => this.renderRoot.querySelector('[part=\"panel\"]'), onDismiss: () => { if (this.open) { this.requestOpen(false) } }, })"
-            },
-            {
-              "kind": "field",
-              "name": "engaged",
+              "name": "panel",
               "type": {
-                "text": "boolean"
+                "text": "HTMLDialogElement | null"
               },
               "privacy": "private",
-              "default": "false",
-              "description": "Whether the trap and the dismisser are currently on."
+              "description": "The panel, which is a real `<dialog>`.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleCancel",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Escape, routed through the request so a listener can refuse it.\n\nA native dialog closes itself on Escape, which would shut the drawer while\nthe consumer's state still said open: the bug that makes a modal impossible\nto reopen. `Dialog` intercepts it for the same reason."
+            },
+            {
+              "kind": "field",
+              "name": "handleClose",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A close that happened anyway is reflected back rather than argued with."
+            },
+            {
+              "kind": "field",
+              "name": "handleBackdrop",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A press on the backdrop, which lands on the dialog element itself.\n\nThe panel fills only part of the dialog's box, so a press beside it hits\nthe dialog and not a child. A native `<dialog>` does not close on that, and\nit is the gesture that most obviously means close."
             },
             {
               "kind": "field",

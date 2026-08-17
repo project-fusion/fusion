@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { startCase } from '@/lib/naming'
 import { getFamilies } from '../../../lib/catalog'
 import { ComponentArt } from '../../../lib/component-art'
 import { findVertical } from '../../verticals'
@@ -73,7 +74,7 @@ export default function Page() {
                   </helix-text>
                   {family.status && (
                     <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'}>
-                      {family.status}
+                      {startCase(family.status)}
                     </helix-tag>
                   )}
                 </helix-flex>

@@ -5693,7 +5693,6 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `scrim`: The cover over the page behind.
    * - `panel`: The sliding panel.
    * - `header`: The header region.
    * - `content`: The scrolling content region.
@@ -10051,7 +10050,6 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `scrim`: The cover over the page behind.
    * - `panel`: The sliding panel.
    * - `header`: The header region.
    * - `content`: The scrolling content region.

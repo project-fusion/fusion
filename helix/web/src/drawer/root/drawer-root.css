@@ -2,39 +2,12 @@
   --_drawer-size: var(--drawer-size, 20rem);
 }
 
-/* The cover fades. It did not before, and the reason is worth keeping.
- *
- * `hidden` on this element and `data-open` on the host change in the same Lit
- * update, so the scrim went from `display: none` to rendered in a single style
- * recalc. An element being rendered for the first time has no previous value to
- * interpolate from, so the opacity transition never ran at all: the cover
- * arrived at full strength in one frame while the panel beside it slid. It
- * looked like a flicker and was a missing animation.
- *
- * `allow-discrete` moves `display` at the useful end of each direction, on at
- * the start of the opening and off at the finish of the closing, and
- * `@starting-style` gives the opening frame somewhere to come from. Driven off
- * `hidden` alone rather than off `hidden` and `data-open` together, so there is
- * one source for whether the cover is there instead of two that have to agree.
- */
-[part="scrim"] {
-  background-color: var(--helix-color-overlay);
-  inset: 0;
-  opacity: 1;
-  position: fixed;
-  transition:
-    opacity var(--helix-duration-normal) var(--helix-easing-standard),
-    display var(--helix-duration-normal) allow-discrete;
-  z-index: var(--helix-layer-overlay);
-}
-
-[part="scrim"][hidden] {
-  display: none;
-  opacity: 0;
-}
-
+/* The backdrop's opening frame. `::backdrop` is the platform's element now, so
+   the fade belongs to it rather than to a scrim div this component drew, and
+   `@starting-style` is what gives an element entering the top layer somewhere
+   to come from. */
 @starting-style {
-  [part="scrim"]:not([hidden]) {
+  [part="panel"]::backdrop {
     opacity: 0;
   }
 }
@@ -49,6 +22,16 @@
  * plus the frame's own edges is three different lines claiming to be the same
  * boundary. The shadow is what separates a surface lying over the page, and it
  * already surrounds the panel on the sides that need it. */
+/* The platform's own backdrop, which the panel gets by being opened with
+   `showModal()`. It was a `<div part="scrim">` in this shadow root, so it sat
+   under anything with a higher `z-index` anywhere on the page and had to be
+   shown and hidden by hand. */
+[part="panel"]::backdrop {
+  background-color: var(--helix-color-overlay);
+  opacity: 1;
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
 [part="panel"] {
   background-color: var(--helix-color-surface);
   /* A drawer's own inset, and nothing about anyone's header.
@@ -150,9 +133,15 @@
   overflow-y: auto;
 }
 
+/* Both things that move, named one at a time so neither loses on specificity.
+   The scrim's half of this went with the scrim; the backdrop's is the platform's
+   element and takes its place. */
 @media (prefers-reduced-motion: reduce) {
-  [part="panel"],
-  [part="scrim"] {
+  [part="panel"] {
+    transition: none;
+  }
+
+  [part="panel"]::backdrop {
     transition: none;
   }
 }

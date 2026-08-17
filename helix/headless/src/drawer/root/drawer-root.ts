@@ -1,11 +1,4 @@
-import {
-  CommandController,
-  customElement,
-  DismissController,
-  FocusTrapController,
-  HelixElement,
-  MixinControllerOpen,
-} from '@helix-io/core'
+import { CommandController, customElement, HelixElement, MixinControllerOpen } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -40,7 +33,6 @@ import { property } from 'lit/decorators.js'
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.
  *
- * @csspart scrim - The cover over the page behind.
  * @csspart panel - The sliding panel.
  * @csspart header - The header region.
  * @csspart content - The scrolling content region.
@@ -85,59 +77,82 @@ export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
   @property({ type: Boolean })
   modal = true
 
-  private readonly trap = new FocusTrapController(this)
+  /** The panel, which is a real `<dialog>`. */
+  private get panel(): HTMLDialogElement | null {
+    return this.renderRoot?.querySelector<HTMLDialogElement>('[part="panel"]') ?? null
+  }
 
-  private readonly dismisser = new DismissController(this, {
-    // The panel, not the host. The scrim is in this shadow root, so a press on
-    // it is inside the host's composed path: measured against the host, the one
-    // gesture that most obviously means "close" never closed anything.
-    boundary: () => this.renderRoot.querySelector('[part="panel"]'),
-    onDismiss: () => {
-      if (this.open) {
-        this.requestOpen(false)
-      }
-    },
-  })
+  /**
+   * Escape, routed through the request so a listener can refuse it.
+   *
+   * A native dialog closes itself on Escape, which would shut the drawer while
+   * the consumer's state still said open: the bug that makes a modal impossible
+   * to reopen. `Dialog` intercepts it for the same reason.
+   */
+  private readonly handleCancel = (event: Event): void => {
+    event.preventDefault()
+    this.requestOpen(false)
+  }
 
-  /** Whether the trap and the dismisser are currently on. */
-  private engaged = false
+  /** A close that happened anyway is reflected back rather than argued with. */
+  private readonly handleClose = (): void => {
+    if (this.open) {
+      this.requestOpen(false)
+    }
+  }
+
+  /**
+   * A press on the backdrop, which lands on the dialog element itself.
+   *
+   * The panel fills only part of the dialog's box, so a press beside it hits
+   * the dialog and not a child. A native `<dialog>` does not close on that, and
+   * it is the gesture that most obviously means close.
+   */
+  private readonly handleBackdrop = (event: MouseEvent): void => {
+    if (event.target === this.panel && this.modal) {
+      this.requestOpen(false)
+    }
+  }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-
-    // Driven by `open` rather than by which property changed. Uncontrolled
-    // state does not live on `open` at all, so watching that property meant the
-    // trap never engaged for the common case.
-    const shouldEngage = this.open && this.modal
-    if (shouldEngage === this.engaged) {
+    /* After render, and only on a difference: `showModal()` on an open dialog
+       throws and `close()` on a shut one fires a second `close` event.
+     *
+     * `showModal` when modal and `show` when not, which is the whole of what
+     * `modal` means now: both put the panel in the top layer, and only the
+     * first brings a backdrop, a focus trap and `inert` behind it. This was a
+     * hand-built `position: fixed` panel with a scrim div, a focus trap and a
+     * dismisser, none of which the platform needed telling. */
+    const panel = this.panel
+    if (!panel) {
       return
     }
-    this.engaged = shouldEngage
-
-    const panel = this.renderRoot.querySelector<HTMLElement>('[part="panel"]')
-    if (shouldEngage && panel) {
-      this.trap.activate(panel)
-      this.dismisser.activate()
-    } else {
-      this.trap.deactivate()
-      this.dismisser.deactivate()
+    if (this.open && !panel.open) {
+      if (this.modal) {
+        panel.showModal()
+      } else {
+        panel.show()
+      }
+    } else if (!this.open && panel.open) {
+      panel.close()
     }
   }
 
   protected override render(): TemplateResult {
-    const open = this.open
-    return html`<div part="scrim" ?hidden=${!open || !this.modal}></div>
-      <div
-        part="panel"
-        role=${this.modal ? 'dialog' : 'region'}
-        aria-modal=${this.modal ? 'true' : 'false'}
-        aria-label=${this.label || 'Drawer'}
-        ?inert=${!open}
-        tabindex="-1"
-      >
-        <div part="header"><slot name="header"></slot></div>
-        <div part="content"><slot></slot></div>
-      </div>`
+    /* No `role`, no `aria-modal`, no `inert`, no `tabindex`: a `<dialog>` opened
+       with `showModal()` carries all four, and each hand-written version was a
+       thing that could drift from what the element actually did. */
+    return html`<dialog
+      part="panel"
+      aria-label=${this.label || 'Drawer'}
+      @cancel=${this.handleCancel}
+      @click=${this.handleBackdrop}
+      @close=${this.handleClose}
+    >
+      <div part="header"><slot name="header"></slot></div>
+      <div part="content"><slot></slot></div>
+    </dialog>`
   }
 }
 

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { startCase } from '@/lib/naming'
 import { type ApiMember, findFamily, getFamilies } from '../../../../../lib/catalog'
 
 /**
@@ -80,7 +81,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
           <helix-flex align="center" data-density="sm" gap="xs" wrap>
             {family.status && (
               <helix-tag appearance={family.status === 'stable' ? 'success' : 'warning'}>
-                {family.status}
+                {startCase(family.status)}
               </helix-tag>
             )}
             {family.since && (
