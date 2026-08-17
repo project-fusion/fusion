@@ -175,7 +175,6 @@ export class HelixBaseCarousel extends HelixElement {
         const previous = this.index
         this.indexState = value
         this.requestUpdate('index', previous)
-        this.scrollToIndex()
       },
       controlled: this.indexIsControlled,
       event: (value) => new HelixSelectEvent({ value: String(value) }),
@@ -272,6 +271,17 @@ export class HelixBaseCarousel extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* The track follows `index`, whoever moved it.
+     *
+     * This was called from inside `goTo`'s apply callback, which returns early
+     * in controlled mode, so a controlled carousel announced where it would go,
+     * the consumer assigned `index`, and the track never moved: the dots
+     * updated and the slides sat still. Every other path in was equally
+     * stranded, a plain `carousel.index = 2` included, apply being the only
+     * caller. Here it is one place and it covers all of them. */
+    if (changed.has('index')) {
+      this.scrollToIndex()
+    }
     // Named on the slides themselves rather than on wrappers, so each is the
     // consumer's own element and keeps whatever it already carried.
     const slides = this.slides

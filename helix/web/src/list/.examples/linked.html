@@ -1,16 +1,16 @@
+<!-- The link is inside the row, not around it. A wrapper between `role="list"`
+     and its `role="listitem"` rows breaks the ownership the roles describe: the
+     rows stop being counted and a reader is no longer told "1 of 2". The anchor
+     fills the row, so the whole row is still the target. -->
 <helix-list label="Label">
-  <a aria-current="page" data-list-item href="#one">
-    <helix-list-item>
-      <helix-icon name="cube" slot="start"></helix-icon>
-      Item One
-      <span slot="supporting">Caption</span>
-    </helix-list-item>
-  </a>
-  <a data-list-item href="#two">
-    <helix-list-item>
-      <helix-icon name="cube" slot="start"></helix-icon>
-      Item Two
-      <span slot="supporting">Caption</span>
-    </helix-list-item>
-  </a>
+  <helix-list-item>
+    <helix-icon name="cube" slot="start"></helix-icon>
+    <a aria-current="page" data-link="quiet" href="#one">Item One</a>
+    <span slot="supporting">Caption</span>
+  </helix-list-item>
+  <helix-list-item>
+    <helix-icon name="cube" slot="start"></helix-icon>
+    <a data-link="quiet" href="#two">Item Two</a>
+    <span slot="supporting">Caption</span>
+  </helix-list-item>
 </helix-list>

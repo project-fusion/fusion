@@ -107,9 +107,24 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
       item.selected = item.value === this.value
     }
     /* Nothing chosen yet, so the first item is the tab stop. A group where
-       every item is `tabindex="-1"` is a group the keyboard cannot enter. */
-    if (this.value === '' && items.length > 0) {
-      items[0]?.setAttribute('tabindex', '0')
+       every item is `tabindex="-1"` is a group the keyboard cannot enter.
+     *
+     * Taken back the moment there is an answer, which it was not: the attribute
+     * was written on the first item and never removed, so an answered group
+     * carried two tab stops, the entry one and the selected item's own. Tabbing
+     * through a form stopped twice on one question, and the first stop was on an
+     * item that is not the answer.
+     *
+     * `entered` rather than a bare toggle, because this also runs when the
+     * group is answered and the attribute has to go whether or not this call is
+     * the one that put it there. */
+    const entered = this.value === '' && items.length > 0 ? items[0] : undefined
+    for (const item of items) {
+      if (item === entered) {
+        item.setAttribute('tabindex', '0')
+      } else {
+        item.removeAttribute('tabindex')
+      }
     }
   }
 

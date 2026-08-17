@@ -36,18 +36,25 @@
 /* One cell holding the control and the marks, and it has to be a grid rather
    than a positioned pair: the control's width is what the flex row gives it, so
    anything measured against the track has to be laid out by the same box. */
-:host([markers]) [part="field"] {
+/* `data-markers`, not `markers`.
+ *
+ * This selected the declared attribute, and `markers` is a property that does
+ * not reflect, so the whole layout appeared only for a slider whose marks were
+ * written in the markup and never for one given them as a property. The element
+ * mirrors the boolean fact under a `data-` name instead, which is what this
+ * wants to know: whether there are marks, not how many. */
+:host([data-markers]) [part="field"] {
   display: grid;
   grid-template-columns: 1fr auto;
 }
 
-:host([markers]) [part="control"],
-:host([markers]) [part="markers"] {
+:host([data-markers]) [part="control"],
+:host([data-markers]) [part="markers"] {
   grid-column: 1;
   grid-row: 1;
 }
 
-:host([markers]) [part="output"] {
+:host([data-markers]) [part="output"] {
   grid-column: 2;
   grid-row: 1;
 }

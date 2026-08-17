@@ -2358,7 +2358,7 @@ the thumb being dragged.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `markerLabels` | `marker-labels` | `boolean` | `false` | `HelixBaseSlider` | Whether each mark says which value it stands at. |
+| `markerLabels` | `marker-labels` | `boolean` | `false` | `HelixBaseSlider` | Mirrors "there are marks" for the stylesheet. |
 | `markers` | `markers` | `number` | `0` | `HelixBaseSlider` | How many marks to draw along the track, evenly spaced, ends included. |
 | `max` | `max` | `number` | `100` | `HelixBaseSlider` | The largest value the reader can choose. |
 | `min` | `min` | `number` | `0` | `HelixBaseSlider` | The smallest value the reader can choose. |
@@ -3133,6 +3133,7 @@ one fill appearing as another disappears.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseToggle` | Whether the item can be chosen. |
+| `focusable` | - | `boolean` | `false` | `HelixBaseToggle` | Whether this item holds the group's tab stop while nothing is chosen. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseToggle` | Whether this item is the current one. |
 | `value` | `value` | `string` | `''` | `HelixBaseToggle` | Identifies the item to the group. |
 

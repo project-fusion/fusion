@@ -51,8 +51,18 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
     const control = event.target as HTMLInputElement
-    if (!this.requestChecked(control.checked)) {
-      control.checked = this.checked
+    const taken = this.requestChecked(control.checked)
+    /* The input follows the element, always, not only where the change was
+       refused.
+     *
+     * A controlled switch takes the request and applies nothing: it has
+       announced where it would go and is waiting to be told. The input had
+       already flipped itself, so until the consumer answered, the switch showed
+       one state and held the other, and a consumer who never answers showed the
+       wrong one for good. Putting it back costs nothing where the change was
+       taken, since `this.checked` is then the new value anyway. */
+    control.checked = this.checked
+    if (!taken) {
       return
     }
     this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))

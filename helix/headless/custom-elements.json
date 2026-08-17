@@ -4548,6 +4548,17 @@
               "description": "Pushes the group's name and value onto the boxes.\n\nAs properties rather than attributes. A `name` written onto a box is a\nchange to markup the consumer rendered, which a React consumer's hydration\nreports and does not patch up. A box that names itself keeps its own."
             },
             {
+              "kind": "method",
+              "name": "seed",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reads the boxes' own state into `value`, once, before anything is pushed.\n\n`sync` used to refuse to write anything while `value` was empty, and the\nguard was there for this: a group written with no `value` and boxes that\ndeclare their own `checked` would have had them all cleared on the first\nupdate. What it also did was make `group.value = ''` do nothing at all, so\nthe obvious way to clear a group silently did not, and the last box could\nnot be unticked through the group either.\n\nSeeding is the honest version of the same intent. The markup decides the\nstarting set, exactly as before, and from then on `value` is what the boxes\nfollow, including when it is empty. The group's `value` is a derived read\nof the boxes rather than state it owns, so reading it out of them at the\nstart is what it already means."
+            },
+            {
               "kind": "field",
               "name": "handleChange",
               "privacy": "private",
@@ -16006,7 +16017,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether each mark says which value it stands at.",
+              "description": "Mirrors \"there are marks\" for the stylesheet.\n\nThe whole marker layout hung off `:host([markers])` and `markers` does not\nreflect, so `slider.markers = 5` drew nothing at all: only the attribute\nwritten in the markup ever worked, and the property that is the documented\nAPI silently did not.\n\nReflecting the count instead would put `markers=\"0\"` on every slider, an\nattribute the server's markup does not have and one that selector would\nmatch, drawing the layout for no marks. So the boolean fact is mirrored to\na `data-` name, which is the rule this library already follows for state:\nthe stylesheet wants to know whether there are marks, not how many. How\nmany is what `markerValues` answers, and `< 2` is where it already draws\nthe line.\n\n/** Whether each mark says which value it stands at.",
               "attribute": "marker-labels",
               "reflects": true
             },
@@ -16632,7 +16643,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether each mark says which value it stands at.",
+              "description": "Mirrors \"there are marks\" for the stylesheet.\n\nThe whole marker layout hung off `:host([markers])` and `markers` does not\nreflect, so `slider.markers = 5` drew nothing at all: only the attribute\nwritten in the markup ever worked, and the property that is the documented\nAPI silently did not.\n\nReflecting the count instead would put `markers=\"0\"` on every slider, an\nattribute the server's markup does not have and one that selector would\nmatch, drawing the layout for no marks. So the boolean fact is mirrored to\na `data-` name, which is the rule this library already follows for state:\nthe stylesheet wants to know whether there are marks, not how many. How\nmany is what `markerValues` answers, and `< 2` is where it already draws\nthe line.\n\n/** Whether each mark says which value it stands at.",
               "fieldName": "markerLabels"
             },
             {
@@ -21412,7 +21423,7 @@
               "name": "indicator",
               "privacy": "private",
               "readonly": true,
-              "default": "new IndicatorController(this, { active: () => resolveActiveItem(this.value, this.items), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"track\"]'), })"
+              "default": "new IndicatorController(this, { // The same exact match `sync` makes: nothing chosen means nothing marked, // and the controller takes the mark away rather than parking it on item one. active: () => this.items.find((item) => item.value === this.value), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"track\"]'), })"
             },
             {
               "kind": "field",
@@ -22238,6 +22249,15 @@
               "type": {
                 "text": "select() => void"
               }
+            },
+            {
+              "kind": "field",
+              "name": "focusable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this item holds the group's tab stop while nothing is chosen.\n\nThe stop normally rides on the selection, and an unanswered group has no\nselection, so it had no stop and the keyboard could not reach it. Written\nby the group, with no attribute: it is coordination between elements, and\n`tabindex` on a host the consumer rendered is the change a React consumer's\nhydration reports and does not patch up."
             },
             {
               "kind": "field",

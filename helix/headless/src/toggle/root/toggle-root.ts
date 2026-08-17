@@ -50,6 +50,18 @@ export class HelixBaseToggle extends HelixElement {
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
+  /**
+   * Whether this item holds the group's tab stop while nothing is chosen.
+   *
+   * The stop normally rides on the selection, and an unanswered group has no
+   * selection, so it had no stop and the keyboard could not reach it. Written
+   * by the group, with no attribute: it is coordination between elements, and
+   * `tabindex` on a host the consumer rendered is the change a React consumer's
+   * hydration reports and does not patch up.
+   */
+  @property({ attribute: false })
+  focusable = false
+
   protected override render(): TemplateResult {
     return html`<button
       part="item"
@@ -57,7 +69,7 @@ export class HelixBaseToggle extends HelixElement {
       role="radio"
       aria-checked=${this.selected ? 'true' : 'false'}
       ?disabled=${this.disabled}
-      tabindex=${this.selected ? '0' : '-1'}
+      tabindex=${this.selected || this.focusable ? '0' : '-1'}
       @click=${() => this.select()}
     >
       <slot></slot>

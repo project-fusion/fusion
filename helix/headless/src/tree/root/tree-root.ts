@@ -149,9 +149,19 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    const item = (event.target as Element | null)?.closest('*')
-    const current = this.items.find((entry) => entry === item || entry.contains(item as Node))
-    if (!current || !KEYS.has(event.key)) {
+    /* The innermost item the press came from, which `find` could not give.
+     *
+     * `items` is every tree item in document order and a nested one is inside
+     * all of its ancestors, so `entry.contains(target)` matched the outermost
+     * ancestor first: every key pressed on a nested node moved the root of its
+     * branch instead. The deeper the node, the further the answer was wrong,
+     * and the shallow cases it was written against all looked right.
+     *
+     * `closestInstance` walks up by identity and crosses shadow roots on the
+     * way, which is the util that exists for exactly this. `closest('*')` was
+     * also a no-op: it returns the element it was called on. */
+    const current = closestInstance(event.target as Element | null, HelixBaseTreeItem)
+    if (!current || !this.items.includes(current) || !KEYS.has(event.key)) {
       return
     }
 

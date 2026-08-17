@@ -84,6 +84,15 @@ export class HelixGrid extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* Mirrors "a floor was given" for the stylesheet, so the rule that makes
+       `min` win can select on it.
+     *
+     * Not `:host([min])` on the declared attribute: `min` is a string property
+       and Lit reflects `''` as `min=""`, so every grid would match it. And a
+       consumer setting it as a property would not write the attribute at all,
+       which is the trap the slider's markers were in. The boolean fact goes to
+       a `data-` name, which is the rule for state in this library. */
+    this.toggleAttribute('data-min', this.min !== '')
     if (changed.has('min')) {
       this.applyTemplate()
     }

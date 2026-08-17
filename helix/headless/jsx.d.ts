@@ -3073,9 +3073,39 @@ one thing a mark must not be, so the spacing gives way rather than the
 step, and marks may come out unevenly spaced when the two disagree. That
 is the honest picture of the range being offered. */
   markers?: HelixBaseSlider["markers"];
-  /** Whether each mark says which value it stands at. */
+  /** Mirrors "there are marks" for the stylesheet.
+
+The whole marker layout hung off `:host([markers])` and `markers` does not
+reflect, so `slider.markers = 5` drew nothing at all: only the attribute
+written in the markup ever worked, and the property that is the documented
+API silently did not.
+
+Reflecting the count instead would put `markers="0"` on every slider, an
+attribute the server's markup does not have and one that selector would
+match, drawing the layout for no marks. So the boolean fact is mirrored to
+a `data-` name, which is the rule this library already follows for state:
+the stylesheet wants to know whether there are marks, not how many. How
+many is what `markerValues` answers, and `< 2` is where it already draws
+the line.
+
+/** Whether each mark says which value it stands at. */
   "marker-labels"?: HelixBaseSlider["markerLabels"];
-  /** Whether each mark says which value it stands at. */
+  /** Mirrors "there are marks" for the stylesheet.
+
+The whole marker layout hung off `:host([markers])` and `markers` does not
+reflect, so `slider.markers = 5` drew nothing at all: only the attribute
+written in the markup ever worked, and the property that is the documented
+API silently did not.
+
+Reflecting the count instead would put `markers="0"` on every slider, an
+attribute the server's markup does not have and one that selector would
+match, drawing the layout for no marks. So the boolean fact is mirrored to
+a `data-` name, which is the rule this library already follows for state:
+the stylesheet wants to know whether there are marks, not how many. How
+many is what `markerValues` answers, and `< 2` is where it already draws
+the line.
+
+/** Whether each mark says which value it stands at. */
   markerLabels?: HelixBaseSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   step?: HelixBaseSlider["step"];
@@ -3148,9 +3178,39 @@ one thing a mark must not be, so the spacing gives way rather than the
 step, and marks may come out unevenly spaced when the two disagree. That
 is the honest picture of the range being offered. */
   "prop:markers"?: HelixBaseSlider["markers"];
-  /** Whether each mark says which value it stands at. */
+  /** Mirrors "there are marks" for the stylesheet.
+
+The whole marker layout hung off `:host([markers])` and `markers` does not
+reflect, so `slider.markers = 5` drew nothing at all: only the attribute
+written in the markup ever worked, and the property that is the documented
+API silently did not.
+
+Reflecting the count instead would put `markers="0"` on every slider, an
+attribute the server's markup does not have and one that selector would
+match, drawing the layout for no marks. So the boolean fact is mirrored to
+a `data-` name, which is the rule this library already follows for state:
+the stylesheet wants to know whether there are marks, not how many. How
+many is what `markerValues` answers, and `< 2` is where it already draws
+the line.
+
+/** Whether each mark says which value it stands at. */
   "bool:marker-labels"?: HelixBaseSlider["markerLabels"];
-  /** Whether each mark says which value it stands at. */
+  /** Mirrors "there are marks" for the stylesheet.
+
+The whole marker layout hung off `:host([markers])` and `markers` does not
+reflect, so `slider.markers = 5` drew nothing at all: only the attribute
+written in the markup ever worked, and the property that is the documented
+API silently did not.
+
+Reflecting the count instead would put `markers="0"` on every slider, an
+attribute the server's markup does not have and one that selector would
+match, drawing the layout for no marks. So the boolean fact is mirrored to
+a `data-` name, which is the rule this library already follows for state:
+the stylesheet wants to know whether there are marks, not how many. How
+many is what `markerValues` answers, and `< 2` is where it already draws
+the line.
+
+/** Whether each mark says which value it stands at. */
   "prop:markerLabels"?: HelixBaseSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   "prop:step"?: HelixBaseSlider["step"];
@@ -4060,6 +4120,14 @@ export type HelixBaseToggleProps = {
   selected?: HelixBaseToggle["selected"];
   /** Whether the item can be chosen. */
   disabled?: HelixBaseToggle["disabled"];
+  /** Whether this item holds the group's tab stop while nothing is chosen.
+
+The stop normally rides on the selection, and an unanswered group has no
+selection, so it had no stop and the keyboard could not reach it. Written
+by the group, with no attribute: it is coordination between elements, and
+`tabindex` on a host the consumer rendered is the change a React consumer's
+hydration reports and does not patch up. */
+  focusable?: HelixBaseToggle["focusable"];
 
   /** Fired when the item is chosen. */
   "onhelix-select"?: (e: HelixBaseToggleHelixSelectElementEvent) => void;
@@ -4072,6 +4140,14 @@ export type HelixBaseToggleSolidJsProps = {
   "prop:selected"?: HelixBaseToggle["selected"];
   /** Whether the item can be chosen. */
   "prop:disabled"?: HelixBaseToggle["disabled"];
+  /** Whether this item holds the group's tab stop while nothing is chosen.
+
+The stop normally rides on the selection, and an unanswered group has no
+selection, so it had no stop and the keyboard could not reach it. Written
+by the group, with no attribute: it is coordination between elements, and
+`tabindex` on a host the consumer rendered is the change a React consumer's
+hydration reports and does not patch up. */
+  "prop:focusable"?: HelixBaseToggle["focusable"];
   /** Fired when the item is chosen. */
   "on:helix-select"?: (e: HelixBaseToggleHelixSelectElementEvent) => void;
 
@@ -7387,7 +7463,22 @@ export type CustomElements = {
    * one thing a mark must not be, so the spacing gives way rather than the
    * step, and marks may come out unevenly spaced when the two disagree. That
    * is the honest picture of the range being offered.
-   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
+   * - `marker-labels`/`markerLabels`: Mirrors "there are marks" for the stylesheet.
+   *
+   * The whole marker layout hung off `:host([markers])` and `markers` does not
+   * reflect, so `slider.markers = 5` drew nothing at all: only the attribute
+   * written in the markup ever worked, and the property that is the documented
+   * API silently did not.
+   *
+   * Reflecting the count instead would put `markers="0"` on every slider, an
+   * attribute the server's markup does not have and one that selector would
+   * match, drawing the layout for no marks. So the boolean fact is mirrored to
+   * a `data-` name, which is the rule this library already follows for state:
+   * the stylesheet wants to know whether there are marks, not how many. How
+   * many is what `markerValues` answers, and `< 2` is where it already draws
+   * the line.
+   *
+   * /** Whether each mark says which value it stands at.
    * - `step`: How far one press of an arrow key moves it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -8413,6 +8504,13 @@ export type CustomElements = {
    * - `value`: Identifies the item to the group.
    * - `selected`: Whether this item is the current one.
    * - `disabled`: Whether the item can be chosen.
+   * - `focusable`: Whether this item holds the group's tab stop while nothing is chosen.
+   *
+   * The stop normally rides on the selection, and an unanswered group has no
+   * selection, so it had no stop and the keyboard could not reach it. Written
+   * by the group, with no attribute: it is coordination between elements, and
+   * `tabindex` on a host the consumer rendered is the change a React consumer's
+   * hydration reports and does not patch up. (property only)
    *
    * ## Events
    *
@@ -11840,7 +11938,22 @@ export type CustomElementsSolidJs = {
    * one thing a mark must not be, so the spacing gives way rather than the
    * step, and marks may come out unevenly spaced when the two disagree. That
    * is the honest picture of the range being offered.
-   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
+   * - `marker-labels`/`markerLabels`: Mirrors "there are marks" for the stylesheet.
+   *
+   * The whole marker layout hung off `:host([markers])` and `markers` does not
+   * reflect, so `slider.markers = 5` drew nothing at all: only the attribute
+   * written in the markup ever worked, and the property that is the documented
+   * API silently did not.
+   *
+   * Reflecting the count instead would put `markers="0"` on every slider, an
+   * attribute the server's markup does not have and one that selector would
+   * match, drawing the layout for no marks. So the boolean fact is mirrored to
+   * a `data-` name, which is the rule this library already follows for state:
+   * the stylesheet wants to know whether there are marks, not how many. How
+   * many is what `markerValues` answers, and `< 2` is where it already draws
+   * the line.
+   *
+   * /** Whether each mark says which value it stands at.
    * - `step`: How far one press of an arrow key moves it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -12917,6 +13030,13 @@ export type CustomElementsSolidJs = {
    * - `value`: Identifies the item to the group.
    * - `selected`: Whether this item is the current one.
    * - `disabled`: Whether the item can be chosen.
+   * - `focusable`: Whether this item holds the group's tab stop while nothing is chosen.
+   *
+   * The stop normally rides on the selection, and an unanswered group has no
+   * selection, so it had no stop and the keyboard could not reach it. Written
+   * by the group, with no attribute: it is coordination between elements, and
+   * `tabindex` on a host the consumer rendered is the change a React consumer's
+   * hydration reports and does not patch up. (property only)
    *
    * ## Events
    *

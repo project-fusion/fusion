@@ -253,7 +253,7 @@ helix-card > [slot="media"] {
 
 [data-text="display"],
 helix-text[appearance="display"],
-helix-text:not([appearance])[as="h1"] {
+:where(helix-text:not([appearance])[as="h1"]) {
   font-family: var(--helix-font-display);
   font-size: var(--helix-text-3xl);
   font-weight: var(--helix-weight-semibold);
@@ -263,7 +263,7 @@ helix-text:not([appearance])[as="h1"] {
 
 [data-text="heading"],
 helix-text[appearance="heading"],
-helix-text:not([appearance])[as="h2"] {
+:where(helix-text:not([appearance])[as="h2"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-2xl);
   font-weight: var(--helix-weight-semibold);
@@ -273,7 +273,7 @@ helix-text:not([appearance])[as="h2"] {
 
 [data-text="subheading"],
 helix-text[appearance="subheading"],
-helix-text:not([appearance])[as="h3"] {
+:where(helix-text:not([appearance])[as="h3"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
@@ -283,7 +283,7 @@ helix-text:not([appearance])[as="h3"] {
 
 [data-text="title"],
 helix-text[appearance="title"],
-helix-text:not([appearance])[as="h4"] {
+:where(helix-text:not([appearance])[as="h4"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-lg);
   font-weight: var(--helix-weight-semibold);

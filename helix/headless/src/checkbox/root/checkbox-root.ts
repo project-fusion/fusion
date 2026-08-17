@@ -69,8 +69,17 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
     // element is controlled, it is put back to whatever the element resolves
     // to, so the box never shows a state the element does not hold.
     const next = input.checked
-    this.indeterminate = false
-    this.requestChecked(next)
+    /* The dash goes only where the change is taken.
+     *
+     * It was cleared first and unconditionally, so a consumer calling
+     * `preventDefault()` on the change kept the checked state and lost the
+     * third one: the box came back neither ticked nor dashed, which is a state
+     * nobody asked for and the element did not hold. Refusing a change should
+     * leave everything as it was, which is the argument the line below already
+     * makes for `checked`. */
+    if (this.requestChecked(next)) {
+      this.indeterminate = false
+    }
     input.checked = this.checked
     this.relayNativeEvent(event)
   }

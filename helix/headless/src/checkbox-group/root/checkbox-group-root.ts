@@ -103,9 +103,30 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
       if (this.name !== '' && box.name === '') {
         box.name = this.name
       }
-      if (this.value !== '' || wanted.size > 0) {
-        box.checked = wanted.has(box.value)
-      }
+      box.checked = wanted.has(box.value)
+    }
+  }
+
+  /**
+   * Reads the boxes' own state into `value`, once, before anything is pushed.
+   *
+   * `sync` used to refuse to write anything while `value` was empty, and the
+   * guard was there for this: a group written with no `value` and boxes that
+   * declare their own `checked` would have had them all cleared on the first
+   * update. What it also did was make `group.value = ''` do nothing at all, so
+   * the obvious way to clear a group silently did not, and the last box could
+   * not be unticked through the group either.
+   *
+   * Seeding is the honest version of the same intent. The markup decides the
+   * starting set, exactly as before, and from then on `value` is what the boxes
+   * follow, including when it is empty. The group's `value` is a derived read
+   * of the boxes rather than state it owns, so reading it out of them at the
+   * start is what it already means.
+   */
+  private seed(): void {
+    const checked = this.boxes.filter((box) => box.checked).map((box) => box.value)
+    if (checked.length > 0) {
+      this.value = checked.join(',')
     }
   }
 
@@ -178,6 +199,16 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
        element references on the client, and those win where a consumer slotted
        a label richer than a string. */
     hostAria(this.internals, { label: this.label, role: 'group' })
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* Before the first `sync`, and only ever once: after this the group's value
+       is what the boxes follow. Client only, the server having no boxes to
+       read. */
+    if (this.value === '') {
+      this.seed()
+    }
   }
 
   protected override updated(changed: PropertyValues): void {

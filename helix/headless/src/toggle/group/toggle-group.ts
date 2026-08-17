@@ -7,7 +7,6 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
-  resolveActiveItem,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -67,15 +66,35 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
    * marked it as chosen.
    */
   private sync(): void {
-    const active = resolveActiveItem(this.value, this.items)
+    /* An exact match and nothing else.
+     *
+     * This went through `resolveActiveItem`, which falls back to the first
+     * enabled item, so a group with no value marked one anyway:
+     * `aria-checked="true"`, the thumb placed under it, full selected styling,
+     * while the group reported nothing. A `required` group showed an answer it
+     * did not have, and a reader who submitted without touching it was told a
+     * value was missing while looking at one.
+     *
+     * The fallback is right where it came from. A tab set always shows a panel,
+     * so something has to be current; a group that reports a form value has the
+     * honest option of reporting none. */
+    const active = this.items.find((item) => item.value === this.value)
+    /* With nothing chosen there is no selection to carry the tab stop, so the
+       first item holds one until there is. Otherwise an unanswered group is a
+       control the keyboard cannot enter, which is what the fallback was quietly
+       also doing for it. */
+    const entry = active ? undefined : this.items.find((item) => !item.disabled)
     for (const item of this.items) {
       item.selected = item === active
+      item.focusable = item === entry
     }
   }
 
   /* The mark. The selection sync it used to share a method with is `sync()`. */
   private readonly indicator = new IndicatorController(this, {
-    active: () => resolveActiveItem(this.value, this.items),
+    // The same exact match `sync` makes: nothing chosen means nothing marked,
+    // and the controller takes the mark away rather than parking it on item one.
+    active: () => this.items.find((item) => item.value === this.value),
     indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="track"]'),
   })

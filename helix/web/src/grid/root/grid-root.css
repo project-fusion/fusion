@@ -33,6 +33,22 @@
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
+/* `min` beats `columns`, which is what the documentation has always said and
+   what the cascade did not do.
+ *
+ * The count rules are `:host([columns="3"])` and set `grid-template-columns`
+ * outright, where the floor arrives as a custom property read by the plain
+ * `:host` rule above at lower specificity. So an element given both got the
+ * fixed count, the exact opposite of "setting `min` wins, because a fixed count
+ * that also reflows is two intentions in one element".
+
+   Same specificity as the count rules and written after them, which is all it
+   takes, and it keeps both halves in the one sheet rather than depending on
+   where a `<style>` element lands in the cascade. */
+:host([data-min]) {
+  grid-template-columns: var(--_grid-template, minmax(0, 1fr));
+}
+
 :host([gap="none"]) {
   gap: var(--helix-space-none);
 }
