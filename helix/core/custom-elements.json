@@ -2133,6 +2133,14 @@
             "name": "severityMark",
             "module": "./utils/severities/severities.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "slotFilled",
+          "declaration": {
+            "name": "slotFilled",
+            "module": "./utils/slot-filled/slot-filled.js"
+          }
         }
       ]
     },
@@ -4035,6 +4043,40 @@
           "declaration": {
             "name": "severityMark",
             "module": "src/utils/severities/severities.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/slot-filled/slot-filled.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "slotFilled",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "slot",
+              "type": {
+                "text": "HTMLSlotElement | null | undefined"
+              }
+            }
+          ],
+          "description": "Whether a consumer put anything in a slot.\n\n**There is no selector for this**, which is why it is script. `slot:empty`\nlooks like the answer and is not: a slot's children are its *fallback*, and\nassigned nodes are not children, so `:empty` is true whenever the fallback is\nabsent whether or not the consumer slotted anything. `:host(:has(...))` is\ninvalid CSS, and the server has no children to inspect.\n\nThe answer matters because an empty wrapper is not free. A region that\ngenerates a box is a flex item or a grid item whether or not it holds\nanything, so it takes the container's gap: an announcement with no actions\npaid the row gap twice, a switch with no label took one for a label that was\nnot there, and a blockquote with no attribution reserved a full space below\nevery quote. `display: none` is the only fix, because only a box that is not\ngenerated has no gap beside it.\n\nText or an element, because neither alone is the test. An element on its own\ncounts a whitespace-only span as content; text on its own counts an icon as\nnothing.\n\n`flatten` is deliberate here, unlike the tooltip's emptiness test: this asks\n\"will anything render\", where that one asks \"did the consumer provide\nanything\", and a slot showing its fallback does render."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "slotFilled",
+          "declaration": {
+            "name": "slotFilled",
+            "module": "src/utils/slot-filled/slot-filled.ts"
           }
         }
       ]

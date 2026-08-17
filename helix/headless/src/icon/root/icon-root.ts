@@ -49,7 +49,10 @@ export class HelixBaseIcon extends HelixElement {
   label = ''
 
   protected override render(): TemplateResult | typeof nothing {
-    const icon = icons[this.name]
+    /* Own keys only. This was a truthiness check on a plain-object index, so an
+       inherited `Object.prototype` key passed it and the component went on to
+       render a sized, empty `<svg viewBox="">` rather than nothing at all. */
+    const icon = Object.hasOwn(icons, this.name) ? icons[this.name] : undefined
     if (!icon) {
       return nothing
     }

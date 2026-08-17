@@ -148,3 +148,10 @@
     transition: none;
   }
 }
+
+/* Nothing in it, so no box and no gap beside it. See `slotFilled`: there is no
+   selector that can ask this, and only a box that is not generated costs
+   nothing in a flex row. */
+[part="actions"][data-empty] {
+  display: none;
+}

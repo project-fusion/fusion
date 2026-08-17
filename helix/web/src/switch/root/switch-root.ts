@@ -6,7 +6,7 @@ import { styles as fieldInlineStyles } from '../../field/field-inline.css.js'
 import { styles } from './switch-root.css.js'
 
 /**
- * @summary A control that turns something on, and turns it on when pressed.
+ * @summary A control that turns something on or off.
  *
  * @description
  * A thumb travelling in a groove, which is the one place in the library color

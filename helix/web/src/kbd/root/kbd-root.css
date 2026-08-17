@@ -47,5 +47,10 @@
   line-height: 1;
   /* Square at minimum, so a single character is not a narrow sliver. */
   min-inline-size: var(--_kbd-height);
+  /* A key label does not wrap. The box has a fixed `block-size`, so a
+     multi-word label, "Ctrl Alt" or a localised "Intro", in a container
+     narrower than the key wrapped to a second line and overflowed a box that
+     could not grow to hold it. */
+  white-space: nowrap;
   padding-inline: var(--_kbd-inset);
 }

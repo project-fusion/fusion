@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@helix-io/core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { customElement, HelixElement, slotFilled } from '@helix-io/core'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -30,6 +30,30 @@ export class HelixBaseBlockquote extends HelixElement {
   /** URL identifying where the passage came from. */
   @property()
   cite = ''
+
+  /**
+   * Says on the footer whether there is an attribution in it.
+   *
+   * A `<footer>` with nothing in it is still a block in the quote's flow and
+   * still takes the container's gap, so every blockquote written without an
+   * attribution reserved a full space below itself. There is no selector that
+   * can ask, `slot:empty` being about a slot's fallback rather than its
+   * assigned nodes, so the component asks and says so on the footer inside this
+   * shadow root: an attribute on the host is a change to markup the consumer
+   * rendered, which React reports on hydration.
+   */
+  private markEmpty(): void {
+    const footer = this.renderRoot?.querySelector<HTMLElement>('[part="attribution"]')
+    footer?.toggleAttribute(
+      'data-empty',
+      !slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="attribution"]')),
+    )
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.markEmpty()
+  }
 
   protected override render(): TemplateResult {
     // The footer is a bare slot inside a real `<footer>`: the element is the

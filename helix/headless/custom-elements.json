@@ -646,6 +646,17 @@
               "reflects": true
             },
             {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on the `actions` region whether anything is in it.\n\nAn empty region is not free: it is still a flex item, so it still takes the\ncontainer's gap. There is no selector that can ask, `slot:empty` being\nabout a slot's fallback rather than its assigned nodes, so the component\nasks and says so, on the region inside this shadow root rather than on the\nhost: an attribute written onto the host is a change to markup the consumer\nrendered, which React reports on hydration and does not patch up."
+            },
+            {
               "kind": "field",
               "name": "dismissible",
               "type": {
@@ -1802,6 +1813,17 @@
               "default": "''",
               "description": "URL identifying where the passage came from.",
               "attribute": "cite"
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on the footer whether there is an attribution in it.\n\nA `<footer>` with nothing in it is still a block in the quote's flow and\nstill takes the container's gap, so every blockquote written without an\nattribution reserved a full space below itself. There is no selector that\ncan ask, `slot:empty` being about a slot's fallback rather than its\nassigned nodes, so the component asks and says so on the footer inside this\nshadow root: an attribute on the host is a change to markup the consumer\nrendered, which React reports on hydration."
             },
             {
               "kind": "field",
@@ -18159,6 +18181,17 @@
               "type": {
                 "text": "formResetCallback() => void"
               }
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on the `label` region whether anything is in it.\n\nAn empty region is not free: it is still a flex item, so it still takes the\ncontainer's gap. There is no selector that can ask, `slot:empty` being\nabout a slot's fallback rather than its assigned nodes, so the component\nasks and says so, on the region inside this shadow root rather than on the\nhost: an attribute written onto the host is a change to markup the consumer\nrendered, which React reports on hydration and does not patch up."
             },
             {
               "kind": "field",

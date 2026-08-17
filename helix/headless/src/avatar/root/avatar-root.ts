@@ -8,8 +8,15 @@ export const initialsOf = (name: string): string => {
   if (words.length === 0) {
     return ''
   }
-  const first = words[0]?.[0] ?? ''
-  const last = words.length > 1 ? (words[words.length - 1]?.[0] ?? '') : ''
+  /* By code point, not by code unit.
+   *
+   * `word[0]` indexes UTF-16, so a name beginning with anything outside the
+   * basic plane, an emoji or most of the world's less common scripts, yields a
+   * lone surrogate and the avatar paints U+FFFD. Spreading a string iterates
+   * code points, which is what a first letter means. */
+  const initial = (word: string | undefined): string => [...(word ?? '')][0] ?? ''
+  const first = initial(words[0])
+  const last = words.length > 1 ? initial(words[words.length - 1]) : ''
   return (first + last).toUpperCase()
 }
 
@@ -77,7 +84,16 @@ export class HelixBaseAvatar extends HelixElement {
     if (changed.has('src')) {
       this.failed = false
     }
-    hostAria(this.internals, { label: this.name, role: 'img' })
+    /* A role only where there is a name to carry.
+     *
+     * `role="img"` was asserted unconditionally, so an avatar with no `name`
+     * was an unnamed image: a screen reader announces "image" and stops, which
+     * is worse than announcing nothing, because nothing is what a decorative
+     * mark should be. With a name it is content and needs the role to hold it. */
+    hostAria(this.internals, {
+      label: this.name,
+      role: this.name === '' ? '' : 'img',
+    })
   }
 
   protected override render(): TemplateResult {

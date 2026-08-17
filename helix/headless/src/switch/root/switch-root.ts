@@ -1,9 +1,15 @@
-import { customElement, HelixFormElement, MixinControllerChecked, MixinField } from '@helix-io/core'
+import {
+  customElement,
+  HelixFormElement,
+  MixinControllerChecked,
+  MixinField,
+  slotFilled,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary A control that turns something on, and turns it on when pressed.
+ * @summary A control that turns something on or off.
  *
  * @description
  * **A switch is not a checkbox with a different shape.** A checkbox is an
@@ -90,7 +96,26 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.markEmpty()
     this.sync()
+  }
+
+  /**
+   * Says on the `label` region whether anything is in it.
+   *
+   * An empty region is not free: it is still a flex item, so it still takes the
+   * container's gap. There is no selector that can ask, `slot:empty` being
+   * about a slot's fallback rather than its assigned nodes, so the component
+   * asks and says so, on the region inside this shadow root rather than on the
+   * host: an attribute written onto the host is a change to markup the consumer
+   * rendered, which React reports on hydration and does not patch up.
+   */
+  private markEmpty(): void {
+    const region = this.renderRoot?.querySelector<HTMLElement>('[part="label"]')
+    region?.toggleAttribute(
+      'data-empty',
+      !slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>('[part="label"] slot')),
+    )
   }
 
   protected override render(): TemplateResult {

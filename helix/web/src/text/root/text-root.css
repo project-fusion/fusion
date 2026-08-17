@@ -33,3 +33,18 @@
   letter-spacing: inherit;
   margin: var(--helix-space-none);
 }
+
+/* `em` is the one tag in the map with nothing else restoring it.
+ *
+ * `font: inherit` above is what makes the component take the surrounding type,
+ * and `font` is a shorthand: it resets `font-style` to `normal` along with
+ * everything else it does not name. Every other tag with a look of its own,
+ * the headings, `strong`, `code`, `label`, has a base-layer rule putting that
+ * look back. `em` had none, so `as="em"` rendered a real `<em>` that was not
+ * italic, which is the whole of what the tag means.
+ *
+ * On the part rather than the host, because the host is not the `<em>`: the
+ * static template renders the tag inside. */
+:host([as="em"]) [part="text"] {
+  font-style: italic;
+}

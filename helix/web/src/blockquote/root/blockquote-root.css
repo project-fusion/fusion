@@ -49,3 +49,9 @@ slot:not([name])::slotted(*) {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
 }
+
+/* Nothing said it, so no footer and no gap under the quote. Only a box that is
+   not generated costs nothing in a flow with spacing between its children. */
+[part="attribution"][data-empty] {
+  display: none;
+}

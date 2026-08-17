@@ -21,7 +21,7 @@ const TAGS: Record<string, StaticValue> = {
 }
 
 /**
- * @summary Text: what element it is, and what it looks like.
+ * @summary A run of text, with the element and the look chosen separately.
  *
  * @description
  * Two properties, and they answer different questions. `as` is the element,
@@ -84,7 +84,14 @@ export class HelixText extends HelixElement {
   tone?: 'default' | 'muted' | 'subtle' | 'primary' | 'danger'
 
   protected override render(): unknown {
-    const tag = (this.as ? TAGS[this.as] : undefined) ?? literal`span`
+    /* `Object.hasOwn`, not a truthy index.
+     *
+     * `TAGS[this.as]` reaches `Object.prototype`, so `as="constructor"` and
+     * every other inherited key came back truthy and were passed to
+     * `staticHtml` as a tag: the result is a lit marker rendered as an element
+     * name, not the span fallback and not a throw. Own keys only. */
+    const tag =
+      (this.as && Object.hasOwn(TAGS, this.as) ? TAGS[this.as] : undefined) ?? literal`span`
     return staticHtml`<${tag} part="text"><slot></slot></${tag}>`
   }
 

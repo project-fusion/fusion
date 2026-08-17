@@ -110,3 +110,4 @@ export {
   type SeverityMark,
   severityMark,
 } from './utils/severities/severities.js'
+export { slotFilled } from './utils/slot-filled/slot-filled.js'
