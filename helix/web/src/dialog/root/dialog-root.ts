@@ -18,7 +18,7 @@ import { styles } from './dialog-root.css.js'
  * @aliases Modal, Lightbox, Sheet
  * @documentation https://helix.fusion.dev/components/dialog
  *
- * @property appearance - How wide the panel is allowed to be.
+ * @property size - How wide the panel is allowed to be.
  *
  * @cssproperty --dialog-inline-size - Width of the panel.
  * @cssproperty --dialog-inset - Padding inside the panel.
@@ -28,12 +28,30 @@ export class HelixDialog extends HelixBaseDialog {
   /**
    * How wide the panel is allowed to be.
    *
-   * Three steps rather than a number, because a dialog's width is a fact about
-   * what is in it: a confirmation is narrow, a form is not, and picking pixels
-   * per dialog is how a product ends up with nine of them.
+   * Steps rather than a number, because a dialog's width is a fact about what is
+   * in it: a confirmation is narrow, a form is not, and picking pixels per
+   * dialog is how a product ends up with nine of them. `full` takes the viewport
+   * less the same inset every step already stops short by, so a takeover is one
+   * more rung and not a second property.
+   *
+   * Unset is `md`, read as `:host(:not([size]))` beside `:host([size="md"])`
+   * rather than assigned here, for the reason `Drawer.placement` gives: this
+   * reflects, and a default would put `size="md"` into markup no consumer wrote.
+   *
+   * **This was `appearance`, and it was the wrong word.** Everywhere else in the
+   * library `appearance` says how a thing *reads*: plain against outlined,
+   * flat against material, surface against a page's own colour. Here it said how
+   * wide the panel is, which its own description admitted in as many words.
+   *
+   * `size` is right despite the rule that controls have no size, because that
+   * rule's own test is whether two of them sitting together could legitimately
+   * differ, and it is answering "a ragged row is unwritable". Two dialogs never
+   * sit together. One is on screen at a time, in the top layer, and it is the
+   * region rather than a control in one, which is the same reason `Avatar` and
+   * `Spinner` keep theirs.
    */
   @property({ reflect: true })
-  appearance?: 'compact' | 'wide'
+  size?: 'sm' | 'md' | 'lg' | 'full'
 
   static override styles: CSSResultGroup = styles
 }

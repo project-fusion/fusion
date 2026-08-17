@@ -8145,12 +8145,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "size",
               "type": {
-                "text": "'compact' | 'wide' | undefined"
+                "text": "'sm' | 'md' | 'lg' | 'full' | undefined"
               },
               "description": "How wide the panel is allowed to be.",
-              "attribute": "appearance",
+              "attribute": "size",
               "reflects": true
             },
             {
@@ -8458,12 +8458,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "size",
               "type": {
-                "text": "'compact' | 'wide' | undefined"
+                "text": "'sm' | 'md' | 'lg' | 'full' | undefined"
               },
               "description": "How wide the panel is allowed to be.",
-              "fieldName": "appearance"
+              "fieldName": "size"
             },
             {
               "name": "open",

@@ -1709,7 +1709,7 @@ export type HelixDialogHelixCloseElementEvent =
 
 export type HelixDialogProps = {
   /** How wide the panel is allowed to be. */
-  appearance?: HelixDialog["appearance"];
+  size?: HelixDialog["size"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -1767,7 +1767,7 @@ instead. */
 
 export type HelixDialogSolidJsProps = {
   /** How wide the panel is allowed to be. */
-  "prop:appearance"?: HelixDialog["appearance"];
+  "prop:size"?: HelixDialog["size"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -7005,7 +7005,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How wide the panel is allowed to be.
+   * - `size`: How wide the panel is allowed to be.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -11899,7 +11899,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How wide the panel is allowed to be.
+   * - `size`: How wide the panel is allowed to be.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the

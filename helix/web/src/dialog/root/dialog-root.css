@@ -52,12 +52,32 @@
   display: none;
 }
 
-:host([appearance="compact"]) [part="dialog"] {
+:host([size="sm"]) [part="dialog"] {
   --dialog-inline-size: 22rem;
 }
 
-:host([appearance="wide"]) [part="dialog"] {
+/* Said as well as defaulted, so a consumer can put a dialog back on the middle
+   step from markup rather than by removing an attribute. */
+:host([size="md"]) [part="dialog"] {
+  --dialog-inline-size: 28rem;
+}
+
+:host([size="lg"]) [part="dialog"] {
   --dialog-inline-size: 44rem;
+}
+
+/* Everything across, and nothing extra to write.
+ *
+ * `100vw` is not the width this resolves to: the rule above already clamps to
+ * `calc(100vw - var(--helix-space-xl))`, which is what keeps every other step
+ * off the edge of a narrow screen, and asking for the whole viewport here just
+ * lets that clamp be the answer. So a full dialog stops short of the sides by
+ * the same margin an `sm` one does on a phone, and the block axis is untouched:
+ * `max-block-size: calc(100dvh - var(--helix-space-xl))` was already leaving
+ * room above and below, which is what makes this read as a panel over the page
+ * rather than as a second page. */
+:host([size="full"]) [part="dialog"] {
+  --dialog-inline-size: 100vw;
 }
 
 /* The platform's own scrim, in the top layer with the dialog. A div positioned
