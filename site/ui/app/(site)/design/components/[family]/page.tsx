@@ -79,11 +79,11 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             {family.label}
           </helix-text>
           <helix-flex align="center" data-density="sm" gap="xs" wrap>
-            {family.status && (
-              <helix-tag tone={family.status === 'stable' ? 'success' : 'warning'}>
-                {startCase(family.status)}
-              </helix-tag>
-            )}
+            {/* Neutral at every stage. The word is the information, and a
+                colour behind it was saying the same thing a second time in a
+                register the word does not have: `warning` read as something
+                being wrong rather than as a stage the component is at. */}
+            {family.status && <helix-tag>{startCase(family.status)}</helix-tag>}
             {family.since && (
               <helix-text appearance="label" tone="subtle">
                 since {family.since}

@@ -81,7 +81,11 @@ export default function Page() {
                       sandbox's own tree. */}
                   {family.status === 'experimental' && (
                     <helix-tooltip content="Experimental. The API can change." placement="top">
-                      <helix-tag className="statusMark" tone="warning">
+                      {/* Neutral. Warning read as a fault rather than a stage,
+                          and the tooltip is what says which stage it is. A card
+                          in a list of fifty-four experimental components is not
+                          reporting a problem. */}
+                      <helix-tag className="statusMark">
                         <helix-icon label="Experimental" name="flask"></helix-icon>
                       </helix-tag>
                     </helix-tooltip>
