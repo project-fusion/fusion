@@ -77,6 +77,27 @@ export class HelixBaseDrilldown extends HelixElement {
     return this.drilldown.rows.filter((item) => !item.disabled)
   }
 
+  /**
+   * Puts the region's one tab stop on the first row of the page showing.
+   *
+   * Every row rendered at `-1`, so nothing in the region was tab-reachable and
+   * the keyboard could not get in at all without a pointer first. One row holds
+   * the stop and the arrows move within, which is the roving pattern the
+   * toolbar uses and the one a `menu` wants.
+   *
+   * Called after every update, because the set changes with the page: drilling
+   * in replaces the rows outright, and the stop has to land on rows that are
+   * actually showing.
+   */
+  private placeTabStop(): void {
+    const items = this.items
+    const held = items.find((item) => item.focusable)
+    const stop = held ?? items[0]
+    for (const item of this.drilldown.rows) {
+      item.focusable = item === stop
+    }
+  }
+
   /** Shows a row's page, and puts focus on the first row of it. */
   private enter(item: HelixBaseDrilldownItem): void {
     if (!this.drilldown.enter(item)) {
@@ -102,6 +123,17 @@ export class HelixBaseDrilldown extends HelixElement {
     this.direction = 'back'
     this.updateComplete.then(() => leaving?.focusItem())
     return true
+  }
+
+  /* The stop follows the reader. Arrowing to a row and tabbing away and back
+     should return to where they were, not to the top of the page. */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const item = this.drilldown.rows.find((row) => row.contains(event.target as Node))
+    if (item && !item.disabled) {
+      for (const row of this.drilldown.rows) {
+        row.focusable = row === item
+      }
+    }
   }
 
   private readonly handleSelect = (event: Event): void => {
@@ -163,12 +195,14 @@ export class HelixBaseDrilldown extends HelixElement {
        stops it for everyone, whatever order anybody bound in. */
     this.addEventListener('helix-select', this.handleSelect, true)
     this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('focusin', this.handleFocusIn)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelect, true)
     this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('focusin', this.handleFocusIn)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -188,6 +222,7 @@ export class HelixBaseDrilldown extends HelixElement {
       }
       this.mark(child, page, page === null)
     }
+    this.placeTabStop()
     this.toggleAttribute('data-drilled', !this.drilldown.atRoot)
     this.setAttribute('data-direction', this.direction)
   }

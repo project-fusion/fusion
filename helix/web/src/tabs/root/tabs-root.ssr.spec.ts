@@ -15,11 +15,20 @@ describe('tabs server output', () => {
     expect(partTag(markup, 'tab')).toContain('role="tab"')
   })
 
-  test('a tab and its panel are already paired in the markup', () => {
-    // The ids come from `value`, so the server and the client agree without
-    // either of them generating anything.
-    expect(partTag(markup, 'tab')).toContain('aria-controls="panel-one"')
-    expect(partTag(markup, 'panel')).toContain('aria-labelledby="tab-one"')
+  test('the server ships no IDREF, because none of them could ever resolve', () => {
+    /* These were `aria-controls="panel-one"` and `aria-labelledby="tab-one"`,
+       derived from `value` so the server and the client would agree without
+       generating anything. They agreed, and both pointed at nothing: each id
+       was rendered inside the *other* element's shadow root, and an IDREF
+       resolves only in the tree it is written in.
+
+       The panel's name is a string handed down by the root, which has to read
+       the tab's light DOM to know it, so it is a client-side enhancement by the
+       same rule everything that inspects the tree is. What the server must not
+       do is ship a reference that resolves to nothing, which is what this now
+       asserts. */
+    expect(partTag(markup, 'tab')).not.toContain('aria-controls')
+    expect(partTag(markup, 'panel')).not.toContain('aria-labelledby')
   })
 
   test('the selected state is rendered, not applied on hydration', () => {

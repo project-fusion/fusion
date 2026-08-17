@@ -1149,6 +1149,7 @@ lines up with the edge the eye is already following down the list.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether the row can be reached at all. |
+| `focusable` | - | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether this row holds the region's tab stop. Written by the stack. |
 | `isDrilldownItem` | - | `boolean` | `true` | `HelixBaseDrilldownItem` | Marks this as a row a stack should count. Cheaper than an instanceof. |
 | `onPage` | - | `boolean` | `true` | `HelixBaseDrilldownItem` | Whether the page showing is the one this row is on. Written by the stack. |
 | `showingPage` | - | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether this row's own page is the one showing. Written by the stack. |
@@ -1597,6 +1598,7 @@ list moves under the reader rather than the reader moving to find it.
 | `options` | - | `HelixBaseOption[]` | - | `HelixBaseListbox` | Every option, in the order a reader meets them. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseListbox` | Focusing the host focuses the list inside it. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `values` | - | `string[]` | - | `HelixBaseListbox` | The chosen values, which is a list whether or not `multiple` is set. |
 
@@ -2758,6 +2760,7 @@ a movement instead of two separate fills.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `label` | - | `string` | `''` | `HelixBaseTabsPanel` | The name of the panel, which is the text of the tab that opens it. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseTabsPanel` | Whether this panel is the visible one. |
 | `value` | `value` | `string` | `''` | `HelixBaseTabsPanel` | Pairs the panel with the tab of the same value. |
 

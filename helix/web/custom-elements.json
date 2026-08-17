@@ -9049,6 +9049,19 @@
               }
             },
             {
+              "kind": "field",
+              "name": "focusable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this row holds the region's tab stop. Written by the stack.\n\nA drill-down keeps one stop and moves within it on the arrows, so every\nother row is at `-1`. Every row was, including the first, which left\nnothing in the region tab-reachable at all: the keyboard could not get in\nwithout first clicking something with a pointer.\n\nNo attribute, the same as `Button`'s: this is coordination between\nelements, and writing `tabindex` onto a host the consumer rendered is a\nchange a React consumer's hydration reports and does not patch up. The stop\nlands inside this shadow root instead.",
+              "inheritedFrom": {
+                "name": "HelixBaseDrilldownItem",
+                "module": "src/drilldown/item/drilldown-item.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "focusItem",
               "return": {
@@ -9396,6 +9409,21 @@
             },
             {
               "kind": "method",
+              "name": "placeTabStop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the region's one tab stop on the first row of the page showing.\n\nEvery row rendered at `-1`, so nothing in the region was tab-reachable and\nthe keyboard could not get in at all without a pointer first. One row holds\nthe stop and the arrows move within, which is the roving pattern the\ntoolbar uses and the one a `menu` wants.\n\nCalled after every update, because the set changes with the page: drilling\nin replaces the rows outright, and the stop has to land on rows that are\nactually showing.",
+              "inheritedFrom": {
+                "name": "HelixBaseDrilldown",
+                "module": "src/drilldown/root/drilldown-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "enter",
               "privacy": "private",
               "return": {
@@ -9429,6 +9457,16 @@
               "type": {
                 "text": "back() => boolean"
               },
+              "inheritedFrom": {
+                "name": "HelixBaseDrilldown",
+                "module": "src/drilldown/root/drilldown-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFocusIn",
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseDrilldown",
                 "module": "src/drilldown/root/drilldown-root.ts"
@@ -14051,6 +14089,20 @@
               "privacy": "private",
               "readonly": true,
               "description": "Sends the keys that belong to the list to the list.\n\nA reader filtering is still choosing: they type two letters and press Down\nto reach what is left, and the field would otherwise swallow it because the\narrows move a caret. Typing keys stay with the field, which is what makes\nthis different from forwarding everything.\n\nEscape clears rather than closing. What frames the list may close on Escape\ntoo, so this stops the event when there is something to clear: one press\nempties the filter, a second reaches whatever is above and closes it. A\nfilter that closed the panel would lose the reader's place for a keystroke\nthey meant as an undo.",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
+              "description": "Focusing the host focuses the list inside it.\n\nThe focusable node is `[part=\"items\"]`, a div in this shadow root, and a\ncaller outside has no way to reach it: `select` opened its panel and called\n`.focus()` on this element, which is not focusable, so focus stayed on the\ntrigger and the arrow keys never reached the options at all. Delegation is\nthe platform answering that, and it keeps `document.activeElement` on the\nhost, which is what a caller reasons about.",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -24022,6 +24074,19 @@
             },
             {
               "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name of the panel, which is the text of the tab that opens it.\n\nSet by the root, which is the only thing that sees both. No attribute,\nbecause it is coordination between elements rather than anything a consumer\nwrites: the tab already says it.\n\nA string where the markup wanted a reference. `aria-labelledby` named\n`tab-${value}`, an id inside the *tab's* own shadow root, and an IDREF\nresolves only in the tree it is written in, so the panel had no accessible\nname at all. An element reference cannot reach there either, a sibling\nshadow tree being neither the same tree nor an ancestor of it. A name is\nthe one form that crosses, and `aria-label` on a `tabpanel` is how the\npattern names one anyway.",
+              "inheritedFrom": {
+                "name": "HelixBaseTabsPanel",
+                "module": "src/tabs/panel/tabs-panel.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -28577,6 +28642,18 @@
             },
             {
               "kind": "field",
+              "name": "watcher",
+              "type": {
+                "text": "MutationObserver | undefined"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "controls",
               "type": {
                 "text": "HTMLElement[]"
@@ -28636,6 +28713,17 @@
               "name": "handleFocusIn",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToolbar",
+                "module": "src/toolbar/root/toolbar-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "restoreTabStop",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Gives the tab stop back to a control that still exists.\n\n`controls` excludes anything disabled or hidden, so disabling the control\nholding the stop dropped it out of the list while every other control was\nalready at `-1`. The toolbar then had no tab stop at all and the keyboard\ncould not reach it again, from a change as ordinary as a Save button\ndisabling itself once the form is clean.\n\n`foreign` stays false, the same as the first claim: a control this package\nhas never heard of that was never given `tabindex=\"-1\"` is still in the\ndocument's own tab order, so it is never the one that gets stranded.",
               "inheritedFrom": {
                 "name": "HelixBaseToolbar",
                 "module": "src/toolbar/root/toolbar-root.ts"

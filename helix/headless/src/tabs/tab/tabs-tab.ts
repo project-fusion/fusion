@@ -52,12 +52,22 @@ export class HelixBaseTabsTab extends HelixElement {
   }
 
   protected override render(): TemplateResult {
+    /* No `aria-controls`, and no id for one to point at.
+     *
+     * It named `panel-${value}`, an id rendered inside the panel's *own* shadow
+     * root, and an IDREF resolves only within the tree it is written in. So it
+     * pointed at nothing from the day it was written, on every tab, and this
+     * file's own comment said a dangling `aria-controls` is worse than none.
+     *
+     * There is no id form that could work and no element reference either: a
+     * reference is valid only into the same tree or a shadow-including ancestor
+     * of it, and the panel's shadow root is neither, it is a sibling. The
+     * relationship a reader actually needs is the panel's name, and the panel
+     * takes that as a string, which crosses anything. */
     return html`<button
       part="tab"
-      id=${`tab-${this.value}`}
       role="tab"
       type="button"
-      aria-controls=${`panel-${this.value}`}
       aria-selected=${this.selected ? 'true' : 'false'}
       ?disabled=${this.disabled}
       tabindex=${this.selected ? '0' : '-1'}

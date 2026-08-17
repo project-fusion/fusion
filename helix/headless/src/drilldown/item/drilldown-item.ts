@@ -56,6 +56,22 @@ export class HelixBaseDrilldownItem extends HelixElement {
   @property({ attribute: false })
   showingPage = false
 
+  /**
+   * Whether this row holds the region's tab stop. Written by the stack.
+   *
+   * A drill-down keeps one stop and moves within it on the arrows, so every
+   * other row is at `-1`. Every row was, including the first, which left
+   * nothing in the region tab-reachable at all: the keyboard could not get in
+   * without first clicking something with a pointer.
+   *
+   * No attribute, the same as `Button`'s: this is coordination between
+   * elements, and writing `tabindex` onto a host the consumer rendered is a
+   * change a React consumer's hydration reports and does not patch up. The stop
+   * lands inside this shadow root instead.
+   */
+  @property({ attribute: false })
+  focusable = false
+
   /** Moves focus onto the row itself. */
   focusItem(): void {
     this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
@@ -76,17 +92,33 @@ export class HelixBaseDrilldownItem extends HelixElement {
     if (!this.onPage) {
       return nothing
     }
-    return html`<div
+    /* A real `<button>`, and `role="menuitem"` on it.
+     *
+     * It was a `<div role="button">` with a click handler and nothing else, so
+     * the row could not be activated from the keyboard at all: Enter and Space
+     * are behaviour the platform gives a real button and gives nothing else,
+     * and neither was handled here. Same argument `Button` makes for rendering
+     * one rather than reproducing it.
+     *
+     * `menuitem` because the stack says `role="menu"`, and a menu whose
+     * children are buttons is not a menu: the roles contradicted each other and
+     * a reader was told the count of items by one and the kind of them by the
+     * other.
+     *
+     * `aria-disabled` rather than `disabled`, so a row that cannot be chosen is
+     * still reachable and still announces why. `select()` is what refuses. */
+    return html`<button
       part="item"
-      role="button"
+      type="button"
+      role="menuitem"
       aria-disabled=${this.disabled ? 'true' : nothing}
-      tabindex=${this.disabled ? nothing : '-1'}
+      tabindex=${this.focusable ? '0' : '-1'}
       @click=${() => this.select()}
     >
       <slot name="start"></slot>
       <span part="label"><slot></slot></span>
       <slot name="end"></slot>
-    </div>`
+    </button>`
   }
 }
 

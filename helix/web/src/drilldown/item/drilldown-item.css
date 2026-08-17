@@ -2,10 +2,24 @@
   display: block;
 }
 
+/* `all: unset` first, because the row is a real `<button>` now and the UA
+   styles one: a border, a fill, a centred label and a font of its own, on every
+   property this rule does not name. It became a button so that Enter and Space
+   come from the platform rather than from key handlers, and the price of that
+   is the platform's paint, which this takes back.
+
+   `box-sizing` is restored in the same rule, since `all: unset` takes the
+   `border-box` that `HelixElement.finalizeStyles` gives every shadow root and
+   there is nowhere later to put it back.
+
+   `inline-size: 100%` because an unset button shrinks to its label, and a row
+   is the width of the page it is on. */
 [part="item"] {
+  all: unset;
   align-items: center;
   block-size: var(--helix-size-control-sm);
   box-sizing: border-box;
+  inline-size: 100%;
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: flex;

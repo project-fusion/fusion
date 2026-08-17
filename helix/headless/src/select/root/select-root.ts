@@ -209,9 +209,12 @@ export class HelixBaseSelect extends MixinControllerOpen(
          controller is idempotent, so arriving here twice for the same open
          costs nothing. */
       this.panel.show()
-      // Into the list, which is where the keyboard has to be for the arrows to
-      // mean anything.
-      this.renderRoot.querySelector<HTMLElement>('[part="listbox"]')?.focus()
+      /* Into the list, which is where the keyboard has to be for the arrows to
+         mean anything. It reached the listbox element and stopped there, that
+         element not being focusable, so focus stayed on the trigger and every
+         arrow press went to the page. The listbox delegates focus now, so this
+         lands on the list inside it. */
+      this.listbox?.focus()
     } else {
       this.panel.hide()
     }

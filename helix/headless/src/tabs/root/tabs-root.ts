@@ -108,8 +108,13 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
     for (const tab of tabs) {
       tab.selected = tab.value === value
     }
+    /* The panel's name comes from its tab, and only this element sees both.
+       Read from the tab's light DOM, which is where the consumer wrote the
+       words, so it is whatever the reader sees on the tab. */
+    const names = new Map(tabs.map((tab) => [tab.value, (tab.textContent ?? '').trim()]))
     for (const panel of this.panels) {
       panel.selected = panel.value === value
+      panel.label = names.get(panel.value) ?? ''
     }
   }
 
@@ -118,7 +123,16 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
       return
     }
     const tabs = this.tabs.filter((tab) => !tab.disabled)
-    const current = tabs.findIndex((tab) => tab.selected)
+    /* Where the press came from, and it has to be a tab.
+     *
+     * This read the selected tab instead and never asked where the event was,
+     * which is two faults at once. A panel is `tabindex="0"` and this listener
+     * is on the whole component, so an arrow pressed while reading a panel
+     * moved the tabs out from under the reader. And in `manual` mode focus
+     * moves without selecting, so after one press the selected tab is no longer
+     * where the reader is: every further press walked from the selection again
+     * rather than from focus, and the set could not be traversed at all. */
+    const current = tabs.findIndex((tab) => tab.contains(event.target as Node))
     if (current === -1) {
       return
     }

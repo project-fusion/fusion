@@ -16,6 +16,45 @@ const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: bool
   'focusable' in node
 
 /**
+ * Input types with no text to move a caret through and no value an arrow moves.
+ *
+ * Everything else claims the arrows for itself: a caret in a text field, a
+ * spinner on `number`, a value on `range`, a group on `radio`.
+ */
+const CARETLESS = new Set(['button', 'checkbox', 'color', 'file', 'image', 'reset', 'submit'])
+
+/**
+ * Whether the press was already the business of whatever it landed on.
+ *
+ * A toolbar holds anything, and some of what it holds uses the arrow keys for
+ * itself. The handler below found the control the press came from and moved the
+ * toolbar regardless, so an input in a toolbar could not be edited: pressing
+ * ArrowRight to move the caret moved the focus to the next control instead, and
+ * `preventDefault` meant the caret never moved at all.
+ *
+ * `composedPath()[0]` rather than `event.target`, which is retargeted to the
+ * control's host at the shadow boundary and cannot tell a text field inside a
+ * component from the component itself.
+ *
+ * `defaultPrevented` first, because a control that has already answered the
+ * press has said so in the way the platform provides, and a foreign control
+ * this package has never heard of has no other way to say it.
+ */
+const claimed = (event: KeyboardEvent): boolean => {
+  if (event.defaultPrevented) {
+    return true
+  }
+  const inner = event.composedPath()[0]
+  if (!(inner instanceof HTMLElement)) {
+    return false
+  }
+  if (inner.isContentEditable || inner.localName === 'textarea' || inner.localName === 'select') {
+    return true
+  }
+  return inner.localName === 'input' && !CARETLESS.has((inner as HTMLInputElement).type)
+}
+
+/**
  * @summary A group of controls that share one tab stop.
  *
  * @description
@@ -47,6 +86,8 @@ export class HelixBaseToolbar extends HelixElement {
   /** Which way the arrow keys move. */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
+
+  private watcher: MutationObserver | undefined
 
   /**
    * Focusable controls, in document order.
@@ -114,6 +155,29 @@ export class HelixBaseToolbar extends HelixElement {
   }
 
   /**
+   * Gives the tab stop back to a control that still exists.
+   *
+   * `controls` excludes anything disabled or hidden, so disabling the control
+   * holding the stop dropped it out of the list while every other control was
+   * already at `-1`. The toolbar then had no tab stop at all and the keyboard
+   * could not reach it again, from a change as ordinary as a Save button
+   * disabling itself once the form is clean.
+   *
+   * `foreign` stays false, the same as the first claim: a control this package
+   * has never heard of that was never given `tabindex="-1"` is still in the
+   * document's own tab order, so it is never the one that gets stranded.
+   */
+  private readonly restoreTabStop = (): void => {
+    const controls = this.controls
+    const held = controls.some((control) =>
+      ownsTabStop(control) ? control.focusable : control.tabIndex === 0,
+    )
+    if (controls.length > 0 && !held) {
+      this.setTabStop(controls[0], false)
+    }
+  }
+
+  /**
    * The orientation in force.
    *
    * Unset is horizontal, and stays unset: the default is the absent attribute,
@@ -126,7 +190,7 @@ export class HelixBaseToolbar extends HelixElement {
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const forward = this.axis === 'horizontal' ? 'ArrowRight' : 'ArrowDown'
     const back = this.axis === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'
-    if (!KEYS.has(event.key)) {
+    if (!KEYS.has(event.key) || claimed(event)) {
       return
     }
 
@@ -160,12 +224,24 @@ export class HelixBaseToolbar extends HelixElement {
     super.connectedCallback()
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('focusin', this.handleFocusIn)
+    /* `disabled` and `aria-hidden` are what `controls` filters on, so a change
+       to either is a change to the set the stop has to live in. Nothing else is
+       watched, which also keeps `setTabStop` writing `tabindex` from feeding
+       back into this. */
+    this.watcher = new MutationObserver(this.restoreTabStop)
+    this.watcher.observe(this, {
+      attributeFilter: ['disabled', 'aria-hidden'],
+      attributes: true,
+      subtree: true,
+    })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.watcher?.disconnect()
+    this.watcher = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

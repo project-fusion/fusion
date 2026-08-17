@@ -1791,6 +1791,18 @@ export type HelixDrilldownItemProps = {
   onPage?: HelixDrilldownItem["onPage"];
   /** Whether this row's own page is the one showing. Written by the stack. */
   showingPage?: HelixDrilldownItem["showingPage"];
+  /** Whether this row holds the region's tab stop. Written by the stack.
+
+A drill-down keeps one stop and moves within it on the arrows, so every
+other row is at `-1`. Every row was, including the first, which left
+nothing in the region tab-reachable at all: the keyboard could not get in
+without first clicking something with a pointer.
+
+No attribute, the same as `Button`'s: this is coordination between
+elements, and writing `tabindex` onto a host the consumer rendered is a
+change a React consumer's hydration reports and does not patch up. The stop
+lands inside this shadow root instead. */
+  focusable?: HelixDrilldownItem["focusable"];
 
   /** Fired when the row is chosen. */
   "onhelix-select"?: (e: HelixDrilldownItemHelixSelectElementEvent) => void;
@@ -1805,6 +1817,18 @@ export type HelixDrilldownItemSolidJsProps = {
   "prop:onPage"?: HelixDrilldownItem["onPage"];
   /** Whether this row's own page is the one showing. Written by the stack. */
   "prop:showingPage"?: HelixDrilldownItem["showingPage"];
+  /** Whether this row holds the region's tab stop. Written by the stack.
+
+A drill-down keeps one stop and moves within it on the arrows, so every
+other row is at `-1`. Every row was, including the first, which left
+nothing in the region tab-reachable at all: the keyboard could not get in
+without first clicking something with a pointer.
+
+No attribute, the same as `Button`'s: this is coordination between
+elements, and writing `tabindex` onto a host the consumer rendered is a
+change a React consumer's hydration reports and does not patch up. The stop
+lands inside this shadow root instead. */
+  "prop:focusable"?: HelixDrilldownItem["focusable"];
   /** Fired when the row is chosen. */
   "on:helix-select"?: (e: HelixDrilldownItemHelixSelectElementEvent) => void;
 
@@ -3766,6 +3790,20 @@ export type HelixTabsPanelProps = {
   value?: HelixTabsPanel["value"];
   /** Whether this panel is the visible one. */
   selected?: HelixTabsPanel["selected"];
+  /** The name of the panel, which is the text of the tab that opens it.
+
+Set by the root, which is the only thing that sees both. No attribute,
+because it is coordination between elements rather than anything a consumer
+writes: the tab already says it.
+
+A string where the markup wanted a reference. `aria-labelledby` named
+`tab-${value}`, an id inside the *tab's* own shadow root, and an IDREF
+resolves only in the tree it is written in, so the panel had no accessible
+name at all. An element reference cannot reach there either, a sibling
+shadow tree being neither the same tree nor an ancestor of it. A name is
+the one form that crosses, and `aria-label` on a `tabpanel` is how the
+pattern names one anyway. */
+  label?: HelixTabsPanel["label"];
 };
 
 export type HelixTabsPanelSolidJsProps = {
@@ -3773,6 +3811,20 @@ export type HelixTabsPanelSolidJsProps = {
   "prop:value"?: HelixTabsPanel["value"];
   /** Whether this panel is the visible one. */
   "prop:selected"?: HelixTabsPanel["selected"];
+  /** The name of the panel, which is the text of the tab that opens it.
+
+Set by the root, which is the only thing that sees both. No attribute,
+because it is coordination between elements rather than anything a consumer
+writes: the tab already says it.
+
+A string where the markup wanted a reference. `aria-labelledby` named
+`tab-${value}`, an id inside the *tab's* own shadow root, and an IDREF
+resolves only in the tree it is written in, so the panel had no accessible
+name at all. An element reference cannot reach there either, a sibling
+shadow tree being neither the same tree nor an ancestor of it. A name is
+the one form that crosses, and `aria-label` on a `tabpanel` is how the
+pattern names one anyway. */
+  "prop:label"?: HelixTabsPanel["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6193,6 +6245,17 @@ export type CustomElements = {
    * - `isDrilldownItem`: Marks this as a row a stack should count. Cheaper than an instanceof. (property only) (readonly)
    * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
    * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
+   * - `focusable`: Whether this row holds the region's tab stop. Written by the stack.
+   *
+   * A drill-down keeps one stop and moves within it on the arrows, so every
+   * other row is at `-1`. Every row was, including the first, which left
+   * nothing in the region tab-reachable at all: the keyboard could not get in
+   * without first clicking something with a pointer.
+   *
+   * No attribute, the same as `Button`'s: this is coordination between
+   * elements, and writing `tabindex` onto a host the consumer rendered is a
+   * change a React consumer's hydration reports and does not patch up. The stop
+   * lands inside this shadow root instead. (property only)
    *
    * ## Events
    *
@@ -8194,6 +8257,19 @@ export type CustomElements = {
    *
    * - `value`: Pairs the panel with the tab of the same value.
    * - `selected`: Whether this panel is the visible one.
+   * - `label`: The name of the panel, which is the text of the tab that opens it.
+   *
+   * Set by the root, which is the only thing that sees both. No attribute,
+   * because it is coordination between elements rather than anything a consumer
+   * writes: the tab already says it.
+   *
+   * A string where the markup wanted a reference. `aria-labelledby` named
+   * `tab-${value}`, an id inside the *tab's* own shadow root, and an IDREF
+   * resolves only in the tree it is written in, so the panel had no accessible
+   * name at all. An element reference cannot reach there either, a sibling
+   * shadow tree being neither the same tree nor an ancestor of it. A name is
+   * the one form that crosses, and `aria-label` on a `tabpanel` is how the
+   * pattern names one anyway. (property only)
    *
    * ## Slots
    *
@@ -10595,6 +10671,17 @@ export type CustomElementsSolidJs = {
    * - `isDrilldownItem`: Marks this as a row a stack should count. Cheaper than an instanceof. (property only) (readonly)
    * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
    * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
+   * - `focusable`: Whether this row holds the region's tab stop. Written by the stack.
+   *
+   * A drill-down keeps one stop and moves within it on the arrows, so every
+   * other row is at `-1`. Every row was, including the first, which left
+   * nothing in the region tab-reachable at all: the keyboard could not get in
+   * without first clicking something with a pointer.
+   *
+   * No attribute, the same as `Button`'s: this is coordination between
+   * elements, and writing `tabindex` onto a host the consumer rendered is a
+   * change a React consumer's hydration reports and does not patch up. The stop
+   * lands inside this shadow root instead. (property only)
    *
    * ## Events
    *
@@ -12701,6 +12788,19 @@ export type CustomElementsSolidJs = {
    *
    * - `value`: Pairs the panel with the tab of the same value.
    * - `selected`: Whether this panel is the visible one.
+   * - `label`: The name of the panel, which is the text of the tab that opens it.
+   *
+   * Set by the root, which is the only thing that sees both. No attribute,
+   * because it is coordination between elements rather than anything a consumer
+   * writes: the tab already says it.
+   *
+   * A string where the markup wanted a reference. `aria-labelledby` named
+   * `tab-${value}`, an id inside the *tab's* own shadow root, and an IDREF
+   * resolves only in the tree it is written in, so the panel had no accessible
+   * name at all. An element reference cannot reach there either, a sibling
+   * shadow tree being neither the same tree nor an ancestor of it. A name is
+   * the one form that crosses, and `aria-label` on a `tabpanel` is how the
+   * pattern names one anyway. (property only)
    *
    * ## Slots
    *

@@ -512,6 +512,21 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
       ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: event.key }))
   }
 
+  /**
+   * Focusing the host focuses the list inside it.
+   *
+   * The focusable node is `[part="items"]`, a div in this shadow root, and a
+   * caller outside has no way to reach it: `select` opened its panel and called
+   * `.focus()` on this element, which is not focusable, so focus stayed on the
+   * trigger and the arrow keys never reached the options at all. Delegation is
+   * the platform answering that, and it keeps `document.activeElement` on the
+   * host, which is what a caller reasons about.
+   */
+  static override shadowRootOptions: ShadowRootInit = {
+    ...HelixFormElement.shadowRootOptions,
+    delegatesFocus: true,
+  }
+
   protected override render(): TemplateResult {
     /* One tab stop for the whole list, which is what a listbox is in the tab
        order: the arrows move within it. `tabindex` on the wrapper rather than

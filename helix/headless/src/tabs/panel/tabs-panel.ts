@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -29,12 +29,29 @@ export class HelixBaseTabsPanel extends HelixElement {
   @property({ reflect: true, type: Boolean })
   selected = false
 
+  /**
+   * The name of the panel, which is the text of the tab that opens it.
+   *
+   * Set by the root, which is the only thing that sees both. No attribute,
+   * because it is coordination between elements rather than anything a consumer
+   * writes: the tab already says it.
+   *
+   * A string where the markup wanted a reference. `aria-labelledby` named
+   * `tab-${value}`, an id inside the *tab's* own shadow root, and an IDREF
+   * resolves only in the tree it is written in, so the panel had no accessible
+   * name at all. An element reference cannot reach there either, a sibling
+   * shadow tree being neither the same tree nor an ancestor of it. A name is
+   * the one form that crosses, and `aria-label` on a `tabpanel` is how the
+   * pattern names one anyway.
+   */
+  @property({ attribute: false })
+  label = ''
+
   protected override render(): TemplateResult {
     return html`<div
       part="panel"
-      id=${`panel-${this.value}`}
       role="tabpanel"
-      aria-labelledby=${`tab-${this.value}`}
+      aria-label=${this.label || nothing}
       ?hidden=${!this.selected}
       tabindex="0"
     >

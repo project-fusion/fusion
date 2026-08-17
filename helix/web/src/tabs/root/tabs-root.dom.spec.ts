@@ -48,17 +48,25 @@ describe('tabs selection', () => {
     expect(third.hasAttribute('selected')).toBe(false)
   })
 
-  test('pairing is by value, so ids survive server rendering', async () => {
-    // Derived rather than generated: a generated id differs between the
-    // server's render and the client's, and aria-controls pointing at nothing
-    // is worse than not being there.
+  test('the panel is named by its tab, since an IDREF cannot reach one', async () => {
+    /* This spec used to assert the two IDREFs existed, and they did: `tab-one`
+       and `panel-one`, derived from the value so they would survive server
+       rendering. What it never asserted is that either one *reached* anything,
+       and neither did. Both ids were rendered inside their own element's shadow
+       root, an IDREF resolves only in the tree it is written in, and a sibling
+       shadow tree is not that tree. So the panel had no accessible name at all
+       and the tab controlled nothing, on every set, while this passed.
+
+       No element reference can fix it either: a reference is valid into the
+       same tree or a shadow-including ancestor, and these are siblings. A name
+       is the one form that crosses, so the root reads the tab's words and hands
+       them to the panel. */
     const host = await mount(markup)
     const tab = part(tabs(host)[0] as HTMLElement, 'tab')
     const panel = part(panels(host)[0] as HTMLElement, 'panel')
-    expect(tab?.getAttribute('aria-controls')).toBe('panel-one')
-    expect(panel?.id).toBe('panel-one')
-    expect(panel?.getAttribute('aria-labelledby')).toBe('tab-one')
-    expect(tab?.id).toBe('tab-one')
+    expect(panel?.getAttribute('aria-label')).toBe('One')
+    expect(tab?.hasAttribute('aria-controls')).toBe(false)
+    expect(panel?.hasAttribute('aria-labelledby')).toBe(false)
   })
 
   test('content stays mounted when its tab is not the current one', async () => {
