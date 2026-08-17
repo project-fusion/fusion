@@ -7816,6 +7816,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--menu-max-block-size`: Tallest the surface grows before it scrolls. (default: `undefined`)
    * - `--menu-min-inline-size`: Narrowest the surface gets. (default: `undefined`)
    * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
    *
@@ -12617,6 +12618,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--menu-max-block-size`: Tallest the surface grows before it scrolls. (default: `undefined`)
    * - `--menu-min-inline-size`: Narrowest the surface gets. (default: `undefined`)
    * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
    *
@@ -15175,6 +15177,8 @@ export type CustomCssProperties = {
   "--listbox-max-block-size"?: string;
   /** Fill under the pointer. */
   "--menu-item-hover-color"?: string;
+  /** Tallest the surface grows before it scrolls. */
+  "--menu-max-block-size"?: string;
   /** Narrowest the surface gets. */
   "--menu-min-inline-size"?: string;
   /** Fill of the surface. */

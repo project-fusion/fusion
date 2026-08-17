@@ -19,13 +19,23 @@ describe('slider', () => {
     expect(formValue(host)).toBe('50')
   })
 
-  test('the fill is written as a fraction, not measured off the thumb', async () => {
-    // Arithmetic the component can do exactly, where a measurement of the thumb
-    // would be a guess at where the platform drew it.
+  test('the fill is written as a fraction, on the control rather than the host', async () => {
+    /* Arithmetic the component can do exactly, where a measurement of the thumb
+       would be a guess at where the platform drew it.
+
+       On the control, which is the correction. It was written onto the host's
+       inline style from `updated()`, which made it the one host-attribute write
+       in the library and put it in a hook Lit SSR never calls, so a
+       server-rendered slider shipped with no fill at all until it hydrated. A
+       custom property set in the render inherits into
+       `::-webkit-slider-runnable-track` and `::-moz-range-track` just the same,
+       which is why the stylesheet needed no change. */
     const host = await mount(
       '<helix-slider label="A" max="200" min="0" default-value="50"></helix-slider>',
     )
-    expect(host.style.getPropertyValue('--_slider-fraction')).toBe('0.25')
+    const control = part(host, 'control')
+    expect(control?.style.getPropertyValue('--_slider-fraction')).toBe('0.25')
+    expect(host.style.getPropertyValue('--_slider-fraction')).toBe('')
   })
 })
 

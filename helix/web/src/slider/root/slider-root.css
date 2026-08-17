@@ -62,7 +62,10 @@
 /* The native range, stripped to its track. The thumb is styled separately
    below, per engine, because the pseudo-elements that name it are not shared
    and a selector list containing an unknown one is dropped whole. */
+/* Above the marks, so the thumb is never crossed by one. */
 [part="control"] {
+  z-index: 1;
+
   appearance: none;
   background: transparent;
   cursor: pointer;
@@ -107,6 +110,21 @@
   inset-inline-start: 50%;
   position: absolute;
   translate: -50% 0;
+}
+
+/* Behind the thumb, not over it.
+ *
+ * The overlay is painted above the whole input, thumb included, and the mark is
+ * the page's own background colour, so in dark mode a stepped slider drew a
+ * near-black slash across its own thumb at exactly the positions the thumb
+ * rests at. `mix-blend-mode` is not the answer either: what a mark has to do is
+ * separate the track into steps, and the track is what it belongs on.
+ *
+ * `pointer-events: none` goes with it. The overlay sits over the control and
+ * without this a press that lands on a mark never reaches the range. */
+[part="markers"] {
+  pointer-events: none;
+  z-index: 0;
 }
 
 [part="marker"] {

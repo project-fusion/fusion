@@ -1737,6 +1737,7 @@ one panel and reads the same on a phone as on a desk.
 
 | Property | Description |
 | --- | --- |
+| `--menu-max-block-size` | Tallest the surface grows before it scrolls. |
 | `--menu-min-inline-size` | Narrowest the surface gets. |
 | `--menu-background-color` | Fill of the surface. |
 

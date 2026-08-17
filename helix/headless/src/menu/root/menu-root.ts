@@ -113,7 +113,14 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
 
   /** The items on the page that is showing, which is what the keys move over. */
   private get items(): HelixBaseMenuItem[] {
-    return this.drilldown.rows
+    /* Disabled rows are not there for the keyboard.
+     *
+     * A disabled row renders no `tabindex` and cannot take focus, so leaving it
+     * in the list meant the arrow keys computed a move onto it, called `focus()`
+     * on something unfocusable, and stopped: the keyboard was stuck one row
+     * above every disabled item in the menu. `Drilldown` filters for the same
+     * reason. */
+    return this.drilldown.rows.filter((row) => !row.disabled)
   }
 
   /** Opens the menu. */
@@ -134,7 +141,14 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
     }
     this.panel.hide()
     this.drilldown.reset()
-    this.trigger.focus()
+    /* Only where the menu still had it. A dismissal that did not take focus with
+       it, a press somewhere else on the page, should leave focus where the
+       reader put it rather than yanking it back to the trigger. `Popover`
+       guards the same way, and `document.activeElement` retargets to the item
+       host here, which is what makes the containment test work. */
+    if (this.contains(document.activeElement)) {
+      this.trigger.focus()
+    }
   }
 
   /** Shows an item's submenu in place of the current page. */
@@ -220,6 +234,16 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
       this.enter(items[at] as HelixBaseMenuItem)
     } else if (event.key === 'ArrowLeft') {
       this.leave()
+    } else if (event.key === 'Tab') {
+      /* Out, and the panel goes with it.
+       *
+       * Nothing closed the menu when focus left it, so tabbing out of an open
+       * one left a shadowed panel in the top layer sitting over whatever the
+       * reader had tabbed to. Deliberately not prevented: focus should carry on
+       * outward, which is what the reader asked for. And deliberately not a
+       * focus trap, because a menu is not a modal and Tab is a way out of one. */
+      this.hide()
+      return
     } else {
       return
     }
@@ -236,13 +260,18 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-select', this.handleSelect)
+    /* Capture, so a drill-in never reaches a consumer's own listener on this
+       same host. The guarantee the class documents is that choosing a row that
+       opens a submenu is navigation rather than a choice, and stopping it in the
+       bubble phase stops it for ancestors and not for the siblings registered
+       here. `Drilldown` learned this already. */
+    this.addEventListener('helix-select', this.handleSelect, true)
     this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleSelect)
+    this.removeEventListener('helix-select', this.handleSelect, true)
     this.removeEventListener('keydown', this.handleKeydown)
   }
 
@@ -269,13 +298,29 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
       if (item.isMenuItem !== true) {
         continue
       }
-      item.onPage = this.drilldown.atRoot
-      item.showingSubmenu = this.drilldown.page === child
-      for (const nested of child.children) {
-        const inner = nested as HelixBaseMenuItem
-        if (inner.isMenuItem === true) {
-          inner.onPage = this.drilldown.page === child
-        }
+      this.mark(item, this.drilldown.atRoot)
+    }
+  }
+
+  /**
+   * Walks the tree marking which rows are on the page showing.
+   *
+   * Two levels were marked by hand and nothing wrote `showingSubmenu` on a
+   * nested row, so drilling into a third-level submenu rendered the header over
+   * an empty panel: the page existed, its rows were still marked as belonging
+   * to the level above, and none of them rendered. `Drilldown.mark()` is the
+   * same walk and was already recursive.
+   *
+   * `slot === 'submenu'` rather than every child, because a row's other
+   * children are its label and its icons.
+   */
+  private mark(item: HelixBaseMenuItem, onPage: boolean): void {
+    item.onPage = onPage
+    item.showingSubmenu = item === this.drilldown.page
+    for (const child of item.children) {
+      const nested = child as HelixBaseMenuItem
+      if (nested.isMenuItem === true && child.slot === 'submenu') {
+        this.mark(nested, item === this.drilldown.page)
       }
     }
   }

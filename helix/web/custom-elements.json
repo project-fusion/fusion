@@ -15142,6 +15142,20 @@
               }
             },
             {
+              "kind": "field",
+              "name": "submenu",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether anything is slotted into `submenu`. Read after first render.\n\nState rather than a getter over `children`, which is what it was: read\nduring `render()` with nothing to re-read it, a submenu arriving after the\nrow's first render produced no caret and no `aria-haspopup` while selecting\nthe row still drilled in. A framework filling a submenu on demand hit that\nevery time. `Tree.Item` backs `branch` the same way for the same reason.\n\nFalse on the server is the right answer rather than a safe one: the server\ncannot know whether a submenu was slotted, and a row that served an\n`aria-haspopup` it might not have would be a promise made to a screen\nreader on the strength of a guess.",
+              "inheritedFrom": {
+                "name": "HelixBaseMenuItem",
+                "module": "src/menu/item/menu-item.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "focus",
               "return": {
@@ -15424,6 +15438,10 @@
           "description": "The surface is in the top layer, so it needs no `z-index` and cannot be\nclipped by whatever it sits inside.\n\nA submenu replaces the page rather than opening beside it, so the panel stays\none panel and reads the same on a phone as on a desk.",
           "name": "HelixMenu",
           "cssProperties": [
+            {
+              "description": "Tallest the surface grows before it scrolls.",
+              "name": "--menu-max-block-size"
+            },
             {
               "description": "Narrowest the surface gets.",
               "name": "--menu-min-inline-size"
@@ -15784,6 +15802,35 @@
               "name": "handleTriggerClick",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "mark",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "HelixBaseMenuItem"
+                  }
+                },
+                {
+                  "name": "onPage",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Walks the tree marking which rows are on the page showing.\n\nTwo levels were marked by hand and nothing wrote `showingSubmenu` on a\nnested row, so drilling into a third-level submenu rendered the header over\nan empty panel: the page existed, its rows were still marked as belonging\nto the level above, and none of them rendered. `Drilldown.mark()` is the\nsame walk and was already recursive.\n\n`slot === 'submenu'` rather than every child, because a row's other\nchildren are its label and its icons.",
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -21644,12 +21691,25 @@
             },
             {
               "kind": "field",
+              "name": "precision",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many decimals the step is written to, so a label is not float noise.\n\n`min + index * step` on a fractional step prints `0.30000000000000004`,\nwhich is arithmetic being honest and a label being wrong. Rounding back to\nthe step's own precision is what the reader asked for when they wrote it.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "markerValues",
               "type": {
                 "text": "number[]"
               },
               "privacy": "private",
-              "description": "The value each mark stands at, snapped to a step it can be reached on.\n\nDe-duplicated, because snapping can land two marks on one step: five marks\nacross a range of two steps is three marks, not five with a pair on top of\neach other, and two marks in one place read as one drawn badly.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
@@ -21713,7 +21773,21 @@
                   "text": "void"
                 }
               },
-              "description": "Reports the value, and how far along the track it sits.",
+              "description": "Reports the value.",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "fraction",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How far along the track the thumb sits, as a fraction.\n\nArithmetic rather than a measurement, because the browser already knows and\nmeasuring the thumb would be a guess at where the platform drew it. The\nstyled tier fills the track with it.\n\nRead from the control where there is one, not from `value`. A range\nsanitizes what it is given, clamping to the bounds and snapping to the\nstep, so a slider given an off-step or out-of-range value had a thumb in\none place and a fill, a readout and a submitted value in another. What the\ncontrol settled on is the truth about where the thumb is.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
                 "module": "src/slider/root/slider-root.ts"

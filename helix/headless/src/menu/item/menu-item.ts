@@ -1,7 +1,7 @@
 import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
 import { caretRight, check } from '@helix-io/icons'
-import { html, nothing, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
@@ -106,7 +106,33 @@ export class HelixBaseMenuItem extends HelixElement {
    * reader on the strength of a guess.
    */
   get hasSubmenu(): boolean {
-    return [...(this.children ?? [])].some((child) => child.slot === 'submenu')
+    return this.submenu
+  }
+
+  /**
+   * Whether anything is slotted into `submenu`. Read after first render.
+   *
+   * State rather than a getter over `children`, which is what it was: read
+   * during `render()` with nothing to re-read it, a submenu arriving after the
+   * row's first render produced no caret and no `aria-haspopup` while selecting
+   * the row still drilled in. A framework filling a submenu on demand hit that
+   * every time. `Tree.Item` backs `branch` the same way for the same reason.
+   *
+   * False on the server is the right answer rather than a safe one: the server
+   * cannot know whether a submenu was slotted, and a row that served an
+   * `aria-haspopup` it might not have would be a promise made to a screen
+   * reader on the strength of a guess.
+   */
+  @state()
+  private submenu = false
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="submenu"]')
+    this.submenu = (slot?.assignedElements().length ?? 0) > 0
+    slot?.addEventListener('slotchange', () => {
+      this.submenu = slot.assignedElements().length > 0
+    })
   }
 
   /**

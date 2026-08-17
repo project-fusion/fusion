@@ -4,17 +4,16 @@
   display: contents;
 }
 
-/* The UA's own `[popover]` rule sets `overflow: auto`, which makes the surface a
-   scroll container, and anything positioned outside a scroll container is
-   clipped. The arrow is drawn deliberately outside it. Measured on a bare
-   popover with a child hanging four pixels past the edge: `scrollHeight`
-   exceeded `clientHeight`, so the box was overflowing and trimming rather than
-   letting the point show.
-
-   Nothing in these surfaces scrolls, so `visible` costs nothing and is what a
-   bubble with a point on it wants. */
 [part="menu"] {
-  overflow: visible;
+  /* A menu taller than the window has to scroll, and could not.
+   *
+   * There was no `max-block-size` and no `overflow`, so a long menu ran off the
+   * bottom of the screen and the keyboard path that walks the rows had nothing
+   * to scroll: the rows below the fold were reachable by arrow and invisible.
+   * `--_floating-available-height` is what the controller measures for exactly
+   * this, and `Select`'s surface already reads it. */
+  max-block-size: var(--menu-max-block-size, var(--_floating-available-height, none));
+  overflow-y: auto;
   /* Compact by nature, and it says so once, so a control slotted into a row is
      the size the rows are rather than the size a page is. */
   --helix-size-control: var(--helix-size-control-sm);

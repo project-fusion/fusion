@@ -18,6 +18,7 @@ import { styles } from './menu-root.css.js'
  * @aliases Dropdown, Action menu
  * @documentation https://helix.fusion.dev/components/menu
  *
+ * @cssproperty --menu-max-block-size - Tallest the surface grows before it scrolls.
  * @cssproperty --menu-min-inline-size - Narrowest the surface gets.
  * @cssproperty --menu-background-color - Fill of the surface.
  */

@@ -108,6 +108,17 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
    * across a range of two steps is three marks, not five with a pair on top of
    * each other, and two marks in one place read as one drawn badly.
    */
+  /**
+   * How many decimals the step is written to, so a label is not float noise.
+   *
+   * `min + index * step` on a fractional step prints `0.30000000000000004`,
+   * which is arithmetic being honest and a label being wrong. Rounding back to
+   * the step's own precision is what the reader asked for when they wrote it.
+   */
+  private get precision(): number {
+    return String(this.step).split('.')[1]?.length ?? 0
+  }
+
   private get markerValues(): number[] {
     const span = this.max - this.min
     if (this.markers < 2 || span <= 0) {
@@ -116,10 +127,13 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
     const step = this.step > 0 ? this.step : 1
     const snapped = Array.from({ length: this.markers }, (_, at) => {
       const raw = this.min + (at / (this.markers - 1)) * span
-      return Math.min(
+      const snappedAt = Math.min(
         this.max,
         Math.max(this.min, this.min + Math.round((raw - this.min) / step) * step),
       )
+      // Back to the step's own precision, or a fractional step prints
+      // `0.30000000000000004` on a marker label.
+      return Number(snappedAt.toFixed(this.precision))
     })
     return [...new Set(snapped)]
   }
@@ -155,17 +169,33 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
     this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
   }
 
-  /** Reports the value, and how far along the track it sits. */
+  /** Reports the value. */
   private sync(): void {
     this.internals.setFormValue(this.value)
-    /* Written as a custom property rather than measured, because the browser
-       already knows: the fraction is arithmetic the component can do exactly
-       and a measurement of the thumb would be a guess at where the platform
-       drew it. The styled tier fills the track with it. */
-    const span = this.max - this.min
-    const fraction = span === 0 ? 0 : (this.valueAsNumber - this.min) / span
-    this.style.setProperty('--_slider-fraction', String(fraction))
     this.refreshFeedback()
+  }
+
+  /**
+   * How far along the track the thumb sits, as a fraction.
+   *
+   * Arithmetic rather than a measurement, because the browser already knows and
+   * measuring the thumb would be a guess at where the platform drew it. The
+   * styled tier fills the track with it.
+   *
+   * Read from the control where there is one, not from `value`. A range
+   * sanitizes what it is given, clamping to the bounds and snapping to the
+   * step, so a slider given an off-step or out-of-range value had a thumb in
+   * one place and a fill, a readout and a submitted value in another. What the
+   * control settled on is the truth about where the thumb is.
+   */
+  private get fraction(): number {
+    const span = this.max - this.min
+    if (span === 0) {
+      return 0
+    }
+    const control = this.renderRoot?.querySelector<HTMLInputElement>('[part="control"]')
+    const at = control ? Number(control.value) : this.valueAsNumber
+    return Math.min(1, Math.max(0, (at - this.min) / span))
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -196,6 +226,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
         part="control"
         id="control"
         type="range"
+        style="--_slider-fraction: ${this.fraction}"
         .value=${this.value}
         min=${this.min}
         max=${this.max}
@@ -222,7 +253,18 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
             </div>`
           : nothing
       }
-      ${this.showValue ? html`<output part="output" for="control">${this.value}</output>` : nothing}
+      ${
+        /* Hidden from the accessibility tree, like the markers above it.
+         *
+         * A bare `<output>` maps to `role="status"` with an implicit polite
+         * live region, so every intermediate value during a drag was announced
+         * on top of the range's own value announcement: a reader dragging from
+         * 10 to 60 heard both twice, fifty times. It repeats what the control
+         * already reports, which is the definition of decoration. */
+        this.showValue
+          ? html`<output part="output" for="control" aria-hidden="true">${this.value}</output>`
+          : nothing
+      }
     </div>
     ${this.renderHint()}${this.renderFeedback()}`
   }
