@@ -9,3 +9,14 @@
   grid-template-columns: var(--table-columns, minmax(0, 1fr));
   inline-size: 100%;
 }
+
+/* The header row exists for the accessibility tree and must not exist for the
+   layout: the whole table is one grid, which is what aligns every column across
+   every row, so a wrapper that generated a box would take one cell and put all
+   three headings inside it.
+
+   `display: contents` is what the rows already do for the same reason, and an
+   element with a role stays in the accessibility tree through it. */
+[part="head"] {
+  display: contents;
+}

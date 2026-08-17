@@ -1668,7 +1668,7 @@ one panel and reads the same on a phone as on a desk.
 | `offset` | `offset` | `number` | `4` | `HelixBaseMenu` | Space between the trigger and the surface, in pixels. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placement` | `placement` | `Placement` | `'bottom-end'` | `HelixBaseMenu` | Preferred side. It moves if that side does not fit. |
+| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixBaseMenu` | Preferred side. It moves if that side does not fit. |
 
 #### Methods
 
@@ -2609,6 +2609,7 @@ decorating none of it.
 | --- | --- | --- | --- | --- | --- |
 | `columns` | `columns` | `string` | `''` | `HelixBaseTable` | Column track list, as CSS. Deprecated: declare columns instead. |
 | `label` | `label` | `string` | `''` | `HelixBaseTable` | Accessible name for the table. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixBaseTable` | Nothing is assigned by name, so the columns can be put in a row. |
 | `tableColumns` | - | `HelixBaseTableColumn[]` | - | `HelixBaseTable` | The columns declared as children, in the order they are written. |
 
 #### Slots

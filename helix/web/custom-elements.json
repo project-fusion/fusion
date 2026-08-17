@@ -15160,7 +15160,7 @@
               "type": {
                 "text": "Placement"
               },
-              "default": "'bottom-end'",
+              "default": "'bottom-start'",
               "description": "Preferred side. It moves if that side does not fit.",
               "attribute": "placement",
               "inheritedFrom": {
@@ -15506,7 +15506,7 @@
               "type": {
                 "text": "Placement"
               },
-              "default": "'bottom-end'",
+              "default": "'bottom-start'",
               "description": "Preferred side. It moves if that side does not fit.",
               "fieldName": "placement",
               "inheritedFrom": {
@@ -23675,6 +23675,34 @@
               "name": "handleSlotChange",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }",
+              "description": "Nothing is assigned by name, so the columns can be put in a row.\n\n`role=\"columnheader\"` was landing directly under `role=\"table\"` with no\nowning `row`, which is invalid: the table pattern is `table > row >\ncolumnheader`, and a header cell with no row is a cell belonging to\nnothing. The columns are ordinary children the consumer writes with no\n`slot`, so the only way to put a wrapper around them without changing what\na consumer writes is to assign them here.\n\nManual rather than a `slot` attribute this element would set on the\nconsumer's own markup, which is the change a React consumer's hydration\nreports and does not patch up. Assignment writes nothing at all.\n\nSafe against the server because this repo ships no declarative shadow DOM:\nthe shadow root exists only after upgrade, and the assignment below runs in\nthat same update. There is no window in which the shadow is present and the\nassignment has not happened.",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "assign",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
               "inheritedFrom": {
                 "name": "HelixBaseTable",
                 "module": "src/table/root/table-root.ts"

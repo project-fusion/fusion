@@ -6,7 +6,12 @@
    declares cannot lose that fight. */
 :host {
   display: grid;
-  gap: var(--helix-space-md);
+  /* `none`, which is what `Flex` has always had. The two layout primitives
+     disagreed with no reason written down, so the same `gap="sm"` meant "less
+     than the default" in one and "more than nothing" in the other, and a grid
+     put space between things nobody had asked for. A layout primitive that adds
+     space you did not ask for is the surprising one. */
+  gap: var(--helix-space-none);
   grid-template-columns: var(--_grid-template, minmax(0, 1fr));
 }
 

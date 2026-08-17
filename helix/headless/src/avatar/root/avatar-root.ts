@@ -66,6 +66,17 @@ export class HelixBaseAvatar extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* A new source is a new attempt.
+     *
+     * `failed` is an observation about the image that was loading, and it
+     * outlived the image: it latched on the first error and nothing ever
+     * cleared it, so an avatar that failed once fell back to initials for the
+     * life of the element. A consumer swapping a broken URL for a good one, or
+     * a list reusing an avatar for the next person, got the initials forever
+     * and no error to say why. */
+    if (changed.has('src')) {
+      this.failed = false
+    }
     hostAria(this.internals, { label: this.name, role: 'img' })
   }
 

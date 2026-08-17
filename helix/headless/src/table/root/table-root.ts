@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixBaseTableColumn } from '../column/table-column.js'
 
@@ -84,6 +84,46 @@ export class HelixBaseTable extends HelixElement {
     this.requestUpdate()
   }
 
+  /**
+   * Nothing is assigned by name, so the columns can be put in a row.
+   *
+   * `role="columnheader"` was landing directly under `role="table"` with no
+   * owning `row`, which is invalid: the table pattern is `table > row >
+   * columnheader`, and a header cell with no row is a cell belonging to
+   * nothing. The columns are ordinary children the consumer writes with no
+   * `slot`, so the only way to put a wrapper around them without changing what
+   * a consumer writes is to assign them here.
+   *
+   * Manual rather than a `slot` attribute this element would set on the
+   * consumer's own markup, which is the change a React consumer's hydration
+   * reports and does not patch up. Assignment writes nothing at all.
+   *
+   * Safe against the server because this repo ships no declarative shadow DOM:
+   * the shadow root exists only after upgrade, and the assignment below runs in
+   * that same update. There is no window in which the shadow is present and the
+   * assignment has not happened.
+   */
+  static override shadowRootOptions: ShadowRootInit = {
+    ...HelixElement.shadowRootOptions,
+    slotAssignment: 'manual',
+  }
+
+  private assign(): void {
+    const head = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="columns"]')
+    const body = this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
+    if (!head || !body) {
+      return
+    }
+    const columns = new Set<Element>(this.tableColumns)
+    head.assign(...this.tableColumns)
+    body.assign(...[...this.children].filter((child) => !columns.has(child)))
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.assign()
+  }
+
   protected override render(): TemplateResult {
     const template = this.template
     return html`<div
@@ -92,6 +132,7 @@ export class HelixBaseTable extends HelixElement {
       aria-label=${this.label || 'Table'}
       style=${template ? `--table-columns: ${template}` : ''}
     >
+      <div part="head" role="row"><slot name="columns"></slot></div>
       <slot @slotchange=${this.handleSlotChange}></slot>
     </div>`
   }

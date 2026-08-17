@@ -56,7 +56,7 @@ import type { HelixBaseMenuItem } from '../item/menu-item.js'
 export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
   /** Preferred side. It moves if that side does not fit. */
   @property()
-  placement: Placement = 'bottom-end'
+  placement: Placement = 'bottom-start'
 
   /** Space between the trigger and the surface, in pixels. */
   @property({ type: Number })

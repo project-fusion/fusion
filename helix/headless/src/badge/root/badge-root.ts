@@ -61,7 +61,20 @@ export class HelixBaseBadge extends HelixElement {
   protected override render(): TemplateResult {
     const blank = this.blank
     const text = this.text
-    const announced = this.label !== '' && !blank
+    /* A mark with text is content and is announced; a dot is decoration and is
+       not.
+     *
+     * This asked for a `label` as well, so a badge showing a count and no label
+     * was `aria-hidden` and the number it exists to show reached nobody using a
+     * screen reader. The number is its own name where none is given, which is
+     * why `aria-label` is now conditional on the label rather than on this: a
+     * `4` announces as "4" from the text, and `label="4 unread"` says the
+     * better thing.
+     *
+     * A dot with no label still says nothing, which is the deliberate half: a
+     * dot means "something here" and cannot say what, so naming it is the
+     * consumer's to do and silence is better than "badge". */
+    const announced = !blank && (text !== '' || this.label !== '')
 
     // The indicator holds the text and nothing else, so an absent value leaves
     // it empty and `[part="indicator"]:empty` is what draws the dot. Lit's
@@ -82,7 +95,7 @@ export class HelixBaseBadge extends HelixElement {
         data-blank=${blank ? '' : nothing}
         data-single=${text.length <= 1 ? '' : nothing}
         role=${announced ? 'status' : nothing}
-        aria-label=${announced ? this.label : nothing}
+        aria-label=${this.label !== '' && announced ? this.label : nothing}
         aria-hidden=${announced ? nothing : 'true'}
         >${text}</span
       >`

@@ -1,4 +1,14 @@
 :host {
+  /* No box at all. A custom element with no `display` is `inline`, so the host
+     was a phantom inline box: a flex item of zero width in any flex parent, and
+     a line box worth of height in ordinary flow, for an element whose only
+     rendered content is a `<dialog>` that lives in the top layer.
+
+     `contents` rather than `block`, because the drawer should occupy nothing
+     where it is written rather than a block of nothing. The `[hidden]` rule
+     from `HelixElement.finalizeStyles` still wins over it, being (0,3,0). */
+  display: contents;
+
   --_drawer-size: var(--drawer-size, 20rem);
 }
 
