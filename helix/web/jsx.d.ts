@@ -6046,8 +6046,11 @@ export type CustomElements = {
   >;
 
   /**
-   * Four appearances and three sizes, all drawn on one control so a link styled
-   * as a button and a real button are indistinguishable to a reader. The focus
+   * Four appearances, all drawn on one control so a link styled as a button and a
+   * real button are indistinguishable to a reader. There are no sizes: a control
+   * takes its height from the region it is in, through `data-density`, which is
+   * the one size axis in the library and the reason a row of controls cannot come
+   * out ragged. The focus
    * ring is declared here rather than inherited, because the base layer's
    * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
    *
@@ -10789,8 +10792,11 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Four appearances and three sizes, all drawn on one control so a link styled
-   * as a button and a real button are indistinguishable to a reader. The focus
+   * Four appearances, all drawn on one control so a link styled as a button and a
+   * real button are indistinguishable to a reader. There are no sizes: a control
+   * takes its height from the region it is in, through `data-density`, which is
+   * the one size axis in the library and the reason a row of controls cannot come
+   * out ragged. The focus
    * ring is declared here rather than inherited, because the base layer's
    * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
    *

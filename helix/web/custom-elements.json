@@ -3259,7 +3259,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Four appearances and three sizes, all drawn on one control so a link styled\nas a button and a real button are indistinguishable to a reader. The focus\nring is declared here rather than inherited, because the base layer's\n`:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.",
+          "description": "Four appearances, all drawn on one control so a link styled as a button and a\nreal button are indistinguishable to a reader. There are no sizes: a control\ntakes its height from the region it is in, through `data-density`, which is\nthe one size axis in the library and the reason a row of controls cannot come\nout ragged. The focus\nring is declared here rather than inherited, because the base layer's\n`:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.",
           "name": "HelixButton",
           "cssProperties": [
             {
@@ -6666,6 +6666,21 @@
               "privacy": "private",
               "readonly": true,
               "description": "Reads a box's requested change into `value`, and says so once.\n\nThe box is found from the event's target, which does two things. It tells\nthe group which box asked, where the detail carries only the shared name.\nAnd it ignores the group's own dispatch, which lands on this same listener\nbecause the group is what it is dispatched from: without the guard the\ngroup answers itself until the stack gives out.\n\nThe requested state comes from the event rather than from the box. Driving\nthe boxes from `value` makes them controlled, so a controlled box applies\nnothing on its own and reports what it was asked for. Reading `checked`\nhere would read the state it still holds and nothing would ever change.",
+              "inheritedFrom": {
+                "name": "HelixBaseCheckboxGroup",
+                "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "validate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Refuses an empty set where one was required, which nothing did.\n\n`required` arrives with `MixinField`, reflects, and paints the asterisk\nthrough the composed field sheet, and enforced nothing at all: no validity,\nno message, and nothing cascading to the boxes. A group marked required\nsubmitted empty.\n\nThe group is deliberately not form-associated, its boxes being the controls,\nso the validity is reported through the group's own internals and anchored\non the list: the browser needs somewhere to point the message.",
               "inheritedFrom": {
                 "name": "HelixBaseCheckboxGroup",
                 "module": "src/checkbox-group/root/checkbox-group-root.ts"

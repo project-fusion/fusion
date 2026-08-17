@@ -85,7 +85,15 @@ export class KeyboardNavigationController implements ReactiveController {
     if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
       next = this.wrap ? (current + 1) % items.length : Math.min(current + 1, last)
     } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      next = this.wrap ? (current - 1 + items.length) % items.length : Math.max(current - 1, 0)
+      /* From nothing, backwards is the last, which the arithmetic did not give.
+       *
+       * `(-1 - 1 + length) % length` is `length - 2`: the *second* to last. So a
+       * reader arrowing backwards into an unanswered group landed one short of
+       * the end, and the comment above says plainly that it lands on the end.
+       * The wrapping form is right for every real index and wrong for the one
+       * that is not an index. */
+      next =
+        current < 0 ? last : this.wrap ? (current - 1 + items.length) % items.length : current - 1
     } else if (event.key === 'Home') {
       next = 0
     } else {

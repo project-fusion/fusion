@@ -378,6 +378,14 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       super.willUpdate(changed)
       this.shownFeedback = this.resolvedFeedback
       this.toggleAttribute('data-invalid', this.shownFeedback !== '')
+      /* And say it to the accessibility tree, which nothing did.
+       *
+       * A field carrying a `feedback` message painted red, and was described by
+       * that message through `aria-describedby`, and was never announced as
+       * being *wrong*: a reader heard the message as though it were help text.
+       * `aria-invalid` is the one word for it, and this is the one place that
+       * knows, so every field in the library gets it from here. */
+      this.internals.ariaInvalid = this.shownFeedback === '' ? null : 'true'
     }
 
     /**

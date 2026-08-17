@@ -4823,6 +4823,17 @@
               "description": "Reads a box's requested change into `value`, and says so once.\n\nThe box is found from the event's target, which does two things. It tells\nthe group which box asked, where the detail carries only the shared name.\nAnd it ignores the group's own dispatch, which lands on this same listener\nbecause the group is what it is dispatched from: without the guard the\ngroup answers itself until the stack gives out.\n\nThe requested state comes from the event rather than from the box. Driving\nthe boxes from `value` makes them controlled, so a controlled box applies\nnothing on its own and reports what it was asked for. Reading `checked`\nhere would read the state it still holds and nothing would ever change."
             },
             {
+              "kind": "method",
+              "name": "validate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Refuses an empty set where one was required, which nothing did.\n\n`required` arrives with `MixinField`, reflects, and paints the asterisk\nthrough the composed field sheet, and enforced nothing at all: no validity,\nno message, and nothing cascading to the boxes. A group marked required\nsubmitted empty.\n\nThe group is deliberately not form-associated, its boxes being the controls,\nso the validity is reported through the group's own internals and anchored\non the list: the browser needs somewhere to point the message."
+            },
+            {
               "kind": "field",
               "name": "hint",
               "type": {
@@ -9079,7 +9090,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the\npassword manager, and the on-screen keyboard a phone chooses all come from the\nplatform. `delegatesFocus` puts focus on it, and it serializes into the\nserver's markup, so the field is usable before any script loads.\n\n**The input inside a shadow root submits nothing**, because the form is on the\nother side of the boundary. The host is form-associated instead and reports\nits own value through `ElementInternals`, which is also what carries validity\nand what answers a form reset.\n\n`value` and `defaultValue` are separate for the reason `checked` and\n`defaultChecked` are: `value` is what is in the field now and\n`defaultValue` is what the markup asked for, which is where a reset returns\nto and is gone the moment anyone types.\n\n**Validity is the platform's.** The type, `required`, `pattern`, `minlength`\nand the rest are set on the real input and its `validity` is copied onto the\nhost, so an email field rejects what the browser says is not an email rather\nthan what a regular expression here guesses. What this adds is the anchor, so\n`reportValidity` points the bubble at the input rather than at the host.",
+          "description": "Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the\npassword manager, and the on-screen keyboard a phone chooses all come from the\nplatform. `delegatesFocus` puts focus on it, and it serializes into the\nserver's markup, so the field is usable before any script loads.\n\n**The input inside a shadow root submits nothing**, because the form is on the\nother side of the boundary. The host is form-associated instead and reports\nits own value through `ElementInternals`, which is also what carries validity\nand what answers a form reset.\n\n`value` and `defaultValue` are separate for the reason `checked` and\n`defaultChecked` are: `value` is what is in the field now and\n`defaultValue` is what the markup asked for, which is where a reset returns\nto and is gone the moment anyone types.\n\n**Validity is the platform's.** The `type` and `required` are set on the real\ninput and its `validity` is copied onto the host, so an email field rejects\nwhat the browser says is not an email rather than what a regular expression\nhere guesses. What this adds is the anchor, so `reportValidity` points the\nbubble at the input rather than at the host.\n\n`pattern`, `minlength` and `maxlength` are **not** forwarded, and this\nparagraph used to say they were, on the strength of \"and the rest\": no such\nproperties exist and nothing binds them, so a consumer following the sentence\nwrote an attribute on the host that reached no input and constrained nothing.\nThey are worth adding and are a change to the API rather than a correction to\na comment, so what is here is the truth about what is forwarded today.",
           "name": "HelixBaseInput",
           "cssParts": [
             {

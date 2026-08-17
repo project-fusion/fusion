@@ -158,6 +158,14 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
        element references on the client, and those win where a consumer slotted
        a label richer than a string. */
     hostAria(this.internals, { label: this.label, role: 'radiogroup' })
+    /* Announced as required, which it never was.
+     *
+     * `required` reflects, sets validity and paints the asterisk the field sheet
+     * draws, and told the accessibility tree nothing: a reader met a group with
+     * a mark beside its label they could not see and no announcement of why the
+     * form would refuse it. The stylesheet drawing that asterisk depends on the
+     * control saying so. */
+    this.internals.ariaRequired = this.required ? 'true' : null
   }
 
   protected override updated(changed: PropertyValues): void {

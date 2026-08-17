@@ -285,7 +285,15 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     }
     event.preventDefault()
 
-    const at = shown.findIndex((option) => option.value === this.activeValue)
+    /* Where the reader is, and failing that where the answer is.
+     *
+     * `activeValue` starts empty, so the first arrow press in a list that
+     * already has a chosen option started from nowhere: Down went to the first
+     * option, which is a move backwards from anything below it, and Up went to
+     * the last. Seeding from the value means the first press moves from what
+     * the reader can see is selected. */
+    const from = this.activeValue || (this.value.split(',')[0] ?? '')
+    const at = shown.findIndex((option) => option.value === from)
     let next = at
     if (event.key === 'ArrowDown') {
       next = at < 0 ? 0 : (at + 1) % shown.length
@@ -502,10 +510,23 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
       return
     }
     event.preventDefault()
-    this.renderRoot.querySelector<HTMLElement>('[part="items"]')?.focus()
-    this.renderRoot
-      .querySelector<HTMLElement>('[part="items"]')
-      ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: event.key }))
+    const items = this.renderRoot.querySelector<HTMLElement>('[part="items"]')
+    items?.focus()
+    /* `composed`, or it reaches nothing.
+     *
+     * A synthetic event that only bubbles stops at the shadow boundary, and the
+     * handler this is aimed at is on the host: the re-dispatch did nothing at
+     * all and the arrows worked only because the original press was also left
+     * to bubble, which is a coincidence rather than a mechanism. `cancelable`
+     * too, since the handler at the other end prevents it. */
+    items?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: event.key,
+      }),
+    )
   }
 
   /**

@@ -199,6 +199,7 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
        element references on the client, and those win where a consumer slotted
        a label richer than a string. */
     hostAria(this.internals, { label: this.label, role: 'group' })
+    this.internals.ariaRequired = this.required ? 'true' : null
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -211,8 +212,34 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
     }
   }
 
+  /**
+   * Refuses an empty set where one was required, which nothing did.
+   *
+   * `required` arrives with `MixinField`, reflects, and paints the asterisk
+   * through the composed field sheet, and enforced nothing at all: no validity,
+   * no message, and nothing cascading to the boxes. A group marked required
+   * submitted empty.
+   *
+   * The group is deliberately not form-associated, its boxes being the controls,
+   * so the validity is reported through the group's own internals and anchored
+   * on the list: the browser needs somewhere to point the message.
+   */
+  private validate(): void {
+    if (this.required && this.value === '') {
+      this.internals.setValidity(
+        { valueMissing: true },
+        'Choose at least one to continue.',
+        this.renderRoot.querySelector<HTMLElement>('[part="items"]') ?? undefined,
+      )
+    } else {
+      this.internals.setValidity({})
+    }
+    this.refreshFeedback()
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.validate()
     this.sync()
     this.linkHost()
   }
@@ -223,7 +250,15 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
        container. On the host, a horizontal group would have put its own label
        in the row beside the first box. */
     return html`${this.renderGroupLabel()}
-      <div part="items"><slot></slot></div>
+      <div part="items">
+        ${
+          /* A box arriving after first render got neither the shared name nor
+             the value's checked state, because nothing was listening: both
+             sibling groups wire this and this one did not. */
+          ''
+        }
+        <slot @slotchange=${() => this.requestUpdate()}></slot>
+      </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }
 }

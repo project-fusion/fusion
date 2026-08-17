@@ -30,11 +30,18 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * `defaultValue` is what the markup asked for, which is where a reset returns
  * to and is gone the moment anyone types.
  *
- * **Validity is the platform's.** The type, `required`, `pattern`, `minlength`
- * and the rest are set on the real input and its `validity` is copied onto the
- * host, so an email field rejects what the browser says is not an email rather
- * than what a regular expression here guesses. What this adds is the anchor, so
- * `reportValidity` points the bubble at the input rather than at the host.
+ * **Validity is the platform's.** The `type` and `required` are set on the real
+ * input and its `validity` is copied onto the host, so an email field rejects
+ * what the browser says is not an email rather than what a regular expression
+ * here guesses. What this adds is the anchor, so `reportValidity` points the
+ * bubble at the input rather than at the host.
+ *
+ * `pattern`, `minlength` and `maxlength` are **not** forwarded, and this
+ * paragraph used to say they were, on the strength of "and the rest": no such
+ * properties exist and nothing binds them, so a consumer following the sentence
+ * wrote an attribute on the host that reached no input and constrained nothing.
+ * They are worth adding and are a change to the API rather than a correction to
+ * a comment, so what is here is the truth about what is forwarded today.
  *
  * @since 0.1.0
  * @status experimental
