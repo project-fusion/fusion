@@ -26604,6 +26604,20 @@
             },
             {
               "kind": "field",
+              "name": "holds",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many reasons there are to hold the clock, rather than whether there is\none.\n\nHover and focus both stopped the same timer with nothing counting them, so\na reader who tabbed into a message and then moved the pointer off it had\nthe clock restarted underneath them while they were still reading it. That\nis the case the pause exists for, and it was the case that broke it.\n\nThe two are genuinely independent: a pointer can leave while focus stays,\nand focus can leave while the pointer stays. Only the last one out starts\nit again.",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "handlePause",
               "privacy": "private",
               "readonly": true,

@@ -210,9 +210,32 @@ export class HelixBaseToastItem extends HelixElement {
   /* Arrows, so `this` is the item wherever the listener ends up. Lit does bind
      a template listener to its host, and relying on that puts a load-bearing
      fact about a library in a place nobody reading this file would look. */
-  private readonly handlePause = (): void => this.pause()
+  /**
+   * How many reasons there are to hold the clock, rather than whether there is
+   * one.
+   *
+   * Hover and focus both stopped the same timer with nothing counting them, so
+   * a reader who tabbed into a message and then moved the pointer off it had
+   * the clock restarted underneath them while they were still reading it. That
+   * is the case the pause exists for, and it was the case that broke it.
+   *
+   * The two are genuinely independent: a pointer can leave while focus stays,
+   * and focus can leave while the pointer stays. Only the last one out starts
+   * it again.
+   */
+  private holds = 0
 
-  private readonly handleResume = (): void => this.resume()
+  private readonly handlePause = (): void => {
+    this.holds += 1
+    this.pause()
+  }
+
+  private readonly handleResume = (): void => {
+    this.holds = Math.max(this.holds - 1, 0)
+    if (this.holds === 0) {
+      this.resume()
+    }
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()

@@ -436,4 +436,52 @@ if (hasLayout()) {
       )
     })
   })
+
+  describe('the clock and what holds it', () => {
+    const item = async (attrs = ''): Promise<Item> => {
+      const host = await region(`<helix-toast-item ${attrs}>Saved</helix-toast-item>`)
+      const found = host.querySelector('helix-toast-item') as Item
+      await found.updateComplete
+      return found
+    }
+
+    test('the region is not atomic, so an arrival is not the whole stack', async () => {
+      /* `role="status"` implies `aria-atomic="true"`, which re-reads the entire
+         region whenever any part of it changes: with four messages up, the
+         fifth announces all five. `aria-relevant="additions"` does not help,
+         because it says which mutations count and not how much is read when one
+         does. Both are needed and only one was set. */
+      const host = await region()
+      expect((host as unknown as { internals?: ElementInternals }).internals?.ariaAtomic).toBe(
+        'false',
+      )
+    })
+
+    test('two reasons to hold the clock take two releases', async () => {
+      /* Hover and focus stopped the same timer with nothing counting them, so a
+         reader who tabbed into a message and then moved the pointer away had it
+         restarted underneath them. That is the case the pause is for. */
+      const found = await item('duration="4000"')
+      const bar = part(found, 'timer') as HTMLElement
+      const frozen = (): boolean => getComputedStyle(bar).animationPlayState === 'paused'
+      /* On the surface, not the host. The listeners are bound in the template
+         and `mouseenter` does not bubble, so a press dispatched at the host
+         reaches nothing. */
+      const surface = part(found, 'item') as HTMLElement
+
+      surface.dispatchEvent(new MouseEvent('mouseenter'))
+      surface.dispatchEvent(new FocusEvent('focusin'))
+      await found.updateComplete
+      expect(frozen()).toBe(true)
+
+      // The pointer leaves; focus has not.
+      surface.dispatchEvent(new MouseEvent('mouseleave'))
+      await found.updateComplete
+      expect(frozen()).toBe(true)
+
+      surface.dispatchEvent(new FocusEvent('focusout'))
+      await found.updateComplete
+      expect(frozen()).toBe(false)
+    })
+  })
 }

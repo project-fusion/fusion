@@ -72,6 +72,12 @@ export class HelixBaseToast extends HelixElement {
     /* Additions are what a reader needs; a message going away is not news, and
        announcing removals means every dismissal is read out. */
     this.internals.ariaRelevant = 'additions'
+    /* `role="status"` carries an implicit `aria-atomic="true"`, which means the
+       whole region is re-read whenever any part of it changes. With a stack of
+       four, the fifth arrival announces all five. `additions` alone does not
+       help: it says which mutations count, not how much is read out when one
+       does. Both are needed, and only one was here. */
+    this.internals.ariaAtomic = 'false'
   }
 
   protected override render(): TemplateResult {
