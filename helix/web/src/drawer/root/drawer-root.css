@@ -33,6 +33,37 @@
 }
 
 [part="panel"] {
+  /* The UA's own dialog box, undone.
+   *
+   * A `<dialog>` arrives with `margin: auto`, a 3px `solid` border, `padding:
+   * 1em`, `width: fit-content` and `max-width/height: calc(100% - 6px - 2em)`.
+   * Every one of those fights an edge-anchored panel: with `inset: 0` the auto
+   * margin centres it, so the drawer came out as a bordered box floating in the
+   * middle of the viewport at 320x564 where it should have been flush to the
+   * right edge at full height. Measured, and visible in a screenshot, which is
+   * the only reason it was caught: `:modal` was true and the panel had escaped
+   * `overflow: hidden`, so every assertion about it passed.
+   *
+   * Named rather than `all: unset`, which would take `box-sizing` and the
+   * inherited font with it. */
+  margin: var(--helix-space-none);
+  border: none;
+  max-inline-size: none;
+  max-block-size: none;
+  /* `auto` on all four, so each placement below sets only the edges it anchors
+     to. The UA gives a dialog `inset-inline-start: 0` as well as `-end`, and
+     with both at zero and a width set, the start edge wins: `placement="end"`
+     came out flush against the *left*. Reset here rather than negated in each
+     placement, because four rules each undoing the same two declarations is
+     four chances to miss one. */
+  inset: auto;
+  /* And `fit-content` on both axes, which is the other half of the same
+     problem: `top` and `bottom` stretch themselves with `inset-inline: 0` and
+     set no width, and a `fit-content` box ignores that entirely. Measured, a
+     full-width top drawer came out 119px wide, the width of its own text. */
+  inline-size: auto;
+  block-size: auto;
+
   background-color: var(--helix-color-surface);
   /* A drawer's own inset, and nothing about anyone's header.
 

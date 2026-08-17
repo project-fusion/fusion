@@ -122,10 +122,20 @@
      component reaching for a different rung is a normal thing, whereas a page
      that is not the color it was chosen to be is not. */
   --helix-color-surface-sunken: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950));
-  --helix-color-overlay: color-mix(
-    in oklab,
-    var(--_helix-neutral-950) light-dark(40%, 64%),
-    transparent
+  /* Two whole colors, not one color with a `light-dark()` strength.
+   *
+   * This was `color-mix(in oklab, neutral-950 light-dark(40%, 64%),
+   * transparent)`, and `light-dark()` resolves to a `<color>`: it is not valid
+   * in a percentage slot. So the declaration was invalid, the token resolved to
+   * nothing, and every scrim in the library was transparent. It took moving the
+   * drawer onto `::backdrop` for anyone to see it, because the drawer had drawn
+   * its own scrim div with its own color and the dialog's was simply missing.
+   *
+   * The mix goes on each arm instead, which is the shape every other two-mode
+   * token here already has. */
+  --helix-color-overlay: light-dark(
+    color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent),
+    color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent)
   );
 
   /* Text and icons, by prominence. */
