@@ -4340,11 +4340,28 @@ export type HelixBaseTreeItemElementEvent<E = Event> = TypedEvent<
 /** `helix-select` event type */
 export type HelixBaseTreeItemHelixSelectElementEvent =
   HelixBaseTreeItemElementEvent<HelixSelectEvent>;
+/** `helix-open` event type */
+export type HelixBaseTreeItemHelixOpenElementEvent =
+  HelixBaseTreeItemElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBaseTreeItemHelixCloseElementEvent =
+  HelixBaseTreeItemElementEvent<HelixCloseEvent>;
 
 export type HelixBaseTreeItemProps = {
-  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  /** Identifies the item to the consumer, carried in `helix-select`. */
   value?: HelixBaseTreeItem["value"];
-  /** Whether this item is the current one. */
+  /** Whether this item is the current one.
+
+Not reflected, for the reason `level` below gives in full: the tree assigns
+this after it upgrades, so the attribute would be a change to markup the
+consumer rendered and hydration would report it. It reflected, one line
+from the paragraph saying why it must not.
+
+The stylesheet reads it from the row inside this shadow root, which is the
+answer `level` gives one paragraph down: the indent it drives is written
+onto the row rather than onto the host, because the row is not part of the
+tree React hydrates. Mirroring to `data-selected` on the host instead was
+the same fault with a different name, and React said so. */
   selected?: HelixBaseTreeItem["selected"];
   /** Depth from the root, set by the tree so indentation needs no CSS nesting.
 
@@ -4392,12 +4409,27 @@ instead. */
 
   /** Fired when the item is chosen. */
   "onhelix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
+  /** Fired before a branch opens, and cancelable. */
+  "onhelix-open"?: (e: HelixBaseTreeItemHelixOpenElementEvent) => void;
+  /** Fired before a branch closes, and cancelable. */
+  "onhelix-close"?: (e: HelixBaseTreeItemHelixCloseElementEvent) => void;
 };
 
 export type HelixBaseTreeItemSolidJsProps = {
-  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  /** Identifies the item to the consumer, carried in `helix-select`. */
   "prop:value"?: HelixBaseTreeItem["value"];
-  /** Whether this item is the current one. */
+  /** Whether this item is the current one.
+
+Not reflected, for the reason `level` below gives in full: the tree assigns
+this after it upgrades, so the attribute would be a change to markup the
+consumer rendered and hydration would report it. It reflected, one line
+from the paragraph saying why it must not.
+
+The stylesheet reads it from the row inside this shadow root, which is the
+answer `level` gives one paragraph down: the indent it drives is written
+onto the row rather than onto the host, because the row is not part of the
+tree React hydrates. Mirroring to `data-selected` on the host instead was
+the same fault with a different name, and React said so. */
   "prop:selected"?: HelixBaseTreeItem["selected"];
   /** Depth from the root, set by the tree so indentation needs no CSS nesting.
 
@@ -4444,6 +4476,10 @@ instead. */
   "prop:onOpenChange"?: HelixBaseTreeItem["onOpenChange"];
   /** Fired when the item is chosen. */
   "on:helix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
+  /** Fired before a branch opens, and cancelable. */
+  "on:helix-open"?: (e: HelixBaseTreeItemHelixOpenElementEvent) => void;
+  /** Fired before a branch closes, and cancelable. */
+  "on:helix-close"?: (e: HelixBaseTreeItemHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8729,8 +8765,19 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
+   * - `value`: Identifies the item to the consumer, carried in `helix-select`.
    * - `selected`: Whether this item is the current one.
+   *
+   * Not reflected, for the reason `level` below gives in full: the tree assigns
+   * this after it upgrades, so the attribute would be a change to markup the
+   * consumer rendered and hydration would report it. It reflected, one line
+   * from the paragraph saying why it must not.
+   *
+   * The stylesheet reads it from the row inside this shadow root, which is the
+   * answer `level` gives one paragraph down: the indent it drives is written
+   * onto the row rather than onto the host, because the row is not part of the
+   * tree React hydrates. Mirroring to `data-selected` on the host instead was
+   * the same fault with a different name, and React said so.
    * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
    *
    * Not reflected. The tree assigns this after it upgrades, so an attribute
@@ -8774,6 +8821,8 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when the item is chosen.
+   * - `helix-open`: Fired before a branch opens, and cancelable.
+   * - `helix-close`: Fired before a branch closes, and cancelable.
    *
    * ## Slots
    *
@@ -13270,8 +13319,19 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Identifies the item to the consumer, carried in `SelectionChange`.
+   * - `value`: Identifies the item to the consumer, carried in `helix-select`.
    * - `selected`: Whether this item is the current one.
+   *
+   * Not reflected, for the reason `level` below gives in full: the tree assigns
+   * this after it upgrades, so the attribute would be a change to markup the
+   * consumer rendered and hydration would report it. It reflected, one line
+   * from the paragraph saying why it must not.
+   *
+   * The stylesheet reads it from the row inside this shadow root, which is the
+   * answer `level` gives one paragraph down: the indent it drives is written
+   * onto the row rather than onto the host, because the row is not part of the
+   * tree React hydrates. Mirroring to `data-selected` on the host instead was
+   * the same fault with a different name, and React said so.
    * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
    *
    * Not reflected. The tree assigns this after it upgrades, so an attribute
@@ -13315,6 +13375,8 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when the item is chosen.
+   * - `helix-open`: Fired before a branch opens, and cancelable.
+   * - `helix-close`: Fired before a branch closes, and cancelable.
    *
    * ## Slots
    *

@@ -43,15 +43,30 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart group - The container for nested items.
  *
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
+ * @event {HelixOpenEvent} helix-open - Fired before a branch opens, and cancelable.
+ * @event {HelixCloseEvent} helix-close - Fired before a branch closes, and cancelable.
  */
 @customElement('helix-base-tree-item')
 export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
-  /** Identifies the item to the consumer, carried in `SelectionChange`. */
+  /** Identifies the item to the consumer, carried in `helix-select`. */
   @property()
   value = ''
 
-  /** Whether this item is the current one. */
-  @property({ reflect: true, type: Boolean })
+  /**
+   * Whether this item is the current one.
+   *
+   * Not reflected, for the reason `level` below gives in full: the tree assigns
+   * this after it upgrades, so the attribute would be a change to markup the
+   * consumer rendered and hydration would report it. It reflected, one line
+   * from the paragraph saying why it must not.
+   *
+   * The stylesheet reads it from the row inside this shadow root, which is the
+   * answer `level` gives one paragraph down: the indent it drives is written
+   * onto the row rather than onto the host, because the row is not part of the
+   * tree React hydrates. Mirroring to `data-selected` on the host instead was
+   * the same fault with a different name, and React said so.
+   */
+  @property({ type: Boolean })
   selected = false
 
   /**
@@ -116,6 +131,7 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
       >
         <div
           part="row"
+          data-selected=${this.selected ? '' : nothing}
           style="--_tree-level: ${this.level ?? 1}"
           @click=${this.handleRowClick}
         >
@@ -130,9 +146,15 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
           <span part="label"><slot></slot></span>
           <slot name="end"></slot>
         </div>
+        <!-- Inside the treeitem, not beside it. It rendered as a sibling, so
+             the row's \`aria-expanded\` described a group the row did not own and
+             the branch reported children it had no relationship to. The pattern
+             is \`treeitem\` containing \`group\`, which is also what an \`<li>\`
+             holding a \`<ul>\` is. -->
+        <div part="group" role="group" ?hidden=${!this.open}>
+          <slot name="children"></slot>
+        </div>
       </div>
-      <div part="group" role="group" ?hidden=${!this.open}>
-        <slot name="children"></slot>
       </div>`
   }
 }

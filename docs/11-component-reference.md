@@ -3418,7 +3418,7 @@ the row itself stays flat.
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item is the current one. |
-| `value` | `value` | `string` | `''` | `HelixBaseTreeItem` | Identifies the item to the consumer, carried in `SelectionChange`. |
+| `value` | `value` | `string` | `''` | `HelixBaseTreeItem` | Identifies the item to the consumer, carried in `helix-select`. |
 
 #### Methods
 
@@ -3434,6 +3434,8 @@ the row itself stays flat.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
+| `helix-open` | `HelixOpenEvent` | Fired before a branch opens, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before a branch closes, and cancelable. |
 
 #### Slots
 

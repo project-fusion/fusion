@@ -114,9 +114,23 @@ slot[name="children"]::slotted(*) {
 
    No change of weight with it, for the reason the toggle group does not either:
    a heavier label is a wider one, and a row that resizes as it is chosen is a
-   list that twitches. The surface says it. */
-:host([selected]) [part="row"] {
-  background-color: var(--helix-color-surface-raised);
+   list that twitches. The surface says it.
+
+   **A different surface from hover, which it was not.** Both painted
+   `surface-raised` over the same foreground, so a pointer travelling down the
+   tree made every row it crossed look chosen and the row that actually was
+   became impossible to find. `sunken` is a step further from the page in light
+   and in dark alike, which reads as settled where `raised` reads as answering
+   the pointer: the row you are on is in, the row under the pointer is lifting.
+
+   On the row, not on the host. The item stopped reflecting `selected` onto the
+   consumer's markup, and mirroring it to `data-selected` on the host instead
+   was the same fault wearing a different name: React reported the mismatch and
+   said it would not patch it up. The row is inside this shadow root and is not
+   part of the tree React hydrates, which is where `level` already puts its
+   indent for the same reason. */
+[part="row"][data-selected] {
+  background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
 }
 

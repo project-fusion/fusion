@@ -64,6 +64,8 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
   @property()
   label = 'Tree'
 
+  private watcher: MutationObserver | undefined
+
   /** Every item, in the order a reader moving down would meet them. */
   private get items(): HelixBaseTreeItem[] {
     return [...this.querySelectorAll('*')].filter(
@@ -102,14 +104,23 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
    */
   private syncItems(): void {
     const visible = this.visibleItems
-    /* Through the mixin, which skips a disabled item in the fallback. The
-       hand-written version took the first whatever it was, so a tree opening on
-       a disabled item made it the tab stop. */
-    const active = this.resolveActive(visible)
+    /* Through the mixin, which resolves an exact match and otherwise falls back
+       to the first item. The comment here used to add "which skips a disabled
+       one", and a tree item has no `disabled` property at all, so the claim was
+       about a check that could not be running. `Tree.Item` is the only
+       selectable row in the library without one, which is worth knowing and is
+       not this line's business to fix. */
+    const chosen = this.resolveActive(visible)
+    /* The keyboard keeps its place. The stop was bound to the selection on
+       every sync, so a branch opening or a child arriving threw the reader back
+       to the selected row from wherever they had arrowed to. It only moves when
+       the row holding it is no longer reachable. */
+    const held = visible.find((item) => item.focusable)
+    const stop = held ?? chosen
 
     for (const item of this.items) {
       item.selected = item.value !== '' && item.value === this.active
-      item.focusable = item === active
+      item.focusable = item === stop
       let level = 1
       let parent = item.parentElement
       while (parent && parent !== this) {
@@ -202,16 +213,43 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
     event.preventDefault()
   }
 
+  /**
+   * A branch opened or closed, whoever did it.
+   *
+   * The keyboard paths called `syncItems` by hand and the pointer path did not,
+   * so collapsing a branch by clicking its chevron left the tab stop on a row
+   * inside the subtree that had just been hidden: the tree kept its one stop
+   * and the stop was on something nobody could see or reach. Listening for the
+   * item's own open events covers every way a branch can move, including a
+   * consumer setting `open` directly.
+   */
+  private readonly handleBranch = (): void => {
+    this.syncItems()
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
+    this.addEventListener('helix-open', this.handleBranch)
+    this.addEventListener('helix-close', this.handleBranch)
     this.addEventListener('keydown', this.handleKeydown)
+    /* Nested items arrive on a *branch's* slot, not on this element's, so the
+       root's `slotchange` never fires for them: a subtree rendered after first
+       paint got no `level`, no `selected` and no `focusable`, and sat at the
+       wrong indent with no way into it. A framework filling a branch on demand,
+       which is what a lazy tree is, hit this every time. */
+    this.watcher = new MutationObserver(() => this.syncItems())
+    this.watcher.observe(this, { childList: true, subtree: true })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
+    this.removeEventListener('helix-open', this.handleBranch)
+    this.removeEventListener('helix-close', this.handleBranch)
     this.removeEventListener('keydown', this.handleKeydown)
+    this.watcher?.disconnect()
+    this.watcher = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

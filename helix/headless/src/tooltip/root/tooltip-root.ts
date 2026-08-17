@@ -338,18 +338,20 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
      * a reference being valid only into the same tree or a shadow-including
      * ancestor of it. The bubble's tree is neither, it is inward.
      *
-     * A string crosses anything, and `aria-description` is what a string
-     * description is called. Same shape as the tabs panel: where the reference
-     * cannot reach, the name goes instead of the pointer to it.
+     * A string would cross, and `aria-description` on the trigger was tried:
+     * it works, and it is a hydration mismatch. The trigger is the consumer's
+     * own element, React rendered it on the server without that attribute, and
+     * writing it at upgrade is exactly what this library declines to do
+     * everywhere else. Measured against the site's own header: React logged the
+     * mismatch on every tooltip on the page and said it would not patch it up.
      *
-     * The host keeps its reference as well, which costs nothing and is what
-     * describes the tooltip where the trigger *is* the host, the case
-     * `anchorElement` falls back to. */
+     * So the description stays on the host and the gap is recorded rather than
+     * papered over. There is no third option: a description has to live on the
+     * element being described, that element belongs to the consumer, and the
+     * bubble is in a tree no reference from there can name. Closing it means
+     * either writing to the consumer's markup or moving the bubble into the
+     * light DOM, and both are decisions rather than fixes. */
     hostAria(this.internals, { describedBy: this.hasContent ? [bubble] : [] })
-    const trigger = this.trigger
-    if (trigger !== this && 'ariaDescription' in trigger) {
-      trigger.ariaDescription = this.hasContent ? bubble.textContent?.trim() || null : null
-    }
   }
 
   protected override render(): TemplateResult {

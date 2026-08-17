@@ -29954,7 +29954,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Identifies the item to the consumer, carried in `SelectionChange`.",
+              "description": "Identifies the item to the consumer, carried in `helix-select`.",
               "attribute": "value",
               "inheritedFrom": {
                 "name": "HelixBaseTreeItem",
@@ -29968,9 +29968,8 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether this item is the current one.",
+              "description": "Whether this item is the current one.\n\nNot reflected, for the reason `level` below gives in full: the tree assigns\nthis after it upgrades, so the attribute would be a change to markup the\nconsumer rendered and hydration would report it. It reflected, one line\nfrom the paragraph saying why it must not.\n\nThe stylesheet reads it from the row inside this shadow root, which is the\nanswer `level` gives one paragraph down: the indent it drives is written\nonto the row rather than onto the host, because the row is not part of the\ntree React hydrates. Mirroring to `data-selected` on the host instead was\nthe same fault with a different name, and React said so.",
               "attribute": "selected",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseTreeItem",
                 "module": "src/tree/item/tree-item.ts"
@@ -30155,6 +30154,30 @@
                 "name": "HelixBaseTreeItem",
                 "module": "src/tree/item/tree-item.ts"
               }
+            },
+            {
+              "type": {
+                "text": "HelixOpenEvent"
+              },
+              "description": "Fired before a branch opens, and cancelable.",
+              "name": "helix-open",
+              "reactProp": "onhelix-open",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired before a branch closes, and cancelable.",
+              "name": "helix-close",
+              "reactProp": "onhelix-close",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
             }
           ],
           "superclass": {
@@ -30209,7 +30232,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Identifies the item to the consumer, carried in `SelectionChange`.",
+              "description": "Identifies the item to the consumer, carried in `helix-select`.",
               "fieldName": "value",
               "inheritedFrom": {
                 "name": "HelixBaseTreeItem",
@@ -30222,7 +30245,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether this item is the current one.",
+              "description": "Whether this item is the current one.\n\nNot reflected, for the reason `level` below gives in full: the tree assigns\nthis after it upgrades, so the attribute would be a change to markup the\nconsumer rendered and hydration would report it. It reflected, one line\nfrom the paragraph saying why it must not.\n\nThe stylesheet reads it from the row inside this shadow root, which is the\nanswer `level` gives one paragraph down: the indent it drives is written\nonto the row rather than onto the host, because the row is not part of the\ntree React hydrates. Mirroring to `data-selected` on the host instead was\nthe same fault with a different name, and React said so.",
               "fieldName": "selected",
               "inheritedFrom": {
                 "name": "HelixBaseTreeItem",
@@ -30491,6 +30514,18 @@
             },
             {
               "kind": "field",
+              "name": "watcher",
+              "type": {
+                "text": "MutationObserver | undefined"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "items",
               "type": {
                 "text": "HelixBaseTreeItem[]"
@@ -30597,6 +30632,17 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleBranch",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A branch opened or closed, whoever did it.\n\nThe keyboard paths called `syncItems` by hand and the pointer path did not,\nso collapsing a branch by clicking its chevron left the tab stop on a row\ninside the subtree that had just been hidden: the tree kept its one stop\nand the stop was on something nobody could see or reach. Listening for the\nitem's own open events covers every way a branch can move, including a\nconsumer setting `open` directly.",
               "inheritedFrom": {
                 "name": "HelixBaseTree",
                 "module": "src/tree/root/tree-root.ts"
