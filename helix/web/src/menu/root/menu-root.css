@@ -28,7 +28,12 @@
      draws a second edge just inside the one the shadow makes. The shadow says
      it is floating; the border only made it look cut out. */
   border: none;
-  border-radius: var(--helix-radii-md);
+  /* The house radius. Dialog, tooltip and toast settled here and the surfaces
+     that float were left at `md`, so a menu and the dialog it opens from drew
+     two different corners. Card's argument is the one that decides it: at
+     anything larger the corner is softer than the controls inside it, and a
+     surface holding controls should recede. */
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
   /* The popover API puts it in the top layer, so the UA's own inset and border
      have to be cleared or it sits in the middle of the window with a frame. */
@@ -54,12 +59,23 @@
  * 0.96 rather than 0, as with Select. A list of commands shrinking to a point
  * squashes its own rows; only Tooltip is small enough for the full collapse to
  * read as arriving rather than as a trick. */
+/* And it leaves the same way it arrived.
+   *
+   * The two lines below are what make an exit possible at all on a top-layer
+   * element, and without them the transition above ran in one direction only:
+   * closing removes `data-placed` *and* stops `:popover-open` matching, so the
+   * `display: none` rule landed in the same frame and there was nothing left to
+   * transition. `overlay` is the second half, or the panel drops out of the top
+   * layer immediately and fades out behind whatever it was covering. Dialog
+   * carries the long version of this. */
 [part="menu"] {
   opacity: 0;
   scale: 0.96;
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
 }
 
 [part="menu"][data-placed] {

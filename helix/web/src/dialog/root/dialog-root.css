@@ -138,29 +138,68 @@
   justify-content: flex-start;
 }
 
-/* It arrives rather than appearing. A modal that snaps in gives no sense of
-   where it came from, and the scrim fading under it is what says the page is
-   still there. */
-@media (prefers-reduced-motion: no-preference) {
-  [part="dialog"][open] {
-    animation: helix-dialog-in var(--helix-duration-normal) var(--helix-easing-decelerate);
-  }
-
-  [part="dialog"][open]::backdrop {
-    animation: helix-dialog-scrim var(--helix-duration-normal) var(--helix-easing-standard);
-  }
+/* It arrives *and* it leaves, which is the correction.
+ *
+ * This was two keyframe animations on `[open]`, so the dialog and its scrim
+ * played on the way in and snapped away on the way out: the panel was gone
+ * before a reader's eye had followed it, and the page underneath reappeared
+ * with no sense of the modal having been dismissed. The sibling drawer fades
+ * both ways, which is what made the difference visible.
+ *
+ * A transition rather than an animation, because a transition runs in both
+ * directions by construction and an entry animation cannot. Three things make
+ * that work on an element in the top layer, and all three are needed:
+ *
+ * - `display` in the transition list with `transition-behavior: allow-discrete`,
+ *   or `display: none` lands the instant `open` goes and takes the exit with it.
+ * - `overlay` likewise, or the dialog leaves the top layer immediately and
+ *   animates out behind whatever it was covering.
+ * - `@starting-style`, which is where an element entering the top layer comes
+ *   *from*: without it the entry has no start value and only the exit plays. */
+[part="dialog"] {
+  opacity: 0;
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    translate var(--helix-duration-normal) var(--helix-easing-decelerate),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
+  translate: 0 var(--helix-space-sm);
 }
 
-@keyframes helix-dialog-in {
-  from {
+[part="dialog"][open] {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@starting-style {
+  [part="dialog"][open] {
     opacity: 0;
     translate: 0 var(--helix-space-sm);
   }
 }
 
-@keyframes helix-dialog-scrim {
-  from {
+[part="dialog"]::backdrop {
+  opacity: 0;
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
+}
+
+[part="dialog"][open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  [part="dialog"][open]::backdrop {
     opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="dialog"],
+  [part="dialog"]::backdrop {
+    transition: none;
   }
 }
 

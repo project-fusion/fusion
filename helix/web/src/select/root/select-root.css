@@ -136,9 +136,15 @@
      rows on the way out and reads as a toy at panel size, where a tooltip at the
      same figure reads as a mark arriving. */
   scale: 0.96;
+  /* Both directions. `display` and `overlay` with `allow-discrete` are what the
+     exit needs: closing stops `:popover-open` matching, and without them the
+     `display: none` below landed in the same frame and the list vanished where
+     Popover and Menu fade. */
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
 }
 
 [part="surface"][data-placed] {

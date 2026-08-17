@@ -11,7 +11,11 @@
   inset-inline: var(--_toast-inset);
   pointer-events: none;
   position: fixed;
-  z-index: var(--helix-layer-overlay);
+  /* The token that exists for this. `--helix-layer-toast` is the top of the
+     stack and nothing referenced it: a message arriving over an open dialog sat
+     at the dialog's own level and was ordered by source order rather than by
+     intent. */
+  z-index: var(--helix-layer-toast);
 }
 
 [part="region"] {

@@ -39,10 +39,29 @@
 [part="panel"]::backdrop {
   background-color: var(--helix-color-overlay);
   opacity: 1;
-  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
+}
+
+/* Closing, the scrim has to hold too. `::backdrop` exists only while its
+   element is in the top layer, so without `overlay` in the list above the
+   backdrop is not faded out, it is deleted: the page behind snaps back to full
+   contrast in one frame while the panel is still sliding. */
+[part="panel"]:not([open])::backdrop {
+  opacity: 0;
 }
 
 [part="panel"] {
+  /* The house radius, on the two corners that face the page.
+   *
+   * The panel had none: the sweep that moved every container to 4px passed it
+   * by. The edge-anchored pair is deliberate, a panel pinned to the window's
+   * edge has nothing to curve away from there, and the inner pair is where it
+   * meets the page. `border-start-*` and `border-end-*` are the logical names,
+   * so the placement rules below flip them with the panel. */
+  border-radius: var(--drawer-radii, var(--helix-radii-sm));
   /* The UA's own dialog box, undone.
    *
    * A `<dialog>` arrives with `margin: auto`, a 3px `solid` border, `padding:
@@ -74,7 +93,11 @@
   inline-size: auto;
   block-size: auto;
 
-  background-color: var(--helix-color-surface);
+  /* `surface-overlay`, which is the token for a surface that sits over the page
+     with a shadow. The panel used the plain page surface, and the repo's own
+     rule puts an over-the-page surface here: in dark mode the two are a step
+     apart, so the panel read as part of the page it was covering. */
+  background-color: var(--helix-color-surface-overlay);
   /* A drawer's own inset, and nothing about anyone's header.
 
      This used to be `calc(var(--helix-size-header) + var(--helix-space-md))`,
@@ -116,7 +139,15 @@
   flex-direction: column;
   outline: none;
   position: fixed;
-  transition: transform var(--helix-duration-normal) var(--helix-easing-decelerate);
+  /* `display` and `overlay` are what let the slide run on the way out as well.
+     Measured before they were here: the panel did travel back to its edge, and
+     it did it having already left the top layer, so it slid out behind the page
+     content and its scrim vanished in the first frame. `allow-discrete` defers
+     both flips to the end of the transition instead. */
+  transition:
+    transform var(--helix-duration-normal) var(--helix-easing-decelerate),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
   z-index: var(--helix-layer-overlay);
 }
 
@@ -126,6 +157,9 @@
 
 :host(:not([placement])) [part="panel"],
 :host([placement="end"]) [part="panel"] {
+  /* Square where it meets the window, curved where it meets the page. */
+  border-start-end-radius: var(--helix-radii-none);
+  border-end-end-radius: var(--helix-radii-none);
   block-size: 100%;
   inline-size: min(var(--_drawer-size), 100%);
   inset-block: 0;
@@ -134,6 +168,8 @@
 }
 
 :host([placement="start"]) [part="panel"] {
+  border-start-start-radius: var(--helix-radii-none);
+  border-end-start-radius: var(--helix-radii-none);
   block-size: 100%;
   inline-size: min(var(--_drawer-size), 100%);
   inset-block: 0;
@@ -142,6 +178,8 @@
 }
 
 :host([placement="bottom"]) [part="panel"] {
+  border-end-start-radius: var(--helix-radii-none);
+  border-end-end-radius: var(--helix-radii-none);
   block-size: min(var(--_drawer-size), 100%);
   inset-block-end: 0;
   inset-inline: 0;
@@ -149,6 +187,8 @@
 }
 
 :host([placement="top"]) [part="panel"] {
+  border-start-start-radius: var(--helix-radii-none);
+  border-start-end-radius: var(--helix-radii-none);
   block-size: min(var(--_drawer-size), 100%);
   inset-block-start: 0;
   inset-inline: 0;

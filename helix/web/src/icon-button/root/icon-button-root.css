@@ -29,8 +29,15 @@
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* A wash of the foreground, not a rung on the surface ladder.
+ *
+ * `surface-raised` is the same neutral as `surface-overlay` in dark mode, so
+ * the hover vanished inside a menu, a dialog or a popover, which is where most
+ * icon buttons live. A percentage of the foreground is a step away from
+ * whatever it sits on in either mode, which is the argument the button recipe
+ * in the base layer already makes for exactly this. */
 [part="button"]:hover {
-  background-color: var(--helix-color-surface-raised);
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 

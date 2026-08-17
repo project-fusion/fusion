@@ -8899,6 +8899,10 @@
           "name": "HelixDrawer",
           "cssProperties": [
             {
+              "description": "Corner radius on the edges that face the page.",
+              "name": "--drawer-radii"
+            },
+            {
               "description": "Width or height of the panel.",
               "name": "--drawer-size"
             },

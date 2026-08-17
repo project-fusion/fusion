@@ -26,6 +26,7 @@ import { styles } from './drawer-root.css.js'
  *
  * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
  *
+ * @cssproperty --drawer-radii - Corner radius on the edges that face the page.
  * @cssproperty --drawer-size - Width or height of the panel.
  * @cssproperty --drawer-inset - Padding inside the panel.
  * @cssproperty --drawer-inset-block-start - Padding above the content, which clears the close control.

@@ -12,7 +12,17 @@
   --_slider-thumb: var(--helix-size-checkbox);
   /* The ring while the thumb is held or focused. The accent at low opacity, so
      it reads as the control's own color rather than as a second element. */
-  --_slider-halo: color-mix(in oklab, var(--helix-color-primary) 24%, transparent);
+  /* A halo of the fill it is a halo of.
+   *
+   * Mixed from `--helix-color-primary` outright, so a slider recoloured through
+   * the documented `--slider-fill-color` kept a halo in the theme's accent: the
+   * one hook the component publishes for its colour was the one thing the halo
+   * did not follow. */
+  --_slider-halo: color-mix(
+    in oklab,
+    var(--slider-fill-color, var(--helix-color-primary)) 24%,
+    transparent
+  );
   /* The unfilled half of the track.
    *
    * `border` rather than `surface-sunken`, which is where this started and is

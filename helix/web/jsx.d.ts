@@ -7174,6 +7174,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
    * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
    * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
@@ -12051,6 +12052,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
    * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
    * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
@@ -15619,6 +15621,8 @@ export type CustomCssProperties = {
   "--divider-color"?: string;
   /** Thickness of the rule. */
   "--divider-thickness"?: string;
+  /** Corner radius on the edges that face the page. */
+  "--drawer-radii"?: string;
   /** Width or height of the panel. */
   "--drawer-size"?: string;
   /** Padding inside the panel. */

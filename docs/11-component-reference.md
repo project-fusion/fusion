@@ -1093,6 +1093,7 @@ rest is flat and the movement is what says something happened.
 
 | Property | Description |
 | --- | --- |
+| `--drawer-radii` | Corner radius on the edges that face the page. |
 | `--drawer-size` | Width or height of the panel. |
 | `--drawer-inset` | Padding inside the panel. |
 | `--drawer-inset-block-start` | Padding above the content, which clears the close control. |

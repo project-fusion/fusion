@@ -46,9 +46,20 @@
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   position: fixed;
   scale: 0;
+  /* And it leaves the same way it arrived.
+   *
+   * The two lines below are what make an exit possible at all on a top-layer
+   * element, and without them the transition above ran in one direction only:
+   * closing removes `data-placed` *and* stops `:popover-open` matching, so the
+   * `display: none` rule landed in the same frame and there was nothing left to
+   * transition. `overlay` is the second half, or the panel drops out of the top
+   * layer immediately and fades out behind whatever it was covering. Dialog
+   * carries the long version of this. */
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
 }
 
 [part="tooltip"][data-placed] {
