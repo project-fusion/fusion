@@ -1,14 +1,20 @@
 :host {
   display: inline-flex;
   font: inherit;
-  /* `middle`, not `baseline`. A key is a box a half-em taller than the text it
-     sits in, and a box is centred on a line rather than hung from its baseline.
-     Marginal, and measured as such: reproducing the shipped `rich-content`
-     example at the tooltip's own 12px on a 14.4px line, the key sits 1.25px
-     below the text's middle on `baseline` and 1.07px below on `middle`. Both
-     are a rounding error, so this is the better default rather than the fix for
-     anything visible. */
-  vertical-align: middle;
+  /* Lifted a tenth of an em, which is what puts the key on the line.
+   *
+   * The box is `1.5em` and the label inside it is `0.75em`, centred. Aligning
+   * that label's baseline with the prose baseline, which is what `baseline`
+   * does, therefore leaves the box hanging about a descender below the line's
+   * middle: measured against the middle of a run of text, 1.25px low at 12px,
+   * 1.75px at 16px and 2px at 20px.
+   *
+   * `middle` is not the answer either, and gets worse as the text grows: it
+   * aligns on half the x-height, where the box wants half the line, so it left
+   * the key 1.07px low at 12px and 1.7px at 20px. Lifting by a tenth of an em
+   * scales with the box, because the box is em-sized: measured at 12, 14, 16
+   * and 20px it lands within 0.35px of centre at every one. */
+  vertical-align: 0.1em;
 
   /* Relative to the surrounding text rather than on the type scale, because a
      key set inside a heading has to be a key-sized thing in that heading. The

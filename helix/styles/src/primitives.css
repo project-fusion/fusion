@@ -35,6 +35,16 @@
      greys hold everything else up. */
   --_helix-seed-neutral-chroma: 0;
   --_helix-seed-neutral-hue: 258;
+
+  /* The two components every neutral step shares, named once.
+   *
+   * Not a shorthand for its own sake: spelled out, a step is long enough that
+   * the formatter wraps `oklch()` across three lines, and Turbopack's CSS
+   * parser rejects a wrapped one outright: "Unexpected token Semicolon",
+   * logged on every page load of the site in development. Next falls back to
+   * the raw file so the tokens do resolve, measured, but a parse error that is
+   * survivable today is a parse error. One line per step and it goes. */
+  --_helix-neutral-cast: var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue);
   --_helix-seed-density: 1;
   --_helix-seed-radii: 0.5rem;
 
@@ -46,12 +56,8 @@
      nothing to do there and reads as a color cast across the whole window.
      Every step between these two keeps the hue. */
   --_helix-neutral-1000: oklch(0 0 0);
-  --_helix-neutral-50: oklch(
-    0.985 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
-  --_helix-neutral-100: oklch(
-    0.97 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
+  --_helix-neutral-50: oklch(0.985 var(--_helix-neutral-cast));
+  --_helix-neutral-100: oklch(0.97 var(--_helix-neutral-cast));
   /* 0.94, not 0.91. The light end of this ramp is where every surface lives,
      and it was accelerating through the range they need: .015 from white to 50,
      .025 to 100, then .05 to 200. That last step is twice the one before it and
@@ -74,9 +80,7 @@
      what has to stay ordered: surface 0.985, raised 0.97, sunken 0.96, each a
      step nearer the page than the last and none of them collapsed into its
      neighbour. */
-  --_helix-neutral-200: oklch(
-    0.96 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
+  --_helix-neutral-200: oklch(0.96 var(--_helix-neutral-cast));
   /* 0.91, was 0.88, was 0.84. This rung and 700 below it are read by exactly
      one token, `--helix-color-border`, so moving them moves every resting
      border in the library and nothing else: a card, a field, a table rule, a
@@ -92,9 +96,9 @@
      **The two ends do not move together, and that is not an oversight.** The
      light ramp has open space below white; the dark one does not. See 700.
 
-     `border-strong` is untouched at 0.71 and 0.5, so the gap between a resting
-     edge and a hovered one has widened again, which is the point: those two
-     were close enough that hover on a field was easy to miss.
+     There is no longer a second neutral line colour to widen the gap against.
+     `border-strong` was removed when interaction moved to the brand, so this is
+     the only resting hairline in the library and quieting it quiets all of it.
 
      **This is decoration, not an affordance, and it is worth being clear which.**
      At 0.91 on white the line is about 1.3:1, nowhere near the 3:1 that
@@ -102,16 +106,12 @@
      under it at 0.88 and at 0.84, so this does not cross a line, it moves
      further from one. What keeps a field identifiable is that a field is also
      filled: `surface-sunken` at 0.96 against a 1.0 page. If the border ever
-     becomes the sole boundary of a control, that control needs
-     `border-strong`, not a darker default here. */
-  --_helix-neutral-300: oklch(
-    0.91 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
-  --_helix-neutral-400: oklch(
-    0.71 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
-  --_helix-neutral-500: oklch(0.6 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue));
-  --_helix-neutral-600: oklch(0.5 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue));
+     becomes the sole boundary of a control, that control reaches for
+     `--helix-color-primary`, not for a darker default here. */
+  --_helix-neutral-300: oklch(0.91 var(--_helix-neutral-cast));
+  --_helix-neutral-400: oklch(0.71 var(--_helix-neutral-cast));
+  --_helix-neutral-500: oklch(0.6 var(--_helix-neutral-cast));
+  --_helix-neutral-600: oklch(0.5 var(--_helix-neutral-cast));
   /* 0.33, and it barely moves while 300 moves three times as far, because this
      end of the ramp has a floor and that end does not.
 
@@ -128,18 +128,10 @@
      Light has no such floor. White is 1.0 with nothing above it competing, so
      300 could take the whole reduction and did. The asymmetry is the ramps
      being asymmetric, not the border meaning two different things. */
-  --_helix-neutral-700: oklch(
-    0.33 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
-  --_helix-neutral-800: oklch(
-    0.29 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
-  --_helix-neutral-900: oklch(
-    0.21 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
-  --_helix-neutral-950: oklch(
-    0.15 var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue)
-  );
+  --_helix-neutral-700: oklch(0.33 var(--_helix-neutral-cast));
+  --_helix-neutral-800: oklch(0.29 var(--_helix-neutral-cast));
+  --_helix-neutral-900: oklch(0.21 var(--_helix-neutral-cast));
+  --_helix-neutral-950: oklch(0.15 var(--_helix-neutral-cast));
 
   /* ------------------------------------------------------- brand ------- */
   --_helix-brand-500: var(--_helix-seed-brand);

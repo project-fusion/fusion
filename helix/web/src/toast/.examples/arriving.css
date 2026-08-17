@@ -1,5 +1,17 @@
-/* Each message arrives after the one above it, so a stack that lands at once
-   reads as a sequence rather than as a block appearing.
+/* Each message arrives after the one nearer the corner, so a stack that lands
+   at once reads as a sequence rather than as a block appearing.
+ *
+ * Counted from the end, which is the correction. `nth-child` delayed them in
+ * document order, and for a bottom-anchored stack document order runs from the
+ * far end towards the corner: the message furthest from the corner arrived
+ * first and the sequence travelled *towards* it, which is the reverse of what
+ * happens when messages really arrive. A real one lands at the corner and
+ * pushes the older ones away from it.
+ *
+ * `nth-last-child` is right for every placement rather than only this one,
+ * because the last child is always the one nearest the anchored edge: the
+ * bottom keeps the default flex direction and the top reverses it, so both draw
+ * the last message at their own corner.
  *
  * The delay is set from out here through `::part(item)`, which is the point
  * worth taking away: the message's own surface is a part, so its motion is
@@ -8,14 +20,14 @@
  * `animation-fill-mode: backwards` is already set by the component, so a
  * message holds its starting state through the wait rather than painting in
  * full and then jumping back to begin. */
-.stack helix-toast-item:nth-child(2)::part(item) {
+.stack helix-toast-item:nth-last-child(2)::part(item) {
   animation-delay: 150ms;
 }
 
-.stack helix-toast-item:nth-child(3)::part(item) {
+.stack helix-toast-item:nth-last-child(3)::part(item) {
   animation-delay: 300ms;
 }
 
-.stack helix-toast-item:nth-child(4)::part(item) {
+.stack helix-toast-item:nth-last-child(4)::part(item) {
   animation-delay: 450ms;
 }
