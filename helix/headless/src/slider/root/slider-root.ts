@@ -1,4 +1,10 @@
-import { customElement, HelixFormElement, MixinControllerValue, MixinField } from '@helix-io/core'
+import {
+  customElement,
+  HelixFormElement,
+  MixinControllerValue,
+  MixinField,
+  restoreValue,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -158,9 +164,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
        to be put back: a refusal and a consumer who owns the value are the same
        situation seen from here. */
     this.requestValue(next)
-    if (control.value !== this.value) {
-      control.value = this.value
-    }
+    restoreValue(control, this.value)
   }
 
   /** Relayed, because `change` does not cross a shadow boundary on its own. */

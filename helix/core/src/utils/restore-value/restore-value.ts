@@ -33,6 +33,11 @@ export const restoreValue = (control: TextControl, next: string): void => {
   const { selectionDirection, selectionEnd, selectionStart } = control
   const delta = next.length - control.value.length
   control.value = next
+  /* A control with no selection is done here, and this is a guard rather than a
+     tidiness: `<input type="range">` reports `selectionStart` as null and
+     *throws* `InvalidStateError` from `setSelectionRange`. Measured. The slider
+     restores through this same util, which is what makes the check load-bearing
+     rather than defensive. */
   if (selectionStart === null || selectionEnd === null) {
     return
   }

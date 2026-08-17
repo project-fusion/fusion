@@ -225,16 +225,7 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
    * on the list: the browser needs somewhere to point the message.
    */
   private validate(): void {
-    if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        'Choose at least one to continue.',
-        this.renderRoot.querySelector<HTMLElement>('[part="items"]') ?? undefined,
-      )
-    } else {
-      this.internals.setValidity({})
-    }
-    this.refreshFeedback()
+    this.reportRequired(this.value === '', 'Choose at least one to continue.', 'items')
   }
 
   protected override updated(changed: PropertyValues): void {

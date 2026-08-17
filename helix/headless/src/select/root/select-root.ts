@@ -192,16 +192,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
   /** Reports the answer and the verdict on it. */
   private sync(): void {
     this.internals.setFormValue(this.value === '' ? null : this.value)
-    if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        'Choose one to continue.',
-        this.renderRoot.querySelector<HTMLElement>('[part="trigger"]') ?? undefined,
-      )
-    } else {
-      this.internals.setValidity({})
-    }
-    this.refreshFeedback()
+    this.reportRequired(this.value === '', 'Choose one to continue.', 'trigger')
   }
 
   protected override willUpdate(changed: PropertyValues): void {

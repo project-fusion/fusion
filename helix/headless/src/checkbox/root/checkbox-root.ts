@@ -84,17 +84,7 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
   /** Reports the value and the validity the host stands behind. */
   private sync(): void {
     this.internals.setFormValue(this.checked ? this.value : null)
-    if (this.required && !this.checked) {
-      this.internals.setValidity(
-        { valueMissing: true },
-        'Tick this box to continue.',
-        this.renderRoot.querySelector<HTMLElement>('[part="control"]') ?? undefined,
-      )
-    } else {
-      this.internals.setValidity({})
-    }
-    // Straight after, because validity moved without any property moving.
-    this.refreshFeedback()
+    this.reportRequired(!this.checked, 'Tick this box to continue.', 'control')
   }
 
   /** Returns the box to the state its markup declared. */

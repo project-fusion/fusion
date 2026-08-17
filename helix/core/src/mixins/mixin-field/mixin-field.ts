@@ -83,6 +83,15 @@ export declare class MixinFieldInterface {
    */
   protected refreshFeedback(): void
 
+  /**
+   * Reports "required and empty" against a rendered part, or clears it.
+   *
+   * `empty` is the control's own answer to whether it holds nothing, `message`
+   * is what to say about it, and `anchor` names the part the browser should
+   * point its bubble at. Seven families wrote this out by hand.
+   */
+  protected reportRequired(empty: boolean, message: string, anchor: string): void
+
   /** The message actually shown: the consumer's, or the platform's, or none. */
   readonly resolvedFeedback: string
 }
@@ -362,6 +371,40 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
         this.shownFeedback = next
         this.requestUpdate()
       }
+    }
+
+    /**
+     * Reports "required and empty" and refreshes the message, or clears both.
+     *
+     * Seven families had this written out: the same `valueMissing`, the same
+     * anchor lookup, the same `refreshFeedback` under the same comment about
+     * validity moving without a property moving. Seven copies of a five-line
+     * shape is the threshold at which this mixin itself was extracted, and two
+     * of them had already drifted, `checkbox-group` having no validity at all
+     * until yesterday.
+     *
+     * What differs between them is exactly two things, so those are the
+     * arguments: whether the control is empty, which only it can say, and the
+     * sentence to say about it, which is different for a box, a switch and a
+     * set. The anchor is looked up here because every one of them anchored on a
+     * rendered part and the browser needs somewhere to point the bubble.
+     *
+     * The message is not derived from the control's kind, deliberately. "Tick
+     * this box" and "Choose one" are not the same instruction and a lookup
+     * table would be one more thing to keep in step with the components.
+     */
+    protected reportRequired(empty: boolean, message: string, anchor: string): void {
+      if (this.required && empty) {
+        this.internals.setValidity(
+          { valueMissing: true },
+          message,
+          this.renderRoot?.querySelector<HTMLElement>(`[part="${anchor}"]`) ?? undefined,
+        )
+      } else {
+        this.internals.setValidity({})
+      }
+      // Straight after, because validity moved without any property moving.
+      this.refreshFeedback()
     }
 
     /**

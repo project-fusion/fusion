@@ -5068,6 +5068,41 @@
               }
             },
             {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -5782,6 +5817,41 @@
                 }
               },
               "description": "Re-reads the platform's verdict, for a control that has just reported one.\n\nValidity changes through `ElementInternals` rather than through a\nproperty, so nothing schedules an update for it. Worse, the order is\nagainst us: this mixin sits above the control in the prototype chain, so\nits `updated` runs before the control's own, which is where `setValidity`\nis called. Reading the verdict here would always read the previous one,\nwhich is what left a corrected field still showing the error it had\nbefore. So the control says when it has reported, and this schedules the\none further update that needs. It converges because the second pass finds\nnothing changed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -9639,6 +9709,41 @@
               }
             },
             {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "formAssociated",
               "type": {
@@ -11253,6 +11358,41 @@
                 }
               },
               "description": "Re-reads the platform's verdict, for a control that has just reported one.\n\nValidity changes through `ElementInternals` rather than through a\nproperty, so nothing schedules an update for it. Worse, the order is\nagainst us: this mixin sits above the control in the prototype chain, so\nits `updated` runs before the control's own, which is where `setValidity`\nis called. Reading the verdict here would always read the previous one,\nwhich is what left a corrected field still showing the error it had\nbefore. So the control says when it has reported, and this schedules the\none further update that needs. It converges because the second pass finds\nnothing changed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -14859,6 +14999,41 @@
               }
             },
             {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "formAssociated",
               "type": {
@@ -16148,6 +16323,41 @@
               }
             },
             {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "formAssociated",
               "type": {
@@ -17264,6 +17474,41 @@
                 }
               },
               "description": "Re-reads the platform's verdict, for a control that has just reported one.\n\nValidity changes through `ElementInternals` rather than through a\nproperty, so nothing schedules an update for it. Worse, the order is\nagainst us: this mixin sits above the control in the prototype chain, so\nits `updated` runs before the control's own, which is where `setValidity`\nis called. Reading the verdict here would always read the previous one,\nwhich is what left a corrected field still showing the error it had\nbefore. So the control says when it has reported, and this schedules the\none further update that needs. It converges because the second pass finds\nnothing changed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -18663,6 +18908,41 @@
                 }
               },
               "description": "Re-reads the platform's verdict, for a control that has just reported one.\n\nValidity changes through `ElementInternals` rather than through a\nproperty, so nothing schedules an update for it. Worse, the order is\nagainst us: this mixin sits above the control in the prototype chain, so\nits `updated` runs before the control's own, which is where `setValidity`\nis called. Reading the verdict here would always read the previous one,\nwhich is what left a corrected field still showing the error it had\nbefore. So the control says when it has reported, and this schedules the\none further update that needs. It converges because the second pass finds\nnothing changed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -21458,6 +21738,41 @@
               }
             },
             {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "formAssociated",
               "type": {
@@ -22956,6 +23271,41 @@
                 }
               },
               "description": "Re-reads the platform's verdict, for a control that has just reported one.\n\nValidity changes through `ElementInternals` rather than through a\nproperty, so nothing schedules an update for it. Worse, the order is\nagainst us: this mixin sits above the control in the prototype chain, so\nits `updated` runs before the control's own, which is where `setValidity`\nis called. Reading the verdict here would always read the previous one,\nwhich is what left a corrected field still showing the error it had\nbefore. So the control says when it has reported, and this schedules the\none further update that needs. It converges because the second pass finds\nnothing changed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"

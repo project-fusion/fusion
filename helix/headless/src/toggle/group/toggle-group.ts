@@ -211,17 +211,7 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
    * points at the control rather than at a box with nothing in it.
    */
   private validate(): void {
-    if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        'Choose one to continue.',
-        this.renderRoot.querySelector<HTMLElement>('[part="track"]') ?? undefined,
-      )
-    } else {
-      this.internals.setValidity({})
-    }
-    // Straight after, because validity moved without any property moving.
-    this.refreshFeedback()
+    this.reportRequired(this.value === '', 'Choose one to continue.', 'track')
   }
 
   protected override render(): TemplateResult {

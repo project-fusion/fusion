@@ -127,17 +127,7 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
   /** Reports the answer and the verdict on it. */
   private sync(): void {
     this.internals.setFormValue(this.value === '' ? null : this.value)
-    if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        'Choose one to continue.',
-        this.renderRoot.querySelector<HTMLElement>('[part="items"]') ?? undefined,
-      )
-    } else {
-      this.internals.setValidity({})
-    }
-    // Straight after, because validity moved without any property moving.
-    this.refreshFeedback()
+    this.reportRequired(this.value === '', 'Choose one to continue.', 'items')
   }
 
   override connectedCallback(): void {

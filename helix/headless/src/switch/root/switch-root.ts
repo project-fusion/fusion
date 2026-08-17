@@ -75,16 +75,7 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
     // `null` rather than the value when it is off, which is how a checkbox
     // behaves: an unticked box submits nothing rather than a blank.
     this.internals.setFormValue(this.checked ? this.value : null)
-    if (this.required && !this.checked) {
-      this.internals.setValidity(
-        { valueMissing: true },
-        'Turn this on to continue.',
-        this.renderRoot.querySelector<HTMLElement>('[part="control"]') ?? undefined,
-      )
-    } else {
-      this.internals.setValidity({})
-    }
-    this.refreshFeedback()
+    this.reportRequired(!this.checked, 'Turn this on to continue.', 'control')
   }
 
   /** Returns the switch to the state its markup declared. */
