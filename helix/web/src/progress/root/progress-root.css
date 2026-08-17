@@ -51,9 +51,25 @@
  * component in a different state, not a different component, and a reader
  * should not have to work out that they are looking at the same control.
  *
- * The segment grows from the inline start, travels, and leaves at the far end.
- * It stops short of filling the track, because a fill that reaches the end
- * reads as finished, which is the one thing this state must never say.
+ * **The segment is never anchored to either end, which is the correction.** It
+ * used to grow from the inline start: forty per cent of every cycle was a bar
+ * fixed to the left edge getting wider, which is a determinate bar filling.
+ * Frozen at eight points of one cycle and laid out as a strip, the first half
+ * read 0, 15, 55, 60 per cent and stalled there before travelling, so the state
+ * that must never say "this much is done" said it twice a second. The file's own
+ * note two lines down had the right rule and applied it to one end only: a fill
+ * that reaches the end reads as finished, and a fill that starts at the start
+ * reads as a measurement.
+ *
+ * So it enters from before the track and leaves past the end of it, and the only
+ * frames where it touches an edge are the ones where it is half off the screen.
+ * It swells in the middle of the crossing, which is what stops a thin bar
+ * reading as a dot without ever making it long enough to be a proportion.
+ *
+ * `linear`, with the shaping in the spacing of the frames rather than in an
+ * easing: it covers 30% of the track in the first third, 40% in the second and
+ * 48% in the last, so it accelerates across. An `ease-in-out` over the whole
+ * cycle stalls at the loop seam, which reads as a hitch every time it repeats.
  *
  * `translate` then `scale`, which is the order CSS applies the individual
  * transform properties in, both about an origin at the inline start. So
@@ -62,7 +78,7 @@
  * the track's pixel width.
  */
 :host([indeterminate]) [part="indicator"] {
-  animation: helix-progress-indeterminate var(--_progress-cycle) ease-in-out infinite;
+  animation: helix-progress-indeterminate var(--_progress-cycle) linear infinite;
   /* Nothing to travel to: this is not moving between two values. */
   transition: none;
 
@@ -88,24 +104,28 @@
   --_progress-way: -1;
 }
 
+/* Every offset carries the sign, including the negative one that puts the
+   segment off the near edge: in a right-to-left document `--_progress-way` is
+   `-1`, so `-18%` becomes `+18%`, and with the origin at the right edge that is
+   off the right rather than off the left. One set of frames, either direction. */
 @keyframes helix-progress-indeterminate {
   0% {
-    scale: 0 1;
-    translate: 0;
+    scale: 0.18 1;
+    translate: calc(-18% * var(--_progress-way, 1));
   }
 
-  40% {
-    scale: 0.6 1;
-    translate: 0;
+  35% {
+    scale: 0.5 1;
+    translate: calc(12% * var(--_progress-way, 1));
   }
 
-  60% {
-    scale: 0.6 1;
-    translate: calc(40% * var(--_progress-way, 1));
+  65% {
+    scale: 0.5 1;
+    translate: calc(52% * var(--_progress-way, 1));
   }
 
   100% {
-    scale: 0 1;
+    scale: 0.18 1;
     translate: calc(100% * var(--_progress-way, 1));
   }
 }
