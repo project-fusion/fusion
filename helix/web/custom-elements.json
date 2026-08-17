@@ -862,6 +862,20 @@
             },
             {
               "kind": "field",
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the message needs.",
+              "attribute": "severity",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -975,6 +989,18 @@
               "inheritedFrom": {
                 "name": "MixinDismissible",
                 "module": "src/mixins/mixin-dismissible/mixin-dismissible.ts"
+              }
+            },
+            {
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the message needs.",
+              "fieldName": "severity",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
               }
             }
           ],

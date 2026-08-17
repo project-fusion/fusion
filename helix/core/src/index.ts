@@ -78,6 +78,7 @@ export {
 } from './mixins/mixin-dismissible/mixin-dismissible.js'
 export { MixinField, type MixinFieldInterface } from './mixins/mixin-field/mixin-field.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
+export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export { customElement } from './utils/custom-element/custom-element.js'
 export {

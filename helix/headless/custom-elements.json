@@ -629,6 +629,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the message needs.",
+              "attribute": "severity",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "dismissible",
               "type": {
                 "text": "boolean"
@@ -768,33 +778,15 @@
               "reactProp": "onhelix-dismiss"
             }
           ],
-          "mixins": [
-            {
-              "name": "MixinDismissible",
-              "package": "@helix-io/core"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "A page-level message above the masthead, which can be dismissed.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/announcement",
-            "aliases": [
-              "Banner",
-              "Notification bar",
-              "Alert bar"
-            ],
-            "tier": "headless",
-            "group": "BaseAnnouncement",
-            "part": "Root"
-          },
-          "tagName": "helix-base-announcement",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "severity",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+              },
+              "description": "What kind of attention the message needs.",
+              "fieldName": "severity"
+            },
             {
               "name": "dismissible",
               "type": {
@@ -822,6 +814,32 @@
               }
             }
           ],
+          "mixins": [
+            {
+              "name": "MixinDismissible",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A page-level message above the masthead, which can be dismissed.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/announcement",
+            "aliases": [
+              "Banner",
+              "Notification bar",
+              "Alert bar"
+            ],
+            "tier": "headless",
+            "group": "BaseAnnouncement",
+            "part": "Root"
+          },
+          "tagName": "helix-base-announcement",
+          "customElement": true,
           "modulePath": "src/announcement/root/announcement-root.ts",
           "definitionPath": "src/announcement/root/announcement-root.ts"
         }

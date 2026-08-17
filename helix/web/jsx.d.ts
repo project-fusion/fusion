@@ -463,6 +463,8 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   dismissLabel?: HelixAnnouncement["dismissLabel"];
+  /** What kind of attention the message needs. */
+  severity?: HelixAnnouncement["severity"];
 
   /** Fired when the reader asks to close it. */
   "onhelix-dismiss"?: (e: HelixAnnouncementHelixDismissElementEvent) => void;
@@ -485,6 +487,8 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   "prop:dismissLabel"?: HelixAnnouncement["dismissLabel"];
+  /** What kind of attention the message needs. */
+  "prop:severity"?: HelixAnnouncement["severity"];
   /** Fired when the reader asks to close it. */
   "on:helix-dismiss"?: (e: HelixAnnouncementHelixDismissElementEvent) => void;
 
@@ -4872,6 +4876,7 @@ export type CustomElements = {
    * derive one rather than dash-casing it, so this would otherwise be
    * reachable only as `dismisslabel`, which nobody would guess and no linter
    * would catch.
+   * - `severity`: What kind of attention the message needs.
    *
    * ## Events
    *
@@ -9162,6 +9167,7 @@ export type CustomElementsSolidJs = {
    * derive one rather than dash-casing it, so this would otherwise be
    * reachable only as `dismisslabel`, which nobody would guess and no linter
    * would catch.
+   * - `severity`: What kind of attention the message needs.
    *
    * ## Events
    *

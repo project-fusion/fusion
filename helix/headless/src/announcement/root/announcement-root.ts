@@ -1,6 +1,7 @@
 import { customElement, HelixElement, hostAria, MixinDismissible } from '@helix-io/core'
 import { x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
@@ -43,6 +44,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-base-announcement')
 export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
+  /** What kind of attention the message needs. */
+  @property({ reflect: true })
+  severity?: 'info' | 'success' | 'warning' | 'danger'
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, and always polite. See the note above on `role="alert"`.

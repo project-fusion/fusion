@@ -437,6 +437,8 @@ export type HelixBaseAnnouncementHelixDismissElementEvent =
   HelixBaseAnnouncementElementEvent<HelixDismissEvent>;
 
 export type HelixBaseAnnouncementProps = {
+  /** What kind of attention the message needs. */
+  severity?: HelixBaseAnnouncement["severity"];
   /** Whether it offers a control to take it away. */
   dismissible?: HelixBaseAnnouncement["dismissible"];
   /** Accessible name for that control.
@@ -461,6 +463,8 @@ would catch. */
 };
 
 export type HelixBaseAnnouncementSolidJsProps = {
+  /** What kind of attention the message needs. */
+  "prop:severity"?: HelixBaseAnnouncement["severity"];
   /** Whether it offers a control to take it away. */
   "prop:dismissible"?: HelixBaseAnnouncement["dismissible"];
   /** Accessible name for that control.
@@ -4557,6 +4561,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `severity`: What kind of attention the message needs.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
@@ -8860,6 +8865,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `severity`: What kind of attention the message needs.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *

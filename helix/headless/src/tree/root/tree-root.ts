@@ -1,4 +1,5 @@
 import {
+  closestInstance,
   customElement,
   HelixElement,
   MixinControllerActive,
@@ -176,7 +177,7 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
         current.requestOpen(false)
         this.syncItems()
       } else {
-        const parent = current.parentElement?.closest('helix-base-tree-item, helix-tree-item')
+        const parent = closestInstance(current.parentElement, HelixBaseTreeItem)
         this.focusOn(parent instanceof HelixBaseTreeItem ? parent : undefined)
       }
     } else {

@@ -127,6 +127,7 @@ band across the top of the page, not a box that happens to be wide.
 | --- | --- | --- | --- | --- | --- |
 | `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
+| `severity` | `severity` | `'info' \| 'success' \| 'warning' \| 'danger' \| undefined` | - | `HelixBaseAnnouncement` | What kind of attention the message needs. |
 
 #### Methods
 

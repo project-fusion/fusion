@@ -1911,6 +1911,14 @@
         },
         {
           "kind": "js",
+          "name": "closestInstance",
+          "declaration": {
+            "name": "closestInstance",
+            "module": "./utils/closest-instance/closest-instance.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "createSheet",
           "declaration": {
             "name": "createSheet",
@@ -3487,6 +3495,46 @@
           "declaration": {
             "name": "anchorElement",
             "module": "src/utils/anchor-element/anchor-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/closest-instance/closest-instance.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "closestInstance",
+          "return": {
+            "type": {
+              "text": "T | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "from",
+              "type": {
+                "text": "Element | null | undefined"
+              }
+            },
+            {
+              "name": "Ctor",
+              "type": {
+                "text": "abstract new (...args: never[]) => T"
+              }
+            }
+          ],
+          "description": "The nearest ancestor that is an instance of a class, crossing shadow roots.\n\n**Identity rather than tag name, and the rule already existed.** `Accordion`'s\nroot states it two files from a violation of it: \"Items are matched with\n`instanceof`, never by tag name. Matching `helix-accordion-item` would tie\nthis tier to the styled one.\" Nine headless families resolve their\nrelationships that way; two did it by tag, and both named `helix-*` tags that\nonly `@helix-io/web` registers, which is a headless package depending on a\nstyled one by string.\n\nThe consequence is silent rather than loud. Subclassing a base element under\na different tag is exactly what the headless tier exists to allow, and it is\nwhat `helix/web` itself does. Under a third tag the lookup returned `null`,\nso an accordion's `mode` was ignored and every section behaved as `multiple`\nwith no error anywhere.\n\n**`closest()` alone is not enough**, which is why this walks rather than\ndelegating. `closest()` stops at a shadow boundary: a component slotted into\nanother component's shadow root has a `parentNode` chain that ends at a\n`ShadowRoot`, and `closest` will not step across it. Following `host` is what\nmakes a nested arrangement resolve, and nesting through a slot is the\nordinary case for anything composable."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "closestInstance",
+          "declaration": {
+            "name": "closestInstance",
+            "module": "src/utils/closest-instance/closest-instance.ts"
           }
         }
       ]

@@ -1,9 +1,9 @@
-import { customElement, HelixElement, MixinControllerOpen } from '@helix-io/core'
+import { closestInstance, customElement, HelixElement, MixinControllerOpen } from '@helix-io/core'
 import { caretDown } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import type { HelixBaseAccordion } from '../root/accordion-root.js'
+import { HelixBaseAccordion } from '../root/accordion-root.js'
 
 /** Shadow-DOM id linking the trigger's aria-controls to the content region. */
 const CONTENT_ID = 'content'
@@ -81,7 +81,7 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
    * what keeps it independent.
    */
   private get accordion(): HelixBaseAccordion | null {
-    return this.closest<HelixBaseAccordion>('helix-base-accordion, helix-accordion')
+    return closestInstance(this, HelixBaseAccordion)
   }
 
   /**
