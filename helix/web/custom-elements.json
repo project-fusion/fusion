@@ -30771,6 +30771,20 @@
             },
             {
               "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element this describes, in this tooltip's own tree.\n\nSet it and the tooltip stops wrapping: it renders no trigger, listens on\nthe element it names, and points its bubble there. Leave it unset and the\ndefault slot is the trigger, which is the older form.\n\nResolved through `getRootNode()`, so a tooltip inside another component's\nshadow root names an element in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, which is\nworth knowing before someone reads the DOM and thinks it did not take.\nMeasured against React 19.2.8: `for` exists on the prototype, so React sets\n`element.for = 'save'` and writes nothing to the markup, where `content`\nand `placement`, which are not properties on the class at that moment, come\nthrough as attributes. Both paths reach the same place through Lit, so\nnothing is broken by it; a `[for]` selector would find nothing, which is\nwhy this does not reflect and nothing styles on it.",
+              "attribute": "for",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "placement",
               "type": {
                 "text": "Placement"
@@ -30880,10 +30894,24 @@
             },
             {
               "kind": "field",
+              "name": "named",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "description": "The element `for` names, or null.\n\n`getRootNode()` rather than `document`, which is what makes this work inside\nanother component: an id is unique to a tree, and a tooltip in a shadow root\nnames an element in that root. Client only, since the server has no tree to\nsearch.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "bubbleLayer",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), boundary: () => this, offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), /* Annotated, because without it the array's element type is inferred from `this`, whose own type depends on this controller, and TypeScript stops at the cycle. */ boundary: (): readonly (Element | null)[] => [this, this.named], offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -30910,6 +30938,20 @@
               },
               "privacy": "private",
               "description": "Whether there is anything to show.\n\nAsked of the slot rather than of the property, because either can carry\nthe content. `assignedNodes` without `flatten` answers what the consumer\nprovided and not what the fallback would render, which is exactly the\nquestion: a bubble with only fallback and an empty property is empty.\n\nText or an element, because neither alone is the test. An element on its\nown would count `<span slot=\"content\">   </span>` as something to say,\nand text on its own would count an icon as nothing, when an icon is the\nwhole point of slotting rather than setting the property.\n\nClient only. The server has no assignment to inspect, and nothing calls\nthis there: a tooltip opens in response to a pointer or to focus.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "describedText",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The bubble's words as a plain string, for naming the host.\n\nThe property when it is set, otherwise whatever was slotted, flattened.\nRich content collapses to its text, which is the right answer for a\ndescription: `Save ⌘ S` is what a reader needs, not the markup.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
@@ -31024,6 +31066,77 @@
               "privacy": "private",
               "readonly": true,
               "description": "Escape closes the bubble from wherever the reader is.\n\nOn the document, not on the host, which is where it was: a tooltip opened\nby hover has focus somewhere else entirely, so the press never reached this\nelement and Escape worked only for the one case that needed it least. That\nis the case the pattern names, a reader escaping a tooltip obscuring what\nis under it, and it was the case that did nothing.\n\nNot stopped from propagating: a tooltip is not what the reader was trying\nto escape if it sits inside something else that also closes.",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "bound",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private",
+              "description": "What the pointer and focus listeners are currently on.\n\nHeld, rather than recomputed at removal time, because what `for` names can\nchange: unbinding from wherever the element is *now* leaves a live listener\non wherever it was, and a tooltip that opens from a control it no longer\ndescribes is worse than one that does not open at all.",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "bind",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the listeners on whatever the trigger is.\n\nThe host when it wraps, since the trigger is inside it and both `focusin`\nand `focusout` bubble. The named element when `for` is set, because then the\nhost wraps nothing and `pointerenter` does not bubble at all.\n\nClient only, and after the first render: `for` names an element that may not\nhave upgraded, or existed, when this one connected.",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "unbind",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "audited",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Said once per element, however many times it opens.",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "auditDescription",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Checks that the trigger actually points back, and says so once if not.\n\n`for` is only half a link: this element finds the trigger, and the trigger\nhas to name this element for a screen reader to read the two together. That\nsecond half is the consumer's line to write, deliberately, because writing\nit from here means `setAttribute` on markup they server-rendered. So it is\ntheirs to forget, and a silent accessibility gap is the worst kind: the\ntooltip looks completely correct.\n\nOn first open rather than on connect, because a framework may render the\nattribute after this element upgrades, and because a tooltip that never\nopens has described nothing eitherway.\n\nEither attribute counts. WebAwesome uses `aria-labelledby` over\n`aria-describedby` on purpose, their reasoning being that some screen\nreaders want the description on the focusable element itself while a label\nreads on first focus regardless, and that is a live enough question that\nthis should not be the thing to settle it.",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -31152,6 +31265,19 @@
               "default": "''",
               "description": "The text shown in the bubble.\n\nThe common case, and the fallback for the `content` slot: slot something\nthere and it replaces this. Both cannot show at once, which is the point\nof using fallback content rather than rendering whichever is present.",
               "fieldName": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element this describes, in this tooltip's own tree.\n\nSet it and the tooltip stops wrapping: it renders no trigger, listens on\nthe element it names, and points its bubble there. Leave it unset and the\ndefault slot is the trigger, which is the older form.\n\nResolved through `getRootNode()`, so a tooltip inside another component's\nshadow root names an element in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, which is\nworth knowing before someone reads the DOM and thinks it did not take.\nMeasured against React 19.2.8: `for` exists on the prototype, so React sets\n`element.for = 'save'` and writes nothing to the markup, where `content`\nand `placement`, which are not properties on the class at that moment, come\nthrough as attributes. Both paths reach the same place through Lit, so\nnothing is broken by it; a `[for]` selector would find nothing, which is\nwhy this does not reflect and nothing styles on it.",
+              "fieldName": "for",
               "inheritedFrom": {
                 "name": "HelixBaseTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"

@@ -162,3 +162,91 @@ describe('tooltip', () => {
     expect(part(tip, 'tooltip')?.matches(':popover-open') ?? false).toBe(false)
   })
 })
+
+describe('tooltip for', () => {
+  /* Trigger and tooltip as siblings in one tree, which is the whole point of
+     `for`: an IDREF between them is then legal in the ordinary way, where a
+     reference from a slotted trigger into this element's shadow root is not. */
+  const pair = async (
+    tipAttrs = 'id="tip" for="target" content="Writes the file to disk"',
+    triggerAttrs = 'id="target" aria-describedby="tip"',
+  ) => {
+    const host = await mount(
+      `<div><button ${triggerAttrs}>Save</button><helix-tooltip ${tipAttrs}></helix-tooltip></div>`,
+    )
+    const tip = host.querySelector('helix-tooltip') as Tooltip
+    await tip.updateComplete
+    return { button: host.querySelector('button') as HTMLElement, tip }
+  }
+
+  test('the bubble points at the element the id names, not at what is slotted', async () => {
+    const { button, tip } = await pair()
+    /* Reached through the private getter deliberately: what is being asserted
+       is which element the floating controller anchors to, and there is no
+       public surface for that by design. */
+    expect((tip as unknown as { trigger: HTMLElement }).trigger).toBe(button)
+  })
+
+  test('the host names itself, so the description resolves with the bubble down', async () => {
+    /* The measurement this exists for: a reference resolves to the referenced
+       element's accessible *name*, which falls back to its contents only after
+       `aria-label`. A closed popover's contents are `display: none`, so without
+       a name of its own the host described nothing until the bubble was already
+       up, and a screen reader computes the description as focus lands. */
+    const { tip } = await pair()
+    expect(tip.internals?.ariaLabel).toBe('Writes the file to disk')
+  })
+
+  test('slotted content is named by its text, flattened', async () => {
+    const host = await mount(
+      `<div><button id="target" aria-describedby="tip">Save</button>` +
+        `<helix-tooltip id="tip" for="target"><span slot="content">Save <b>now</b></span></helix-tooltip></div>`,
+    )
+    const tip = host.querySelector('helix-tooltip') as Tooltip
+    await tip.updateComplete
+    expect(tip.internals?.ariaLabel).toBe('Save now')
+  })
+
+  test('wrapping names nothing, because the host is an ancestor and not a reference', async () => {
+    const tip = await tooltip()
+    expect(tip.internals?.ariaLabel ?? null).toBeNull()
+  })
+
+  test('an id that names nothing resolves to no trigger', async () => {
+    const { tip } = await pair('id="tip" for="absent" content="Nothing"')
+    expect((tip as unknown as { named: HTMLElement | null }).named).toBeNull()
+  })
+
+  test('a trigger that does not point back is reported once', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const { tip } = await pair('id="tip" for="target" content="Unread"', 'id="target"')
+      tip.show()
+      await tip.updateComplete
+      tip.hide()
+      await tip.updateComplete
+      tip.show()
+      await tip.updateComplete
+    } finally {
+      console.warn = original
+    }
+    expect(warnings.length).toBe(1)
+    expect(warnings[0]).toContain('aria-describedby')
+  })
+
+  test('a trigger that does point back is left alone', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const { tip } = await pair()
+      tip.show()
+      await tip.updateComplete
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toEqual([])
+  })
+})

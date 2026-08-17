@@ -1,0 +1,12 @@
+.row {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-md);
+  padding-block: var(--helix-space-2xl);
+}
+
+.prose {
+  display: grid;
+  gap: var(--helix-space-xs);
+  max-inline-size: 44rem;
+}

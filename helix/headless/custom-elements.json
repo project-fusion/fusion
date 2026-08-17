@@ -24234,7 +24234,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The trigger is slotted and stays the consumer's own element. The bubble is\nrendered here, in the top layer through the popover API, so it clears any\nancestor with `overflow: hidden` without a `z-index` anywhere.\n\nPosition comes from `FloatingController`, which flips to another side when\nthe preferred one does not fit and slides along it to stay in view.\n\n**The description is linked by element reference, not by id.** An IDREF\ncannot cross a shadow boundary, so `aria-describedby` on a slotted trigger\npointing at a bubble in here resolves to nothing.\n`ElementInternals.ariaDescribedByElements` takes the element itself, which\ndoes cross.\n\nIt shows on hover and on focus, and hides on leave, on blur, and on Escape.\nA tooltip that answers only the pointer is one a keyboard reader never sees.\n\nThe pointer waits out `delay` first, or sweeping a row of controls flashes a\ntooltip for each of them. Focus does not wait: a keyboard reader landing on a\ncontrol has already committed to it.\n\nOpen state comes from `MixinControllerOpen`, so it announces `helix-open` and\n`helix-close` like every other overlay here, and a consumer can drive it with\n`open` where they need to.",
+          "description": "The trigger is slotted and stays the consumer's own element. The bubble is\nrendered here, in the top layer through the popover API, so it clears any\nancestor with `overflow: hidden` without a `z-index` anywhere.\n\nPosition comes from `FloatingController`, which flips to another side when\nthe preferred one does not fit and slides along it to stay in view.\n\n**Two forms, and they are not equivalent for a screen reader.**\n\nWrapping is the convenience form and is right where the bubble decorates a\ncontrol that already says what it is. The trigger stays the consumer's own\nelement, slotted, and nothing here can describe it: an IDREF cannot cross a\nshadow boundary, an element reference is valid only into the same tree or a\nshadow-including *ancestor* (the bubble's tree is neither, it is inward), and\na string on the trigger means writing to markup the consumer server-rendered.\nAll three measured.\n\n`for` is the form that works. The tooltip sits *beside* the trigger in the\nconsumer's own tree and names it by id, so both are in one tree and an IDREF\nbetween them is legal in the ordinary way:\n\n```html\n<helix-button id=\"save\" aria-describedby=\"save-tip\">Save</helix-button>\n<helix-tooltip id=\"save-tip\" for=\"save\" content=\"Save your work\"></helix-tooltip>\n```\n\nNote that the reference points at *this host*, not at the bubble inside its\nshadow root: the description is computed from the flat tree, which descends\ninto shadow content on its own.\n\n**The consumer writes that `aria-describedby`, and nothing here writes it for\nthem.** WebAwesome and Spectrum Web Components both do write it, with\n`setAttribute` on the trigger at runtime, which is the one thing this library\ndeclines everywhere: React rendered that element on the server without the\nattribute and reports a mismatch it will not patch up. Two ids in the markup\nis the whole cost of the version that is correct before any JavaScript runs.\n\nBecause it is the consumer's line to write, it is also theirs to forget, so\n`for` audits itself on first open and says so once. Same shape as\n`requestControlledChange` warning about a controlled property nothing\nanswered.\n\nIt shows on hover and on focus, and hides on leave, on blur, and on Escape.\nA tooltip that answers only the pointer is one a keyboard reader never sees.\n\nThe pointer waits out `delay` first, or sweeping a row of controls flashes a\ntooltip for each of them. Focus does not wait: a keyboard reader landing on a\ncontrol has already committed to it.\n\nOpen state comes from `MixinControllerOpen`, so it announces `helix-open` and\n`helix-close` like every other overlay here, and a consumer can drive it with\n`open` where they need to.",
           "name": "HelixBaseTooltip",
           "cssParts": [
             {
@@ -24266,6 +24266,16 @@
               "default": "''",
               "description": "The text shown in the bubble.\n\nThe common case, and the fallback for the `content` slot: slot something\nthere and it replaces this. Both cannot show at once, which is the point\nof using fallback content rather than rendering whichever is present.",
               "attribute": "content"
+            },
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element this describes, in this tooltip's own tree.\n\nSet it and the tooltip stops wrapping: it renders no trigger, listens on\nthe element it names, and points its bubble there. Leave it unset and the\ndefault slot is the trigger, which is the older form.\n\nResolved through `getRootNode()`, so a tooltip inside another component's\nshadow root names an element in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, which is\nworth knowing before someone reads the DOM and thinks it did not take.\nMeasured against React 19.2.8: `for` exists on the prototype, so React sets\n`element.for = 'save'` and writes nothing to the markup, where `content`\nand `placement`, which are not properties on the class at that moment, come\nthrough as attributes. Both paths reach the same place through Lit, so\nnothing is broken by it; a `[for]` selector would find nothing, which is\nwhy this does not reflect and nothing styles on it.",
+              "attribute": "for"
             },
             {
               "kind": "field",
@@ -24346,10 +24356,20 @@
             },
             {
               "kind": "field",
+              "name": "named",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "description": "The element `for` names, or null.\n\n`getRootNode()` rather than `document`, which is what makes this work inside\nanother component: an id is unique to a tree, and a tooltip in a shadow root\nnames an element in that root. Client only, since the server has no tree to\nsearch.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "bubbleLayer",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), boundary: () => this, offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })"
+              "default": "new PopoverController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), /* Annotated, because without it the array's element type is inferred from `this`, whose own type depends on this controller, and TypeScript stops at the cycle. */ boundary: (): readonly (Element | null)[] => [this, this.named], offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })"
             },
             {
               "kind": "field",
@@ -24368,6 +24388,16 @@
               },
               "privacy": "private",
               "description": "Whether there is anything to show.\n\nAsked of the slot rather than of the property, because either can carry\nthe content. `assignedNodes` without `flatten` answers what the consumer\nprovided and not what the fallback would render, which is exactly the\nquestion: a bubble with only fallback and an empty property is empty.\n\nText or an element, because neither alone is the test. An element on its\nown would count `<span slot=\"content\">   </span>` as something to say,\nand text on its own would count an icon as nothing, when an icon is the\nwhole point of slotting rather than setting the property.\n\nClient only. The server has no assignment to inspect, and nothing calls\nthis there: a tooltip opens in response to a pointer or to focus.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "describedText",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The bubble's words as a plain string, for naming the host.\n\nThe property when it is set, otherwise whatever was slotted, flattened.\nRich content collapses to its text, which is the right answer for a\ndescription: `Save ⌘ S` is what a reader needs, not the markup.",
               "readonly": true
             },
             {
@@ -24446,6 +24476,57 @@
               "privacy": "private",
               "readonly": true,
               "description": "Escape closes the bubble from wherever the reader is.\n\nOn the document, not on the host, which is where it was: a tooltip opened\nby hover has focus somewhere else entirely, so the press never reached this\nelement and Escape worked only for the one case that needed it least. That\nis the case the pattern names, a reader escaping a tooltip obscuring what\nis under it, and it was the case that did nothing.\n\nNot stopped from propagating: a tooltip is not what the reader was trying\nto escape if it sits inside something else that also closes."
+            },
+            {
+              "kind": "field",
+              "name": "bound",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private",
+              "description": "What the pointer and focus listeners are currently on.\n\nHeld, rather than recomputed at removal time, because what `for` names can\nchange: unbinding from wherever the element is *now* leaves a live listener\non wherever it was, and a tooltip that opens from a control it no longer\ndescribes is worse than one that does not open at all."
+            },
+            {
+              "kind": "method",
+              "name": "bind",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the listeners on whatever the trigger is.\n\nThe host when it wraps, since the trigger is inside it and both `focusin`\nand `focusout` bubble. The named element when `for` is set, because then the\nhost wraps nothing and `pointerenter` does not bubble at all.\n\nClient only, and after the first render: `for` names an element that may not\nhave upgraded, or existed, when this one connected."
+            },
+            {
+              "kind": "method",
+              "name": "unbind",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "audited",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Said once per element, however many times it opens."
+            },
+            {
+              "kind": "method",
+              "name": "auditDescription",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Checks that the trigger actually points back, and says so once if not.\n\n`for` is only half a link: this element finds the trigger, and the trigger\nhas to name this element for a screen reader to read the two together. That\nsecond half is the consumer's line to write, deliberately, because writing\nit from here means `setAttribute` on markup they server-rendered. So it is\ntheirs to forget, and a silent accessibility gap is the worst kind: the\ntooltip looks completely correct.\n\nOn first open rather than on connect, because a framework may render the\nattribute after this element upgrades, and because a tooltip that never\nopens has described nothing eitherway.\n\nEither attribute counts. WebAwesome uses `aria-labelledby` over\n`aria-describedby` on purpose, their reasoning being that some screen\nreaders want the description on the focusable element itself while a label\nreads on first focus regardless, and that is a live enough question that\nthis should not be the thing to settle it."
             },
             {
               "kind": "field",
@@ -24667,6 +24748,15 @@
               "default": "''",
               "description": "The text shown in the bubble.\n\nThe common case, and the fallback for the `content` slot: slot something\nthere and it replaces this. Both cannot show at once, which is the point\nof using fallback content rather than rendering whichever is present.",
               "fieldName": "content"
+            },
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element this describes, in this tooltip's own tree.\n\nSet it and the tooltip stops wrapping: it renders no trigger, listens on\nthe element it names, and points its bubble there. Leave it unset and the\ndefault slot is the trigger, which is the older form.\n\nResolved through `getRootNode()`, so a tooltip inside another component's\nshadow root names an element in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, which is\nworth knowing before someone reads the DOM and thinks it did not take.\nMeasured against React 19.2.8: `for` exists on the prototype, so React sets\n`element.for = 'save'` and writes nothing to the markup, where `content`\nand `placement`, which are not properties on the class at that moment, come\nthrough as attributes. Both paths reach the same place through Lit, so\nnothing is broken by it; a `[for]` selector would find nothing, which is\nwhy this does not reflect and nothing styles on it.",
+              "fieldName": "for"
             },
             {
               "name": "placement",

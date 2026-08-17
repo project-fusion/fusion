@@ -4851,6 +4851,24 @@ The common case, and the fallback for the `content` slot: slot something
 there and it replaces this. Both cannot show at once, which is the point
 of using fallback content rather than rendering whichever is present. */
   content?: HelixBaseTooltip["content"];
+  /** The id of the element this describes, in this tooltip's own tree.
+
+Set it and the tooltip stops wrapping: it renders no trigger, listens on
+the element it names, and points its bubble there. Leave it unset and the
+default slot is the trigger, which is the older form.
+
+Resolved through `getRootNode()`, so a tooltip inside another component's
+shadow root names an element in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, which is
+worth knowing before someone reads the DOM and thinks it did not take.
+Measured against React 19.2.8: `for` exists on the prototype, so React sets
+`element.for = 'save'` and writes nothing to the markup, where `content`
+and `placement`, which are not properties on the class at that moment, come
+through as attributes. Both paths reach the same place through Lit, so
+nothing is broken by it; a `[for]` selector would find nothing, which is
+why this does not reflect and nothing styles on it. */
+  for?: HelixBaseTooltip["for"];
   /** Preferred side. It moves if that side does not fit. */
   placement?: HelixBaseTooltip["placement"];
   /** Space between the trigger and the bubble, in pixels.
@@ -4921,6 +4939,24 @@ The common case, and the fallback for the `content` slot: slot something
 there and it replaces this. Both cannot show at once, which is the point
 of using fallback content rather than rendering whichever is present. */
   "prop:content"?: HelixBaseTooltip["content"];
+  /** The id of the element this describes, in this tooltip's own tree.
+
+Set it and the tooltip stops wrapping: it renders no trigger, listens on
+the element it names, and points its bubble there. Leave it unset and the
+default slot is the trigger, which is the older form.
+
+Resolved through `getRootNode()`, so a tooltip inside another component's
+shadow root names an element in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, which is
+worth knowing before someone reads the DOM and thinks it did not take.
+Measured against React 19.2.8: `for` exists on the prototype, so React sets
+`element.for = 'save'` and writes nothing to the markup, where `content`
+and `placement`, which are not properties on the class at that moment, come
+through as attributes. Both paths reach the same place through Lit, so
+nothing is broken by it; a `[for]` selector would find nothing, which is
+why this does not reflect and nothing styles on it. */
+  "prop:for"?: HelixBaseTooltip["for"];
   /** Preferred side. It moves if that side does not fit. */
   "prop:placement"?: HelixBaseTooltip["placement"];
   /** Space between the trigger and the bubble, in pixels.
@@ -9694,11 +9730,40 @@ export type CustomElements = {
    * Position comes from `FloatingController`, which flips to another side when
    * the preferred one does not fit and slides along it to stay in view.
    *
-   * **The description is linked by element reference, not by id.** An IDREF
-   * cannot cross a shadow boundary, so `aria-describedby` on a slotted trigger
-   * pointing at a bubble in here resolves to nothing.
-   * `ElementInternals.ariaDescribedByElements` takes the element itself, which
-   * does cross.
+   * **Two forms, and they are not equivalent for a screen reader.**
+   *
+   * Wrapping is the convenience form and is right where the bubble decorates a
+   * control that already says what it is. The trigger stays the consumer's own
+   * element, slotted, and nothing here can describe it: an IDREF cannot cross a
+   * shadow boundary, an element reference is valid only into the same tree or a
+   * shadow-including *ancestor* (the bubble's tree is neither, it is inward), and
+   * a string on the trigger means writing to markup the consumer server-rendered.
+   * All three measured.
+   *
+   * `for` is the form that works. The tooltip sits *beside* the trigger in the
+   * consumer's own tree and names it by id, so both are in one tree and an IDREF
+   * between them is legal in the ordinary way:
+   *
+   * ```html
+   * <helix-button id="save" aria-describedby="save-tip">Save</helix-button>
+   * <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip>
+   * ```
+   *
+   * Note that the reference points at *this host*, not at the bubble inside its
+   * shadow root: the description is computed from the flat tree, which descends
+   * into shadow content on its own.
+   *
+   * **The consumer writes that `aria-describedby`, and nothing here writes it for
+   * them.** WebAwesome and Spectrum Web Components both do write it, with
+   * `setAttribute` on the trigger at runtime, which is the one thing this library
+   * declines everywhere: React rendered that element on the server without the
+   * attribute and reports a mismatch it will not patch up. Two ids in the markup
+   * is the whole cost of the version that is correct before any JavaScript runs.
+   *
+   * Because it is the consumer's line to write, it is also theirs to forget, so
+   * `for` audits itself on first open and says so once. Same shape as
+   * `requestControlledChange` warning about a controlled property nothing
+   * answered.
    *
    * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
    * A tooltip that answers only the pointer is one a keyboard reader never sees.
@@ -9720,6 +9785,23 @@ export type CustomElements = {
    * The common case, and the fallback for the `content` slot: slot something
    * there and it replaces this. Both cannot show at once, which is the point
    * of using fallback content rather than rendering whichever is present.
+   * - `for`: The id of the element this describes, in this tooltip's own tree.
+   *
+   * Set it and the tooltip stops wrapping: it renders no trigger, listens on
+   * the element it names, and points its bubble there. Leave it unset and the
+   * default slot is the trigger, which is the older form.
+   *
+   * Resolved through `getRootNode()`, so a tooltip inside another component's
+   * shadow root names an element in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, which is
+   * worth knowing before someone reads the DOM and thinks it did not take.
+   * Measured against React 19.2.8: `for` exists on the prototype, so React sets
+   * `element.for = 'save'` and writes nothing to the markup, where `content`
+   * and `placement`, which are not properties on the class at that moment, come
+   * through as attributes. Both paths reach the same place through Lit, so
+   * nothing is broken by it; a `[for]` selector would find nothing, which is
+   * why this does not reflect and nothing styles on it.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    *
@@ -14646,11 +14728,40 @@ export type CustomElementsSolidJs = {
    * Position comes from `FloatingController`, which flips to another side when
    * the preferred one does not fit and slides along it to stay in view.
    *
-   * **The description is linked by element reference, not by id.** An IDREF
-   * cannot cross a shadow boundary, so `aria-describedby` on a slotted trigger
-   * pointing at a bubble in here resolves to nothing.
-   * `ElementInternals.ariaDescribedByElements` takes the element itself, which
-   * does cross.
+   * **Two forms, and they are not equivalent for a screen reader.**
+   *
+   * Wrapping is the convenience form and is right where the bubble decorates a
+   * control that already says what it is. The trigger stays the consumer's own
+   * element, slotted, and nothing here can describe it: an IDREF cannot cross a
+   * shadow boundary, an element reference is valid only into the same tree or a
+   * shadow-including *ancestor* (the bubble's tree is neither, it is inward), and
+   * a string on the trigger means writing to markup the consumer server-rendered.
+   * All three measured.
+   *
+   * `for` is the form that works. The tooltip sits *beside* the trigger in the
+   * consumer's own tree and names it by id, so both are in one tree and an IDREF
+   * between them is legal in the ordinary way:
+   *
+   * ```html
+   * <helix-button id="save" aria-describedby="save-tip">Save</helix-button>
+   * <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip>
+   * ```
+   *
+   * Note that the reference points at *this host*, not at the bubble inside its
+   * shadow root: the description is computed from the flat tree, which descends
+   * into shadow content on its own.
+   *
+   * **The consumer writes that `aria-describedby`, and nothing here writes it for
+   * them.** WebAwesome and Spectrum Web Components both do write it, with
+   * `setAttribute` on the trigger at runtime, which is the one thing this library
+   * declines everywhere: React rendered that element on the server without the
+   * attribute and reports a mismatch it will not patch up. Two ids in the markup
+   * is the whole cost of the version that is correct before any JavaScript runs.
+   *
+   * Because it is the consumer's line to write, it is also theirs to forget, so
+   * `for` audits itself on first open and says so once. Same shape as
+   * `requestControlledChange` warning about a controlled property nothing
+   * answered.
    *
    * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
    * A tooltip that answers only the pointer is one a keyboard reader never sees.
@@ -14672,6 +14783,23 @@ export type CustomElementsSolidJs = {
    * The common case, and the fallback for the `content` slot: slot something
    * there and it replaces this. Both cannot show at once, which is the point
    * of using fallback content rather than rendering whichever is present.
+   * - `for`: The id of the element this describes, in this tooltip's own tree.
+   *
+   * Set it and the tooltip stops wrapping: it renders no trigger, listens on
+   * the element it names, and points its bubble there. Leave it unset and the
+   * default slot is the trigger, which is the older form.
+   *
+   * Resolved through `getRootNode()`, so a tooltip inside another component's
+   * shadow root names an element in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, which is
+   * worth knowing before someone reads the DOM and thinks it did not take.
+   * Measured against React 19.2.8: `for` exists on the prototype, so React sets
+   * `element.for = 'save'` and writes nothing to the markup, where `content`
+   * and `placement`, which are not properties on the class at that moment, come
+   * through as attributes. Both paths reach the same place through Lit, so
+   * nothing is broken by it; a `[for]` selector would find nothing, which is
+   * why this does not reflect and nothing styles on it.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    *

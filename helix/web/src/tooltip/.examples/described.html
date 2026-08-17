@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="described.css">
+
+<div class="row">
+  <helix-button id="save" aria-describedby="save-tip">Save</helix-button>
+  <helix-tooltip id="save-tip" for="save" content="Writes the file to disk"></helix-tooltip>
+
+  <helix-icon-button id="archive" label="Archive" aria-describedby="archive-tip">
+    <helix-icon name="archive"></helix-icon>
+  </helix-icon-button>
+  <helix-tooltip
+    id="archive-tip"
+    for="archive"
+    content="Moves it out of the inbox"
+    placement="bottom"
+  ></helix-tooltip>
+</div>
+
+<div class="prose">
+  <helix-text appearance="title" as="h2">Two ids, and why</helix-text>
+  <helix-text as="p">
+    The tooltip names its trigger with <code>for</code>, which is what puts the
+    two in one tree and lets it listen and position. The trigger names the
+    tooltip back with <code>aria-describedby</code>, which is what a screen
+    reader reads. Both halves are written here rather than one being applied at
+    runtime, so the pairing is in the server's output and holds before any
+    JavaScript has run.
+  </helix-text>
+
+  <helix-text appearance="title" as="h2">The wrapping form</helix-text>
+  <helix-text as="p">
+    Still there, still right where the bubble decorates a control that already
+    says what it is. It cannot describe its trigger, though: the trigger belongs
+    to the page and the bubble is inside this element, and no reference reaches
+    inward across that boundary. Use this form where the words matter.
+  </helix-text>
+</div>

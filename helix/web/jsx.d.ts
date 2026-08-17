@@ -5326,6 +5326,24 @@ The common case, and the fallback for the `content` slot: slot something
 there and it replaces this. Both cannot show at once, which is the point
 of using fallback content rather than rendering whichever is present. */
   content?: HelixTooltip["content"];
+  /** The id of the element this describes, in this tooltip's own tree.
+
+Set it and the tooltip stops wrapping: it renders no trigger, listens on
+the element it names, and points its bubble there. Leave it unset and the
+default slot is the trigger, which is the older form.
+
+Resolved through `getRootNode()`, so a tooltip inside another component's
+shadow root names an element in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, which is
+worth knowing before someone reads the DOM and thinks it did not take.
+Measured against React 19.2.8: `for` exists on the prototype, so React sets
+`element.for = 'save'` and writes nothing to the markup, where `content`
+and `placement`, which are not properties on the class at that moment, come
+through as attributes. Both paths reach the same place through Lit, so
+nothing is broken by it; a `[for]` selector would find nothing, which is
+why this does not reflect and nothing styles on it. */
+  for?: HelixTooltip["for"];
   /** Preferred side. It moves if that side does not fit. */
   placement?: HelixTooltip["placement"];
   /** Space between the trigger and the bubble, in pixels.
@@ -5396,6 +5414,24 @@ The common case, and the fallback for the `content` slot: slot something
 there and it replaces this. Both cannot show at once, which is the point
 of using fallback content rather than rendering whichever is present. */
   "prop:content"?: HelixTooltip["content"];
+  /** The id of the element this describes, in this tooltip's own tree.
+
+Set it and the tooltip stops wrapping: it renders no trigger, listens on
+the element it names, and points its bubble there. Leave it unset and the
+default slot is the trigger, which is the older form.
+
+Resolved through `getRootNode()`, so a tooltip inside another component's
+shadow root names an element in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, which is
+worth knowing before someone reads the DOM and thinks it did not take.
+Measured against React 19.2.8: `for` exists on the prototype, so React sets
+`element.for = 'save'` and writes nothing to the markup, where `content`
+and `placement`, which are not properties on the class at that moment, come
+through as attributes. Both paths reach the same place through Lit, so
+nothing is broken by it; a `[for]` selector would find nothing, which is
+why this does not reflect and nothing styles on it. */
+  "prop:for"?: HelixTooltip["for"];
   /** Preferred side. It moves if that side does not fit. */
   "prop:placement"?: HelixTooltip["placement"];
   /** Space between the trigger and the bubble, in pixels.
@@ -10232,6 +10268,23 @@ export type CustomElements = {
    * The common case, and the fallback for the `content` slot: slot something
    * there and it replaces this. Both cannot show at once, which is the point
    * of using fallback content rather than rendering whichever is present.
+   * - `for`: The id of the element this describes, in this tooltip's own tree.
+   *
+   * Set it and the tooltip stops wrapping: it renders no trigger, listens on
+   * the element it names, and points its bubble there. Leave it unset and the
+   * default slot is the trigger, which is the older form.
+   *
+   * Resolved through `getRootNode()`, so a tooltip inside another component's
+   * shadow root names an element in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, which is
+   * worth knowing before someone reads the DOM and thinks it did not take.
+   * Measured against React 19.2.8: `for` exists on the prototype, so React sets
+   * `element.for = 'save'` and writes nothing to the markup, where `content`
+   * and `placement`, which are not properties on the class at that moment, come
+   * through as attributes. Both paths reach the same place through Lit, so
+   * nothing is broken by it; a `[for]` selector would find nothing, which is
+   * why this does not reflect and nothing styles on it.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    *
@@ -15250,6 +15303,23 @@ export type CustomElementsSolidJs = {
    * The common case, and the fallback for the `content` slot: slot something
    * there and it replaces this. Both cannot show at once, which is the point
    * of using fallback content rather than rendering whichever is present.
+   * - `for`: The id of the element this describes, in this tooltip's own tree.
+   *
+   * Set it and the tooltip stops wrapping: it renders no trigger, listens on
+   * the element it names, and points its bubble there. Leave it unset and the
+   * default slot is the trigger, which is the older form.
+   *
+   * Resolved through `getRootNode()`, so a tooltip inside another component's
+   * shadow root names an element in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, which is
+   * worth knowing before someone reads the DOM and thinks it did not take.
+   * Measured against React 19.2.8: `for` exists on the prototype, so React sets
+   * `element.for = 'save'` and writes nothing to the markup, where `content`
+   * and `placement`, which are not properties on the class at that moment, come
+   * through as attributes. Both paths reach the same place through Lit, so
+   * nothing is broken by it; a `[for]` selector would find nothing, which is
+   * why this does not reflect and nothing styles on it.
    * - `placement`: Preferred side. It moves if that side does not fit.
    * - `offset`: Space between the trigger and the bubble, in pixels.
    *

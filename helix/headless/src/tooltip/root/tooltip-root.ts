@@ -24,11 +24,40 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * Position comes from `FloatingController`, which flips to another side when
  * the preferred one does not fit and slides along it to stay in view.
  *
- * **The description is linked by element reference, not by id.** An IDREF
- * cannot cross a shadow boundary, so `aria-describedby` on a slotted trigger
- * pointing at a bubble in here resolves to nothing.
- * `ElementInternals.ariaDescribedByElements` takes the element itself, which
- * does cross.
+ * **Two forms, and they are not equivalent for a screen reader.**
+ *
+ * Wrapping is the convenience form and is right where the bubble decorates a
+ * control that already says what it is. The trigger stays the consumer's own
+ * element, slotted, and nothing here can describe it: an IDREF cannot cross a
+ * shadow boundary, an element reference is valid only into the same tree or a
+ * shadow-including *ancestor* (the bubble's tree is neither, it is inward), and
+ * a string on the trigger means writing to markup the consumer server-rendered.
+ * All three measured.
+ *
+ * `for` is the form that works. The tooltip sits *beside* the trigger in the
+ * consumer's own tree and names it by id, so both are in one tree and an IDREF
+ * between them is legal in the ordinary way:
+ *
+ * ```html
+ * <helix-button id="save" aria-describedby="save-tip">Save</helix-button>
+ * <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip>
+ * ```
+ *
+ * Note that the reference points at *this host*, not at the bubble inside its
+ * shadow root: the description is computed from the flat tree, which descends
+ * into shadow content on its own.
+ *
+ * **The consumer writes that `aria-describedby`, and nothing here writes it for
+ * them.** WebAwesome and Spectrum Web Components both do write it, with
+ * `setAttribute` on the trigger at runtime, which is the one thing this library
+ * declines everywhere: React rendered that element on the server without the
+ * attribute and reports a mismatch it will not patch up. Two ids in the markup
+ * is the whole cost of the version that is correct before any JavaScript runs.
+ *
+ * Because it is the consumer's line to write, it is also theirs to forget, so
+ * `for` audits itself on first open and says so once. Same shape as
+ * `requestControlledChange` warning about a controlled property nothing
+ * answered.
  *
  * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
  * A tooltip that answers only the pointer is one a keyboard reader never sees.
@@ -67,6 +96,28 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
    */
   @property()
   content = ''
+
+  /**
+   * The id of the element this describes, in this tooltip's own tree.
+   *
+   * Set it and the tooltip stops wrapping: it renders no trigger, listens on
+   * the element it names, and points its bubble there. Leave it unset and the
+   * default slot is the trigger, which is the older form.
+   *
+   * Resolved through `getRootNode()`, so a tooltip inside another component's
+   * shadow root names an element in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, which is
+   * worth knowing before someone reads the DOM and thinks it did not take.
+   * Measured against React 19.2.8: `for` exists on the prototype, so React sets
+   * `element.for = 'save'` and writes nothing to the markup, where `content`
+   * and `placement`, which are not properties on the class at that moment, come
+   * through as attributes. Both paths reach the same place through Lit, so
+   * nothing is broken by it; a `[for]` selector would find nothing, which is
+   * why this does not reflect and nothing styles on it.
+   */
+  @property()
+  for = ''
 
   /** Preferred side. It moves if that side does not fit. */
   @property()
@@ -124,12 +175,35 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
    * of the viewport rather than against the button.
    */
   private get trigger(): HTMLElement {
+    /* Named, or slotted. The named one is looked up every time rather than
+       cached: `for` can be pointed somewhere else, and the element it names can
+       upgrade, move or be replaced by a framework without telling this. */
+    const named = this.named
+    if (named) {
+      return named
+    }
     /* Through the util, which was written from a measurement of this component
        and then not used by it. Its extra is the descent: the first assigned
        element may itself draw nothing, and an icon button wrapped in a
        `display: contents` span was the case that took the bubble to the corner
        of the window. */
     return anchorElement(this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])'), this)
+  }
+
+  /**
+   * The element `for` names, or null.
+   *
+   * `getRootNode()` rather than `document`, which is what makes this work inside
+   * another component: an id is unique to a tree, and a tooltip in a shadow root
+   * names an element in that root. Client only, since the server has no tree to
+   * search.
+   */
+  private get named(): HTMLElement | null {
+    if (this.for === '') {
+      return null
+    }
+    const root = this.getRootNode() as Document | ShadowRoot
+    return root.getElementById?.(this.for) ?? null
   }
 
   /* One controller rather than the pair this was: a `FloatingController` beside
@@ -144,7 +218,10 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   private readonly bubbleLayer = new PopoverController(this, {
     anchor: () => this.trigger,
     arrow: () => this.renderRoot.querySelector<HTMLElement>('[part="arrow"]'),
-    boundary: () => this,
+    /* Annotated, because without it the array's element type is inferred from
+       `this`, whose own type depends on this controller, and TypeScript stops
+       at the cycle. */
+    boundary: (): readonly (Element | null)[] => [this, this.named],
     offset: () => this.offset,
     onDismiss: () => this.hide(),
     placement: () => this.placement,
@@ -200,6 +277,25 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
         ? element.childElementCount > 0 || element.textContent?.trim() !== ''
         : true
     })
+  }
+
+  /**
+   * The bubble's words as a plain string, for naming the host.
+   *
+   * The property when it is set, otherwise whatever was slotted, flattened.
+   * Rich content collapses to its text, which is the right answer for a
+   * description: `Save ⌘ S` is what a reader needs, not the markup.
+   */
+  private get describedText(): string {
+    if (this.content !== '') {
+      return this.content
+    }
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="content"]')
+    return (slot?.assignedNodes() ?? [])
+      .map((node) => node.textContent ?? '')
+      .join(' ')
+      .replace(/\s+/gu, ' ')
+      .trim()
   }
 
   /**
@@ -289,26 +385,118 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  override connectedCallback(): void {
-    super.connectedCallback()
-    this.addEventListener('pointerenter', this.showLater)
-    this.addEventListener('pointerleave', this.hideLater)
+  /**
+   * What the pointer and focus listeners are currently on.
+   *
+   * Held, rather than recomputed at removal time, because what `for` names can
+   * change: unbinding from wherever the element is *now* leaves a live listener
+   * on wherever it was, and a tooltip that opens from a control it no longer
+   * describes is worse than one that does not open at all.
+   */
+  private bound: HTMLElement | undefined
+
+  /**
+   * Puts the listeners on whatever the trigger is.
+   *
+   * The host when it wraps, since the trigger is inside it and both `focusin`
+   * and `focusout` bubble. The named element when `for` is set, because then the
+   * host wraps nothing and `pointerenter` does not bubble at all.
+   *
+   * Client only, and after the first render: `for` names an element that may not
+   * have upgraded, or existed, when this one connected.
+   */
+  private bind(): void {
+    const target = this.named ?? this
+    if (this.bound === target) {
+      return
+    }
+    this.unbind()
+    target.addEventListener('pointerenter', this.showLater)
+    target.addEventListener('pointerleave', this.hideLater)
     // Focus opens at once: a keyboard reader landing on a control has already
     // committed to it, where a pointer crossing one has not.
-    this.addEventListener('focusin', this.showNow)
-    this.addEventListener('focusout', this.releaseFocus)
+    target.addEventListener('focusin', this.showNow)
+    target.addEventListener('focusout', this.releaseFocus)
+    this.bound = target
+  }
+
+  private unbind(): void {
+    this.bound?.removeEventListener('pointerenter', this.showLater)
+    this.bound?.removeEventListener('pointerleave', this.hideLater)
+    this.bound?.removeEventListener('focusin', this.showNow)
+    this.bound?.removeEventListener('focusout', this.releaseFocus)
+    this.bound = undefined
+  }
+
+  /** Said once per element, however many times it opens. */
+  private audited = false
+
+  /**
+   * Checks that the trigger actually points back, and says so once if not.
+   *
+   * `for` is only half a link: this element finds the trigger, and the trigger
+   * has to name this element for a screen reader to read the two together. That
+   * second half is the consumer's line to write, deliberately, because writing
+   * it from here means `setAttribute` on markup they server-rendered. So it is
+   * theirs to forget, and a silent accessibility gap is the worst kind: the
+   * tooltip looks completely correct.
+   *
+   * On first open rather than on connect, because a framework may render the
+   * attribute after this element upgrades, and because a tooltip that never
+   * opens has described nothing eitherway.
+   *
+   * Either attribute counts. WebAwesome uses `aria-labelledby` over
+   * `aria-describedby` on purpose, their reasoning being that some screen
+   * readers want the description on the focusable element itself while a label
+   * reads on first focus regardless, and that is a live enough question that
+   * this should not be the thing to settle it.
+   */
+  private auditDescription(): void {
+    if (this.audited || this.for === '' || !this.hasContent) {
+      return
+    }
+    this.audited = true
+    const trigger = this.named
+    if (!trigger) {
+      console.warn(
+        `<${this.localName} for="${this.for}"> found no element with that id in its own tree, ` +
+          'so it has nothing to describe and nothing to point at. Ids resolve per tree: an ' +
+          'element inside another shadow root is not reachable from here.',
+      )
+      return
+    }
+    const names = `${trigger.getAttribute('aria-describedby') ?? ''} ${
+      trigger.getAttribute('aria-labelledby') ?? ''
+    }`
+      .split(/\s+/)
+      .filter(Boolean)
+    if (this.id !== '' && names.includes(this.id)) {
+      return
+    }
+    console.warn(
+      `<${this.localName} for="${this.for}"> is not read out with its trigger. The link is ` +
+        'written from the trigger, not from here: give this tooltip an `id` and add ' +
+        '`aria-describedby="<that id>"` to the element it names. Written in your own markup ' +
+        'it survives server rendering, which is why this element will not write it for you.',
+    )
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
     document.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('pointerenter', this.showLater)
-    this.removeEventListener('pointerleave', this.hideLater)
-    this.removeEventListener('focusin', this.showNow)
-    this.removeEventListener('focusout', this.releaseFocus)
+    this.unbind()
     document.removeEventListener('keydown', this.handleKeydown)
     this.holds.clear()
     clearTimeout(this.timer)
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.bind()
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -317,9 +505,13 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
        declaring `open` takes the same path as one opened by a pointer. Here
        rather than a microtask later: the render has been written, so the bubble
        is no longer `display: none` and `showPopover` is safe on it. */
+    if (changed.has('for')) {
+      this.bind()
+    }
     if (changed.has('open')) {
       if (this.open) {
         this.bubbleLayer.show()
+        this.auditDescription()
       } else {
         this.bubbleLayer.hide()
       }
@@ -351,7 +543,31 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
      * bubble is in a tree no reference from there can name. Closing it means
      * either writing to the consumer's markup or moving the bubble into the
      * light DOM, and both are decisions rather than fixes. */
-    hostAria(this.internals, { describedBy: this.hasContent ? [bubble] : [] })
+    hostAria(this.internals, {
+      describedBy: this.hasContent ? [bubble] : [],
+      /* **And the host names itself, which is what makes `for` work when the
+         bubble is down.**
+       *
+       * A reference resolves to the referenced element's accessible *name*, and
+       * that name comes from `aria-labelledby`, then `aria-label`, then the
+       * element's contents, in that order. Only the third can be defeated by
+       * the contents being `display: none`, which is exactly what a closed
+       * popover is. So without a name of its own the host describes nothing
+       * until the bubble is already up, and a screen reader computes a
+       * description when focus lands, which is a frame or two before that.
+       *
+       * Measured, one page, two identical tooltips:
+       *
+       *   CLOSED  bare host     (none)
+       *   CLOSED  labelled host Description B
+       *   OPEN    bare host     Description A
+       *   OPEN    labelled host Description B
+       *
+       * Only when `for` is set, because only then is this host the thing being
+       * referenced. Wrapping, it is an ancestor of the trigger and naming it
+       * would put a name on a box that is `display: contents`. */
+      label: this.for === '' ? '' : this.describedText,
+    })
   }
 
   protected override render(): TemplateResult {
