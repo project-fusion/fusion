@@ -3,6 +3,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
+  IndicatorController,
   requestControlledChange,
 } from '@helix-io/core'
 import { caretLeft, caretRight, play, stop } from '@helix-io/icons'
@@ -44,9 +45,18 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart track - The scroller the slides sit in.
  * @csspart indicators - The row of controls saying where the reader is.
  * @csspart indicator - One of them, and a way to reach that slide.
+ * @csspart indicator-mark - The mark that travels to the slide you are on.
  */
 @customElement('helix-base-carousel')
 export class HelixBaseCarousel extends HelixElement {
+  /* The mark. Same controller as the nav bar, the tab row and the page nav, and
+     the carousel was the one run in the library still doing this per item. */
+  private readonly indicator = new IndicatorController(this, {
+    active: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"][data-current]'),
+    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator-mark"]'),
+    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicators"]'),
+  })
+
   /** Accessible name for the carousel. */
   @property()
   label = 'Carousel'
@@ -214,13 +224,56 @@ export class HelixBaseCarousel extends HelixElement {
      * initial value, and the scroll that actually animates is this call, which
      * names `smooth` outright and overrides the property either way. A reader
      * who asked not to be moved was moved. */
+    const vertical = this.orientation === 'vertical'
+    const target = vertical
+      ? slide.offsetTop - track.offsetTop
+      : slide.offsetLeft - track.offsetLeft
+
+    /* Already there, and saying so rather than asking anyway.
+     *
+     * This is every index change that came *from* the track: a drag settles,
+     * the index follows it, and this would then send the scroller where it
+     * already is. No scroll runs, so no `scrollend` arrives, and a claim staked
+     * here would be cleared by the reader's *next* drag rather than by its own
+     * scroll, swallowing it. A pixel of slack, because a snapped offset is
+     * fractional and an exact comparison never holds. */
+    if (Math.abs(target - (vertical ? track.scrollTop : track.scrollLeft)) < 1) {
+      return
+    }
+
+    /* The preference is read here, because this is where the motion is.
+     *
+     * `scroll-behavior: auto` in a reduce block does nothing: it restates the
+     * initial value, and the scroll that actually animates is this call, which
+     * names `smooth` outright and overrides the property either way. A reader
+     * who asked not to be moved was moved. */
     const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    /* The scroll about to run is ours, so the `scrollend` it produces is not a
+       reader saying where they went. See `handleScroll`. */
+    this.settling = true
     track.scrollTo({
       behavior: still ? 'instant' : 'smooth',
-      ...(this.orientation === 'vertical'
-        ? { top: slide.offsetTop - track.offsetTop }
-        : { left: slide.offsetLeft - track.offsetLeft }),
+      ...(vertical ? { top: target } : { left: target }),
     })
+  }
+
+  /**
+   * Whether the scroll now settling is one this component asked for.
+   *
+   * Cleared by the first `scrollend` after it is set, and by a reader taking
+   * hold of the track. The second half is not belt and braces: a `scrollTo`
+   * whose target is already the scroll position fires no `scrollend` at all,
+   * and the clamped end of a `per-view` track is exactly that case. Measured:
+   * clicking past the last reachable slide moves `index` and produces no
+   * `scrollend`, so a flag that only a `scrollend` could clear would stay set
+   * and swallow the reader's next drag.
+   */
+  private settling = false
+
+  /* A reader's own input on the track ends our claim on the next `scrollend`,
+     whatever became of the scroll we issued. */
+  private readonly handleTake = (): void => {
+    this.settling = false
   }
 
   /**
@@ -260,7 +313,28 @@ export class HelixBaseCarousel extends HelixElement {
     this.timer = setInterval(() => this.goTo(this.index + 1), this.interval)
   }
 
+  /**
+   * Reads where a reader's drag settled, and only a reader's.
+   *
+   * **The scroll we issued ourselves ends with a `scrollend` too, and taking it
+   * as a reading is what makes the dots jump back.** This ran on every one, so
+   * the index a reader had just chosen was overwritten by whichever slide
+   * happened to be nearest the leading edge at the moment the animation
+   * finished. Any disagreement there is enough: a snap settling a pixel short of
+   * a midpoint, a target clamped by the scroller's own maximum, a fractional
+   * layout, or a smooth scroll cut off by the next click. The component asked
+   * for slide four, the pixels said three, and the pixels won.
+   *
+   * Which is the wrong precedence in one direction only. A drag is the reader
+   * moving the track and the index has to follow it; a click is the reader
+   * moving the index and the track has to follow *that*. One `scrollend` cannot
+   * tell those apart, so the flag does.
+   */
   private readonly handleScroll = (): void => {
+    if (this.settling) {
+      this.settling = false
+      return
+    }
     const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
     if (!track) {
       return
@@ -283,11 +357,18 @@ export class HelixBaseCarousel extends HelixElement {
        the controlled-change helper's own documentation distinguishes, a native
        control that has already moved, and putting it on that path would offer a
        refusal that cannot be honoured. */
-    if (nearest.index !== this.index) {
+    if (nearest.index === this.index) {
+      return
+    }
+    /* Announced whoever owns the state, written only if we do. `goTo` has this
+       guard and this did not, so a consumer who declared `index` had it
+       overwritten by every drag: the one thing controlled mode promises is that
+       nothing but them assigns it. */
+    if (!this.indexIsControlled) {
       this.indexState = nearest.index
       this.requestUpdate('index')
-      this.dispatchEvent(new HelixSelectEvent({ value: String(nearest.index) }))
     }
+    this.dispatchEvent(new HelixSelectEvent({ value: String(nearest.index) }))
   }
 
   /**
@@ -305,6 +386,18 @@ export class HelixBaseCarousel extends HelixElement {
     super.connectedCallback()
     this.addEventListener('focusin', this.pause)
     this.addEventListener('pointerenter', this.pause)
+  }
+
+  /* Straight away, and again after a frame. Same pair as `Tabs`, for the reason
+     given there: the first call places the mark in a document already laid out,
+     the second covers a first paint that has not happened, where every dot
+     measures zero and `place` refuses rather than writing a wrong position. The
+     frame alone is not enough, because `requestAnimationFrame` does not run in a
+     document the browser is not painting. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.indicator.place()
+    requestAnimationFrame(() => this.indicator.place())
   }
 
   override disconnectedCallback(): void {
@@ -421,7 +514,13 @@ export class HelixBaseCarousel extends HelixElement {
           </svg>
         </button>
       </div>
-      <div part="track" @scrollend=${this.handleScroll}>
+      <div
+        part="track"
+        @scrollend=${this.handleScroll}
+        @pointerdown=${this.handleTake}
+        @touchstart=${this.handleTake}
+        @wheel=${this.handleTake}
+      >
         <slot @slotchange=${() => this.requestUpdate()}></slot>
       </div>
       ${
@@ -454,6 +553,23 @@ export class HelixBaseCarousel extends HelixElement {
                   @click=${() => this.goTo(at)}
                 ></button>`,
               )}
+              ${
+                /* The mark that travels, drawn once rather than per dot.
+                 *
+                 * Every dot used to carry its own current state and grow into
+                 * it, so a move was two dots resizing in two places: the old one
+                 * deflating here, a new one inflating there, and nothing going
+                 * between them. Frozen at 40ms intervals it was plain that the
+                 * mark does not travel at all, it disappears and reappears, and
+                 * every dot between the two slides sideways while it happens
+                 * because the row is relaid out. One mark that moves is what a
+                 * reader reads as the same mark.
+                 *
+                 * `aria-hidden`, because the state it draws is already on the
+                 * dot it lands on, as `aria-current`. */
+                ''
+              }
+              <span part="indicator-mark" aria-hidden="true"></span>
             </div>`
           : nothing
       }`

@@ -100,15 +100,27 @@
  * makes it six tenths wide, and the two compose without either needing to know
  * the track's pixel width.
  */
+/* Slow enough to read as work rather than as a stripe going past. Derived from
+   the slowest duration token, so a theme that slows its motion slows this
+   with it.
+
+   **On the host, and that is not tidying.** It was declared on the indicator,
+   which is the only element that read it while the bar was the only shape.
+   Custom properties inherit downward and the ring's `<svg>` is the indicator's
+   *parent*, so the rotation written against it resolved `var(--_progress-cycle)`
+   to nothing, the `animation` shorthand failed to parse, and `animation-name`
+   fell back to `none`. The indeterminate ring never turned: it was a static arc
+   parked on the groove, which is a value, which is the one thing an
+   indeterminate state must never look like. Measured, after being written twice:
+   `animationName` came back `none` on the element the rule names. */
+:host([indeterminate]) {
+  --_progress-cycle: calc(var(--helix-duration-slow) * 5);
+}
+
 :host([indeterminate]) [part="indicator"] {
   animation: helix-progress-indeterminate var(--_progress-cycle) linear infinite;
   /* Nothing to travel to: this is not moving between two values. */
   transition: none;
-
-  /* Slow enough to read as work rather than as a stripe going past. Derived
-     from the slowest duration token, so a theme that slows its motion slows
-     this with it. */
-  --_progress-cycle: calc(var(--helix-duration-slow) * 5);
 }
 
 /* The travel is signed, because `translate` is physical and the track is not.
@@ -263,15 +275,42 @@
   text-align: center;
 }
 
-/* Running: a third of the circle turning, which is what `Spinner` draws and for
-   the reason its own comment gives, that a gap is what makes a rotation visible
-   and a full circle turning looks like nothing at all. */
+/* Running: the arc draws the circle in and takes it away again.
+ *
+ * A fixed third of the ring turning was `Spinner` exactly, and that is what was
+ * wrong with it. A spinner says "something is happening" and has no circle to
+ * fill; a progress ring's whole subject is a circle being filled, and its
+ * indeterminate state should be that same act with the amount unknown rather
+ * than a different component wearing its geometry. So the arc grows to most of
+ * the way round and shrinks again, and the ring reads as filling even though
+ * nothing here is a proportion.
+ *
+ * **Two motions, and the sweep is the one that carries it.** `stroke-dasharray`
+ * grows the arc while `stroke-dashoffset` moves its tail, so head and tail each
+ * advance monotonically and the arc never runs backwards. The rotation
+ * underneath is what stops the shrink from reading as the arc retreating: the
+ * tail catches up to a head that has already moved on.
+ *
+ * **The dash cycle ends one full lap along**, offset `-100` against a
+ * `pathLength` of 100, so the last frame is the first frame and the loop has no
+ * seam to hide. Written to land short of a lap first, and it ticked once per
+ * cycle where the two frames failed to meet.
+ *
+ * The two periods are 10:7, so they line up only every seventh turn and the
+ * pair never settles into a single beat. Same argument as the spinner's swell.
+ *
+ * The floor is 10 rather than the 3 it was written at, which is a measurement
+ * rather than a preference: the stroke is 8px on a 64px ring whose path is about
+ * 176px long, so three per cent of it is 5px, shorter than the stroke is thick.
+ * With round caps the two ends merge and the shortest frames rendered as a dot
+ * sitting on the groove. Ten per cent is 18px, which still reads as an arc.
+ */
 :host([shape="ring"][indeterminate]) [part="track"] {
   animation: helix-progress-ring var(--_progress-cycle) linear infinite;
 }
 
 :host([shape="ring"][indeterminate]) [part="indicator"] {
-  stroke-dasharray: 33 100;
+  animation: helix-progress-ring-sweep calc(var(--_progress-cycle) * 0.7) ease-in-out infinite;
   transition: none;
 }
 
@@ -285,6 +324,31 @@
   }
 }
 
+@keyframes helix-progress-ring-sweep {
+  0% {
+    stroke-dasharray: 10 100;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    stroke-dasharray: 70 100;
+    stroke-dashoffset: -25;
+  }
+
+  100% {
+    stroke-dasharray: 10 100;
+    stroke-dashoffset: -100;
+  }
+}
+
+/* Still, and the arc has to say "unknown" without moving.
+ *
+ * The same problem the bar answers with a hatch, and the same answer: a stopped
+ * arc parked at some length is a value, and a ring that cannot move cannot
+ * correct the impression. Held at a quarter with the groove behind it, which is
+ * a fraction nobody would mistake for a reading of one, and the turn crawls
+ * rather than stopping so the work still reads as outstanding. Same call the
+ * spinner makes two files over. */
 @media (prefers-reduced-motion: reduce) {
   :host([shape="ring"]) [part="indicator"] {
     transition: none;
@@ -292,5 +356,10 @@
 
   :host([shape="ring"][indeterminate]) [part="track"] {
     animation-duration: calc(var(--_progress-cycle) * 12);
+  }
+
+  :host([shape="ring"][indeterminate]) [part="indicator"] {
+    animation: none;
+    stroke-dasharray: 25 100;
   }
 }

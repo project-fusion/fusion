@@ -235,3 +235,102 @@ describe('carousel, controlled and uncontrolled', () => {
     expect(host.index).toBe(1)
   })
 })
+
+describe('carousel settling', () => {
+  /* Enough of a scroller for `handleScroll` to have something to read. happy-dom
+     lays nothing out, so the offsets are stated: what is under test is which
+     `scrollend` the component acts on, not the arithmetic of finding the
+     nearest slide. */
+  const scrolling = async (
+    attrs = '',
+  ): Promise<{ host: Carousel & { goTo(index: number): void }; track: HTMLElement }> => {
+    const host = (await mount(`<helix-carousel label="Shots" ${attrs}>
+      <div>One</div><div>Two</div><div>Three</div><div>Four</div>
+    </helix-carousel>`)) as Carousel & { goTo(index: number): void }
+    await host.updateComplete
+    const track = part(host, 'track') as HTMLElement
+    for (const [at, slide] of [...host.children].entries()) {
+      Object.defineProperty(slide, 'offsetLeft', { configurable: true, value: at * 100 })
+    }
+    Object.defineProperty(track, 'offsetLeft', { configurable: true, value: 0 })
+    track.scrollTo = ((options: ScrollToOptions) => {
+      track.scrollLeft = options.left ?? 0
+    }) as typeof track.scrollTo
+    return { host, track }
+  }
+
+  const settle = (track: HTMLElement, at: number): void => {
+    track.scrollLeft = at
+    track.dispatchEvent(new Event('scrollend'))
+  }
+
+  test('a stray scrollend after a move of ours does not drag the index back', async () => {
+    // The flip-back. Our own smooth scroll ends with a `scrollend` too, and
+    // reading it as a reader's drag lets whichever slide happens to be nearest
+    // at that instant overwrite the one they just chose.
+    const { host, track } = await scrolling('default-index="0"')
+    host.goTo(2)
+    await host.updateComplete
+    settle(track, 0)
+    await host.updateComplete
+    expect(host.index).toBe(2)
+  })
+
+  test('a reader’s drag still moves it', async () => {
+    const { host, track } = await scrolling('default-index="0"')
+    track.dispatchEvent(new Event('pointerdown'))
+    settle(track, 200)
+    await host.updateComplete
+    expect(host.index).toBe(2)
+  })
+
+  test('and the drag after that one, which a stuck claim would swallow', async () => {
+    /* The index following a drag runs `scrollToIndex`, which finds the track
+       already where it would send it. No scroll runs, so no `scrollend` comes,
+       so a claim staked there would be cleared by this drag instead of by its
+       own scroll. */
+    const { host, track } = await scrolling('default-index="0"')
+    track.dispatchEvent(new Event('pointerdown'))
+    settle(track, 200)
+    await host.updateComplete
+    settle(track, 100)
+    await host.updateComplete
+    expect(host.index).toBe(1)
+  })
+
+  test('a drag does not write an index the consumer owns', async () => {
+    // `goTo` has this guard and the scroll handler did not, so every drag
+    // overwrote a declared `index`, which is the one thing controlled mode
+    // promises will not happen.
+    const { host, track } = await scrolling('index="0"')
+    let asked = ''
+    host.addEventListener('helix-select', (event) => {
+      asked = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    track.dispatchEvent(new Event('pointerdown'))
+    settle(track, 200)
+    await host.updateComplete
+    expect(host.index).toBe(0)
+    expect(asked).toBe('2')
+  })
+})
+
+describe('carousel indicator mark', () => {
+  test('one mark for the run, rather than a state on every dot', async () => {
+    // A move used to be two dots resizing in two places, with nothing going
+    // between them and every dot between the two sliding sideways as the row
+    // was laid out again.
+    const host = await carousel()
+    expect(part(host, 'indicator-mark')).not.toBeNull()
+    expect(part(host, 'indicator-mark')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  test('the state a reader hears is still on the dot', async () => {
+    // The mark is a picture of it. `aria-current` is what says which slide you
+    // are on, and it stays where a screen reader will find it.
+    const host = await carousel('default-index="1"')
+    await host.updateComplete
+    const dots = [...(host.shadowRoot?.querySelectorAll('[part="indicator"]') ?? [])]
+    expect(dots.map((dot) => dot.getAttribute('aria-current'))).toEqual([null, 'true', null])
+  })
+})

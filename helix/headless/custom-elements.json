@@ -4321,6 +4321,10 @@
             {
               "description": "One of them, and a way to reach that slide.",
               "name": "indicator"
+            },
+            {
+              "description": "The mark that travels to the slide you are on.",
+              "name": "indicator-mark"
             }
           ],
           "slots": [
@@ -4330,6 +4334,13 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "indicator",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new IndicatorController(this, { active: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"][data-current]'), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator-mark\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicators\"]'), })"
+            },
             {
               "kind": "field",
               "name": "label",
@@ -4494,6 +4505,22 @@
               }
             },
             {
+              "kind": "field",
+              "name": "settling",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the scroll now settling is one this component asked for.\n\nCleared by the first `scrollend` after it is set, and by a reader taking\nhold of the track. The second half is not belt and braces: a `scrollTo`\nwhose target is already the scroll position fires no `scrollend` at all,\nand the clamped end of a `per-view` track is exactly that case. Measured:\nclicking past the last reachable slide moves `index` and produces no\n`scrollend`, so a flag that only a `scrollend` could clear would stay set\nand swallow the reader's next drag."
+            },
+            {
+              "kind": "field",
+              "name": "handleTake",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
               "kind": "method",
               "name": "stop",
               "privacy": "private",
@@ -4529,7 +4556,8 @@
               "kind": "field",
               "name": "handleScroll",
               "privacy": "private",
-              "readonly": true
+              "readonly": true,
+              "description": "Reads where a reader's drag settled, and only a reader's.\n\n**The scroll we issued ourselves ends with a `scrollend` too, and taking it\nas a reading is what makes the dots jump back.** This ran on every one, so\nthe index a reader had just chosen was overwritten by whichever slide\nhappened to be nearest the leading edge at the moment the animation\nfinished. Any disagreement there is enough: a snap settling a pixel short of\na midpoint, a target clamped by the scroller's own maximum, a fractional\nlayout, or a smooth scroll cut off by the next click. The component asked\nfor slide four, the pixels said three, and the pixels won.\n\nWhich is the wrong precedence in one direction only. A drag is the reader\nmoving the track and the index has to follow it; a click is the reader\nmoving the index and the track has to follow *that*. One `scrollend` cannot\ntell those apart, so the flag does."
             },
             {
               "kind": "field",

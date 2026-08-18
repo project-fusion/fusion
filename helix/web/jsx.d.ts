@@ -7380,6 +7380,7 @@ export type CustomElements = {
    * - `track`: The scroller the slides sit in.
    * - `indicators`: The row of controls saying where the reader is.
    * - `indicator`: One of them, and a way to reach that slide.
+   * - `indicator-mark`: The mark that travels to the slide you are on.
    */
   "helix-carousel": Partial<
     HelixCarouselProps & BaseProps<HelixCarousel> & BaseEvents
@@ -12505,6 +12506,7 @@ export type CustomElementsSolidJs = {
    * - `track`: The scroller the slides sit in.
    * - `indicators`: The row of controls saying where the reader is.
    * - `indicator`: One of them, and a way to reach that slide.
+   * - `indicator-mark`: The mark that travels to the slide you are on.
    */
   "helix-carousel": Partial<
     HelixCarouselProps &
