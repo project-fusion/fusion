@@ -5719,7 +5719,7 @@
               "type": {
                 "text": "'hero' | undefined"
               },
-              "description": "Whether the controls sit under the slides or on them.",
+              "description": "Whether the controls sit beside the dots or on the slides.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -6101,7 +6101,7 @@
               "type": {
                 "text": "'hero' | undefined"
               },
-              "description": "Whether the controls sit under the slides or on them.",
+              "description": "Whether the controls sit beside the dots or on the slides.",
               "fieldName": "appearance"
             },
             {

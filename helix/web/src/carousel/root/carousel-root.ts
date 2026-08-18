@@ -19,19 +19,30 @@ import { styles } from './carousel-root.css.js'
  * @aliases Slider, Gallery, Slideshow
  * @documentation https://helix.fusion.dev/components/carousel
  *
- * @property appearance - Whether the controls sit under the slides or on them.
+ * @property appearance - Whether the controls sit beside the dots or on the slides.
  *
  * @cssproperty --carousel-gap - Space between slides.
  */
 @customElement('helix-carousel')
 export class HelixCarousel extends HelixBaseCarousel {
   /**
-   * Whether the controls sit under the slides or on them.
+   * Whether the controls sit beside the dots or on the slides.
+   *
+   * Unset is one bar under the track, dots at the start of it and arrows at the
+   * end. That was three parts stacked in template order until it was measured,
+   * which put a bar of arrows *above* the slides and the dots below them: on a
+   * three-slide carousel with autoplay, sixty-four pixels of a hundred and
+   * seventeen were chrome, and the two things a reader uses to move were at
+   * opposite ends of the component. Nobody chose that arrangement; it is what
+   * stacking gives.
    *
    * `hero` puts the arrows against the track's own edges, over the content,
    * which is what a full-bleed carousel wants: the slide is the page and the
-   * controls are on it rather than in a bar beneath it. Presentation only, so
-   * it lives here rather than on the headless tier.
+   * controls are on it rather than in a bar beneath it. The dots go back to the
+   * middle there, because the row below them holds nothing else and there is a
+   * real centre to sit on.
+   *
+   * Presentation only, so it lives here rather than on the headless tier.
    */
   @property({ reflect: true })
   appearance?: 'hero'

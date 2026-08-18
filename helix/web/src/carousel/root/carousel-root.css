@@ -5,12 +5,40 @@
   --_carousel-per-view: 1;
 }
 
+/* One bar under the track, holding the dots and the arrows.
+ *
+ * The three parts render in template order, controls then track then
+ * indicators, and left in that order they stacked: a bar of arrows above the
+ * slides and a row of dots below them. Nobody chose that, it is what stacking
+ * gives, and it measured badly. On a three-slide carousel with autoplay:
+ * `host 117px, controls 0..32, track 44..97, dots 97..117`. Sixty-four pixels
+ * of a hundred and seventeen were chrome, and the two things a reader uses to
+ * move were at opposite ends of the component.
+ *
+ * A grid puts them in one row without touching the template: the track spans
+ * both columns of row one, the dots take the start of row two and the arrows
+ * the end of it. The chrome halves, and everything a reader reaches for is in
+ * one place.
+ *
+ * Dots at the start rather than centred. Centring them in the column that is
+ * left over from the arrows is not centring them on the track, and the half-
+ * truth is worse than the honest alignment. */
+:host {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+[part="track"] {
+  grid-area: 1 / 1 / 2 / 3;
+}
+
 [part="controls"] {
   align-items: center;
   display: flex;
   gap: var(--helix-space-2xs);
+  grid-area: 2 / 2;
   justify-content: flex-end;
-  margin-block-end: var(--helix-space-sm);
+  padding-block-start: var(--helix-space-sm);
 }
 
 [part="rotation"],
@@ -110,9 +138,11 @@
 /* Where the reader is, and a way to get anywhere. Dots rather than numbers,
    because the count is rarely the point and a row of numerals reads as data. */
 [part="indicators"] {
+  align-items: center;
   display: flex;
   gap: var(--helix-space-2xs);
-  justify-content: center;
+  grid-area: 2 / 1;
+  justify-content: flex-start;
   padding-block-start: var(--helix-space-sm);
 }
 
@@ -160,14 +190,16 @@
    centered on the slides rather than on the whole component. Positioning them
    against the host does not work: the host holds the indicator row too, so its
    middle is half that row below the track's, and the arrows came out high. */
-:host([appearance="hero"]) {
-  display: grid;
-  grid-template-rows: auto auto;
-}
-
 :host([appearance="hero"]) [part="controls"],
 :host([appearance="hero"]) [part="track"] {
-  grid-area: 1 / 1;
+  grid-area: 1 / 1 / 2 / 3;
+}
+
+/* Back to the middle, because with the arrows on the slides the row below holds
+   nothing else and there is a real centre to sit on. */
+:host([appearance="hero"]) [part="indicators"] {
+  grid-area: 2 / 1 / 3 / 3;
+  justify-content: center;
 }
 
 /* The bar itself catches nothing, so a press between the arrows reaches the
@@ -175,7 +207,7 @@
 :host([appearance="hero"]) [part="controls"] {
   align-items: center;
   justify-content: space-between;
-  margin-block-end: var(--helix-space-none);
+  padding-block-start: var(--helix-space-none);
   padding-inline: var(--helix-space-md);
   pointer-events: none;
   z-index: var(--helix-layer-raised);

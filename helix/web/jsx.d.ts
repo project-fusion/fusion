@@ -1390,7 +1390,7 @@ export type HelixCarouselHelixSelectElementEvent =
   HelixCarouselElementEvent<HelixSelectEvent>;
 
 export type HelixCarouselProps = {
-  /** Whether the controls sit under the slides or on them. */
+  /** Whether the controls sit beside the dots or on the slides. */
   appearance?: HelixCarousel["appearance"];
   /** How many slides are shown across the track at once. Absent shows one.
 
@@ -1438,7 +1438,7 @@ state turns up, this is what it is extracted from. */
 };
 
 export type HelixCarouselSolidJsProps = {
-  /** Whether the controls sit under the slides or on them. */
+  /** Whether the controls sit beside the dots or on the slides. */
   "prop:appearance"?: HelixCarousel["appearance"];
   /** How many slides are shown across the track at once. Absent shows one.
 
@@ -6806,7 +6806,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the controls sit under the slides or on them.
+   * - `appearance`: Whether the controls sit beside the dots or on the slides.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * No default, because it reflects. A reflected property with a value writes
@@ -11728,7 +11728,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the controls sit under the slides or on them.
+   * - `appearance`: Whether the controls sit beside the dots or on the slides.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * No default, because it reflects. A reflected property with a value writes
