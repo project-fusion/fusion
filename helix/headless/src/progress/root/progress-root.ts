@@ -38,6 +38,7 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart track - The full length the work is measured against.
  * @csspart indicator - The part of it that is done.
+ * @csspart groove - The unfilled circle, under the ring's own sweep.
  * @csspart value - The reading beside the bar, under `show-value`.
  */
 @customElement('helix-base-progress')
@@ -65,6 +66,22 @@ export class HelixBaseProgress extends HelixElement {
   /** The total the work is measured against. */
   @property({ type: Number })
   max = 100
+
+  /**
+   * Whether the value is drawn as a bar or as a ring.
+   *
+   * **On this tier because it changes the markup**, which is the base tier's to
+   * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
+   * stylesheet turns one into the other: the styled tier tried, with a conic
+   * gradient and a mask, and the thing it could not do was the round end the
+   * spinner has, because a gradient has hard radial edges and no notion of a
+   * cap. `Skeleton.shape` is the same word for the same kind of decision.
+   *
+   * The value, the ARIA and the form participation are untouched by it. What
+   * changes is only which shape carries the fraction.
+   */
+  @property({ reflect: true })
+  shape?: 'ring'
 
   /**
    * Whether the reading is shown beside the bar.
@@ -146,12 +163,31 @@ export class HelixBaseProgress extends HelixElement {
   protected override render(): TemplateResult {
     /* A custom property rather than a width, so the styled tier decides what
        the number means: a bar fills along it, and a ring would sweep. */
-    return html`<div part="track">
-        <div
-          part="indicator"
-          style="--_progress-fraction: ${this.indeterminate ? 1 : this.fraction}"
-        ></div>
-      </div>
+    const fraction = this.indeterminate ? 1 : this.fraction
+
+    /* Two circles and `pathLength`, which is what makes the arithmetic go away.
+     *
+     * Declaring the path 100 units long lets `stroke-dasharray` be written as
+     * the percentage itself, so nothing here or in the stylesheet needs the
+     * circumference, the radius or pi. The geometry is CSS as well: `r` and the
+     * stroke both read the ring's own custom properties, so a consumer changing
+     * the thickness moves the circle that carries it without the component
+     * recalculating anything.
+     *
+     * `aria-hidden`, because the host is the `progressbar` and carries the
+     * value. The drawing is a picture of what it already says. */
+    const ring = html`<svg part="track" aria-hidden="true">
+      <circle part="groove" />
+      <circle part="indicator" pathLength="100" style="--_progress-fraction: ${fraction}" />
+    </svg>`
+
+    return html`${
+      this.shape === 'ring'
+        ? ring
+        : html`<div part="track">
+            <div part="indicator" style="--_progress-fraction: ${fraction}"></div>
+          </div>`
+    }
       ${
         /* `aria-hidden`, because the bar already reports this. The host carries
            `role="progressbar"` with `aria-valuenow` and `aria-valuetext`, so a

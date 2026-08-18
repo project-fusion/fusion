@@ -213,7 +213,9 @@
  * now, and what is left here is the one thing on this element that really is a
  * transition: the indicator, which three sibling components already drop. */
 @media (prefers-reduced-motion: reduce) {
-  [part="indicator"] {
+  [part="indicator"],
+  :host([indicator-placement="inline-start"]) [part="indicator"],
+  :host([indicator-placement="inline-end"]) [part="indicator"] {
     transition: none;
   }
 }
@@ -241,6 +243,26 @@
 [part="indicator"][data-current] {
   background-color: var(--helix-color-primary);
   inline-size: var(--helix-space-lg);
+}
+
+/* The current dot stretches along the run, whichever way the run goes.
+ *
+ * It grew on the inline axis wherever it was, so a column of dots beside the
+ * slides had one lying on its side across the column: an oval pointing the way
+ * the reader is not travelling. Beside the track it lengthens on the block axis
+ * instead, and the transition follows it, or the growth is instant on the one
+ * axis and animated on the other. */
+:host([indicator-placement="inline-start"]) [part="indicator"],
+:host([indicator-placement="inline-end"]) [part="indicator"] {
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    block-size var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+:host([indicator-placement="inline-start"]) [part="indicator"][data-current],
+:host([indicator-placement="inline-end"]) [part="indicator"][data-current] {
+  block-size: var(--helix-space-lg);
+  inline-size: var(--helix-space-xs);
 }
 
 /* Neutral, not brand. This is the one `border-strong` in the library that was

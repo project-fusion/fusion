@@ -3102,6 +3102,18 @@ place in the layout when the answer arrives and it becomes determinate. */
   indeterminate?: HelixBaseProgress["indeterminate"];
   /** The total the work is measured against. */
   max?: HelixBaseProgress["max"];
+  /** Whether the value is drawn as a bar or as a ring.
+
+**On this tier because it changes the markup**, which is the base tier's to
+own. A bar is two boxes and a ring is an SVG with two circles in it, and no
+stylesheet turns one into the other: the styled tier tried, with a conic
+gradient and a mask, and the thing it could not do was the round end the
+spinner has, because a gradient has hard radial edges and no notion of a
+cap. `Skeleton.shape` is the same word for the same kind of decision.
+
+The value, the ARIA and the form participation are untouched by it. What
+changes is only which shape carries the fraction. */
+  shape?: HelixBaseProgress["shape"];
   /** Whether the reading is shown beside the bar.
 
 The same name and shape `Slider` uses, because it is the same question:
@@ -3162,6 +3174,18 @@ place in the layout when the answer arrives and it becomes determinate. */
   "prop:indeterminate"?: HelixBaseProgress["indeterminate"];
   /** The total the work is measured against. */
   "prop:max"?: HelixBaseProgress["max"];
+  /** Whether the value is drawn as a bar or as a ring.
+
+**On this tier because it changes the markup**, which is the base tier's to
+own. A bar is two boxes and a ring is an SVG with two circles in it, and no
+stylesheet turns one into the other: the styled tier tried, with a conic
+gradient and a mask, and the thing it could not do was the round end the
+spinner has, because a gradient has hard radial edges and no notion of a
+cap. `Skeleton.shape` is the same word for the same kind of decision.
+
+The value, the ARIA and the form participation are untouched by it. What
+changes is only which shape carries the fraction. */
+  "prop:shape"?: HelixBaseProgress["shape"];
   /** Whether the reading is shown beside the bar.
 
 The same name and shape `Slider` uses, because it is the same question:
@@ -8255,6 +8279,17 @@ export type CustomElements = {
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
+   * - `shape`: Whether the value is drawn as a bar or as a ring.
+   *
+   * **On this tier because it changes the markup**, which is the base tier's to
+   * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
+   * stylesheet turns one into the other: the styled tier tried, with a conic
+   * gradient and a mask, and the thing it could not do was the round end the
+   * spinner has, because a gradient has hard radial edges and no notion of a
+   * cap. `Skeleton.shape` is the same word for the same kind of decision.
+   *
+   * The value, the ARIA and the form participation are untouched by it. What
+   * changes is only which shape carries the fraction.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
    *
    * The same name and shape `Slider` uses, because it is the same question:
@@ -8283,6 +8318,7 @@ export type CustomElements = {
    *
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
+   * - `groove`: The unfilled circle, under the ring's own sweep.
    * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-base-progress": Partial<
@@ -13269,6 +13305,17 @@ export type CustomElementsSolidJs = {
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
+   * - `shape`: Whether the value is drawn as a bar or as a ring.
+   *
+   * **On this tier because it changes the markup**, which is the base tier's to
+   * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
+   * stylesheet turns one into the other: the styled tier tried, with a conic
+   * gradient and a mask, and the thing it could not do was the round end the
+   * spinner has, because a gradient has hard radial edges and no notion of a
+   * cap. `Skeleton.shape` is the same word for the same kind of decision.
+   *
+   * The value, the ARIA and the form participation are untouched by it. What
+   * changes is only which shape carries the fraction.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
    *
    * The same name and shape `Slider` uses, because it is the same question:
@@ -13297,6 +13344,7 @@ export type CustomElementsSolidJs = {
    *
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
+   * - `groove`: The unfilled circle, under the ring's own sweep.
    * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-base-progress": Partial<

@@ -188,161 +188,109 @@
 
 /* ============================================================ ring =======
  *
- * The same value, swept instead of filled, and no markup changed to do it.
+ * The spinner's shape carrying the bar's value, which is what was asked for and
+ * what a conic gradient could not give.
  *
- * The headless tier hands the styled tier one number on a custom property and
- * says nothing about shape, which is what its own comment predicted: "a bar
- * fills along it, and a ring would sweep". So this is an `appearance` on the
- * existing family rather than a `ProgressRing` beside it, and it inherits the
- * form participation, the ARIA, `indeterminate` and `show-value` by being the
- * same component. A separate family would have duplicated all four to change a
- * stylesheet.
+ * The gradient version is worth recording because it failed on one thing: a
+ * gradient has hard radial edges and no notion of a cap, so the rounded end the
+ * spinner has had to be drawn as a disc at each end of the arc, and those discs
+ * sat proud of the band and were wider than the arc itself at small values. An
+ * SVG stroke has `stroke-linecap: round` and needs none of it.
  *
- * A `conic-gradient` on the part that already carries the fraction, rather than
- * an SVG. An SVG would have to be rendered by the headless tier, which owns
- * markup, to serve a decision the styled tier owns: the tier split would be
- * paying for a shape.
+ * That moved `shape` to the headless tier, where markup belongs. See the note
+ * there: the value, the ARIA and the form participation are untouched, and the
+ * only thing that changes is which shape carries the fraction.
  */
-@property --_progress-fraction {
-  inherits: true;
-  initial-value: 0;
-  syntax: "<number>";
-}
-
-:host([appearance="ring"]) {
+:host([shape="ring"]) {
   display: inline-grid;
   place-items: center;
 }
 
-/* The groove: a full circle of the track colour with its middle cut out.
- *
- * `mask` rather than a smaller circle laid on top, because a disc in the middle
- * has to be filled with something, and whatever it is stops being transparent:
- * a ring over a photograph or a tinted callout would carry a plug of page
- * colour with it. A mask removes the middle instead of covering it. */
-:host([appearance="ring"]) [part="track"] {
-  /* The bar's own height, so a ring and a bar in one interface are the same
-     weight. It was `space-2xs`, a spacing token standing in for a stroke, which
-     drew the ring at half the bar and made the two read as different components
-     rather than one value in two shapes. `--helix-size-progress` also follows
-     the density seed, which a spacing token does not. */
-  --_ring-hole: calc(50% - var(--progress-ring-width, var(--helix-size-progress)));
+:host([shape="ring"]) [part="track"] {
+  --_ring-stroke: var(--progress-ring-width, var(--helix-size-progress));
 
-  background-color: var(--progress-track-color, var(--helix-color-surface-sunken));
+  /* The bar's own track rule paints this, and here it is an `<svg>`: the fill
+     and the full radius it gives a bar came out as a solid grey disc behind the
+     ring, which read as a filled circle with an arc on its edge. The groove is a
+     stroked circle inside the drawing, not a background behind it. */
+  background-color: transparent;
   block-size: var(--progress-ring-size, 4rem);
-  border-radius: var(--helix-radii-full);
   grid-area: 1 / 1;
   inline-size: var(--progress-ring-size, 4rem);
-  mask: radial-gradient(
-    circle,
-    transparent var(--_ring-hole),
-    black calc(var(--_ring-hole) + 0.5px)
-  );
-  overflow: visible;
-  position: relative;
+  /* Twelve o'clock, where a dial starts. An SVG circle starts at three. */
+  rotate: -90deg;
 }
 
-/* The sweep. `from 0deg` starts at twelve o'clock, which is where a reader
-   expects a dial to begin, and the hard stop rather than a gradient keeps the
-   leading edge a line instead of a fade.
- *
- * `--_progress-fraction` is registered above, which is what lets it animate:
- * an unregistered custom property is a string to the interpolator and jumps
- * between values. Registering it is also why the bar's `scale` and this share
- * one number without either knowing about the other. */
-:host([appearance="ring"]) [part="indicator"] {
-  background-color: transparent;
-  background-image: conic-gradient(
-    from 0deg,
-    var(--progress-color, var(--helix-color-primary)) calc(var(--_progress-fraction) * 360deg),
-    transparent 0
-  );
-  border-radius: var(--helix-radii-full);
-  inset: 0;
-  mask: inherit;
-  position: absolute;
+/* Geometry as CSS rather than as attributes, so both circles read the ring's own
+   properties and a consumer changing the thickness moves the circle that carries
+   it without the component recalculating anything.
+
+   `r` in per cent resolves against the diagonal normalised by root two, which
+   for the square this always is comes out as the side. */
+:host([shape="ring"]) [part="groove"],
+:host([shape="ring"]) [part="indicator"] {
+  cx: 50%;
+  cy: 50%;
+  fill: none;
+  r: calc(50% - var(--_ring-stroke) / 2);
+  stroke-width: var(--_ring-stroke);
+}
+
+:host([shape="ring"]) [part="groove"] {
+  stroke: var(--progress-track-color, var(--helix-color-surface-sunken));
+}
+
+/* `pathLength="100"` on the element is what makes this the percentage itself:
+   the path is declared a hundred units long, so nothing here needs the
+   circumference, the radius or pi. */
+:host([shape="ring"]) [part="indicator"] {
   scale: none;
-  /* Reset, and it is the one thing that made this look broken. The bar's rule
-     sets `transform-origin: left center`, so the ring turned about its own left
-     edge and swung the arc clear off the component: the ring rendered as an
-     empty groove with a speck beside it. Isolated in a bare document the
-     identical gradient and mask were correct, which is what pointed at a
-     declaration the ring inherits rather than at either of them. */
-  transform-origin: center;
-  transition: --_progress-fraction var(--helix-duration-normal) var(--helix-easing-decelerate);
+  stroke: var(--progress-color, var(--helix-color-primary));
+  stroke-dasharray: calc(var(--_progress-fraction) * 100) 100;
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--helix-duration-normal) var(--helix-easing-decelerate);
 }
 
-/* **No round caps, and the attempt is worth recording.**
- *
- * A conic gradient has hard radial edges and no notion of a cap, so matching the
- * spinner's rounded ends meant drawing a disc at each end of the arc. It was
- * built, twice, and it looked far worse than the plain edge it replaced: the
- * discs sat proud of the band, bulged past the outer circle, and at small
- * values the cap was wider than the arc it was meant to finish. Zoomed to six
- * times, an 8% ring was a blob on a sliver.
- *
- * The honest reading is that the bar's rounded ends are a rounded rectangle,
- * which is a property of its shape, and a ring has no equivalent to reproduce.
- * A hard radial edge is what a dial has always had.
- *
- * The one route that would give real caps is an SVG with `stroke-linecap:
- * round`, which the headless tier would have to render, to serve a decision the
- * styled tier owns. That is a tier call worth taking deliberately if it ever
- * matters, rather than smuggling in behind a stylesheet. */
-
-/* In the middle, where a dial puts its reading, and the grid is what centres it
-   over the ring rather than beside it. */
-:host([appearance="ring"][show-value]) {
+/* In the middle, where a dial puts its reading. */
+:host([shape="ring"][show-value]) {
   gap: var(--helix-space-none);
   grid-template-columns: auto;
 }
 
-:host([appearance="ring"]) [part="value"] {
+:host([shape="ring"]) [part="value"] {
   grid-area: 1 / 1;
   min-inline-size: 0;
   text-align: center;
 }
 
-/* Running, with no knowable end: the whole ring turns rather than a segment
-   travelling a track, because a ring has no ends for a segment to leave by. */
-:host([appearance="ring"][indeterminate]) [part="indicator"] {
+/* Running: a third of the circle turning, which is what `Spinner` draws and for
+   the reason its own comment gives, that a gap is what makes a rotation visible
+   and a full circle turning looks like nothing at all. */
+:host([shape="ring"][indeterminate]) [part="track"] {
   animation: helix-progress-ring var(--_progress-cycle) linear infinite;
-  /* A third of the circle, which is what `Spinner` draws and for the reason its
-     own comment gives: a gap is what makes the rotation visible, and a full
-     circle turning looks like nothing at all.
-   *
-   * Two earlier versions were wrong in opposite directions. `transparent 0deg,
-   * colour 300deg, transparent 360deg` interpolates across the whole sweep, so
-   * the arc was a gradient from nothing to nothing and read as an empty ring
-   * with a smudge in it. Hard stops fixed the smudge and left a 300 degree arc,
-   * which is a nearly closed ring with a notch: it reads as a bar at 85 per cent
-   * rather than as something running, and the notch was the only thing moving.
-   *
-   * 120 degrees solid with 20 either side to soften the ends, so the head and
-   * tail are edges rather than cuts. */
-  background-image: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    var(--progress-color, var(--helix-color-primary)) 20deg 140deg,
-    transparent 160deg
-  );
+}
+
+:host([shape="ring"][indeterminate]) [part="indicator"] {
+  stroke-dasharray: 33 100;
   transition: none;
 }
 
 @keyframes helix-progress-ring {
+  from {
+    rotate: -90deg;
+  }
+
   to {
-    rotate: 1turn;
+    rotate: 270deg;
   }
 }
 
-/* The turn slows to a crawl rather than stopping, for the reason `Spinner`
-   records: a frozen indicator reads as broken rather than as busy. */
 @media (prefers-reduced-motion: reduce) {
-  :host([appearance="ring"]) [part="indicator"] {
+  :host([shape="ring"]) [part="indicator"] {
     transition: none;
   }
 
-  :host([appearance="ring"][indeterminate]) [part="indicator"] {
+  :host([shape="ring"][indeterminate]) [part="track"] {
     animation-duration: calc(var(--_progress-cycle) * 12);
   }
 }

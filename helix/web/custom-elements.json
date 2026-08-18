@@ -18725,16 +18725,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'ring' | undefined"
-              },
-              "description": "Whether the value is drawn as a bar or as a ring.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -18771,6 +18761,20 @@
               "default": "100",
               "description": "The total the work is measured against.",
               "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": {
+                "text": "'ring' | undefined"
+              },
+              "description": "Whether the value is drawn as a bar or as a ring.\n\n**On this tier because it changes the markup**, which is the base tier's to\nown. A bar is two boxes and a ring is an SVG with two circles in it, and no\nstylesheet turns one into the other: the styled tier tried, with a conic\ngradient and a mask, and the thing it could not do was the round end the\nspinner has, because a gradient has hard radial edges and no notion of a\ncap. `Skeleton.shape` is the same word for the same kind of decision.\n\nThe value, the ARIA and the form participation are untouched by it. What\nchanges is only which shape carries the fraction.",
+              "attribute": "shape",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseProgress",
                 "module": "src/progress/root/progress-root.ts"
@@ -18902,15 +18906,60 @@
               }
             }
           ],
-          "attributes": [
+          "superclass": {
+            "name": "HelixBaseProgress",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Shows how far along a task is, when that is known.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/progress",
+            "aliases": [
+              "Progress bar",
+              "Loading bar"
+            ],
+            "tier": "styled",
+            "group": "Progress",
+            "part": "Root"
+          },
+          "tagName": "helix-progress",
+          "customElement": true,
+          "cssParts": [
             {
-              "name": "appearance",
-              "type": {
-                "text": "'ring' | undefined"
-              },
-              "description": "Whether the value is drawn as a bar or as a ring.",
-              "fieldName": "appearance"
+              "description": "The full length the work is measured against.",
+              "name": "track",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
             },
+            {
+              "description": "The part of it that is done.",
+              "name": "indicator",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "description": "The unfilled circle, under the ring's own sweep.",
+              "name": "groove",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "description": "The reading beside the bar, under `show-value`.",
+              "name": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            }
+          ],
+          "attributes": [
             {
               "name": "label",
               "type": {
@@ -18951,6 +19000,18 @@
               }
             },
             {
+              "name": "shape",
+              "type": {
+                "text": "'ring' | undefined"
+              },
+              "description": "Whether the value is drawn as a bar or as a ring.\n\n**On this tier because it changes the markup**, which is the base tier's to\nown. A bar is two boxes and a ring is an SVG with two circles in it, and no\nstylesheet turns one into the other: the styled tier tried, with a conic\ngradient and a mask, and the thing it could not do was the round end the\nspinner has, because a gradient has hard radial edges and no notion of a\ncap. `Skeleton.shape` is the same word for the same kind of decision.\n\nThe value, the ARIA and the form participation are untouched by it. What\nchanges is only which shape carries the fraction.",
+              "fieldName": "shape",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
               "name": "show-value",
               "type": {
                 "text": "boolean"
@@ -18984,51 +19045,6 @@
               "default": "''",
               "description": "A reading for the value, where the number alone does not say enough.\n\n\"3 of 8 files\" rather than \"37\". Announced instead of the percentage, and\nnever instead of the value itself: `aria-valuenow` still carries the\nnumber, because assistive technology that ignores the text still has to\nreport progress.",
               "fieldName": "valueText",
-              "inheritedFrom": {
-                "name": "HelixBaseProgress",
-                "module": "src/progress/root/progress-root.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseProgress",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Shows how far along a task is, when that is known.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/progress",
-            "aliases": [
-              "Progress bar",
-              "Loading bar"
-            ],
-            "tier": "styled",
-            "group": "Progress",
-            "part": "Root"
-          },
-          "tagName": "helix-progress",
-          "customElement": true,
-          "cssParts": [
-            {
-              "description": "The full length the work is measured against.",
-              "name": "track",
-              "inheritedFrom": {
-                "name": "HelixBaseProgress",
-                "module": "src/progress/root/progress-root.ts"
-              }
-            },
-            {
-              "description": "The part of it that is done.",
-              "name": "indicator",
-              "inheritedFrom": {
-                "name": "HelixBaseProgress",
-                "module": "src/progress/root/progress-root.ts"
-              }
-            },
-            {
-              "description": "The reading beside the bar, under `show-value`.",
-              "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseProgress",
                 "module": "src/progress/root/progress-root.ts"

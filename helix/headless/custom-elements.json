@@ -14321,6 +14321,10 @@
               "name": "indicator"
             },
             {
+              "description": "The unfilled circle, under the ring's own sweep.",
+              "name": "groove"
+            },
+            {
               "description": "The reading beside the bar, under `show-value`.",
               "name": "value"
             }
@@ -14356,6 +14360,16 @@
               "default": "100",
               "description": "The total the work is measured against.",
               "attribute": "max"
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": {
+                "text": "'ring' | undefined"
+              },
+              "description": "Whether the value is drawn as a bar or as a ring.\n\n**On this tier because it changes the markup**, which is the base tier's to\nown. A bar is two boxes and a ring is an SVG with two circles in it, and no\nstylesheet turns one into the other: the styled tier tried, with a conic\ngradient and a mask, and the thing it could not do was the round end the\nspinner has, because a gradient has hard radial edges and no notion of a\ncap. `Skeleton.shape` is the same word for the same kind of decision.\n\nThe value, the ARIA and the form participation are untouched by it. What\nchanges is only which shape carries the fraction.",
+              "attribute": "shape",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -14494,6 +14508,14 @@
               "default": "100",
               "description": "The total the work is measured against.",
               "fieldName": "max"
+            },
+            {
+              "name": "shape",
+              "type": {
+                "text": "'ring' | undefined"
+              },
+              "description": "Whether the value is drawn as a bar or as a ring.\n\n**On this tier because it changes the markup**, which is the base tier's to\nown. A bar is two boxes and a ring is an SVG with two circles in it, and no\nstylesheet turns one into the other: the styled tier tried, with a conic\ngradient and a mask, and the thing it could not do was the round end the\nspinner has, because a gradient has hard radial edges and no notion of a\ncap. `Skeleton.shape` is the same word for the same kind of decision.\n\nThe value, the ARIA and the form participation are untouched by it. What\nchanges is only which shape carries the fraction.",
+              "fieldName": "shape"
             },
             {
               "name": "show-value",

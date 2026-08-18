@@ -2084,11 +2084,11 @@ thing advancing.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'ring' \| undefined` | - | - | Whether the value is drawn as a bar or as a ring. |
 | `fraction` | - | `number` | - | `HelixBaseProgress` | What is done, as a fraction of the whole, between 0 and 1. |
 | `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseProgress` | Whether the work has a knowable end. |
 | `label` | `label` | `string` | `'Progress'` | `HelixBaseProgress` | Accessible name for what is in progress. |
 | `max` | `max` | `number` | `100` | `HelixBaseProgress` | The total the work is measured against. |
+| `shape` | `shape` | `'ring' \| undefined` | - | `HelixBaseProgress` | Whether the value is drawn as a bar or as a ring. |
 | `showValue` | `show-value` | `boolean` | `false` | `HelixBaseProgress` | Whether the reading is shown beside the bar. |
 | `value` | `value` | `number` | `0` | `HelixBaseProgress` | What has been done so far, in the same units as `max`. |
 | `valueText` | `value-text` | `string` | `''` | `HelixBaseProgress` | A reading for the value, where the number alone does not say enough. |
@@ -2099,6 +2099,7 @@ thing advancing.
 | --- | --- |
 | `track` | The full length the work is measured against. |
 | `indicator` | The part of it that is done. |
+| `groove` | The unfilled circle, under the ring's own sweep. |
 | `value` | The reading beside the bar, under `show-value`. |
 
 #### Custom properties
