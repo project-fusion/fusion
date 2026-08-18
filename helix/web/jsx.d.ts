@@ -47,6 +47,8 @@ import type {
   HelixOptionGroup,
   HelixOutline,
   HelixPagination,
+  HelixPaginationSize,
+  HelixPaginationSummary,
   HelixPopover,
   HelixProgress,
   HelixQuote,
@@ -3614,21 +3616,23 @@ so there is never a question of which of two sources is current. */
   pages?: HelixPagination["pages"];
   /** How many items there are across every page.
 
-What the count reads from, and what `pages` falls back to with `page-size`.
-Unset renders no count, which is the common case where a consumer knows the
-page total and not the item total. */
+What `pages` falls back to together with `page-size`. Unset is the common
+case, where a consumer knows the page total and not the item total.
+
+Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+to a reader, and takes its own. */
   total?: HelixPagination["total"];
   /** How many items are on a page.
 
 Only arithmetic: this does not slice anything, because the component never
-sees the items. It is what turns a page number into "31-40" for the count,
-and what turns `total` into a page count. */
+sees the items. It is what turns `total` into a page count, and nothing
+else. */
   "page-size"?: HelixPagination["pageSize"];
   /** How many items are on a page.
 
 Only arithmetic: this does not slice anything, because the component never
-sees the items. It is what turns a page number into "31-40" for the count,
-and what turns `total` into a page count. */
+sees the items. It is what turns `total` into a page count, and nothing
+else. */
   pageSize?: HelixPagination["pageSize"];
   /** Whether to offer a jump to the first and last pages.
 
@@ -3713,20 +3717,6 @@ existing is that the row is narrow. The numbers are the reading. */
   "last-label"?: HelixPagination["lastLabel"];
   /** Accessible name for the control that jumps to the last page. */
   lastLabel?: HelixPagination["lastLabel"];
-  /** The count, with `{from}`, `{to}` and `{total}` filled in.
-
-A separate template from `statusLabel` because they answer different
-questions: one says which page of how many, the other says which items of
-how many. A reader looking for "am I near the end" wants the first and one
-looking for "how much is there" wants the second. */
-  "count-label"?: HelixPagination["countLabel"];
-  /** The count, with `{from}`, `{to}` and `{total}` filled in.
-
-A separate template from `statusLabel` because they answer different
-questions: one says which page of how many, the other says which items of
-how many. A reader looking for "am I near the end" wants the first and one
-looking for "how much is there" wants the second. */
-  countLabel?: HelixPagination["countLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
   "gap-label"?: HelixPagination["gapLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
@@ -3749,21 +3739,23 @@ so there is never a question of which of two sources is current. */
   "prop:pages"?: HelixPagination["pages"];
   /** How many items there are across every page.
 
-What the count reads from, and what `pages` falls back to with `page-size`.
-Unset renders no count, which is the common case where a consumer knows the
-page total and not the item total. */
+What `pages` falls back to together with `page-size`. Unset is the common
+case, where a consumer knows the page total and not the item total.
+
+Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+to a reader, and takes its own. */
   "prop:total"?: HelixPagination["total"];
   /** How many items are on a page.
 
 Only arithmetic: this does not slice anything, because the component never
-sees the items. It is what turns a page number into "31-40" for the count,
-and what turns `total` into a page count. */
+sees the items. It is what turns `total` into a page count, and nothing
+else. */
   "attr:page-size"?: HelixPagination["pageSize"];
   /** How many items are on a page.
 
 Only arithmetic: this does not slice anything, because the component never
-sees the items. It is what turns a page number into "31-40" for the count,
-and what turns `total` into a page count. */
+sees the items. It is what turns `total` into a page count, and nothing
+else. */
   "prop:pageSize"?: HelixPagination["pageSize"];
   /** Whether to offer a jump to the first and last pages.
 
@@ -3848,26 +3840,120 @@ existing is that the row is narrow. The numbers are the reading. */
   "attr:last-label"?: HelixPagination["lastLabel"];
   /** Accessible name for the control that jumps to the last page. */
   "prop:lastLabel"?: HelixPagination["lastLabel"];
-  /** The count, with `{from}`, `{to}` and `{total}` filled in.
-
-A separate template from `statusLabel` because they answer different
-questions: one says which page of how many, the other says which items of
-how many. A reader looking for "am I near the end" wants the first and one
-looking for "how much is there" wants the second. */
-  "attr:count-label"?: HelixPagination["countLabel"];
-  /** The count, with `{from}`, `{to}` and `{total}` filled in.
-
-A separate template from `statusLabel` because they answer different
-questions: one says which page of how many, the other says which items of
-how many. A reader looking for "am I near the end" wants the first and one
-looking for "how much is there" wants the second. */
-  "prop:countLabel"?: HelixPagination["countLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
   "attr:gap-label"?: HelixPagination["gapLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
   "prop:gapLabel"?: HelixPagination["gapLabel"];
   /** Fired before the page changes, and cancelable. The only way to refuse one. */
   "on:helix-navigate"?: (e: HelixPaginationHelixNavigateElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixPaginationSize` component event */
+export type HelixPaginationSizeElementEvent<E = Event> = TypedEvent<
+  HelixPaginationSize,
+  E
+>;
+/** `helix-change` event type */
+export type HelixPaginationSizeHelixChangeElementEvent =
+  HelixPaginationSizeElementEvent<HelixChangeEvent>;
+
+export type HelixPaginationSizeProps = {
+  /** The sizes offered, comma separated.
+
+A string rather than an array, so the whole control is expressible in
+markup and survives a server render. Anything that is not a positive number
+is dropped rather than rendered as an option that cannot mean anything. */
+  sizes?: HelixPaginationSize["sizes"];
+  /** The size in force.
+
+Reading gives the real one; writing declares it the consumer's, and
+`default-value` seeds one this element owns. Same accessor pair as
+`Pagination.page` and the calendar's `month`. */
+  value?: HelixPaginationSize["value"];
+  /** Size to start on, where nothing declared one. */
+  "default-value"?: HelixPaginationSize["defaultValue"];
+  /** Size to start on, where nothing declared one. */
+  defaultValue?: HelixPaginationSize["defaultValue"];
+  /** The words beside the control. */
+  label?: HelixPaginationSize["label"];
+  /** Locale for the numbers. Absent uses the runtime's own. */
+  locale?: HelixPaginationSize["locale"];
+
+  /** Fired before the size changes, and cancelable. The only way to refuse one. */
+  "onhelix-change"?: (e: HelixPaginationSizeHelixChangeElementEvent) => void;
+};
+
+export type HelixPaginationSizeSolidJsProps = {
+  /** The sizes offered, comma separated.
+
+A string rather than an array, so the whole control is expressible in
+markup and survives a server render. Anything that is not a positive number
+is dropped rather than rendered as an option that cannot mean anything. */
+  "prop:sizes"?: HelixPaginationSize["sizes"];
+  /** The size in force.
+
+Reading gives the real one; writing declares it the consumer's, and
+`default-value` seeds one this element owns. Same accessor pair as
+`Pagination.page` and the calendar's `month`. */
+  "prop:value"?: HelixPaginationSize["value"];
+  /** Size to start on, where nothing declared one. */
+  "attr:default-value"?: HelixPaginationSize["defaultValue"];
+  /** Size to start on, where nothing declared one. */
+  "prop:defaultValue"?: HelixPaginationSize["defaultValue"];
+  /** The words beside the control. */
+  "prop:label"?: HelixPaginationSize["label"];
+  /** Locale for the numbers. Absent uses the runtime's own. */
+  "prop:locale"?: HelixPaginationSize["locale"];
+  /** Fired before the size changes, and cancelable. The only way to refuse one. */
+  "on:helix-change"?: (e: HelixPaginationSizeHelixChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixPaginationSummaryProps = {
+  /** The page on show, one-based. */
+  page?: HelixPaginationSummary["page"];
+  /** How many items are on a page. */
+  "page-size"?: HelixPaginationSummary["pageSize"];
+  /** How many items are on a page. */
+  pageSize?: HelixPaginationSummary["pageSize"];
+  /** How many items there are across every page. */
+  total?: HelixPaginationSummary["total"];
+  /** The reading, with `{from}`, `{to}` and `{total}` filled in.
+
+A template rather than a prefix and a suffix, because word order is not
+universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
+and three concatenations anywhere else. */
+  label?: HelixPaginationSummary["label"];
+  /** Locale for the numbers. Absent uses the runtime's own. */
+  locale?: HelixPaginationSummary["locale"];
+};
+
+export type HelixPaginationSummarySolidJsProps = {
+  /** The page on show, one-based. */
+  "prop:page"?: HelixPaginationSummary["page"];
+  /** How many items are on a page. */
+  "attr:page-size"?: HelixPaginationSummary["pageSize"];
+  /** How many items are on a page. */
+  "prop:pageSize"?: HelixPaginationSummary["pageSize"];
+  /** How many items there are across every page. */
+  "prop:total"?: HelixPaginationSummary["total"];
+  /** The reading, with `{from}`, `{to}` and `{total}` filled in.
+
+A template rather than a prefix and a suffix, because word order is not
+universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
+and three concatenations anywhere else. */
+  "prop:label"?: HelixPaginationSummary["label"];
+  /** Locale for the numbers. Absent uses the runtime's own. */
+  "prop:locale"?: HelixPaginationSummary["locale"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9380,14 +9466,16 @@ export type CustomElements = {
    * so there is never a question of which of two sources is current.
    * - `total`: How many items there are across every page.
    *
-   * What the count reads from, and what `pages` falls back to with `page-size`.
-   * Unset renders no count, which is the common case where a consumer knows the
-   * page total and not the item total.
+   * What `pages` falls back to together with `page-size`. Unset is the common
+   * case, where a consumer knows the page total and not the item total.
+   *
+   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+   * to a reader, and takes its own.
    * - `page-size`/`pageSize`: How many items are on a page.
    *
    * Only arithmetic: this does not slice anything, because the component never
-   * sees the items. It is what turns a page number into "31-40" for the count,
-   * and what turns `total` into a page count.
+   * sees the items. It is what turns `total` into a page count, and nothing
+   * else.
    * - `ends`: Whether to offer a jump to the first and last pages.
    *
    * Off by default. The gaps already reach any page in a few presses and the
@@ -9437,12 +9525,6 @@ export type CustomElements = {
    * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
    * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
    * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
-   * - `count-label`/`countLabel`: The count, with `{from}`, `{to}` and `{total}` filled in.
-   *
-   * A separate template from `statusLabel` because they answer different
-   * questions: one says which page of how many, the other says which items of
-   * how many. A reader looking for "am I near the end" wants the first and one
-   * looking for "how much is there" wants the second.
    * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
    *
    * ## Events
@@ -9450,13 +9532,6 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `start`: Anything to sit before the run. A page-size select goes here.
-   * - `end`: Anything to sit after it.
    *
    * ## CSS Custom Properties
    *
@@ -9480,10 +9555,78 @@ export type CustomElements = {
    * - `first`: The control that jumps to the first page, under `ends`.
    * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
-   * - `count`: The reading of which items are on show, under `total`.
    */
   "helix-pagination": Partial<
     HelixPaginationProps & BaseProps<HelixPagination> & BaseEvents
+  >;
+
+  /**
+   * The trigger wears the same frame every field wears, so a closed one is
+   * indistinguishable from a `Select`. What differs is only what happens while it
+   * is open, which for a list of four numbers is the half the platform does
+   * better: a wheel on a phone, and the widget a screen-reader user already
+   * knows.
+   *
+   * The label is on the row rather than above it. Every other field stacks its
+   * label because it stands in a column of fields; this one stands in a footer,
+   * where a two-line control makes the whole row two lines tall.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `sizes`: The sizes offered, comma separated.
+   *
+   * A string rather than an array, so the whole control is expressible in
+   * markup and survives a server render. Anything that is not a positive number
+   * is dropped rather than rendered as an option that cannot mean anything.
+   * - `value`: The size in force.
+   *
+   * Reading gives the real one; writing declares it the consumer's, and
+   * `default-value` seeds one this element owns. Same accessor pair as
+   * `Pagination.page` and the calendar's `month`.
+   * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
+   * - `label`: The words beside the control.
+   * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the size changes, and cancelable. The only way to refuse one.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The words naming the control.
+   * - `control`: The select itself.
+   */
+  "helix-pagination-size": Partial<
+    HelixPaginationSizeProps & BaseProps<HelixPaginationSize> & BaseEvents
+  >;
+
+  /**
+   * Prose beside the controls rather than one of them: no box and no hover, in the
+   * subtler of the two muted steps, because it is a fact about the result and not
+   * a way to move through it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `page`: The page on show, one-based.
+   * - `page-size`/`pageSize`: How many items are on a page.
+   * - `total`: How many items there are across every page.
+   * - `label`: The reading, with `{from}`, `{to}` and `{total}` filled in.
+   *
+   * A template rather than a prefix and a suffix, because word order is not
+   * universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
+   * and three concatenations anywhere else.
+   * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   */
+  "helix-pagination-summary": Partial<
+    HelixPaginationSummaryProps & BaseProps<HelixPaginationSummary> & BaseEvents
   >;
 
   /**
@@ -14669,14 +14812,16 @@ export type CustomElementsSolidJs = {
    * so there is never a question of which of two sources is current.
    * - `total`: How many items there are across every page.
    *
-   * What the count reads from, and what `pages` falls back to with `page-size`.
-   * Unset renders no count, which is the common case where a consumer knows the
-   * page total and not the item total.
+   * What `pages` falls back to together with `page-size`. Unset is the common
+   * case, where a consumer knows the page total and not the item total.
+   *
+   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+   * to a reader, and takes its own.
    * - `page-size`/`pageSize`: How many items are on a page.
    *
    * Only arithmetic: this does not slice anything, because the component never
-   * sees the items. It is what turns a page number into "31-40" for the count,
-   * and what turns `total` into a page count.
+   * sees the items. It is what turns `total` into a page count, and nothing
+   * else.
    * - `ends`: Whether to offer a jump to the first and last pages.
    *
    * Off by default. The gaps already reach any page in a few presses and the
@@ -14726,12 +14871,6 @@ export type CustomElementsSolidJs = {
    * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
    * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
    * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
-   * - `count-label`/`countLabel`: The count, with `{from}`, `{to}` and `{total}` filled in.
-   *
-   * A separate template from `statusLabel` because they answer different
-   * questions: one says which page of how many, the other says which items of
-   * how many. A reader looking for "am I near the end" wants the first and one
-   * looking for "how much is there" wants the second.
    * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
    *
    * ## Events
@@ -14739,13 +14878,6 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `start`: Anything to sit before the run. A page-size select goes here.
-   * - `end`: Anything to sit after it.
    *
    * ## CSS Custom Properties
    *
@@ -14769,12 +14901,86 @@ export type CustomElementsSolidJs = {
    * - `first`: The control that jumps to the first page, under `ends`.
    * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
-   * - `count`: The reading of which items are on show, under `total`.
    */
   "helix-pagination": Partial<
     HelixPaginationProps &
       HelixPaginationSolidJsProps &
       BaseProps<HelixPagination> &
+      BaseEvents
+  >;
+
+  /**
+   * The trigger wears the same frame every field wears, so a closed one is
+   * indistinguishable from a `Select`. What differs is only what happens while it
+   * is open, which for a list of four numbers is the half the platform does
+   * better: a wheel on a phone, and the widget a screen-reader user already
+   * knows.
+   *
+   * The label is on the row rather than above it. Every other field stacks its
+   * label because it stands in a column of fields; this one stands in a footer,
+   * where a two-line control makes the whole row two lines tall.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `sizes`: The sizes offered, comma separated.
+   *
+   * A string rather than an array, so the whole control is expressible in
+   * markup and survives a server render. Anything that is not a positive number
+   * is dropped rather than rendered as an option that cannot mean anything.
+   * - `value`: The size in force.
+   *
+   * Reading gives the real one; writing declares it the consumer's, and
+   * `default-value` seeds one this element owns. Same accessor pair as
+   * `Pagination.page` and the calendar's `month`.
+   * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
+   * - `label`: The words beside the control.
+   * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the size changes, and cancelable. The only way to refuse one.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `label`: The words naming the control.
+   * - `control`: The select itself.
+   */
+  "helix-pagination-size": Partial<
+    HelixPaginationSizeProps &
+      HelixPaginationSizeSolidJsProps &
+      BaseProps<HelixPaginationSize> &
+      BaseEvents
+  >;
+
+  /**
+   * Prose beside the controls rather than one of them: no box and no hover, in the
+   * subtler of the two muted steps, because it is a fact about the result and not
+   * a way to move through it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `page`: The page on show, one-based.
+   * - `page-size`/`pageSize`: How many items are on a page.
+   * - `total`: How many items there are across every page.
+   * - `label`: The reading, with `{from}`, `{to}` and `{total}` filled in.
+   *
+   * A template rather than a prefix and a suffix, because word order is not
+   * universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
+   * and three concatenations anywhere else.
+   * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   */
+  "helix-pagination-summary": Partial<
+    HelixPaginationSummaryProps &
+      HelixPaginationSummarySolidJsProps &
+      BaseProps<HelixPaginationSummary> &
       BaseEvents
   >;
 

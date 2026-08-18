@@ -1,0 +1,39 @@
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { mount, registerDom } from '@fusion-io/testing/dom'
+
+beforeAll(async () => {
+  registerDom()
+  await import('../index.js')
+})
+
+const text = (host: HTMLElement): string => host.shadowRoot?.textContent?.trim() ?? ''
+
+describe('pagination summary', () => {
+  test('reads which items are on show', async () => {
+    const it = await mount(
+      '<helix-pagination-summary page="4" page-size="25" total="248"></helix-pagination-summary>',
+    )
+    expect(text(it)).toBe('76-100 of 248')
+  })
+
+  test('the last page is clamped to the total, because it is rarely full', async () => {
+    const it = await mount(
+      '<helix-pagination-summary page="10" page-size="25" total="248"></helix-pagination-summary>',
+    )
+    expect(text(it)).toBe('226-248 of 248')
+  })
+
+  test('says nothing until it has been told enough to say something', async () => {
+    // A wrong count is worse than none: it is the one number in a footer a
+    // reader cannot check against anything else on screen.
+    const it = await mount('<helix-pagination-summary page="2"></helix-pagination-summary>')
+    expect(text(it)).toBe('')
+  })
+
+  test('the words are a template and the numbers take a locale', async () => {
+    const it = await mount(
+      '<helix-pagination-summary label="{from} bis {to} von {total}" locale="de-DE" page="2" page-size="10" total="1500"></helix-pagination-summary>',
+    )
+    expect(text(it)).toBe('11 bis 20 von 1.500')
+  })
+})

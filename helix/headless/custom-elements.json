@@ -13872,6 +13872,22 @@
             "name": "*",
             "module": "src/pagination/root/pagination-root.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/pagination/size/pagination-size.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/pagination/summary/pagination-summary.js"
+          }
         }
       ]
     },
@@ -13881,7 +13897,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**And a gap is a control.** It goes to the middle of the run it stands over,\nwhich is the binary-search step: any page in a set of any size is a handful of\npresses, where a jump of a fixed size would need forty of them on a set of a\nhundred and twenty-eight. A menu listing the hidden pages was the other idea\nand the arithmetic refuses it, for the reasons on `renderGap`.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n**A page-size select is not in here, and a count is.** The count is\narithmetic over numbers the component can be given, `{from}-{to} of {total}`,\nwhich a consumer would otherwise write out beside every pagination they\nrender. A select is a second control with a second piece of state, whose\noptions are the consumer's and whose change means \"go and re-query\": owning\none would make `Pagination` depend on `Select` and hold state that is not\nabout paging. The `start` and `end` slots are how it composes into the same\nrow instead.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
+          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**And a gap is a control.** It goes to the middle of the run it stands over,\nwhich is the binary-search step: any page in a set of any size is a handful of\npresses, where a jump of a fixed size would need forty of them on a set of a\nhundred and twenty-eight. A menu listing the hidden pages was the other idea\nand the arithmetic refuses it, for the reasons on `renderGap`.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n**The count and the page-size control are their own elements.** They were\nbriefly a part and a pair of slots in here, and a slot can only offer one\nplace: at one end of one row, in one order, on one axis. `Pagination.Summary`\nand `Pagination.Size` sit beside this one instead, so the direction and the\norder of a footer are the consumer's, which is what they were always going to\nwant. `total` and `page-size` stay here for the arithmetic below and nothing\nelse.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
           "name": "HelixBasePagination",
           "cssParts": [
             {
@@ -13919,20 +13935,6 @@
             {
               "description": "The reading of where you are, in `compact`.",
               "name": "status"
-            },
-            {
-              "description": "The reading of which items are on show, under `total`.",
-              "name": "count"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Anything to sit before the run. A page-size select goes here.",
-              "name": "start"
-            },
-            {
-              "description": "Anything to sit after it.",
-              "name": "end"
             }
           ],
           "members": [
@@ -13953,7 +13955,7 @@
                 "text": "number"
               },
               "default": "0",
-              "description": "How many items there are across every page.\n\nWhat the count reads from, and what `pages` falls back to with `page-size`.\nUnset renders no count, which is the common case where a consumer knows the\npage total and not the item total.",
+              "description": "How many items there are across every page.\n\nWhat `pages` falls back to together with `page-size`. Unset is the common\ncase, where a consumer knows the page total and not the item total.\n\nNothing is rendered from it. `Pagination.Summary` is what reads a total out\nto a reader, and takes its own.",
               "attribute": "total"
             },
             {
@@ -13963,7 +13965,7 @@
                 "text": "number"
               },
               "default": "0",
-              "description": "How many items are on a page.\n\nOnly arithmetic: this does not slice anything, because the component never\nsees the items. It is what turns a page number into \"31-40\" for the count,\nand what turns `total` into a page count.",
+              "description": "How many items are on a page.\n\nOnly arithmetic: this does not slice anything, because the component never\nsees the items. It is what turns `total` into a page count, and nothing\nelse.",
               "attribute": "page-size"
             },
             {
@@ -14119,16 +14121,6 @@
             },
             {
               "kind": "field",
-              "name": "countLabel",
-              "type": {
-                "text": "string"
-              },
-              "default": "'{from}-{to} of {total}'",
-              "description": "The count, with `{from}`, `{to}` and `{total}` filled in.\n\nA separate template from `statusLabel` because they answer different\nquestions: one says which page of how many, the other says which items of\nhow many. A reader looking for \"am I near the end\" wants the first and one\nlooking for \"how much is there\" wants the second.",
-              "attribute": "count-label"
-            },
-            {
-              "kind": "field",
               "name": "gapLabel",
               "type": {
                 "text": "string"
@@ -14192,16 +14184,6 @@
               },
               "privacy": "private",
               "description": "How many pages, clamped once, so every reader agrees on it.\n\n`pages` first, because writing it is the explicit answer. Then `total` over\n`pageSize`, which is the same fact stated the other way round and is what a\nconsumer holding a result set already has. Then one, so a result that has\nnot loaded renders a single page rather than an empty control that appears\nlater and pushes the layout down.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "span",
-              "type": {
-                "text": "{ from: number; to: number }"
-              },
-              "privacy": "private",
-              "description": "The items this page covers, one-based and inclusive, for the count.",
               "readonly": true
             },
             {
@@ -14367,17 +14349,6 @@
               }
             },
             {
-              "kind": "method",
-              "name": "renderCount",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult | typeof nothing"
-                }
-              },
-              "description": "Which items are on show, where the component has been told enough to say.\n\nNeeds `total`, and `pageSize` to place the window inside it. Absent\notherwise rather than guessed at, because a wrong count is worse than none:\nit is the one number here a reader cannot check against anything else on\nscreen."
-            },
-            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -14473,7 +14444,7 @@
                 "text": "number"
               },
               "default": "0",
-              "description": "How many items there are across every page.\n\nWhat the count reads from, and what `pages` falls back to with `page-size`.\nUnset renders no count, which is the common case where a consumer knows the\npage total and not the item total.",
+              "description": "How many items there are across every page.\n\nWhat `pages` falls back to together with `page-size`. Unset is the common\ncase, where a consumer knows the page total and not the item total.\n\nNothing is rendered from it. `Pagination.Summary` is what reads a total out\nto a reader, and takes its own.",
               "fieldName": "total"
             },
             {
@@ -14482,7 +14453,7 @@
                 "text": "number"
               },
               "default": "0",
-              "description": "How many items are on a page.\n\nOnly arithmetic: this does not slice anything, because the component never\nsees the items. It is what turns a page number into \"31-40\" for the count,\nand what turns `total` into a page count.",
+              "description": "How many items are on a page.\n\nOnly arithmetic: this does not slice anything, because the component never\nsees the items. It is what turns `total` into a page count, and nothing\nelse.",
               "fieldName": "pageSize"
             },
             {
@@ -14620,15 +14591,6 @@
               "fieldName": "lastLabel"
             },
             {
-              "name": "count-label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'{from}-{to} of {total}'",
-              "description": "The count, with `{from}`, `{to}` and `{total}` filled in.\n\nA separate template from `statusLabel` because they answer different\nquestions: one says which page of how many, the other says which items of\nhow many. A reader looking for \"am I near the end\" wants the first and one\nlooking for \"how much is there\" wants the second.",
-              "fieldName": "countLabel"
-            },
-            {
               "name": "gap-label",
               "type": {
                 "text": "string"
@@ -14676,6 +14638,551 @@
           "declaration": {
             "name": "HelixBasePagination",
             "module": "src/pagination/root/pagination-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/pagination/size/pagination-size.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Its own element beside `Pagination` rather than a slot inside it, for the\nreason `Pagination.Summary` is: a footer's direction and order are the\nconsumer's, and a control that can only sit at one end of one row has taken\nthat decision for them.\n\n**A native `<select>`, which is a deliberate exception and worth the note.**\nThe library ships `Select` because a closed list needs a panel it can style,\nand this is four numbers. The native control opens as the platform's own\nmenu, which on a phone is a wheel and under a screen reader is the widget the\nreader already knows, and it needs no popover, no listbox and no second\nelement to register. The trigger wears the same frame as every other field, so\nwhat differs from `Select` is only what happens while it is open, which for a\nlist of four numbers is the half that native does better.\n\n**The label sits on the row, not above it.** Every other field in the library\nstacks its label because it stands in a column of fields; this one stands in a\nfooter beside a run of page numbers, and a two-line control there makes the\nwhole row two lines tall. It is a real `<label for>` against a real `<select>`\nin one shadow root, so the association is the platform's rather than an ARIA\nreconstruction of it.\n\n`value` is the controlled property and `default-value` seeds one this owns,\nthe same contract every other stateful element here carries. Changing it\nannounces `helix-change`; what a consumer does with that is re-query and move\nback to page one, which is theirs to decide because only they know whether\nthe reader's position should survive it.",
+          "name": "HelixBasePaginationSize",
+          "cssParts": [
+            {
+              "description": "The words naming the control.",
+              "name": "label"
+            },
+            {
+              "description": "The select itself.",
+              "name": "control"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "sizes",
+              "type": {
+                "text": "string"
+              },
+              "default": "'10,25,50,100'",
+              "description": "The sizes offered, comma separated.\n\nA string rather than an array, so the whole control is expressible in\nmarkup and survives a server render. Anything that is not a positive number\nis dropped rather than rendered as an option that cannot mean anything.",
+              "attribute": "sizes"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "description": "The size in force.\n\nReading gives the real one; writing declares it the consumer's, and\n`default-value` seeds one this element owns. Same accessor pair as\n`Pagination.page` and the calendar's `month`.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Size to start on, where nothing declared one.",
+              "attribute": "default-value"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Per page'",
+              "description": "The words beside the control.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the numbers. Absent uses the runtime's own.",
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "valueState",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The size, whoever set it, and `undefined` until somebody has."
+            },
+            {
+              "kind": "field",
+              "name": "valueMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns it, decided once and then fixed."
+            },
+            {
+              "kind": "field",
+              "name": "valueIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "cachedFormat",
+              "type": {
+                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
+              },
+              "privacy": "private",
+              "description": "Built once per locale. Same reasoning as the calendar's date formatters."
+            },
+            {
+              "kind": "field",
+              "name": "numbers",
+              "type": {
+                "text": "(value: number) => string"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "number[]"
+              },
+              "privacy": "private",
+              "description": "The sizes, parsed once, with anything that is not a size dropped.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The one in force, which is the first offered where nothing named one.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleChange",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the size changes, and cancelable. The only way to refuse one.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "sizes",
+              "type": {
+                "text": "string"
+              },
+              "default": "'10,25,50,100'",
+              "description": "The sizes offered, comma separated.\n\nA string rather than an array, so the whole control is expressible in\nmarkup and survives a server render. Anything that is not a positive number\nis dropped rather than rendered as an option that cannot mean anything.",
+              "fieldName": "sizes"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "description": "The size in force.\n\nReading gives the real one; writing declares it the consumer's, and\n`default-value` seeds one this element owns. Same accessor pair as\n`Pagination.page` and the calendar's `month`.",
+              "fieldName": "value"
+            },
+            {
+              "name": "default-value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Size to start on, where nothing declared one.",
+              "fieldName": "defaultValue"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Per page'",
+              "description": "The words beside the control.",
+              "fieldName": "label"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the numbers. Absent uses the runtime's own.",
+              "fieldName": "locale"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Chooses how many items a page holds.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/pagination",
+            "aliases": [
+              "Page size",
+              "Rows per page"
+            ],
+            "tier": "headless",
+            "group": "BasePagination",
+            "part": "Size"
+          },
+          "tagName": "helix-base-pagination-size",
+          "customElement": true,
+          "modulePath": "src/pagination/size/pagination-size.ts",
+          "definitionPath": "src/pagination/size/pagination-size.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBasePaginationSize",
+          "declaration": {
+            "name": "HelixBasePaginationSize",
+            "module": "src/pagination/size/pagination-size.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-pagination-size",
+          "declaration": {
+            "name": "HelixBasePaginationSize",
+            "module": "src/pagination/size/pagination-size.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/pagination/summary/pagination-summary.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Its own element rather than a part of `Pagination`, so a consumer decides\nwhere it goes. Inside the run it could only ever be at one end of one row;\nbeside it, it goes above, below, in a table's caption, or on the other side of\nthe page, and the direction and order of the whole footer are the consumer's.\n\n**It repeats `page`, `page-size` and `total`, and that is not drift.** Those\nthree come from the consumer's own query, so writing them on two elements is\none variable used twice, which is how a framework consumer writes everything.\nThe alternative is a coordinating root that feeds its slotted children, and\nthe only ways to do that here are writing attributes onto elements the\nconsumer rendered, which this library refuses because a framework reports the\ndifference as a hydration error, or a context mechanism that does not exist.\n\nRenders nothing without a `total` and a `page-size`. A wrong count is worse\nthan none: it is the one number in a footer a reader cannot check against\nanything else on screen.",
+          "name": "HelixBasePaginationSummary",
+          "members": [
+            {
+              "kind": "field",
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "The page on show, one-based.",
+              "attribute": "page"
+            },
+            {
+              "kind": "field",
+              "name": "pageSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items are on a page.",
+              "attribute": "page-size"
+            },
+            {
+              "kind": "field",
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items there are across every page.",
+              "attribute": "total"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'{from}-{to} of {total}'",
+              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `count-label=\"{total} 件中 {from}-{to} 件\"` is one attribute here\nand three concatenations anywhere else.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the numbers. Absent uses the runtime's own.",
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "cachedFormat",
+              "type": {
+                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
+              },
+              "privacy": "private",
+              "description": "Built once per locale. Same reasoning as the calendar's date formatters."
+            },
+            {
+              "kind": "field",
+              "name": "numbers",
+              "type": {
+                "text": "(value: number) => string"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "The page on show, one-based.",
+              "fieldName": "page"
+            },
+            {
+              "name": "page-size",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items are on a page.",
+              "fieldName": "pageSize"
+            },
+            {
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items there are across every page.",
+              "fieldName": "total"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'{from}-{to} of {total}'",
+              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `count-label=\"{total} 件中 {from}-{to} 件\"` is one attribute here\nand three concatenations anywhere else.",
+              "fieldName": "label"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the numbers. Absent uses the runtime's own.",
+              "fieldName": "locale"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Reads out which items of how many are on show.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/pagination",
+            "aliases": [
+              "Result count",
+              "Range"
+            ],
+            "tier": "headless",
+            "group": "BasePagination",
+            "part": "Summary"
+          },
+          "tagName": "helix-base-pagination-summary",
+          "customElement": true,
+          "modulePath": "src/pagination/summary/pagination-summary.ts",
+          "definitionPath": "src/pagination/summary/pagination-summary.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBasePaginationSummary",
+          "declaration": {
+            "name": "HelixBasePaginationSummary",
+            "module": "src/pagination/summary/pagination-summary.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-pagination-summary",
+          "declaration": {
+            "name": "HelixBasePaginationSummary",
+            "module": "src/pagination/summary/pagination-summary.ts"
           }
         }
       ]

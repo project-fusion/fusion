@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role, slotted } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -341,27 +341,9 @@ describe('pagination ends', () => {
 })
 
 describe('pagination count', () => {
-  test('no count unless it has been told enough to say one', async () => {
-    // A wrong count is worse than none: it is the one number here a reader
-    // cannot check against anything else on screen.
-    const nav = await mount('<helix-pagination default-page="2" pages="12"></helix-pagination>')
-    expect(part(nav, 'count')).toBeNull()
-  })
-
-  test('reads which items are on show', async () => {
-    const nav = await mount(
-      '<helix-pagination default-page="4" page-size="25" total="248"></helix-pagination>',
-    )
-    expect(part(nav, 'count')?.textContent?.trim()).toBe('76-100 of 248')
-  })
-
-  test('the last page is clamped to the total, because it is rarely full', async () => {
-    const nav = await mount(
-      '<helix-pagination default-page="10" page-size="25" total="248"></helix-pagination>',
-    )
-    expect(part(nav, 'count')?.textContent?.trim()).toBe('226-248 of 248')
-  })
-
+  /* The count itself moved to `Pagination.Summary`, so what is left to hold the
+     root to is the arithmetic it kept: `total` and `page-size` are still how a
+     consumer who holds a result set states the page total. */
   test('the page count falls back to the two, so `pages` need not be given', async () => {
     const nav = await mount(
       '<helix-pagination default-page="1" page-size="25" total="248"></helix-pagination>',
@@ -378,25 +360,13 @@ describe('pagination count', () => {
     expect(shown.at(-1)?.textContent?.trim()).toBe('4')
   })
 
-  test('the count is a template too', async () => {
+  test('the root reads nothing out, because that is the summary’s job', async () => {
+    // It was a part in here and a pair of slots, and a slot can only offer one
+    // place: at one end of one row, in one order, on one axis.
     const nav = await mount(
-      '<helix-pagination count-label="Zeige {from} bis {to} von {total}" default-page="2" locale="de-DE" page-size="10" total="1500"></helix-pagination>',
+      '<helix-pagination default-page="4" page-size="25" total="248"></helix-pagination>',
     )
-    expect(part(nav, 'count')?.textContent?.trim()).toBe('Zeige 11 bis 20 von 1.500')
-  })
-})
-
-describe('pagination slots', () => {
-  test('a page-size select composes into the row rather than being owned', async () => {
-    // A select is a second control with a second piece of state, whose options
-    // are the consumer's and whose change means "go and re-query".
-    const nav = await mount(
-      `<helix-pagination default-page="1" page-size="10" total="90">
-        <span slot="start">size</span>
-      </helix-pagination>`,
-    )
-    const slots = [...(nav.shadowRoot?.querySelectorAll('slot') ?? [])].map((one) => one.name)
-    expect(slots).toEqual(['start', 'end'])
-    expect(slotted(nav, 'start').map((one) => one.textContent)).toEqual(['size'])
+    expect(part(nav, 'count')).toBeNull()
+    expect(nav.shadowRoot?.querySelector('slot')).toBeNull()
   })
 })

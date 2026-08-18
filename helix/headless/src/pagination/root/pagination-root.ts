@@ -104,14 +104,13 @@ const fill = (
  * result that has not changed. A consumer driving the view has to be able to
  * hear that without being told an answer changed.
  *
- * **A page-size select is not in here, and a count is.** The count is
- * arithmetic over numbers the component can be given, `{from}-{to} of {total}`,
- * which a consumer would otherwise write out beside every pagination they
- * render. A select is a second control with a second piece of state, whose
- * options are the consumer's and whose change means "go and re-query": owning
- * one would make `Pagination` depend on `Select` and hold state that is not
- * about paging. The `start` and `end` slots are how it composes into the same
- * row instead.
+ * **The count and the page-size control are their own elements.** They were
+ * briefly a part and a pair of slots in here, and a slot can only offer one
+ * place: at one end of one row, in one order, on one axis. `Pagination.Summary`
+ * and `Pagination.Size` sit beside this one instead, so the direction and the
+ * order of a footer are the consumer's, which is what they were always going to
+ * want. `total` and `page-size` stay here for the arithmetic below and nothing
+ * else.
  *
  * `page` is the controlled property and `default-page` seeds one the element
  * owns. Naming `page` is a claim of ownership: the element announces and waits
@@ -131,10 +130,6 @@ const fill = (
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart status - The reading of where you are, in `compact`.
- * @csspart count - The reading of which items are on show, under `total`.
- *
- * @slot start - Anything to sit before the run. A page-size select goes here.
- * @slot end - Anything to sit after it.
  *
  * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. The only way to refuse one.
  */
@@ -157,9 +152,11 @@ export class HelixBasePagination extends HelixElement {
   /**
    * How many items there are across every page.
    *
-   * What the count reads from, and what `pages` falls back to with `page-size`.
-   * Unset renders no count, which is the common case where a consumer knows the
-   * page total and not the item total.
+   * What `pages` falls back to together with `page-size`. Unset is the common
+   * case, where a consumer knows the page total and not the item total.
+   *
+   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+   * to a reader, and takes its own.
    */
   @property({ type: Number })
   total = 0
@@ -168,8 +165,8 @@ export class HelixBasePagination extends HelixElement {
    * How many items are on a page.
    *
    * Only arithmetic: this does not slice anything, because the component never
-   * sees the items. It is what turns a page number into "31-40" for the count,
-   * and what turns `total` into a page count.
+   * sees the items. It is what turns `total` into a page count, and nothing
+   * else.
    */
   @property({ attribute: 'page-size', type: Number })
   pageSize = 0
@@ -288,17 +285,6 @@ export class HelixBasePagination extends HelixElement {
   @property({ attribute: 'last-label' })
   lastLabel = 'Last page'
 
-  /**
-   * The count, with `{from}`, `{to}` and `{total}` filled in.
-   *
-   * A separate template from `statusLabel` because they answer different
-   * questions: one says which page of how many, the other says which items of
-   * how many. A reader looking for "am I near the end" wants the first and one
-   * looking for "how much is there" wants the second.
-   */
-  @property({ attribute: 'count-label' })
-  countLabel = '{from}-{to} of {total}'
-
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
   @property({ attribute: 'gap-label' })
   gapLabel = 'Skip to page {page}'
@@ -352,16 +338,6 @@ export class HelixBasePagination extends HelixElement {
       return Math.max(1, Math.ceil(this.total / this.pageSize))
     }
     return 1
-  }
-
-  /** The items this page covers, one-based and inclusive, for the count. */
-  private get span(): { from: number; to: number } {
-    const size = Math.max(1, Math.floor(this.pageSize) || 1)
-    const from = (this.current - 1) * size + 1
-    /* Clamped, because the last page is rarely full: a set of 248 at 25 a page
-       ends at 248, not at 250, and a count that overran its own total would be
-       the one number on screen a reader could check against nothing. */
-    return { from, to: Math.min(this.total, from + size - 1) }
   }
 
   /** The page on show, clamped into the total. */
@@ -671,45 +647,21 @@ export class HelixBasePagination extends HelixElement {
         </button>`
   }
 
-  /**
-   * Which items are on show, where the component has been told enough to say.
-   *
-   * Needs `total`, and `pageSize` to place the window inside it. Absent
-   * otherwise rather than guessed at, because a wrong count is worse than none:
-   * it is the one number here a reader cannot check against anything else on
-   * screen.
-   */
-  private renderCount(): TemplateResult | typeof nothing {
-    if (this.total <= 0 || this.pageSize <= 0) {
-      return nothing
-    }
-    const { from, to } = this.span
-    return html`<span part="count"
-      >${this.countLabel
-        .replaceAll('{from}', this.numbers(from))
-        .replaceAll('{to}', this.numbers(to))
-        .replaceAll('{total}', this.numbers(this.total))}</span
-    >`
-  }
-
   protected override render(): TemplateResult {
-    const chrome = html`<slot name="start"></slot>${this.renderCount()}`
     if (this.compact) {
-      return html`${chrome}${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
+      return html`${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
         <span part="status"
           >${fill(this.statusLabel, this.current, this.count, this.numbers)}</span
         >
-        ${this.renderNext()}${this.ends ? this.renderLast() : nothing}
-        <slot name="end"></slot>`
+        ${this.renderNext()}${this.ends ? this.renderLast() : nothing}`
     }
-    return html`${chrome}${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
+    return html`${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
       <ol part="list" role="list">
         ${this.slots.map((slot) =>
           typeof slot === 'number' ? this.renderPage(slot) : this.renderGap(slot),
         )}
       </ol>
-      ${this.renderNext()}${this.ends ? this.renderLast() : nothing}
-      <slot name="end"></slot>`
+      ${this.renderNext()}${this.ends ? this.renderLast() : nothing}`
   }
 }
 

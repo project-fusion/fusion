@@ -2034,7 +2034,6 @@ is a way through rather than a destination, so it does not compete.
 | --- | --- | --- | --- | --- | --- |
 | `boundaries` | `boundaries` | `number` | `1` | `HelixBasePagination` | How many pages to show at each end, whatever the current one is. |
 | `compact` | `compact` | `boolean` | `false` | `HelixBasePagination` | Where the numbers are replaced by a reading of the two. |
-| `countLabel` | `count-label` | `string` | `'{from}-{to} of {total}'` | `HelixBasePagination` | The count, with `{from}`, `{to}` and `{total}` filled in. |
 | `defaultPage` | `default-page` | `number` | `1` | `HelixBasePagination` | Page to open on, where nothing declared one. |
 | `ends` | `ends` | `boolean` | `false` | `HelixBasePagination` | Whether to offer a jump to the first and last pages. |
 | `firstLabel` | `first-label` | `string` | `'First page'` | `HelixBasePagination` | Accessible name for the control that jumps to the first page. |
@@ -2059,13 +2058,6 @@ is a way through rather than a destination, so it does not compete.
 | --- | --- | --- |
 | `helix-navigate` | `HelixNavigateEvent` | Fired before the page changes, and cancelable. The only way to refuse one. |
 
-#### Slots
-
-| Slot | Description |
-| --- | --- |
-| `start` | Anything to sit before the run. A page-size select goes here. |
-| `end` | Anything to sit after it. |
-
 #### Parts
 
 | Part | Description |
@@ -2079,7 +2071,6 @@ is a way through rather than a destination, so it does not compete.
 | `first` | The control that jumps to the first page, under `ends`. |
 | `last` | The control that jumps to the last page, under `ends`. |
 | `status` | The reading of where you are, in `compact`. |
-| `count` | The reading of which items are on show, under `total`. |
 
 #### Custom properties
 
@@ -2089,6 +2080,65 @@ is a way through rather than a destination, so it does not compete.
 | `--pagination-gap` | Space between one control and the next. |
 | `--pagination-hover-color` | Fill behind a control under the pointer. |
 | `--pagination-size` | The box every control in the row takes. |
+
+### Size — `helix-pagination-size`
+
+Chooses how many items a page holds.
+
+Extends `HelixBasePaginationSize`.
+
+The trigger wears the same frame every field wears, so a closed one is
+indistinguishable from a `Select`. What differs is only what happens while it
+is open, which for a list of four numbers is the half the platform does
+better: a wheel on a phone, and the widget a screen-reader user already
+knows.
+
+The label is on the row rather than above it. Every other field stacks its
+label because it stands in a column of fields; this one stands in a footer,
+where a two-line control makes the whole row two lines tall.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultValue` | `default-value` | `number` | `0` | `HelixBasePaginationSize` | Size to start on, where nothing declared one. |
+| `label` | `label` | `string` | `'Per page'` | `HelixBasePaginationSize` | The words beside the control. |
+| `locale` | `locale` | `string` | `''` | `HelixBasePaginationSize` | Locale for the numbers. Absent uses the runtime's own. |
+| `sizes` | `sizes` | `string` | `'10,25,50,100'` | `HelixBasePaginationSize` | The sizes offered, comma separated. |
+| `value` | `value` | `number` | - | `HelixBasePaginationSize` | The size in force. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired before the size changes, and cancelable. The only way to refuse one. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `label` | The words naming the control. |
+| `control` | The select itself. |
+
+### Summary — `helix-pagination-summary`
+
+Reads out which items of how many are on show.
+
+Extends `HelixBasePaginationSummary`.
+
+Prose beside the controls rather than one of them: no box and no hover, in the
+subtler of the two muted steps, because it is a fact about the result and not
+a way to move through it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `'{from}-{to} of {total}'` | `HelixBasePaginationSummary` | The reading, with `{from}`, `{to}` and `{total}` filled in. |
+| `locale` | `locale` | `string` | `''` | `HelixBasePaginationSummary` | Locale for the numbers. Absent uses the runtime's own. |
+| `page` | `page` | `number` | `1` | `HelixBasePaginationSummary` | The page on show, one-based. |
+| `pageSize` | `page-size` | `number` | `0` | `HelixBasePaginationSummary` | How many items are on a page. |
+| `total` | `total` | `number` | `0` | `HelixBasePaginationSummary` | How many items there are across every page. |
 
 ## Popover
 

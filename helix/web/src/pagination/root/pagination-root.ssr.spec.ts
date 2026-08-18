@@ -49,14 +49,15 @@ describe('pagination server output', () => {
     expect(partTag(ssr(first), 'previous')).toContain('aria-disabled="true"')
   })
 
-  test('the count is computed on the server, from numbers the server has', () => {
-    // Arithmetic over two properties, so there is nothing here to wait for.
+  test('the page total is worked out on the server, from numbers it has', () => {
+    // Arithmetic over two properties, so there is nothing here to wait for: the
+    // run ships with ten pages in it rather than one that grows on hydration.
     const counted = html`<helix-pagination
-      default-page="4"
+      default-page="1"
       page-size="25"
       total="248"
     ></helix-pagination>`
-    expect(withoutStyles(ssr(counted))).toContain('76-100 of 248')
+    expect(withoutStyles(ssr(counted))).toContain('>10<')
   })
 
   test('the jump to either end ships with the rest, under `ends`', () => {
