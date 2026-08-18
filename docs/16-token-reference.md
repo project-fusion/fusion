@@ -64,7 +64,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 101 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 145 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 141 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 123 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 114 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 65 |
@@ -102,7 +102,7 @@ Font size.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 48 |
-| `--helix-text-sm` | `var(--_helix-size-14)` | 70 |
+| `--helix-text-sm` | `var(--_helix-size-14)` | 74 |
 | `--helix-text-md` | `var(--_helix-size-15)` | 17 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 15 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 10 |
@@ -125,7 +125,7 @@ Line height, unitless so it scales with the size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-leading-tight` | `1.2` | 33 |
+| `--helix-leading-tight` | `1.2` | 37 |
 | `--helix-leading-normal` | `1.5` | 35 |
 | `--helix-leading-loose` | `1.7` | 0 |
 

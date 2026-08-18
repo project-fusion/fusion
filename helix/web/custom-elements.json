@@ -17653,6 +17653,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "markTo",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "active",
+                  "type": {
+                    "text": "{ link: HTMLAnchorElement; target: Element } | undefined"
+                  }
+                }
+              ],
+              "description": "Where the destination is set, whether measured or asked for.",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "atEnd",
               "type": {
@@ -17675,6 +17698,32 @@
               "privacy": "private",
               "default": "0",
               "description": "The frame a mark is already scheduled for, so a scroll asks for one.",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "landing",
+              "type": {
+                "text": "{ link: HTMLAnchorElement; target: Element } | undefined"
+              },
+              "privacy": "private",
+              "description": "Where a click said to go, while the page is still on its way there.",
+              "inheritedFrom": {
+                "name": "HelixBaseOutline",
+                "module": "src/outline/root/outline-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "landed",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private",
+              "description": "The guard behind `scrollend`, in case it never comes.",
               "inheritedFrom": {
                 "name": "HelixBaseOutline",
                 "module": "src/outline/root/outline-root.ts"
@@ -20119,6 +20168,17 @@
             },
             {
               "kind": "field",
+              "name": "hideControl",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Takes the circle away, leaving the card as the whole control.\n\n`card` only, and it is a graphic that goes rather than a radio: the control\nin the shadow root is untouched, so the row is still focusable, still\nreported to a screen reader, and still the thing a form submits.\n\nSafe because the card already carries the answer in its surface, a raised\nfill inside a primary edge and a three-pixel ring of it. That ring is\nrecent, and before it there was nothing left saying which card was chosen,\nwhich is why this is a property now and could not have been one then.\n\nNot on `Checkbox`, deliberately. A radio card with no circle is still\nunmistakably one-of-many because its siblings behave that way; a checkbox\ncard with no box loses the only thing that says you may pick several.",
+              "attribute": "hide-control",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "disabled",
               "type": {
                 "text": "boolean"
@@ -20273,6 +20333,15 @@
               },
               "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
               "fieldName": "appearance"
+            },
+            {
+              "name": "hide-control",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Takes the circle away, leaving the card as the whole control.\n\n`card` only, and it is a graphic that goes rather than a radio: the control\nin the shadow root is untouched, so the row is still focusable, still\nreported to a screen reader, and still the thing a form submits.\n\nSafe because the card already carries the answer in its surface, a raised\nfill inside a primary edge and a three-pixel ring of it. That ring is\nrecent, and before it there was nothing left saying which card was chosen,\nwhich is why this is a property now and could not have been one then.\n\nNot on `Checkbox`, deliberately. A radio card with no circle is still\nunmistakably one-of-many because its siblings behave that way; a checkbox\ncard with no box loses the only thing that says you may pick several.",
+              "fieldName": "hideControl"
             },
             {
               "name": "disabled",

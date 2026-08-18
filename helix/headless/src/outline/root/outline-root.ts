@@ -147,6 +147,12 @@ export class HelixBaseOutline extends HelixElement {
    * wherever the page says the top of the readable area is.
    */
   private mark(): void {
+    /* A destination beats a measurement. See `handleClick`: while the page is
+       travelling to somewhere a reader asked for, what it passes on the way is
+       not what they are reading. */
+    if (this.landing) {
+      return
+    }
     const sections = this.sections
     if (sections.length === 0) {
       return
@@ -176,7 +182,12 @@ export class HelixBaseOutline extends HelixElement {
      * are at the end". That is a fact about the page rather than a choice made
      * here: the component cannot invent room to scroll. */
     const active = this.atEnd ? sections.at(-1) : (passed.at(-1) ?? sections[0])
-    for (const { link, target } of sections) {
+    this.markTo(active)
+  }
+
+  /** Where the destination is set, whether measured or asked for. */
+  private markTo(active: { link: HTMLAnchorElement; target: Element } | undefined): void {
+    for (const { link, target } of this.sections) {
       if (target === active?.target) {
         link.setAttribute('aria-current', 'location')
       } else {
@@ -203,6 +214,12 @@ export class HelixBaseOutline extends HelixElement {
 
   /** The frame a mark is already scheduled for, so a scroll asks for one. */
   private frame = 0
+
+  /** Where a click said to go, while the page is still on its way there. */
+  private landing: { link: HTMLAnchorElement; target: Element } | undefined
+
+  /** The guard behind `scrollend`, in case it never comes. */
+  private landed: ReturnType<typeof setTimeout> | undefined
 
   /**
    * The two things an `IntersectionObserver` cannot see, and one listener for
@@ -279,7 +296,7 @@ export class HelixBaseOutline extends HelixElement {
    * handled is not ours, and `auto` is the whole point of `auto`.
    */
   private readonly handleClick = (event: MouseEvent): void => {
-    if (this.behavior === 'auto' || event.defaultPrevented || event.button !== 0) {
+    if (event.defaultPrevented || event.button !== 0) {
       return
     }
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
@@ -288,6 +305,41 @@ export class HelixBaseOutline extends HelixElement {
     const link = (event.target as Element | null)?.closest?.('a[href^="#"]')
     const section = this.sections.find((one) => one.link === link)
     if (!section) {
+      return
+    }
+
+    /* The destination is marked now, and everything between here and there is
+     * not.
+     *
+     * The marker follows the scroll, which is right when a reader is scrolling
+     * and wrong when they have said where they are going: travelling to the
+     * fifth section passes the second, third and fourth, each became current
+     * for a frame or two on the way, and the mark stepped down the list one
+     * item at a time instead of making the journey. Asked for as "it stops at
+     * each item rather than seamlessly moving", which is exactly what it was
+     * doing.
+     *
+     * Suppressed for any click on one of these links, not only the ones this
+     * component scrolls itself: a consumer with `scroll-behavior: smooth` on
+     * their own scroll container gets the same travel and the same stepping,
+     * and `behavior="auto"` does not mean "nobody is animating".
+     *
+     * `landing` is cleared when the page stops moving, by the same `scrollend`
+     * and timeout pair the mark uses elsewhere, because a scroll that is
+     * interrupted by a reader grabbing the page has to hand the marker back. */
+    this.landing = section
+    this.markTo(section)
+    clearTimeout(this.landed)
+    const arrive = (): void => {
+      clearTimeout(this.landed)
+      this.landing = undefined
+      globalThis.removeEventListener?.('scrollend', arrive)
+      this.mark()
+    }
+    globalThis.addEventListener?.('scrollend', arrive, { once: true })
+    this.landed = setTimeout(arrive, 1200)
+
+    if (this.behavior === 'auto') {
       return
     }
     event.preventDefault()

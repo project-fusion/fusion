@@ -267,8 +267,15 @@
   outline: none;
 }
 
+/* On the label's first line, half the difference between the line and the box.
+   Derived rather than picked, for the reason `Radio` records: a flat `space-2xs`
+   put the box's centre 6.5px below the centre of the text beside it, measured on
+   a one-line card, because 4px was chosen for a paragraph. */
 :host([appearance="card"]) [part="box"] {
-  margin-block-start: var(--helix-space-2xs);
+  margin-block-start: calc(
+    (var(--helix-text-sm) * var(--helix-leading-tight) - var(--_checkbox-size)) /
+    2
+  );
 }
 
 /* Named one selector at a time, because a reduce rule written looser than the

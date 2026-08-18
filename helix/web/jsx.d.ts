@@ -3759,6 +3759,36 @@ The circle stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
 leave nothing for a high-contrast display. */
   appearance?: HelixRadio["appearance"];
+  /** Takes the circle away, leaving the card as the whole control.
+
+`card` only, and it is a graphic that goes rather than a radio: the control
+in the shadow root is untouched, so the row is still focusable, still
+reported to a screen reader, and still the thing a form submits.
+
+Safe because the card already carries the answer in its surface, a raised
+fill inside a primary edge and a three-pixel ring of it. That ring is
+recent, and before it there was nothing left saying which card was chosen,
+which is why this is a property now and could not have been one then.
+
+Not on `Checkbox`, deliberately. A radio card with no circle is still
+unmistakably one-of-many because its siblings behave that way; a checkbox
+card with no box loses the only thing that says you may pick several. */
+  "hide-control"?: HelixRadio["hideControl"];
+  /** Takes the circle away, leaving the card as the whole control.
+
+`card` only, and it is a graphic that goes rather than a radio: the control
+in the shadow root is untouched, so the row is still focusable, still
+reported to a screen reader, and still the thing a form submits.
+
+Safe because the card already carries the answer in its surface, a raised
+fill inside a primary edge and a three-pixel ring of it. That ring is
+recent, and before it there was nothing left saying which card was chosen,
+which is why this is a property now and could not have been one then.
+
+Not on `Checkbox`, deliberately. A radio card with no circle is still
+unmistakably one-of-many because its siblings behave that way; a checkbox
+card with no box loses the only thing that says you may pick several. */
+  hideControl?: HelixRadio["hideControl"];
   /** Whether this choice can be made. */
   disabled?: HelixRadio["disabled"];
   /** Whether this is the current choice. Written by the group. */
@@ -3784,6 +3814,36 @@ The circle stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
 leave nothing for a high-contrast display. */
   "prop:appearance"?: HelixRadio["appearance"];
+  /** Takes the circle away, leaving the card as the whole control.
+
+`card` only, and it is a graphic that goes rather than a radio: the control
+in the shadow root is untouched, so the row is still focusable, still
+reported to a screen reader, and still the thing a form submits.
+
+Safe because the card already carries the answer in its surface, a raised
+fill inside a primary edge and a three-pixel ring of it. That ring is
+recent, and before it there was nothing left saying which card was chosen,
+which is why this is a property now and could not have been one then.
+
+Not on `Checkbox`, deliberately. A radio card with no circle is still
+unmistakably one-of-many because its siblings behave that way; a checkbox
+card with no box loses the only thing that says you may pick several. */
+  "bool:hide-control"?: HelixRadio["hideControl"];
+  /** Takes the circle away, leaving the card as the whole control.
+
+`card` only, and it is a graphic that goes rather than a radio: the control
+in the shadow root is untouched, so the row is still focusable, still
+reported to a screen reader, and still the thing a form submits.
+
+Safe because the card already carries the answer in its surface, a raised
+fill inside a primary edge and a three-pixel ring of it. That ring is
+recent, and before it there was nothing left saying which card was chosen,
+which is why this is a property now and could not have been one then.
+
+Not on `Checkbox`, deliberately. A radio card with no circle is still
+unmistakably one-of-many because its siblings behave that way; a checkbox
+card with no box loses the only thing that says you may pick several. */
+  "prop:hideControl"?: HelixRadio["hideControl"];
   /** Whether this choice can be made. */
   "prop:disabled"?: HelixRadio["disabled"];
   /** Whether this is the current choice. Written by the group. */
@@ -8981,6 +9041,20 @@ export type CustomElements = {
    * The circle stays in both. A card whose only marker was its own border would
    * ask a reader to compare surfaces across a row to find the answer, and would
    * leave nothing for a high-contrast display.
+   * - `hide-control`/`hideControl`: Takes the circle away, leaving the card as the whole control.
+   *
+   * `card` only, and it is a graphic that goes rather than a radio: the control
+   * in the shadow root is untouched, so the row is still focusable, still
+   * reported to a screen reader, and still the thing a form submits.
+   *
+   * Safe because the card already carries the answer in its surface, a raised
+   * fill inside a primary edge and a three-pixel ring of it. That ring is
+   * recent, and before it there was nothing left saying which card was chosen,
+   * which is why this is a property now and could not have been one then.
+   *
+   * Not on `Checkbox`, deliberately. A radio card with no circle is still
+   * unmistakably one-of-many because its siblings behave that way; a checkbox
+   * card with no box loses the only thing that says you may pick several.
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice. Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
@@ -14023,6 +14097,20 @@ export type CustomElementsSolidJs = {
    * The circle stays in both. A card whose only marker was its own border would
    * ask a reader to compare surfaces across a row to find the answer, and would
    * leave nothing for a high-contrast display.
+   * - `hide-control`/`hideControl`: Takes the circle away, leaving the card as the whole control.
+   *
+   * `card` only, and it is a graphic that goes rather than a radio: the control
+   * in the shadow root is untouched, so the row is still focusable, still
+   * reported to a screen reader, and still the thing a form submits.
+   *
+   * Safe because the card already carries the answer in its surface, a raised
+   * fill inside a primary edge and a three-pixel ring of it. That ring is
+   * recent, and before it there was nothing left saying which card was chosen,
+   * which is why this is a property now and could not have been one then.
+   *
+   * Not on `Checkbox`, deliberately. A radio card with no circle is still
+   * unmistakably one-of-many because its siblings behave that way; a checkbox
+   * card with no box loses the only thing that says you may pick several.
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice. Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.

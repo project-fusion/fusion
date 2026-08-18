@@ -13538,6 +13538,25 @@
               "description": "Works out which section is being read, and marks its link.\n\nPositional rather than a reading of what intersects, for the reason above.\nThe comparison is against `offset` and not zero, so the reading line is\nwherever the page says the top of the readable area is."
             },
             {
+              "kind": "method",
+              "name": "markTo",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "active",
+                  "type": {
+                    "text": "{ link: HTMLAnchorElement; target: Element } | undefined"
+                  }
+                }
+              ],
+              "description": "Where the destination is set, whether measured or asked for."
+            },
+            {
               "kind": "field",
               "name": "atEnd",
               "type": {
@@ -13556,6 +13575,24 @@
               "privacy": "private",
               "default": "0",
               "description": "The frame a mark is already scheduled for, so a scroll asks for one."
+            },
+            {
+              "kind": "field",
+              "name": "landing",
+              "type": {
+                "text": "{ link: HTMLAnchorElement; target: Element } | undefined"
+              },
+              "privacy": "private",
+              "description": "Where a click said to go, while the page is still on its way there."
+            },
+            {
+              "kind": "field",
+              "name": "landed",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private",
+              "description": "The guard behind `scrollend`, in case it never comes."
             },
             {
               "kind": "field",

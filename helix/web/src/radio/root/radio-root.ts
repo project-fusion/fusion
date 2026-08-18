@@ -47,6 +47,25 @@ export class HelixRadio extends HelixBaseRadio {
    */
   @property({ reflect: true })
   appearance?: 'plain' | 'card'
+
+  /**
+   * Takes the circle away, leaving the card as the whole control.
+   *
+   * `card` only, and it is a graphic that goes rather than a radio: the control
+   * in the shadow root is untouched, so the row is still focusable, still
+   * reported to a screen reader, and still the thing a form submits.
+   *
+   * Safe because the card already carries the answer in its surface, a raised
+   * fill inside a primary edge and a three-pixel ring of it. That ring is
+   * recent, and before it there was nothing left saying which card was chosen,
+   * which is why this is a property now and could not have been one then.
+   *
+   * Not on `Checkbox`, deliberately. A radio card with no circle is still
+   * unmistakably one-of-many because its siblings behave that way; a checkbox
+   * card with no box loses the only thing that says you may pick several.
+   */
+  @property({ attribute: 'hide-control', reflect: true, type: Boolean })
+  hideControl = false
 }
 
 declare global {
