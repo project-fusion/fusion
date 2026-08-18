@@ -395,3 +395,71 @@ describe('pagination out of range', () => {
     expect((nav as HTMLElement & { page: number }).page).toBe(1)
   })
 })
+
+describe('pagination with nowhere to go', () => {
+  const states = (host: HTMLElement): Set<string> =>
+    (host as unknown as { internals: { states: Set<string> } }).internals.states
+
+  test('a single page reports itself empty, so the stylesheet can close over it', async () => {
+    /* A control offering one page offers no navigation, and the row it sits in
+       should close over it rather than hold a space for a thing that cannot be
+       used. Reported through `ElementInternals.states` rather than an attribute,
+       because an attribute written at upgrade is markup a server's output never
+       had. Whether the rule matched is a browser's question, and is measured
+       there. */
+    const nav = await mount('<helix-pagination pages="1"></helix-pagination>')
+    expect(states(nav).has('empty')).toBe(true)
+  })
+
+  test('and stops reporting it the moment there is somewhere to go', async () => {
+    const nav = await mount('<helix-pagination pages="1"></helix-pagination>')
+    ;(nav as HTMLElement & { pages: number }).pages = 4
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(states(nav).has('empty')).toBe(false)
+  })
+
+  test('a total that has not loaded is one page, not none', async () => {
+    // A result mid-flight renders a single page rather than an empty control
+    // that appears later and pushes the layout down.
+    const nav = await mount('<helix-pagination></helix-pagination>')
+    expect(states(nav).has('empty')).toBe(true)
+  })
+})
+
+describe('pagination announcements', () => {
+  const live = (host: HTMLElement): Element | null =>
+    host.shadowRoot?.querySelector('[part="live"]') ?? null
+
+  test('the region is there from the start and says nothing', async () => {
+    // A live region populated at the moment it enters the document announces
+    // itself on arrival, which for an element that upgrades on load is every
+    // page load.
+    const nav = await mount('<helix-pagination default-page="4" pages="12"></helix-pagination>')
+    expect(live(nav)?.getAttribute('role')).toBe('status')
+    expect(live(nav)?.textContent).toBe('')
+  })
+
+  test('says where the reader now is, once they have moved', async () => {
+    /* Nothing did: moving the page moves `aria-current` onto a different
+       element, and a screen reader does not announce that, so a reader who
+       pressed 5 heard the word from the button they were on and nothing about
+       having arrived. */
+    const nav = await mount('<helix-pagination default-page="4" pages="12"></helix-pagination>')
+    nav.shadowRoot
+      ?.querySelectorAll('[part="page"]')[4]
+      ?.dispatchEvent(new Event('click', { bubbles: true }))
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(live(nav)?.textContent?.trim()).toBe('Page 5')
+  })
+
+  test('and says it for a consumer who moved it themselves', async () => {
+    // A controlled consumer assigns `page` and never goes through the request
+    // path, and a reader who got there that way deserves the same sentence.
+    const nav = await mount('<helix-pagination page="4" pages="12"></helix-pagination>')
+    ;(nav as HTMLElement & { page: number }).page = 9
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(live(nav)?.textContent?.trim()).toBe('Page 9')
+  })
+})

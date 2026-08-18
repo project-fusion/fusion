@@ -13,7 +13,7 @@ import {
   type HelixIcon,
 } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /** What one step control is made of, once the arithmetic is done. */
@@ -112,6 +112,21 @@ const fill = (
  * want. `total` and `page-size` stay here for the arithmetic below and nothing
  * else.
  *
+ * **A single page renders nothing.** A control offering one page offers no
+ * navigation, and the row it sits in should close over it rather than hold a
+ * space for a thing that cannot be used. Reported through
+ * `ElementInternals.states` rather than an attribute on the host, because an
+ * attribute written at upgrade is markup a server's output never had and a
+ * framework reports the difference; a custom state carries the same fact to a
+ * stylesheet and none of that to the DOM.
+ *
+ * **And a page change is announced.** Nothing did: moving the page moves
+ * `aria-current` onto a different element, and a screen reader does not announce
+ * that, so a reader who pressed 5 heard the word "5" from the button they were
+ * on and nothing at all about having arrived. A polite live region says where
+ * they now are. It ships empty and is filled only on a change, because a region
+ * populated as it enters the document announces itself on arrival.
+ *
  * `page` is the controlled property and `default-page` seeds one the element
  * owns. Naming `page` is a claim of ownership: the element announces and waits
  * to be told, which is what a consumer paging through a router already wants.
@@ -130,6 +145,7 @@ const fill = (
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart status - The reading of where you are, in `compact`.
+ * @csspart live - The region that says the page changed. Clipped, not hidden.
  *
  * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. The only way to refuse one.
  */
@@ -179,8 +195,13 @@ export class HelixBasePagination extends HelixElement {
    * are two more controls for a move already on screen. They earn their place
    * where the reader is deep in a long result and "back to the start" is the
    * move they actually want.
+   *
+   * Not reflected. It adds two elements rather than changing how any of them
+   * look, so no rule selects on it, and the house rule is that reflection
+   * exists for selectors: an unread reflected attribute is one more thing
+   * written onto a host at upgrade that a server's output never had.
    */
-  @property({ reflect: true, type: Boolean })
+  @property({ type: Boolean })
   ends = false
 
   /**
@@ -240,8 +261,11 @@ export class HelixBasePagination extends HelixElement {
    * here: the run of pages is gone and a single status line stands in its
    * place. This is the shape a narrow screen wants, and the only shape possible
    * where the total is large enough that no window over it is useful.
+   *
+   * Not reflected, for the reason `ends` is not: it decides what renders, so
+   * nothing has to select on it.
    */
-  @property({ reflect: true, type: Boolean })
+  @property({ type: Boolean })
   compact = false
 
   /** Accessible name for the navigation landmark. */
@@ -298,6 +322,19 @@ export class HelixBasePagination extends HelixElement {
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
   @property({ attribute: 'gap-label' })
   gapLabel = 'Skip to page {page}'
+
+  /**
+   * What the live region says, and nothing until the page has moved once.
+   *
+   * `pageLabel` rather than a template of its own, so the announcement is the
+   * same sentence the control the reader just pressed already carried, and
+   * there is not a ninth string to translate for the sake of one of them.
+   */
+  @state()
+  private announcement = ''
+
+  /** The page last announced, so the first render announces nothing. */
+  private announced: number | undefined = undefined
 
   /** The page on show, whoever set it, and `undefined` until somebody has. */
   private pageState: number | undefined = undefined
@@ -467,6 +504,34 @@ export class HelixBasePagination extends HelixElement {
        default name at all: an author's own `aria-label` is an attribute and
        beats internals, so naming it here costs them nothing. */
     hostAria(this.internals, { label: this.label, role: 'navigation' })
+
+    /* Feature-tested rather than assumed, the same way `hostAria` tests element
+       references: an engine without `CustomStateSet` gets a control that renders
+       its one page instead of disappearing, which is the behaviour this had
+       before and is not broken. */
+    if ('states' in this.internals) {
+      this.internals.states[this.count <= 1 ? 'add' : 'delete']('empty')
+    }
+  }
+
+  /**
+   * Says where the reader now is, once they have moved.
+   *
+   * In `updated` rather than in `request`, so it covers both modes: a controlled
+   * consumer assigns `page` and never goes through the request path at all, and
+   * a reader who got there that way deserves the same sentence.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (this.announced === undefined) {
+      // The first render establishes where we started. Arriving is not moving.
+      this.announced = this.page
+      return
+    }
+    if (this.announced !== this.page) {
+      this.announced = this.page
+      this.announcement = fill(this.pageLabel, this.page, this.count, this.numbers)
+    }
   }
 
   /**
@@ -663,7 +728,7 @@ export class HelixBasePagination extends HelixElement {
         <span part="status"
           >${fill(this.statusLabel, this.current, this.count, this.numbers)}</span
         >
-        ${this.renderNext()}${this.ends ? this.renderLast() : nothing}`
+        ${this.renderNext()}${this.ends ? this.renderLast() : nothing}${this.renderLive()}`
     }
     return html`${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
       <ol part="list" role="list">
@@ -671,7 +736,18 @@ export class HelixBasePagination extends HelixElement {
           typeof slot === 'number' ? this.renderPage(slot) : this.renderGap(slot),
         )}
       </ol>
-      ${this.renderNext()}${this.ends ? this.renderLast() : nothing}`
+      ${this.renderNext()}${this.ends ? this.renderLast() : nothing}${this.renderLive()}`
+  }
+
+  /**
+   * The region that says the page moved.
+   *
+   * Always rendered and empty until it has something to say. A live region
+   * populated at the moment it enters the document announces itself on arrival,
+   * which for a component that upgrades on load is every page load.
+   */
+  private renderLive(): TemplateResult {
+    return html`<span part="live" role="status" aria-live="polite">${this.announcement}</span>`
   }
 }
 

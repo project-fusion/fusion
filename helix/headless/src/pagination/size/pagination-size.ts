@@ -4,7 +4,7 @@ import {
   HelixElement,
   requestControlledChange,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 /* Side-effect imports, because this renders `<helix-select>` and
    `<helix-option>` in its own shadow root and a custom element registers on
@@ -42,6 +42,13 @@ import '../../select/index.js'
  * whole row two lines tall. `Select`'s host is a column, and an outer-tree rule
  * beats a `:host` rule, so turning it into a row needs no property on `Select`
  * and nothing written into the consumer's markup.
+ *
+ * **An empty `sizes` renders nothing.** A chooser with nothing to choose from
+ * is a control a reader can operate and cannot use, which is worse than an
+ * absence. Falling back to the built-in list was the other answer and it is a
+ * component overruling a consumer who said "none". Same rule as `Pagination`
+ * over a single page, and reported the same way, through
+ * `ElementInternals.states` rather than an attribute the server never wrote.
  *
  * `value` is the controlled property and `default-value` seeds one this owns,
  * the same contract every other stateful element here carries. Changing it
@@ -188,9 +195,18 @@ export class HelixBasePaginationSize extends HelixElement {
     if (this.valueMode === undefined) {
       this.valueMode = this.valueState !== undefined
     }
+    /* Feature-tested, like `Pagination`'s: an engine without `CustomStateSet`
+       gets an empty select rather than no element, which is the behaviour this
+       had before. */
+    if ('states' in this.internals) {
+      this.internals.states[this.options.length === 0 ? 'add' : 'delete']('empty')
+    }
   }
 
-  protected override render(): TemplateResult {
+  protected override render(): TemplateResult | typeof nothing {
+    if (this.options.length === 0) {
+      return nothing
+    }
     /* `Select` renders the label and gives the trigger the id it points at, so
        the association is the platform's and is already covered by that
        component's own specs. Nothing here reconstructs it. */

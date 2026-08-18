@@ -2071,6 +2071,7 @@ is a way through rather than a destination, so it does not compete.
 | `first` | The control that jumps to the first page, under `ends`. |
 | `last` | The control that jumps to the last page, under `ends`. |
 | `status` | The reading of where you are, in `compact`. |
+| `live` | The region that says the page changed. Clipped, not hidden. |
 
 #### Custom properties
 
@@ -2130,7 +2131,7 @@ a way to move through it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `'{from}-{to} of {total}'` | `HelixBasePaginationSummary` | The reading, with `{from}`, `{to}` and `{total}` filled in. |
+| `format` | `format` | `string` | `'{from}-{to} of {total}'` | `HelixBasePaginationSummary` | The reading, with `{from}`, `{to}` and `{total}` filled in. |
 | `locale` | `locale` | `string` | `''` | `HelixBasePaginationSummary` | Locale for the numbers. Absent uses the runtime's own. |
 | `page` | `page` | `number` | `1` | `HelixBasePaginationSummary` | The page on show, one-based. |
 | `pageSize` | `page-size` | `number` | `0` | `HelixBasePaginationSummary` | How many items are on a page. |

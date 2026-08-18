@@ -32,7 +32,7 @@ describe('pagination summary', () => {
 
   test('the words are a template and the numbers take a locale', async () => {
     const it = await mount(
-      '<helix-pagination-summary label="{from} bis {to} von {total}" locale="de-DE" page="2" page-size="10" total="1500"></helix-pagination-summary>',
+      '<helix-pagination-summary format="{from} bis {to} von {total}" locale="de-DE" page="2" page-size="10" total="1500"></helix-pagination-summary>',
     )
     expect(text(it)).toBe('11 bis 20 von 1.500')
   })

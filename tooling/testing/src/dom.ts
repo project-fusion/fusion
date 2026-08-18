@@ -43,6 +43,13 @@ export const registerDom = (): void => {
  * the right moment, and that is what the recording proves. A spec that needs
  * the whole path from a press to a submitted field wants a real browser.
  *
+ * `states` is modelled as a real set, because a component that reports a fact
+ * through `ElementInternals.states` has no other channel for it: the whole
+ * point of a custom state is that it reaches a stylesheet and never the DOM, so
+ * there is no attribute a spec could read instead. Feature-tested by its users
+ * (`'states' in internals`), so leaving it out did not break anything; it made
+ * the behaviour untestable outside a browser, which is how it went in.
+ *
  * `setValidity` is modelled too, for the same reason `setFormValue` is: a
  * control reads its own verdict back to decide whether to show a message, so a
  * `setValidity` that records nothing leaves `internals.validity` undefined and
@@ -119,6 +126,12 @@ const shimElementInternals = (): void => {
         validity = { ...flags, valid: failed.length === 0 } as ValidityState
         validationMessage = failed.length === 0 ? '' : message
       },
+      /* A `Set` rather than a `CustomStateSet`. The interface a component uses
+         is `add`, `delete` and `has`, which a `Set` already is, and the real
+         one differs only in being observed by the selector engine, which
+         happy-dom has no `:state()` support for anyway. A spec asserts on the
+         set; whether a rule matched is a browser's question. */
+      states: new Set<string>(),
       get validationMessage(): string {
         return validationMessage
       },

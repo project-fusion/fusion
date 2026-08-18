@@ -171,6 +171,36 @@
   user-select: none;
 }
 
+/* Nothing to move between, so nothing to draw.
+ *
+ * `display: none` and not an empty box: the host is a flex item wherever it is
+ * placed, and a zero-width one still has the parent's gap drawn on both sides of
+ * it. That is the fault this repository has hit in the toast, the list, the
+ * divider and the carousel, and it is the reason this is a rule about the box
+ * rather than about the contents.
+ *
+ * `:state()` and not an attribute. The headless tier sets a custom state, which
+ * carries the fact to this stylesheet and nothing to the DOM, so a server's
+ * output and a hydrated client's agree. */
+:host(:state(empty)) {
+  display: none;
+}
+
+/* Said out loud, drawn nowhere.
+ *
+ * The standard clip rather than `display: none` or `visibility: hidden`, both of
+ * which take the region out of the accessibility tree along with the picture,
+ * which is the one thing it is here to stay in. Same recipe the field family
+ * uses for a hidden label, and for the same reason. */
+[part="live"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
 [part="status"] {
   color: var(--helix-color-foreground-muted);
   font-variant-numeric: tabular-nums;

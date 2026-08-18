@@ -18300,6 +18300,14 @@
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
               }
+            },
+            {
+              "description": "The region that says the page changed. Clipped, not hidden.",
+              "name": "live",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
             }
           ],
           "members": [
@@ -18352,9 +18360,8 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.",
+              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.\n\nNot reflected. It adds two elements rather than changing how any of them\nlook, so no rule selects on it, and the house rule is that reflection\nexists for selectors: an unread reflected attribute is one more thing\nwritten onto a host at upgrade that a server's output never had.",
               "attribute": "ends",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18436,9 +18443,8 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.",
+              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.\n\nNot reflected, for the reason `ends` is not: it decides what renders, so\nnothing has to select on it.",
               "attribute": "compact",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18565,6 +18571,34 @@
               "default": "'Skip to page {page}'",
               "description": "Accessible name for a gap, with `{page}` filled in as where it goes.",
               "attribute": "gap-label",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcement",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What the live region says, and nothing until the page has moved once.\n\n`pageLabel` rather than a template of its own, so the announcement is the\nsame sentence the control the reader just pressed already carried, and\nthere is not a ninth string to translate for the sake of one of them.",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announced",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The page last announced, so the first render announces nothing.",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18858,6 +18892,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderLive",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The region that says the page moved.\n\nAlways rendered and empty until it has something to say. A live region\npopulated at the moment it enters the document announces itself on arrival,\nwhich for a component that upgrades on load is every page load.",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -18992,7 +19041,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.",
+              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.\n\nNot reflected. It adds two elements rather than changing how any of them\nlook, so no rule selects on it, and the house rule is that reflection\nexists for selectors: an unread reflected attribute is one more thing\nwritten onto a host at upgrade that a server's output never had.",
               "fieldName": "ends",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
@@ -19069,7 +19118,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.",
+              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.\n\nNot reflected, for the reason `ends` is not: it decides what renders, so\nnothing has to select on it.",
               "fieldName": "compact",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
@@ -19709,13 +19758,13 @@
             },
             {
               "kind": "field",
-              "name": "label",
+              "name": "format",
               "type": {
                 "text": "string"
               },
               "default": "'{from}-{to} of {total}'",
-              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `count-label=\"{total} 件中 {from}-{to} 件\"` is one attribute here\nand three concatenations anywhere else.",
-              "attribute": "label",
+              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `format=\"{total} 件中 {from}-{to} 件\"` is one attribute here and\nthree concatenations anywhere else.\n\n**`format`, not `label`, and the difference is worth the rename.** `label`\nacross this library means the accessible name of a thing that has one:\n`Pagination.label` names the landmark and `Pagination.Size.label` is the\nwords beside the control. This is neither. It is the whole visible content\nof the element, so calling it `label` put one word on three jobs inside one\nfamily. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,\nwhich each label something; this labels nothing, it *is* the thing.",
+              "attribute": "format",
               "inheritedFrom": {
                 "name": "HelixBasePaginationSummary",
                 "module": "src/pagination/summary/pagination-summary.ts"
@@ -19891,13 +19940,13 @@
               }
             },
             {
-              "name": "label",
+              "name": "format",
               "type": {
                 "text": "string"
               },
               "default": "'{from}-{to} of {total}'",
-              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `count-label=\"{total} 件中 {from}-{to} 件\"` is one attribute here\nand three concatenations anywhere else.",
-              "fieldName": "label",
+              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `format=\"{total} 件中 {from}-{to} 件\"` is one attribute here and\nthree concatenations anywhere else.\n\n**`format`, not `label`, and the difference is worth the rename.** `label`\nacross this library means the accessible name of a thing that has one:\n`Pagination.label` names the landmark and `Pagination.Size.label` is the\nwords beside the control. This is neither. It is the whole visible content\nof the element, so calling it `label` put one word on three jobs inside one\nfamily. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,\nwhich each label something; this labels nothing, it *is* the thing.",
+              "fieldName": "format",
               "inheritedFrom": {
                 "name": "HelixBasePaginationSummary",
                 "module": "src/pagination/summary/pagination-summary.ts"

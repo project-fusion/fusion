@@ -13897,7 +13897,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**And a gap is a control.** It goes to the middle of the run it stands over,\nwhich is the binary-search step: any page in a set of any size is a handful of\npresses, where a jump of a fixed size would need forty of them on a set of a\nhundred and twenty-eight. A menu listing the hidden pages was the other idea\nand the arithmetic refuses it, for the reasons on `renderGap`.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n**The count and the page-size control are their own elements.** They were\nbriefly a part and a pair of slots in here, and a slot can only offer one\nplace: at one end of one row, in one order, on one axis. `Pagination.Summary`\nand `Pagination.Size` sit beside this one instead, so the direction and the\norder of a footer are the consumer's, which is what they were always going to\nwant. `total` and `page-size` stay here for the arithmetic below and nothing\nelse.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
+          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**And a gap is a control.** It goes to the middle of the run it stands over,\nwhich is the binary-search step: any page in a set of any size is a handful of\npresses, where a jump of a fixed size would need forty of them on a set of a\nhundred and twenty-eight. A menu listing the hidden pages was the other idea\nand the arithmetic refuses it, for the reasons on `renderGap`.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n**The count and the page-size control are their own elements.** They were\nbriefly a part and a pair of slots in here, and a slot can only offer one\nplace: at one end of one row, in one order, on one axis. `Pagination.Summary`\nand `Pagination.Size` sit beside this one instead, so the direction and the\norder of a footer are the consumer's, which is what they were always going to\nwant. `total` and `page-size` stay here for the arithmetic below and nothing\nelse.\n\n**A single page renders nothing.** A control offering one page offers no\nnavigation, and the row it sits in should close over it rather than hold a\nspace for a thing that cannot be used. Reported through\n`ElementInternals.states` rather than an attribute on the host, because an\nattribute written at upgrade is markup a server's output never had and a\nframework reports the difference; a custom state carries the same fact to a\nstylesheet and none of that to the DOM.\n\n**And a page change is announced.** Nothing did: moving the page moves\n`aria-current` onto a different element, and a screen reader does not announce\nthat, so a reader who pressed 5 heard the word \"5\" from the button they were\non and nothing at all about having arrived. A polite live region says where\nthey now are. It ships empty and is filled only on a change, because a region\npopulated as it enters the document announces itself on arrival.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
           "name": "HelixBasePagination",
           "cssParts": [
             {
@@ -13935,6 +13935,10 @@
             {
               "description": "The reading of where you are, in `compact`.",
               "name": "status"
+            },
+            {
+              "description": "The region that says the page changed. Clipped, not hidden.",
+              "name": "live"
             }
           ],
           "members": [
@@ -13975,9 +13979,8 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.",
-              "attribute": "ends",
-              "reflects": true
+              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.\n\nNot reflected. It adds two elements rather than changing how any of them\nlook, so no rule selects on it, and the house rule is that reflection\nexists for selectors: an unread reflected attribute is one more thing\nwritten onto a host at upgrade that a server's output never had.",
+              "attribute": "ends"
             },
             {
               "kind": "field",
@@ -14035,9 +14038,8 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.",
-              "attribute": "compact",
-              "reflects": true
+              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.\n\nNot reflected, for the reason `ends` is not: it decides what renders, so\nnothing has to select on it.",
+              "attribute": "compact"
             },
             {
               "kind": "field",
@@ -14128,6 +14130,26 @@
               "default": "'Skip to page {page}'",
               "description": "Accessible name for a gap, with `{page}` filled in as where it goes.",
               "attribute": "gap-label"
+            },
+            {
+              "kind": "field",
+              "name": "announcement",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What the live region says, and nothing until the page has moved once.\n\n`pageLabel` rather than a template of its own, so the announcement is the\nsame sentence the control the reader just pressed already carried, and\nthere is not a ninth string to translate for the sake of one of them."
+            },
+            {
+              "kind": "field",
+              "name": "announced",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The page last announced, so the first render announces nothing."
             },
             {
               "kind": "field",
@@ -14349,6 +14371,17 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderLive",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The region that says the page moved.\n\nAlways rendered and empty until it has something to say. A live region\npopulated at the moment it enters the document announces itself on arrival,\nwhich for a component that upgrades on load is every page load."
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -14462,7 +14495,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.",
+              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.\n\nNot reflected. It adds two elements rather than changing how any of them\nlook, so no rule selects on it, and the house rule is that reflection\nexists for selectors: an unread reflected attribute is one more thing\nwritten onto a host at upgrade that a server's output never had.",
               "fieldName": "ends"
             },
             {
@@ -14515,7 +14548,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.",
+              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.\n\nNot reflected, for the reason `ends` is not: it decides what renders, so\nnothing has to select on it.",
               "fieldName": "compact"
             },
             {
@@ -14648,7 +14681,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Its own element beside `Pagination` rather than a slot inside it, for the\nreason `Pagination.Summary` is: a footer's direction and order are the\nconsumer's, and a control that can only sit at one end of one row has taken\nthat decision for them.\n\n**`Select`, not a native `<select>`.** It was native first, on the argument\nthat the platform's own menu is a wheel on a phone and the widget a\nscreen-reader user already knows. What that argument leaves out is that the\nlibrary then has two dropdowns that are identical closed and different open,\nand a reader meets both in the same footer as a table's filters. Consistency\nis the whole product here, and it wins.\n\nWhat it takes back with it: the caret is `Select`'s again rather than a colour\nliteral baked into a data URI, because a background image cannot read\n`currentColor`, and the label is a real `<label for>` against the trigger's\nown id, which `Select` already renders and already tests.\n\n**The label sits on the row, not above it.** Every other field in the library\nstacks its label because it stands in a column of fields; this one stands in a\nfooter beside a run of page numbers, and a two-line control there makes the\nwhole row two lines tall. `Select`'s host is a column, and an outer-tree rule\nbeats a `:host` rule, so turning it into a row needs no property on `Select`\nand nothing written into the consumer's markup.\n\n`value` is the controlled property and `default-value` seeds one this owns,\nthe same contract every other stateful element here carries. Changing it\nannounces `helix-change`; what a consumer does with that is re-query and move\nback to page one, which is theirs to decide because only they know whether\nthe reader's position should survive it.",
+          "description": "Its own element beside `Pagination` rather than a slot inside it, for the\nreason `Pagination.Summary` is: a footer's direction and order are the\nconsumer's, and a control that can only sit at one end of one row has taken\nthat decision for them.\n\n**`Select`, not a native `<select>`.** It was native first, on the argument\nthat the platform's own menu is a wheel on a phone and the widget a\nscreen-reader user already knows. What that argument leaves out is that the\nlibrary then has two dropdowns that are identical closed and different open,\nand a reader meets both in the same footer as a table's filters. Consistency\nis the whole product here, and it wins.\n\nWhat it takes back with it: the caret is `Select`'s again rather than a colour\nliteral baked into a data URI, because a background image cannot read\n`currentColor`, and the label is a real `<label for>` against the trigger's\nown id, which `Select` already renders and already tests.\n\n**The label sits on the row, not above it.** Every other field in the library\nstacks its label because it stands in a column of fields; this one stands in a\nfooter beside a run of page numbers, and a two-line control there makes the\nwhole row two lines tall. `Select`'s host is a column, and an outer-tree rule\nbeats a `:host` rule, so turning it into a row needs no property on `Select`\nand nothing written into the consumer's markup.\n\n**An empty `sizes` renders nothing.** A chooser with nothing to choose from\nis a control a reader can operate and cannot use, which is worse than an\nabsence. Falling back to the built-in list was the other answer and it is a\ncomponent overruling a consumer who said \"none\". Same rule as `Pagination`\nover a single page, and reported the same way, through\n`ElementInternals.states` rather than an attribute the server never wrote.\n\n`value` is the controlled property and `default-value` seeds one this owns,\nthe same contract every other stateful element here carries. Changing it\nannounces `helix-change`; what a consumer does with that is re-query and move\nback to page one, which is theirs to decide because only they know whether\nthe reader's position should survive it.",
           "name": "HelixBasePaginationSize",
           "cssParts": [
             {
@@ -14988,13 +15021,13 @@
             },
             {
               "kind": "field",
-              "name": "label",
+              "name": "format",
               "type": {
                 "text": "string"
               },
               "default": "'{from}-{to} of {total}'",
-              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `count-label=\"{total} 件中 {from}-{to} 件\"` is one attribute here\nand three concatenations anywhere else.",
-              "attribute": "label"
+              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `format=\"{total} 件中 {from}-{to} 件\"` is one attribute here and\nthree concatenations anywhere else.\n\n**`format`, not `label`, and the difference is worth the rename.** `label`\nacross this library means the accessible name of a thing that has one:\n`Pagination.label` names the landmark and `Pagination.Size.label` is the\nwords beside the control. This is neither. It is the whole visible content\nof the element, so calling it `label` put one word on three jobs inside one\nfamily. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,\nwhich each label something; this labels nothing, it *is* the thing.",
+              "attribute": "format"
             },
             {
               "kind": "field",
@@ -15123,13 +15156,13 @@
               "fieldName": "total"
             },
             {
-              "name": "label",
+              "name": "format",
               "type": {
                 "text": "string"
               },
               "default": "'{from}-{to} of {total}'",
-              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `count-label=\"{total} 件中 {from}-{to} 件\"` is one attribute here\nand three concatenations anywhere else.",
-              "fieldName": "label"
+              "description": "The reading, with `{from}`, `{to}` and `{total}` filled in.\n\nA template rather than a prefix and a suffix, because word order is not\nuniversal: `format=\"{total} 件中 {from}-{to} 件\"` is one attribute here and\nthree concatenations anywhere else.\n\n**`format`, not `label`, and the difference is worth the rename.** `label`\nacross this library means the accessible name of a thing that has one:\n`Pagination.label` names the landmark and `Pagination.Size.label` is the\nwords beside the control. This is neither. It is the whole visible content\nof the element, so calling it `label` put one word on three jobs inside one\nfamily. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,\nwhich each label something; this labels nothing, it *is* the thing.",
+              "fieldName": "format"
             },
             {
               "name": "locale",

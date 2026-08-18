@@ -3022,7 +3022,12 @@ Off by default. The gaps already reach any page in a few presses and the
 last page is one of the two the run always shows, so on a short set these
 are two more controls for a move already on screen. They earn their place
 where the reader is deep in a long result and "back to the start" is the
-move they actually want. */
+move they actually want.
+
+Not reflected. It adds two elements rather than changing how any of them
+look, so no rule selects on it, and the house rule is that reflection
+exists for selectors: an unread reflected attribute is one more thing
+written onto a host at upgrade that a server's output never had. */
   ends?: HelixBasePagination["ends"];
   /** The page on show, one-based.
 
@@ -3058,7 +3063,10 @@ one, and the back button works without the consumer wiring anything. */
 A different structure rather than a different look, which is why it is
 here: the run of pages is gone and a single status line stands in its
 place. This is the shape a narrow screen wants, and the only shape possible
-where the total is large enough that no window over it is useful. */
+where the total is large enough that no window over it is useful.
+
+Not reflected, for the reason `ends` is not: it decides what renders, so
+nothing has to select on it. */
   compact?: HelixBasePagination["compact"];
   /** Accessible name for the navigation landmark. */
   label?: HelixBasePagination["label"];
@@ -3156,7 +3164,12 @@ Off by default. The gaps already reach any page in a few presses and the
 last page is one of the two the run always shows, so on a short set these
 are two more controls for a move already on screen. They earn their place
 where the reader is deep in a long result and "back to the start" is the
-move they actually want. */
+move they actually want.
+
+Not reflected. It adds two elements rather than changing how any of them
+look, so no rule selects on it, and the house rule is that reflection
+exists for selectors: an unread reflected attribute is one more thing
+written onto a host at upgrade that a server's output never had. */
   "prop:ends"?: HelixBasePagination["ends"];
   /** The page on show, one-based.
 
@@ -3192,7 +3205,10 @@ one, and the back button works without the consumer wiring anything. */
 A different structure rather than a different look, which is why it is
 here: the run of pages is gone and a single status line stands in its
 place. This is the shape a narrow screen wants, and the only shape possible
-where the total is large enough that no window over it is useful. */
+where the total is large enough that no window over it is useful.
+
+Not reflected, for the reason `ends` is not: it decides what renders, so
+nothing has to select on it. */
   "prop:compact"?: HelixBasePagination["compact"];
   /** Accessible name for the navigation landmark. */
   "prop:label"?: HelixBasePagination["label"];
@@ -3338,9 +3354,17 @@ export type HelixBasePaginationSummaryProps = {
   /** The reading, with `{from}`, `{to}` and `{total}` filled in.
 
 A template rather than a prefix and a suffix, because word order is not
-universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-and three concatenations anywhere else. */
-  label?: HelixBasePaginationSummary["label"];
+universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+three concatenations anywhere else.
+
+**`format`, not `label`, and the difference is worth the rename.** `label`
+across this library means the accessible name of a thing that has one:
+`Pagination.label` names the landmark and `Pagination.Size.label` is the
+words beside the control. This is neither. It is the whole visible content
+of the element, so calling it `label` put one word on three jobs inside one
+family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+which each label something; this labels nothing, it *is* the thing. */
+  format?: HelixBasePaginationSummary["format"];
   /** Locale for the numbers. Absent uses the runtime's own. */
   locale?: HelixBasePaginationSummary["locale"];
 };
@@ -3357,9 +3381,17 @@ export type HelixBasePaginationSummarySolidJsProps = {
   /** The reading, with `{from}`, `{to}` and `{total}` filled in.
 
 A template rather than a prefix and a suffix, because word order is not
-universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-and three concatenations anywhere else. */
-  "prop:label"?: HelixBasePaginationSummary["label"];
+universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+three concatenations anywhere else.
+
+**`format`, not `label`, and the difference is worth the rename.** `label`
+across this library means the accessible name of a thing that has one:
+`Pagination.label` names the landmark and `Pagination.Size.label` is the
+words beside the control. This is neither. It is the whole visible content
+of the element, so calling it `label` put one word on three jobs inside one
+family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+which each label something; this labels nothing, it *is* the thing. */
+  "prop:format"?: HelixBasePaginationSummary["format"];
   /** Locale for the numbers. Absent uses the runtime's own. */
   "prop:locale"?: HelixBasePaginationSummary["locale"];
 
@@ -8578,6 +8610,21 @@ export type CustomElements = {
    * want. `total` and `page-size` stay here for the arithmetic below and nothing
    * else.
    *
+   * **A single page renders nothing.** A control offering one page offers no
+   * navigation, and the row it sits in should close over it rather than hold a
+   * space for a thing that cannot be used. Reported through
+   * `ElementInternals.states` rather than an attribute on the host, because an
+   * attribute written at upgrade is markup a server's output never had and a
+   * framework reports the difference; a custom state carries the same fact to a
+   * stylesheet and none of that to the DOM.
+   *
+   * **And a page change is announced.** Nothing did: moving the page moves
+   * `aria-current` onto a different element, and a screen reader does not announce
+   * that, so a reader who pressed 5 heard the word "5" from the button they were
+   * on and nothing at all about having arrived. A polite live region says where
+   * they now are. It ships empty and is filled only on a change, because a region
+   * populated as it enters the document announces itself on arrival.
+   *
    * `page` is the controlled property and `default-page` seeds one the element
    * owns. Naming `page` is a claim of ownership: the element announces and waits
    * to be told, which is what a consumer paging through a router already wants.
@@ -8614,6 +8661,11 @@ export type CustomElements = {
    * are two more controls for a move already on screen. They earn their place
    * where the reader is deep in a long result and "back to the start" is the
    * move they actually want.
+   *
+   * Not reflected. It adds two elements rather than changing how any of them
+   * look, so no rule selects on it, and the house rule is that reflection
+   * exists for selectors: an unread reflected attribute is one more thing
+   * written onto a host at upgrade that a server's output never had.
    * - `page`: The page on show, one-based.
    *
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -8642,6 +8694,9 @@ export type CustomElements = {
    * here: the run of pages is gone and a single status line stands in its
    * place. This is the shape a narrow screen wants, and the only shape possible
    * where the total is large enough that no window over it is useful.
+   *
+   * Not reflected, for the reason `ends` is not: it decides what renders, so
+   * nothing has to select on it.
    * - `label`: Accessible name for the navigation landmark.
    * - `locale`: Locale for the page numbers. Absent uses the runtime's own.
    *
@@ -8686,6 +8741,7 @@ export type CustomElements = {
    * - `first`: The control that jumps to the first page, under `ends`.
    * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
+   * - `live`: The region that says the page changed. Clipped, not hidden.
    */
   "helix-base-pagination": Partial<
     HelixBasePaginationProps & BaseProps<HelixBasePagination> & BaseEvents
@@ -8715,6 +8771,13 @@ export type CustomElements = {
    * whole row two lines tall. `Select`'s host is a column, and an outer-tree rule
    * beats a `:host` rule, so turning it into a row needs no property on `Select`
    * and nothing written into the consumer's markup.
+   *
+   * **An empty `sizes` renders nothing.** A chooser with nothing to choose from
+   * is a control a reader can operate and cannot use, which is worse than an
+   * absence. Falling back to the built-in list was the other answer and it is a
+   * component overruling a consumer who said "none". Same rule as `Pagination`
+   * over a single page, and reported the same way, through
+   * `ElementInternals.states` rather than an attribute the server never wrote.
    *
    * `value` is the controlled property and `default-value` seeds one this owns,
    * the same contract every other stateful element here carries. Changing it
@@ -8783,11 +8846,19 @@ export type CustomElements = {
    * - `page`: The page on show, one-based.
    * - `page-size`/`pageSize`: How many items are on a page.
    * - `total`: How many items there are across every page.
-   * - `label`: The reading, with `{from}`, `{to}` and `{total}` filled in.
+   * - `format`: The reading, with `{from}`, `{to}` and `{total}` filled in.
    *
    * A template rather than a prefix and a suffix, because word order is not
-   * universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-   * and three concatenations anywhere else.
+   * universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+   * three concatenations anywhere else.
+   *
+   * **`format`, not `label`, and the difference is worth the rename.** `label`
+   * across this library means the accessible name of a thing that has one:
+   * `Pagination.label` names the landmark and `Pagination.Size.label` is the
+   * words beside the control. This is neither. It is the whole visible content
+   * of the element, so calling it `label` put one word on three jobs inside one
+   * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+   * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
    */
   "helix-base-pagination-summary": Partial<
@@ -13864,6 +13935,21 @@ export type CustomElementsSolidJs = {
    * want. `total` and `page-size` stay here for the arithmetic below and nothing
    * else.
    *
+   * **A single page renders nothing.** A control offering one page offers no
+   * navigation, and the row it sits in should close over it rather than hold a
+   * space for a thing that cannot be used. Reported through
+   * `ElementInternals.states` rather than an attribute on the host, because an
+   * attribute written at upgrade is markup a server's output never had and a
+   * framework reports the difference; a custom state carries the same fact to a
+   * stylesheet and none of that to the DOM.
+   *
+   * **And a page change is announced.** Nothing did: moving the page moves
+   * `aria-current` onto a different element, and a screen reader does not announce
+   * that, so a reader who pressed 5 heard the word "5" from the button they were
+   * on and nothing at all about having arrived. A polite live region says where
+   * they now are. It ships empty and is filled only on a change, because a region
+   * populated as it enters the document announces itself on arrival.
+   *
    * `page` is the controlled property and `default-page` seeds one the element
    * owns. Naming `page` is a claim of ownership: the element announces and waits
    * to be told, which is what a consumer paging through a router already wants.
@@ -13900,6 +13986,11 @@ export type CustomElementsSolidJs = {
    * are two more controls for a move already on screen. They earn their place
    * where the reader is deep in a long result and "back to the start" is the
    * move they actually want.
+   *
+   * Not reflected. It adds two elements rather than changing how any of them
+   * look, so no rule selects on it, and the house rule is that reflection
+   * exists for selectors: an unread reflected attribute is one more thing
+   * written onto a host at upgrade that a server's output never had.
    * - `page`: The page on show, one-based.
    *
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -13928,6 +14019,9 @@ export type CustomElementsSolidJs = {
    * here: the run of pages is gone and a single status line stands in its
    * place. This is the shape a narrow screen wants, and the only shape possible
    * where the total is large enough that no window over it is useful.
+   *
+   * Not reflected, for the reason `ends` is not: it decides what renders, so
+   * nothing has to select on it.
    * - `label`: Accessible name for the navigation landmark.
    * - `locale`: Locale for the page numbers. Absent uses the runtime's own.
    *
@@ -13972,6 +14066,7 @@ export type CustomElementsSolidJs = {
    * - `first`: The control that jumps to the first page, under `ends`.
    * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
+   * - `live`: The region that says the page changed. Clipped, not hidden.
    */
   "helix-base-pagination": Partial<
     HelixBasePaginationProps &
@@ -14004,6 +14099,13 @@ export type CustomElementsSolidJs = {
    * whole row two lines tall. `Select`'s host is a column, and an outer-tree rule
    * beats a `:host` rule, so turning it into a row needs no property on `Select`
    * and nothing written into the consumer's markup.
+   *
+   * **An empty `sizes` renders nothing.** A chooser with nothing to choose from
+   * is a control a reader can operate and cannot use, which is worse than an
+   * absence. Falling back to the built-in list was the other answer and it is a
+   * component overruling a consumer who said "none". Same rule as `Pagination`
+   * over a single page, and reported the same way, through
+   * `ElementInternals.states` rather than an attribute the server never wrote.
    *
    * `value` is the controlled property and `default-value` seeds one this owns,
    * the same contract every other stateful element here carries. Changing it
@@ -14073,11 +14175,19 @@ export type CustomElementsSolidJs = {
    * - `page`: The page on show, one-based.
    * - `page-size`/`pageSize`: How many items are on a page.
    * - `total`: How many items there are across every page.
-   * - `label`: The reading, with `{from}`, `{to}` and `{total}` filled in.
+   * - `format`: The reading, with `{from}`, `{to}` and `{total}` filled in.
    *
    * A template rather than a prefix and a suffix, because word order is not
-   * universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-   * and three concatenations anywhere else.
+   * universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+   * three concatenations anywhere else.
+   *
+   * **`format`, not `label`, and the difference is worth the rename.** `label`
+   * across this library means the accessible name of a thing that has one:
+   * `Pagination.label` names the landmark and `Pagination.Size.label` is the
+   * words beside the control. This is neither. It is the whole visible content
+   * of the element, so calling it `label` put one word on three jobs inside one
+   * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+   * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
    */
   "helix-base-pagination-summary": Partial<

@@ -9,6 +9,14 @@
   display: inline-flex;
 }
 
+/* Nothing to choose from, so no chooser. Same rule and same mechanism as
+   `Pagination` over a single page: `display: none` rather than an empty box,
+   because a zero-width flex item still has its parent's gap drawn either side
+   of it. */
+:host(:state(empty)) {
+  display: none;
+}
+
 /* `Select`'s host is `flex-direction: column`, declared in its own `:host` rule.
    An outer-tree rule beats a `:host` rule, so turning it into a row is four
    declarations here and needs no property on `Select`, no wrapper, and nothing

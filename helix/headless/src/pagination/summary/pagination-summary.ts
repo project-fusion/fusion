@@ -46,11 +46,19 @@ export class HelixBasePaginationSummary extends HelixElement {
    * The reading, with `{from}`, `{to}` and `{total}` filled in.
    *
    * A template rather than a prefix and a suffix, because word order is not
-   * universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-   * and three concatenations anywhere else.
+   * universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+   * three concatenations anywhere else.
+   *
+   * **`format`, not `label`, and the difference is worth the rename.** `label`
+   * across this library means the accessible name of a thing that has one:
+   * `Pagination.label` names the landmark and `Pagination.Size.label` is the
+   * words beside the control. This is neither. It is the whole visible content
+   * of the element, so calling it `label` put one word on three jobs inside one
+   * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+   * which each label something; this labels nothing, it *is* the thing.
    */
   @property()
-  label = '{from}-{to} of {total}'
+  format = '{from}-{to} of {total}'
 
   /** Locale for the numbers. Absent uses the runtime's own. */
   @property()
@@ -95,7 +103,7 @@ export class HelixBasePaginationSummary extends HelixElement {
     /* And the end is clamped to the total, because the last page is rarely
        full: 248 items at 25 a page end at 248, not at 250. */
     const to = Math.min(this.total, from + size - 1)
-    return html`${this.label
+    return html`${this.format
       .replaceAll('{from}', this.numbers(from))
       .replaceAll('{to}', this.numbers(to))
       .replaceAll('{total}', this.numbers(this.total))}`

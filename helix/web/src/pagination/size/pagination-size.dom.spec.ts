@@ -137,3 +137,17 @@ describe('pagination size', () => {
     expect(it.value).toBe(10)
   })
 })
+
+describe('pagination size with nothing to offer', () => {
+  test('an empty `sizes` renders no control and reports itself empty', async () => {
+    /* A chooser with nothing to choose from is a control a reader can operate
+       and cannot use, which is worse than an absence. Falling back to the
+       built-in list was the other answer and it is a component overruling a
+       consumer who said "none". */
+    const it = await mount('<helix-pagination-size sizes=""></helix-pagination-size>')
+    expect(part(it, 'control')).toBeNull()
+    expect(
+      (it as unknown as { internals: { states: Set<string> } }).internals.states.has('empty'),
+    ).toBe(true)
+  })
+})

@@ -3640,7 +3640,12 @@ Off by default. The gaps already reach any page in a few presses and the
 last page is one of the two the run always shows, so on a short set these
 are two more controls for a move already on screen. They earn their place
 where the reader is deep in a long result and "back to the start" is the
-move they actually want. */
+move they actually want.
+
+Not reflected. It adds two elements rather than changing how any of them
+look, so no rule selects on it, and the house rule is that reflection
+exists for selectors: an unread reflected attribute is one more thing
+written onto a host at upgrade that a server's output never had. */
   ends?: HelixPagination["ends"];
   /** The page on show, one-based.
 
@@ -3676,7 +3681,10 @@ one, and the back button works without the consumer wiring anything. */
 A different structure rather than a different look, which is why it is
 here: the run of pages is gone and a single status line stands in its
 place. This is the shape a narrow screen wants, and the only shape possible
-where the total is large enough that no window over it is useful. */
+where the total is large enough that no window over it is useful.
+
+Not reflected, for the reason `ends` is not: it decides what renders, so
+nothing has to select on it. */
   compact?: HelixPagination["compact"];
   /** Accessible name for the navigation landmark. */
   label?: HelixPagination["label"];
@@ -3772,7 +3780,12 @@ Off by default. The gaps already reach any page in a few presses and the
 last page is one of the two the run always shows, so on a short set these
 are two more controls for a move already on screen. They earn their place
 where the reader is deep in a long result and "back to the start" is the
-move they actually want. */
+move they actually want.
+
+Not reflected. It adds two elements rather than changing how any of them
+look, so no rule selects on it, and the house rule is that reflection
+exists for selectors: an unread reflected attribute is one more thing
+written onto a host at upgrade that a server's output never had. */
   "prop:ends"?: HelixPagination["ends"];
   /** The page on show, one-based.
 
@@ -3808,7 +3821,10 @@ one, and the back button works without the consumer wiring anything. */
 A different structure rather than a different look, which is why it is
 here: the run of pages is gone and a single status line stands in its
 place. This is the shape a narrow screen wants, and the only shape possible
-where the total is large enough that no window over it is useful. */
+where the total is large enough that no window over it is useful.
+
+Not reflected, for the reason `ends` is not: it decides what renders, so
+nothing has to select on it. */
   "prop:compact"?: HelixPagination["compact"];
   /** Accessible name for the navigation landmark. */
   "prop:label"?: HelixPagination["label"];
@@ -3948,9 +3964,17 @@ export type HelixPaginationSummaryProps = {
   /** The reading, with `{from}`, `{to}` and `{total}` filled in.
 
 A template rather than a prefix and a suffix, because word order is not
-universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-and three concatenations anywhere else. */
-  label?: HelixPaginationSummary["label"];
+universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+three concatenations anywhere else.
+
+**`format`, not `label`, and the difference is worth the rename.** `label`
+across this library means the accessible name of a thing that has one:
+`Pagination.label` names the landmark and `Pagination.Size.label` is the
+words beside the control. This is neither. It is the whole visible content
+of the element, so calling it `label` put one word on three jobs inside one
+family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+which each label something; this labels nothing, it *is* the thing. */
+  format?: HelixPaginationSummary["format"];
   /** Locale for the numbers. Absent uses the runtime's own. */
   locale?: HelixPaginationSummary["locale"];
 };
@@ -3967,9 +3991,17 @@ export type HelixPaginationSummarySolidJsProps = {
   /** The reading, with `{from}`, `{to}` and `{total}` filled in.
 
 A template rather than a prefix and a suffix, because word order is not
-universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-and three concatenations anywhere else. */
-  "prop:label"?: HelixPaginationSummary["label"];
+universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+three concatenations anywhere else.
+
+**`format`, not `label`, and the difference is worth the rename.** `label`
+across this library means the accessible name of a thing that has one:
+`Pagination.label` names the landmark and `Pagination.Size.label` is the
+words beside the control. This is neither. It is the whole visible content
+of the element, so calling it `label` put one word on three jobs inside one
+family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+which each label something; this labels nothing, it *is* the thing. */
+  "prop:format"?: HelixPaginationSummary["format"];
   /** Locale for the numbers. Absent uses the runtime's own. */
   "prop:locale"?: HelixPaginationSummary["locale"];
 
@@ -9501,6 +9533,11 @@ export type CustomElements = {
    * are two more controls for a move already on screen. They earn their place
    * where the reader is deep in a long result and "back to the start" is the
    * move they actually want.
+   *
+   * Not reflected. It adds two elements rather than changing how any of them
+   * look, so no rule selects on it, and the house rule is that reflection
+   * exists for selectors: an unread reflected attribute is one more thing
+   * written onto a host at upgrade that a server's output never had.
    * - `page`: The page on show, one-based.
    *
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -9529,6 +9566,9 @@ export type CustomElements = {
    * here: the run of pages is gone and a single status line stands in its
    * place. This is the shape a narrow screen wants, and the only shape possible
    * where the total is large enough that no window over it is useful.
+   *
+   * Not reflected, for the reason `ends` is not: it decides what renders, so
+   * nothing has to select on it.
    * - `label`: Accessible name for the navigation landmark.
    * - `locale`: Locale for the page numbers. Absent uses the runtime's own.
    *
@@ -9582,6 +9622,7 @@ export type CustomElements = {
    * - `first`: The control that jumps to the first page, under `ends`.
    * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
+   * - `live`: The region that says the page changed. Clipped, not hidden.
    */
   "helix-pagination": Partial<
     HelixPaginationProps & BaseProps<HelixPagination> & BaseEvents
@@ -9641,11 +9682,19 @@ export type CustomElements = {
    * - `page`: The page on show, one-based.
    * - `page-size`/`pageSize`: How many items are on a page.
    * - `total`: How many items there are across every page.
-   * - `label`: The reading, with `{from}`, `{to}` and `{total}` filled in.
+   * - `format`: The reading, with `{from}`, `{to}` and `{total}` filled in.
    *
    * A template rather than a prefix and a suffix, because word order is not
-   * universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-   * and three concatenations anywhere else.
+   * universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+   * three concatenations anywhere else.
+   *
+   * **`format`, not `label`, and the difference is worth the rename.** `label`
+   * across this library means the accessible name of a thing that has one:
+   * `Pagination.label` names the landmark and `Pagination.Size.label` is the
+   * words beside the control. This is neither. It is the whole visible content
+   * of the element, so calling it `label` put one word on three jobs inside one
+   * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+   * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
    */
   "helix-pagination-summary": Partial<
@@ -14852,6 +14901,11 @@ export type CustomElementsSolidJs = {
    * are two more controls for a move already on screen. They earn their place
    * where the reader is deep in a long result and "back to the start" is the
    * move they actually want.
+   *
+   * Not reflected. It adds two elements rather than changing how any of them
+   * look, so no rule selects on it, and the house rule is that reflection
+   * exists for selectors: an unread reflected attribute is one more thing
+   * written onto a host at upgrade that a server's output never had.
    * - `page`: The page on show, one-based.
    *
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -14880,6 +14934,9 @@ export type CustomElementsSolidJs = {
    * here: the run of pages is gone and a single status line stands in its
    * place. This is the shape a narrow screen wants, and the only shape possible
    * where the total is large enough that no window over it is useful.
+   *
+   * Not reflected, for the reason `ends` is not: it decides what renders, so
+   * nothing has to select on it.
    * - `label`: Accessible name for the navigation landmark.
    * - `locale`: Locale for the page numbers. Absent uses the runtime's own.
    *
@@ -14933,6 +14990,7 @@ export type CustomElementsSolidJs = {
    * - `first`: The control that jumps to the first page, under `ends`.
    * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
+   * - `live`: The region that says the page changed. Clipped, not hidden.
    */
   "helix-pagination": Partial<
     HelixPaginationProps &
@@ -14998,11 +15056,19 @@ export type CustomElementsSolidJs = {
    * - `page`: The page on show, one-based.
    * - `page-size`/`pageSize`: How many items are on a page.
    * - `total`: How many items there are across every page.
-   * - `label`: The reading, with `{from}`, `{to}` and `{total}` filled in.
+   * - `format`: The reading, with `{from}`, `{to}` and `{total}` filled in.
    *
    * A template rather than a prefix and a suffix, because word order is not
-   * universal: `count-label="{total} 件中 {from}-{to} 件"` is one attribute here
-   * and three concatenations anywhere else.
+   * universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
+   * three concatenations anywhere else.
+   *
+   * **`format`, not `label`, and the difference is worth the rename.** `label`
+   * across this library means the accessible name of a thing that has one:
+   * `Pagination.label` names the landmark and `Pagination.Size.label` is the
+   * words beside the control. This is neither. It is the whole visible content
+   * of the element, so calling it `label` put one word on three jobs inside one
+   * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
+   * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
    */
   "helix-pagination-summary": Partial<
