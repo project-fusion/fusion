@@ -424,10 +424,17 @@
      thin, transient and one colour; a run of meters under it reads as readings.
 
      The other half is that a meter carries more. A progress bar draws one
-     quantity; a meter draws a fill, a mark at each threshold and a band. At
-     eight the marks are hairlines, at twelve they are marks, and at sixteen the
-     bar reads as a segmented control rather than a reading. */
-  --helix-size-meter: calc(0.75rem * var(--_helix-seed-density));
+     quantity; a meter draws a fill, a mark at each threshold and a band, and at
+     eight the marks are hairlines.
+
+     **Sixteen, and the reading that said twelve was measured at the wrong
+     corner.** It read as a segmented control at sixteen while the bar still
+     wore `radii-full`, where eight pixel round ends made every band between two
+     ticks a capsule. At the house corner the segments are rectangles that agree
+     with each other, the ticks are unmistakable, and the difference from the
+     eight pixel progress bar above it reads as deliberate rather than as
+     drift. */
+  --helix-size-meter: calc(1rem * var(--_helix-seed-density));
   /* Sixteen, twenty, twenty-four: an even four pixels a step.
      `md` was eighteen and `lg` twenty-two, which made the top step two pixels
      while the bottom one was four. Moving `md` up to twenty is what was asked

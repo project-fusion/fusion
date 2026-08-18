@@ -216,7 +216,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-tag-md` | `calc(1.75rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-tag-sm` | `calc(1.5rem * var(--_helix-seed-density))` | 6 |
 | `--helix-size-progress` | `calc(0.5rem * var(--_helix-seed-density))` | 6 |
-| `--helix-size-meter` | `calc(0.75rem * var(--_helix-seed-density))` | 2 |
+| `--helix-size-meter` | `calc(1rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-checkbox` | `var(--helix-size-checkbox-md)` | 6 |
 | `--helix-size-checkbox-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-checkbox-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
