@@ -10,8 +10,25 @@
   --_calendar-day: var(--calendar-day-size, 1.875rem);
 }
 
+/* As many months as fit, and the rest on the next line.
+ *
+ * A flex row without `wrap` cannot do anything but overflow, and it did:
+ * `months="3"` measured 872px wide in an 820px container, a 560px one and a
+ * 320px one alike, always three across and always past the edge. The component
+ * was the same width whatever it was put in, which is the one thing a run of
+ * months should not be.
+ *
+ * Wrapping rather than shrinking, because a month has an honest intrinsic
+ * width: seven day cells at `--calendar-day-size`, and squeezing them makes a
+ * grid of dates that no longer reads as a calendar. A consumer who wants three
+ * months in less room sets that token, which is what it is for.
+ *
+ * `align-items: start` so a wrapped row whose months have different week counts
+ * still lines their headers up. */
 [part="months"] {
+  align-items: start;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--helix-space-md);
 }
 
