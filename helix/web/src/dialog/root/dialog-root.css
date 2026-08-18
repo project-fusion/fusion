@@ -278,9 +278,40 @@
    property nothing sets. `check:motion` compares reduce rules against the rules
    that move and cannot see one that answers nothing. */
 
+/* Saying no, by moving.
+ *
+ * A persistent dialog that ignores a press on the backdrop is indistinguishable
+ * from one that did not notice it, and a reader's next move is to press again
+ * harder. Two per cent and back is the smallest thing that reads as "I heard
+ * you, and no", and it is the gesture a native alert already makes.
+ *
+ * `scale` rather than `translate`, which is the property the panel's entrance
+ * transitions: an animation outranks a transition for as long as it runs, so
+ * refusing on `translate` would fight the arrival on a dialog refused within
+ * the first frames of opening. Two properties, no argument.
+ *
+ * `emphasized` out and back, so it swells faster than it settles: a symmetric
+ * curve reads as a pulse rather than as a rebuff. */
+[part="dialog"][data-refused] {
+  animation: helix-dialog-refuse var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+@keyframes helix-dialog-refuse {
+  50% {
+    scale: 1.02;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [part="dialog"],
   [part="dialog"]::backdrop {
     transition: none;
+  }
+
+  /* The refusal is motion and nothing but, so with motion off it does not slow
+     down, it goes. What a reader loses is the answer to a press the dialog was
+     always going to ignore; what they keep is a dialog that has not moved. */
+  [part="dialog"][data-refused] {
+    animation: none;
   }
 }

@@ -73,11 +73,15 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
    *
-   * This said "Escape and the backdrop", and the family has never dismissed on
-   * a backdrop press: nothing listens for one and the `<dialog>` is not opened
-   * with `closedby`, so the sentence promised a behaviour a consumer would have
-   * written their markup around, and it had shipped into four generated type
-   * entries. Escape is what `persistent` governs.
+   * Escape *and* a press on the backdrop, which it now genuinely means. The
+   * sentence said both for a long time while nothing listened for a backdrop
+   * press, so it promised a behaviour a consumer would have written their
+   * markup around; the fix then was to narrow the sentence, and the fix now is
+   * to build the half that was missing.
+   *
+   * A persistent dialog does not ignore that press. It answers it: see
+   * `refuse`, which is the only way a dialog that will not be dismissed can say
+   * so at the moment a reader asks.
    */
   @property({ reflect: true, type: Boolean })
   persistent = false
@@ -158,11 +162,74 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /**
+   * A press on the backdrop, which lands on the dialog element itself.
+   *
+   * **The target alone is not enough here, where it is for `Drawer`.** A modal
+   * `<dialog>` attributes backdrop clicks to itself, which is the usual trick,
+   * and this panel also carries `--dialog-inset` of padding: a press in that
+   * padding has the same target as a press on the backdrop, so the trick alone
+   * closes a dialog when a reader clicks just inside its own edge. The drawer
+   * escapes that because its panel is flush against the window and its content
+   * fills it. So the point is compared against the panel's box.
+   */
+  private readonly handleBackdrop = (event: MouseEvent): void => {
+    const panel = this.dialog
+    if (!panel || event.target !== panel) {
+      return
+    }
+    const box = panel.getBoundingClientRect()
+    if (
+      event.clientX >= box.left &&
+      event.clientX <= box.right &&
+      event.clientY >= box.top &&
+      event.clientY <= box.bottom
+    ) {
+      return
+    }
+    if (this.persistent) {
+      this.refuse()
+      return
+    }
+    this.requestOpen(false)
+  }
+
+  /**
+   * Says no to a dismissal, by moving.
+   *
+   * A persistent dialog that ignores a press on the backdrop is
+   * indistinguishable from one that did not notice, and a reader's next move is
+   * to press again harder. A short swell and settle is the smallest thing that
+   * reads as "I heard you, and no": it is the same gesture a native alert makes
+   * on macOS and the one every reader has already been taught.
+   *
+   * An attribute for the length of the animation rather than a class, cleared
+   * on `animationend`, so the styled tier decides what refusing looks like and
+   * this decides only when it happens. Removed first so a second press
+   * restarts it: without that, pressing twice does nothing the second time,
+   * which is the impression the whole thing exists to avoid.
+   */
+  private refuse(): void {
+    const panel = this.dialog
+    if (!panel) {
+      return
+    }
+    panel.removeAttribute('data-refused')
+    // Read forces the removal to land before the attribute goes back on, or the
+    // two happen in one frame and the animation never restarts.
+    void panel.offsetWidth
+    panel.setAttribute('data-refused', '')
+    panel.addEventListener('animationend', () => panel.removeAttribute('data-refused'), {
+      once: true,
+    })
+  }
+
   protected override render(): TemplateResult {
     return html`<dialog
       part="dialog"
       aria-label=${this.label || 'Dialog'}
       @cancel=${this.handleCancel}
+      @click=${this.handleBackdrop}
       @close=${this.handleClose}
     >
       <slot name="header"></slot>

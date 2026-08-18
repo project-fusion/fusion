@@ -1503,11 +1503,15 @@ Off for a dialog that must be answered. It does not disable the close
 control a consumer slots in: refusing to be dismissed is not the same as
 refusing to be closed, and a dialog with no way out at all is a trap.
 
-This said "Escape and the backdrop", and the family has never dismissed on
-a backdrop press: nothing listens for one and the `<dialog>` is not opened
-with `closedby`, so the sentence promised a behaviour a consumer would have
-written their markup around, and it had shipped into four generated type
-entries. Escape is what `persistent` governs. */
+Escape *and* a press on the backdrop, which it now genuinely means. The
+sentence said both for a long time while nothing listened for a backdrop
+press, so it promised a behaviour a consumer would have written their
+markup around; the fix then was to narrow the sentence, and the fix now is
+to build the half that was missing.
+
+A persistent dialog does not ignore that press. It answers it: see
+`refuse`, which is the only way a dialog that will not be dismissed can say
+so at the moment a reader asks. */
   persistent?: HelixBaseDialog["persistent"];
   /** Whether the element is open.
 
@@ -1559,11 +1563,15 @@ Off for a dialog that must be answered. It does not disable the close
 control a consumer slots in: refusing to be dismissed is not the same as
 refusing to be closed, and a dialog with no way out at all is a trap.
 
-This said "Escape and the backdrop", and the family has never dismissed on
-a backdrop press: nothing listens for one and the `<dialog>` is not opened
-with `closedby`, so the sentence promised a behaviour a consumer would have
-written their markup around, and it had shipped into four generated type
-entries. Escape is what `persistent` governs. */
+Escape *and* a press on the backdrop, which it now genuinely means. The
+sentence said both for a long time while nothing listened for a backdrop
+press, so it promised a behaviour a consumer would have written their
+markup around; the fix then was to narrow the sentence, and the fix now is
+to build the half that was missing.
+
+A persistent dialog does not ignore that press. It answers it: see
+`refuse`, which is the only way a dialog that will not be dismissed can say
+so at the moment a reader asks. */
   "prop:persistent"?: HelixBaseDialog["persistent"];
   /** Whether the element is open.
 
@@ -6659,11 +6667,15 @@ export type CustomElements = {
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
    *
-   * This said "Escape and the backdrop", and the family has never dismissed on
-   * a backdrop press: nothing listens for one and the `<dialog>` is not opened
-   * with `closedby`, so the sentence promised a behaviour a consumer would have
-   * written their markup around, and it had shipped into four generated type
-   * entries. Escape is what `persistent` governs.
+   * Escape *and* a press on the backdrop, which it now genuinely means. The
+   * sentence said both for a long time while nothing listened for a backdrop
+   * press, so it promised a behaviour a consumer would have written their
+   * markup around; the fix then was to narrow the sentence, and the fix now is
+   * to build the half that was missing.
+   *
+   * A persistent dialog does not ignore that press. It answers it: see
+   * `refuse`, which is the only way a dialog that will not be dismissed can say
+   * so at the moment a reader asks.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -11589,11 +11601,15 @@ export type CustomElementsSolidJs = {
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
    *
-   * This said "Escape and the backdrop", and the family has never dismissed on
-   * a backdrop press: nothing listens for one and the `<dialog>` is not opened
-   * with `closedby`, so the sentence promised a behaviour a consumer would have
-   * written their markup around, and it had shipped into four generated type
-   * entries. Escape is what `persistent` governs.
+   * Escape *and* a press on the backdrop, which it now genuinely means. The
+   * sentence said both for a long time while nothing listened for a backdrop
+   * press, so it promised a behaviour a consumer would have written their
+   * markup around; the fix then was to narrow the sentence, and the fix now is
+   * to build the half that was missing.
+   *
+   * A persistent dialog does not ignore that press. It answers it: see
+   * `refuse`, which is the only way a dialog that will not be dismissed can say
+   * so at the moment a reader asks.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the

@@ -203,13 +203,18 @@
  * nothing left saying which card was chosen, which is why this is a property
  * now and was not one then.
  *
- * `visibility` rather than `display`, so the row keeps the column the circle
- * occupied and a set of cards with different label lengths still aligns down
- * the left. And on the box alone, so the control the shadow root renders is
- * still there, still focusable and still reported: this hides a graphic, never
- * a radio. */
+ * `display: none`, not `visibility: hidden`. It was the second for half an hour,
+ * on the argument that keeping the column lets a mixed set align down the left.
+ * A mixed set is not a thing anyone builds: `hide-control` is a decision about a
+ * group, and every card in that group makes it. What it left instead was an
+ * empty gutter and the row's gap beside it on every card, which is asking for
+ * the circle's space back after asking for the circle to go.
+ *
+ * On the box alone either way, so the control the shadow root renders is still
+ * there, still focusable and still reported: this takes away a graphic, never a
+ * radio. */
 :host([appearance="card"][hide-control]) [part="box"] {
-  visibility: hidden;
+  display: none;
 }
 
 /* Named one selector at a time, because a reduce rule written looser than the

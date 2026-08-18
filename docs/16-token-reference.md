@@ -180,7 +180,7 @@ How long something takes.
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 0 |
 | `--helix-duration-fast` | `var(--_helix-ms-120)` | 168 |
-| `--helix-duration-normal` | `var(--_helix-ms-200)` | 83 |
+| `--helix-duration-normal` | `var(--_helix-ms-200)` | 85 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 10 |
 
 ## easing
@@ -190,7 +190,7 @@ The shape of the curve it takes it along.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-easing-standard` | `var(--_helix-curve-standard)` | 160 |
-| `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 32 |
+| `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 34 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 21 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
 | `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 4 |

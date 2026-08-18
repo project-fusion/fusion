@@ -6322,7 +6322,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether Escape can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.\n\nThis said \"Escape and the backdrop\", and the family has never dismissed on\na backdrop press: nothing listens for one and the `<dialog>` is not opened\nwith `closedby`, so the sentence promised a behaviour a consumer would have\nwritten their markup around, and it had shipped into four generated type\nentries. Escape is what `persistent` governs.",
+              "description": "Whether Escape can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.\n\nEscape *and* a press on the backdrop, which it now genuinely means. The\nsentence said both for a long time while nothing listened for a backdrop\npress, so it promised a behaviour a consumer would have written their\nmarkup around; the fix then was to narrow the sentence, and the fix now is\nto build the half that was missing.\n\nA persistent dialog does not ignore that press. It answers it: see\n`refuse`, which is the only way a dialog that will not be dismissed can say\nso at the moment a reader asks.",
               "attribute": "persistent",
               "reflects": true
             },
@@ -6382,6 +6382,24 @@
               "privacy": "private",
               "readonly": true,
               "description": "A close that happened anyway, reflected back.\n\n`<form method=\"dialog\">` closes the dialog directly and there is no event\nto prevent. Rather than fight it, the state follows: the dialog is shut, so\nsaying otherwise would be a lie the next `showModal()` would trip over."
+            },
+            {
+              "kind": "field",
+              "name": "handleBackdrop",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A press on the backdrop, which lands on the dialog element itself.\n\n**The target alone is not enough here, where it is for `Drawer`.** A modal\n`<dialog>` attributes backdrop clicks to itself, which is the usual trick,\nand this panel also carries `--dialog-inset` of padding: a press in that\npadding has the same target as a press on the backdrop, so the trick alone\ncloses a dialog when a reader clicks just inside its own edge. The drawer\nescapes that because its panel is flush against the window and its content\nfills it. So the point is compared against the panel's box."
+            },
+            {
+              "kind": "method",
+              "name": "refuse",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says no to a dismissal, by moving.\n\nA persistent dialog that ignores a press on the backdrop is\nindistinguishable from one that did not notice, and a reader's next move is\nto press again harder. A short swell and settle is the smallest thing that\nreads as \"I heard you, and no\": it is the same gesture a native alert makes\non macOS and the one every reader has already been taught.\n\nAn attribute for the length of the animation rather than a class, cleared\non `animationend`, so the styled tier decides what refusing looks like and\nthis decides only when it happens. Removed first so a second press\nrestarts it: without that, pressing twice does nothing the second time,\nwhich is the impression the whole thing exists to avoid."
             },
             {
               "kind": "field",
@@ -6610,7 +6628,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether Escape can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.\n\nThis said \"Escape and the backdrop\", and the family has never dismissed on\na backdrop press: nothing listens for one and the `<dialog>` is not opened\nwith `closedby`, so the sentence promised a behaviour a consumer would have\nwritten their markup around, and it had shipped into four generated type\nentries. Escape is what `persistent` governs.",
+              "description": "Whether Escape can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.\n\nEscape *and* a press on the backdrop, which it now genuinely means. The\nsentence said both for a long time while nothing listened for a backdrop\npress, so it promised a behaviour a consumer would have written their\nmarkup around; the fix then was to narrow the sentence, and the fix now is\nto build the half that was missing.\n\nA persistent dialog does not ignore that press. It answers it: see\n`refuse`, which is the only way a dialog that will not be dismissed can say\nso at the moment a reader asks.",
               "fieldName": "persistent"
             },
             {
