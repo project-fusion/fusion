@@ -34,6 +34,7 @@ import type {
   HelixIcon,
   HelixIconButton,
   HelixInput,
+  HelixInputNumber,
   HelixKbd,
   HelixList,
   HelixListItem,
@@ -2728,6 +2729,219 @@ export type HelixIconSolidJsProps = {
   "prop:name"?: HelixIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixInputNumber` component event */
+export type HelixInputNumberElementEvent<E = Event> = TypedEvent<
+  HelixInputNumber,
+  E
+>;
+/** `helix-change` event type */
+export type HelixInputNumberHelixChangeElementEvent =
+  HelixInputNumberElementEvent<HelixChangeEvent>;
+
+export type HelixInputNumberProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixInputNumber["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixInputNumber["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixInputNumber["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixInputNumber["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixInputNumber["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixInputNumber["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixInputNumber["required"];
+  /** Smallest value the reader may reach. Absent has no floor. */
+  min?: HelixInputNumber["min"];
+  /** Largest value the reader may reach. Absent has no ceiling. */
+  max?: HelixInputNumber["max"];
+  /** How far one step moves. */
+  step?: HelixInputNumber["step"];
+  /** How far `PageUp` and `PageDown` move.
+
+Ten steps, which is the convention every spinner on the platform follows,
+and a property because ten of a step of `0.01` is a hundredth and rarely
+what a reader wants from a whole key. */
+  "large-step"?: HelixInputNumber["largeStep"];
+  /** How far `PageUp` and `PageDown` move.
+
+Ten steps, which is the convention every spinner on the platform follows,
+and a property because ten of a step of `0.01` is a hundredth and rarely
+what a reader wants from a whole key. */
+  largeStep?: HelixInputNumber["largeStep"];
+  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  placeholder?: HelixInputNumber["placeholder"];
+  /** Whether the field refuses input while still submitting its value. */
+  "read-only"?: HelixInputNumber["readOnly"];
+  /** Whether the field refuses input while still submitting its value. */
+  readOnly?: HelixInputNumber["readOnly"];
+  /** Accessible name for the control that steps down. */
+  "decrement-label"?: HelixInputNumber["decrementLabel"];
+  /** Accessible name for the control that steps down. */
+  decrementLabel?: HelixInputNumber["decrementLabel"];
+  /** Accessible name for the control that steps up. */
+  "increment-label"?: HelixInputNumber["incrementLabel"];
+  /** Accessible name for the control that steps up. */
+  incrementLabel?: HelixInputNumber["incrementLabel"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixInputNumber["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixInputNumber["name"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixInputNumber["onValueChange"];
+
+  /** Fired as the value changes, and cancelable. */
+  "onhelix-change"?: (e: HelixInputNumberHelixChangeElementEvent) => void;
+  /** Relayed from the field once the reader has finished. */
+  onchange?: (e: HelixInputNumberElementEvent) => void;
+};
+
+export type HelixInputNumberSolidJsProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixInputNumber["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixInputNumber["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  "prop:value"?: HelixInputNumber["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixInputNumber["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixInputNumber["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixInputNumber["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixInputNumber["required"];
+  /** Smallest value the reader may reach. Absent has no floor. */
+  "prop:min"?: HelixInputNumber["min"];
+  /** Largest value the reader may reach. Absent has no ceiling. */
+  "prop:max"?: HelixInputNumber["max"];
+  /** How far one step moves. */
+  "prop:step"?: HelixInputNumber["step"];
+  /** How far `PageUp` and `PageDown` move.
+
+Ten steps, which is the convention every spinner on the platform follows,
+and a property because ten of a step of `0.01` is a hundredth and rarely
+what a reader wants from a whole key. */
+  "attr:large-step"?: HelixInputNumber["largeStep"];
+  /** How far `PageUp` and `PageDown` move.
+
+Ten steps, which is the convention every spinner on the platform follows,
+and a property because ten of a step of `0.01` is a hundredth and rarely
+what a reader wants from a whole key. */
+  "prop:largeStep"?: HelixInputNumber["largeStep"];
+  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  "prop:placeholder"?: HelixInputNumber["placeholder"];
+  /** Whether the field refuses input while still submitting its value. */
+  "bool:read-only"?: HelixInputNumber["readOnly"];
+  /** Whether the field refuses input while still submitting its value. */
+  "prop:readOnly"?: HelixInputNumber["readOnly"];
+  /** Accessible name for the control that steps down. */
+  "attr:decrement-label"?: HelixInputNumber["decrementLabel"];
+  /** Accessible name for the control that steps down. */
+  "prop:decrementLabel"?: HelixInputNumber["decrementLabel"];
+  /** Accessible name for the control that steps up. */
+  "attr:increment-label"?: HelixInputNumber["incrementLabel"];
+  /** Accessible name for the control that steps up. */
+  "prop:incrementLabel"?: HelixInputNumber["incrementLabel"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixInputNumber["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixInputNumber["name"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixInputNumber["onValueChange"];
+  /** Fired as the value changes, and cancelable. */
+  "on:helix-change"?: (e: HelixInputNumberHelixChangeElementEvent) => void;
+  /** Relayed from the field once the reader has finished. */
+  "on:change"?: (e: HelixInputNumberElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8672,6 +8886,151 @@ export type CustomElements = {
   "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents>;
 
   /**
+   * The frame an `Input` wears, because in a form this stands in a row with them.
+   * The difference is inside it: a button at each end of the box rather than
+   * beside it, so the whole reads as one field rather than a field with two
+   * controls after it.
+   *
+   * The number is centred and set in tabular figures, which is the one place this
+   * differs from every other field in the library. Digits are what changes under a
+   * repeated press, and proportional ones make the number shuffle while it counts.
+   *
+   * The steppers are out of the tab order. A keyboard reader already has four keys
+   * on the field itself, and two more tab stops per number is a form that takes
+   * three times as long to cross.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `min`: Smallest value the reader may reach. Absent has no floor.
+   * - `max`: Largest value the reader may reach. Absent has no ceiling.
+   * - `step`: How far one step moves.
+   * - `large-step`/`largeStep`: How far `PageUp` and `PageDown` move.
+   *
+   * Ten steps, which is the convention every spinner on the platform follows,
+   * and a property because ten of a step of `0.01` is a hundredth and rarely
+   * what a reader wants from a whole key.
+   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `decrement-label`/`decrementLabel`: Accessible name for the control that steps down.
+   * - `increment-label`/`incrementLabel`: Accessible name for the control that steps up.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired as the value changes, and cancelable.
+   * - `change`: Relayed from the field once the reader has finished.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Before the number, for a unit or an icon.
+   * - `end`: After it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `stepUp(large = false) => void`: One step up, or `PageUp`'s larger one.
+   * - `stepDown(large = false) => void`: One step down.
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `select() => void`: Selects the number, so typing replaces it.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding everything.
+   * - `control`: The field itself.
+   * - `decrement`: The control that steps down.
+   * - `increment`: The control that steps up.
+   */
+  "helix-input-number": Partial<
+    HelixInputNumberProps & BaseProps<HelixInputNumber> & BaseEvents
+  >;
+
+  /**
    * The frame is the field rather than the input, so anything slotted at either
    * end sits inside the same box as the text and the focus ring is drawn once,
    * around the whole control, instead of around a smaller box within it.
@@ -14005,6 +14364,154 @@ export type CustomElementsSolidJs = {
    */
   "helix-icon": Partial<
     HelixIconProps & HelixIconSolidJsProps & BaseProps<HelixIcon> & BaseEvents
+  >;
+
+  /**
+   * The frame an `Input` wears, because in a form this stands in a row with them.
+   * The difference is inside it: a button at each end of the box rather than
+   * beside it, so the whole reads as one field rather than a field with two
+   * controls after it.
+   *
+   * The number is centred and set in tabular figures, which is the one place this
+   * differs from every other field in the library. Digits are what changes under a
+   * repeated press, and proportional ones make the number shuffle while it counts.
+   *
+   * The steppers are out of the tab order. A keyboard reader already has four keys
+   * on the field itself, and two more tab stops per number is a form that takes
+   * three times as long to cross.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `min`: Smallest value the reader may reach. Absent has no floor.
+   * - `max`: Largest value the reader may reach. Absent has no ceiling.
+   * - `step`: How far one step moves.
+   * - `large-step`/`largeStep`: How far `PageUp` and `PageDown` move.
+   *
+   * Ten steps, which is the convention every spinner on the platform follows,
+   * and a property because ten of a step of `0.01` is a hundredth and rarely
+   * what a reader wants from a whole key.
+   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `decrement-label`/`decrementLabel`: Accessible name for the control that steps down.
+   * - `increment-label`/`incrementLabel`: Accessible name for the control that steps up.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired as the value changes, and cancelable.
+   * - `change`: Relayed from the field once the reader has finished.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Before the number, for a unit or an icon.
+   * - `end`: After it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `stepUp(large = false) => void`: One step up, or `PageUp`'s larger one.
+   * - `stepDown(large = false) => void`: One step down.
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `select() => void`: Selects the number, so typing replaces it.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding everything.
+   * - `control`: The field itself.
+   * - `decrement`: The control that steps down.
+   * - `increment`: The control that steps up.
+   */
+  "helix-input-number": Partial<
+    HelixInputNumberProps &
+      HelixInputNumberSolidJsProps &
+      BaseProps<HelixInputNumber> &
+      BaseEvents
   >;
 
   /**

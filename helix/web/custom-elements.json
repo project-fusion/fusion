@@ -12246,6 +12246,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/input-number/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/kbd/index.js"
           }
         },
@@ -12463,6 +12471,1314 @@
           "declaration": {
             "name": "*",
             "module": "src/tree/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input-number/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/input-number/root/input-number-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input-number/root/input-number-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/input-number/root/input-number-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input-number/root/input-number-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The frame an `Input` wears, because in a form this stands in a row with them.\nThe difference is inside it: a button at each end of the box rather than\nbeside it, so the whole reads as one field rather than a field with two\ncontrols after it.\n\nThe number is centred and set in tabular figures, which is the one place this\ndiffers from every other field in the library. Digits are what changes under a\nrepeated press, and proportional ones make the number shuffle while it counts.\n\nThe steppers are out of the tab order. A keyboard reader already has four keys\non the field itself, and two more tab stops per number is a form that takes\nthree times as long to cross.",
+          "name": "HelixInputNumber",
+          "cssParts": [
+            {
+              "description": "The box holding everything.",
+              "name": "field",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "description": "The control that steps down.",
+              "name": "decrement",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "description": "The control that steps up.",
+              "name": "increment",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "Before the number, for a unit or an icon.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "description": "After it.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onValueChange",
+              "type": {
+                "text": "((value: string) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestValue",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a new value, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. In uncontrolled mode the control then\nupdates itself; in controlled mode it applies nothing and waits for the\nconsumer to pass a new `value`, which is what controlled means.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "requestValue(next: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared.\n\nBoth halves are dropped, the consumer's and the control's, because a\nreset means the form is as it was served. Clearing only the internal one\nwould leave a control that had been written to stuck at that value.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hint",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "attribute": "hint",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "attribute": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The accessible name, and the fallback for the `label` slot.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "touched",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "validates",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolvedFeedback",
+              "type": {
+                "text": "string"
+              },
+              "description": "The message actually shown: the consumer's, or the platform's, or none.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "describedBy",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderGroupLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A label over a set rather than beside a control.\n\nA plain element and not a `<label for>`, because a group is not a single\ncontrol and there is nothing for `for` to point at. What names the group\nis `linkHost`, pointing the host's internals at this element.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.\n\n**Nothing at all when there is no label**, which is the same rule the\nhint and the feedback follow: none of the three is always used, and an\nelement rendered empty is not free. It still generates a box, so it still\ntakes a row of the grid and a gap on either side of it, which is a field\nthat has moved down the page for a label nobody wrote. `nothing` leaves\ncomment markers rather than a node, so the gap has nothing to sit between.\n\n**`aria-label` names without showing**, and it is forwarded rather than\nleft where the consumer put it. A custom element has no way to delegate a\nlabel to the control inside it, so an `aria-label` on the host reaches\nnothing: measured, the inner input came back with no label and no name of\nits own while the attribute sat on the wrapper. What happens instead is\nthat the label is rendered and clipped, so the name arrives through the\nsame `<label for>` a visible one does.\n\nThis replaced `hide-label`, which was a second attribute to say what the\nabsence of the first should have said. The rule is now `label` means a\nlabel, `aria-label` means a name, and neither means an unnamed field a\nscreen reader announces as \"edit text\"",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderHint",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "Help under the control, unless something has gone wrong.\n\nThe two share a place rather than stacking, so a field is one line of\nsmall text either way and nothing below it moves when the message\nchanges. What the reader needs at that moment is what is wrong, and a\nhint that survives the error it describes is a second line to read before\ngetting to the one that matters.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The validation message, in the hint's place.\n\n`role=\"alert\"` rather than a live region on the whole field, so what is\nannounced is the message and not the label and help along with it.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "linkHost",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Points the host at its own label and description nodes, for a group.\n\nA control's `<input>` and its hint are both in the shadow root, so a\nplain `aria-describedby` resolves between them. A group's host is in the\nlight DOM and its hint is not, so the IDREF cannot reach and\n`element.ariaDescribedByElements` drops the reference outright. Only the\n`ElementInternals` form keeps it, measured in Chrome 148: two of two\nkept through internals, zero of one through the element.\n\nClient only, and deliberately, because element references need the nodes\nto exist and on the server they do not. The name is therefore also set as\na plain string by the component, which a server can write, and the\nreference here overrides it wherever a consumer slotted something richer\nthan a string. A group with only a property for a label reads the same\neither way.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shownFeedback",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What the last render put on screen, so a change can be noticed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refreshFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-reads the platform's verdict, for a control that has just reported one.\n\nValidity changes through `ElementInternals` rather than through a\nproperty, so nothing schedules an update for it. Worse, the order is\nagainst us: this mixin sits above the control in the prototype chain, so\nits `updated` runs before the control's own, which is where `setValidity`\nis called. Reading the verdict here would always read the previous one,\nwhich is what left a corrected field still showing the error it had\nbefore. So the control says when it has reported, and this schedules the\none further update that needs. It converges because the second pass finds\nnothing changed.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "empty",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "anchor",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Reports \"required and empty\" and refreshes the message, or clears both.\n\nSeven families had this written out: the same `valueMissing`, the same\nanchor lookup, the same `refreshFeedback` under the same comment about\nvalidity moving without a property moving. Seven copies of a five-line\nshape is the threshold at which this mixin itself was extracted, and two\nof them had already drifted, `checkbox-group` having no validity at all\nuntil yesterday.\n\nWhat differs between them is exactly two things, so those are the\narguments: whether the control is empty, which only it can say, and the\nsentence to say about it, which is different for a box, a switch and a\nset. The anchor is looked up here because every one of them anchored on a\nrendered part and the browser needs somewhere to point the bubble.\n\nThe message is not derived from the control's kind, deliberately. \"Tick\nthis box\" and \"Choose one\" are not the same instruction and a lookup\ntable would be one more thing to keep in step with the components.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Smallest value the reader may reach. Absent has no floor.",
+              "attribute": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Largest value the reader may reach. Absent has no ceiling.",
+              "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How far one step moves.",
+              "attribute": "step",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "largeStep",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How far `PageUp` and `PageDown` move.\n\nTen steps, which is the convention every spinner on the platform follows,\nand a property because ten of a step of `0.01` is a hundredth and rarely\nwhat a reader wants from a whole key.",
+              "attribute": "large-step",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Shown while the field is empty. Not a label: it goes when typing starts.",
+              "attribute": "placeholder",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readOnly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field refuses input while still submitting its value.",
+              "attribute": "read-only",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "decrementLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Decrease'",
+              "description": "Accessible name for the control that steps down.",
+              "attribute": "decrement-label",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "incrementLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Increase'",
+              "description": "Accessible name for the control that steps up.",
+              "attribute": "increment-label",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
+              "description": "Focus is delegated to the field, so the host is never the focus target.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "control",
+              "type": {
+                "text": "HTMLInputElement | null"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "numeric",
+              "type": {
+                "text": "number | null"
+              },
+              "privacy": "private",
+              "description": "The value as a number, or `null` where the field holds nothing usable.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "clamp",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "A value pulled into range and onto the step grid.\n\nThe grid is anchored at `min` where there is one, so `min=\"1\" step=\"2\"`\ngives 1, 3, 5 rather than 0, 2, 4. Rounded to the step's own precision,\nbecause stepping 0.1 in binary floating point otherwise produces\n`0.30000000000000004` and puts it in the field.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "nudge",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "steps",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Moves by whole steps, from where the reader is.\n\nFrom `min` when the field is empty, so the first press of an arrow lands\nsomewhere meaningful rather than on zero: an empty field with `min=\"1\"`\nstepping to 0 would be out of range before the reader had typed anything.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stepUp",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "large",
+                  "default": "false"
+                }
+              ],
+              "description": "One step up, or `PageUp`'s larger one.",
+              "type": {
+                "text": "stepUp(large = false) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stepDown",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "large",
+                  "default": "false"
+                }
+              ],
+              "description": "One step down.",
+              "type": {
+                "text": "stepDown(large = false) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleInput",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Every keystroke, cancelable, and put back where it is refused.\n\nNot clamped here. A reader typing \"12\" is at \"1\" for one keystroke, and a\nfield with `min=\"10\"` that corrected them at that moment could never be\ntyped into at all. Range is settled on blur, on a step, and at submit.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleBlur",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Leaving the field is where a half-typed number becomes a number.\n\nBlank is left blank, because an empty optional field is a legitimate answer\nand filling it with `min` would put a number in a form the reader never\ngave.\n\n**And text that is not a number is left alone, which this cleared at\nfirst.** Typing `2.7e` and tabbing away emptied the field: the reader looks\nback and their entry is gone with nothing saying why, and the likeliest\ncause is a fat finger on a number they had almost finished. Nothing is lost\nby keeping it, because `sync` has already marked it `badInput`, so the field\nshows as wrong and the form refuses to submit. Destroying the evidence of a\nmistake is not the same as preventing one.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Relayed, because `change` does not cross a shadow boundary on its own.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The four keys a spinner answers, which `Input` does not bind.\n\n`Home` and `End` only where there is a bound to go to: without one they are\nthe text field's own keys and moving the caret to the start of the number is\nwhat a reader pressing them meant.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "sync",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reports the value and a verdict on it.\n\nComputed here rather than copied off the field, which is the one place this\ndiffers from `Input`: the field is text, so the browser has no opinion about\nwhether it is a number in range. The flags are the platform's own names, so\na consumer reading `validity.rangeOverflow` finds what they expect and the\nmessage is what a native spinner would have said.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ],
+              "description": "Puts the caret in the field, the way a label pointing at one would.",
+              "type": {
+                "text": "focus(options?: FocusOptions) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Selects the number, so typing replaces it.",
+              "type": {
+                "text": "select() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "default": "false",
+              "description": "Whether an ancestor `<fieldset disabled>` has switched this control off.\n\nThe platform tells a form-associated element through `formDisabledCallback`\nand nothing here implemented it, so a control inside a disabled fieldset\nstayed fully typeable and announced itself as enabled. Measured: a\n`helix-input` in one accepted text, reported `disabled` as false, and\ncarried no `aria-disabled`.\n\nWhat the platform already did on its own is the submission half. The same\nmeasurement showed the fieldset's controls absent from the form's entry\nlist and the host matching `:disabled`, so the value never went anywhere.\nWhat was missing is everything a reader can see or touch.\n\nState rather than the `disabled` property. Writing that would reflect an\nattribute the consumer's server markup does not have, which React reports\non hydration and does not patch up, and it would also silently overwrite\nwhat the consumer set.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formDisabledCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "disabled",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The platform's notice that an ancestor fieldset changed.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              },
+              "type": {
+                "text": "formDisabledCallback(disabled: boolean) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseInputNumber",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A number a reader types or steps to.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/input-number",
+            "aliases": [
+              "NumberField",
+              "NumberInput",
+              "Spinner",
+              "Stepper"
+            ],
+            "tier": "styled",
+            "group": "InputNumber",
+            "part": "Root"
+          },
+          "tagName": "helix-input-number",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "hint",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "fieldName": "hint",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "feedback",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What is wrong, in the reader's words rather than the browser's.",
+              "fieldName": "feedback",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The accessible name, and the fallback for the `label` slot.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit without it.",
+              "fieldName": "required",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Smallest value the reader may reach. Absent has no floor.",
+              "fieldName": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Largest value the reader may reach. Absent has no ceiling.",
+              "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How far one step moves.",
+              "fieldName": "step",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "name": "large-step",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How far `PageUp` and `PageDown` move.\n\nTen steps, which is the convention every spinner on the platform follows,\nand a property because ten of a step of `0.01` is a hundredth and rarely\nwhat a reader wants from a whole key.",
+              "fieldName": "largeStep",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Shown while the field is empty. Not a label: it goes when typing starts.",
+              "fieldName": "placeholder",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "name": "read-only",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field refuses input while still submitting its value.",
+              "fieldName": "readOnly",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "name": "decrement-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Decrease'",
+              "description": "Accessible name for the control that steps down.",
+              "fieldName": "decrementLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "name": "increment-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Increase'",
+              "description": "Accessible name for the control that steps up.",
+              "fieldName": "incrementLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired as the value changes, and cancelable.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed from the field once the reader has finished.",
+              "name": "change",
+              "reactProp": "onchange",
+              "inheritedFrom": {
+                "name": "HelixBaseInputNumber",
+                "module": "src/input-number/root/input-number-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/input-number/root/input-number-root.ts",
+          "definitionPath": "src/input-number/root/input-number-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixInputNumber",
+          "declaration": {
+            "name": "HelixInputNumber",
+            "module": "src/input-number/root/input-number-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-input-number",
+          "declaration": {
+            "name": "HelixInputNumber",
+            "module": "src/input-number/root/input-number-root.ts"
           }
         }
       ]

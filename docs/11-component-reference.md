@@ -1513,6 +1513,92 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `--input-size` | Height of the field. |
 | `--input-background-color` | Fill behind the text. |
 
+## Input Number
+
+### Root — `helix-input-number`
+
+A number a reader types or steps to.
+
+Extends `HelixBaseInputNumber`.
+
+The frame an `Input` wears, because in a form this stands in a row with them.
+The difference is inside it: a button at each end of the box rather than
+beside it, so the whole reads as one field rather than a field with two
+controls after it.
+
+The number is centred and set in tabular figures, which is the one place this
+differs from every other field in the library. Digits are what changes under a
+repeated press, and proportional ones make the number shuffle while it counts.
+
+The steppers are out of the tab order. A keyboard reader already has four keys
+on the field itself, and two more tab stops per number is a form that takes
+three times as long to cross.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `decrementLabel` | `decrement-label` | `string` | `'Decrease'` | `HelixBaseInputNumber` | Accessible name for the control that steps down. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `incrementLabel` | `increment-label` | `string` | `'Increase'` | `HelixBaseInputNumber` | Accessible name for the control that steps up. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `largeStep` | `large-step` | `number \| undefined` | - | `HelixBaseInputNumber` | How far `PageUp` and `PageDown` move. |
+| `max` | `max` | `number \| undefined` | - | `HelixBaseInputNumber` | Largest value the reader may reach. Absent has no ceiling. |
+| `min` | `min` | `number \| undefined` | - | `HelixBaseInputNumber` | Smallest value the reader may reach. Absent has no floor. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseInputNumber` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInputNumber` | Whether the field refuses input while still submitting its value. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInputNumber` | Focus is delegated to the field, so the host is never the focus target. |
+| `step` | `step` | `number` | `1` | `HelixBaseInputNumber` | How far one step moves. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseInputNumber` | Puts the caret in the field, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `select()` | `HelixBaseInputNumber` | Selects the number, so typing replaces it. |
+| `stepDown()` | `HelixBaseInputNumber` | One step down. |
+| `stepUp()` | `HelixBaseInputNumber` | One step up, or `PageUp`'s larger one. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired as the value changes, and cancelable. |
+| `change` | `Event` | Relayed from the field once the reader has finished. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `start` | Before the number, for a unit or an icon. |
+| `end` | After it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding everything. |
+| `control` | The field itself. |
+| `decrement` | The control that steps down. |
+| `increment` | The control that steps up. |
+
 ## Kbd
 
 ### Root — `helix-kbd`

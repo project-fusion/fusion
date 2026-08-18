@@ -1,0 +1,145 @@
+/* The same frame an `Input` wears, because in a form this stands in a row with
+   them and a control that looks like anything else reads as something else. The
+   difference is inside it: a button at each end of the box rather than beside
+   it, so the whole thing is one field and not a field with two controls after
+   it. */
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+[part="field"] {
+  align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  display: flex;
+  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* `:host(:not(:disabled))`, not `[disabled]`. The pseudo-class also matches an
+   ancestor `<fieldset disabled>`, where the attribute selector only ever sees
+   the element's own. Same call `Select` documents. */
+:host(:not(:disabled)) [part="field"]:hover {
+  border-color: var(--helix-color-foreground-muted);
+}
+
+/* The ring is on the box rather than on the input, because the box is what a
+   reader sees as the control: focus landing on a field whose own edge stays
+   quiet reads as nothing having happened. `:focus-within`, since focus is
+   delegated and lands on the input inside. */
+:host(:not(:disabled)) [part="field"]:focus-within {
+  border-color: var(--helix-color-primary);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* `data-invalid` rather than `:user-invalid`, and rather than an `invalid`
+   property. `MixinField` mirrors "wrong, and the reader knows it" onto the host
+   under that name, because `:user-invalid` tracks interaction with the element
+   it is on and nobody interacts with this one: the reader types into an
+   `<input>` in the shadow root, so the host's own flag is never set. `Input`
+   carries the same rule and the full measurement.
+
+   Written wrong here first, as `:host([invalid])`, and `check:selectors` caught
+   it: it works, which is the problem, because it would have been an API in a
+   stylesheet and nowhere else. All four states, so the edge turns whichever
+   route it arrives by. */
+:host([data-invalid]) [part="field"],
+:host([data-invalid]) [part="field"]:hover,
+:host([data-invalid]:focus-within) [part="field"],
+:host([data-invalid]:focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-danger);
+}
+
+:host([data-invalid]:focus-within) [part="field"] {
+  outline-color: var(--helix-color-danger);
+}
+
+:host(:disabled) [part="field"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[part="control"] {
+  all: unset;
+  /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
+     `border-box` every shadow root is given comes from a rule this one
+     outranks. */
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inline-size: 100%;
+  min-inline-size: 0;
+  /* Tabular, because the digits are what changes when a step is pressed and
+     proportional ones make the number jump about under a repeated press. */
+  font-variant-numeric: tabular-nums;
+  padding-inline: var(--helix-space-xs);
+  text-align: center;
+}
+
+[part="control"]::placeholder {
+  color: var(--helix-color-foreground-subtle);
+}
+
+/* Square, at the field's own height, so the two ends are the same weight and the
+   number sits in the middle of what is left. A rule between each and the number
+   rather than a border of its own: the button is part of the field, and a full
+   border would make it read as a button beside one. */
+[part="decrement"],
+[part="increment"] {
+  all: unset;
+  align-items: center;
+  align-self: stretch;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  inline-size: var(--helix-size-control);
+  justify-content: center;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="decrement"] {
+  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+[part="increment"] {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+[part="decrement"]:hover:not(:disabled),
+[part="increment"]:hover:not(:disabled) {
+  background-color: var(--helix-color-surface);
+  color: var(--helix-color-foreground);
+}
+
+/* Spent at a bound, and dimmed rather than removed: a stepper that loses a
+   button at the end of its range changes width, and the field beside it moves
+   with it. */
+[part="decrement"]:disabled,
+[part="increment"]:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+[part="decrement"] svg,
+[part="increment"] svg {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="field"],
+  [part="decrement"],
+  [part="increment"] {
+    transition: none;
+  }
+}
