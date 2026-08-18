@@ -185,3 +185,134 @@
     translate: 0;
   }
 }
+
+/* ============================================================ ring =======
+ *
+ * The same value, swept instead of filled, and no markup changed to do it.
+ *
+ * The headless tier hands the styled tier one number on a custom property and
+ * says nothing about shape, which is what its own comment predicted: "a bar
+ * fills along it, and a ring would sweep". So this is an `appearance` on the
+ * existing family rather than a `ProgressRing` beside it, and it inherits the
+ * form participation, the ARIA, `indeterminate` and `show-value` by being the
+ * same component. A separate family would have duplicated all four to change a
+ * stylesheet.
+ *
+ * A `conic-gradient` on the part that already carries the fraction, rather than
+ * an SVG. An SVG would have to be rendered by the headless tier, which owns
+ * markup, to serve a decision the styled tier owns: the tier split would be
+ * paying for a shape.
+ */
+@property --_progress-fraction {
+  inherits: true;
+  initial-value: 0;
+  syntax: "<number>";
+}
+
+:host([appearance="ring"]) {
+  display: inline-grid;
+  place-items: center;
+}
+
+/* The groove: a full circle of the track colour with its middle cut out.
+ *
+ * `mask` rather than a smaller circle laid on top, because a disc in the middle
+ * has to be filled with something, and whatever it is stops being transparent:
+ * a ring over a photograph or a tinted callout would carry a plug of page
+ * colour with it. A mask removes the middle instead of covering it. */
+:host([appearance="ring"]) [part="track"] {
+  --_ring-hole: calc(50% - var(--progress-ring-width, var(--helix-space-2xs)));
+
+  background-color: var(--progress-track-color, var(--helix-color-surface-sunken));
+  block-size: var(--progress-ring-size, 4rem);
+  border-radius: var(--helix-radii-full);
+  grid-area: 1 / 1;
+  inline-size: var(--progress-ring-size, 4rem);
+  mask: radial-gradient(
+    circle,
+    transparent var(--_ring-hole),
+    black calc(var(--_ring-hole) + 0.5px)
+  );
+  overflow: visible;
+  position: relative;
+}
+
+/* The sweep. `from 0deg` starts at twelve o'clock, which is where a reader
+   expects a dial to begin, and the hard stop rather than a gradient keeps the
+   leading edge a line instead of a fade.
+ *
+ * `--_progress-fraction` is registered above, which is what lets it animate:
+ * an unregistered custom property is a string to the interpolator and jumps
+ * between values. Registering it is also why the bar's `scale` and this share
+ * one number without either knowing about the other. */
+:host([appearance="ring"]) [part="indicator"] {
+  background-color: transparent;
+  background-image: conic-gradient(
+    from 0deg,
+    var(--progress-color, var(--helix-color-primary)) calc(var(--_progress-fraction) * 360deg),
+    transparent 0
+  );
+  border-radius: var(--helix-radii-full);
+  inset: 0;
+  mask: inherit;
+  position: absolute;
+  scale: none;
+  /* Reset, and it is the one thing that made this look broken. The bar's rule
+     sets `transform-origin: left center`, so the ring turned about its own left
+     edge and swung the arc clear off the component: the ring rendered as an
+     empty groove with a speck beside it. Isolated in a bare document the
+     identical gradient and mask were correct, which is what pointed at a
+     declaration the ring inherits rather than at either of them. */
+  transform-origin: center;
+  transition: --_progress-fraction var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+/* In the middle, where a dial puts its reading, and the grid is what centres it
+   over the ring rather than beside it. */
+:host([appearance="ring"][show-value]) {
+  gap: var(--helix-space-none);
+  grid-template-columns: auto;
+}
+
+:host([appearance="ring"]) [part="value"] {
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+  text-align: center;
+}
+
+/* Running, with no knowable end: the whole ring turns rather than a segment
+   travelling a track, because a ring has no ends for a segment to leave by. */
+:host([appearance="ring"][indeterminate]) [part="indicator"] {
+  animation: helix-progress-ring var(--_progress-cycle) linear infinite;
+  /* Solid for most of the turn with a fade at each end, not a two-stop ramp.
+     Written `transparent 0deg, colour 300deg, transparent 360deg` first, which
+     interpolates across the whole sweep: the arc was a gradient from nothing to
+     nothing and read as an empty ring with a smudge in it. Hard stops on the
+     solid middle, and short fades either side so the head and tail are edges
+     rather than cuts. */
+  background-image: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--progress-color, var(--helix-color-primary)) 40deg 300deg,
+    transparent 340deg
+  );
+  transition: none;
+}
+
+@keyframes helix-progress-ring {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* The turn slows to a crawl rather than stopping, for the reason `Spinner`
+   records: a frozen indicator reads as broken rather than as busy. */
+@media (prefers-reduced-motion: reduce) {
+  :host([appearance="ring"]) [part="indicator"] {
+    transition: none;
+  }
+
+  :host([appearance="ring"][indeterminate]) [part="indicator"] {
+    animation-duration: calc(var(--_progress-cycle) * 12);
+  }
+}

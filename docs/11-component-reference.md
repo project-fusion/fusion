@@ -2072,6 +2072,7 @@ thing advancing.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'ring' \| undefined` | - | - | Whether the value is drawn as a bar or as a ring. |
 | `fraction` | - | `number` | - | `HelixBaseProgress` | What is done, as a fraction of the whole, between 0 and 1. |
 | `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseProgress` | Whether the work has a knowable end. |
 | `label` | `label` | `string` | `'Progress'` | `HelixBaseProgress` | Accessible name for what is in progress. |
@@ -2095,6 +2096,8 @@ thing advancing.
 | `--progress-size` | Thickness of the bar. |
 | `--progress-color` | Fill of the part that is done. |
 | `--progress-track-color` | Fill of the part that is not. |
+| `--progress-ring-size` | Diameter of the ring appearance. |
+| `--progress-ring-width` | Thickness of its stroke. |
 
 ## Quote
 

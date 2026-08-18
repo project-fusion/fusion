@@ -18659,9 +18659,27 @@
             {
               "description": "Fill of the part that is not.",
               "name": "--progress-track-color"
+            },
+            {
+              "description": "Diameter of the ring appearance.",
+              "name": "--progress-ring-size"
+            },
+            {
+              "description": "Thickness of its stroke.",
+              "name": "--progress-ring-width"
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'ring' | undefined"
+              },
+              "description": "Whether the value is drawn as a bar or as a ring.",
+              "attribute": "appearance",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "label",
@@ -18831,52 +18849,15 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseProgress",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Shows how far along a task is, when that is known.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/progress",
-            "aliases": [
-              "Progress bar",
-              "Loading bar"
-            ],
-            "tier": "styled",
-            "group": "Progress",
-            "part": "Root"
-          },
-          "tagName": "helix-progress",
-          "customElement": true,
-          "cssParts": [
-            {
-              "description": "The full length the work is measured against.",
-              "name": "track",
-              "inheritedFrom": {
-                "name": "HelixBaseProgress",
-                "module": "src/progress/root/progress-root.ts"
-              }
-            },
-            {
-              "description": "The part of it that is done.",
-              "name": "indicator",
-              "inheritedFrom": {
-                "name": "HelixBaseProgress",
-                "module": "src/progress/root/progress-root.ts"
-              }
-            },
-            {
-              "description": "The reading beside the bar, under `show-value`.",
-              "name": "value",
-              "inheritedFrom": {
-                "name": "HelixBaseProgress",
-                "module": "src/progress/root/progress-root.ts"
-              }
-            }
-          ],
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'ring' | undefined"
+              },
+              "description": "Whether the value is drawn as a bar or as a ring.",
+              "fieldName": "appearance"
+            },
             {
               "name": "label",
               "type": {
@@ -18950,6 +18931,51 @@
               "default": "''",
               "description": "A reading for the value, where the number alone does not say enough.\n\n\"3 of 8 files\" rather than \"37\". Announced instead of the percentage, and\nnever instead of the value itself: `aria-valuenow` still carries the\nnumber, because assistive technology that ignores the text still has to\nreport progress.",
               "fieldName": "valueText",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseProgress",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Shows how far along a task is, when that is known.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/progress",
+            "aliases": [
+              "Progress bar",
+              "Loading bar"
+            ],
+            "tier": "styled",
+            "group": "Progress",
+            "part": "Root"
+          },
+          "tagName": "helix-progress",
+          "customElement": true,
+          "cssParts": [
+            {
+              "description": "The full length the work is measured against.",
+              "name": "track",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "description": "The part of it that is done.",
+              "name": "indicator",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "description": "The reading beside the bar, under `show-value`.",
+              "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseProgress",
                 "module": "src/progress/root/progress-root.ts"

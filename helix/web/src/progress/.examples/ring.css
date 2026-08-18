@@ -1,0 +1,5 @@
+/* The two hooks the ring publishes, shown at a size a dashboard would use. */
+.storage {
+  --progress-ring-size: 6rem;
+  --progress-ring-width: 0.75rem;
+}

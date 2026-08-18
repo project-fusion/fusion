@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseProgress } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './progress-root.css.js'
 
 /**
@@ -25,9 +26,30 @@ import { styles } from './progress-root.css.js'
  * @cssproperty --progress-size - Thickness of the bar.
  * @cssproperty --progress-color - Fill of the part that is done.
  * @cssproperty --progress-track-color - Fill of the part that is not.
- */
-@customElement('helix-progress')
+ *
+ * @cssproperty --progress-ring-size - Diameter of the ring appearance.
+ * @cssproperty --progress-ring-width - Thickness of its stroke.
+ *
+ * @property appearance - Whether the value is drawn as a bar or as a ring.
+ */ @customElement('helix-progress')
 export class HelixProgress extends HelixBaseProgress {
+  /**
+   * Whether the value is drawn as a bar or as a ring.
+   *
+   * Unset is the bar. `ring` sweeps the same number around a dial, which is
+   * what a compact space wants: a bar needs a length to be read against and a
+   * ring carries its own.
+   *
+   * An appearance rather than a `ProgressRing` beside this, because the shape is
+   * the only thing that differs. Form participation, `role="progressbar"`,
+   * `indeterminate` and `show-value` are all the same component's, and a second
+   * family would have copied every one of them to change a stylesheet. The
+   * headless tier hands over a fraction and says nothing about shape, which is
+   * what makes that possible.
+   */
+  @property({ reflect: true })
+  appearance?: 'ring'
+
   static override styles: CSSResultGroup = styles
 }
 

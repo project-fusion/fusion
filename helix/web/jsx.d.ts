@@ -3485,6 +3485,8 @@ instead. */
 };
 
 export type HelixProgressProps = {
+  /** Whether the value is drawn as a bar or as a ring. */
+  appearance?: HelixProgress["appearance"];
   /** Accessible name for what is in progress. */
   label?: HelixProgress["label"];
   /** Whether the work has a knowable end.
@@ -3545,6 +3547,8 @@ report progress. */
 };
 
 export type HelixProgressSolidJsProps = {
+  /** Whether the value is drawn as a bar or as a ring. */
+  "prop:appearance"?: HelixProgress["appearance"];
   /** Accessible name for what is in progress. */
   "prop:label"?: HelixProgress["label"];
   /** Whether the work has a knowable end.
@@ -8854,6 +8858,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the value is drawn as a bar or as a ring.
    * - `label`: Accessible name for what is in progress.
    * - `indeterminate`: Whether the work has a knowable end.
    *
@@ -8896,6 +8901,8 @@ export type CustomElements = {
    * - `--progress-size`: Thickness of the bar. (default: `undefined`)
    * - `--progress-color`: Fill of the part that is done. (default: `undefined`)
    * - `--progress-track-color`: Fill of the part that is not. (default: `undefined`)
+   * - `--progress-ring-size`: Diameter of the ring appearance. (default: `undefined`)
+   * - `--progress-ring-width`: Thickness of its stroke. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -13920,6 +13927,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the value is drawn as a bar or as a ring.
    * - `label`: Accessible name for what is in progress.
    * - `indeterminate`: Whether the work has a knowable end.
    *
@@ -13962,6 +13970,8 @@ export type CustomElementsSolidJs = {
    * - `--progress-size`: Thickness of the bar. (default: `undefined`)
    * - `--progress-color`: Fill of the part that is done. (default: `undefined`)
    * - `--progress-track-color`: Fill of the part that is not. (default: `undefined`)
+   * - `--progress-ring-size`: Diameter of the ring appearance. (default: `undefined`)
+   * - `--progress-ring-width`: Thickness of its stroke. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16287,6 +16297,10 @@ export type CustomCssProperties = {
   "--progress-color"?: string;
   /** Fill of the part that is not. */
   "--progress-track-color"?: string;
+  /** Diameter of the ring appearance. */
+  "--progress-ring-size"?: string;
+  /** Thickness of its stroke. */
+  "--progress-ring-width"?: string;
   /** Color of the quoted text. */
   "--quote-color"?: string;
   /** Space between the choices. */
