@@ -272,49 +272,23 @@
   transition: --_progress-fraction var(--helix-duration-normal) var(--helix-easing-decelerate);
 }
 
-/* Round ends, so the sweep reads as a stroke rather than as a slice of pie.
+/* **No round caps, and the attempt is worth recording.**
  *
- * This is what "look like the spinner" costs in a conic gradient: a gradient has
- * hard radial edges and no notion of a cap, so each end is drawn as a disc of
- * its own.
+ * A conic gradient has hard radial edges and no notion of a cap, so matching the
+ * spinner's rounded ends meant drawing a disc at each end of the arc. It was
+ * built, twice, and it looked far worse than the plain edge it replaced: the
+ * discs sat proud of the band, bulged past the outer circle, and at small
+ * values the cap was wider than the arc it was meant to finish. Zoomed to six
+ * times, an 8% ring was a blob on a sliver.
  *
- * **Both caps are full-size layers with the dot painted at the top**, not small
- * boxes moved into place. A positioned dot was tried first and the moving one
- * would not go: rotating a box that sits at the top of the ring turns it about
- * *its own* centre, not the ring's, so the cap spun on the spot while the arc
- * travelled. A layer the size of the whole ring has the ring's centre for an
- * origin by construction, and the dot rides its top edge, which is how a cap
- * lands at an arbitrary angle with no trigonometry in the stylesheet.
+ * The honest reading is that the bar's rounded ends are a rounded rectangle,
+ * which is a property of its shape, and a ring has no equivalent to reproduce.
+ * A hard radial edge is what a dial has always had.
  *
- * The trailing one turns by the same fraction the sweep uses, so it is always
- * exactly at the arc's end however the value moves. */
-:host([appearance="ring"]) [part="indicator"] {
-  --_ring-stroke: var(--progress-ring-width, var(--helix-size-progress));
-  --_ring-cap: radial-gradient(
-    circle at 50% calc(var(--_ring-stroke) / 2),
-    var(--progress-color, var(--helix-color-primary)) calc(var(--_ring-stroke) / 2),
-    transparent 0
-  );
-}
-
-:host([appearance="ring"]) [part="indicator"]::before,
-:host([appearance="ring"]) [part="indicator"]::after {
-  background-image: var(--_ring-cap);
-  content: "";
-  inset: 0;
-  position: absolute;
-}
-
-:host([appearance="ring"]) [part="indicator"]::after {
-  rotate: calc(var(--_progress-fraction) * 1turn);
-}
-
-/* Nothing to cap while it is running: the indeterminate arc already fades at
-   both ends, and a pair of hard discs on a fading edge is two ideas at once. */
-:host([appearance="ring"][indeterminate]) [part="indicator"]::before,
-:host([appearance="ring"][indeterminate]) [part="indicator"]::after {
-  content: none;
-}
+ * The one route that would give real caps is an SVG with `stroke-linecap:
+ * round`, which the headless tier would have to render, to serve a decision the
+ * styled tier owns. That is a tier call worth taking deliberately if it ever
+ * matters, rather than smuggling in behind a stylesheet. */
 
 /* In the middle, where a dial puts its reading, and the grid is what centres it
    over the ring rather than beside it. */
@@ -333,17 +307,24 @@
    travelling a track, because a ring has no ends for a segment to leave by. */
 :host([appearance="ring"][indeterminate]) [part="indicator"] {
   animation: helix-progress-ring var(--_progress-cycle) linear infinite;
-  /* Solid for most of the turn with a fade at each end, not a two-stop ramp.
-     Written `transparent 0deg, colour 300deg, transparent 360deg` first, which
-     interpolates across the whole sweep: the arc was a gradient from nothing to
-     nothing and read as an empty ring with a smudge in it. Hard stops on the
-     solid middle, and short fades either side so the head and tail are edges
-     rather than cuts. */
+  /* A third of the circle, which is what `Spinner` draws and for the reason its
+     own comment gives: a gap is what makes the rotation visible, and a full
+     circle turning looks like nothing at all.
+   *
+   * Two earlier versions were wrong in opposite directions. `transparent 0deg,
+   * colour 300deg, transparent 360deg` interpolates across the whole sweep, so
+   * the arc was a gradient from nothing to nothing and read as an empty ring
+   * with a smudge in it. Hard stops fixed the smudge and left a 300 degree arc,
+   * which is a nearly closed ring with a notch: it reads as a bar at 85 per cent
+   * rather than as something running, and the notch was the only thing moving.
+   *
+   * 120 degrees solid with 20 either side to soften the ends, so the head and
+   * tail are edges rather than cuts. */
   background-image: conic-gradient(
     from 0deg,
     transparent 0deg,
-    var(--progress-color, var(--helix-color-primary)) 40deg 300deg,
-    transparent 340deg
+    var(--progress-color, var(--helix-color-primary)) 20deg 140deg,
+    transparent 160deg
   );
   transition: none;
 }

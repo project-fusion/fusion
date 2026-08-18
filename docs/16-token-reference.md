@@ -39,7 +39,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
 | `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 98 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 83 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 81 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 7 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 6 |
@@ -215,7 +215,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-tag-lg` | `calc(2rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-tag-md` | `calc(1.75rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-tag-sm` | `calc(1.5rem * var(--_helix-seed-density))` | 6 |
-| `--helix-size-progress` | `calc(0.5rem * var(--_helix-seed-density))` | 8 |
+| `--helix-size-progress` | `calc(0.5rem * var(--_helix-seed-density))` | 6 |
 | `--helix-size-checkbox` | `var(--helix-size-checkbox-md)` | 6 |
 | `--helix-size-checkbox-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-checkbox-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
