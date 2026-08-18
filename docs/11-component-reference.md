@@ -1516,6 +1516,94 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `--input-size` | Height of the field. |
 | `--input-background-color` | Fill behind the text. |
 
+## Input File
+
+### Root — `helix-input-file`
+
+A control for choosing files, by pointer or by dropping them on it.
+
+Extends `HelixBaseInputFile`.
+
+The field is a box rather than a line, because nothing is typed into it: its
+height is not a line of text, and what a reader aims at is the whole area. The
+border is dashed for the same reason a drop target usually is, which is the
+only affordance one has before anything is being dragged.
+
+The native input is kept and laid over the field at zero opacity rather than
+hidden, so a click anywhere on the box lands on the input itself and opens the
+picker. Hiding it with `display: none` would take it out of the tab order and
+out of the form, and a script clicking a hidden input is the same thing with
+more moving parts.
+
+The focus ring is drawn on the field, because the control it belongs to is
+invisible.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `accept` | `accept` | `string` | `''` | `HelixBaseInputFile` | Which files the picker offers, as a native `accept` list. |
+| `capture` | `capture` | `'environment' \| 'user' \| undefined` | - | `HelixBaseInputFile` | Which camera or microphone a mobile picker should offer, if any. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `files` | - | `File[]` | - | `HelixBaseInputFile` | The files chosen, which is the element's own and never assigned. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseInputFile` | Whether more than one file can be chosen. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseInputFile` | What the control removing one file is called, per file. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose files'` | `HelixBaseInputFile` | What the trigger reads, where nothing is slotted into it. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `clear()` | `HelixBaseInputFile` | Takes every file back out. |
+| `focus()` | `HelixBaseInputFile` | Puts focus on the input, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `HelixBaseInputFile` | Empties it, which is what a form reset means for a file input. |
+| `removeAt()` | `HelixBaseInputFile` | Drops one file, by index. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the chosen files change, with their names. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | What the reader presses to open the picker. |
+| `hint` | Help under the field. |
+| `feedback` | What is wrong with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box that is pressed and dropped on. |
+| `control` | The file input itself, which carries the label and validity. |
+| `trigger` | The label that opens the picker. |
+| `list` | The chosen files. |
+| `file` | One chosen file. |
+| `name` | Its name. |
+| `remove` | The control that takes it back out. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--input-file-background-color` | Fill behind the field. |
+| `--input-file-inset` | Padding inside the field. |
+
 ## Input Number
 
 ### Root — `helix-input-number`

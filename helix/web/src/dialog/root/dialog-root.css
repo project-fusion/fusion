@@ -146,16 +146,23 @@
 ::slotted([slot="header"]) {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
-  /* `lg`, and an attempt to raise it to `xl` is reverted here rather than left
-     in looking like it did something. Measured against the built bundle: the
-     rule ships `var(--helix-text-xl)`, that token resolves to 24px on this very
-     element, and the computed size stays 18px. A literal `30px` injected through
-     the same selector at runtime does not move it either.
+  /* **Raising this does nothing, and the reason is not yet found.** Left at `lg`
+     rather than set to a number that does not take.
    
-     The clue for whoever picks this up: a `helix-text as="h2"` computes 32px
-     outside a dialog and 18px inside one, so something here *is* reducing it,
-     and it is not this declaration. Find that first; raising this number does
-     nothing until it is found. */
+     What is ruled out, all measured on a clean load of the built bundle: the
+     source carries exactly one rule for this slot and it names the token asked
+     for; `dist` and the frame bundle both carry it; the rule *applies*, because
+     its `font-weight`, `letter-spacing` and `margin` all land on the element;
+     and the token resolves to 24px on that very element, in the dialog and out
+     of it. `helix-text` is not the culprit either, since it declares no
+     font-size of its own and a plain `<span slot="header">` behaves the same.
+     Inheritance is not it: the slot computes 15px.
+   
+     So one declaration of a rule that otherwise applies is being ignored, and it
+     lands on exactly the previous value of this line. That signature says stale
+     styles somewhere, but the sheet read back from the live element already
+     holds the new value. Whoever picks this up should start there rather than
+     with the selector. */
   font-size: var(--helix-text-lg);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);

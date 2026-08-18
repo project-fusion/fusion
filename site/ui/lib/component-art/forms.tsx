@@ -199,6 +199,56 @@ export const formsArt: Record<string, ReactNode> = {
    * getting longer is what counting looks like, so it stretches, which is the
    * archetype `Input` uses for the same thing.
    */
+  /* A field with a dashed edge and two names under it, which is the one shape
+     that reads as "a place to put files" at this size: a solid box is just a
+     field, and a picture of a cloud says upload to nobody who has not already
+     been told. The dashes are drawn as a run of short bars rather than stroked,
+     for the reason the rules are: a stroke half-renders at the card's
+     three-quarter scale. */
+  'input-file': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="56" x="48" y="44" />
+      <rect className="artSunken" height="56" rx="4" width="224" x="48" y="64" />
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((step) => (
+        <rect
+          className="artRule"
+          height="1"
+          key={`top-${step}`}
+          width="16"
+          x={52 + step * 28}
+          y="64"
+        />
+      ))}
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((step) => (
+        <rect
+          className="artRule"
+          height="1"
+          key={`bottom-${step}`}
+          width="16"
+          x={52 + step * 28}
+          y="119"
+        />
+      ))}
+      {/* The trigger, centred in the box the way the label is. */}
+      <rect
+        className="artSolid artMotion artFill"
+        height="8"
+        rx="4"
+        style={{ '--art-grow': 1.4 } as CSSProperties}
+        width="64"
+        x="128"
+        y="88"
+      />
+      {/* Two chosen files under it, each with the mark that takes it back out. */}
+      <rect className="artSunken" height="16" rx="4" width="224" x="48" y="128" />
+      <rect className="artInk" fillOpacity="0.4" height="6" rx="3" width="96" x="56" y="133" />
+      <rect className="artInk" fillOpacity="0.28" height="2" rx="1" width="8" x="256" y="135" />
+      <rect className="artSunken" height="16" rx="4" width="224" x="48" y="152" />
+      <rect className="artInk" fillOpacity="0.4" height="6" rx="3" width="72" x="56" y="157" />
+      <rect className="artInk" fillOpacity="0.28" height="2" rx="1" width="8" x="256" y="159" />
+    </>
+  ),
+
   'input-number': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="48" x="48" y="52" />

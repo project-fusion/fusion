@@ -30,20 +30,20 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 26 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 22 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 27 |
-| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 47 |
+| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 51 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 3 |
-| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 178 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 98 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 70 |
+| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 182 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 102 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 72 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 21 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 109 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 85 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 111 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 87 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 7 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
-| `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 6 |
-| `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 74 |
+| `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 8 |
+| `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 78 |
 | `--helix-color-syntax-callable` | `light-dark( var(--_helix-syntax-callable-light), var(--_helix-syntax-callable-dark) )` | 1 |
 | `--helix-color-syntax-comment` | `light-dark( var(--_helix-syntax-comment-light), var(--_helix-syntax-comment-dark) )` | 1 |
 | `--helix-color-syntax-constant` | `light-dark( var(--_helix-syntax-constant-light), var(--_helix-syntax-constant-dark) )` | 1 |
@@ -55,7 +55,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-info` | `light-dark(var(--_helix-info-500), var(--_helix-info-400))` | 6 |
 | `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 15 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-500), var(--_helix-warning-400))` | 16 |
-| `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 63 |
+| `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 65 |
 
 ## space
 
@@ -63,11 +63,11 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 127 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 139 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 145 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 129 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 143 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 153 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 132 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 69 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 71 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 56 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 19 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 27 |
@@ -80,7 +80,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 46 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 108 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 114 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
 | `--helix-radii-full` | `9999px` | 46 |
@@ -91,7 +91,7 @@ The three families.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-font-sans` | `var(--_helix-family-sans)` | 68 |
+| `--helix-font-sans` | `var(--_helix-family-sans)` | 72 |
 | `--helix-font-mono` | `var(--_helix-family-mono)` | 16 |
 | `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 7 |
 
@@ -102,10 +102,10 @@ Font size.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 52 |
-| `--helix-text-sm` | `var(--_helix-size-14)` | 80 |
-| `--helix-text-md` | `var(--_helix-size-15)` | 17 |
+| `--helix-text-sm` | `var(--_helix-size-14)` | 82 |
+| `--helix-text-md` | `var(--_helix-size-15)` | 19 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 17 |
-| `--helix-text-xl` | `var(--_helix-size-24)` | 14 |
+| `--helix-text-xl` | `var(--_helix-size-24)` | 12 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 5 |
 | `--helix-text-3xl` | `var(--_helix-size-44)` | 7 |
 
@@ -116,7 +116,7 @@ The three weights.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-weight-regular` | `400` | 10 |
-| `--helix-weight-medium` | `500` | 64 |
+| `--helix-weight-medium` | `500` | 66 |
 | `--helix-weight-semibold` | `600` | 37 |
 
 ## leading
@@ -145,7 +145,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 112 |
+| `--helix-border-thin` | `1px` | 114 |
 | `--helix-border-thick` | `2px` | 33 |
 
 ## shadow
@@ -179,7 +179,7 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 0 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 186 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 192 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 87 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 12 |
 
@@ -189,7 +189,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 178 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 184 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 34 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 25 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
@@ -232,9 +232,9 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 54 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 8 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
-| `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 41 |
-| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 74 |
-| `--helix-size-focus-offset` | `2px` | 68 |
+| `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 45 |
+| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 78 |
+| `--helix-size-focus-offset` | `2px` | 72 |
 
 ## layer
 

@@ -1,0 +1,161 @@
+/* The field is the drop target, so it is a box with room in it rather than a
+   line. A file control is not a text field: nothing is typed into it, its height
+   is not a line of text, and the thing a reader aims at is the whole area. */
+[part="field"] {
+  align-items: center;
+  position: relative;
+  background-color: var(--input-file-background-color, var(--helix-color-surface-sunken));
+  border: var(--helix-border-thin) dashed var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: flex;
+  gap: var(--helix-space-xs);
+  justify-content: center;
+  padding: var(--input-file-inset, var(--helix-space-md));
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Dashed, and that is the one piece of ornament here worth defending: a solid
+   border says "a box", and a dashed one is the convention for a box you may put
+   something into. It is the only affordance a drop target has before anything is
+   dragged, because a cursor cannot say it in advance. */
+
+/* The input is kept, not replaced. It has to be in the layout and reachable,
+   because it holds the label, the name, the validity and the focus, so it is
+   made invisible rather than `display: none`, which would take it out of the
+   tab order and out of the form.
+
+   Sized to the field and laid over it rather than pushed off-screen: a click
+   anywhere on the box then lands on the input itself, which is what opens the
+   picker without a script pretending to be a reader. */
+[part="control"] {
+  cursor: pointer;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+/* The field is what the input is measured against, not the host.
+ *
+ * Positioned on the host it covered the host: the label above the box and the
+ * hint below it were both under an invisible file input, so pressing either one
+ * opened a picker, and the box a reader actually aims at was not the box that
+ * answered. Measured, the control and the field were different sizes. */
+:host {
+  display: block;
+}
+
+/* The ring is drawn on the field, because the input it belongs to is invisible.
+   `:has()` is allowed here: what the rules forbid is `:has()` inside the
+   functional `:host()`, and this is an ordinary descendant selector in the
+   shadow root. */
+[part="field"]:has([part="control"]:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Something is over it. The accent rather than a darker grey, because a drop is
+   a thing about to happen rather than a thing being pointed at, and the field
+   has to read as armed from across the page. */
+[part="field"][data-dropping] {
+  background-color: var(--helix-color-primary-subtle);
+  border-color: var(--helix-color-primary);
+  border-style: solid;
+}
+
+[part="trigger"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-medium);
+  /* Not `pointer`: the input above it already carries that, and a label with its
+     own cursor would flicker as the pointer crossed between them. */
+  pointer-events: none;
+}
+
+/* The chosen files. A list, because that is what it is, with the marker taken
+   off: the names are already a column and a bullet beside each is noise. */
+[part="list"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  list-style: none;
+  margin-block: var(--helix-space-xs) 0;
+  padding: var(--helix-space-none);
+}
+
+[part="file"] {
+  align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  border-radius: var(--helix-radii-sm);
+  display: flex;
+  gap: var(--helix-space-xs);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="name"] {
+  color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  /* A file name is the one string here that is not the component's to shorten,
+     and the middle of it is where the meaning usually is. Wrapping beats an
+     ellipsis for that reason. */
+  overflow-wrap: anywhere;
+}
+
+/* The mark is drawn rather than slotted, the same stencil-over-a-coloured-box
+   the checkbox uses, so removing a file costs the component no icon dependency
+   and no second element for a consumer to fill. */
+[part="remove"] {
+  all: unset;
+  background-color: var(--helix-color-foreground-muted);
+  block-size: var(--helix-size-icon-sm);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  cursor: pointer;
+  flex: none;
+  inline-size: var(--helix-size-icon-sm);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E");
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: 100%;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="remove"]:hover {
+  background-color: var(--helix-color-danger);
+}
+
+[part="remove"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* `:host(:disabled)`, not `:host([disabled])`. The pseudo-class matches on this
+   element's own attribute *and* on an ancestor `<fieldset disabled>`, where the
+   attribute selector only ever sees the first. Same reason Input gives. */
+:host(:disabled) [part="field"] {
+  border-style: solid;
+  color: var(--helix-color-foreground-subtle);
+}
+
+:host(:disabled) [part="control"],
+:host(:disabled) [part="trigger"] {
+  cursor: not-allowed;
+}
+
+/* Hover only where it can be acted on, so a disabled field does not light up
+   under a pointer that cannot open anything. */
+:host(:not(:disabled)) [part="field"]:hover {
+  border-color: var(--helix-color-foreground-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="field"],
+  [part="remove"] {
+    transition: none;
+  }
+}

@@ -27,6 +27,7 @@ import type {
   HelixBaseIcon,
   HelixBaseIconButton,
   HelixBaseInput,
+  HelixBaseInputFile,
   HelixBaseInputNumber,
   HelixBaseInputPin,
   HelixBaseKbd,
@@ -2107,6 +2108,133 @@ export type HelixBaseIconSolidJsProps = {
   "prop:name"?: HelixBaseIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixBaseIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseInputFile` component event */
+export type HelixBaseInputFileElementEvent<E = Event> = TypedEvent<
+  HelixBaseInputFile,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseInputFileHelixChangeElementEvent =
+  HelixBaseInputFileElementEvent<HelixChangeEvent>;
+
+export type HelixBaseInputFileProps = {
+  /** Which files the picker offers, as a native `accept` list. */
+  accept?: HelixBaseInputFile["accept"];
+  /** Whether more than one file can be chosen. */
+  multiple?: HelixBaseInputFile["multiple"];
+  /** Which camera or microphone a mobile picker should offer, if any. */
+  capture?: HelixBaseInputFile["capture"];
+  /** What the trigger reads, where nothing is slotted into it. */
+  "trigger-label"?: HelixBaseInputFile["triggerLabel"];
+  /** What the trigger reads, where nothing is slotted into it. */
+  triggerLabel?: HelixBaseInputFile["triggerLabel"];
+  /** What the control removing one file is called, per file. */
+  "remove-label"?: HelixBaseInputFile["removeLabel"];
+  /** What the control removing one file is called, per file. */
+  removeLabel?: HelixBaseInputFile["removeLabel"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseInputFile["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseInputFile["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseInputFile["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseInputFile["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixBaseInputFile["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseInputFile["name"];
+
+  /** Fired when the chosen files change, with their names. */
+  "onhelix-change"?: (e: HelixBaseInputFileHelixChangeElementEvent) => void;
+};
+
+export type HelixBaseInputFileSolidJsProps = {
+  /** Which files the picker offers, as a native `accept` list. */
+  "prop:accept"?: HelixBaseInputFile["accept"];
+  /** Whether more than one file can be chosen. */
+  "prop:multiple"?: HelixBaseInputFile["multiple"];
+  /** Which camera or microphone a mobile picker should offer, if any. */
+  "prop:capture"?: HelixBaseInputFile["capture"];
+  /** What the trigger reads, where nothing is slotted into it. */
+  "attr:trigger-label"?: HelixBaseInputFile["triggerLabel"];
+  /** What the trigger reads, where nothing is slotted into it. */
+  "prop:triggerLabel"?: HelixBaseInputFile["triggerLabel"];
+  /** What the control removing one file is called, per file. */
+  "attr:remove-label"?: HelixBaseInputFile["removeLabel"];
+  /** What the control removing one file is called, per file. */
+  "prop:removeLabel"?: HelixBaseInputFile["removeLabel"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseInputFile["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseInputFile["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseInputFile["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseInputFile["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixBaseInputFile["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseInputFile["name"];
+  /** Fired when the chosen files change, with their names. */
+  "on:helix-change"?: (e: HelixBaseInputFileHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8415,6 +8543,146 @@ export type CustomElements = {
   >;
 
   /**
+   * **A real `<input type="file">`, kept and made invisible rather than
+   * replaced.** It is the only way to open a file picker: the dialog is a
+   * privileged action a script cannot start on its own, and it opens for a click
+   * on the input or on a `<label>` pointing at it. Every version of this component
+   * that draws its own button ends up calling `.click()` on a hidden input
+   * anyway, and then has two things a screen reader can find where there is one
+   * control.
+   *
+   * So the input stays, holds the label, the name, the validity and the focus,
+   * and the visible trigger is a `<label for>` rather than a button. A label is
+   * not focusable and does not need to be: the input is, and Enter and Space on it
+   * open the picker because that is what the platform does with a file input.
+   *
+   * **Dropping is why this is a component rather than an attribute.** A bare file
+   * input accepts a drop only on the input itself, which is invisible here, so the
+   * field is the drop target and it says when something is over it.
+   *
+   * **Files are not a value a consumer can hand back.** Every other control here
+   * takes the controlled and uncontrolled pair, and this one does not: a `FileList`
+   * cannot be constructed from markup, and a consumer writing `value` on a file
+   * input is the one thing browsers refuse outright, because a page that could
+   * name a file could read it. So this element owns what was chosen, announces it,
+   * and offers `clear()` for the one change a consumer can legitimately ask for.
+   *
+   * **The list under it is the control's own, not decoration.** A file input with
+   * files chosen reports "3 files" and nothing else, which is unusable for
+   * checking that the right ones were picked. The names are rendered, and each
+   * carries the way to take it back out.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `accept`: Which files the picker offers, as a native `accept` list.
+   * - `multiple`: Whether more than one file can be chosen.
+   * - `capture`: Which camera or microphone a mobile picker should offer, if any.
+   * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
+   * - `remove-label`/`removeLabel`: What the control removing one file is called, per file.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `files`: The files chosen, which is the element's own and never assigned.
+   *
+   * Read from the input rather than mirrored into a field. The input is what
+   * the picker filled and what a form submits, so a copy here could only ever
+   * disagree with it. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the chosen files change, with their names.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: What the reader presses to open the picker.
+   * - `hint`: Help under the field.
+   * - `feedback`: What is wrong with it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `clear() => void`: Takes every file back out.
+   *
+   * The one change a consumer can ask for. Setting a `FileList` is refused by
+   * every browser for a reason worth keeping, but emptying one is not: nothing
+   * about the page learns anything it did not already have.
+   * - `removeAt(at: number) => void`: Drops one file, by index.
+   *
+   * `removeAt` rather than `remove`, which is `Element`'s own and takes no
+   * arguments: shadowing it would break every caller who meant the node.
+   *
+   * Through `DataTransfer`, which is the only way to build a `FileList`: the
+   * type has no constructor and `input.files` takes nothing else. It is the same
+   * mechanism a drop uses, so a file put in by dragging and one put in by the
+   * picker come back out the same way.
+   * - `focus(options?: FocusOptions) => void`: Puts focus on the input, the way a label pointing at one would.
+   * - `formResetCallback() => void`: Empties it, which is what a form reset means for a file input.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box that is pressed and dropped on.
+   * - `control`: The file input itself, which carries the label and validity.
+   * - `trigger`: The label that opens the picker.
+   * - `list`: The chosen files.
+   * - `file`: One chosen file.
+   * - `name`: Its name.
+   * - `remove`: The control that takes it back out.
+   */
+  "helix-base-input-file": Partial<
+    HelixBaseInputFileProps & BaseProps<HelixBaseInputFile> & BaseEvents
+  >;
+
+  /**
    * **A family rather than `Input`'s `type="number"`, and rather than a part of
    * it.** `Input` already takes that type and will keep it: a bare numeric field
    * in a form is a text field with a different keyboard, and that is all it needs
@@ -14313,6 +14581,149 @@ export type CustomElementsSolidJs = {
     HelixBaseIconProps &
       HelixBaseIconSolidJsProps &
       BaseProps<HelixBaseIcon> &
+      BaseEvents
+  >;
+
+  /**
+   * **A real `<input type="file">`, kept and made invisible rather than
+   * replaced.** It is the only way to open a file picker: the dialog is a
+   * privileged action a script cannot start on its own, and it opens for a click
+   * on the input or on a `<label>` pointing at it. Every version of this component
+   * that draws its own button ends up calling `.click()` on a hidden input
+   * anyway, and then has two things a screen reader can find where there is one
+   * control.
+   *
+   * So the input stays, holds the label, the name, the validity and the focus,
+   * and the visible trigger is a `<label for>` rather than a button. A label is
+   * not focusable and does not need to be: the input is, and Enter and Space on it
+   * open the picker because that is what the platform does with a file input.
+   *
+   * **Dropping is why this is a component rather than an attribute.** A bare file
+   * input accepts a drop only on the input itself, which is invisible here, so the
+   * field is the drop target and it says when something is over it.
+   *
+   * **Files are not a value a consumer can hand back.** Every other control here
+   * takes the controlled and uncontrolled pair, and this one does not: a `FileList`
+   * cannot be constructed from markup, and a consumer writing `value` on a file
+   * input is the one thing browsers refuse outright, because a page that could
+   * name a file could read it. So this element owns what was chosen, announces it,
+   * and offers `clear()` for the one change a consumer can legitimately ask for.
+   *
+   * **The list under it is the control's own, not decoration.** A file input with
+   * files chosen reports "3 files" and nothing else, which is unusable for
+   * checking that the right ones were picked. The names are rendered, and each
+   * carries the way to take it back out.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `accept`: Which files the picker offers, as a native `accept` list.
+   * - `multiple`: Whether more than one file can be chosen.
+   * - `capture`: Which camera or microphone a mobile picker should offer, if any.
+   * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
+   * - `remove-label`/`removeLabel`: What the control removing one file is called, per file.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `files`: The files chosen, which is the element's own and never assigned.
+   *
+   * Read from the input rather than mirrored into a field. The input is what
+   * the picker filled and what a form submits, so a copy here could only ever
+   * disagree with it. (property only) (readonly)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the chosen files change, with their names.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: What the reader presses to open the picker.
+   * - `hint`: Help under the field.
+   * - `feedback`: What is wrong with it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `clear() => void`: Takes every file back out.
+   *
+   * The one change a consumer can ask for. Setting a `FileList` is refused by
+   * every browser for a reason worth keeping, but emptying one is not: nothing
+   * about the page learns anything it did not already have.
+   * - `removeAt(at: number) => void`: Drops one file, by index.
+   *
+   * `removeAt` rather than `remove`, which is `Element`'s own and takes no
+   * arguments: shadowing it would break every caller who meant the node.
+   *
+   * Through `DataTransfer`, which is the only way to build a `FileList`: the
+   * type has no constructor and `input.files` takes nothing else. It is the same
+   * mechanism a drop uses, so a file put in by dragging and one put in by the
+   * picker come back out the same way.
+   * - `focus(options?: FocusOptions) => void`: Puts focus on the input, the way a label pointing at one would.
+   * - `formResetCallback() => void`: Empties it, which is what a form reset means for a file input.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box that is pressed and dropped on.
+   * - `control`: The file input itself, which carries the label and validity.
+   * - `trigger`: The label that opens the picker.
+   * - `list`: The chosen files.
+   * - `file`: One chosen file.
+   * - `name`: Its name.
+   * - `remove`: The control that takes it back out.
+   */
+  "helix-base-input-file": Partial<
+    HelixBaseInputFileProps &
+      HelixBaseInputFileSolidJsProps &
+      BaseProps<HelixBaseInputFile> &
       BaseEvents
   >;
 
