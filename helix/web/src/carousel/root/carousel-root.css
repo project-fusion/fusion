@@ -485,3 +485,22 @@
     transition: none;
   }
 }
+
+/* A caret is physical and the thing it points at is not.
+ *
+ * The row itself already flips, because it is laid out on the inline axis and
+ * the browser reverses that in a right-to-left document. The glyph inside does
+ * not, so the mark ends up on the correct side pointing the wrong way, which in
+ * that reading direction means the opposite of what it says. Mirrored rather
+ * than swapped for the opposite icon, so the pair stays one decision: a reversed
+ * `caret-left` is exactly `caret-right`, and two sets of icon imports that have
+ * to agree is the kind of thing that drifts.
+ *
+ * Written out in each component rather than shared, because there is no sheet a
+ * shadow root can compose for this and no way for one to know which of a
+ * component's glyphs are directional. `Pagination` carries the same rule and the
+ * same argument. */
+:host(:dir(rtl)) [part="previous"] svg,
+:host(:dir(rtl)) [part="next"] svg {
+  scale: -1 1;
+}

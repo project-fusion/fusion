@@ -196,9 +196,19 @@ export class HelixBaseMenuItem extends HelixElement {
           // nothing to tick, and a choice opens nothing. The tick sits after the
           // label rather than before it, so the labels start at the edge of the
           // row and the marks line up down the side they are read from.
+          //
+          // `data-submenu` is what tells the two apart from CSS. They share a
+          // part name because they share a column, and only one of them is
+          // directional: a caret has to mirror in a right-to-left document and a
+          // tick must not, which Unicode's own mirroring list agrees on. The
+          // attribute is on an element in this shadow root rather than on the
+          // host, so it is the divider's `data-empty` and not a hydration
+          // hazard. `hasSubmenu` is derived from slot assignment and has no
+          // attribute a selector could read instead.
           submenu
             ? html`<svg
                 part="mark"
+                data-submenu
                 fill="currentColor"
                 viewBox=${caretRight.viewBox}
                 aria-hidden="true"
