@@ -74,7 +74,9 @@
    and a selector list containing an unknown one is dropped whole. */
 /* Above the marks, so the thumb is never crossed by one. */
 [part="control"] {
-  z-index: 1;
+  /* The raised step rather than a bare 1, for the reason `ButtonGroup`
+     records: a number of its own cannot be reasoned about against the scale. */
+  z-index: var(--helix-layer-raised);
 
   appearance: none;
   background: transparent;

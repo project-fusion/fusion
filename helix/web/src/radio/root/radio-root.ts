@@ -26,6 +26,8 @@ import { styles } from './radio-root.css.js'
  * @cssproperty --radio-mark-color - Color of the dot.
  * @cssproperty --radio-background-color - Fill of an unselected circle.
  * @cssproperty --radio-card-padding - Inset of the card appearance.
+ * @cssproperty --radio-card-background-color - Fill behind a card-shaped choice.
+ * @cssproperty --radio-card-border-color - Edge around one.
  */
 @customElement('helix-radio')
 export class HelixRadio extends HelixBaseRadio {

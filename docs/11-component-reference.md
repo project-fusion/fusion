@@ -888,6 +888,8 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `--checkbox-background-color` | Fill of an unticked box. |
 | `--checkbox-mark-color` | Ink the tick is drawn in. |
 | `--checkbox-card-padding` | Inset of the card appearance. |
+| `--checkbox-card-background-color` | Fill behind a card-shaped choice. |
+| `--checkbox-card-border-color` | Edge around one. |
 
 ## Checkbox Group
 
@@ -2192,6 +2194,8 @@ and being chosen is an answer rather than a state.
 | `--radio-mark-color` | Color of the dot. |
 | `--radio-background-color` | Fill of an unselected circle. |
 | `--radio-card-padding` | Inset of the card appearance. |
+| `--radio-card-background-color` | Fill behind a card-shaped choice. |
+| `--radio-card-border-color` | Edge around one. |
 
 ### Group — `helix-radio-group`
 

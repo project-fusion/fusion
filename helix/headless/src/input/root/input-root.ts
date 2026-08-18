@@ -65,8 +65,23 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
   @property({ attribute: 'read-only', reflect: true, type: Boolean })
   readOnly = false
 
-  /** What the field accepts, which decides the keyboard and the validation. */
-  @property({ reflect: true })
+  /**
+   * What the field accepts, which decides the keyboard and the validation.
+   *
+   * **Not reflected**, and it was. Reflection exists so a selector can reach a
+   * value, and no stylesheet in this repository selects on `type`: what it did
+   * instead was write `type="text"` onto every `<helix-input>` ever rendered,
+   * an attribute no consumer's markup had. That is precisely the fault `Button`
+   * had with `href`, `target` and `rel`, written up in the area rules as the
+   * reason the rule exists, and this was the last property in the library still
+   * doing it. Audited: ten reflected attributes have no selector anywhere, and
+   * this is the only one of them with a value that puts itself on the host.
+   *
+   * Nothing reads it from the attribute either. The real `<input>` inside takes
+   * it as a property binding, which is what makes the keyboard and the
+   * validation follow.
+   */
+  @property()
   type: InputType = 'text'
 
   /** Focus is delegated to the input, so the host is never the focus target. */

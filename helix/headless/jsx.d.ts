@@ -2122,7 +2122,20 @@ export type HelixBaseInputProps = {
   "read-only"?: HelixBaseInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   readOnly?: HelixBaseInput["readOnly"];
-  /** What the field accepts, which decides the keyboard and the validation. */
+  /** What the field accepts, which decides the keyboard and the validation.
+
+**Not reflected**, and it was. Reflection exists so a selector can reach a
+value, and no stylesheet in this repository selects on `type`: what it did
+instead was write `type="text"` onto every `<helix-input>` ever rendered,
+an attribute no consumer's markup had. That is precisely the fault `Button`
+had with `href`, `target` and `rel`, written up in the area rules as the
+reason the rule exists, and this was the last property in the library still
+doing it. Audited: ten reflected attributes have no selector anywhere, and
+this is the only one of them with a value that puts itself on the host.
+
+Nothing reads it from the attribute either. The real `<input>` inside takes
+it as a property binding, which is what makes the keyboard and the
+validation follow. */
   type?: HelixBaseInput["type"];
   /** A regular expression the value has to match, as the platform reads it.
 
@@ -2217,7 +2230,20 @@ export type HelixBaseInputSolidJsProps = {
   "bool:read-only"?: HelixBaseInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   "prop:readOnly"?: HelixBaseInput["readOnly"];
-  /** What the field accepts, which decides the keyboard and the validation. */
+  /** What the field accepts, which decides the keyboard and the validation.
+
+**Not reflected**, and it was. Reflection exists so a selector can reach a
+value, and no stylesheet in this repository selects on `type`: what it did
+instead was write `type="text"` onto every `<helix-input>` ever rendered,
+an attribute no consumer's markup had. That is precisely the fault `Button`
+had with `href`, `target` and `rel`, written up in the area rules as the
+reason the rule exists, and this was the last property in the library still
+doing it. Audited: ten reflected attributes have no selector anywhere, and
+this is the only one of them with a value that puts itself on the host.
+
+Nothing reads it from the attribute either. The real `<input>` inside takes
+it as a property binding, which is what makes the keyboard and the
+validation follow. */
   "prop:type"?: HelixBaseInput["type"];
   /** A regular expression the value has to match, as the platform reads it.
 
@@ -7248,6 +7274,19 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
+   *
+   * **Not reflected**, and it was. Reflection exists so a selector can reach a
+   * value, and no stylesheet in this repository selects on `type`: what it did
+   * instead was write `type="text"` onto every `<helix-input>` ever rendered,
+   * an attribute no consumer's markup had. That is precisely the fault `Button`
+   * had with `href`, `target` and `rel`, written up in the area rules as the
+   * reason the rule exists, and this was the last property in the library still
+   * doing it. Audited: ten reflected attributes have no selector anywhere, and
+   * this is the only one of them with a value that puts itself on the host.
+   *
+   * Nothing reads it from the attribute either. The real `<input>` inside takes
+   * it as a property binding, which is what makes the keyboard and the
+   * validation follow.
    * - `pattern`: A regular expression the value has to match, as the platform reads it.
    *
    * The class documentation promised `pattern` and `minlength` "and the rest"
@@ -12206,6 +12245,19 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
+   *
+   * **Not reflected**, and it was. Reflection exists so a selector can reach a
+   * value, and no stylesheet in this repository selects on `type`: what it did
+   * instead was write `type="text"` onto every `<helix-input>` ever rendered,
+   * an attribute no consumer's markup had. That is precisely the fault `Button`
+   * had with `href`, `target` and `rel`, written up in the area rules as the
+   * reason the rule exists, and this was the last property in the library still
+   * doing it. Audited: ten reflected attributes have no selector anywhere, and
+   * this is the only one of them with a value that puts itself on the host.
+   *
+   * Nothing reads it from the attribute either. The real `<input>` inside takes
+   * it as a property binding, which is what makes the keyboard and the
+   * validation follow.
    * - `pattern`: A regular expression the value has to match, as the platform reads it.
    *
    * The class documentation promised `pattern` and `minlength` "and the rest"

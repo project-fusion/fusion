@@ -7157,6 +7157,14 @@
             {
               "description": "Inset of the card appearance.",
               "name": "--checkbox-card-padding"
+            },
+            {
+              "description": "Fill behind a card-shaped choice.",
+              "name": "--checkbox-card-background-color"
+            },
+            {
+              "description": "Edge around one.",
+              "name": "--checkbox-card-border-color"
             }
           ],
           "members": [
@@ -12825,9 +12833,8 @@
                 "text": "InputType"
               },
               "default": "'text'",
-              "description": "What the field accepts, which decides the keyboard and the validation.",
+              "description": "What the field accepts, which decides the keyboard and the validation.\n\n**Not reflected**, and it was. Reflection exists so a selector can reach a\nvalue, and no stylesheet in this repository selects on `type`: what it did\ninstead was write `type=\"text\"` onto every `<helix-input>` ever rendered,\nan attribute no consumer's markup had. That is precisely the fault `Button`\nhad with `href`, `target` and `rel`, written up in the area rules as the\nreason the rule exists, and this was the last property in the library still\ndoing it. Audited: ten reflected attributes have no selector anywhere, and\nthis is the only one of them with a value that puts itself on the host.\n\nNothing reads it from the attribute either. The real `<input>` inside takes\nit as a property binding, which is what makes the keyboard and the\nvalidation follow.",
               "attribute": "type",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -13303,7 +13310,7 @@
                 "text": "InputType"
               },
               "default": "'text'",
-              "description": "What the field accepts, which decides the keyboard and the validation.",
+              "description": "What the field accepts, which decides the keyboard and the validation.\n\n**Not reflected**, and it was. Reflection exists so a selector can reach a\nvalue, and no stylesheet in this repository selects on `type`: what it did\ninstead was write `type=\"text\"` onto every `<helix-input>` ever rendered,\nan attribute no consumer's markup had. That is precisely the fault `Button`\nhad with `href`, `target` and `rel`, written up in the area rules as the\nreason the rule exists, and this was the last property in the library still\ndoing it. Audited: ten reflected attributes have no selector anywhere, and\nthis is the only one of them with a value that puts itself on the host.\n\nNothing reads it from the attribute either. The real `<input>` inside takes\nit as a property binding, which is what makes the keyboard and the\nvalidation follow.",
               "fieldName": "type",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
@@ -20201,6 +20208,14 @@
             {
               "description": "Inset of the card appearance.",
               "name": "--radio-card-padding"
+            },
+            {
+              "description": "Fill behind a card-shaped choice.",
+              "name": "--radio-card-background-color"
+            },
+            {
+              "description": "Edge around one.",
+              "name": "--radio-card-border-color"
             }
           ],
           "members": [

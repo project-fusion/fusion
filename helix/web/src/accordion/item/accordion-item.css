@@ -23,7 +23,10 @@
      content split across the row. The label takes the room instead, through
      `flex: 1` on the part below, which reads the same at either placement. */
   gap: var(--helix-space-xs);
-  min-block-size: var(--helix-size-control-md);
+  /* The current step, not the fixed `md` one. Naming the step directly is what
+     made `data-density` unable to reach a trigger: the token exists so a dense
+     region shrinks its controls, and a floor pinned to `md` refused to. */
+  min-block-size: var(--helix-size-control);
   padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }

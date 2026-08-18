@@ -83,7 +83,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 100 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
-| `--helix-radii-full` | `9999px` | 46 |
+| `--helix-radii-full` | `9999px` | 48 |
 
 ## font
 
@@ -146,7 +146,7 @@ Widths for a rule or an outline.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-border-thin` | `1px` | 106 |
-| `--helix-border-thick` | `2px` | 23 |
+| `--helix-border-thick` | `2px` | 25 |
 
 ## shadow
 
@@ -201,9 +201,9 @@ Heights and widths a component takes, all of them multiplied by the density seed
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-size-control-md` | `calc(2.5rem * var(--_helix-seed-density))` | 13 |
+| `--helix-size-control-md` | `calc(2.5rem * var(--_helix-seed-density))` | 11 |
 | `--helix-size-control-sm` | `calc(2rem * var(--_helix-seed-density))` | 42 |
-| `--helix-size-control` | `var(--helix-size-control-md)` | 14 |
+| `--helix-size-control` | `var(--helix-size-control-md)` | 16 |
 | `--helix-size-control-lg` | `calc(3rem * var(--_helix-seed-density))` | 8 |
 | `--helix-size-button` | `calc(12.5rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-badge` | `calc(1rem * var(--_helix-seed-density))` | 2 |
@@ -242,7 +242,7 @@ Position in the stack. Positional, never named after a component.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-layer-base` | `0` | 8 |
-| `--helix-layer-raised` | `10` | 12 |
+| `--helix-layer-raised` | `10` | 16 |
 | `--helix-layer-sticky` | `100` | 2 |
 | `--helix-layer-overlay` | `1000` | 2 |
 | `--helix-layer-toast` | `1200` | 2 |

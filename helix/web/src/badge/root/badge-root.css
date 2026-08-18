@@ -21,7 +21,10 @@
   border-radius: var(--helix-radii-full);
   /* A ring in the page's own color, so the mark stays separate from whatever it
      overlaps rather than merging into it. */
-  box-shadow: 0 0 0 2px var(--badge-ring-color, var(--helix-color-background));
+  /* `border-thick`, not a literal 2. The separating ring is a rule like any
+     other and a theme that thickens its rules should thicken this with them;
+     it was the only place in the file naming a length outright. */
+  box-shadow: 0 0 0 var(--helix-border-thick) var(--badge-ring-color, var(--helix-color-background));
   color: var(--helix-color-foreground-on-accent);
   display: inline-flex;
   font-size: var(--_badge-text);

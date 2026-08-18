@@ -65,7 +65,10 @@
 }
 
 :host([shape="circle"]) [part="skeleton"] {
-  border-radius: 50%;
+  /* The full radius token, not a bare 50%. It was the only raw border-radius
+     in the styled tier, and `radii-full` is what every other circle in the
+     library names. */
+  border-radius: var(--helix-radii-full);
 }
 
 @keyframes helix-skeleton-sweep {

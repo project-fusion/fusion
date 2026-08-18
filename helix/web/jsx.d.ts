@@ -2541,7 +2541,20 @@ being four of a kind rather than four of three kinds. */
   "read-only"?: HelixInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   readOnly?: HelixInput["readOnly"];
-  /** What the field accepts, which decides the keyboard and the validation. */
+  /** What the field accepts, which decides the keyboard and the validation.
+
+**Not reflected**, and it was. Reflection exists so a selector can reach a
+value, and no stylesheet in this repository selects on `type`: what it did
+instead was write `type="text"` onto every `<helix-input>` ever rendered,
+an attribute no consumer's markup had. That is precisely the fault `Button`
+had with `href`, `target` and `rel`, written up in the area rules as the
+reason the rule exists, and this was the last property in the library still
+doing it. Audited: ten reflected attributes have no selector anywhere, and
+this is the only one of them with a value that puts itself on the host.
+
+Nothing reads it from the attribute either. The real `<input>` inside takes
+it as a property binding, which is what makes the keyboard and the
+validation follow. */
   type?: HelixInput["type"];
   /** A regular expression the value has to match, as the platform reads it.
 
@@ -2636,7 +2649,20 @@ being four of a kind rather than four of three kinds. */
   "bool:read-only"?: HelixInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   "prop:readOnly"?: HelixInput["readOnly"];
-  /** What the field accepts, which decides the keyboard and the validation. */
+  /** What the field accepts, which decides the keyboard and the validation.
+
+**Not reflected**, and it was. Reflection exists so a selector can reach a
+value, and no stylesheet in this repository selects on `type`: what it did
+instead was write `type="text"` onto every `<helix-input>` ever rendered,
+an attribute no consumer's markup had. That is precisely the fault `Button`
+had with `href`, `target` and `rel`, written up in the area rules as the
+reason the rule exists, and this was the last property in the library still
+doing it. Audited: ten reflected attributes have no selector anywhere, and
+this is the only one of them with a value that puts itself on the host.
+
+Nothing reads it from the attribute either. The real `<input>` inside takes
+it as a property binding, which is what makes the keyboard and the
+validation follow. */
   "prop:type"?: HelixInput["type"];
   /** A regular expression the value has to match, as the platform reads it.
 
@@ -7281,6 +7307,8 @@ export type CustomElements = {
    * - `--checkbox-background-color`: Fill of an unticked box. (default: `undefined`)
    * - `--checkbox-mark-color`: Ink the tick is drawn in. (default: `undefined`)
    * - `--checkbox-card-padding`: Inset of the card appearance. (default: `undefined`)
+   * - `--checkbox-card-background-color`: Fill behind a card-shaped choice. (default: `undefined`)
+   * - `--checkbox-card-border-color`: Edge around one. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -7941,6 +7969,19 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
+   *
+   * **Not reflected**, and it was. Reflection exists so a selector can reach a
+   * value, and no stylesheet in this repository selects on `type`: what it did
+   * instead was write `type="text"` onto every `<helix-input>` ever rendered,
+   * an attribute no consumer's markup had. That is precisely the fault `Button`
+   * had with `href`, `target` and `rel`, written up in the area rules as the
+   * reason the rule exists, and this was the last property in the library still
+   * doing it. Audited: ten reflected attributes have no selector anywhere, and
+   * this is the only one of them with a value that puts itself on the host.
+   *
+   * Nothing reads it from the attribute either. The real `<input>` inside takes
+   * it as a property binding, which is what makes the keyboard and the
+   * validation follow.
    * - `pattern`: A regular expression the value has to match, as the platform reads it.
    *
    * The class documentation promised `pattern` and `minlength` "and the rest"
@@ -9098,6 +9139,8 @@ export type CustomElements = {
    * - `--radio-mark-color`: Color of the dot. (default: `undefined`)
    * - `--radio-background-color`: Fill of an unselected circle. (default: `undefined`)
    * - `--radio-card-padding`: Inset of the card appearance. (default: `undefined`)
+   * - `--radio-card-background-color`: Fill behind a card-shaped choice. (default: `undefined`)
+   * - `--radio-card-border-color`: Edge around one. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -12263,6 +12306,8 @@ export type CustomElementsSolidJs = {
    * - `--checkbox-background-color`: Fill of an unticked box. (default: `undefined`)
    * - `--checkbox-mark-color`: Ink the tick is drawn in. (default: `undefined`)
    * - `--checkbox-card-padding`: Inset of the card appearance. (default: `undefined`)
+   * - `--checkbox-card-background-color`: Fill behind a card-shaped choice. (default: `undefined`)
+   * - `--checkbox-card-border-color`: Edge around one. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -12955,6 +13000,19 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
+   *
+   * **Not reflected**, and it was. Reflection exists so a selector can reach a
+   * value, and no stylesheet in this repository selects on `type`: what it did
+   * instead was write `type="text"` onto every `<helix-input>` ever rendered,
+   * an attribute no consumer's markup had. That is precisely the fault `Button`
+   * had with `href`, `target` and `rel`, written up in the area rules as the
+   * reason the rule exists, and this was the last property in the library still
+   * doing it. Audited: ten reflected attributes have no selector anywhere, and
+   * this is the only one of them with a value that puts itself on the host.
+   *
+   * Nothing reads it from the attribute either. The real `<input>` inside takes
+   * it as a property binding, which is what makes the keyboard and the
+   * validation follow.
    * - `pattern`: A regular expression the value has to match, as the platform reads it.
    *
    * The class documentation promised `pattern` and `minlength` "and the rest"
@@ -14158,6 +14216,8 @@ export type CustomElementsSolidJs = {
    * - `--radio-mark-color`: Color of the dot. (default: `undefined`)
    * - `--radio-background-color`: Fill of an unselected circle. (default: `undefined`)
    * - `--radio-card-padding`: Inset of the card appearance. (default: `undefined`)
+   * - `--radio-card-background-color`: Fill behind a card-shaped choice. (default: `undefined`)
+   * - `--radio-card-border-color`: Edge around one. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16145,6 +16205,10 @@ export type CustomCssProperties = {
   "--checkbox-mark-color"?: string;
   /** Inset of the card appearance. */
   "--checkbox-card-padding"?: string;
+  /** Fill behind a card-shaped choice. */
+  "--checkbox-card-background-color"?: string;
+  /** Edge around one. */
+  "--checkbox-card-border-color"?: string;
   /** Width of the panel. */
   "--dialog-inline-size"?: string;
   /** Padding inside the panel. */
@@ -16235,6 +16299,10 @@ export type CustomCssProperties = {
   "--radio-background-color"?: string;
   /** Inset of the card appearance. */
   "--radio-card-padding"?: string;
+  /** Fill behind a card-shaped choice. */
+  "--radio-card-background-color"?: string;
+  /** Edge around one. */
+  "--radio-card-border-color"?: string;
   /** How tall the panel gets. */
   "--select-surface-max-block-size"?: string;
   /** Diameter of the circle shape. */

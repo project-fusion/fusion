@@ -130,10 +130,18 @@
   display: block;
 }
 
+/* Through hooks, the way `Card` does it.
+ *
+ * These named `--helix-color-surface` and `--helix-color-border` outright, so a
+ * consumer could restyle a `Card`'s surface and could not restyle the identical
+ * surface on a card-shaped choice. Not the duplication the audit called it,
+ * which was worth measuring: the two rules share exactly two declarations, `gap`
+ * and `transition`, and everything that looks copied is four token references
+ * doing what tokens are for. What was actually missing was the API. */
 :host([appearance="card"]) [part="item"] {
   align-items: start;
-  background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  background-color: var(--radio-card-background-color, var(--helix-color-surface));
+  border: var(--helix-border-thin) solid var(--radio-card-border-color, var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
   display: flex;
   gap: var(--helix-space-sm);
