@@ -42,7 +42,13 @@ import { styles } from './pagination-root.css.js'
  * @csspart gap - The control standing over pages not shown, which jumps into them.
  * @csspart previous - The control that moves back one page.
  * @csspart next - The control that moves forward one page.
+ * @csspart first - The control that jumps to the first page, under `ends`.
+ * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart status - The reading of where you are, in `compact`.
+ * @csspart count - The reading of which items are on show, under `total`.
+ *
+ * @slot start - Anything to sit before the run. A page-size select goes here.
+ * @slot end - Anything to sit after it.
  *
  * @cssproperty --pagination-current-color - Fill behind the page you are on.
  * @cssproperty --pagination-gap - Space between one control and the next.

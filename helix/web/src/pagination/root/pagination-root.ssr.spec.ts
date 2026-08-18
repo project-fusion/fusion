@@ -49,9 +49,26 @@ describe('pagination server output', () => {
     expect(partTag(ssr(first), 'previous')).toContain('aria-disabled="true"')
   })
 
+  test('the count is computed on the server, from numbers the server has', () => {
+    // Arithmetic over two properties, so there is nothing here to wait for.
+    const counted = html`<helix-pagination
+      default-page="4"
+      page-size="25"
+      total="248"
+    ></helix-pagination>`
+    expect(withoutStyles(ssr(counted))).toContain('76-100 of 248')
+  })
+
+  test('the jump to either end ships with the rest, under `ends`', () => {
+    const ends = html`<helix-pagination default-page="4" ends pages="12"></helix-pagination>`
+    expect(hasPart(ssr(ends), 'first')).toBe(true)
+    expect(hasPart(ssr(ends), 'last')).toBe(true)
+    expect(hasPart(ssr(buttons), 'first')).toBe(false)
+  })
+
   test('compact ships its reading rather than a run to be replaced', () => {
     const compact = html`<helix-pagination compact default-page="7" pages="24"></helix-pagination>`
     expect(hasPart(ssr(compact), 'list')).toBe(false)
-    expect(withoutStyles(ssr(compact))).toContain('Page 7 of 24')
+    expect(withoutStyles(ssr(compact))).toContain('7 of 24')
   })
 })

@@ -31,7 +31,9 @@
    two characters and a rectangle sized to the widest of them would leave the
    short ones swimming. `min-inline-size` rather than a fixed one, so page 100
    grows instead of overflowing. */
+[part="first"],
 [part="gap"],
+[part="last"],
 [part="page"],
 [part="previous"],
 [part="next"] {
@@ -56,7 +58,9 @@
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+[part="first"]:hover,
 [part="gap"]:hover,
+[part="last"]:hover,
 [part="page"]:hover,
 [part="previous"]:hover,
 [part="next"]:hover {
@@ -64,7 +68,9 @@
   color: var(--helix-color-foreground);
 }
 
+[part="first"]:focus-visible,
 [part="gap"]:focus-visible,
+[part="last"]:focus-visible,
 [part="page"]:focus-visible,
 [part="previous"]:focus-visible,
 [part="next"]:focus-visible {
@@ -112,8 +118,12 @@
 /* Both shapes of spent step, and they need both selectors: the button form
    carries `disabled` and the link form is an `<a>` with no `href`, which is not
    a link at all and so cannot be disabled. */
+[part="first"]:disabled,
+[part="last"]:disabled,
 [part="previous"]:disabled,
 [part="next"]:disabled,
+[part="first"][aria-disabled="true"],
+[part="last"][aria-disabled="true"],
 [part="previous"][aria-disabled="true"],
 [part="next"][aria-disabled="true"] {
   color: var(--helix-color-foreground-subtle);
@@ -122,6 +132,8 @@
   pointer-events: none;
 }
 
+[part="first"] svg,
+[part="last"] svg,
 [part="previous"] svg,
 [part="next"] svg {
   block-size: var(--helix-size-icon-sm);
@@ -148,8 +160,37 @@
   padding-inline: var(--helix-space-xs);
 }
 
+/* The count reads as prose beside the controls rather than as one of them: no
+   box, no hover, and the subtler of the two muted steps, because it is a fact
+   about the result and not a way to move through it.
+
+   `margin-inline-end: auto` is what puts it at the far end of the row from the
+   controls wherever the row is wider than its contents, which is the
+   arrangement every table footer in the world uses. It costs nothing in a row
+   sized to its contents. */
+/* The slots take a real gap, where the row's own is sized for controls sitting
+   shoulder to shoulder. Four pixels between two arrows is right and four
+   between a select and a reading is not. On the slotted element rather than the
+   `<slot>`, which generates no box of its own. */
+::slotted([slot="start"]) {
+  margin-inline-end: var(--helix-space-sm);
+}
+
+::slotted([slot="end"]) {
+  margin-inline-start: var(--helix-space-sm);
+}
+
+[part="count"] {
+  color: var(--helix-color-foreground-subtle);
+  font-variant-numeric: tabular-nums;
+  margin-inline-end: auto;
+  padding-inline-end: var(--helix-space-sm);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  [part="first"],
   [part="gap"],
+  [part="last"],
   [part="page"],
   [part="previous"],
   [part="next"] {

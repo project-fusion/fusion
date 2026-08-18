@@ -2988,8 +2988,38 @@ export type HelixBasePaginationProps = {
 
 Clamped to at least one wherever it is read, so a result that has not
 loaded yet renders a single page rather than an empty control that then
-appears and pushes the layout down. */
+appears and pushes the layout down.
+
+Left unset where `total` and `page-size` are both given, since the two of
+them already say it. A fallback rather than an override: writing this wins,
+so there is never a question of which of two sources is current. */
   pages?: HelixBasePagination["pages"];
+  /** How many items there are across every page.
+
+What the count reads from, and what `pages` falls back to with `page-size`.
+Unset renders no count, which is the common case where a consumer knows the
+page total and not the item total. */
+  total?: HelixBasePagination["total"];
+  /** How many items are on a page.
+
+Only arithmetic: this does not slice anything, because the component never
+sees the items. It is what turns a page number into "31-40" for the count,
+and what turns `total` into a page count. */
+  "page-size"?: HelixBasePagination["pageSize"];
+  /** How many items are on a page.
+
+Only arithmetic: this does not slice anything, because the component never
+sees the items. It is what turns a page number into "31-40" for the count,
+and what turns `total` into a page count. */
+  pageSize?: HelixBasePagination["pageSize"];
+  /** Whether to offer a jump to the first and last pages.
+
+Off by default. The gaps already reach any page in a few presses and the
+last page is one of the two the run always shows, so on a short set these
+are two more controls for a move already on screen. They earn their place
+where the reader is deep in a long result and "back to the start" is the
+move they actually want. */
+  ends?: HelixBasePagination["ends"];
   /** The page on show, one-based.
 
 An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -3035,9 +3065,19 @@ different address from `?page=1234`. */
   "page-label"?: HelixBasePagination["pageLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   pageLabel?: HelixBasePagination["pageLabel"];
-  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+
+The word went: it read "Page 7 of 24" and the landmark it sits in is
+already named "Pagination", so the noun was said twice to a screen reader
+and took a third of the width from a control whose whole reason for
+existing is that the row is narrow. The numbers are the reading. */
   "status-label"?: HelixBasePagination["statusLabel"];
-  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+
+The word went: it read "Page 7 of 24" and the landmark it sits in is
+already named "Pagination", so the noun was said twice to a screen reader
+and took a third of the width from a control whose whole reason for
+existing is that the row is narrow. The numbers are the reading. */
   statusLabel?: HelixBasePagination["statusLabel"];
   /** Accessible name for the control that moves back. */
   "previous-label"?: HelixBasePagination["previousLabel"];
@@ -3047,6 +3087,28 @@ different address from `?page=1234`. */
   "next-label"?: HelixBasePagination["nextLabel"];
   /** Accessible name for the control that moves forward. */
   nextLabel?: HelixBasePagination["nextLabel"];
+  /** Accessible name for the control that jumps to the first page. */
+  "first-label"?: HelixBasePagination["firstLabel"];
+  /** Accessible name for the control that jumps to the first page. */
+  firstLabel?: HelixBasePagination["firstLabel"];
+  /** Accessible name for the control that jumps to the last page. */
+  "last-label"?: HelixBasePagination["lastLabel"];
+  /** Accessible name for the control that jumps to the last page. */
+  lastLabel?: HelixBasePagination["lastLabel"];
+  /** The count, with `{from}`, `{to}` and `{total}` filled in.
+
+A separate template from `statusLabel` because they answer different
+questions: one says which page of how many, the other says which items of
+how many. A reader looking for "am I near the end" wants the first and one
+looking for "how much is there" wants the second. */
+  "count-label"?: HelixBasePagination["countLabel"];
+  /** The count, with `{from}`, `{to}` and `{total}` filled in.
+
+A separate template from `statusLabel` because they answer different
+questions: one says which page of how many, the other says which items of
+how many. A reader looking for "am I near the end" wants the first and one
+looking for "how much is there" wants the second. */
+  countLabel?: HelixBasePagination["countLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
   "gap-label"?: HelixBasePagination["gapLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
@@ -3063,8 +3125,38 @@ export type HelixBasePaginationSolidJsProps = {
 
 Clamped to at least one wherever it is read, so a result that has not
 loaded yet renders a single page rather than an empty control that then
-appears and pushes the layout down. */
+appears and pushes the layout down.
+
+Left unset where `total` and `page-size` are both given, since the two of
+them already say it. A fallback rather than an override: writing this wins,
+so there is never a question of which of two sources is current. */
   "prop:pages"?: HelixBasePagination["pages"];
+  /** How many items there are across every page.
+
+What the count reads from, and what `pages` falls back to with `page-size`.
+Unset renders no count, which is the common case where a consumer knows the
+page total and not the item total. */
+  "prop:total"?: HelixBasePagination["total"];
+  /** How many items are on a page.
+
+Only arithmetic: this does not slice anything, because the component never
+sees the items. It is what turns a page number into "31-40" for the count,
+and what turns `total` into a page count. */
+  "attr:page-size"?: HelixBasePagination["pageSize"];
+  /** How many items are on a page.
+
+Only arithmetic: this does not slice anything, because the component never
+sees the items. It is what turns a page number into "31-40" for the count,
+and what turns `total` into a page count. */
+  "prop:pageSize"?: HelixBasePagination["pageSize"];
+  /** Whether to offer a jump to the first and last pages.
+
+Off by default. The gaps already reach any page in a few presses and the
+last page is one of the two the run always shows, so on a short set these
+are two more controls for a move already on screen. They earn their place
+where the reader is deep in a long result and "back to the start" is the
+move they actually want. */
+  "prop:ends"?: HelixBasePagination["ends"];
   /** The page on show, one-based.
 
 An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -3110,9 +3202,19 @@ different address from `?page=1234`. */
   "attr:page-label"?: HelixBasePagination["pageLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   "prop:pageLabel"?: HelixBasePagination["pageLabel"];
-  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+
+The word went: it read "Page 7 of 24" and the landmark it sits in is
+already named "Pagination", so the noun was said twice to a screen reader
+and took a third of the width from a control whose whole reason for
+existing is that the row is narrow. The numbers are the reading. */
   "attr:status-label"?: HelixBasePagination["statusLabel"];
-  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+
+The word went: it read "Page 7 of 24" and the landmark it sits in is
+already named "Pagination", so the noun was said twice to a screen reader
+and took a third of the width from a control whose whole reason for
+existing is that the row is narrow. The numbers are the reading. */
   "prop:statusLabel"?: HelixBasePagination["statusLabel"];
   /** Accessible name for the control that moves back. */
   "attr:previous-label"?: HelixBasePagination["previousLabel"];
@@ -3122,6 +3224,28 @@ different address from `?page=1234`. */
   "attr:next-label"?: HelixBasePagination["nextLabel"];
   /** Accessible name for the control that moves forward. */
   "prop:nextLabel"?: HelixBasePagination["nextLabel"];
+  /** Accessible name for the control that jumps to the first page. */
+  "attr:first-label"?: HelixBasePagination["firstLabel"];
+  /** Accessible name for the control that jumps to the first page. */
+  "prop:firstLabel"?: HelixBasePagination["firstLabel"];
+  /** Accessible name for the control that jumps to the last page. */
+  "attr:last-label"?: HelixBasePagination["lastLabel"];
+  /** Accessible name for the control that jumps to the last page. */
+  "prop:lastLabel"?: HelixBasePagination["lastLabel"];
+  /** The count, with `{from}`, `{to}` and `{total}` filled in.
+
+A separate template from `statusLabel` because they answer different
+questions: one says which page of how many, the other says which items of
+how many. A reader looking for "am I near the end" wants the first and one
+looking for "how much is there" wants the second. */
+  "attr:count-label"?: HelixBasePagination["countLabel"];
+  /** The count, with `{from}`, `{to}` and `{total}` filled in.
+
+A separate template from `statusLabel` because they answer different
+questions: one says which page of how many, the other says which items of
+how many. A reader looking for "am I near the end" wants the first and one
+looking for "how much is there" wants the second. */
+  "prop:countLabel"?: HelixBasePagination["countLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
   "attr:gap-label"?: HelixBasePagination["gapLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
@@ -8338,6 +8462,15 @@ export type CustomElements = {
    * result that has not changed. A consumer driving the view has to be able to
    * hear that without being told an answer changed.
    *
+   * **A page-size select is not in here, and a count is.** The count is
+   * arithmetic over numbers the component can be given, `{from}-{to} of {total}`,
+   * which a consumer would otherwise write out beside every pagination they
+   * render. A select is a second control with a second piece of state, whose
+   * options are the consumer's and whose change means "go and re-query": owning
+   * one would make `Pagination` depend on `Select` and hold state that is not
+   * about paging. The `start` and `end` slots are how it composes into the same
+   * row instead.
+   *
    * `page` is the controlled property and `default-page` seeds one the element
    * owns. Naming `page` is a claim of ownership: the element announces and waits
    * to be told, which is what a consumer paging through a router already wants.
@@ -8351,6 +8484,27 @@ export type CustomElements = {
    * Clamped to at least one wherever it is read, so a result that has not
    * loaded yet renders a single page rather than an empty control that then
    * appears and pushes the layout down.
+   *
+   * Left unset where `total` and `page-size` are both given, since the two of
+   * them already say it. A fallback rather than an override: writing this wins,
+   * so there is never a question of which of two sources is current.
+   * - `total`: How many items there are across every page.
+   *
+   * What the count reads from, and what `pages` falls back to with `page-size`.
+   * Unset renders no count, which is the common case where a consumer knows the
+   * page total and not the item total.
+   * - `page-size`/`pageSize`: How many items are on a page.
+   *
+   * Only arithmetic: this does not slice anything, because the component never
+   * sees the items. It is what turns a page number into "31-40" for the count,
+   * and what turns `total` into a page count.
+   * - `ends`: Whether to offer a jump to the first and last pages.
+   *
+   * Off by default. The gaps already reach any page in a few presses and the
+   * last page is one of the two the run always shows, so on a short set these
+   * are two more controls for a move already on screen. They earn their place
+   * where the reader is deep in a long result and "back to the start" is the
+   * move they actually want.
    * - `page`: The page on show, one-based.
    *
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -8384,8 +8538,21 @@ export type CustomElements = {
    * different address from `?page=1234`.
    * - `page-label`/`pageLabel`: Accessible name for one page, with `{page}` and `{pages}` filled in.
    * - `status-label`/`statusLabel`: The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+   *
+   * The word went: it read "Page 7 of 24" and the landmark it sits in is
+   * already named "Pagination", so the noun was said twice to a screen reader
+   * and took a third of the width from a control whose whole reason for
+   * existing is that the row is narrow. The numbers are the reading.
    * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
    * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
+   * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
+   * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
+   * - `count-label`/`countLabel`: The count, with `{from}`, `{to}` and `{total}` filled in.
+   *
+   * A separate template from `statusLabel` because they answer different
+   * questions: one says which page of how many, the other says which items of
+   * how many. A reader looking for "am I near the end" wants the first and one
+   * looking for "how much is there" wants the second.
    * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
    *
    * ## Events
@@ -8393,6 +8560,13 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Anything to sit before the run. A page-size select goes here.
+   * - `end`: Anything to sit after it.
    *
    * ## CSS Parts
    *
@@ -8404,7 +8578,10 @@ export type CustomElements = {
    * - `gap`: The control standing over pages not shown, which jumps into them.
    * - `previous`: The control that moves back one page.
    * - `next`: The control that moves forward one page.
+   * - `first`: The control that jumps to the first page, under `ends`.
+   * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
+   * - `count`: The reading of which items are on show, under `total`.
    */
   "helix-base-pagination": Partial<
     HelixBasePaginationProps & BaseProps<HelixBasePagination> & BaseEvents
@@ -13470,6 +13647,15 @@ export type CustomElementsSolidJs = {
    * result that has not changed. A consumer driving the view has to be able to
    * hear that without being told an answer changed.
    *
+   * **A page-size select is not in here, and a count is.** The count is
+   * arithmetic over numbers the component can be given, `{from}-{to} of {total}`,
+   * which a consumer would otherwise write out beside every pagination they
+   * render. A select is a second control with a second piece of state, whose
+   * options are the consumer's and whose change means "go and re-query": owning
+   * one would make `Pagination` depend on `Select` and hold state that is not
+   * about paging. The `start` and `end` slots are how it composes into the same
+   * row instead.
+   *
    * `page` is the controlled property and `default-page` seeds one the element
    * owns. Naming `page` is a claim of ownership: the element announces and waits
    * to be told, which is what a consumer paging through a router already wants.
@@ -13483,6 +13669,27 @@ export type CustomElementsSolidJs = {
    * Clamped to at least one wherever it is read, so a result that has not
    * loaded yet renders a single page rather than an empty control that then
    * appears and pushes the layout down.
+   *
+   * Left unset where `total` and `page-size` are both given, since the two of
+   * them already say it. A fallback rather than an override: writing this wins,
+   * so there is never a question of which of two sources is current.
+   * - `total`: How many items there are across every page.
+   *
+   * What the count reads from, and what `pages` falls back to with `page-size`.
+   * Unset renders no count, which is the common case where a consumer knows the
+   * page total and not the item total.
+   * - `page-size`/`pageSize`: How many items are on a page.
+   *
+   * Only arithmetic: this does not slice anything, because the component never
+   * sees the items. It is what turns a page number into "31-40" for the count,
+   * and what turns `total` into a page count.
+   * - `ends`: Whether to offer a jump to the first and last pages.
+   *
+   * Off by default. The gaps already reach any page in a few presses and the
+   * last page is one of the two the run always shows, so on a short set these
+   * are two more controls for a move already on screen. They earn their place
+   * where the reader is deep in a long result and "back to the start" is the
+   * move they actually want.
    * - `page`: The page on show, one-based.
    *
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -13516,8 +13723,21 @@ export type CustomElementsSolidJs = {
    * different address from `?page=1234`.
    * - `page-label`/`pageLabel`: Accessible name for one page, with `{page}` and `{pages}` filled in.
    * - `status-label`/`statusLabel`: The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+   *
+   * The word went: it read "Page 7 of 24" and the landmark it sits in is
+   * already named "Pagination", so the noun was said twice to a screen reader
+   * and took a third of the width from a control whose whole reason for
+   * existing is that the row is narrow. The numbers are the reading.
    * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
    * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
+   * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
+   * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
+   * - `count-label`/`countLabel`: The count, with `{from}`, `{to}` and `{total}` filled in.
+   *
+   * A separate template from `statusLabel` because they answer different
+   * questions: one says which page of how many, the other says which items of
+   * how many. A reader looking for "am I near the end" wants the first and one
+   * looking for "how much is there" wants the second.
    * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
    *
    * ## Events
@@ -13525,6 +13745,13 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Anything to sit before the run. A page-size select goes here.
+   * - `end`: Anything to sit after it.
    *
    * ## CSS Parts
    *
@@ -13536,7 +13763,10 @@ export type CustomElementsSolidJs = {
    * - `gap`: The control standing over pages not shown, which jumps into them.
    * - `previous`: The control that moves back one page.
    * - `next`: The control that moves forward one page.
+   * - `first`: The control that jumps to the first page, under `ends`.
+   * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
+   * - `count`: The reading of which items are on show, under `total`.
    */
   "helix-base-pagination": Partial<
     HelixBasePaginationProps &

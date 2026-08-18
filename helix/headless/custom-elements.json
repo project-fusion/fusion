@@ -13881,7 +13881,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**And a gap is a control.** It goes to the middle of the run it stands over,\nwhich is the binary-search step: any page in a set of any size is a handful of\npresses, where a jump of a fixed size would need forty of them on a set of a\nhundred and twenty-eight. A menu listing the hidden pages was the other idea\nand the arithmetic refuses it, for the reasons on `renderGap`.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
+          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**And a gap is a control.** It goes to the middle of the run it stands over,\nwhich is the binary-search step: any page in a set of any size is a handful of\npresses, where a jump of a fixed size would need forty of them on a set of a\nhundred and twenty-eight. A menu listing the hidden pages was the other idea\nand the arithmetic refuses it, for the reasons on `renderGap`.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n**A page-size select is not in here, and a count is.** The count is\narithmetic over numbers the component can be given, `{from}-{to} of {total}`,\nwhich a consumer would otherwise write out beside every pagination they\nrender. A select is a second control with a second piece of state, whose\noptions are the consumer's and whose change means \"go and re-query\": owning\none would make `Pagination` depend on `Select` and hold state that is not\nabout paging. The `start` and `end` slots are how it composes into the same\nrow instead.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
           "name": "HelixBasePagination",
           "cssParts": [
             {
@@ -13909,8 +13909,30 @@
               "name": "next"
             },
             {
+              "description": "The control that jumps to the first page, under `ends`.",
+              "name": "first"
+            },
+            {
+              "description": "The control that jumps to the last page, under `ends`.",
+              "name": "last"
+            },
+            {
               "description": "The reading of where you are, in `compact`.",
               "name": "status"
+            },
+            {
+              "description": "The reading of which items are on show, under `total`.",
+              "name": "count"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Anything to sit before the run. A page-size select goes here.",
+              "name": "start"
+            },
+            {
+              "description": "Anything to sit after it.",
+              "name": "end"
             }
           ],
           "members": [
@@ -13920,9 +13942,40 @@
               "type": {
                 "text": "number"
               },
-              "default": "1",
-              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.",
+              "default": "0",
+              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.\n\nLeft unset where `total` and `page-size` are both given, since the two of\nthem already say it. A fallback rather than an override: writing this wins,\nso there is never a question of which of two sources is current.",
               "attribute": "pages"
+            },
+            {
+              "kind": "field",
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items there are across every page.\n\nWhat the count reads from, and what `pages` falls back to with `page-size`.\nUnset renders no count, which is the common case where a consumer knows the\npage total and not the item total.",
+              "attribute": "total"
+            },
+            {
+              "kind": "field",
+              "name": "pageSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items are on a page.\n\nOnly arithmetic: this does not slice anything, because the component never\nsees the items. It is what turns a page number into \"31-40\" for the count,\nand what turns `total` into a page count.",
+              "attribute": "page-size"
+            },
+            {
+              "kind": "field",
+              "name": "ends",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.",
+              "attribute": "ends",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -14020,8 +14073,8 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Page {page} of {pages}'",
-              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.",
+              "default": "'{page} of {pages}'",
+              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.\n\nThe word went: it read \"Page 7 of 24\" and the landmark it sits in is\nalready named \"Pagination\", so the noun was said twice to a screen reader\nand took a third of the width from a control whose whole reason for\nexisting is that the row is narrow. The numbers are the reading.",
               "attribute": "status-label"
             },
             {
@@ -14043,6 +14096,36 @@
               "default": "'Next page'",
               "description": "Accessible name for the control that moves forward.",
               "attribute": "next-label"
+            },
+            {
+              "kind": "field",
+              "name": "firstLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'First page'",
+              "description": "Accessible name for the control that jumps to the first page.",
+              "attribute": "first-label"
+            },
+            {
+              "kind": "field",
+              "name": "lastLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Last page'",
+              "description": "Accessible name for the control that jumps to the last page.",
+              "attribute": "last-label"
+            },
+            {
+              "kind": "field",
+              "name": "countLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'{from}-{to} of {total}'",
+              "description": "The count, with `{from}`, `{to}` and `{total}` filled in.\n\nA separate template from `statusLabel` because they answer different\nquestions: one says which page of how many, the other says which items of\nhow many. A reader looking for \"am I near the end\" wants the first and one\nlooking for \"how much is there\" wants the second.",
+              "attribute": "count-label"
             },
             {
               "kind": "field",
@@ -14103,12 +14186,22 @@
             },
             {
               "kind": "field",
-              "name": "total",
+              "name": "count",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
-              "description": "The total, clamped once, so every reader agrees on it.",
+              "description": "How many pages, clamped once, so every reader agrees on it.\n\n`pages` first, because writing it is the explicit answer. Then `total` over\n`pageSize`, which is the same fact stated the other way round and is what a\nconsumer holding a result set already has. Then one, so a result that has\nnot loaded renders a single page rather than an empty control that appears\nlater and pushes the layout down.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "span",
+              "type": {
+                "text": "{ from: number; to: number }"
+              },
+              "privacy": "private",
+              "description": "The items this page covers, one-based and inclusive, for the count.",
               "readonly": true
             },
             {
@@ -14197,22 +14290,92 @@
             },
             {
               "kind": "method",
-              "name": "renderStep",
+              "name": "step",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "StepParts"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "to",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "spent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "icon",
+                  "type": {
+                    "text": "HelixIcon"
+                  }
+                },
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Everything a step needs, computed once, so the markup below is only markup.\n\nSplit out because the part name has to be a literal. `check:parts` reads\n`part=\"name\"` out of the source, so a computed one is a part the tooling\ncannot see: nothing pairs it with its `@csspart` and a later rename takes\nthe promise silently. With four controls and two shapes each that is eight\nliterals, and eight copies of the arithmetic behind them would be the\nactual duplication. This is the arithmetic, written once."
+            },
+            {
+              "kind": "method",
+              "name": "renderFirst",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "TemplateResult"
                 }
               },
-              "parameters": [
-                {
-                  "name": "back",
-                  "type": {
-                    "text": "boolean"
-                  }
+              "description": "The four controls, inert at the end each points at.\n\nInert rather than absent: a control that disappears at the first page takes\nthe row's width with it and moves everything else under the pointer. In\nlink mode the inert one is an `<a>` with no `href`, which is not a link and\nis not focusable, and is the platform's own way of saying there is nowhere\nto go."
+            },
+            {
+              "kind": "method",
+              "name": "renderPrevious",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
                 }
-              ],
-              "description": "Previous or next, inert at the end it points at.\n\nInert rather than absent: a control that disappears at the first page takes\nthe row's width with it and moves everything else under the pointer. In\nlink mode the inert one is an `<a>` with no `href`, which is not a link and\nis not focusable, and is the platform's own way of saying there is nowhere\nto go."
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderNext",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLast",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderCount",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "Which items are on show, where the component has been told enough to say.\n\nNeeds `total`, and `pageSize` to place the window inside it. Absent\notherwise rather than guessed at, because a wrong count is worse than none:\nit is the one number here a reader cannot check against anything else on\nscreen."
             },
             {
               "kind": "field",
@@ -14300,9 +14463,36 @@
               "type": {
                 "text": "number"
               },
-              "default": "1",
-              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.",
+              "default": "0",
+              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.\n\nLeft unset where `total` and `page-size` are both given, since the two of\nthem already say it. A fallback rather than an override: writing this wins,\nso there is never a question of which of two sources is current.",
               "fieldName": "pages"
+            },
+            {
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items there are across every page.\n\nWhat the count reads from, and what `pages` falls back to with `page-size`.\nUnset renders no count, which is the common case where a consumer knows the\npage total and not the item total.",
+              "fieldName": "total"
+            },
+            {
+              "name": "page-size",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items are on a page.\n\nOnly arithmetic: this does not slice anything, because the component never\nsees the items. It is what turns a page number into \"31-40\" for the count,\nand what turns `total` into a page count.",
+              "fieldName": "pageSize"
+            },
+            {
+              "name": "ends",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.",
+              "fieldName": "ends"
             },
             {
               "name": "page",
@@ -14389,8 +14579,8 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Page {page} of {pages}'",
-              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.",
+              "default": "'{page} of {pages}'",
+              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.\n\nThe word went: it read \"Page 7 of 24\" and the landmark it sits in is\nalready named \"Pagination\", so the noun was said twice to a screen reader\nand took a third of the width from a control whose whole reason for\nexisting is that the row is narrow. The numbers are the reading.",
               "fieldName": "statusLabel"
             },
             {
@@ -14410,6 +14600,33 @@
               "default": "'Next page'",
               "description": "Accessible name for the control that moves forward.",
               "fieldName": "nextLabel"
+            },
+            {
+              "name": "first-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'First page'",
+              "description": "Accessible name for the control that jumps to the first page.",
+              "fieldName": "firstLabel"
+            },
+            {
+              "name": "last-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Last page'",
+              "description": "Accessible name for the control that jumps to the last page.",
+              "fieldName": "lastLabel"
+            },
+            {
+              "name": "count-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'{from}-{to} of {total}'",
+              "description": "The count, with `{from}`, `{to}` and `{total}` filled in.\n\nA separate template from `statusLabel` because they answer different\nquestions: one says which page of how many, the other says which items of\nhow many. A reader looking for \"am I near the end\" wants the first and one\nlooking for \"how much is there\" wants the second.",
+              "fieldName": "countLabel"
             },
             {
               "name": "gap-label",

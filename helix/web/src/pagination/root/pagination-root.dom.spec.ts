@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, role, slotted } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -231,7 +231,7 @@ describe('pagination compact', () => {
     const nav = await mount(
       '<helix-pagination compact default-page="7" pages="24"></helix-pagination>',
     )
-    expect(part(nav, 'status')?.textContent?.trim()).toBe('Page 7 of 24')
+    expect(part(nav, 'status')?.textContent?.trim()).toBe('7 of 24')
     expect(part(nav, 'list')).toBeNull()
   })
 
@@ -248,7 +248,7 @@ describe('pagination compact', () => {
     )
     part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true }))
     await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
-    expect(part(nav, 'status')?.textContent?.trim()).toBe('Page 4 of 9')
+    expect(part(nav, 'status')?.textContent?.trim()).toBe('4 of 9')
   })
 })
 
@@ -281,7 +281,7 @@ describe('pagination in another language', () => {
     const nav = await mount(
       '<helix-pagination compact default-page="1234" locale="de-DE" pages="5678"></helix-pagination>',
     )
-    expect(part(nav, 'status')?.textContent?.trim()).toBe('Page 1.234 of 5.678')
+    expect(part(nav, 'status')?.textContent?.trim()).toBe('1.234 of 5.678')
   })
 
   test('the visible page number is formatted, and the address is not', async () => {
@@ -293,5 +293,110 @@ describe('pagination in another language', () => {
     const current = nav.shadowRoot?.querySelector('[aria-current="page"]')
     expect(current?.textContent?.trim()).toBe('1,234')
     expect(current?.getAttribute('href')).toBe('/r?p=1234')
+  })
+})
+
+describe('pagination ends', () => {
+  test('no jump to either end unless it is asked for', async () => {
+    // The gaps already reach any page in a few presses and the last page is one
+    // of the two the run always shows, so on a short set these are two more
+    // controls for a move already on screen.
+    const nav = await mount('<helix-pagination default-page="4" pages="12"></helix-pagination>')
+    expect(part(nav, 'first')).toBeNull()
+    expect(part(nav, 'last')).toBeNull()
+  })
+
+  test('`ends` adds both, outside the two that step', async () => {
+    const nav = await mount(
+      '<helix-pagination default-page="4" ends pages="12"></helix-pagination>',
+    )
+    const order = [...(nav.shadowRoot?.querySelectorAll('[part]') ?? [])]
+      .map((one) => one.getAttribute('part'))
+      .filter((one) => one === 'first' || one === 'previous' || one === 'next' || one === 'last')
+    expect(order).toEqual(['first', 'previous', 'next', 'last'])
+  })
+
+  test('the jump goes to the end, not one step toward it', async () => {
+    const nav = await mount(
+      '<helix-pagination default-page="4" ends pages="12"></helix-pagination>',
+    )
+    part(nav, 'last')?.dispatchEvent(new Event('click', { bubbles: true }))
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect((nav as HTMLElement & { page: number }).page).toBe(12)
+  })
+
+  test('both ends are spent at the end they point at', async () => {
+    const first = await mount(
+      '<helix-pagination default-page="1" ends pages="6"></helix-pagination>',
+    )
+    expect((part(first, 'first') as HTMLButtonElement).disabled).toBe(true)
+    expect((part(first, 'last') as HTMLButtonElement).disabled).toBe(false)
+
+    const last = await mount(
+      '<helix-pagination default-page="6" ends pages="6"></helix-pagination>',
+    )
+    expect((part(last, 'first') as HTMLButtonElement).disabled).toBe(false)
+    expect((part(last, 'last') as HTMLButtonElement).disabled).toBe(true)
+  })
+})
+
+describe('pagination count', () => {
+  test('no count unless it has been told enough to say one', async () => {
+    // A wrong count is worse than none: it is the one number here a reader
+    // cannot check against anything else on screen.
+    const nav = await mount('<helix-pagination default-page="2" pages="12"></helix-pagination>')
+    expect(part(nav, 'count')).toBeNull()
+  })
+
+  test('reads which items are on show', async () => {
+    const nav = await mount(
+      '<helix-pagination default-page="4" page-size="25" total="248"></helix-pagination>',
+    )
+    expect(part(nav, 'count')?.textContent?.trim()).toBe('76-100 of 248')
+  })
+
+  test('the last page is clamped to the total, because it is rarely full', async () => {
+    const nav = await mount(
+      '<helix-pagination default-page="10" page-size="25" total="248"></helix-pagination>',
+    )
+    expect(part(nav, 'count')?.textContent?.trim()).toBe('226-248 of 248')
+  })
+
+  test('the page count falls back to the two, so `pages` need not be given', async () => {
+    const nav = await mount(
+      '<helix-pagination default-page="1" page-size="25" total="248"></helix-pagination>',
+    )
+    const shown = [...(nav.shadowRoot?.querySelectorAll('[part="page"]') ?? [])]
+    expect(shown.at(-1)?.textContent?.trim()).toBe('10')
+  })
+
+  test('and `pages` wins where both are given, so there is one current answer', async () => {
+    const nav = await mount(
+      '<helix-pagination default-page="1" page-size="25" pages="4" total="248"></helix-pagination>',
+    )
+    const shown = [...(nav.shadowRoot?.querySelectorAll('[part="page"]') ?? [])]
+    expect(shown.at(-1)?.textContent?.trim()).toBe('4')
+  })
+
+  test('the count is a template too', async () => {
+    const nav = await mount(
+      '<helix-pagination count-label="Zeige {from} bis {to} von {total}" default-page="2" locale="de-DE" page-size="10" total="1500"></helix-pagination>',
+    )
+    expect(part(nav, 'count')?.textContent?.trim()).toBe('Zeige 11 bis 20 von 1.500')
+  })
+})
+
+describe('pagination slots', () => {
+  test('a page-size select composes into the row rather than being owned', async () => {
+    // A select is a second control with a second piece of state, whose options
+    // are the consumer's and whose change means "go and re-query".
+    const nav = await mount(
+      `<helix-pagination default-page="1" page-size="10" total="90">
+        <span slot="start">size</span>
+      </helix-pagination>`,
+    )
+    const slots = [...(nav.shadowRoot?.querySelectorAll('slot') ?? [])].map((one) => one.name)
+    expect(slots).toEqual(['start', 'end'])
+    expect(slotted(nav, 'start').map((one) => one.textContent)).toEqual(['size'])
   })
 })

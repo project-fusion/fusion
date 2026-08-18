@@ -12,6 +12,8 @@ arrows-out-line-vertical
 bell
 book-open-text
 briefcase
+caret-double-left
+caret-double-right
 caret-down
 caret-left
 caret-right

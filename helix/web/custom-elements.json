@@ -18262,8 +18262,50 @@
               }
             },
             {
+              "description": "The control that jumps to the first page, under `ends`.",
+              "name": "first",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "description": "The control that jumps to the last page, under `ends`.",
+              "name": "last",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
               "description": "The reading of where you are, in `compact`.",
               "name": "status",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "description": "The reading of which items are on show, under `total`.",
+              "name": "count",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "Anything to sit before the run. A page-size select goes here.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "description": "Anything to sit after it.",
+              "name": "end",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18277,9 +18319,52 @@
               "type": {
                 "text": "number"
               },
-              "default": "1",
-              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.",
+              "default": "0",
+              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.\n\nLeft unset where `total` and `page-size` are both given, since the two of\nthem already say it. A fallback rather than an override: writing this wins,\nso there is never a question of which of two sources is current.",
               "attribute": "pages",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items there are across every page.\n\nWhat the count reads from, and what `pages` falls back to with `page-size`.\nUnset renders no count, which is the common case where a consumer knows the\npage total and not the item total.",
+              "attribute": "total",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pageSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items are on a page.\n\nOnly arithmetic: this does not slice anything, because the component never\nsees the items. It is what turns a page number into \"31-40\" for the count,\nand what turns `total` into a page count.",
+              "attribute": "page-size",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ends",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.",
+              "attribute": "ends",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18417,8 +18502,8 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Page {page} of {pages}'",
-              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.",
+              "default": "'{page} of {pages}'",
+              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.\n\nThe word went: it read \"Page 7 of 24\" and the landmark it sits in is\nalready named \"Pagination\", so the noun was said twice to a screen reader\nand took a third of the width from a control whose whole reason for\nexisting is that the row is narrow. The numbers are the reading.",
               "attribute": "status-label",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
@@ -18448,6 +18533,48 @@
               "default": "'Next page'",
               "description": "Accessible name for the control that moves forward.",
               "attribute": "next-label",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "firstLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'First page'",
+              "description": "Accessible name for the control that jumps to the first page.",
+              "attribute": "first-label",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "lastLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Last page'",
+              "description": "Accessible name for the control that jumps to the last page.",
+              "attribute": "last-label",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "countLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'{from}-{to} of {total}'",
+              "description": "The count, with `{from}`, `{to}` and `{total}` filled in.\n\nA separate template from `statusLabel` because they answer different\nquestions: one says which page of how many, the other says which items of\nhow many. A reader looking for \"am I near the end\" wants the first and one\nlooking for \"how much is there\" wants the second.",
+              "attribute": "count-label",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18536,12 +18663,26 @@
             },
             {
               "kind": "field",
-              "name": "total",
+              "name": "count",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
-              "description": "The total, clamped once, so every reader agrees on it.",
+              "description": "How many pages, clamped once, so every reader agrees on it.\n\n`pages` first, because writing it is the explicit answer. Then `total` over\n`pageSize`, which is the same fact stated the other way round and is what a\nconsumer holding a result set already has. Then one, so a result that has\nnot loaded renders a single page rather than an empty control that appears\nlater and pushes the layout down.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "span",
+              "type": {
+                "text": "{ from: number; to: number }"
+              },
+              "privacy": "private",
+              "description": "The items this page covers, one-based and inclusive, for the count.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBasePagination",
@@ -18658,22 +18799,112 @@
             },
             {
               "kind": "method",
-              "name": "renderStep",
+              "name": "step",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "StepParts"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "to",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "spent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "icon",
+                  "type": {
+                    "text": "HelixIcon"
+                  }
+                },
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Everything a step needs, computed once, so the markup below is only markup.\n\nSplit out because the part name has to be a literal. `check:parts` reads\n`part=\"name\"` out of the source, so a computed one is a part the tooling\ncannot see: nothing pairs it with its `@csspart` and a later rename takes\nthe promise silently. With four controls and two shapes each that is eight\nliterals, and eight copies of the arithmetic behind them would be the\nactual duplication. This is the arithmetic, written once.",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderFirst",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "TemplateResult"
                 }
               },
-              "parameters": [
-                {
-                  "name": "back",
-                  "type": {
-                    "text": "boolean"
-                  }
+              "description": "The four controls, inert at the end each points at.\n\nInert rather than absent: a control that disappears at the first page takes\nthe row's width with it and moves everything else under the pointer. In\nlink mode the inert one is an `<a>` with no `href`, which is not a link and\nis not focusable, and is the platform's own way of saying there is nowhere\nto go.",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderPrevious",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
                 }
-              ],
-              "description": "Previous or next, inert at the end it points at.\n\nInert rather than absent: a control that disappears at the first page takes\nthe row's width with it and moves everything else under the pointer. In\nlink mode the inert one is an `<a>` with no `href`, which is not a link and\nis not focusable, and is the platform's own way of saying there is nowhere\nto go.",
+              },
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderNext",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLast",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderCount",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "Which items are on show, where the component has been told enough to say.\n\nNeeds `total`, and `pageSize` to place the window inside it. Absent\notherwise rather than guessed at, because a wrong count is worse than none:\nit is the one number here a reader cannot check against anything else on\nscreen.",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18774,9 +19005,48 @@
               "type": {
                 "text": "number"
               },
-              "default": "1",
-              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.",
+              "default": "0",
+              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.\n\nLeft unset where `total` and `page-size` are both given, since the two of\nthem already say it. A fallback rather than an override: writing this wins,\nso there is never a question of which of two sources is current.",
               "fieldName": "pages",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items there are across every page.\n\nWhat the count reads from, and what `pages` falls back to with `page-size`.\nUnset renders no count, which is the common case where a consumer knows the\npage total and not the item total.",
+              "fieldName": "total",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "name": "page-size",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many items are on a page.\n\nOnly arithmetic: this does not slice anything, because the component never\nsees the items. It is what turns a page number into \"31-40\" for the count,\nand what turns `total` into a page count.",
+              "fieldName": "pageSize",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "name": "ends",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to offer a jump to the first and last pages.\n\nOff by default. The gaps already reach any page in a few presses and the\nlast page is one of the two the run always shows, so on a short set these\nare two more controls for a move already on screen. They earn their place\nwhere the reader is deep in a long result and \"back to the start\" is the\nmove they actually want.",
+              "fieldName": "ends",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18903,8 +19173,8 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Page {page} of {pages}'",
-              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.",
+              "default": "'{page} of {pages}'",
+              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.\n\nThe word went: it read \"Page 7 of 24\" and the landmark it sits in is\nalready named \"Pagination\", so the noun was said twice to a screen reader\nand took a third of the width from a control whose whole reason for\nexisting is that the row is narrow. The numbers are the reading.",
               "fieldName": "statusLabel",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
@@ -18932,6 +19202,45 @@
               "default": "'Next page'",
               "description": "Accessible name for the control that moves forward.",
               "fieldName": "nextLabel",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "name": "first-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'First page'",
+              "description": "Accessible name for the control that jumps to the first page.",
+              "fieldName": "firstLabel",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "name": "last-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Last page'",
+              "description": "Accessible name for the control that jumps to the last page.",
+              "fieldName": "lastLabel",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "name": "count-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'{from}-{to} of {total}'",
+              "description": "The count, with `{from}`, `{to}` and `{total}` filled in.\n\nA separate template from `statusLabel` because they answer different\nquestions: one says which page of how many, the other says which items of\nhow many. A reader looking for \"am I near the end\" wants the first and one\nlooking for \"how much is there\" wants the second.",
+              "fieldName": "countLabel",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"

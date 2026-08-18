@@ -5,10 +5,32 @@ import {
   hostAria,
   requestControlledChange,
 } from '@helix-io/core'
-import { caretLeft, caretRight } from '@helix-io/icons'
+import {
+  caretDoubleLeft,
+  caretDoubleRight,
+  caretLeft,
+  caretRight,
+  type HelixIcon,
+} from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+
+/** What one step control is made of, once the arithmetic is done. */
+interface StepParts {
+  /** Where it points, or nothing where there is nowhere to go. */
+  address: string | typeof nothing
+  /** The handler, which also refuses the navigation on a refused change. */
+  click: (event: Event) => void
+  /** The mark inside it. */
+  glyph: TemplateResult
+  /** Its accessible name. */
+  name: string
+  /** `'true'` where it is spent, for `aria-disabled` on the link form. */
+  off: string | typeof nothing
+  /** Whether it points off the end. */
+  spent: boolean
+}
 
 /** A run of pages nobody can see, and what a gap stands over. */
 interface Hidden {
@@ -82,6 +104,15 @@ const fill = (
  * result that has not changed. A consumer driving the view has to be able to
  * hear that without being told an answer changed.
  *
+ * **A page-size select is not in here, and a count is.** The count is
+ * arithmetic over numbers the component can be given, `{from}-{to} of {total}`,
+ * which a consumer would otherwise write out beside every pagination they
+ * render. A select is a second control with a second piece of state, whose
+ * options are the consumer's and whose change means "go and re-query": owning
+ * one would make `Pagination` depend on `Select` and hold state that is not
+ * about paging. The `start` and `end` slots are how it composes into the same
+ * row instead.
+ *
  * `page` is the controlled property and `default-page` seeds one the element
  * owns. Naming `page` is a claim of ownership: the element announces and waits
  * to be told, which is what a consumer paging through a router already wants.
@@ -97,7 +128,13 @@ const fill = (
  * @csspart gap - The control standing over pages not shown, which jumps into them.
  * @csspart previous - The control that moves back one page.
  * @csspart next - The control that moves forward one page.
+ * @csspart first - The control that jumps to the first page, under `ends`.
+ * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart status - The reading of where you are, in `compact`.
+ * @csspart count - The reading of which items are on show, under `total`.
+ *
+ * @slot start - Anything to sit before the run. A page-size select goes here.
+ * @slot end - Anything to sit after it.
  *
  * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. The only way to refuse one.
  */
@@ -109,9 +146,45 @@ export class HelixBasePagination extends HelixElement {
    * Clamped to at least one wherever it is read, so a result that has not
    * loaded yet renders a single page rather than an empty control that then
    * appears and pushes the layout down.
+   *
+   * Left unset where `total` and `page-size` are both given, since the two of
+   * them already say it. A fallback rather than an override: writing this wins,
+   * so there is never a question of which of two sources is current.
    */
   @property({ type: Number })
-  pages = 1
+  pages = 0
+
+  /**
+   * How many items there are across every page.
+   *
+   * What the count reads from, and what `pages` falls back to with `page-size`.
+   * Unset renders no count, which is the common case where a consumer knows the
+   * page total and not the item total.
+   */
+  @property({ type: Number })
+  total = 0
+
+  /**
+   * How many items are on a page.
+   *
+   * Only arithmetic: this does not slice anything, because the component never
+   * sees the items. It is what turns a page number into "31-40" for the count,
+   * and what turns `total` into a page count.
+   */
+  @property({ attribute: 'page-size', type: Number })
+  pageSize = 0
+
+  /**
+   * Whether to offer a jump to the first and last pages.
+   *
+   * Off by default. The gaps already reach any page in a few presses and the
+   * last page is one of the two the run always shows, so on a short set these
+   * are two more controls for a move already on screen. They earn their place
+   * where the reader is deep in a long result and "back to the start" is the
+   * move they actually want.
+   */
+  @property({ reflect: true, type: Boolean })
+  ends = false
 
   /**
    * The page on show, one-based.
@@ -188,9 +261,16 @@ export class HelixBasePagination extends HelixElement {
   @property({ attribute: 'page-label' })
   pageLabel = 'Page {page}'
 
-  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  /**
+   * The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+   *
+   * The word went: it read "Page 7 of 24" and the landmark it sits in is
+   * already named "Pagination", so the noun was said twice to a screen reader
+   * and took a third of the width from a control whose whole reason for
+   * existing is that the row is narrow. The numbers are the reading.
+   */
   @property({ attribute: 'status-label' })
-  statusLabel = 'Page {page} of {pages}'
+  statusLabel = '{page} of {pages}'
 
   /** Accessible name for the control that moves back. */
   @property({ attribute: 'previous-label' })
@@ -199,6 +279,25 @@ export class HelixBasePagination extends HelixElement {
   /** Accessible name for the control that moves forward. */
   @property({ attribute: 'next-label' })
   nextLabel = 'Next page'
+
+  /** Accessible name for the control that jumps to the first page. */
+  @property({ attribute: 'first-label' })
+  firstLabel = 'First page'
+
+  /** Accessible name for the control that jumps to the last page. */
+  @property({ attribute: 'last-label' })
+  lastLabel = 'Last page'
+
+  /**
+   * The count, with `{from}`, `{to}` and `{total}` filled in.
+   *
+   * A separate template from `statusLabel` because they answer different
+   * questions: one says which page of how many, the other says which items of
+   * how many. A reader looking for "am I near the end" wants the first and one
+   * looking for "how much is there" wants the second.
+   */
+  @property({ attribute: 'count-label' })
+  countLabel = '{from}-{to} of {total}'
 
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
   @property({ attribute: 'gap-label' })
@@ -236,14 +335,38 @@ export class HelixBasePagination extends HelixElement {
     return (value) => format.format(value)
   }
 
-  /** The total, clamped once, so every reader agrees on it. */
-  private get total(): number {
-    return Math.max(1, Math.floor(this.pages) || 1)
+  /**
+   * How many pages, clamped once, so every reader agrees on it.
+   *
+   * `pages` first, because writing it is the explicit answer. Then `total` over
+   * `pageSize`, which is the same fact stated the other way round and is what a
+   * consumer holding a result set already has. Then one, so a result that has
+   * not loaded renders a single page rather than an empty control that appears
+   * later and pushes the layout down.
+   */
+  private get count(): number {
+    if (this.pages > 0) {
+      return Math.max(1, Math.floor(this.pages))
+    }
+    if (this.total > 0 && this.pageSize > 0) {
+      return Math.max(1, Math.ceil(this.total / this.pageSize))
+    }
+    return 1
+  }
+
+  /** The items this page covers, one-based and inclusive, for the count. */
+  private get span(): { from: number; to: number } {
+    const size = Math.max(1, Math.floor(this.pageSize) || 1)
+    const from = (this.current - 1) * size + 1
+    /* Clamped, because the last page is rarely full: a set of 248 at 25 a page
+       ends at 248, not at 250, and a count that overran its own total would be
+       the one number on screen a reader could check against nothing. */
+    return { from, to: Math.min(this.total, from + size - 1) }
   }
 
   /** The page on show, clamped into the total. */
   private get current(): number {
-    return Math.min(this.total, Math.max(1, Math.floor(this.page) || 1))
+    return Math.min(this.count, Math.max(1, Math.floor(this.page) || 1))
   }
 
   /**
@@ -260,7 +383,7 @@ export class HelixBasePagination extends HelixElement {
    * `most` slots, which is what holds the width still.
    */
   private get slots(): Slot[] {
-    const total = this.total
+    const total = this.count
     const current = this.current
     const boundaries = Math.max(0, Math.floor(this.boundaries) || 0)
     const siblings = Math.max(0, Math.floor(this.siblings) || 0)
@@ -311,7 +434,7 @@ export class HelixBasePagination extends HelixElement {
    * asked for another one.
    */
   private request(next: number): boolean {
-    if (next === this.current || next < 1 || next > this.total) {
+    if (next === this.current || next < 1 || next > this.count) {
       return false
     }
     return requestControlledChange({
@@ -370,13 +493,13 @@ export class HelixBasePagination extends HelixElement {
   private renderPage(page: number): TemplateResult {
     const current = page === this.current
     const shown = this.numbers(page)
-    const name = fill(this.pageLabel, page, this.total, this.numbers)
+    const name = fill(this.pageLabel, page, this.count, this.numbers)
     return html`<li part="item">
       ${
         this.href
           ? html`<a
               part="page"
-              href=${fill(this.href, page, this.total)}
+              href=${fill(this.href, page, this.count)}
               aria-current=${current ? 'page' : nothing}
               aria-label=${name}
               @click=${(event: Event) => this.go(page, event)}
@@ -418,13 +541,13 @@ export class HelixBasePagination extends HelixElement {
    */
   private renderGap(hidden: Hidden): TemplateResult {
     const to = Math.round((hidden.from + hidden.to) / 2)
-    const name = fill(this.gapLabel, to, this.total, this.numbers)
+    const name = fill(this.gapLabel, to, this.count, this.numbers)
     return html`<li part="item">
       ${
         this.href
           ? html`<a
               part="gap"
-              href=${fill(this.href, to, this.total)}
+              href=${fill(this.href, to, this.count)}
               aria-label=${name}
               @click=${(event: Event) => this.go(to, event)}
               >&hellip;</a
@@ -442,7 +565,30 @@ export class HelixBasePagination extends HelixElement {
   }
 
   /**
-   * Previous or next, inert at the end it points at.
+   * Everything a step needs, computed once, so the markup below is only markup.
+   *
+   * Split out because the part name has to be a literal. `check:parts` reads
+   * `part="name"` out of the source, so a computed one is a part the tooling
+   * cannot see: nothing pairs it with its `@csspart` and a later rename takes
+   * the promise silently. With four controls and two shapes each that is eight
+   * literals, and eight copies of the arithmetic behind them would be the
+   * actual duplication. This is the arithmetic, written once.
+   */
+  private step(to: number, spent: boolean, icon: HelixIcon, name: string): StepParts {
+    return {
+      address: spent ? nothing : fill(this.href, to, this.count),
+      click: (event: Event): void => this.go(to, event),
+      glyph: html`<svg fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
+        ${unsafeSVG(icon.content)}
+      </svg>`,
+      name,
+      off: spent ? 'true' : nothing,
+      spent,
+    }
+  }
+
+  /**
+   * The four controls, inert at the end each points at.
    *
    * Inert rather than absent: a control that disappears at the first page takes
    * the row's width with it and moves everything else under the pointer. In
@@ -450,62 +596,120 @@ export class HelixBasePagination extends HelixElement {
    * is not focusable, and is the platform's own way of saying there is nowhere
    * to go.
    */
-  private renderStep(back: boolean): TemplateResult {
-    const to = this.current + (back ? -1 : 1)
-    const spent = back ? this.current <= 1 : this.current >= this.total
-    const icon = back ? caretLeft : caretRight
-    const name = back ? this.previousLabel : this.nextLabel
-    const glyph = html`<svg fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
-      ${unsafeSVG(icon.content)}
-    </svg>`
-    const click = (event: Event): void => this.go(to, event)
-    const address = spent ? nothing : fill(this.href, to, this.total)
-    const off = spent ? 'true' : nothing
-
-    /* The part name is written out rather than interpolated, and one
-       `part=${…}` would have covered all four of these. `check:parts` reads
-       `part="name"` out of the source, so a computed one is a part the tooling
-       cannot see: it is not in the manifest's reach, nothing pairs it with its
-       `@csspart`, and a later rename takes the promise with it silently. Four
-       literals cost four lines and are greppable. */
-    if (this.href) {
-      return back
-        ? html`<a
-            part="previous"
-            href=${address}
-            aria-disabled=${off}
-            aria-label=${name}
-            @click=${click}
-            >${glyph}</a
-          >`
-        : html`<a part="next" href=${address} aria-disabled=${off} aria-label=${name} @click=${click}
-            >${glyph}</a
-          >`
-    }
-    return back
-      ? html`<button part="previous" type="button" ?disabled=${spent} aria-label=${name} @click=${click}>
+  private renderFirst(): TemplateResult {
+    const { address, click, glyph, name, off, spent } = this.step(
+      1,
+      this.current <= 1,
+      caretDoubleLeft,
+      this.firstLabel,
+    )
+    return this.href
+      ? html`<a part="first" href=${address} aria-disabled=${off} aria-label=${name} @click=${click}
+          >${glyph}</a
+        >`
+      : html`<button part="first" type="button" ?disabled=${spent} aria-label=${name} @click=${click}>
           ${glyph}
         </button>`
+  }
+
+  private renderPrevious(): TemplateResult {
+    const { address, click, glyph, name, off, spent } = this.step(
+      this.current - 1,
+      this.current <= 1,
+      caretLeft,
+      this.previousLabel,
+    )
+    return this.href
+      ? html`<a
+          part="previous"
+          href=${address}
+          aria-disabled=${off}
+          aria-label=${name}
+          @click=${click}
+          >${glyph}</a
+        >`
+      : html`<button
+          part="previous"
+          type="button"
+          ?disabled=${spent}
+          aria-label=${name}
+          @click=${click}
+        >
+          ${glyph}
+        </button>`
+  }
+
+  private renderNext(): TemplateResult {
+    const { address, click, glyph, name, off, spent } = this.step(
+      this.current + 1,
+      this.current >= this.count,
+      caretRight,
+      this.nextLabel,
+    )
+    return this.href
+      ? html`<a part="next" href=${address} aria-disabled=${off} aria-label=${name} @click=${click}
+          >${glyph}</a
+        >`
       : html`<button part="next" type="button" ?disabled=${spent} aria-label=${name} @click=${click}>
           ${glyph}
         </button>`
   }
 
-  protected override render(): TemplateResult {
-    if (this.compact) {
-      return html`${this.renderStep(true)}
-        <span part="status"
-          >${fill(this.statusLabel, this.current, this.total, this.numbers)}</span
-        >
-        ${this.renderStep(false)}`
+  private renderLast(): TemplateResult {
+    const { address, click, glyph, name, off, spent } = this.step(
+      this.count,
+      this.current >= this.count,
+      caretDoubleRight,
+      this.lastLabel,
+    )
+    return this.href
+      ? html`<a part="last" href=${address} aria-disabled=${off} aria-label=${name} @click=${click}
+          >${glyph}</a
+        >`
+      : html`<button part="last" type="button" ?disabled=${spent} aria-label=${name} @click=${click}>
+          ${glyph}
+        </button>`
+  }
+
+  /**
+   * Which items are on show, where the component has been told enough to say.
+   *
+   * Needs `total`, and `pageSize` to place the window inside it. Absent
+   * otherwise rather than guessed at, because a wrong count is worse than none:
+   * it is the one number here a reader cannot check against anything else on
+   * screen.
+   */
+  private renderCount(): TemplateResult | typeof nothing {
+    if (this.total <= 0 || this.pageSize <= 0) {
+      return nothing
     }
-    return html`${this.renderStep(true)}
+    const { from, to } = this.span
+    return html`<span part="count"
+      >${this.countLabel
+        .replaceAll('{from}', this.numbers(from))
+        .replaceAll('{to}', this.numbers(to))
+        .replaceAll('{total}', this.numbers(this.total))}</span
+    >`
+  }
+
+  protected override render(): TemplateResult {
+    const chrome = html`<slot name="start"></slot>${this.renderCount()}`
+    if (this.compact) {
+      return html`${chrome}${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
+        <span part="status"
+          >${fill(this.statusLabel, this.current, this.count, this.numbers)}</span
+        >
+        ${this.renderNext()}${this.ends ? this.renderLast() : nothing}
+        <slot name="end"></slot>`
+    }
+    return html`${chrome}${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
       <ol part="list" role="list">
         ${this.slots.map((slot) =>
           typeof slot === 'number' ? this.renderPage(slot) : this.renderGap(slot),
         )}
       </ol>
-      ${this.renderStep(false)}`
+      ${this.renderNext()}${this.ends ? this.renderLast() : nothing}
+      <slot name="end"></slot>`
   }
 }
 

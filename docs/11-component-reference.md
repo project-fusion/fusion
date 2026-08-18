@@ -2034,24 +2034,37 @@ is a way through rather than a destination, so it does not compete.
 | --- | --- | --- | --- | --- | --- |
 | `boundaries` | `boundaries` | `number` | `1` | `HelixBasePagination` | How many pages to show at each end, whatever the current one is. |
 | `compact` | `compact` | `boolean` | `false` | `HelixBasePagination` | Where the numbers are replaced by a reading of the two. |
+| `countLabel` | `count-label` | `string` | `'{from}-{to} of {total}'` | `HelixBasePagination` | The count, with `{from}`, `{to}` and `{total}` filled in. |
 | `defaultPage` | `default-page` | `number` | `1` | `HelixBasePagination` | Page to open on, where nothing declared one. |
+| `ends` | `ends` | `boolean` | `false` | `HelixBasePagination` | Whether to offer a jump to the first and last pages. |
+| `firstLabel` | `first-label` | `string` | `'First page'` | `HelixBasePagination` | Accessible name for the control that jumps to the first page. |
 | `gapLabel` | `gap-label` | `string` | `'Skip to page {page}'` | `HelixBasePagination` | Accessible name for a gap, with `{page}` filled in as where it goes. |
 | `href` | `href` | `string` | `''` | `HelixBasePagination` | Address for a page, with `{page}` standing in for its number. |
 | `label` | `label` | `string` | `'Pagination'` | `HelixBasePagination` | Accessible name for the navigation landmark. |
+| `lastLabel` | `last-label` | `string` | `'Last page'` | `HelixBasePagination` | Accessible name for the control that jumps to the last page. |
 | `locale` | `locale` | `string` | `''` | `HelixBasePagination` | Locale for the page numbers. Absent uses the runtime's own. |
 | `nextLabel` | `next-label` | `string` | `'Next page'` | `HelixBasePagination` | Accessible name for the control that moves forward. |
 | `page` | `page` | `number` | - | `HelixBasePagination` | The page on show, one-based. |
 | `pageLabel` | `page-label` | `string` | `'Page {page}'` | `HelixBasePagination` | Accessible name for one page, with `{page}` and `{pages}` filled in. |
-| `pages` | `pages` | `number` | `1` | `HelixBasePagination` | How many pages there are in total. |
+| `pages` | `pages` | `number` | `0` | `HelixBasePagination` | How many pages there are in total. |
+| `pageSize` | `page-size` | `number` | `0` | `HelixBasePagination` | How many items are on a page. |
 | `previousLabel` | `previous-label` | `string` | `'Previous page'` | `HelixBasePagination` | Accessible name for the control that moves back. |
 | `siblings` | `siblings` | `number` | `1` | `HelixBasePagination` | How many pages to show either side of the current one. |
-| `statusLabel` | `status-label` | `string` | `'Page {page} of {pages}'` | `HelixBasePagination` | The reading shown in `compact`, with `{page}` and `{pages}` filled in. |
+| `statusLabel` | `status-label` | `string` | `'{page} of {pages}'` | `HelixBasePagination` | The reading shown in `compact`, with `{page}` and `{pages}` filled in. |
+| `total` | `total` | `number` | `0` | `HelixBasePagination` | How many items there are across every page. |
 
 #### Events
 
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-navigate` | `HelixNavigateEvent` | Fired before the page changes, and cancelable. The only way to refuse one. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `start` | Anything to sit before the run. A page-size select goes here. |
+| `end` | Anything to sit after it. |
 
 #### Parts
 
@@ -2063,7 +2076,10 @@ is a way through rather than a destination, so it does not compete.
 | `gap` | The control standing over pages not shown, which jumps into them. |
 | `previous` | The control that moves back one page. |
 | `next` | The control that moves forward one page. |
+| `first` | The control that jumps to the first page, under `ends`. |
+| `last` | The control that jumps to the last page, under `ends`. |
 | `status` | The reading of where you are, in `compact`. |
+| `count` | The reading of which items are on show, under `total`. |
 
 #### Custom properties
 
