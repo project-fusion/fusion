@@ -362,32 +362,55 @@ Only `@summary` is native CEM; the rest reach the manifest through
 `helix-metadata`. A `@status experimental` that lives only in a comment cannot
 badge a docs page or warn a consumer.
 
-Events are declared, never inferred, and **names are PascalCase and compound**:
+Events are declared, never inferred, and **names are `helix-{verb}`, lowercase
+and prefixed**:
 
 ```ts
-@event {HelixOpenChangeEvent} OpenChange - Fired when it opens.
+@event {HelixOpenEvent} helix-open - Fired when it opens.
 ```
 
-Two rules, both enforced by `helix-convention-lint`:
+*Corrected 17 Aug 2026. This section described PascalCase names (`OpenChange`)
+for one day and the code has never carried them since. `f8c7365` made that
+change at 00:35 and rewrote this file; `db172f2` reversed it at 23:07 the same
+day and did not, so the rule outlived the decision by four days of work against
+it. `check:events` and `helix-convention-lint` both enforce
+`/^helix-[a-z][a-z0-9-]*$/`, which is what the sixty-six shipped events answer
+to.*
 
-**PascalCase.** Events dispatched inside a shadow root are retargeted to look
-like they came from the host, so a name that could collide with a native event
-is indistinguishable from one escaping a component's internals. Every native
-event name is lowercase, so casing alone makes that collision impossible. This
-is the protection a `helix-` prefix used to provide.
+**The prefix is what stops a collision with a native name.** An event dispatched
+inside a shadow root is retargeted to look like it came from the host, so a bare
+`input` from a `<helix-input>` is indistinguishable from the inner control's
+own. Prefixed, it can be mistaken for neither. PascalCase was proposed as a
+cheaper version of the same protection, on the grounds that every native name is
+lowercase; it is not wrong, and it was given up for the reason below.
 
-**Compound.** React strips `on` from a prop and listens for the remainder
-verbatim, so the event name decides the React API: `OpenChange` is
-`onOpenChange`. A single word is unreachable, because React's synthetic system
-has already claimed the prop: an event named `Change` would be bound by
-`onChange`, which React wires to the native `change`, so ours would never fire.
-`ValueChange`, `CheckedChange`, `OpenChange`.
+**At most one hyphen, and that is a measurement rather than a preference.**
+React binds a custom element's events from a prop, and a probe dispatching each
+candidate from a real element found that it stops at one: `onhelix-open` reaches
+`helix-open`, and `onhelix-value-change` binds nothing at all. `conventionLint`
+fails the build on a name carrying two.
+
+**Which verbs are usable was measured the same way.** React's synthetic system
+owns `change`, `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`,
+`focus` and `blur`, and a prop deriving from one of those is wired to the native
+event, so ours would never fire. `open`, `close`, `toggle`, `select`, `dismiss`,
+`navigate` and `remove` are free. That is why a value change is `helix-change`
+and the rest can be bare verbs, and the linter carries the measured list.
+
+**The same probe is what ended the PascalCase scheme.** Its argument was that
+React strips `on` from a prop and listens for the remainder verbatim, so
+`OpenChange` would be `onOpenChange`. Measured, React reserves *every* prop
+matching `on[A-Z]` for its own system and drops what it does not recognise,
+whether or not the element declares the property, so `onOpenChange` in raw JSX
+never reached the element and never had. A callback prop is a feature of the
+generated wrappers; the DOM event is the universal channel, and it needs a name
+a plain listener can use.
 
 The type in braces is what lets the React generator emit
-`(event: HelixOpenChangeEvent) => void` instead of `(detail: unknown)`. Each
-event is a class in `helix/core/src/events.ts` that carries its own name and
-augments `HTMLElementEventMap`. There is no generic `emit(name, detail)` helper:
-a dispatch through one cannot be named by the analyzer.
+`(event: HelixOpenEvent) => void` instead of `(detail: unknown)`. Each event is a
+class in `helix/core/src/events/events.ts` that carries its own name and augments
+`HTMLElementEventMap`. There is no generic `emit(name, detail)` helper: a
+dispatch through one cannot be named by the analyzer.
 
 Every `@property` gets a one-line description.
 
