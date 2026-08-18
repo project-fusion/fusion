@@ -3297,7 +3297,12 @@ one it is looking at.
 Written, this wins outright and the thresholds are only for drawing the
 ticks. A consumer whose rule is more than three buckets already knows the
 answer, and asking them to encode it as thresholds so this can decode it
-again is a worse API than letting them say it. */
+again is a worse API than letting them say it.
+
+Not reflected. Nothing selects on it: the band reaches the stylesheet as
+`data-band` on the fill, because that is the element being coloured, so
+reflecting here would write an attribute onto the host for no reader. Third
+time this rule has caught something today. */
   band?: HelixBaseMeter["band"];
   /** Whether the reading is shown beside the bar. */
   "show-value"?: HelixBaseMeter["showValue"];
@@ -3361,7 +3366,12 @@ one it is looking at.
 Written, this wins outright and the thresholds are only for drawing the
 ticks. A consumer whose rule is more than three buckets already knows the
 answer, and asking them to encode it as thresholds so this can decode it
-again is a worse API than letting them say it. */
+again is a worse API than letting them say it.
+
+Not reflected. Nothing selects on it: the band reaches the stylesheet as
+`data-band` on the fill, because that is the element being coloured, so
+reflecting here would write an attribute onto the host for no reader. Third
+time this rule has caught something today. */
   "prop:band"?: HelixBaseMeter["band"];
   /** Whether the reading is shown beside the bar. */
   "bool:show-value"?: HelixBaseMeter["showValue"];
@@ -9269,6 +9279,11 @@ export type CustomElements = {
    * ticks. A consumer whose rule is more than three buckets already knows the
    * answer, and asking them to encode it as thresholds so this can decode it
    * again is a worse API than letting them say it.
+   *
+   * Not reflected. Nothing selects on it: the band reaches the stylesheet as
+   * `data-band` on the fill, because that is the element being coloured, so
+   * reflecting here would write an attribute onto the host for no reader. Third
+   * time this rule has caught something today.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
    * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
    *
@@ -15005,6 +15020,11 @@ export type CustomElementsSolidJs = {
    * ticks. A consumer whose rule is more than three buckets already knows the
    * answer, and asking them to encode it as thresholds so this can decode it
    * again is a worse API than letting them say it.
+   *
+   * Not reflected. Nothing selects on it: the band reaches the stylesheet as
+   * `data-band` on the fill, because that is the element being coloured, so
+   * reflecting here would write an attribute onto the host for no reader. Third
+   * time this rule has caught something today.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
    * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
    *
