@@ -1028,11 +1028,18 @@ tall that is.
 | `announced` | `announced` | `boolean` | `false` | `HelixBaseDivider` | Whether the rule is announced as a separator. |
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseDivider` | Which way the rule runs. |
 
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | Content set into the rule, such as the word between two sections. |
+
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `line` | The rule itself. |
+| `content` | What is set into it. |
 
 #### Custom properties
 
@@ -1040,6 +1047,11 @@ tall that is.
 | --- | --- |
 | `--divider-color` | Color of the rule. |
 | `--divider-thickness` | Thickness of the rule. |
+| `--divider-color` | Colour of the rule. |
+| `--divider-inset` | Space taken off both ends of it. |
+| `--divider-inset-end` | Off the far end only. |
+| `--divider-inset-start` | Off the near end only. |
+| `--divider-thickness` | How heavy the rule is. |
 
 ## Drawer
 

@@ -7456,18 +7456,30 @@ export type CustomElements = {
    * property. An opt-in is absent by default, which every reflected property
    * here has to be.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Content set into the rule, such as the word between two sections.
+   *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
    * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
+   * - `--divider-color`: Colour of the rule. (default: `undefined`)
+   * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
+   * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
+   * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
+   * - `--divider-thickness`: How heavy the rule is. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `line`: The rule itself.
+   * - `content`: What is set into it.
    */
   "helix-divider": Partial<
     HelixDividerProps & BaseProps<HelixDivider> & BaseEvents
@@ -12464,18 +12476,30 @@ export type CustomElementsSolidJs = {
    * property. An opt-in is absent by default, which every reflected property
    * here has to be.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Content set into the rule, such as the word between two sections.
+   *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
    * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
+   * - `--divider-color`: Colour of the rule. (default: `undefined`)
+   * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
+   * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
+   * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
+   * - `--divider-thickness`: How heavy the rule is. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `line`: The rule itself.
+   * - `content`: What is set into it.
    */
   "helix-divider": Partial<
     HelixDividerProps &
@@ -16227,6 +16251,12 @@ export type CustomCssProperties = {
   "--divider-color"?: string;
   /** Thickness of the rule. */
   "--divider-thickness"?: string;
+  /** Space taken off both ends of it. */
+  "--divider-inset"?: string;
+  /** Off the far end only. */
+  "--divider-inset-end"?: string;
+  /** Off the near end only. */
+  "--divider-inset-start"?: string;
   /** Corner radius on the edges that face the page. */
   "--drawer-radii"?: string;
   /** Width or height of the panel. */

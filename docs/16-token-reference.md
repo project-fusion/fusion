@@ -33,7 +33,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 39 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 3 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 168 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 82 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 84 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 60 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 21 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
@@ -63,10 +63,10 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 103 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 115 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 141 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 123 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 114 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 118 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 65 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 54 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 19 |
@@ -91,7 +91,7 @@ The three families.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-font-sans` | `var(--_helix-family-sans)` | 58 |
+| `--helix-font-sans` | `var(--_helix-family-sans)` | 60 |
 | `--helix-font-mono` | `var(--_helix-family-mono)` | 16 |
 | `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 7 |
 
@@ -101,7 +101,7 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 48 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 50 |
 | `--helix-text-sm` | `var(--_helix-size-14)` | 74 |
 | `--helix-text-md` | `var(--_helix-size-15)` | 17 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 15 |
@@ -125,7 +125,7 @@ Line height, unitless so it scales with the size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-leading-tight` | `1.2` | 37 |
+| `--helix-leading-tight` | `1.2` | 39 |
 | `--helix-leading-normal` | `1.5` | 35 |
 | `--helix-leading-loose` | `1.7` | 0 |
 

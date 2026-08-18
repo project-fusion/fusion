@@ -6738,8 +6738,18 @@
           "name": "HelixBaseDivider",
           "cssParts": [
             {
-              "description": "The rule itself.",
+              "description": "The rule itself, or each half of it where something is set in.",
               "name": "line"
+            },
+            {
+              "description": "What is set into it.",
+              "name": "content"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Content set into the rule, such as the word between two sections.",
+              "name": ""
             }
           ],
           "members": [
@@ -6763,6 +6773,17 @@
               "description": "Whether the rule is announced as a separator.\n\nOff by default, and out of the accessibility tree. Most rules on a page\nseparate nothing: they underline a heading or close a section that space\nhad already closed, and announcing every one as a separator is noise a\nscreen-reader user has to walk past.\n\nAn opt-in, not a `decorative` opt-out, because a boolean attribute cannot\nbe turned off: `decorative=\"false\"` parses as `true`, which would put the\nquiet default out of reach from HTML and leave it settable only as a\nproperty. An opt-in is absent by default, which every reflected property\nhere has to be.",
               "attribute": "announced",
               "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Marks the middle region when nothing has been set into it.\n\nA divider with no content has to be one continuous line, and the space\neither side of the content is what would break it. `:empty` cannot answer\nthis and neither can `:host(:has(...))`, which is invalid CSS dropped at\nparse time: `check:selectors` caught exactly that rule here, written in\nthis file, by an author who had already read the note saying so.\n\nOn the region inside the shadow root rather than on the host, because an\nattribute written onto the host is a change to markup the consumer rendered."
             },
             {
               "kind": "field",

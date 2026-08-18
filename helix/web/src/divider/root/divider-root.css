@@ -1,7 +1,61 @@
+/* A line, whatever is set into it, and a line. Flex rather than a single rule,
+   so the two halves take what is left after the content and a divider with
+   nothing in it is one continuous line: the second half is zero long and the
+   gap collapses with it. */
 :host {
-  display: block;
+  align-items: center;
+  display: flex;
+  /* No flex gap. A gap is drawn between items whatever their size, so with the
+     middle region hidden the two halves still stood 12px apart and every plain
+     divider had a break in it. The space belongs to the content, which takes it
+     away with it when there is none. */
 
   --_divider-thickness: var(--divider-thickness, var(--helix-border-thin));
+}
+
+/* What is set into the rule, and the space either side of it. */
+[part="content"] {
+  color: var(--helix-color-foreground-muted);
+  margin-inline: var(--helix-space-sm);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-tight);
+}
+
+[part="content"] slot::slotted(*),
+[part="content"] {
+  white-space: nowrap;
+}
+
+/* Nothing set in, so no region and no gap either side of it: the two halves meet
+   and the divider is one continuous line. `:empty` cannot ask this, since the
+   region always holds a `<slot>` however little is assigned, and
+   `:host(:has(...))` is invalid CSS dropped at parse time. `check:selectors`
+   caught that rule here, written by an author who had already read the note
+   saying so. The component answers it instead, as `Announcement` and `List` do.
+
+   `display: none` rather than a zero size, because a flex gap is drawn beside
+   an item of no width just the same. */
+[part="content"][data-empty] {
+  display: none;
+}
+
+/* The inset. Space taken off both ends of the rule rather than off the box, so
+   a divider between list rows can start where the text starts and a set of them
+   still fills the width they are given. One hook for the symmetric case and a
+   pair under it for the rest, which is the shape `Drawer` uses for its own
+   inset. */
+:host {
+  padding-inline-end: var(--divider-inset-end, var(--divider-inset, var(--helix-space-none)));
+  padding-inline-start: var(--divider-inset-start, var(--divider-inset, var(--helix-space-none)));
+}
+
+:host([orientation="vertical"]) {
+  padding-block-end: var(--divider-inset-end, var(--divider-inset, var(--helix-space-none)));
+  padding-block-start: var(--divider-inset-start, var(--divider-inset, var(--helix-space-none)));
+  padding-inline: var(--helix-space-none);
 }
 
 /* Stretches to the flex or grid parent rather than declaring a height, so a
@@ -9,21 +63,29 @@
    they are. */
 :host([orientation="vertical"]) {
   align-self: stretch;
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+:host([orientation="vertical"]) [part="content"] {
+  margin-block: var(--helix-space-sm);
+  margin-inline: var(--helix-space-none);
 }
 
 [part="line"] {
   background-color: var(--divider-color, var(--helix-color-border));
 }
 
+/* `flex: 1` rather than `inline-size: 100%`, so the two halves share whatever is
+   left after the content instead of each demanding the whole width. */
 :host(:not([orientation])) [part="line"],
 :host([orientation="horizontal"]) [part="line"] {
   block-size: var(--_divider-thickness);
-  inline-size: 100%;
+  flex: 1 1 0;
 }
 
 :host([orientation="vertical"]) [part="line"] {
-  block-size: 100%;
+  flex: 1 1 0;
   inline-size: var(--_divider-thickness);
   /* A stretched parent may resolve to zero height, in which case the rule would
      vanish rather than degrade. One line of text is the sensible floor. */

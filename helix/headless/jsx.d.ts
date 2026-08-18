@@ -6801,11 +6801,18 @@ export type CustomElements = {
    * property. An opt-in is absent by default, which every reflected property
    * here has to be.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Content set into the rule, such as the word between two sections.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `line`: The rule itself.
+   * - `line`: The rule itself, or each half of it where something is set in.
+   * - `content`: What is set into it.
    */
   "helix-base-divider": Partial<
     HelixBaseDividerProps & BaseProps<HelixBaseDivider> & BaseEvents
@@ -11751,11 +11758,18 @@ export type CustomElementsSolidJs = {
    * property. An opt-in is absent by default, which every reflected property
    * here has to be.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Content set into the rule, such as the word between two sections.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `line`: The rule itself.
+   * - `line`: The rule itself, or each half of it where something is set in.
+   * - `content`: What is set into it.
    */
   "helix-base-divider": Partial<
     HelixBaseDividerProps &
