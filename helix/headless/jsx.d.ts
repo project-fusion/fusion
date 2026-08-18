@@ -8827,13 +8827,31 @@ export type CustomElements = {
    * beside it, it goes above, below, in a table's caption, or on the other side of
    * the page, and the direction and order of the whole footer are the consumer's.
    *
-   * **It repeats `page`, `page-size` and `total`, and that is not drift.** Those
-   * three come from the consumer's own query, so writing them on two elements is
-   * one variable used twice, which is how a framework consumer writes everything.
-   * The alternative is a coordinating root that feeds its slotted children, and
-   * the only ways to do that here are writing attributes onto elements the
-   * consumer rendered, which this library refuses because a framework reports the
-   * difference as a hydration error, or a context mechanism that does not exist.
+   * **It repeats `page`, `page-size` and `total`, and the cost of that is skew
+   * rather than verbosity.** Those three come from the consumer's own query, so
+   * writing them on two elements is one variable used twice; what it risks is the
+   * two disagreeing, and a count reading `76-100 of 248` beside a run showing page
+   * 7 is the same failure this element's own clamping exists to prevent, arriving
+   * from the outside instead.
+   *
+   * **Nothing removes it at this level, and that was measured rather than
+   * assumed.** A coordinating root can only reach children the consumer laid out
+   * by writing attributes onto them, which a framework reports as a hydration
+   * error, or through context, which is dead on a server: `@lit/context`
+   * subscribes from `connectedCallback`, and Lit SSR does not call it, so every
+   * value is `undefined` in exactly the render this element exists to be part of.
+   * Confirmed against Lit SSR directly. The fork is real: children in the light
+   * DOM mean the consumer owns the layout and no root can feed them; children in a
+   * shadow root mean a root feeds them by ordinary binding and owns the layout.
+   *
+   * **It resolves one level up, at a composite, and the state is why.** `page`,
+   * `page-size` and `total` are facts about a *result*, not about a pagination, so
+   * the element that should hold them once is the one that holds the result: a
+   * data table composing a pagination inside itself, rather than a pagination root
+   * invented to hold three pagination elements together. That root would have been
+   * plumbing; a table's paging state is the thing itself. And because a composite
+   * renders its parts into its own shadow root, it lands on the side of the fork
+   * where binding works and the server renders, at no cost to anyone.
    *
    * Renders nothing without a `total` and a `page-size`. A wrong count is worse
    * than none: it is the one number in a footer a reader cannot check against
@@ -14156,13 +14174,31 @@ export type CustomElementsSolidJs = {
    * beside it, it goes above, below, in a table's caption, or on the other side of
    * the page, and the direction and order of the whole footer are the consumer's.
    *
-   * **It repeats `page`, `page-size` and `total`, and that is not drift.** Those
-   * three come from the consumer's own query, so writing them on two elements is
-   * one variable used twice, which is how a framework consumer writes everything.
-   * The alternative is a coordinating root that feeds its slotted children, and
-   * the only ways to do that here are writing attributes onto elements the
-   * consumer rendered, which this library refuses because a framework reports the
-   * difference as a hydration error, or a context mechanism that does not exist.
+   * **It repeats `page`, `page-size` and `total`, and the cost of that is skew
+   * rather than verbosity.** Those three come from the consumer's own query, so
+   * writing them on two elements is one variable used twice; what it risks is the
+   * two disagreeing, and a count reading `76-100 of 248` beside a run showing page
+   * 7 is the same failure this element's own clamping exists to prevent, arriving
+   * from the outside instead.
+   *
+   * **Nothing removes it at this level, and that was measured rather than
+   * assumed.** A coordinating root can only reach children the consumer laid out
+   * by writing attributes onto them, which a framework reports as a hydration
+   * error, or through context, which is dead on a server: `@lit/context`
+   * subscribes from `connectedCallback`, and Lit SSR does not call it, so every
+   * value is `undefined` in exactly the render this element exists to be part of.
+   * Confirmed against Lit SSR directly. The fork is real: children in the light
+   * DOM mean the consumer owns the layout and no root can feed them; children in a
+   * shadow root mean a root feeds them by ordinary binding and owns the layout.
+   *
+   * **It resolves one level up, at a composite, and the state is why.** `page`,
+   * `page-size` and `total` are facts about a *result*, not about a pagination, so
+   * the element that should hold them once is the one that holds the result: a
+   * data table composing a pagination inside itself, rather than a pagination root
+   * invented to hold three pagination elements together. That root would have been
+   * plumbing; a table's paging state is the thing itself. And because a composite
+   * renders its parts into its own shadow root, it lands on the side of the fork
+   * where binding works and the server renders, at no cost to anyone.
    *
    * Renders nothing without a `total` and a `page-size`. A wrong count is worse
    * than none: it is the one number in a footer a reader cannot check against
