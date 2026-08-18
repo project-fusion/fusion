@@ -4997,6 +4997,36 @@ Reading gives where it is; writing declares it the consumer's, and
   "default-position"?: HelixBaseSplitter["defaultPosition"];
   /** Where the divider starts, where nothing declared it. */
   defaultPosition?: HelixBaseSplitter["defaultPosition"];
+  /** Which pane is shut, if either.
+
+The same accessor pair as `position`, and deliberately a second state
+rather than a reading of the first. A pane shut by dragging the divider to
+the edge and a pane shut on purpose look identical in geometry and are not
+the same thing: only the second knows where to go back to. Kept apart, the
+open position is simply the one collapsing never overwrote, so restoring
+needs no memory of its own.
+
+It overrides `min` and `max`, which is the point of it. Those keep a sliver
+of a pane during a drag; this is the thing that says the sliver can go. */
+  collapsed?: HelixBaseSplitter["collapsed"];
+  /** Which pane starts shut, where nothing declared it. */
+  "default-collapsed"?: HelixBaseSplitter["defaultCollapsed"];
+  /** Which pane starts shut, where nothing declared it. */
+  defaultCollapsed?: HelixBaseSplitter["defaultCollapsed"];
+  /** How much of a shut pane is still shown, as a percentage.
+
+Zero by default, which is a pane fully gone. A tab strip or a title bar
+that should survive its own collapse says how much of itself to keep, and
+only whoever put it there knows that, which is the same reason `min` is a
+consumer's to set. */
+  "collapsed-size"?: HelixBaseSplitter["collapsedSize"];
+  /** How much of a shut pane is still shown, as a percentage.
+
+Zero by default, which is a pane fully gone. A tab strip or a title bar
+that should survive its own collapse says how much of itself to keep, and
+only whoever put it there knows that, which is the same reason `min` is a
+consumer's to set. */
+  collapsedSize?: HelixBaseSplitter["collapsedSize"];
   /** Nearest the divider may come to the start, as a percentage. */
   min?: HelixBaseSplitter["min"];
   /** Nearest it may come to the end. */
@@ -5005,8 +5035,12 @@ Reading gives where it is; writing declares it the consumer's, and
   step?: HelixBaseSplitter["step"];
   /** Accessible name for the divider. */
   label?: HelixBaseSplitter["label"];
+  /** Accessible name for the handle where two dividers cross. */
+  "corner-label"?: HelixBaseSplitter["cornerLabel"];
+  /** Accessible name for the handle where two dividers cross. */
+  cornerLabel?: HelixBaseSplitter["cornerLabel"];
 
-  /** Fired when the divider settles, with the position. */
+  /** Fired when the divider settles, named `position` or `collapsed`. */
   "onhelix-change"?: (e: HelixBaseSplitterHelixChangeElementEvent) => void;
 };
 
@@ -5032,6 +5066,36 @@ Reading gives where it is; writing declares it the consumer's, and
   "attr:default-position"?: HelixBaseSplitter["defaultPosition"];
   /** Where the divider starts, where nothing declared it. */
   "prop:defaultPosition"?: HelixBaseSplitter["defaultPosition"];
+  /** Which pane is shut, if either.
+
+The same accessor pair as `position`, and deliberately a second state
+rather than a reading of the first. A pane shut by dragging the divider to
+the edge and a pane shut on purpose look identical in geometry and are not
+the same thing: only the second knows where to go back to. Kept apart, the
+open position is simply the one collapsing never overwrote, so restoring
+needs no memory of its own.
+
+It overrides `min` and `max`, which is the point of it. Those keep a sliver
+of a pane during a drag; this is the thing that says the sliver can go. */
+  "prop:collapsed"?: HelixBaseSplitter["collapsed"];
+  /** Which pane starts shut, where nothing declared it. */
+  "attr:default-collapsed"?: HelixBaseSplitter["defaultCollapsed"];
+  /** Which pane starts shut, where nothing declared it. */
+  "prop:defaultCollapsed"?: HelixBaseSplitter["defaultCollapsed"];
+  /** How much of a shut pane is still shown, as a percentage.
+
+Zero by default, which is a pane fully gone. A tab strip or a title bar
+that should survive its own collapse says how much of itself to keep, and
+only whoever put it there knows that, which is the same reason `min` is a
+consumer's to set. */
+  "attr:collapsed-size"?: HelixBaseSplitter["collapsedSize"];
+  /** How much of a shut pane is still shown, as a percentage.
+
+Zero by default, which is a pane fully gone. A tab strip or a title bar
+that should survive its own collapse says how much of itself to keep, and
+only whoever put it there knows that, which is the same reason `min` is a
+consumer's to set. */
+  "prop:collapsedSize"?: HelixBaseSplitter["collapsedSize"];
   /** Nearest the divider may come to the start, as a percentage. */
   "prop:min"?: HelixBaseSplitter["min"];
   /** Nearest it may come to the end. */
@@ -5040,7 +5104,11 @@ Reading gives where it is; writing declares it the consumer's, and
   "prop:step"?: HelixBaseSplitter["step"];
   /** Accessible name for the divider. */
   "prop:label"?: HelixBaseSplitter["label"];
-  /** Fired when the divider settles, with the position. */
+  /** Accessible name for the handle where two dividers cross. */
+  "attr:corner-label"?: HelixBaseSplitter["cornerLabel"];
+  /** Accessible name for the handle where two dividers cross. */
+  "prop:cornerLabel"?: HelixBaseSplitter["cornerLabel"];
+  /** Fired when the divider settles, named `position` or `collapsed`. */
   "on:helix-change"?: (e: HelixBaseSplitterHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -10772,22 +10840,48 @@ export type CustomElements = {
    * inside a splitter gives the cross back, and gives the three-pane and the
    * four-pane arrangements it never had.
    *
-   * **Where two of them cross, the inner one takes the pointer, and there is no
-   * handle that moves both.** Measured on a three-deep nest: every separator
-   * carries the same `z-index`, so a tie is broken by document order and a deeper
-   * splitter is always later. That is deterministic rather than accidental, and it
-   * is the right way round, since a reader pointing inside a pane is pointing at
-   * that pane's divider. What it costs is the length of one divider where the
-   * other crosses it: eight pixels of the outer one, reachable anywhere else along
+   * **Where two of them cross there is a corner, and it moves both.** A splitter
+   * slotted into a pane of another, at right angles to it, has one end of its
+   * divider sitting exactly on the other's. That end grows a handle: `move` under
+   * the pointer, both arrow axes on the keyboard, and a drag that carries the two
+   * positions at once.
+   *
+   * **The outer splitter draws it and the nested one announces itself upward.**
+   * Built the other way round first, because a splitter already knows where its
+   * own divider begins and needs no measurement of the other, and that version was
+   * clipped: the crossing lies on the boundary between a pane and the divider
+   * beside it, a handle centred there reaches back over the boundary, and a pane
+   * is `overflow: auto`. Exactly half the corner was cut off. The outer separator
+   * is the one element that already straddles the seam, so the corner belongs in
    * it.
    *
-   * A corner that moved both at once is the one thing the sandbox has that nesting
-   * does not give back. It is deliberately not here: it would need the outer
-   * splitter to drive a slotted inner one, which is the parent-to-child
-   * coordination `Pagination.Summary` records as having no answer that survives a
-   * server render. A corner belongs to a composite that owns both positions
-   * directly, the way the sandbox does, not to the two-pane component underneath
-   * it.
+   * That makes the channel between the two a single call in a single direction:
+   * `cross(child, at)` says where the child crosses, `moveTo` drives either one,
+   * and neither reads the other's state. The child is what calls it, because a
+   * parent cannot poll for a child that has not upgraded yet.
+   *
+   * The one number it carries is a percentage rather than a measurement, which is
+   * what keeps either of them from measuring the other, and it assumes the nested
+   * splitter fills its pane. That is what slotting one into a pane does. Give the
+   * nested splitter its own inset, or wrap it in something smaller than the pane,
+   * and the corner is drawn where the crossing would be rather than where it is.
+   *
+   * **It is a client-side enhancement and says so.** Finding the parent means
+   * inspecting the tree, which a server cannot do, so the corner appears at
+   * `firstUpdated` and never in the served markup. That is allowed for exactly
+   * this: it is an affordance rather than content, and a splitter with no corner
+   * yet is a splitter with two working dividers.
+   *
+   * Where two dividers are parallel there is no corner, because there is nothing
+   * to take hold of. Where they cross without a corner, the inner divider takes
+   * the pointer: every separator sits on the same layer, so a tie goes to document
+   * order and a deeper splitter is always later.
+   *
+   * **A divider that is moving says so, whoever is moving it.** `:hover` cannot
+   * carry that: a drag holds the pointer through capture and a fast one leaves the
+   * target behind, and a corner moves the nested divider while the reader is on
+   * the crossing, nowhere near it. So a drag in progress is a state, and both
+   * dividers a corner moves are lit for as long as it moves them.
    *
    * **The divider is a real `role="separator"` with `aria-valuenow`, moved by the
    * arrow keys as well as by pointer.** A divider only a mouse can move is
@@ -10799,6 +10893,24 @@ export type CustomElements = {
    * that stops dead short of the edge gives a reader no way to put a pane away.
    * Where a pane should keep a sliver of itself, only whoever put the tabs on it
    * knows how much, so they say so.
+   *
+   * **A pane can be shut, and that is not the same as a divider at the edge.**
+   * The geometry is identical and the knowledge is not: only a shut pane knows
+   * where to open back to. So `collapsed` is a second state rather than a reading
+   * of the position, and the position it opens to is simply the one collapsing
+   * never overwrote. `collapsed-size` keeps a sliver showing where a pane has a
+   * tab strip worth leaving, and collapse overrides `min` and `max`, which is
+   * what those are for: they keep a pane from vanishing by accident, and this is
+   * the deliberate version.
+   *
+   * The two are kept in step in one direction only: a drag that settles on the
+   * collapsed size latches shut, and any move opens it again. Otherwise a reader
+   * could drag a pane closed and the consumer's own button would still be
+   * offering to close it.
+   *
+   * A pane shut to nothing is told apart from one shut to a sliver, because the
+   * two want different dividers: a sliver still has a boundary worth drawing, and
+   * nothing leaves the divider sitting on the container's own edge.
    *
    * **The box is measured once, when a drag starts.** Measuring per move is a
    * forced layout on every pointer event, in the middle of a gesture whose whole
@@ -10832,16 +10944,36 @@ export type CustomElements = {
    * `default-position` seeds one this element owns. The same accessor pair
    * `Pagination.page` and the calendar's `month` carry.
    * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
+   * - `collapsed`: Which pane is shut, if either.
+   *
+   * The same accessor pair as `position`, and deliberately a second state
+   * rather than a reading of the first. A pane shut by dragging the divider to
+   * the edge and a pane shut on purpose look identical in geometry and are not
+   * the same thing: only the second knows where to go back to. Kept apart, the
+   * open position is simply the one collapsing never overwrote, so restoring
+   * needs no memory of its own.
+   *
+   * It overrides `min` and `max`, which is the point of it. Those keep a sliver
+   * of a pane during a drag; this is the thing that says the sliver can go.
+   * - `default-collapsed`/`defaultCollapsed`: Which pane starts shut, where nothing declared it.
+   * - `collapsed-size`/`collapsedSize`: How much of a shut pane is still shown, as a percentage.
+   *
+   * Zero by default, which is a pane fully gone. A tab strip or a title bar
+   * that should survive its own collapse says how much of itself to keep, and
+   * only whoever put it there knows that, which is the same reason `min` is a
+   * consumer's to set.
    * - `min`: Nearest the divider may come to the start, as a percentage.
    * - `max`: Nearest it may come to the end.
    * - `step`: How far one arrow press moves it, as a percentage.
    * - `label`: Accessible name for the divider.
+   * - `corner-label`/`cornerLabel`: Accessible name for the handle where two dividers cross.
+   * - `vertical`: Public because a nested splitter compares axes with the one it is in. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the divider settles, with the position.
+   * - `helix-change`: Fired when the divider settles, named `position` or `collapsed`.
    *
    * ## Slots
    *
@@ -10850,6 +10982,25 @@ export type CustomElements = {
    * - `start`: The pane before the divider.
    * - `end`: The pane after it.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `moveTo(next: number, settled = false) => void`: Moves the divider, and optionally says so.
+   *
+   * Public because a corner on a nested splitter has to drive the one it is
+   * nested in, and that is the whole of what it needs: the pair are not
+   * otherwise coupled and neither reads the other's state. `settled` is false
+   * for each step of a drag and true once, at the end, for the reason a drag
+   * announces once: only the position it ends at is a preference.
+   * - `cross(by: HelixBaseSplitter, at: number) => void`: Records that a nested splitter crosses this one at `at` percent along it.
+   *
+   * Public because it is the whole of the channel between the two, and it runs
+   * one way: the child tells the parent where it is, and the parent draws the
+   * corner and drives them both. Nothing is read back, so neither has to know
+   * anything about the other's state.
+   * - `uncross(by: HelixBaseSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -10857,6 +11008,7 @@ export type CustomElements = {
    * - `start`: The box holding the first pane.
    * - `end`: The box holding the second.
    * - `separator`: The divider itself.
+   * - `corner`: The handle where two dividers cross, added on the client.
    */
   "helix-base-splitter": Partial<
     HelixBaseSplitterProps & BaseProps<HelixBaseSplitter> & BaseEvents
@@ -16658,22 +16810,48 @@ export type CustomElementsSolidJs = {
    * inside a splitter gives the cross back, and gives the three-pane and the
    * four-pane arrangements it never had.
    *
-   * **Where two of them cross, the inner one takes the pointer, and there is no
-   * handle that moves both.** Measured on a three-deep nest: every separator
-   * carries the same `z-index`, so a tie is broken by document order and a deeper
-   * splitter is always later. That is deterministic rather than accidental, and it
-   * is the right way round, since a reader pointing inside a pane is pointing at
-   * that pane's divider. What it costs is the length of one divider where the
-   * other crosses it: eight pixels of the outer one, reachable anywhere else along
+   * **Where two of them cross there is a corner, and it moves both.** A splitter
+   * slotted into a pane of another, at right angles to it, has one end of its
+   * divider sitting exactly on the other's. That end grows a handle: `move` under
+   * the pointer, both arrow axes on the keyboard, and a drag that carries the two
+   * positions at once.
+   *
+   * **The outer splitter draws it and the nested one announces itself upward.**
+   * Built the other way round first, because a splitter already knows where its
+   * own divider begins and needs no measurement of the other, and that version was
+   * clipped: the crossing lies on the boundary between a pane and the divider
+   * beside it, a handle centred there reaches back over the boundary, and a pane
+   * is `overflow: auto`. Exactly half the corner was cut off. The outer separator
+   * is the one element that already straddles the seam, so the corner belongs in
    * it.
    *
-   * A corner that moved both at once is the one thing the sandbox has that nesting
-   * does not give back. It is deliberately not here: it would need the outer
-   * splitter to drive a slotted inner one, which is the parent-to-child
-   * coordination `Pagination.Summary` records as having no answer that survives a
-   * server render. A corner belongs to a composite that owns both positions
-   * directly, the way the sandbox does, not to the two-pane component underneath
-   * it.
+   * That makes the channel between the two a single call in a single direction:
+   * `cross(child, at)` says where the child crosses, `moveTo` drives either one,
+   * and neither reads the other's state. The child is what calls it, because a
+   * parent cannot poll for a child that has not upgraded yet.
+   *
+   * The one number it carries is a percentage rather than a measurement, which is
+   * what keeps either of them from measuring the other, and it assumes the nested
+   * splitter fills its pane. That is what slotting one into a pane does. Give the
+   * nested splitter its own inset, or wrap it in something smaller than the pane,
+   * and the corner is drawn where the crossing would be rather than where it is.
+   *
+   * **It is a client-side enhancement and says so.** Finding the parent means
+   * inspecting the tree, which a server cannot do, so the corner appears at
+   * `firstUpdated` and never in the served markup. That is allowed for exactly
+   * this: it is an affordance rather than content, and a splitter with no corner
+   * yet is a splitter with two working dividers.
+   *
+   * Where two dividers are parallel there is no corner, because there is nothing
+   * to take hold of. Where they cross without a corner, the inner divider takes
+   * the pointer: every separator sits on the same layer, so a tie goes to document
+   * order and a deeper splitter is always later.
+   *
+   * **A divider that is moving says so, whoever is moving it.** `:hover` cannot
+   * carry that: a drag holds the pointer through capture and a fast one leaves the
+   * target behind, and a corner moves the nested divider while the reader is on
+   * the crossing, nowhere near it. So a drag in progress is a state, and both
+   * dividers a corner moves are lit for as long as it moves them.
    *
    * **The divider is a real `role="separator"` with `aria-valuenow`, moved by the
    * arrow keys as well as by pointer.** A divider only a mouse can move is
@@ -16685,6 +16863,24 @@ export type CustomElementsSolidJs = {
    * that stops dead short of the edge gives a reader no way to put a pane away.
    * Where a pane should keep a sliver of itself, only whoever put the tabs on it
    * knows how much, so they say so.
+   *
+   * **A pane can be shut, and that is not the same as a divider at the edge.**
+   * The geometry is identical and the knowledge is not: only a shut pane knows
+   * where to open back to. So `collapsed` is a second state rather than a reading
+   * of the position, and the position it opens to is simply the one collapsing
+   * never overwrote. `collapsed-size` keeps a sliver showing where a pane has a
+   * tab strip worth leaving, and collapse overrides `min` and `max`, which is
+   * what those are for: they keep a pane from vanishing by accident, and this is
+   * the deliberate version.
+   *
+   * The two are kept in step in one direction only: a drag that settles on the
+   * collapsed size latches shut, and any move opens it again. Otherwise a reader
+   * could drag a pane closed and the consumer's own button would still be
+   * offering to close it.
+   *
+   * A pane shut to nothing is told apart from one shut to a sliver, because the
+   * two want different dividers: a sliver still has a boundary worth drawing, and
+   * nothing leaves the divider sitting on the container's own edge.
    *
    * **The box is measured once, when a drag starts.** Measuring per move is a
    * forced layout on every pointer event, in the middle of a gesture whose whole
@@ -16718,16 +16914,36 @@ export type CustomElementsSolidJs = {
    * `default-position` seeds one this element owns. The same accessor pair
    * `Pagination.page` and the calendar's `month` carry.
    * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
+   * - `collapsed`: Which pane is shut, if either.
+   *
+   * The same accessor pair as `position`, and deliberately a second state
+   * rather than a reading of the first. A pane shut by dragging the divider to
+   * the edge and a pane shut on purpose look identical in geometry and are not
+   * the same thing: only the second knows where to go back to. Kept apart, the
+   * open position is simply the one collapsing never overwrote, so restoring
+   * needs no memory of its own.
+   *
+   * It overrides `min` and `max`, which is the point of it. Those keep a sliver
+   * of a pane during a drag; this is the thing that says the sliver can go.
+   * - `default-collapsed`/`defaultCollapsed`: Which pane starts shut, where nothing declared it.
+   * - `collapsed-size`/`collapsedSize`: How much of a shut pane is still shown, as a percentage.
+   *
+   * Zero by default, which is a pane fully gone. A tab strip or a title bar
+   * that should survive its own collapse says how much of itself to keep, and
+   * only whoever put it there knows that, which is the same reason `min` is a
+   * consumer's to set.
    * - `min`: Nearest the divider may come to the start, as a percentage.
    * - `max`: Nearest it may come to the end.
    * - `step`: How far one arrow press moves it, as a percentage.
    * - `label`: Accessible name for the divider.
+   * - `corner-label`/`cornerLabel`: Accessible name for the handle where two dividers cross.
+   * - `vertical`: Public because a nested splitter compares axes with the one it is in. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the divider settles, with the position.
+   * - `helix-change`: Fired when the divider settles, named `position` or `collapsed`.
    *
    * ## Slots
    *
@@ -16736,6 +16952,25 @@ export type CustomElementsSolidJs = {
    * - `start`: The pane before the divider.
    * - `end`: The pane after it.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `moveTo(next: number, settled = false) => void`: Moves the divider, and optionally says so.
+   *
+   * Public because a corner on a nested splitter has to drive the one it is
+   * nested in, and that is the whole of what it needs: the pair are not
+   * otherwise coupled and neither reads the other's state. `settled` is false
+   * for each step of a drag and true once, at the end, for the reason a drag
+   * announces once: only the position it ends at is a preference.
+   * - `cross(by: HelixBaseSplitter, at: number) => void`: Records that a nested splitter crosses this one at `at` percent along it.
+   *
+   * Public because it is the whole of the channel between the two, and it runs
+   * one way: the child tells the parent where it is, and the parent draws the
+   * corner and drives them both. Nothing is read back, so neither has to know
+   * anything about the other's state.
+   * - `uncross(by: HelixBaseSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -16743,6 +16978,7 @@ export type CustomElementsSolidJs = {
    * - `start`: The box holding the first pane.
    * - `end`: The box holding the second.
    * - `separator`: The divider itself.
+   * - `corner`: The handle where two dividers cross, added on the client.
    */
   "helix-base-splitter": Partial<
     HelixBaseSplitterProps &

@@ -28553,12 +28553,20 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The divider is a line to look at and a box to hit, and they are different\nsizes. Drawn at the border's own width it is a one pixel pointer target, which\nis the fault every hand-rolled splitter has; the line is a border and the\ntarget is the box around it.\n\nIt lights on hover before it is touched, because a hairline says nothing about\nbeing movable, and the whole target lights rather than the line, so the thing\nthat answers the pointer is the thing that changed.\n\nBoth panes scroll and both have their minimum size taken off them. A flex\nitem's floor is its content, so a pane holding anything scrollable would\notherwise refuse to go below it: the divider would stop at a width nobody\nasked for and nothing would say why.",
+          "description": "The divider is a line to look at and a box to hit, and they are different\nsizes. Drawn at the border's own width it is a one pixel pointer target, which\nis the fault every hand-rolled splitter has; the line is a border and the\ntarget is the box around it.\n\nIt lights on hover before it is touched, because a hairline says nothing about\nbeing movable, and the whole target lights rather than the line, so the thing\nthat answers the pointer is the thing that changed.\n\nBoth panes scroll and both have their minimum size taken off them. A flex\nitem's floor is its content, so a pane holding anything scrollable would\notherwise refuse to go below it: the divider would stop at a width nobody\nasked for and nothing would say why.\n\nThe corner where a nested splitter crosses is twice the divider's target,\nbecause it is aimed at as a point rather than a line. It draws nothing of its\nown: the `move` cursor already says what it is, at the moment a reader is on\nit. A ring on focus is the exception, since with nothing drawn there would\notherwise be no way to see where the keyboard is.\n\nA divider stays lit for as long as it is moving, which `:hover` cannot say on\nits own: a drag captures the pointer, and a corner moves the nested divider\nwhile the reader is nowhere near it. It goes primary while it moves rather\nthan merely darker, because hover is a question and a drag is an answer, and\nbecause a corner moving two dividers at once needs the pair to read as one\ngesture.",
           "name": "HelixSplitter",
           "cssProperties": [
             {
               "description": "The line between the panes.",
               "name": "--splitter-color"
+            },
+            {
+              "description": "How wide the handle at a crossing is.",
+              "name": "--splitter-corner"
+            },
+            {
+              "description": "The line while it is being moved.",
+              "name": "--splitter-drag-color"
             },
             {
               "description": "The target under the pointer.",
@@ -28589,6 +28597,14 @@
             {
               "description": "The divider itself.",
               "name": "separator",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "description": "The handle where a nested splitter's divider crosses this one.",
+              "name": "corner",
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
@@ -28632,6 +28648,46 @@
               "default": "50",
               "description": "Where the divider starts, where nothing declared it.",
               "attribute": "default-position",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "collapsed",
+              "type": {
+                "text": "'end' | 'start' | undefined"
+              },
+              "description": "Which pane is shut, if either.\n\nThe same accessor pair as `position`, and deliberately a second state\nrather than a reading of the first. A pane shut by dragging the divider to\nthe edge and a pane shut on purpose look identical in geometry and are not\nthe same thing: only the second knows where to go back to. Kept apart, the\nopen position is simply the one collapsing never overwrote, so restoring\nneeds no memory of its own.\n\nIt overrides `min` and `max`, which is the point of it. Those keep a sliver\nof a pane during a drag; this is the thing that says the sliver can go.",
+              "attribute": "collapsed",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultCollapsed",
+              "type": {
+                "text": "'end' | 'start' | undefined"
+              },
+              "description": "Which pane starts shut, where nothing declared it.",
+              "attribute": "default-collapsed",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "collapsedSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How much of a shut pane is still shown, as a percentage.\n\nZero by default, which is a pane fully gone. A tab strip or a title bar\nthat should survive its own collapse says how much of itself to keep, and\nonly whoever put it there knows that, which is the same reason `min` is a\nconsumer's to set.",
+              "attribute": "collapsed-size",
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
@@ -28695,6 +28751,20 @@
             },
             {
               "kind": "field",
+              "name": "cornerLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize both'",
+              "description": "Accessible name for the handle where two dividers cross.",
+              "attribute": "corner-label",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "positionState",
               "type": {
                 "text": "number | undefined"
@@ -28736,6 +28806,61 @@
             },
             {
               "kind": "field",
+              "name": "collapsedState",
+              "type": {
+                "text": "'end' | 'none' | 'start' | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The collapse, whoever set it, and `undefined` until somebody has.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "collapsedMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns it, decided once and then fixed.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "collapsedIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "opened",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Where the divider was before the gesture that may be about to shut it.\n\nA drag writes a position on every pointer move, so by the time it reaches\nthe edge the number it started from is gone. Taken once, on the press, and\nwritten back if the gesture ends shut, so the pane opens to where it was\nrather than to the edge it was dragged against.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "initial",
               "type": {
                 "text": "number | undefined"
@@ -28750,6 +28875,76 @@
             },
             {
               "kind": "field",
+              "name": "dragging",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether this divider is being moved right now, by anything.\n\n`:hover` is not enough on its own. A drag holds the pointer through capture\nand a fast one leaves the eight pixel target behind, and a corner moves a\ndivider the pointer is nowhere near: the nested one, while the reader is on\nthe crossing. Both are dividers that are moving and should say so.\n\nA `data-` attribute on an element in this shadow root, never on the host.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "crossings",
+              "type": {
+                "text": "Array<{ at: number; by: HelixBaseSplitter }>"
+              },
+              "privacy": "private",
+              "default": "[]",
+              "description": "Nested splitters that cross this one, and how far along they cross it.\n\nWritten by the child, not found by the parent: a parent cannot poll for a\nchild that has not upgraded, so the child announces itself once it has. The\nnumber is the child's own `position`, which is also its offset along this\ndivider, because the child fills the pane and the pane spans this splitter\nend to end on the axis the divider runs.\n\nNot `@state`, because the array is mutated in place. `cross` and `uncross`\nrequest the update themselves.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "outer",
+              "type": {
+                "text": "HelixBaseSplitter | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The splitter this one is nested in, once it has found it.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "crossedAt",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The last position announced upward, so an unchanged one costs nothing.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "cornerOrigin",
+              "type": {
+                "text": "{\n    by: HelixBaseSplitter\n    inner: { length: number; start: number }\n    outer: { length: number; start: number }\n  } | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The two boxes a corner drag is measured against, taken once.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "origin",
               "type": {
                 "text": "{ length: number; start: number } | null"
@@ -28757,6 +28952,85 @@
               "privacy": "private",
               "default": "null",
               "description": "The host's box, measured once when a drag starts.\n\nMeasuring per move is a forced layout on every pointer event, in the middle\nof a gesture whose whole job is to stay ahead of the pointer. Nothing about\nit moves while the divider does.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "moveTo",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "settled",
+                  "default": "false"
+                }
+              ],
+              "description": "Moves the divider, and optionally says so.\n\nPublic because a corner on a nested splitter has to drive the one it is\nnested in, and that is the whole of what it needs: the pair are not\notherwise coupled and neither reads the other's state. `settled` is false\nfor each step of a drag and true once, at the end, for the reason a drag\nannounces once: only the position it ends at is a preference.",
+              "type": {
+                "text": "moveTo(next: number, settled = false) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "sliver",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The collapsed size, held inside the range a percentage can be.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "flush",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether a shut pane has gone entirely, leaving the divider on the edge.\n\nNot the same question as `collapsed`, and the stylesheet needs both: a pane\nshut down to a sliver still has a boundary worth drawing, and one shut to\nnothing has the container's own edge there instead.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "shutAt",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "'end' | 'start' | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "position",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
@@ -28791,7 +29065,7 @@
               "type": {
                 "text": "boolean"
               },
-              "privacy": "private",
+              "description": "Public because a nested splitter compares axes with the one it is in.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
@@ -28879,7 +29153,22 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true,
-              "description": "The keys a separator answers.\n\nBoth axes, always, which is the same call `KeyboardNavigationController`\nmakes for a set of items: a reader who guesses the wrong arrow on a divider\ngets nothing, and the orientation is a fact about the layout rather than\nabout which keys should work.",
+              "description": "The keys a separator answers.\n\nOne axis, the one the divider actually travels along, plus `Home` and `End`\nfor its bounds. The other two arrows are left alone and the page scrolls\nunder them as it would anywhere else.\n\n*Corrected 18 Aug 2026. This said \"both axes, always\", on the reasoning\n`KeyboardNavigationController` uses for a set of items: a reader who guesses\nthe wrong arrow gets nothing. The code has never done it, and measuring the\nthree tab stops of a nested pair is what turned that up, so the prose was\ndescribing a decision nobody implemented.*\n\n*Leaving it as one axis, because nesting is what settles it. Taking all four\nwould mean `ArrowLeft` moving a horizontal divider up and down, which is not\na reader being helped past a guess, it is an arrow that does not go the way\nit points. And the guess it was protecting against is answered better by the\ncorner: there, all four arrows are live and each moves the divider it points\nalong, which is the only place in a splitter where a second axis means\nanything.*",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the divider back where the markup put it.",
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
@@ -28890,7 +29179,153 @@
               "name": "handleDoubleClick",
               "privacy": "private",
               "readonly": true,
-              "description": "Puts the divider back where the markup put it.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleCornerDoubleClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Both of them, because the corner moves both.\n\nIt needs its own handler now. Inside the separator this came free by\nbubbling, and moving the corner out to sit against the host for the stacking\nreason took the double click with it: the divider reset and the crossing\ndid not. Reported.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "cross",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "by",
+                  "type": {
+                    "text": "HelixBaseSplitter"
+                  }
+                },
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Records that a nested splitter crosses this one at `at` percent along it.\n\nPublic because it is the whole of the channel between the two, and it runs\none way: the child tells the parent where it is, and the parent draws the\ncorner and drives them both. Nothing is read back, so neither has to know\nanything about the other's state.",
+              "type": {
+                "text": "cross(by: HelixBaseSplitter, at: number) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "uncross",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "by",
+                  "type": {
+                    "text": "HelixBaseSplitter"
+                  }
+                }
+              ],
+              "description": "Forgets a nested splitter that has left the tree. See `cross`.",
+              "type": {
+                "text": "uncross(by: HelixBaseSplitter) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "findOuter",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces this splitter to the one it is nested in, if they cross.\n\nClient only. The server has no tree to walk, and a parent that has not\nupgraded has no `orientation` to compare against, so this waits for\n`firstUpdated`. That is what the corner is allowed to be: an affordance\nrather than content, absent from the served markup and appearing at\nhydration, with two working dividers in the meantime.\n\n`parentElement` before `closest`, so a splitter does not find itself.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleCornerDown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleCornerMove",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Both axes at once, each measured against the splitter that owns it.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleCornerUp",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleCornerKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The corner takes every arrow, each moving the splitter whose axis it points\nalong, which is the only reading a keyboard can give a handle that moves in\ntwo directions.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "leaveSeparator",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Keeps a gesture on the corner to itself.\n\nThe corner was a child of the separator first, and every one of its events\nbubbled there, so the separator started its own drag from the same press.\nThat is worse than moving twice: the separator calls `setPointerCapture`,\nwhich retargets every later pointer event to *it*, so the corner's\n`pointerup` never arrived, its origin was never cleared, and it went on\nresizing with no button held. Reported as resizing without a press.\n\nThe corner is a sibling now, for the stacking reason in the stylesheet, so\nnothing reaches the separator by bubbling. This stays because the fix should\nnot depend on where the element happens to sit, and `preventDefault` is\nstill needed either way: a drag across a pane would otherwise select the\ntext under it.",
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
@@ -29043,6 +29478,43 @@
               }
             },
             {
+              "name": "collapsed",
+              "type": {
+                "text": "'end' | 'start' | undefined"
+              },
+              "description": "Which pane is shut, if either.\n\nThe same accessor pair as `position`, and deliberately a second state\nrather than a reading of the first. A pane shut by dragging the divider to\nthe edge and a pane shut on purpose look identical in geometry and are not\nthe same thing: only the second knows where to go back to. Kept apart, the\nopen position is simply the one collapsing never overwrote, so restoring\nneeds no memory of its own.\n\nIt overrides `min` and `max`, which is the point of it. Those keep a sliver\nof a pane during a drag; this is the thing that says the sliver can go.",
+              "fieldName": "collapsed",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "name": "default-collapsed",
+              "type": {
+                "text": "'end' | 'start' | undefined"
+              },
+              "description": "Which pane starts shut, where nothing declared it.",
+              "fieldName": "defaultCollapsed",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "name": "collapsed-size",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How much of a shut pane is still shown, as a percentage.\n\nZero by default, which is a pane fully gone. A tab strip or a title bar\nthat should survive its own collapse says how much of itself to keep, and\nonly whoever put it there knows that, which is the same reason `min` is a\nconsumer's to set.",
+              "fieldName": "collapsedSize",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
               "name": "min",
               "type": {
                 "text": "number"
@@ -29093,6 +29565,19 @@
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
               }
+            },
+            {
+              "name": "corner-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize both'",
+              "description": "Accessible name for the handle where two dividers cross.",
+              "fieldName": "cornerLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
             }
           ],
           "events": [
@@ -29100,7 +29585,7 @@
               "type": {
                 "text": "HelixChangeEvent"
               },
-              "description": "Fired when the divider settles, with the position.",
+              "description": "Fired when the divider settles, named `position` or `collapsed`.",
               "name": "helix-change",
               "reactProp": "onhelix-change",
               "inheritedFrom": {

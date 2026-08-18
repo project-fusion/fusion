@@ -2926,10 +2926,27 @@ item's floor is its content, so a pane holding anything scrollable would
 otherwise refuse to go below it: the divider would stop at a width nobody
 asked for and nothing would say why.
 
+The corner where a nested splitter crosses is twice the divider's target,
+because it is aimed at as a point rather than a line. It draws nothing of its
+own: the `move` cursor already says what it is, at the moment a reader is on
+it. A ring on focus is the exception, since with nothing drawn there would
+otherwise be no way to see where the keyboard is.
+
+A divider stays lit for as long as it is moving, which `:hover` cannot say on
+its own: a drag captures the pointer, and a corner moves the nested divider
+while the reader is nowhere near it. It goes primary while it moves rather
+than merely darker, because hover is a question and a drag is an answer, and
+because a corner moving two dividers at once needs the pair to read as one
+gesture.
+
 #### Properties
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `collapsed` | `collapsed` | `'end' \| 'start' \| undefined` | - | `HelixBaseSplitter` | Which pane is shut, if either. |
+| `collapsedSize` | `collapsed-size` | `number` | `0` | `HelixBaseSplitter` | How much of a shut pane is still shown, as a percentage. |
+| `cornerLabel` | `corner-label` | `string` | `'Resize both'` | `HelixBaseSplitter` | Accessible name for the handle where two dividers cross. |
+| `defaultCollapsed` | `default-collapsed` | `'end' \| 'start' \| undefined` | - | `HelixBaseSplitter` | Which pane starts shut, where nothing declared it. |
 | `defaultPosition` | `default-position` | `number` | `50` | `HelixBaseSplitter` | Where the divider starts, where nothing declared it. |
 | `label` | `label` | `string` | `'Resize panes'` | `HelixBaseSplitter` | Accessible name for the divider. |
 | `max` | `max` | `number` | `100` | `HelixBaseSplitter` | Nearest it may come to the end. |
@@ -2937,12 +2954,21 @@ asked for and nothing would say why.
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseSplitter` | Which way the panes are laid out. |
 | `position` | `position` | `number` | - | `HelixBaseSplitter` | Where the divider sits, as a percentage of the whole. |
 | `step` | `step` | `number` | `2` | `HelixBaseSplitter` | How far one arrow press moves it, as a percentage. |
+| `vertical` | - | `boolean` | - | `HelixBaseSplitter` | Public because a nested splitter compares axes with the one it is in. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `cross()` | `HelixBaseSplitter` | Records that a nested splitter crosses this one at `at` percent along it. |
+| `moveTo()` | `HelixBaseSplitter` | Moves the divider, and optionally says so. |
+| `uncross()` | `HelixBaseSplitter` | Forgets a nested splitter that has left the tree. See `cross`. |
 
 #### Events
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the divider settles, with the position. |
+| `helix-change` | `HelixChangeEvent` | Fired when the divider settles, named `position` or `collapsed`. |
 
 #### Slots
 
@@ -2958,12 +2984,15 @@ asked for and nothing would say why.
 | `start` | The box holding the first pane. |
 | `end` | The box holding the second. |
 | `separator` | The divider itself. |
+| `corner` | The handle where a nested splitter's divider crosses this one. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
 | `--splitter-color` | The line between the panes. |
+| `--splitter-corner` | How wide the handle at a crossing is. |
+| `--splitter-drag-color` | The line while it is being moved. |
 | `--splitter-hover-color` | The target under the pointer. |
 | `--splitter-target` | How wide the draggable box is. |
 

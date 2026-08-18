@@ -1,0 +1,33 @@
+<link
+  href="workbench.css"
+  rel="stylesheet"
+>
+
+<helix-splitter
+  default-position="70"
+  orientation="vertical"
+>
+  <helix-splitter
+    default-position="45"
+    slot="start"
+  >
+    <helix-card
+      appearance="plain"
+      slot="start"
+    >
+      <helix-text>Editor</helix-text>
+    </helix-card>
+    <helix-card
+      appearance="plain"
+      slot="end"
+    >
+      <helix-text>Preview</helix-text>
+    </helix-card>
+  </helix-splitter>
+  <helix-card
+    appearance="plain"
+    slot="end"
+  >
+    <helix-text>Terminal</helix-text>
+  </helix-card>
+</helix-splitter>

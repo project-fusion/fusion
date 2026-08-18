@@ -138,3 +138,309 @@ describe('splitter settling', () => {
     expect(host.position).toBe(30)
   })
 })
+
+const nested = async (
+  outer = '',
+  inner = 'orientation="vertical"',
+): Promise<[Splitter, Splitter]> => {
+  const host = (await mount(`<helix-splitter ${outer}>
+    <div slot="start">one</div>
+    <helix-splitter slot="end" ${inner}>
+      <div slot="start">two</div><div slot="end">three</div>
+    </helix-splitter>
+  </helix-splitter>`)) as Splitter
+  const within = host.querySelector('helix-splitter') as Splitter
+  await host.updateComplete
+  await within.updateComplete
+  await host.updateComplete
+  return [host, within]
+}
+
+const corner = (host: HTMLElement): HTMLElement | null =>
+  (host.shadowRoot?.querySelector('[part="corner"]') ?? null) as HTMLElement | null
+
+const grab = async (host: Splitter, handle: HTMLElement, type: string): Promise<PointerEvent> => {
+  const event = new (globalThis as unknown as { PointerEvent: typeof MouseEvent }).PointerEvent(
+    type,
+    { bubbles: true, cancelable: true },
+  ) as PointerEvent
+  handle.dispatchEvent(event)
+  await host.updateComplete
+  return event
+}
+
+describe('splitter crossings', () => {
+  test('the outer one draws the corner, and the nested one does not', async () => {
+    // It has to be the outer: the crossing is on a pane's edge, and a pane is
+    // `overflow: auto`, so a handle centred there is cut in half by the pane it
+    // belongs to.
+    const [host, within] = await nested()
+    expect(corner(host)).not.toBeNull()
+    expect(corner(within)).toBeNull()
+  })
+
+  test('it sits where the two dividers cross, on both their numbers', async () => {
+    const [host] = await nested('default-position="30"', 'orientation="vertical" position="65"')
+    const handle = corner(host) as HTMLElement
+    expect(handle.getAttribute('style')).toContain('--_splitter-position: 30%')
+    expect(handle.getAttribute('style')).toContain('--_splitter-corner-at: 65%')
+  })
+
+  test('it follows the nested divider as that one moves', async () => {
+    const [host, within] = await nested('default-position="30"', 'orientation="vertical" step="5"')
+    const bar = part(within, 'separator') as HTMLElement
+    bar.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowDown' }),
+    )
+    await within.updateComplete
+    await host.updateComplete
+    expect((corner(host) as HTMLElement).getAttribute('style')).toContain(
+      '--_splitter-corner-at: 55%',
+    )
+  })
+
+  test('parallel dividers never meet, so there is no corner', async () => {
+    const [host] = await nested('', '')
+    expect(corner(host)).toBeNull()
+  })
+
+  test('a nested splitter that leaves takes its corner with it', async () => {
+    const [host, within] = await nested()
+    within.remove()
+    await host.updateComplete
+    expect(corner(host)).toBeNull()
+  })
+
+  test('each arrow moves the splitter whose axis it points along', async () => {
+    const [host, within] = await nested(
+      'default-position="30" step="5"',
+      'orientation="vertical" default-position="60" step="5"',
+    )
+    const handle = corner(host) as HTMLElement
+    const press = async (key: string): Promise<KeyboardEvent> => {
+      const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
+      handle.dispatchEvent(event)
+      await host.updateComplete
+      await within.updateComplete
+      return event
+    }
+    await press('ArrowRight')
+    expect([host.position, within.position]).toEqual([35, 60])
+    await press('ArrowUp')
+    expect([host.position, within.position]).toEqual([35, 55])
+    expect((await press('Tab')).defaultPrevented).toBe(false)
+  })
+
+  test('a double click on the corner puts both dividers back', async () => {
+    // Free by bubbling while the corner lived inside the separator, and lost the
+    // moment it moved out to sit against the host. Reported.
+    const [host, within] = await nested(
+      'default-position="30" step="5"',
+      'orientation="vertical" default-position="60" step="5"',
+    )
+    const handle = corner(host) as HTMLElement
+    handle.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }),
+    )
+    handle.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }),
+    )
+    await host.updateComplete
+    await within.updateComplete
+    expect([host.position, within.position]).toEqual([35, 55])
+    handle.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }))
+    await host.updateComplete
+    await within.updateComplete
+    expect([host.position, within.position]).toEqual([30, 60])
+  })
+
+  test('nothing moves until something is pressed', async () => {
+    // Reported: it resized on a bare hover. The move handler runs on every
+    // pointer event the handle sees, so the origin taken at `pointerdown` is
+    // what says a drag is under way.
+    const [host, within] = await nested(
+      'default-position="30"',
+      'orientation="vertical" default-position="60"',
+    )
+    const handle = corner(host) as HTMLElement
+    await grab(host, handle, 'pointermove')
+    expect([host.position, within.position]).toEqual([30, 60])
+  })
+
+  test('the divider underneath never starts its own drag from the same press', async () => {
+    // It used to, and pointer capture then sent every later event to it, so the
+    // corner's `pointerup` never arrived and it kept resizing with no button
+    // held. The corner is a sibling now and stops its events either way.
+    const [host] = await nested()
+    let pressed = 0
+    ;(part(host, 'separator') as HTMLElement).addEventListener('pointerdown', () => {
+      pressed += 1
+    })
+    await grab(host, corner(host) as HTMLElement, 'pointerdown')
+    expect(pressed).toBe(0)
+  })
+})
+
+describe('splitter while it moves', () => {
+  test('the divider says it is moving, and stops when it settles', async () => {
+    // `:hover` cannot carry this: a drag captures the pointer, and a fast one
+    // leaves an eight pixel target behind.
+    const host = await splitter()
+    const bar = separator(host)
+    expect(bar.hasAttribute('data-dragging')).toBe(false)
+    await grab(host, bar, 'pointerdown')
+    expect(bar.hasAttribute('data-dragging')).toBe(true)
+    await grab(host, bar, 'pointerup')
+    expect(separator(host).hasAttribute('data-dragging')).toBe(false)
+  })
+
+  test('the accent is on the drag, not on the interest', async () => {
+    // Hover is a question and a drag is an answer, so the rule that answers has
+    // to be the later of the two: they tie on specificity, and a tie is settled
+    // by order alone.
+    //
+    // Against the declared text rather than a computed colour, because happy-dom
+    // resolves no cascade to ask. The colours themselves were checked in a
+    // browser, where reading one straight after flipping the attribute returns
+    // the transition mid-flight and lies.
+    const declared = (customElements.get('helix-splitter') as unknown as { styles: unknown }).styles
+    const sheet = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n')
+    const accent = sheet.indexOf('--splitter-drag-color')
+    const interest = sheet.indexOf('--splitter-hover-color')
+    expect(interest).toBeGreaterThan(-1)
+    expect(accent).toBeGreaterThan(interest)
+  })
+
+  test('a keyboard move never reads as a drag', async () => {
+    const host = await splitter('default-position="50" step="5"')
+    await press(host, 'ArrowRight')
+    expect(separator(host).hasAttribute('data-dragging')).toBe(false)
+  })
+
+  test('a corner lights both dividers, including the one under nobody', async () => {
+    const [host, within] = await nested()
+    const handle = corner(host) as HTMLElement
+    await grab(host, handle, 'pointerdown')
+    await within.updateComplete
+    expect(separator(host).hasAttribute('data-dragging')).toBe(true)
+    expect((part(within, 'separator') as HTMLElement).hasAttribute('data-dragging')).toBe(true)
+    await grab(host, handle, 'pointerup')
+    await within.updateComplete
+    expect(separator(host).hasAttribute('data-dragging')).toBe(false)
+    expect((part(within, 'separator') as HTMLElement).hasAttribute('data-dragging')).toBe(false)
+  })
+
+  test('the corner reports the divider whose value it carries', async () => {
+    // It moves both, and ARIA has no role for that, so the axis it names has to
+    // be the axis of the number it names. It named the perpendicular one.
+    const [host] = await nested('default-position="30"', 'orientation="vertical" position="65"')
+    const handle = corner(host) as HTMLElement
+    expect(handle.getAttribute('aria-valuenow')).toBe('65')
+    expect(handle.getAttribute('aria-orientation')).toBe('horizontal')
+  })
+})
+
+describe('splitter collapsing', () => {
+  test('a shut pane is gone, past whatever bounds a drag answers to', async () => {
+    // The bounds keep a pane from vanishing by accident. This is the deliberate
+    // version, so it goes through them.
+    const host = await splitter('default-position="40" min="20" default-collapsed="start"')
+    expect(host.position).toBe(0)
+  })
+
+  test('and keeps a sliver where it was asked to', async () => {
+    const host = await splitter('default-collapsed="end" collapsed-size="10"')
+    expect(host.position).toBe(90)
+  })
+
+  test('opening it again returns to where it was, with nothing remembering', async () => {
+    const host = (await splitter('default-position="35"')) as Splitter & {
+      collapsed?: 'end' | 'start'
+    }
+    host.collapsed = 'start'
+    await host.updateComplete
+    expect(host.position).toBe(0)
+    host.collapsed = undefined
+    await host.updateComplete
+    expect(host.position).toBe(35)
+  })
+
+  test('a drag that lands on the edge latches shut, and says which pane', async () => {
+    const host = await splitter('default-position="40"')
+    let named = ''
+    let value = ''
+    host.addEventListener('helix-change', (event) => {
+      const detail = (event as CustomEvent<{ name: string; value: string }>).detail
+      if (detail.name === 'collapsed') {
+        named = detail.name
+        value = detail.value
+      }
+    })
+    await press(host, 'Home')
+    expect([named, value]).toEqual(['collapsed', 'start'])
+    expect(host.hasAttribute('data-collapsed')).toBe(true)
+  })
+
+  test('a drag ending shut opens back to where the drag began, not to the edge', async () => {
+    const host = (await splitter('default-position="60"')) as Splitter & {
+      collapsed?: 'end' | 'start'
+    }
+    const bar = separator(host)
+    await grab(host, bar, 'pointerdown')
+    // Every move overwrites the position, so by the edge the start is gone
+    // unless the press took it.
+    host.position = 20
+    await host.updateComplete
+    await press(host, 'Home')
+    expect(host.collapsed).toBe('start')
+    host.collapsed = undefined
+    await host.updateComplete
+    expect(host.position).toBe(60)
+  })
+
+  test('any move opens it, so a shut pane is still draggable', async () => {
+    const host = (await splitter('default-collapsed="start" step="5"')) as Splitter & {
+      collapsed?: 'end' | 'start'
+    }
+    expect(host.position).toBe(0)
+    await press(host, 'ArrowRight')
+    expect(host.collapsed).toBeUndefined()
+    expect(host.position).toBe(5)
+    expect(host.hasAttribute('data-collapsed')).toBe(false)
+  })
+
+  test('a pane shut to nothing leaves no line behind, but keeps its target', async () => {
+    // The divider is flush against whatever contains the splitter, and that has
+    // its own edge: two lines a pixel apart with nothing between them.
+    const host = await splitter('default-collapsed="start"')
+    expect(separator(host).hasAttribute('data-flush')).toBe(true)
+  })
+
+  test('a pane shut to a sliver keeps its line, because a sliver is a pane', async () => {
+    const host = await splitter('default-collapsed="start" collapsed-size="10"')
+    expect(separator(host).hasAttribute('data-flush')).toBe(false)
+  })
+
+  test('and the line comes back the moment the pane opens', async () => {
+    const host = await splitter('default-collapsed="start" step="5"')
+    await press(host, 'ArrowRight')
+    expect(separator(host).hasAttribute('data-flush')).toBe(false)
+  })
+
+  test('declaring `collapsed` hands it over: it announces and applies nothing', async () => {
+    const host = (await splitter('collapsed="start"')) as Splitter & { collapsed?: 'end' | 'start' }
+    let asked = ''
+    host.addEventListener('helix-change', (event) => {
+      const detail = (event as CustomEvent<{ name: string; value: string }>).detail
+      if (detail.name === 'collapsed') {
+        asked = detail.value
+      }
+    })
+    await press(host, 'End')
+    expect(asked).toBe('end')
+    expect(host.collapsed).toBe('start')
+  })
+})

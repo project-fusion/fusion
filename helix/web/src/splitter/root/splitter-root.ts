@@ -21,6 +21,19 @@ import { styles } from './splitter-root.css.js'
  * otherwise refuse to go below it: the divider would stop at a width nobody
  * asked for and nothing would say why.
  *
+ * The corner where a nested splitter crosses is twice the divider's target,
+ * because it is aimed at as a point rather than a line. It draws nothing of its
+ * own: the `move` cursor already says what it is, at the moment a reader is on
+ * it. A ring on focus is the exception, since with nothing drawn there would
+ * otherwise be no way to see where the keyboard is.
+ *
+ * A divider stays lit for as long as it is moving, which `:hover` cannot say on
+ * its own: a drag captures the pointer, and a corner moves the nested divider
+ * while the reader is nowhere near it. It goes primary while it moves rather
+ * than merely darker, because hover is a question and a drag is an answer, and
+ * because a corner moving two dividers at once needs the pair to read as one
+ * gesture.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases SplitPane, Resizable, SplitView
@@ -29,8 +42,11 @@ import { styles } from './splitter-root.css.js'
  * @csspart start - The box holding the first pane.
  * @csspart end - The box holding the second.
  * @csspart separator - The divider itself.
+ * @csspart corner - The handle where a nested splitter's divider crosses this one.
  *
  * @cssproperty --splitter-color - The line between the panes.
+ * @cssproperty --splitter-corner - How wide the handle at a crossing is.
+ * @cssproperty --splitter-drag-color - The line while it is being moved.
  * @cssproperty --splitter-hover-color - The target under the pointer.
  * @cssproperty --splitter-target - How wide the draggable box is.
  */

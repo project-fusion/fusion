@@ -5,7 +5,7 @@ import {
   requestControlledChange,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * @summary Two panes and a divider the reader can move.
@@ -18,22 +18,48 @@ import { property } from 'lit/decorators.js'
  * inside a splitter gives the cross back, and gives the three-pane and the
  * four-pane arrangements it never had.
  *
- * **Where two of them cross, the inner one takes the pointer, and there is no
- * handle that moves both.** Measured on a three-deep nest: every separator
- * carries the same `z-index`, so a tie is broken by document order and a deeper
- * splitter is always later. That is deterministic rather than accidental, and it
- * is the right way round, since a reader pointing inside a pane is pointing at
- * that pane's divider. What it costs is the length of one divider where the
- * other crosses it: eight pixels of the outer one, reachable anywhere else along
+ * **Where two of them cross there is a corner, and it moves both.** A splitter
+ * slotted into a pane of another, at right angles to it, has one end of its
+ * divider sitting exactly on the other's. That end grows a handle: `move` under
+ * the pointer, both arrow axes on the keyboard, and a drag that carries the two
+ * positions at once.
+ *
+ * **The outer splitter draws it and the nested one announces itself upward.**
+ * Built the other way round first, because a splitter already knows where its
+ * own divider begins and needs no measurement of the other, and that version was
+ * clipped: the crossing lies on the boundary between a pane and the divider
+ * beside it, a handle centred there reaches back over the boundary, and a pane
+ * is `overflow: auto`. Exactly half the corner was cut off. The outer separator
+ * is the one element that already straddles the seam, so the corner belongs in
  * it.
  *
- * A corner that moved both at once is the one thing the sandbox has that nesting
- * does not give back. It is deliberately not here: it would need the outer
- * splitter to drive a slotted inner one, which is the parent-to-child
- * coordination `Pagination.Summary` records as having no answer that survives a
- * server render. A corner belongs to a composite that owns both positions
- * directly, the way the sandbox does, not to the two-pane component underneath
- * it.
+ * That makes the channel between the two a single call in a single direction:
+ * `cross(child, at)` says where the child crosses, `moveTo` drives either one,
+ * and neither reads the other's state. The child is what calls it, because a
+ * parent cannot poll for a child that has not upgraded yet.
+ *
+ * The one number it carries is a percentage rather than a measurement, which is
+ * what keeps either of them from measuring the other, and it assumes the nested
+ * splitter fills its pane. That is what slotting one into a pane does. Give the
+ * nested splitter its own inset, or wrap it in something smaller than the pane,
+ * and the corner is drawn where the crossing would be rather than where it is.
+ *
+ * **It is a client-side enhancement and says so.** Finding the parent means
+ * inspecting the tree, which a server cannot do, so the corner appears at
+ * `firstUpdated` and never in the served markup. That is allowed for exactly
+ * this: it is an affordance rather than content, and a splitter with no corner
+ * yet is a splitter with two working dividers.
+ *
+ * Where two dividers are parallel there is no corner, because there is nothing
+ * to take hold of. Where they cross without a corner, the inner divider takes
+ * the pointer: every separator sits on the same layer, so a tie goes to document
+ * order and a deeper splitter is always later.
+ *
+ * **A divider that is moving says so, whoever is moving it.** `:hover` cannot
+ * carry that: a drag holds the pointer through capture and a fast one leaves the
+ * target behind, and a corner moves the nested divider while the reader is on
+ * the crossing, nowhere near it. So a drag in progress is a state, and both
+ * dividers a corner moves are lit for as long as it moves them.
  *
  * **The divider is a real `role="separator"` with `aria-valuenow`, moved by the
  * arrow keys as well as by pointer.** A divider only a mouse can move is
@@ -45,6 +71,24 @@ import { property } from 'lit/decorators.js'
  * that stops dead short of the edge gives a reader no way to put a pane away.
  * Where a pane should keep a sliver of itself, only whoever put the tabs on it
  * knows how much, so they say so.
+ *
+ * **A pane can be shut, and that is not the same as a divider at the edge.**
+ * The geometry is identical and the knowledge is not: only a shut pane knows
+ * where to open back to. So `collapsed` is a second state rather than a reading
+ * of the position, and the position it opens to is simply the one collapsing
+ * never overwrote. `collapsed-size` keeps a sliver showing where a pane has a
+ * tab strip worth leaving, and collapse overrides `min` and `max`, which is
+ * what those are for: they keep a pane from vanishing by accident, and this is
+ * the deliberate version.
+ *
+ * The two are kept in step in one direction only: a drag that settles on the
+ * collapsed size latches shut, and any move opens it again. Otherwise a reader
+ * could drag a pane closed and the consumer's own button would still be
+ * offering to close it.
+ *
+ * A pane shut to nothing is told apart from one shut to a sliver, because the
+ * two want different dividers: a sliver still has a boundary worth drawing, and
+ * nothing leaves the divider sitting on the container's own edge.
  *
  * **The box is measured once, when a drag starts.** Measuring per move is a
  * forced layout on every pointer event, in the middle of a gesture whose whole
@@ -66,11 +110,12 @@ import { property } from 'lit/decorators.js'
  * @slot start - The pane before the divider.
  * @slot end - The pane after it.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the divider settles, with the position.
+ * @event {HelixChangeEvent} helix-change - Fired when the divider settles, named `position` or `collapsed`.
  *
  * @csspart start - The box holding the first pane.
  * @csspart end - The box holding the second.
  * @csspart separator - The divider itself.
+ * @csspart corner - The handle where two dividers cross, added on the client.
  */
 @customElement('helix-base-splitter')
 export class HelixBaseSplitter extends HelixElement {
@@ -98,6 +143,10 @@ export class HelixBaseSplitter extends HelixElement {
    */
   @property({ type: Number })
   get position(): number {
+    const shut = this.collapsed
+    if (shut) {
+      return shut === 'start' ? this.sliver : 100 - this.sliver
+    }
     return this.clamp(this.positionState ?? this.defaultPosition)
   }
 
@@ -110,6 +159,53 @@ export class HelixBaseSplitter extends HelixElement {
   /** Where the divider starts, where nothing declared it. */
   @property({ attribute: 'default-position', type: Number })
   defaultPosition = 50
+
+  /**
+   * Which pane is shut, if either.
+   *
+   * The same accessor pair as `position`, and deliberately a second state
+   * rather than a reading of the first. A pane shut by dragging the divider to
+   * the edge and a pane shut on purpose look identical in geometry and are not
+   * the same thing: only the second knows where to go back to. Kept apart, the
+   * open position is simply the one collapsing never overwrote, so restoring
+   * needs no memory of its own.
+   *
+   * It overrides `min` and `max`, which is the point of it. Those keep a sliver
+   * of a pane during a drag; this is the thing that says the sliver can go.
+   */
+  @property()
+  get collapsed(): 'end' | 'start' | undefined {
+    const held = this.collapsedState
+    if (held === undefined) {
+      return this.defaultCollapsed
+    }
+    return held === 'none' ? undefined : held
+  }
+
+  set collapsed(next: 'end' | 'start' | undefined) {
+    const previous = this.collapsed
+    /* `none` rather than `undefined`, because the two mean different things
+       here and conflating them cost a spec: `undefined` is nobody having
+       spoken, which is the seed's cue to answer, so clearing a collapse handed
+       it straight back to `default-collapsed` and the pane would not open. */
+    this.collapsedState = next ?? 'none'
+    this.requestUpdate('collapsed', previous)
+  }
+
+  /** Which pane starts shut, where nothing declared it. */
+  @property({ attribute: 'default-collapsed' })
+  defaultCollapsed?: 'end' | 'start'
+
+  /**
+   * How much of a shut pane is still shown, as a percentage.
+   *
+   * Zero by default, which is a pane fully gone. A tab strip or a title bar
+   * that should survive its own collapse says how much of itself to keep, and
+   * only whoever put it there knows that, which is the same reason `min` is a
+   * consumer's to set.
+   */
+  @property({ attribute: 'collapsed-size', type: Number })
+  collapsedSize = 0
 
   /** Nearest the divider may come to the start, as a percentage. */
   @property({ type: Number })
@@ -127,6 +223,10 @@ export class HelixBaseSplitter extends HelixElement {
   @property()
   label = 'Resize panes'
 
+  /** Accessible name for the handle where two dividers cross. */
+  @property({ attribute: 'corner-label' })
+  cornerLabel = 'Resize both'
+
   /** The position, whoever set it, and `undefined` until somebody has. */
   private positionState: number | undefined = undefined
 
@@ -137,8 +237,68 @@ export class HelixBaseSplitter extends HelixElement {
     return this.positionMode === true
   }
 
+  /** The collapse, whoever set it, and `undefined` until somebody has. */
+  private collapsedState: 'end' | 'none' | 'start' | undefined = undefined
+
+  /** Whether the consumer owns it, decided once and then fixed. */
+  private collapsedMode: boolean | undefined = undefined
+
+  private get collapsedIsControlled(): boolean {
+    return this.collapsedMode === true
+  }
+
+  /**
+   * Where the divider was before the gesture that may be about to shut it.
+   *
+   * A drag writes a position on every pointer move, so by the time it reaches
+   * the edge the number it started from is gone. Taken once, on the press, and
+   * written back if the gesture ends shut, so the pane opens to where it was
+   * rather than to the edge it was dragged against.
+   */
+  private opened: number | undefined = undefined
+
   /** Where the divider was when the element first rendered, for a reset. */
   private initial: number | undefined = undefined
+
+  /**
+   * Whether this divider is being moved right now, by anything.
+   *
+   * `:hover` is not enough on its own. A drag holds the pointer through capture
+   * and a fast one leaves the eight pixel target behind, and a corner moves a
+   * divider the pointer is nowhere near: the nested one, while the reader is on
+   * the crossing. Both are dividers that are moving and should say so.
+   *
+   * A `data-` attribute on an element in this shadow root, never on the host.
+   */
+  @state()
+  private dragging = false
+
+  /**
+   * Nested splitters that cross this one, and how far along they cross it.
+   *
+   * Written by the child, not found by the parent: a parent cannot poll for a
+   * child that has not upgraded, so the child announces itself once it has. The
+   * number is the child's own `position`, which is also its offset along this
+   * divider, because the child fills the pane and the pane spans this splitter
+   * end to end on the axis the divider runs.
+   *
+   * Not `@state`, because the array is mutated in place. `cross` and `uncross`
+   * request the update themselves.
+   */
+  private crossings: Array<{ at: number; by: HelixBaseSplitter }> = []
+
+  /** The splitter this one is nested in, once it has found it. */
+  private outer: HelixBaseSplitter | null = null
+
+  /** The last position announced upward, so an unchanged one costs nothing. */
+  private crossedAt: number | undefined = undefined
+
+  /** The two boxes a corner drag is measured against, taken once. */
+  private cornerOrigin: {
+    by: HelixBaseSplitter
+    inner: { length: number; start: number }
+    outer: { length: number; start: number }
+  } | null = null
 
   /**
    * The host's box, measured once when a drag starts.
@@ -149,6 +309,62 @@ export class HelixBaseSplitter extends HelixElement {
    */
   private origin: { length: number; start: number } | null = null
 
+  /**
+   * Moves the divider, and optionally says so.
+   *
+   * Public because a corner on a nested splitter has to drive the one it is
+   * nested in, and that is the whole of what it needs: the pair are not
+   * otherwise coupled and neither reads the other's state. `settled` is false
+   * for each step of a drag and true once, at the end, for the reason a drag
+   * announces once: only the position it ends at is a preference.
+   */
+  moveTo(next: number, settled = false): void {
+    /* An unsettled move is a drag in progress, which is what `settled` already
+       means, so the nested splitter a corner drives lights up without either of
+       them being told about the other's presentation. */
+    this.dragging = !settled
+    if (settled) {
+      this.settle(next)
+    } else {
+      this.move(next)
+    }
+  }
+
+  /**
+   * The collapse a settled position amounts to, if any.
+   *
+   * So that a pane dragged shut and a pane shut by a consumer's button are the
+   * same state. Left apart, a reader could drag the panel closed and the button
+   * offering to reopen it would read as already open.
+   *
+   * No separate threshold. Landing on the collapsed size *is* the gesture, and
+   * `clamp` puts every overshoot exactly on the bound, so the default of zero
+   * latches on any drag that runs off the end.
+   */
+  /** The collapsed size, held inside the range a percentage can be. */
+  private get sliver(): number {
+    return Math.min(100, Math.max(0, this.collapsedSize))
+  }
+
+  /**
+   * Whether a shut pane has gone entirely, leaving the divider on the edge.
+   *
+   * Not the same question as `collapsed`, and the stylesheet needs both: a pane
+   * shut down to a sliver still has a boundary worth drawing, and one shut to
+   * nothing has the container's own edge there instead.
+   */
+  private get flush(): boolean {
+    return this.collapsed !== undefined && this.sliver === 0
+  }
+
+  private shutAt(position: number): 'end' | 'start' | undefined {
+    const size = this.sliver
+    if (position <= size) {
+      return 'start'
+    }
+    return position >= 100 - size ? 'end' : undefined
+  }
+
   /** Pulled between the bounds, which are the ends unless a consumer moved them. */
   private clamp(next: number): number {
     const min = Math.max(0, Math.min(100, this.min))
@@ -156,7 +372,8 @@ export class HelixBaseSplitter extends HelixElement {
     return Math.min(max, Math.max(min, Number.isFinite(next) ? next : min))
   }
 
-  private get vertical(): boolean {
+  /** Public because a nested splitter compares axes with the one it is in. */
+  get vertical(): boolean {
     return this.orientation === 'vertical'
   }
 
@@ -174,6 +391,12 @@ export class HelixBaseSplitter extends HelixElement {
     }
     const previous = this.position
     this.positionState = wanted
+    /* A divider that is moving is a pane that is opening, and a shut one is
+       still draggable precisely so it can be. Silent, like the move itself:
+       the settling below is what announces either. */
+    if (!this.collapsedIsControlled) {
+      this.collapsedState = 'none'
+    }
     this.requestUpdate('position', previous)
   }
 
@@ -185,6 +408,7 @@ export class HelixBaseSplitter extends HelixElement {
    */
   private settle(next: number): void {
     const wanted = this.clamp(next)
+    const shut = this.shutAt(wanted)
     requestControlledChange({
       apply: (value) => {
         if (this.positionIsControlled) {
@@ -201,6 +425,32 @@ export class HelixBaseSplitter extends HelixElement {
       next: wanted,
       read: () => this.position,
     })
+    if (shut !== this.collapsed) {
+      /* Two values from one gesture, so two announcements. `ChangeDetail`
+         carries a name for exactly this, and a consumer listening for one of
+         them is not made to care about the other. */
+      requestControlledChange({
+        apply: (value) => {
+          if (this.collapsedIsControlled) {
+            return
+          }
+          const previous = this.collapsed
+          // Back to where the gesture started, so opening it again is a return
+          // rather than a jump to the edge it was dragged against.
+          if (value !== '' && this.opened !== undefined) {
+            this.positionState = this.opened
+          }
+          this.collapsedState = value === '' ? 'none' : (value as 'end' | 'start')
+          this.requestUpdate('collapsed', previous)
+        },
+        controlled: this.collapsedIsControlled,
+        event: (value) => new HelixChangeEvent({ name: 'collapsed', value }),
+        host: this,
+        label: 'collapsed',
+        next: shut ?? '',
+        read: () => this.collapsed ?? '',
+      })
+    }
   }
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
@@ -213,6 +463,9 @@ export class HelixBaseSplitter extends HelixElement {
        outruns a thin target otherwise ends the moment the pointer leaves it,
        which on a fast gesture is immediately. */
     separator.setPointerCapture(event.pointerId)
+    this.opened = this.collapsed ? undefined : this.position
+    // On the press rather than the first move, so holding it still says so too.
+    this.dragging = true
     event.preventDefault()
   }
 
@@ -239,16 +492,30 @@ export class HelixBaseSplitter extends HelixElement {
       separator.releasePointerCapture(event.pointerId)
     }
     this.origin = null
+    this.dragging = false
     this.settle(this.position)
   }
 
   /**
    * The keys a separator answers.
    *
-   * Both axes, always, which is the same call `KeyboardNavigationController`
-   * makes for a set of items: a reader who guesses the wrong arrow on a divider
-   * gets nothing, and the orientation is a fact about the layout rather than
-   * about which keys should work.
+   * One axis, the one the divider actually travels along, plus `Home` and `End`
+   * for its bounds. The other two arrows are left alone and the page scrolls
+   * under them as it would anywhere else.
+   *
+   * *Corrected 18 Aug 2026. This said "both axes, always", on the reasoning
+   * `KeyboardNavigationController` uses for a set of items: a reader who guesses
+   * the wrong arrow gets nothing. The code has never done it, and measuring the
+   * three tab stops of a nested pair is what turned that up, so the prose was
+   * describing a decision nobody implemented.*
+   *
+   * *Leaving it as one axis, because nesting is what settles it. Taking all four
+   * would mean `ArrowLeft` moving a horizontal divider up and down, which is not
+   * a reader being helped past a guess, it is an arrow that does not go the way
+   * it points. And the guess it was protecting against is answered better by the
+   * corner: there, all four arrows are live and each moves the divider it points
+   * along, which is the only place in a splitter where a second axis means
+   * anything.*
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const back = this.vertical ? 'ArrowUp' : 'ArrowLeft'
@@ -272,7 +539,7 @@ export class HelixBaseSplitter extends HelixElement {
   }
 
   /** Puts the divider back where the markup put it. */
-  private readonly handleDoubleClick = (): void => {
+  private reset(): void {
     if (this.initial === undefined) {
       return
     }
@@ -280,11 +547,255 @@ export class HelixBaseSplitter extends HelixElement {
     this.settle(this.initial)
   }
 
+  private readonly handleDoubleClick = (): void => {
+    this.reset()
+  }
+
+  /**
+   * Both of them, because the corner moves both.
+   *
+   * It needs its own handler now. Inside the separator this came free by
+   * bubbling, and moving the corner out to sit against the host for the stacking
+   * reason took the double click with it: the divider reset and the crossing
+   * did not. Reported.
+   */
+  private readonly handleCornerDoubleClick = (event: MouseEvent): void => {
+    const crossing = this.crossings[Number((event.currentTarget as HTMLElement).dataset.cross)]
+    if (!crossing) {
+      return
+    }
+    this.reset()
+    crossing.by.reset()
+    this.leaveSeparator(event)
+  }
+
+  /**
+   * Records that a nested splitter crosses this one at `at` percent along it.
+   *
+   * Public because it is the whole of the channel between the two, and it runs
+   * one way: the child tells the parent where it is, and the parent draws the
+   * corner and drives them both. Nothing is read back, so neither has to know
+   * anything about the other's state.
+   */
+  cross(by: HelixBaseSplitter, at: number): void {
+    const found = this.crossings.find((crossing) => crossing.by === by)
+    if (found) {
+      if (found.at === at) {
+        return
+      }
+      found.at = at
+    } else {
+      this.crossings.push({ at, by })
+    }
+    this.requestUpdate()
+  }
+
+  /** Forgets a nested splitter that has left the tree. See `cross`. */
+  uncross(by: HelixBaseSplitter): void {
+    const at = this.crossings.findIndex((crossing) => crossing.by === by)
+    if (at === -1) {
+      return
+    }
+    this.crossings.splice(at, 1)
+    this.requestUpdate()
+  }
+
+  /**
+   * Announces this splitter to the one it is nested in, if they cross.
+   *
+   * Client only. The server has no tree to walk, and a parent that has not
+   * upgraded has no `orientation` to compare against, so this waits for
+   * `firstUpdated`. That is what the corner is allowed to be: an affordance
+   * rather than content, absent from the served markup and appearing at
+   * hydration, with two working dividers in the meantime.
+   *
+   * `parentElement` before `closest`, so a splitter does not find itself.
+   */
+  private findOuter(): void {
+    const outer = this.parentElement?.closest<HelixBaseSplitter>(
+      'helix-splitter, helix-base-splitter',
+    )
+    if (!outer || outer === this || outer.vertical === this.vertical) {
+      // Parallel dividers never meet, so there is no corner to take hold of.
+      return
+    }
+    this.outer = outer
+    this.crossedAt = this.position
+    outer.cross(this, this.position)
+  }
+
+  private readonly handleCornerDown = (event: PointerEvent): void => {
+    const handle = event.currentTarget as HTMLElement
+    const crossing = this.crossings[Number(handle.dataset.cross)]
+    if (!crossing) {
+      return
+    }
+    const mine = this.getBoundingClientRect()
+    const theirs = crossing.by.getBoundingClientRect()
+    this.cornerOrigin = {
+      by: crossing.by,
+      inner: crossing.by.vertical
+        ? { length: theirs.height, start: theirs.top }
+        : { length: theirs.width, start: theirs.left },
+      outer: this.vertical
+        ? { length: mine.height, start: mine.top }
+        : { length: mine.width, start: mine.left },
+    }
+    handle.setPointerCapture(event.pointerId)
+    this.opened = this.collapsed ? undefined : this.position
+    crossing.by.opened = crossing.by.collapsed ? undefined : crossing.by.position
+    /* Both of them, on the press. The nested one is reachable here because it is
+       the same class, and this is the whole of what the corner needs beyond
+       `moveTo`: a divider being moved looks like one. */
+    this.dragging = true
+    crossing.by.dragging = true
+    this.leaveSeparator(event)
+  }
+
+  /** Both axes at once, each measured against the splitter that owns it. */
+  private readonly handleCornerMove = (event: PointerEvent): void => {
+    const origin = this.cornerOrigin
+    if (!origin) {
+      return
+    }
+    const rtl = getComputedStyle(this).direction === 'rtl'
+    const along = (
+      box: { length: number; start: number },
+      at: number,
+      inline: boolean,
+    ): number | undefined => {
+      if (box.length === 0) {
+        return undefined
+      }
+      const raw = ((at - box.start) / box.length) * 100
+      return inline && rtl ? 100 - raw : raw
+    }
+    const mine = along(origin.outer, this.vertical ? event.clientY : event.clientX, !this.vertical)
+    const theirs = along(
+      origin.inner,
+      origin.by.vertical ? event.clientY : event.clientX,
+      !origin.by.vertical,
+    )
+    if (mine !== undefined) {
+      this.moveTo(mine)
+    }
+    if (theirs !== undefined) {
+      origin.by.moveTo(theirs)
+    }
+    this.leaveSeparator(event)
+  }
+
+  private readonly handleCornerUp = (event: PointerEvent): void => {
+    const origin = this.cornerOrigin
+    if (!origin) {
+      return
+    }
+    const handle = event.currentTarget as HTMLElement
+    if (handle.hasPointerCapture(event.pointerId)) {
+      handle.releasePointerCapture(event.pointerId)
+    }
+    this.cornerOrigin = null
+    this.moveTo(this.position, true)
+    origin.by.moveTo(origin.by.position, true)
+    this.leaveSeparator(event)
+  }
+
+  /**
+   * The corner takes every arrow, each moving the splitter whose axis it points
+   * along, which is the only reading a keyboard can give a handle that moves in
+   * two directions.
+   */
+  private readonly handleCornerKeydown = (event: KeyboardEvent): void => {
+    const crossing = this.crossings[Number((event.currentTarget as HTMLElement).dataset.cross)]
+    if (!crossing) {
+      return
+    }
+    const inner = crossing.by
+    const mineBack = this.vertical ? 'ArrowUp' : 'ArrowLeft'
+    const mineForward = this.vertical ? 'ArrowDown' : 'ArrowRight'
+    const theirsBack = inner.vertical ? 'ArrowUp' : 'ArrowLeft'
+    const theirsForward = inner.vertical ? 'ArrowDown' : 'ArrowRight'
+
+    if (event.key === mineBack || event.key === mineForward) {
+      this.moveTo(this.position + (event.key === mineBack ? -this.step : this.step), true)
+    } else if (event.key === theirsBack || event.key === theirsForward) {
+      inner.moveTo(inner.position + (event.key === theirsBack ? -inner.step : inner.step), true)
+    } else {
+      return
+    }
+    this.leaveSeparator(event)
+  }
+
+  /**
+   * Keeps a gesture on the corner to itself.
+   *
+   * The corner was a child of the separator first, and every one of its events
+   * bubbled there, so the separator started its own drag from the same press.
+   * That is worse than moving twice: the separator calls `setPointerCapture`,
+   * which retargets every later pointer event to *it*, so the corner's
+   * `pointerup` never arrived, its origin was never cleared, and it went on
+   * resizing with no button held. Reported as resizing without a press.
+   *
+   * The corner is a sibling now, for the stacking reason in the stylesheet, so
+   * nothing reaches the separator by bubbling. This stays because the fix should
+   * not depend on where the element happens to sit, and `preventDefault` is
+   * still needed either way: a drag across a pane would otherwise select the
+   * text under it.
+   */
+  private leaveSeparator(event: Event): void {
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    // Only on a re-connect. The first pass waits for `firstUpdated`, which is
+    // where a parent is guaranteed to have upgraded.
+    if (this.hasUpdated) {
+      this.findOuter()
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.outer?.uncross(this)
+    this.outer = null
+    this.crossedAt = undefined
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.findOuter()
+  }
+
+  /** Keeps the corner in step while this divider moves under it. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    /* The resolved collapse, mirrored for a consumer's own rules: a shut pane
+       usually wants its contents to stop being read as well as stop being seen.
+       `data-` and not `collapsed`, so a serialized host cannot be re-parsed with
+       it declared, which is the trap `value` records. It carries which pane
+       rather than a bare boolean, and that is still a state and not a payload:
+       two names for the two sides, nothing of the consumer's in it. */
+    if (this.collapsed) {
+      this.dataset.collapsed = this.collapsed
+    } else {
+      delete this.dataset.collapsed
+    }
+    if (this.outer && this.position !== this.crossedAt) {
+      this.crossedAt = this.position
+      this.outer.cross(this, this.position)
+    }
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // Only the first time, before anything reads it. See `MixinControllerOpen`.
     if (this.positionMode === undefined) {
       this.positionMode = this.positionState !== undefined
+    }
+    if (this.collapsedMode === undefined) {
+      this.collapsedMode = this.collapsedState !== undefined
     }
     if (this.initial === undefined) {
       this.initial = this.position
@@ -305,6 +816,8 @@ export class HelixBaseSplitter extends HelixElement {
         aria-valuemax=${this.clamp(this.max)}
         aria-valuemin=${this.clamp(this.min)}
         aria-valuenow=${Math.round(position)}
+        ?data-dragging=${this.dragging}
+        ?data-flush=${this.flush}
         @dblclick=${this.handleDoubleClick}
         @keydown=${this.handleKeydown}
         @pointercancel=${this.handlePointerUp}
@@ -312,12 +825,28 @@ export class HelixBaseSplitter extends HelixElement {
         @pointermove=${this.handlePointerMove}
         @pointerup=${this.handlePointerUp}
       ></div>
-      <div part="end"><slot name="end"></slot></div>`
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'helix-base-splitter': HelixBaseSplitter
+      <div part="end">
+        <slot name="end"></slot>
+      </div>
+      ${this.crossings.map(
+        (crossing, index) => html`<div
+          part="corner"
+          role="separator"
+          tabindex="0"
+          aria-label=${this.cornerLabel}
+          aria-orientation=${crossing.by.vertical ? 'horizontal' : 'vertical'}
+          aria-valuemax="100"
+          aria-valuemin="0"
+          aria-valuenow=${Math.round(crossing.at)}
+          data-cross=${index}
+          style="--_splitter-corner-at: ${crossing.at}%; --_splitter-position: ${position}%"
+          @dblclick=${this.handleCornerDoubleClick}
+          @keydown=${this.handleCornerKeydown}
+          @pointercancel=${this.handleCornerUp}
+          @pointerdown=${this.handleCornerDown}
+          @pointermove=${this.handleCornerMove}
+          @pointerup=${this.handleCornerUp}
+        ></div>`,
+      )}`
   }
 }

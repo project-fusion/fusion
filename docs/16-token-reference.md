@@ -39,11 +39,11 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
 | `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 110 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 85 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 87 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 7 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 6 |
-| `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 76 |
+| `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 78 |
 | `--helix-color-syntax-callable` | `light-dark( var(--_helix-syntax-callable-light), var(--_helix-syntax-callable-dark) )` | 1 |
 | `--helix-color-syntax-comment` | `light-dark( var(--_helix-syntax-comment-light), var(--_helix-syntax-comment-dark) )` | 1 |
 | `--helix-color-syntax-constant` | `light-dark( var(--_helix-syntax-constant-light), var(--_helix-syntax-constant-dark) )` | 1 |
@@ -67,7 +67,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 149 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 145 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 132 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 65 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 73 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 56 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 19 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 27 |
@@ -145,7 +145,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 120 |
+| `--helix-border-thin` | `1px` | 124 |
 | `--helix-border-thick` | `2px` | 33 |
 
 ## shadow
@@ -233,8 +233,8 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 4 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 41 |
-| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 76 |
-| `--helix-size-focus-offset` | `2px` | 70 |
+| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 78 |
+| `--helix-size-focus-offset` | `2px` | 72 |
 
 ## layer
 
@@ -243,7 +243,7 @@ Position in the stack. Positional, never named after a component.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-layer-base` | `0` | 8 |
-| `--helix-layer-raised` | `10` | 22 |
+| `--helix-layer-raised` | `10` | 24 |
 | `--helix-layer-sticky` | `100` | 2 |
 | `--helix-layer-overlay` | `1000` | 2 |
 | `--helix-layer-toast` | `1200` | 2 |

@@ -33,3 +33,50 @@ describe('splitter server output', () => {
     expect(hostAttributes(ssr(split), 'helix-splitter')).toEqual(['default-position'])
   })
 })
+
+const nest = html`<helix-splitter default-position="30">
+  <div slot="start">one</div>
+  <helix-splitter orientation="vertical" slot="end">
+    <div slot="start">two</div>
+    <div slot="end">three</div>
+  </helix-splitter>
+</helix-splitter>`
+
+const shut = html`<helix-splitter default-position="40" default-collapsed="start">
+  <div slot="start">one</div>
+  <div slot="end">two</div>
+</helix-splitter>`
+
+describe('splitter crossings on a server', () => {
+  test('no corner is served, because a server cannot see the tree', () => {
+    // It is an affordance rather than content, so it is allowed to arrive at
+    // hydration. Until it does there are still two working dividers.
+    //
+    // The divider is asserted alongside it, and that is the point of the pair:
+    // written against a raw string rather than a template, `ssr` rendered
+    // nothing, `hasPart` answered false, and the test passed while proving
+    // nothing at all.
+    expect(hasPart(ssr(nest), 'separator')).toBe(true)
+    expect(hasPart(ssr(nest), 'corner')).toBe(false)
+  })
+})
+
+describe('splitter collapsing on a server', () => {
+  test('a pane declared shut is already shut in the markup', () => {
+    // The geometry lives on the pane in this shadow root, so the server can
+    // write it and nothing moves on hydration.
+    expect(partTag(ssr(shut), 'start')).toContain('0%')
+  })
+
+  test('the divider reports the shut position, not the seed underneath it', () => {
+    expect(partTag(ssr(shut), 'separator')).toContain('aria-valuenow="0"')
+  })
+
+  test('the host still carries only what the consumer wrote', () => {
+    // `data-collapsed` is mirrored once the element upgrades, never served.
+    expect(hostAttributes(ssr(shut), 'helix-splitter')).toEqual([
+      'default-collapsed',
+      'default-position',
+    ])
+  })
+})

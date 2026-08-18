@@ -11,6 +11,10 @@
   display: flex;
   min-block-size: 0;
   min-inline-size: 0;
+  /* For the corner, which is positioned against this box. `relative` with an
+     `auto` z-index is not a stacking context, so nothing about how this splitter
+     paints inside its own parent changes. */
+  position: relative;
 }
 
 :host([orientation="vertical"]) {
@@ -86,8 +90,8 @@
   inline-size: var(--helix-border-thin);
   inset-block: 0;
   inset-inline-start: 50%;
+  margin-inline-start: calc(var(--helix-border-thin) / -2);
   position: absolute;
-  translate: -50%;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     inline-size var(--helix-duration-fast) var(--helix-easing-standard);
@@ -106,7 +110,7 @@
   inline-size: auto;
   inset-block-start: 50%;
   inset-inline: 0;
-  translate: 0 -50%;
+  margin-block-start: calc(var(--helix-border-thin) / -2);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     block-size var(--helix-duration-fast) var(--helix-easing-standard);
@@ -125,7 +129,8 @@
  * One step of the layer is enough, because a hovered inner divider is later
  * again and wins the tie the same way. The rule is simply that interest wins. */
 [part="separator"]:hover,
-[part="separator"]:focus-visible {
+[part="separator"]:focus-visible,
+[part="separator"][data-dragging] {
   z-index: calc(var(--helix-layer-raised) + 1);
 }
 
@@ -134,14 +139,49 @@
    about the second made the line appear to change width. The line thickens and
    darkens instead: it is the thing being pointed at, so it is the thing that
    answers. */
+/* **A pane shut to nothing gets no line at rest.**
+ *
+ * There is already an edge there: the divider has been dragged flush against
+ * whatever contains the splitter, so the hairline lands on top of a border that
+ * is drawn by something else, and the reader sees two lines a pixel apart with
+ * nothing between them. A pane shut to a *sliver* keeps its line, because a
+ * sliver is a real pane with a real boundary.
+ *
+ * Idle only. The eight pixel target is still there and still answers, so hover,
+ * focus and a drag all bring the line straight back, which is what lets a pane
+ * shut to nothing be opened again. Those rules carry the same specificity as
+ * this one and sit after it, which is what decides it. */
+[part="separator"][data-flush]::before {
+  background-color: transparent;
+}
+
+/* Interest darkens the line and thickens it. */
 [part="separator"]:hover::before,
-[part="separator"]:focus-visible::before {
+[part="separator"]:focus-visible::before,
+[part="separator"][data-dragging]::before {
   background-color: var(--splitter-hover-color, var(--helix-color-foreground-muted));
   inline-size: var(--helix-border-thick);
 }
 
+/* **And a divider that is actually moving goes primary.**
+ *
+ * Hover is a question and a drag is an answer, so they should not look the
+ * same. It also has a job the hover colour cannot do: a corner moves two
+ * dividers at once, one of them nowhere near the pointer, and the accent is what
+ * makes the pair read as one gesture rather than as a line that happened to
+ * darken.
+ *
+ * `:hover` alone could carry none of this. A drag captures the pointer and a
+ * fast one leaves the eight pixel target behind, and the nested divider a corner
+ * moves is never hovered at all. After the interest rules, so a divider being
+ * dragged under the pointer is primary rather than muted. */
+[part="separator"][data-dragging]::before {
+  background-color: var(--splitter-drag-color, var(--helix-color-primary));
+}
+
 :host([orientation="vertical"]) [part="separator"]:hover::before,
-:host([orientation="vertical"]) [part="separator"]:focus-visible::before {
+:host([orientation="vertical"]) [part="separator"]:focus-visible::before,
+:host([orientation="vertical"]) [part="separator"][data-dragging]::before {
   block-size: var(--helix-border-thick);
   inline-size: auto;
 }
@@ -163,4 +203,72 @@
   :host([orientation="vertical"]) [part="separator"]::before {
     transition: none;
   }
+}
+
+/* The corner, where a nested splitter's divider crosses this one.
+ *
+ * **Drawn by the outer splitter, and it has to be.** The crossing sits on the
+ * boundary between a pane and the divider beside it, so a handle centred on it
+ * straddles that boundary, and a pane is `overflow: auto` and clips whatever
+ * reaches out of it. Built on the nested splitter first, and measured: exactly
+ * the half that reached back over the seam was cut off.
+ *
+ * **And it is a sibling of the divider rather than a child of it.** Inside the
+ * separator it was inside the separator's stacking context, which `z-index`
+ * creates, so its own layer only ordered it against the divider's other
+ * children. The whole context still sat at `raised`, tied with the nested
+ * splitter's separator, and a tie goes to document order: the nested one is
+ * later, so it took the pointer along the eight pixels where the two dividers
+ * overlap. Hit-tested at the crossing before the move, the centre and the whole
+ * inline-forward edge of the corner resolved to the nested splitter. Positioned
+ * against the host instead, the corner's layer is read in the host's context and
+ * beats every separator in the nest.
+ *
+ * It needs two numbers and has both: `--_splitter-position` is this splitter's
+ * own divider, and `--_splitter-corner-at` is the nested one's, which the child
+ * announces. Each is a percentage of the host on its own axis, and the nested
+ * splitter fills its pane, so its position is an offset along this divider too.
+ *
+ * Sixteen pixels against the divider's eight: it is the target for two dividers
+ * rather than one, and the reader is aiming at a point instead of a line. It is
+ * centred on the crossing with logical margins rather than `translate`, which is
+ * physical and would push the inline half the wrong way in a right-to-left
+ * document. Margins on an absolutely positioned box offset it from its inset and
+ * do flip. */
+[part="corner"] {
+  block-size: var(--splitter-corner, var(--helix-space-md));
+  /* The four-point arrow: this handle moves two dividers, and `col-resize` or
+     `row-resize` would each name half of what it does. */
+  cursor: move;
+  inline-size: var(--splitter-corner, var(--helix-space-md));
+  inset-block-start: var(--_splitter-corner-at);
+  inset-inline-start: var(--_splitter-position);
+  margin-block-start: calc(var(--splitter-corner, var(--helix-space-md)) / -2);
+  margin-inline-start: calc(var(--splitter-corner, var(--helix-space-md)) / -2);
+  position: absolute;
+  touch-action: none;
+  user-select: none;
+  z-index: calc(var(--helix-layer-raised) + 2);
+}
+
+/* The axes swap with the divider: a horizontal splitter's own divider is an
+   inline offset and the crossing is a distance down it, and the other way round
+   for a vertical one. */
+:host([orientation="vertical"]) [part="corner"] {
+  inset-block-start: var(--_splitter-position);
+  inset-inline-start: var(--_splitter-corner-at);
+}
+
+/* **The handle draws nothing, and the cursor is the whole affordance.** A mark
+   was tried at rest and then only on approach, and both were wrong for the same
+   reason: `move` already says exactly this, it says it at the moment the reader
+   is on the crossing, and it costs the layout no ink. A crossing is two lines
+   meeting, which is what it looks like.
+ 
+   A ring on focus is the exception, and it is not decoration: with nothing drawn
+   there is otherwise no way to see where the keyboard is. It goes on the target,
+   because the target is now the only thing the corner has. */
+[part="corner"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
 }
