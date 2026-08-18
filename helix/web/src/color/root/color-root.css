@@ -117,11 +117,15 @@
   inline-size: var(--helix-size-icon-lg);
 }
 
+/* `sm` between the ramps, not `2xs`. They are two separate decisions that
+   happen to be the same shape, and stacked tight they read as one striped
+   control: the hue is a wheel and the opacity is a proportion, and nothing but
+   the space says so. */
 [part="channels"] {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: var(--helix-space-2xs);
+  gap: var(--helix-space-sm);
   min-inline-size: 0;
 }
 
@@ -197,61 +201,103 @@
   display: none;
 }
 
+/* The tools, sized down from the field height every button here takes by
+ * default.
+ *
+ * The token is set on the group and inherited, rather than reaching through
+ * `::part(button)` into each one: `--helix-size-control` is what a button reads
+ * for its height, so scoping the small value to this subtree is the density
+ * mechanism working rather than a component being overridden. The document's own
+ * `[data-density="sm"]` rule cannot help here, being a document rule that
+ * reaches `helix-button::part(button)` and so stopping at the first shadow
+ * boundary, which this row is two inside. */
+/* The two tools, joined into one control.
+ *
+ * Their own rules rather than `helix-button` inside `helix-button-group`, which
+ * was tried and rendered two unstyled words. The button keeps its whole
+ * appearance in the base layer as `helix-button::part(button)`, and a part
+ * selector crosses exactly one shadow boundary: a document rule reaches a button
+ * on the page and stops one short of a button inside this element. Measured, it
+ * came out with no background, no border, no radius and no padding.
+ *
+ * What is borrowed is the arrangement rather than the element. The second button
+ * is pulled onto the first's border so the two share one line, which is what
+ * Button Group does and for the same reason. */
+[part="actions"] {
+  display: flex;
+  flex: none;
+}
+
 [part="eyedropper"],
 [part="format"] {
   all: unset;
   align-items: center;
-  border-radius: var(--helix-radii-sm);
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
   box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: flex;
   justify-content: center;
+  min-block-size: var(--helix-size-control-sm);
+  padding-inline: var(--helix-space-2xs);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* Round at the ends and square at the join, so the pair reads as one control
+   rather than as two that happen to touch. Logical corners, so it holds when the
+   row is mirrored. */
+[part="actions"] > *:first-child {
+  border-end-start-radius: var(--helix-radii-sm);
+  border-start-start-radius: var(--helix-radii-sm);
+}
+
+[part="actions"] > *:last-child {
+  border-end-end-radius: var(--helix-radii-sm);
+  border-start-end-radius: var(--helix-radii-sm);
+}
+
+[part="actions"] > *:not(:first-child) {
+  margin-inline-start: calc(var(--helix-border-thin) * -1);
+}
+
+/* A hovered or focused button draws above its neighbour, or the border it lights
+   up is half covered by the one overlapping it. The same note Button Group
+   carries, for the same overlap. */
 [part="eyedropper"]:hover,
 [part="format"]:hover {
   background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
+  position: relative;
+  z-index: var(--helix-layer-raised);
 }
 
 [part="eyedropper"]:focus-visible,
-[part="format"]:focus-visible,
-[part="swatch"]:focus-visible {
+[part="format"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
+  position: relative;
+  z-index: var(--helix-layer-raised);
 }
 
-/* Drawn rather than slotted, the same stencil-over-a-coloured-box the checkbox
-   uses, so a colour picker costs no icon dependency and no element to fill. */
-[part="eyedropper"] {
-  background-color: currentColor;
-  block-size: var(--helix-size-icon);
-  flex: none;
-  inline-size: var(--helix-size-icon);
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 4a2.8 2.8 0 0 1 4 4l-8 8-4 1 1-4z'/%3E%3Cpath d='M11 10 4 17v3h3l7-7'/%3E%3C/svg%3E");
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: 70%;
+/* The mark comes from the icon set rather than being drawn here. It was a mask
+   with a hand-written path in it, which meant this component owned an eyedropper
+   nothing else could reuse and nobody would think to fix. `helix-icon` styles
+   itself from its own stylesheet, so unlike `helix-button` it works at any
+   depth. */
+[part="eyedropper"] helix-icon {
+  --icon-size: var(--helix-size-icon-sm);
 }
 
-[part="eyedropper"]:hover {
-  background-color: var(--helix-color-foreground);
-}
-
-/* The syntax, written out. Uppercased in the stylesheet rather than in the
-   markup, so the accessible name stays a word rather than an abbreviation a
-   screen reader spells out. */
+/* Small caps rather than uppercased text: `text-transform` would leave a screen
+   reader reading a shouted token, and the accessible name is the word. */
 [part="format"] {
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
+  font-variant-caps: all-small-caps;
   font-weight: var(--helix-weight-medium);
-  min-block-size: var(--helix-size-icon);
-  padding-inline: var(--helix-space-2xs);
-  text-transform: uppercase;
 }
 
 [part="swatches"] {
@@ -275,7 +321,6 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-primary);
   outline-offset: var(--helix-size-focus-offset);
 }
-
 @media (prefers-reduced-motion: reduce) {
   [part="eyedropper"],
   [part="format"] {

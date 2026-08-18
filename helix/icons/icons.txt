@@ -30,6 +30,7 @@ download
 envelope
 eye
 eye-slash
+eyedropper
 flask
 folder-open
 funnel-simple

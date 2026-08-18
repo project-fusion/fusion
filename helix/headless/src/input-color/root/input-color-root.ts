@@ -98,6 +98,23 @@ export class HelixBaseInputColor extends MixinControllerOpen(
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
   })
 
+  /**
+   * The last value that was a colour.
+   *
+   * Half-typed input reaches here on every keystroke and most of it is not a
+   * colour, so the picker is given the last thing that was one rather than a
+   * fallback. Typing `#00ff00` one character at a time goes `#`, `#0`, `#00`,
+   * `#00f`, `#00ff`, `#00ff0`, `#00ff00`: measured, the square went red, red,
+   * red, blue, blue, **red**, green, because two of those are colours and the
+   * ones between are not. Holding the last good one takes the flicker out and
+   * leaves the square on blue until green arrives.
+   *
+   * Not state, because it is only ever read on a render the value already
+   * caused. The same reasoning Input Date records for its calendar, which will
+   * not follow a date until the field says something complete.
+   */
+  private settled = ''
+
   private get control(): HTMLInputElement | null {
     if (typeof this.renderRoot?.querySelector !== 'function') {
       return null
@@ -105,7 +122,12 @@ export class HelixBaseInputColor extends MixinControllerOpen(
     return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
   }
 
-  /** What the picker should paint, which is only ever a colour. */
+  /** What the picker should show, which is only ever a colour. */
+  private get picked(): string {
+    return parseColor(this.value) ? this.value : this.settled
+  }
+
+  /** What the trigger's swatch paints, which is only ever a colour. */
   private get painted(): string {
     const parsed = parseColor(this.value)
     return parsed ? toCss(parsed) : 'transparent'
@@ -197,6 +219,9 @@ export class HelixBaseInputColor extends MixinControllerOpen(
     super.updated(changed)
     if (changed.has('value')) {
       this.sync()
+      if (parseColor(this.value)) {
+        this.settled = this.value
+      }
     }
     /* Driven from here rather than from the toggle, because `open` is a property
        a consumer may set directly and the panel has to follow either way. The
@@ -257,7 +282,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
           ?alpha=${this.alpha}
           ?no-format=${this.noFormat}
           .format=${this.format}
-          .value=${this.value}
+          .value=${this.picked}
           swatches=${this.swatches || nothing}
           ?disabled=${this.isDisabled}
           @helix-change=${this.handlePickerChange}

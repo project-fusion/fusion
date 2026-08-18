@@ -22,15 +22,19 @@
 }
 
 /* Stripped rather than replaced, so the caret, the selection and the keyboard a
-   phone chooses are all the platform's. Monospace, because a colour is a code
-   rather than a word: in a proportional face `rgb(255 0 0)` and `rgb(100 8 8)`
-   are visibly different lengths while a reader is comparing them. */
+   phone chooses are all the platform's.
+
+   The field's own face, not mono. Mono was here on the argument that a colour is
+   a code, which is true of the syntax and not of the field: nobody scans a
+   column of colours for alignment, and one field in a form set in a different
+   typeface reads as a mistake in the form. The syntax toggle in the panel keeps
+   mono, where it is genuinely a token rather than a word. */
 [part="control"] {
   all: unset;
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   flex: 1 1 auto;
-  font-family: var(--helix-font-mono);
+  font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
   min-inline-size: 0;

@@ -8551,6 +8551,20 @@
             },
             {
               "kind": "field",
+              "name": "tools",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether the tools row holds anything at all.\n\nThe group is withheld rather than rendered empty, because it is an element\nwith a role and a name: an empty group labelled \"Colour tools\" announces\nnothing, and the footer cannot tell it is empty either, so the row kept its\npadding with nothing in it.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "presets",
               "type": {
                 "text": "string[]"
@@ -9076,6 +9090,14 @@
             {
               "description": "One ramp.",
               "name": "channel",
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
+              "description": "The group holding the eyedropper and the syntax toggle.",
+              "name": "actions",
               "inheritedFrom": {
                 "name": "HelixBaseColor",
                 "module": "src/color/root/color-root.ts"
@@ -14178,6 +14200,20 @@
             },
             {
               "kind": "field",
+              "name": "settled",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The last value that was a colour.\n\nHalf-typed input reaches here on every keystroke and most of it is not a\ncolour, so the picker is given the last thing that was one rather than a\nfallback. Typing `#00ff00` one character at a time goes `#`, `#0`, `#00`,\n`#00f`, `#00ff`, `#00ff0`, `#00ff00`: measured, the square went red, red,\nred, blue, blue, **red**, green, because two of those are colours and the\nones between are not. Holding the last good one takes the flicker out and\nleaves the square on blue until green arrives.\n\nNot state, because it is only ever read on a render the value already\ncaused. The same reasoning Input Date records for its calendar, which will\nnot follow a date until the field says something complete.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "control",
               "type": {
                 "text": "HTMLInputElement | null"
@@ -14191,12 +14227,26 @@
             },
             {
               "kind": "field",
+              "name": "picked",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What the picker should show, which is only ever a colour.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "painted",
               "type": {
                 "text": "string"
               },
               "privacy": "private",
-              "description": "What the picker should paint, which is only ever a colour.",
+              "description": "What the trigger's swatch paints, which is only ever a colour.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",

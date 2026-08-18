@@ -9734,6 +9734,7 @@ export type CustomElements = {
    * - `sample`: The chip of the current colour, in that row.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
+   * - `actions`: The group holding the eyedropper and the syntax toggle.
    * - `eyedropper`: The control that samples a colour from the screen.
    * - `footer`: The row holding the syntax toggle and the presets.
    * - `format`: The control that changes the syntax the value is written in.
@@ -16220,6 +16221,7 @@ export type CustomElementsSolidJs = {
    * - `sample`: The chip of the current colour, in that row.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
+   * - `actions`: The group holding the eyedropper and the syntax toggle.
    * - `eyedropper`: The control that samples a colour from the screen.
    * - `footer`: The row holding the syntax toggle and the presets.
    * - `format`: The control that changes the syntax the value is written in.

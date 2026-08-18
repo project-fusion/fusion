@@ -70,6 +70,43 @@ describe('input color', () => {
     expect(said).toEqual(['#00ff00'])
   })
 
+  test('a pasted colour lands in the picker, in any syntax', async () => {
+    for (const [written, hue] of [
+      ['rgb(0 255 0)', '120'],
+      ['#00ff00', '120'],
+      ['hsl(240 100% 50%)', '240'],
+    ] as const) {
+      const host = await field()
+      await type(host, written)
+      const picker = part(host, 'picker') as HTMLElement & { updateComplete: Promise<unknown> }
+      await picker.updateComplete
+      expect(picker.shadowRoot?.querySelector('[part="grid"]')?.getAttribute('style')).toContain(
+        `--_hue: ${hue}`,
+      )
+    }
+  })
+
+  test('and half-typed input does not throw the square around on the way', async () => {
+    /* Measured before this: typing `#00ff00` one character at a time walked the
+       square red, red, red, blue, blue, RED, green, because `#00f` and `#00ff`
+       are colours and `#00ff0` is not. The picker is handed the last value that
+       was a colour rather than a fallback, so it holds on blue until green
+       arrives. The same reasoning Input Date records for its calendar. */
+    const host = await field()
+    const seen: string[] = []
+    for (const text of ['#', '#0', '#00', '#00f', '#00ff', '#00ff0', '#00ff00']) {
+      await type(host, text)
+      const picker = part(host, 'picker') as HTMLElement & { updateComplete: Promise<unknown> }
+      await picker.updateComplete
+      const style = picker.shadowRoot?.querySelector('[part="grid"]')?.getAttribute('style') ?? ''
+      seen.push(/--_hue: (\d+)/.exec(style)?.[1] ?? '?')
+    }
+    // Never back to red once it has left it.
+    expect(seen).toEqual(['0', '0', '0', '240', '240', '240', '120'])
+    // And the field kept every character, including the ones that were not colours.
+    expect(host.value).toBe('#00ff00')
+  })
+
   test('typing any syntax is accepted', async () => {
     for (const written of ['#f00', 'rgb(255 0 0)', 'hsl(0 100% 50%)', 'rgba(255,0,0,.5)']) {
       const host = await field()

@@ -5,6 +5,7 @@ import type { CSSResultGroup } from 'lit'
    custom element registers on import. Inherited from the base along with the
    template, which is why it has to be restated here: this file has no
    `<helix-slider>` in it to remind anyone. `check:composed` enforces it. */
+import '../../icon/index.js'
 import '../../slider/index.js'
 import { styles } from './color-root.css.js'
 

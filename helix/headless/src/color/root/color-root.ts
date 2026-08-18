@@ -10,6 +10,7 @@ import { property, state } from 'lit/decorators.js'
    root and a custom element registers on import. The public tag rather than the
    base one: a consumer on the styled tier gets the styled slider, and one on the
    headless tier brings a slider of their own under that name. */
+import '../../icon/index.js'
 import '../../slider/index.js'
 import { type Color, type ColorFormat, formatColor, parseColor, toCss } from '../color.js'
 
@@ -79,6 +80,7 @@ interface EyeDropperConstructor {
  * @csspart sample - The chip of the current colour, in that row.
  * @csspart channels - The ramps beside it.
  * @csspart channel - One ramp.
+ * @csspart actions - The group holding the eyedropper and the syntax toggle.
  * @csspart eyedropper - The control that samples a colour from the screen.
  * @csspart footer - The row holding the syntax toggle and the presets.
  * @csspart format - The control that changes the syntax the value is written in.
@@ -149,6 +151,18 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
   /** Where the picker stands: what was moved, or what the value says, or the start. */
   get color(): Color {
     return this.moved ?? parseColor(this.value) ?? START
+  }
+
+  /**
+   * Whether the tools row holds anything at all.
+   *
+   * The group is withheld rather than rendered empty, because it is an element
+   * with a role and a name: an empty group labelled "Colour tools" announces
+   * nothing, and the footer cannot tell it is empty either, so the row kept its
+   * padding with nothing in it.
+   */
+  private get tools(): boolean {
+    return (this.sampling && !this.noEyedropper) || !this.noFormat
   }
 
   /** The presets, as written, with anything that is not a colour dropped. */
@@ -285,6 +299,21 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
     ></helix-slider>`
   }
 
+  /*
+   * The tools are plain buttons in a group of this element's own, rather than
+   * helix-button inside helix-button-group.
+   *
+   * That was the first version and it rendered two unstyled words. helix-button
+   * carries its whole appearance in the base layer, as rules on
+   * helix-button::part(button), and a part selector pierces exactly one shadow
+   * boundary: from the document it reaches a button on the page and stops one
+   * short of a button inside this element. Measured, both came out with no
+   * background, no border, no radius and no padding at all.
+   *
+   * So no component can compose a helix-button today, which is why none does.
+   * helix-icon is fine and is used here: it styles itself from its own
+   * stylesheet, so it works at any depth.
+   */
   protected override render(): TemplateResult {
     const color = this.color
     const painted = toCss(color)
@@ -320,17 +349,6 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
       </div>
 
       <div part="controls" style="--_hue: ${color.hue}; --_color: ${painted}">
-        ${
-          this.sampling && !this.noEyedropper
-            ? html`<button
-                part="eyedropper"
-                type="button"
-                aria-label="Sample a colour from the screen"
-                ?disabled=${this.isDisabled}
-                @click=${this.handleEyeDropper}
-              ></button>`
-            : nothing
-        }
         <span part="sample"></span>
         <div part="channels">
           ${this.renderChannel('hue', 'Hue', 360, color.hue)}
@@ -344,17 +362,36 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
            eighty pixels, and a hue is picked out of three hundred and sixty. -->
       <div part="footer">
         ${
-          this.noFormat
-            ? nothing
-            : html`<button
-                part="format"
-                type="button"
-                aria-label=${`Syntax: ${this.format}. Change it.`}
-                ?disabled=${this.isDisabled}
-                @click=${this.handleFormat}
-              >
-                ${this.format}
-              </button>`
+          this.tools
+            ? html`<div part="actions" role="group" aria-label="Colour tools">
+                ${
+                  this.sampling && !this.noEyedropper
+                    ? html`<button
+                        part="eyedropper"
+                        type="button"
+                        aria-label="Sample a colour from the screen"
+                        ?disabled=${this.isDisabled}
+                        @click=${this.handleEyeDropper}
+                      >
+                        <helix-icon name="eyedropper"></helix-icon>
+                      </button>`
+                    : nothing
+                }
+                ${
+                  this.noFormat
+                    ? nothing
+                    : html`<button
+                        part="format"
+                        type="button"
+                        aria-label=${`Syntax: ${this.format}. Change it.`}
+                        ?disabled=${this.isDisabled}
+                        @click=${this.handleFormat}
+                      >
+                        ${this.format}
+                      </button>`
+                }
+              </div>`
+            : nothing
         }
         ${
           this.presets.length === 0
