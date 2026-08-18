@@ -312,9 +312,52 @@ looks correct and the component is quietly unstyled.
 Per-component hooks (`--card-padding`) are not Helix tokens and are exempt. They
 should default to a semantic token.
 
-**Apps use components, not native elements.** *Reversed 13 Aug 2026.* The base
-layer still styles `h1`–`h6` and `:where(a)`, because prose the design system
-never renders (markdown, a CMS) has to look right too. But an app written
+### The base layer holds helpers, a component holds itself
+
+**A shadow rule loses to a document rule, whatever the specificity and whatever
+the layer.** Measured in Chrome 148 rather than recalled: a `::slotted()` rule
+lost to an unlayered `:where()` document rule *and* to the same rule inside a low
+`@layer`, and `:host` lost to both. Encapsulation context is sorted before layers
+and before specificity, so neither can rescue a component. The only
+normal-declaration escape is `!important` from the inner tree, which just moves
+the fight onto consumers, who would then need `!important` of their own.
+
+The consequence is per-declaration, which is what makes it so hard to see: in one
+rule, the properties the document does not set come through from the shadow and
+the ones it does are dead. Measured on Outline, `margin-inline-start` and
+`font-weight` arrived and `color` and `text-decoration` did not, so the rule
+looked alive. Outline asked for `foreground-muted` from the day it was written
+and no outline ever showed it. Dialog kept a `font-size` beside a base-layer rule
+that had taken the same property: it read as the deciding value, changing it
+moved nothing, and finding that cost an afternoon.
+
+So the split:
+
+- **`helix/styles` holds helpers**, keyed on `data-`: `data-button`, `data-text`,
+  `data-navigation-item`, `data-prose`. A recipe pairing a helper with the
+  component (`[data-button], helix-button`) is one decision written for two
+  surfaces and is fine.
+- **A component holds its own styling**, including the light-DOM content it
+  slots. If the base layer also names that content, the component cannot.
+- **Prose theming is opt-in behind `[data-prose]`.** The base layer still resets
+  bare elements, because zeroing a UA margin fights nothing and a component
+  slotting a `<p>` wants it too, but it themes nothing without the attribute.
+  Markdown, a CMS, anything the library did not render says so once on its
+  container.
+
+Two exceptions, both real. `::part()` is the published door into a component, so
+a document rule using one is the mechanism rather than a collision. And a rule
+undoing the *reset* stays: `helix-card > [slot="media"]` lifts the image clamp,
+which is global by necessity.
+
+`bun run check:overruled` enforces it, per declaration. It was written against
+the two failures above and fails on both when they are put back.
+
+**Apps use components, not native elements.** *Reversed 13 Aug 2026, and
+narrowed 18 Aug 2026: the base layer styles `h1`–`h6` and `:where(a)` only under
+`[data-prose]` now, for the reason in the section above.* Prose the design system
+never renders (markdown, a CMS) still has to look right, and says so on its
+container. But an app written
 against Helix reaches for `Heading`, `Text`, `Link`, `Flex`, and `Grid` rather
 than raw tags, so dropping a component in works without the app knowing which
 token to apply.
