@@ -63,6 +63,7 @@ import type {
   HelixSkeleton,
   HelixSlider,
   HelixSpinner,
+  HelixSplitter,
   HelixStat,
   HelixStatGroup,
   HelixSwitch,
@@ -5665,6 +5666,86 @@ export type HelixSpinnerSolidJsProps = {
   "prop:size"?: HelixSpinner["size"];
   /** Accessible name, announced while the work is outstanding. */
   "prop:label"?: HelixSpinner["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixSplitter` component event */
+export type HelixSplitterElementEvent<E = Event> = TypedEvent<HelixSplitter, E>;
+/** `helix-change` event type */
+export type HelixSplitterHelixChangeElementEvent =
+  HelixSplitterElementEvent<HelixChangeEvent>;
+
+export type HelixSplitterProps = {
+  /** Which way the panes are laid out.
+
+`horizontal` is side by side with an upright divider between them, and
+`aria-orientation` on that divider is therefore `vertical`: a separator's
+orientation is the direction it is *drawn* in, not the axis it moves along,
+so the two words are opposite each other here on purpose. The code had this
+right and the sentence beside it said the reverse.
+
+Unset is horizontal and stays unset, so a reflected default cannot appear on
+a host whose server output never had it. */
+  orientation?: HelixSplitter["orientation"];
+  /** Where the divider sits, as a percentage of the whole.
+
+Reading gives where it is; writing declares it the consumer's, and
+`default-position` seeds one this element owns. The same accessor pair
+`Pagination.page` and the calendar's `month` carry. */
+  position?: HelixSplitter["position"];
+  /** Where the divider starts, where nothing declared it. */
+  "default-position"?: HelixSplitter["defaultPosition"];
+  /** Where the divider starts, where nothing declared it. */
+  defaultPosition?: HelixSplitter["defaultPosition"];
+  /** Nearest the divider may come to the start, as a percentage. */
+  min?: HelixSplitter["min"];
+  /** Nearest it may come to the end. */
+  max?: HelixSplitter["max"];
+  /** How far one arrow press moves it, as a percentage. */
+  step?: HelixSplitter["step"];
+  /** Accessible name for the divider. */
+  label?: HelixSplitter["label"];
+
+  /** Fired when the divider settles, with the position. */
+  "onhelix-change"?: (e: HelixSplitterHelixChangeElementEvent) => void;
+};
+
+export type HelixSplitterSolidJsProps = {
+  /** Which way the panes are laid out.
+
+`horizontal` is side by side with an upright divider between them, and
+`aria-orientation` on that divider is therefore `vertical`: a separator's
+orientation is the direction it is *drawn* in, not the axis it moves along,
+so the two words are opposite each other here on purpose. The code had this
+right and the sentence beside it said the reverse.
+
+Unset is horizontal and stays unset, so a reflected default cannot appear on
+a host whose server output never had it. */
+  "prop:orientation"?: HelixSplitter["orientation"];
+  /** Where the divider sits, as a percentage of the whole.
+
+Reading gives where it is; writing declares it the consumer's, and
+`default-position` seeds one this element owns. The same accessor pair
+`Pagination.page` and the calendar's `month` carry. */
+  "prop:position"?: HelixSplitter["position"];
+  /** Where the divider starts, where nothing declared it. */
+  "attr:default-position"?: HelixSplitter["defaultPosition"];
+  /** Where the divider starts, where nothing declared it. */
+  "prop:defaultPosition"?: HelixSplitter["defaultPosition"];
+  /** Nearest the divider may come to the start, as a percentage. */
+  "prop:min"?: HelixSplitter["min"];
+  /** Nearest it may come to the end. */
+  "prop:max"?: HelixSplitter["max"];
+  /** How far one arrow press moves it, as a percentage. */
+  "prop:step"?: HelixSplitter["step"];
+  /** Accessible name for the divider. */
+  "prop:label"?: HelixSplitter["label"];
+  /** Fired when the divider settles, with the position. */
+  "on:helix-change"?: (e: HelixSplitterHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11497,6 +11578,79 @@ export type CustomElements = {
   >;
 
   /**
+   * The divider is a line to look at and a box to hit, and they are different
+   * sizes. Drawn at the border's own width it is a one pixel pointer target, which
+   * is the fault every hand-rolled splitter has; the line is a border and the
+   * target is the box around it.
+   *
+   * It lights on hover before it is touched, because a hairline says nothing about
+   * being movable, and the whole target lights rather than the line, so the thing
+   * that answers the pointer is the thing that changed.
+   *
+   * Both panes scroll and both have their minimum size taken off them. A flex
+   * item's floor is its content, so a pane holding anything scrollable would
+   * otherwise refuse to go below it: the divider would stop at a width nobody
+   * asked for and nothing would say why.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way the panes are laid out.
+   *
+   * `horizontal` is side by side with an upright divider between them, and
+   * `aria-orientation` on that divider is therefore `vertical`: a separator's
+   * orientation is the direction it is *drawn* in, not the axis it moves along,
+   * so the two words are opposite each other here on purpose. The code had this
+   * right and the sentence beside it said the reverse.
+   *
+   * Unset is horizontal and stays unset, so a reflected default cannot appear on
+   * a host whose server output never had it.
+   * - `position`: Where the divider sits, as a percentage of the whole.
+   *
+   * Reading gives where it is; writing declares it the consumer's, and
+   * `default-position` seeds one this element owns. The same accessor pair
+   * `Pagination.page` and the calendar's `month` carry.
+   * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
+   * - `min`: Nearest the divider may come to the start, as a percentage.
+   * - `max`: Nearest it may come to the end.
+   * - `step`: How far one arrow press moves it, as a percentage.
+   * - `label`: Accessible name for the divider.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the divider settles, with the position.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: The pane before the divider.
+   * - `end`: The pane after it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--splitter-color`: The line between the panes. (default: `undefined`)
+   * - `--splitter-hover-color`: The target under the pointer. (default: `undefined`)
+   * - `--splitter-target`: How wide the draggable box is. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `start`: The box holding the first pane.
+   * - `end`: The box holding the second.
+   * - `separator`: The divider itself.
+   */
+  "helix-splitter": Partial<
+    HelixSplitterProps & BaseProps<HelixSplitter> & BaseEvents
+  >;
+
+  /**
    * Wraps rather than scrolls, and each figure keeps its own width instead of
    * every one taking an equal share: a set of figures is read by comparing them,
    * and equal columns make a four-digit number and a two-digit one look like the
@@ -17307,6 +17461,82 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The divider is a line to look at and a box to hit, and they are different
+   * sizes. Drawn at the border's own width it is a one pixel pointer target, which
+   * is the fault every hand-rolled splitter has; the line is a border and the
+   * target is the box around it.
+   *
+   * It lights on hover before it is touched, because a hairline says nothing about
+   * being movable, and the whole target lights rather than the line, so the thing
+   * that answers the pointer is the thing that changed.
+   *
+   * Both panes scroll and both have their minimum size taken off them. A flex
+   * item's floor is its content, so a pane holding anything scrollable would
+   * otherwise refuse to go below it: the divider would stop at a width nobody
+   * asked for and nothing would say why.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way the panes are laid out.
+   *
+   * `horizontal` is side by side with an upright divider between them, and
+   * `aria-orientation` on that divider is therefore `vertical`: a separator's
+   * orientation is the direction it is *drawn* in, not the axis it moves along,
+   * so the two words are opposite each other here on purpose. The code had this
+   * right and the sentence beside it said the reverse.
+   *
+   * Unset is horizontal and stays unset, so a reflected default cannot appear on
+   * a host whose server output never had it.
+   * - `position`: Where the divider sits, as a percentage of the whole.
+   *
+   * Reading gives where it is; writing declares it the consumer's, and
+   * `default-position` seeds one this element owns. The same accessor pair
+   * `Pagination.page` and the calendar's `month` carry.
+   * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
+   * - `min`: Nearest the divider may come to the start, as a percentage.
+   * - `max`: Nearest it may come to the end.
+   * - `step`: How far one arrow press moves it, as a percentage.
+   * - `label`: Accessible name for the divider.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the divider settles, with the position.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: The pane before the divider.
+   * - `end`: The pane after it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--splitter-color`: The line between the panes. (default: `undefined`)
+   * - `--splitter-hover-color`: The target under the pointer. (default: `undefined`)
+   * - `--splitter-target`: How wide the draggable box is. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `start`: The box holding the first pane.
+   * - `end`: The box holding the second.
+   * - `separator`: The divider itself.
+   */
+  "helix-splitter": Partial<
+    HelixSplitterProps &
+      HelixSplitterSolidJsProps &
+      BaseProps<HelixSplitter> &
+      BaseEvents
+  >;
+
+  /**
    * Wraps rather than scrolls, and each figure keeps its own width instead of
    * every one taking an equal share: a set of figures is read by comparing them,
    * and equal columns make a four-digit number and a two-digit one look like the
@@ -18992,6 +19222,12 @@ export type CustomCssProperties = {
   "--spinner-color"?: string;
   /** Color of the circle behind it. */
   "--spinner-track-color"?: string;
+  /** The line between the panes. */
+  "--splitter-color"?: string;
+  /** The target under the pointer. */
+  "--splitter-hover-color"?: string;
+  /** How wide the draggable box is. */
+  "--splitter-target"?: string;
   /** Space between figures. */
   "--stat-group-gap"?: string;
   /** Size of the figure. */

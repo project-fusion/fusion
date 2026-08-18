@@ -52,6 +52,7 @@ import type {
   HelixBaseSkeleton,
   HelixBaseSlider,
   HelixBaseSpinner,
+  HelixBaseSplitter,
   HelixBaseStat,
   HelixBaseStatGroup,
   HelixBaseSwitch,
@@ -4958,6 +4959,89 @@ export type HelixBaseSpinnerProps = {
 export type HelixBaseSpinnerSolidJsProps = {
   /** Accessible name, announced while the work is outstanding. */
   "prop:label"?: HelixBaseSpinner["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseSplitter` component event */
+export type HelixBaseSplitterElementEvent<E = Event> = TypedEvent<
+  HelixBaseSplitter,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseSplitterHelixChangeElementEvent =
+  HelixBaseSplitterElementEvent<HelixChangeEvent>;
+
+export type HelixBaseSplitterProps = {
+  /** Which way the panes are laid out.
+
+`horizontal` is side by side with an upright divider between them, and
+`aria-orientation` on that divider is therefore `vertical`: a separator's
+orientation is the direction it is *drawn* in, not the axis it moves along,
+so the two words are opposite each other here on purpose. The code had this
+right and the sentence beside it said the reverse.
+
+Unset is horizontal and stays unset, so a reflected default cannot appear on
+a host whose server output never had it. */
+  orientation?: HelixBaseSplitter["orientation"];
+  /** Where the divider sits, as a percentage of the whole.
+
+Reading gives where it is; writing declares it the consumer's, and
+`default-position` seeds one this element owns. The same accessor pair
+`Pagination.page` and the calendar's `month` carry. */
+  position?: HelixBaseSplitter["position"];
+  /** Where the divider starts, where nothing declared it. */
+  "default-position"?: HelixBaseSplitter["defaultPosition"];
+  /** Where the divider starts, where nothing declared it. */
+  defaultPosition?: HelixBaseSplitter["defaultPosition"];
+  /** Nearest the divider may come to the start, as a percentage. */
+  min?: HelixBaseSplitter["min"];
+  /** Nearest it may come to the end. */
+  max?: HelixBaseSplitter["max"];
+  /** How far one arrow press moves it, as a percentage. */
+  step?: HelixBaseSplitter["step"];
+  /** Accessible name for the divider. */
+  label?: HelixBaseSplitter["label"];
+
+  /** Fired when the divider settles, with the position. */
+  "onhelix-change"?: (e: HelixBaseSplitterHelixChangeElementEvent) => void;
+};
+
+export type HelixBaseSplitterSolidJsProps = {
+  /** Which way the panes are laid out.
+
+`horizontal` is side by side with an upright divider between them, and
+`aria-orientation` on that divider is therefore `vertical`: a separator's
+orientation is the direction it is *drawn* in, not the axis it moves along,
+so the two words are opposite each other here on purpose. The code had this
+right and the sentence beside it said the reverse.
+
+Unset is horizontal and stays unset, so a reflected default cannot appear on
+a host whose server output never had it. */
+  "prop:orientation"?: HelixBaseSplitter["orientation"];
+  /** Where the divider sits, as a percentage of the whole.
+
+Reading gives where it is; writing declares it the consumer's, and
+`default-position` seeds one this element owns. The same accessor pair
+`Pagination.page` and the calendar's `month` carry. */
+  "prop:position"?: HelixBaseSplitter["position"];
+  /** Where the divider starts, where nothing declared it. */
+  "attr:default-position"?: HelixBaseSplitter["defaultPosition"];
+  /** Where the divider starts, where nothing declared it. */
+  "prop:defaultPosition"?: HelixBaseSplitter["defaultPosition"];
+  /** Nearest the divider may come to the start, as a percentage. */
+  "prop:min"?: HelixBaseSplitter["min"];
+  /** Nearest it may come to the end. */
+  "prop:max"?: HelixBaseSplitter["max"];
+  /** How far one arrow press moves it, as a percentage. */
+  "prop:step"?: HelixBaseSplitter["step"];
+  /** Accessible name for the divider. */
+  "prop:label"?: HelixBaseSplitter["label"];
+  /** Fired when the divider settles, with the position. */
+  "on:helix-change"?: (e: HelixBaseSplitterHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10678,6 +10762,87 @@ export type CustomElements = {
    */
   "helix-base-spinner": Partial<
     HelixBaseSpinnerProps & BaseProps<HelixBaseSpinner> & BaseEvents
+  >;
+
+  /**
+   * **One axis, and nesting is how you get two.** The sandbox this was taken from
+   * moves a cross: a divider down the middle, another across the bottom, and a
+   * corner that moves both. That is a layout rather than a component, and every
+   * part of it that is worth sharing is one divider between two panes. A splitter
+   * inside a splitter gives the cross back, and gives the three-pane and the
+   * four-pane arrangements it never had.
+   *
+   * **The divider is a real `role="separator"` with `aria-valuenow`, moved by the
+   * arrow keys as well as by pointer.** A divider only a mouse can move is
+   * unusable without one, which is the reason the sandbox's carries the same, and
+   * `Home` and `End` take it to its bounds.
+   *
+   * **It goes where it is put, all the way to either end.** `min` and `max` are
+   * nothing and everything unless a consumer says otherwise, because a divider
+   * that stops dead short of the edge gives a reader no way to put a pane away.
+   * Where a pane should keep a sliver of itself, only whoever put the tabs on it
+   * knows how much, so they say so.
+   *
+   * **The box is measured once, when a drag starts.** Measuring per move is a
+   * forced layout on every pointer event, in the middle of a gesture whose whole
+   * job is to stay ahead of the pointer, and nothing about the box moves while the
+   * divider does.
+   *
+   * **`helix-change` fires when it settles, not while it moves.** A drag is a
+   * stream of positions and only the one it ends at is a preference; announcing
+   * each would ask a consumer to write to storage a hundred times to record one
+   * decision. Nothing is stored here either: where a preference lives, and whether
+   * it should be kept at all, is the consumer's to decide, and a component writing
+   * to storage on its own would be deciding for all of them under a key it chose.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way the panes are laid out.
+   *
+   * `horizontal` is side by side with an upright divider between them, and
+   * `aria-orientation` on that divider is therefore `vertical`: a separator's
+   * orientation is the direction it is *drawn* in, not the axis it moves along,
+   * so the two words are opposite each other here on purpose. The code had this
+   * right and the sentence beside it said the reverse.
+   *
+   * Unset is horizontal and stays unset, so a reflected default cannot appear on
+   * a host whose server output never had it.
+   * - `position`: Where the divider sits, as a percentage of the whole.
+   *
+   * Reading gives where it is; writing declares it the consumer's, and
+   * `default-position` seeds one this element owns. The same accessor pair
+   * `Pagination.page` and the calendar's `month` carry.
+   * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
+   * - `min`: Nearest the divider may come to the start, as a percentage.
+   * - `max`: Nearest it may come to the end.
+   * - `step`: How far one arrow press moves it, as a percentage.
+   * - `label`: Accessible name for the divider.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the divider settles, with the position.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: The pane before the divider.
+   * - `end`: The pane after it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `start`: The box holding the first pane.
+   * - `end`: The box holding the second.
+   * - `separator`: The divider itself.
+   */
+  "helix-base-splitter": Partial<
+    HelixBaseSplitterProps & BaseProps<HelixBaseSplitter> & BaseEvents
   >;
 
   /**
@@ -16465,6 +16630,90 @@ export type CustomElementsSolidJs = {
     HelixBaseSpinnerProps &
       HelixBaseSpinnerSolidJsProps &
       BaseProps<HelixBaseSpinner> &
+      BaseEvents
+  >;
+
+  /**
+   * **One axis, and nesting is how you get two.** The sandbox this was taken from
+   * moves a cross: a divider down the middle, another across the bottom, and a
+   * corner that moves both. That is a layout rather than a component, and every
+   * part of it that is worth sharing is one divider between two panes. A splitter
+   * inside a splitter gives the cross back, and gives the three-pane and the
+   * four-pane arrangements it never had.
+   *
+   * **The divider is a real `role="separator"` with `aria-valuenow`, moved by the
+   * arrow keys as well as by pointer.** A divider only a mouse can move is
+   * unusable without one, which is the reason the sandbox's carries the same, and
+   * `Home` and `End` take it to its bounds.
+   *
+   * **It goes where it is put, all the way to either end.** `min` and `max` are
+   * nothing and everything unless a consumer says otherwise, because a divider
+   * that stops dead short of the edge gives a reader no way to put a pane away.
+   * Where a pane should keep a sliver of itself, only whoever put the tabs on it
+   * knows how much, so they say so.
+   *
+   * **The box is measured once, when a drag starts.** Measuring per move is a
+   * forced layout on every pointer event, in the middle of a gesture whose whole
+   * job is to stay ahead of the pointer, and nothing about the box moves while the
+   * divider does.
+   *
+   * **`helix-change` fires when it settles, not while it moves.** A drag is a
+   * stream of positions and only the one it ends at is a preference; announcing
+   * each would ask a consumer to write to storage a hundred times to record one
+   * decision. Nothing is stored here either: where a preference lives, and whether
+   * it should be kept at all, is the consumer's to decide, and a component writing
+   * to storage on its own would be deciding for all of them under a key it chose.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way the panes are laid out.
+   *
+   * `horizontal` is side by side with an upright divider between them, and
+   * `aria-orientation` on that divider is therefore `vertical`: a separator's
+   * orientation is the direction it is *drawn* in, not the axis it moves along,
+   * so the two words are opposite each other here on purpose. The code had this
+   * right and the sentence beside it said the reverse.
+   *
+   * Unset is horizontal and stays unset, so a reflected default cannot appear on
+   * a host whose server output never had it.
+   * - `position`: Where the divider sits, as a percentage of the whole.
+   *
+   * Reading gives where it is; writing declares it the consumer's, and
+   * `default-position` seeds one this element owns. The same accessor pair
+   * `Pagination.page` and the calendar's `month` carry.
+   * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
+   * - `min`: Nearest the divider may come to the start, as a percentage.
+   * - `max`: Nearest it may come to the end.
+   * - `step`: How far one arrow press moves it, as a percentage.
+   * - `label`: Accessible name for the divider.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the divider settles, with the position.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: The pane before the divider.
+   * - `end`: The pane after it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `start`: The box holding the first pane.
+   * - `end`: The box holding the second.
+   * - `separator`: The divider itself.
+   */
+  "helix-base-splitter": Partial<
+    HelixBaseSplitterProps &
+      HelixBaseSplitterSolidJsProps &
+      BaseProps<HelixBaseSplitter> &
       BaseEvents
   >;
 

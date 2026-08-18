@@ -276,6 +276,35 @@ export const contentArt: Record<string, ReactNode> = {
    * The pair behind a rule is the group, which is what stops one bar over
    * another from reading as `text`.
    */
+  /**
+   * Two panes and the divider between them, which is the whole component.
+   *
+   * The panes are surfaces rather than the ink bars the rest of this group uses
+   * for text, because what a splitter arranges is regions and not sentences:
+   * filling them with lines would make this a card about content and it is a
+   * card about the boundary.
+   *
+   * The divider is a rule at one unit, which is the vocabulary this file fixes
+   * for a rule, and it is the only mark that has to survive at thumbnail size:
+   * two panes with nothing between them is `grid`.
+   *
+   * It moves on hover, because that is the one thing a splitter does.
+   */
+  splitter: (
+    <>
+      <rect className="artSunken" height="96" rx="4" width="104" x="48" y="52" />
+      <rect className="artSunken" height="96" rx="4" width="112" x="160" y="52" />
+      <rect
+        className="artSolid artMotion artTravel"
+        height="96"
+        style={{ '--art-to': '24px' } as CSSProperties}
+        width="2"
+        x="155"
+        y="52"
+      />
+    </>
+  ),
+
   stat: (
     <>
       <rect className="artInk" fillOpacity="0.28" height="6" rx="3" width="56" x="48" y="76" />

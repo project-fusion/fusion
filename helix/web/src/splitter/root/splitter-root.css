@@ -1,0 +1,83 @@
+/* Flex rather than a grid, and the reason is where the number can live.
+ *
+ * The position has to reach the layout, and the layout is the host. Writing an
+ * inline style onto the host at upgrade is markup a server's output never had
+ * and a framework reports the difference, which is the same rule `hostAria`
+ * exists for. So the number goes on the first pane, which is an element in this
+ * shadow root, and the pane sizes itself: `flex-basis` on the start, `flex: none`
+ * on the divider, and the end takes what is left. The host stays exactly as the
+ * consumer wrote it. */
+:host {
+  display: flex;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+:host([orientation="vertical"]) {
+  flex-direction: column;
+}
+
+[part="start"] {
+  flex: 0 0 var(--_splitter-position, 50%);
+  /* Both, because a flex item's floor is its content and a pane holding
+     anything scrollable would otherwise refuse to go below it: the divider
+     would stop at a width nobody asked for and nothing would say why. */
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: auto;
+}
+
+[part="end"] {
+  flex: 1 1 0;
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: auto;
+}
+
+/* The divider. A line to look at and a target to hit are different sizes, so the
+   line is drawn by a border and the box around it is the target: at the border's
+   own width this is a one pixel pointer target, which is the fault every
+   hand-rolled splitter has. */
+[part="separator"] {
+  background-color: transparent;
+  border-inline-start: var(--helix-border-thin) solid
+    var(--splitter-color, var(--helix-color-border));
+  box-sizing: border-box;
+  cursor: col-resize;
+  flex: none;
+  inline-size: var(--splitter-target, var(--helix-space-xs));
+  /* The pointer stays with the divider once it has it, and a drag that crosses
+     a pane must not select the text under it. */
+  touch-action: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+  user-select: none;
+}
+
+:host([orientation="vertical"]) [part="separator"] {
+  block-size: var(--splitter-target, var(--helix-space-xs));
+  border-block-start: var(--helix-border-thin) solid
+    var(--splitter-color, var(--helix-color-border));
+  border-inline-start: none;
+  cursor: row-resize;
+  inline-size: auto;
+}
+
+/* It says it can be moved before it is touched, which a hairline does not. The
+   whole target lights rather than the line, so the thing that answers the
+   pointer is the thing that changed. */
+[part="separator"]:hover {
+  background-color: var(--splitter-hover-color, var(--helix-color-surface-sunken));
+}
+
+[part="separator"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  /* Inset, because the divider is a sliver between two panes and an outset ring
+     would be drawn over both of them. */
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="separator"] {
+    transition: none;
+  }
+}

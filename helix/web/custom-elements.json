@@ -12398,6 +12398,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/splitter/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/stat/index.js"
           }
         },
@@ -28500,6 +28508,626 @@
           "declaration": {
             "name": "HelixSpinner",
             "module": "src/spinner/root/spinner-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/splitter/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/splitter/root/splitter-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/splitter/root/splitter-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/splitter/root/splitter-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/splitter/root/splitter-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The divider is a line to look at and a box to hit, and they are different\nsizes. Drawn at the border's own width it is a one pixel pointer target, which\nis the fault every hand-rolled splitter has; the line is a border and the\ntarget is the box around it.\n\nIt lights on hover before it is touched, because a hairline says nothing about\nbeing movable, and the whole target lights rather than the line, so the thing\nthat answers the pointer is the thing that changed.\n\nBoth panes scroll and both have their minimum size taken off them. A flex\nitem's floor is its content, so a pane holding anything scrollable would\notherwise refuse to go below it: the divider would stop at a width nobody\nasked for and nothing would say why.",
+          "name": "HelixSplitter",
+          "cssProperties": [
+            {
+              "description": "The line between the panes.",
+              "name": "--splitter-color"
+            },
+            {
+              "description": "The target under the pointer.",
+              "name": "--splitter-hover-color"
+            },
+            {
+              "description": "How wide the draggable box is.",
+              "name": "--splitter-target"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The box holding the first pane.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "description": "The box holding the second.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "description": "The divider itself.",
+              "name": "separator",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the panes are laid out.\n\n`horizontal` is side by side with an upright divider between them, and\n`aria-orientation` on that divider is therefore `vertical`: a separator's\norientation is the direction it is *drawn* in, not the axis it moves along,\nso the two words are opposite each other here on purpose. The code had this\nright and the sentence beside it said the reverse.\n\nUnset is horizontal and stays unset, so a reflected default cannot appear on\na host whose server output never had it.",
+              "attribute": "orientation",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "type": {
+                "text": "number"
+              },
+              "description": "Where the divider sits, as a percentage of the whole.\n\nReading gives where it is; writing declares it the consumer's, and\n`default-position` seeds one this element owns. The same accessor pair\n`Pagination.page` and the calendar's `month` carry.",
+              "attribute": "position",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultPosition",
+              "type": {
+                "text": "number"
+              },
+              "default": "50",
+              "description": "Where the divider starts, where nothing declared it.",
+              "attribute": "default-position",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Nearest the divider may come to the start, as a percentage.",
+              "attribute": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Nearest it may come to the end.",
+              "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "2",
+              "description": "How far one arrow press moves it, as a percentage.",
+              "attribute": "step",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize panes'",
+              "description": "Accessible name for the divider.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "positionState",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The position, whoever set it, and `undefined` until somebody has.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "positionMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns it, decided once and then fixed.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "positionIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "initial",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Where the divider was when the element first rendered, for a reset.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "origin",
+              "type": {
+                "text": "{ length: number; start: number } | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The host's box, measured once when a drag starts.\n\nMeasuring per move is a forced layout on every pointer event, in the middle\nof a gesture whose whole job is to stay ahead of the pointer. Nothing about\nit moves while the divider does.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "clamp",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Pulled between the bounds, which are the ends unless a consumer moved them.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "vertical",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "move",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Asks to move, and applies it where the position is this element's to move.\n\nNot announced per step: `helix-change` is the settling, below. A drag that\nannounced every position would be asking a consumer to record a hundred\ndecisions to keep one.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "settle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Says the arrangement has settled, so a consumer can keep it.\n\nThrough the audited path, so a consumer who owns `position` is told what was\nasked for and decides, and one who does not has already had it applied.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerDown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerMove",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerUp",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The keys a separator answers.\n\nBoth axes, always, which is the same call `KeyboardNavigationController`\nmakes for a set of items: a reader who guesses the wrong arrow on a divider\ngets nothing, and the orientation is a fact about the layout rather than\nabout which keys should work.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleDoubleClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Puts the divider back where the markup put it.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseSplitter",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Two panes and a divider the reader can move.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/splitter",
+            "aliases": [
+              "SplitPane",
+              "Resizable",
+              "SplitView"
+            ],
+            "tier": "styled",
+            "group": "Splitter",
+            "part": "Root"
+          },
+          "tagName": "helix-splitter",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The pane before the divider.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "description": "The pane after it.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the panes are laid out.\n\n`horizontal` is side by side with an upright divider between them, and\n`aria-orientation` on that divider is therefore `vertical`: a separator's\norientation is the direction it is *drawn* in, not the axis it moves along,\nso the two words are opposite each other here on purpose. The code had this\nright and the sentence beside it said the reverse.\n\nUnset is horizontal and stays unset, so a reflected default cannot appear on\na host whose server output never had it.",
+              "fieldName": "orientation",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "name": "position",
+              "type": {
+                "text": "number"
+              },
+              "description": "Where the divider sits, as a percentage of the whole.\n\nReading gives where it is; writing declares it the consumer's, and\n`default-position` seeds one this element owns. The same accessor pair\n`Pagination.page` and the calendar's `month` carry.",
+              "fieldName": "position",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "name": "default-position",
+              "type": {
+                "text": "number"
+              },
+              "default": "50",
+              "description": "Where the divider starts, where nothing declared it.",
+              "fieldName": "defaultPosition",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Nearest the divider may come to the start, as a percentage.",
+              "fieldName": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Nearest it may come to the end.",
+              "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "2",
+              "description": "How far one arrow press moves it, as a percentage.",
+              "fieldName": "step",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Resize panes'",
+              "description": "Accessible name for the divider.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired when the divider settles, with the position.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/splitter/root/splitter-root.ts",
+          "definitionPath": "src/splitter/root/splitter-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSplitter",
+          "declaration": {
+            "name": "HelixSplitter",
+            "module": "src/splitter/root/splitter-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-splitter",
+          "declaration": {
+            "name": "HelixSplitter",
+            "module": "src/splitter/root/splitter-root.ts"
           }
         }
       ]

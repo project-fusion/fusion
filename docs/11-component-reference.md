@@ -2904,6 +2904,69 @@ to say so.
 | `--spinner-color` | Color of the moving arc. |
 | `--spinner-track-color` | Color of the circle behind it. |
 
+## Splitter
+
+### Root — `helix-splitter`
+
+Two panes and a divider the reader can move.
+
+Extends `HelixBaseSplitter`.
+
+The divider is a line to look at and a box to hit, and they are different
+sizes. Drawn at the border's own width it is a one pixel pointer target, which
+is the fault every hand-rolled splitter has; the line is a border and the
+target is the box around it.
+
+It lights on hover before it is touched, because a hairline says nothing about
+being movable, and the whole target lights rather than the line, so the thing
+that answers the pointer is the thing that changed.
+
+Both panes scroll and both have their minimum size taken off them. A flex
+item's floor is its content, so a pane holding anything scrollable would
+otherwise refuse to go below it: the divider would stop at a width nobody
+asked for and nothing would say why.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultPosition` | `default-position` | `number` | `50` | `HelixBaseSplitter` | Where the divider starts, where nothing declared it. |
+| `label` | `label` | `string` | `'Resize panes'` | `HelixBaseSplitter` | Accessible name for the divider. |
+| `max` | `max` | `number` | `100` | `HelixBaseSplitter` | Nearest it may come to the end. |
+| `min` | `min` | `number` | `0` | `HelixBaseSplitter` | Nearest the divider may come to the start, as a percentage. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseSplitter` | Which way the panes are laid out. |
+| `position` | `position` | `number` | - | `HelixBaseSplitter` | Where the divider sits, as a percentage of the whole. |
+| `step` | `step` | `number` | `2` | `HelixBaseSplitter` | How far one arrow press moves it, as a percentage. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the divider settles, with the position. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `start` | The pane before the divider. |
+| `end` | The pane after it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `start` | The box holding the first pane. |
+| `end` | The box holding the second. |
+| `separator` | The divider itself. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--splitter-color` | The line between the panes. |
+| `--splitter-hover-color` | The target under the pointer. |
+| `--splitter-target` | How wide the draggable box is. |
+
 ## Stat
 
 ### Root — `helix-stat`

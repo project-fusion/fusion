@@ -1,0 +1,4 @@
+/* A splitter fills whatever it is given, so the example has to give it one. */
+helix-splitter {
+  block-size: 12rem;
+}
