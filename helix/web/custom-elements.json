@@ -5708,6 +5708,10 @@
           "name": "HelixCarousel",
           "cssProperties": [
             {
+              "description": "Height of a vertical track.",
+              "name": "--carousel-block-size"
+            },
+            {
               "description": "Space between slides.",
               "name": "--carousel-gap"
             }
@@ -5721,6 +5725,16 @@
               },
               "description": "Whether the controls sit beside the dots or on the slides.",
               "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "indicatorPlacement",
+              "type": {
+                "text": "'center' | 'end' | 'start' | undefined"
+              },
+              "description": "Where the dots sit along the bar they share with the arrows.\n\nUnset is `start`, under the slides where the reading begins. `center` and\n`end` are for a carousel whose bar is doing something else with the space:\ncentred reads as a gallery, and at the end the two chrome groups sit\ntogether in one corner.\n\nIt centres within the dots' own column rather than across the whole bar, so\n`center` is the middle of the space left over from the arrows and never\nunderneath them.",
+              "attribute": "indicator-placement",
               "reflects": true
             },
             {
@@ -5755,6 +5769,20 @@
               },
               "description": "The slide in view, counted from zero.\n\nReading gives the real slide, in either mode. Writing sets it, the way a\nscript assigning to a native control does. Which mode the carousel is in is\nread once, at the first update, from whether anything had declared an\n`index` by then: declared, and the consumer owns it and the carousel only\nannounces where it would have gone; not declared, and the carousel owns it\nand `default-index` says where it starts.\n\nThe same contract the four mixins carry, written out here rather than\nextracted, because a slide is addressed by position and every one of those\nmixins is keyed by a name. One consumer is not a mixin: if a second numeric\nstate turns up, this is what it is extracted from.",
               "attribute": "index",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the track runs.\n\nBehaviour rather than presentation, which is why it is here: the scroll\nposition and the nearest-slide arithmetic are both single-axis, and a\nstyled-tier attribute cannot change which one they read. Two sites branch\non it, `scrollTo` and the drag settle, and nothing else in the component\nknows about the axis at all.\n\nA vertical track needs a height, which a horizontal one does not: width\ncomes from the page and height does not, so the styled tier gives it\n`--carousel-block-size` and a consumer sets that to whatever the slides\nwant.",
+              "attribute": "orientation",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -6105,6 +6133,14 @@
               "fieldName": "appearance"
             },
             {
+              "name": "indicator-placement",
+              "type": {
+                "text": "'center' | 'end' | 'start' | undefined"
+              },
+              "description": "Where the dots sit along the bar they share with the arrows.\n\nUnset is `start`, under the slides where the reading begins. `center` and\n`end` are for a carousel whose bar is doing something else with the space:\ncentred reads as a gallery, and at the end the two chrome groups sit\ntogether in one corner.\n\nIt centres within the dots' own column rather than across the whole bar, so\n`center` is the middle of the space left over from the arrows and never\nunderneath them.",
+              "fieldName": "indicatorPlacement"
+            },
+            {
               "name": "per-view",
               "type": {
                 "text": "number | undefined"
@@ -6132,6 +6168,18 @@
               },
               "description": "The slide in view, counted from zero.\n\nReading gives the real slide, in either mode. Writing sets it, the way a\nscript assigning to a native control does. Which mode the carousel is in is\nread once, at the first update, from whether anything had declared an\n`index` by then: declared, and the consumer owns it and the carousel only\nannounces where it would have gone; not declared, and the carousel owns it\nand `default-index` says where it starts.\n\nThe same contract the four mixins carry, written out here rather than\nextracted, because a slide is addressed by position and every one of those\nmixins is keyed by a name. One consumer is not a mixin: if a second numeric\nstate turns up, this is what it is extracted from.",
               "fieldName": "index",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the track runs.\n\nBehaviour rather than presentation, which is why it is here: the scroll\nposition and the nearest-slide arithmetic are both single-axis, and a\nstyled-tier attribute cannot change which one they read. Two sites branch\non it, `scrollTo` and the drag settle, and nothing else in the component\nknows about the axis at all.\n\nA vertical track needs a height, which a horizontal one does not: width\ncomes from the page and height does not, so the styled tier gives it\n`--carousel-block-size` and a consumer sets that to whatever the slides\nwant.",
+              "fieldName": "orientation",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -13800,6 +13848,10 @@
             {
               "description": "Space between rows.",
               "name": "--list-gap"
+            },
+            {
+              "description": "Room the ordered and unordered markers hang into.",
+              "name": "--list-marker-gutter"
             }
           ],
           "members": [
@@ -15289,6 +15341,14 @@
             {
               "description": "The region holding the field that narrows the list.",
               "name": "search",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "description": "The mark beside that field.",
+              "name": "filter-icon",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -18543,6 +18603,21 @@
             },
             {
               "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reading is shown beside the bar.\n\nThe same name and shape `Slider` uses, because it is the same question:\na control that holds a number can either show it or leave it to whatever is\naround it. Off by default, since most bars sit under a label that already\nsays what is happening and a second number is noise.\n\nNothing under `indeterminate`, where there is no reading to show: a percent\nthat does not move is worse than none, and `valueText` is the property for\nsaying \"uploading\" while the bar runs.",
+              "attribute": "show-value",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "value",
               "type": {
                 "text": "number"
@@ -18687,6 +18762,14 @@
                 "name": "HelixBaseProgress",
                 "module": "src/progress/root/progress-root.ts"
               }
+            },
+            {
+              "description": "The reading beside the bar, under `show-value`.",
+              "name": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
             }
           ],
           "attributes": [
@@ -18724,6 +18807,19 @@
               "default": "100",
               "description": "The total the work is measured against.",
               "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reading is shown beside the bar.\n\nThe same name and shape `Slider` uses, because it is the same question:\na control that holds a number can either show it or leave it to whatever is\naround it. Off by default, since most bars sit under a label that already\nsays what is happening and a second number is noise.\n\nNothing under `indeterminate`, where there is no reading to show: a percent\nthat does not move is worse than none, and `valueText` is the property for\nsaying \"uploading\" while the bar runs.",
+              "fieldName": "showValue",
               "inheritedFrom": {
                 "name": "HelixBaseProgress",
                 "module": "src/progress/root/progress-root.ts"

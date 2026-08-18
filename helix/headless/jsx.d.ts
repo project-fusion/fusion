@@ -1181,6 +1181,19 @@ extracted, because a slide is addressed by position and every one of those
 mixins is keyed by a name. One consumer is not a mixin: if a second numeric
 state turns up, this is what it is extracted from. */
   index?: HelixBaseCarousel["index"];
+  /** Which way the track runs.
+
+Behaviour rather than presentation, which is why it is here: the scroll
+position and the nearest-slide arithmetic are both single-axis, and a
+styled-tier attribute cannot change which one they read. Two sites branch
+on it, `scrollTo` and the drag settle, and nothing else in the component
+knows about the axis at all.
+
+A vertical track needs a height, which a horizontal one does not: width
+comes from the page and height does not, so the styled tier gives it
+`--carousel-block-size` and a consumer sets that to whatever the slides
+want. */
+  orientation?: HelixBaseCarousel["orientation"];
   /** Slide to start on, where nothing declared one. */
   "default-index"?: HelixBaseCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
@@ -1213,6 +1226,19 @@ extracted, because a slide is addressed by position and every one of those
 mixins is keyed by a name. One consumer is not a mixin: if a second numeric
 state turns up, this is what it is extracted from. */
   "prop:index"?: HelixBaseCarousel["index"];
+  /** Which way the track runs.
+
+Behaviour rather than presentation, which is why it is here: the scroll
+position and the nearest-slide arithmetic are both single-axis, and a
+styled-tier attribute cannot change which one they read. Two sites branch
+on it, `scrollTo` and the drag settle, and nothing else in the component
+knows about the axis at all.
+
+A vertical track needs a height, which a horizontal one does not: width
+comes from the page and height does not, so the styled tier gives it
+`--carousel-block-size` and a consumer sets that to whatever the slides
+want. */
+  "prop:orientation"?: HelixBaseCarousel["orientation"];
   /** Slide to start on, where nothing declared one. */
   "attr:default-index"?: HelixBaseCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
@@ -3042,6 +3068,28 @@ place in the layout when the answer arrives and it becomes determinate. */
   indeterminate?: HelixBaseProgress["indeterminate"];
   /** The total the work is measured against. */
   max?: HelixBaseProgress["max"];
+  /** Whether the reading is shown beside the bar.
+
+The same name and shape `Slider` uses, because it is the same question:
+a control that holds a number can either show it or leave it to whatever is
+around it. Off by default, since most bars sit under a label that already
+says what is happening and a second number is noise.
+
+Nothing under `indeterminate`, where there is no reading to show: a percent
+that does not move is worse than none, and `valueText` is the property for
+saying "uploading" while the bar runs. */
+  "show-value"?: HelixBaseProgress["showValue"];
+  /** Whether the reading is shown beside the bar.
+
+The same name and shape `Slider` uses, because it is the same question:
+a control that holds a number can either show it or leave it to whatever is
+around it. Off by default, since most bars sit under a label that already
+says what is happening and a second number is noise.
+
+Nothing under `indeterminate`, where there is no reading to show: a percent
+that does not move is worse than none, and `valueText` is the property for
+saying "uploading" while the bar runs. */
+  showValue?: HelixBaseProgress["showValue"];
   /** What has been done so far, in the same units as `max`.
 
 Clamped between zero and `max` for both the fill and the announcement, so
@@ -3080,6 +3128,28 @@ place in the layout when the answer arrives and it becomes determinate. */
   "prop:indeterminate"?: HelixBaseProgress["indeterminate"];
   /** The total the work is measured against. */
   "prop:max"?: HelixBaseProgress["max"];
+  /** Whether the reading is shown beside the bar.
+
+The same name and shape `Slider` uses, because it is the same question:
+a control that holds a number can either show it or leave it to whatever is
+around it. Off by default, since most bars sit under a label that already
+says what is happening and a second number is noise.
+
+Nothing under `indeterminate`, where there is no reading to show: a percent
+that does not move is worse than none, and `valueText` is the property for
+saying "uploading" while the bar runs. */
+  "bool:show-value"?: HelixBaseProgress["showValue"];
+  /** Whether the reading is shown beside the bar.
+
+The same name and shape `Slider` uses, because it is the same question:
+a control that holds a number can either show it or leave it to whatever is
+around it. Off by default, since most bars sit under a label that already
+says what is happening and a second number is noise.
+
+Nothing under `indeterminate`, where there is no reading to show: a percent
+that does not move is worse than none, and `valueText` is the property for
+saying "uploading" while the bar runs. */
+  "prop:showValue"?: HelixBaseProgress["showValue"];
   /** What has been done so far, in the same units as `max`.
 
 Clamped between zero and `max` for both the fill and the announcement, so
@@ -6292,6 +6362,18 @@ export type CustomElements = {
    * extracted, because a slide is addressed by position and every one of those
    * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
    * state turns up, this is what it is extracted from.
+   * - `orientation`: Which way the track runs.
+   *
+   * Behaviour rather than presentation, which is why it is here: the scroll
+   * position and the nearest-slide arithmetic are both single-axis, and a
+   * styled-tier attribute cannot change which one they read. Two sites branch
+   * on it, `scrollTo` and the drag settle, and nothing else in the component
+   * knows about the axis at all.
+   *
+   * A vertical track needs a height, which a horizontal one does not: width
+   * comes from the page and height does not, so the styled tier gives it
+   * `--carousel-block-size` and a consumer sets that to whatever the slides
+   * want.
    * - `default-index`/`defaultIndex`: Slide to start on, where nothing declared one.
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
@@ -7545,6 +7627,7 @@ export type CustomElements = {
    * - `items`: The list itself.
    * - `empty`: Shown when a filter has hidden everything.
    * - `search`: The region holding the field that narrows the list.
+   * - `filter-icon`: The mark beside that field.
    * - `search-field`: The field itself.
    * - `hint`: Help under the list.
    * - `feedback`: What is wrong with it.
@@ -8114,6 +8197,16 @@ export type CustomElements = {
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
+   * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
+   *
+   * The same name and shape `Slider` uses, because it is the same question:
+   * a control that holds a number can either show it or leave it to whatever is
+   * around it. Off by default, since most bars sit under a label that already
+   * says what is happening and a second number is noise.
+   *
+   * Nothing under `indeterminate`, where there is no reading to show: a percent
+   * that does not move is worse than none, and `valueText` is the property for
+   * saying "uploading" while the bar runs.
    * - `value`: What has been done so far, in the same units as `max`.
    *
    * Clamped between zero and `max` for both the fill and the announcement, so
@@ -8132,6 +8225,7 @@ export type CustomElements = {
    *
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
+   * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-base-progress": Partial<
     HelixBaseProgressProps & BaseProps<HelixBaseProgress> & BaseEvents
@@ -11189,6 +11283,18 @@ export type CustomElementsSolidJs = {
    * extracted, because a slide is addressed by position and every one of those
    * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
    * state turns up, this is what it is extracted from.
+   * - `orientation`: Which way the track runs.
+   *
+   * Behaviour rather than presentation, which is why it is here: the scroll
+   * position and the nearest-slide arithmetic are both single-axis, and a
+   * styled-tier attribute cannot change which one they read. Two sites branch
+   * on it, `scrollTo` and the drag settle, and nothing else in the component
+   * knows about the axis at all.
+   *
+   * A vertical track needs a height, which a horizontal one does not: width
+   * comes from the page and height does not, so the styled tier gives it
+   * `--carousel-block-size` and a consumer sets that to whatever the slides
+   * want.
    * - `default-index`/`defaultIndex`: Slide to start on, where nothing declared one.
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
@@ -12487,6 +12593,7 @@ export type CustomElementsSolidJs = {
    * - `items`: The list itself.
    * - `empty`: Shown when a filter has hidden everything.
    * - `search`: The region holding the field that narrows the list.
+   * - `filter-icon`: The mark beside that field.
    * - `search-field`: The field itself.
    * - `hint`: Help under the list.
    * - `feedback`: What is wrong with it.
@@ -13080,6 +13187,16 @@ export type CustomElementsSolidJs = {
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
+   * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
+   *
+   * The same name and shape `Slider` uses, because it is the same question:
+   * a control that holds a number can either show it or leave it to whatever is
+   * around it. Off by default, since most bars sit under a label that already
+   * says what is happening and a second number is noise.
+   *
+   * Nothing under `indeterminate`, where there is no reading to show: a percent
+   * that does not move is worse than none, and `valueText` is the property for
+   * saying "uploading" while the bar runs.
    * - `value`: What has been done so far, in the same units as `max`.
    *
    * Clamped between zero and `max` for both the fill and the announcement, so
@@ -13098,6 +13215,7 @@ export type CustomElementsSolidJs = {
    *
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
+   * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-base-progress": Partial<
     HelixBaseProgressProps &

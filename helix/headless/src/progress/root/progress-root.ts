@@ -38,6 +38,7 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart track - The full length the work is measured against.
  * @csspart indicator - The part of it that is done.
+ * @csspart value - The reading beside the bar, under `show-value`.
  */
 @customElement('helix-base-progress')
 export class HelixBaseProgress extends HelixElement {
@@ -64,6 +65,21 @@ export class HelixBaseProgress extends HelixElement {
   /** The total the work is measured against. */
   @property({ type: Number })
   max = 100
+
+  /**
+   * Whether the reading is shown beside the bar.
+   *
+   * The same name and shape `Slider` uses, because it is the same question:
+   * a control that holds a number can either show it or leave it to whatever is
+   * around it. Off by default, since most bars sit under a label that already
+   * says what is happening and a second number is noise.
+   *
+   * Nothing under `indeterminate`, where there is no reading to show: a percent
+   * that does not move is worse than none, and `valueText` is the property for
+   * saying "uploading" while the bar runs.
+   */
+  @property({ attribute: 'show-value', reflect: true, type: Boolean })
+  showValue = false
 
   /**
    * What has been done so far, in the same units as `max`.
@@ -131,11 +147,22 @@ export class HelixBaseProgress extends HelixElement {
     /* A custom property rather than a width, so the styled tier decides what
        the number means: a bar fills along it, and a ring would sweep. */
     return html`<div part="track">
-      <div
-        part="indicator"
-        style="--_progress-fraction: ${this.indeterminate ? 1 : this.fraction}"
-      ></div>
-    </div>`
+        <div
+          part="indicator"
+          style="--_progress-fraction: ${this.indeterminate ? 1 : this.fraction}"
+        ></div>
+      </div>
+      ${
+        /* `aria-hidden`, because the bar already reports this. The host carries
+           `role="progressbar"` with `aria-valuenow` and `aria-valuetext`, so a
+           readable copy of the same number is a second announcement of one
+           fact. It is here to be looked at, not to be read out. */
+        this.showValue && !this.indeterminate
+          ? html`<span part="value" aria-hidden="true"
+              >${this.valueText || `${Math.round(this.fraction * 100)}%`}</span
+            >`
+          : ''
+      }`
   }
 }
 

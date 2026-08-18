@@ -100,6 +100,49 @@
 
 /* Each slide is a share of the track, less its share of the gaps. Sized here
    rather than on the slide, which is the consumer's own element. */
+/* Vertical: the same track turned, and the one thing it needs that the
+ * horizontal one does not is a height.
+ *
+ * Width comes from the page and height does not, so a column of slides in a
+ * track with no block size collapses to the tallest of them and scrolls
+ * nothing. `--carousel-block-size` is that number, and 20rem is a starting
+ * point rather than a claim about anyone's slides.
+ *
+ * The snap axis moves with it, and so does the overflow: `overflow-x: auto`
+ * on a column scroller does nothing at all, which is the silent half of
+ * getting this wrong. */
+:host([orientation="vertical"]) [part="track"] {
+  block-size: var(--carousel-block-size, 20rem);
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+}
+
+/* Sized on the block axis instead, by the same arithmetic. */
+:host([orientation="vertical"]) [part="track"] ::slotted(*) {
+  flex: 0 0
+    calc(
+      (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
+      var(--_carousel-per-view)
+    );
+}
+
+/* Where the dots sit in the column they have. `center` is the middle of the
+   space left over from the arrows rather than of the whole bar, so they never
+   end up underneath them. */
+:host([indicator-placement="center"]) [part="indicators"] {
+  justify-content: center;
+}
+
+:host([indicator-placement="end"]) [part="indicators"] {
+  justify-content: flex-end;
+}
+
+:host([indicator-placement="start"]) [part="indicators"] {
+  justify-content: flex-start;
+}
+
 [part="track"] ::slotted(*) {
   flex: 0 0
     calc(

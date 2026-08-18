@@ -77,6 +77,23 @@ export class HelixBaseCarousel extends HelixElement {
     this.requestUpdate('index', previous)
   }
 
+  /**
+   * Which way the track runs.
+   *
+   * Behaviour rather than presentation, which is why it is here: the scroll
+   * position and the nearest-slide arithmetic are both single-axis, and a
+   * styled-tier attribute cannot change which one they read. Two sites branch
+   * on it, `scrollTo` and the drag settle, and nothing else in the component
+   * knows about the axis at all.
+   *
+   * A vertical track needs a height, which a horizontal one does not: width
+   * comes from the page and height does not, so the styled tier gives it
+   * `--carousel-block-size` and a consumer sets that to whatever the slides
+   * want.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
+
   /** Slide to start on, where nothing declared one. */
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
@@ -200,7 +217,9 @@ export class HelixBaseCarousel extends HelixElement {
     const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     track.scrollTo({
       behavior: still ? 'instant' : 'smooth',
-      left: slide.offsetLeft - track.offsetLeft,
+      ...(this.orientation === 'vertical'
+        ? { top: slide.offsetTop - track.offsetTop }
+        : { left: slide.offsetLeft - track.offsetLeft }),
     })
   }
 
@@ -250,7 +269,10 @@ export class HelixBaseCarousel extends HelixElement {
     // between two reports the one it settled on.
     const nearest = this.slides.reduce(
       (best, slide, index) => {
-        const distance = Math.abs(slide.offsetLeft - track.offsetLeft - track.scrollLeft)
+        const distance =
+          this.orientation === 'vertical'
+            ? Math.abs(slide.offsetTop - track.offsetTop - track.scrollTop)
+            : Math.abs(slide.offsetLeft - track.offsetLeft - track.scrollLeft)
         return distance < best.distance ? { distance, index } : best
       },
       { distance: Number.POSITIVE_INFINITY, index: this.index },

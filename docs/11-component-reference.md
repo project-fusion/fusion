@@ -761,9 +761,11 @@ which is what a run of cards wants rather than a run of full-width panels.
 | `autoplay` | `autoplay` | `boolean` | `false` | `HelixBaseCarousel` | Whether the carousel advances on its own. |
 | `defaultIndex` | `default-index` | `number` | `0` | `HelixBaseCarousel` | Slide to start on, where nothing declared one. |
 | `index` | `index` | `number` | - | `HelixBaseCarousel` | The slide in view, counted from zero. |
+| `indicatorPlacement` | `indicator-placement` | `'center' \| 'end' \| 'start' \| undefined` | - | - | Where the dots sit along the bar they share with the arrows. |
 | `interval` | `interval` | `number` | `5000` | `HelixBaseCarousel` | How long each slide is held, in milliseconds. |
 | `label` | `label` | `string` | `'Carousel'` | `HelixBaseCarousel` | Accessible name for the carousel. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseCarousel` | Whether moving past either end wraps to the other. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseCarousel` | Which way the track runs. |
 | `perView` | `per-view` | `number \| undefined` | - | - | How many slides are shown across the track at once. Absent shows one. |
 | `slides` | - | `HTMLElement[]` | - | `HelixBaseCarousel` | The slides, in light-DOM order. Empty on the server, which has no tree. |
 
@@ -801,6 +803,7 @@ which is what a run of cards wants rather than a run of full-width panels.
 
 | Property | Description |
 | --- | --- |
+| `--carousel-block-size` | Height of a vertical track. |
 | `--carousel-gap` | Space between slides. |
 
 ## Checkbox
@@ -1560,6 +1563,7 @@ decoration doing what emptiness already does.
 | Property | Description |
 | --- | --- |
 | `--list-gap` | Space between rows. |
+| `--list-marker-gutter` | Room the ordered and unordered markers hang into. |
 
 ### Item — `helix-list-item`
 
@@ -1671,6 +1675,7 @@ list moves under the reader rather than the reader moving to find it.
 | `items` | The list itself. |
 | `empty` | Shown when a filter has hidden everything. |
 | `search` | The region holding the field that narrows the list. |
+| `filter-icon` | The mark beside that field. |
 | `search-field` | The field itself. |
 | `hint` | Help under the list. |
 | `feedback` | What is wrong with it. |
@@ -2069,6 +2074,7 @@ thing advancing.
 | `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseProgress` | Whether the work has a knowable end. |
 | `label` | `label` | `string` | `'Progress'` | `HelixBaseProgress` | Accessible name for what is in progress. |
 | `max` | `max` | `number` | `100` | `HelixBaseProgress` | The total the work is measured against. |
+| `showValue` | `show-value` | `boolean` | `false` | `HelixBaseProgress` | Whether the reading is shown beside the bar. |
 | `value` | `value` | `number` | `0` | `HelixBaseProgress` | What has been done so far, in the same units as `max`. |
 | `valueText` | `value-text` | `string` | `''` | `HelixBaseProgress` | A reading for the value, where the number alone does not say enough. |
 
@@ -2078,6 +2084,7 @@ thing advancing.
 | --- | --- |
 | `track` | The full length the work is measured against. |
 | `indicator` | The part of it that is done. |
+| `value` | The reading beside the bar, under `show-value`. |
 
 #### Custom properties
 

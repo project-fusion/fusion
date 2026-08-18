@@ -10,8 +10,10 @@ import {
   requestControlledChange,
   scrollItemIntoView,
 } from '@helix-io/core'
+import { magnifyingGlass } from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixBaseOptionGroup } from '../../option/group/option-group.js'
 import { HelixBaseOption } from '../../option/root/option-root.js'
 
@@ -69,6 +71,7 @@ const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
  * @csspart items - The list itself.
  * @csspart empty - Shown when a filter has hidden everything.
  * @csspart search - The region holding the field that narrows the list.
+ * @csspart filter-icon - The mark beside that field.
  * @csspart search-field - The field itself.
  * @csspart hint - Help under the list.
  * @csspart feedback - What is wrong with it.
@@ -543,6 +546,13 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
       ${
         this.filterable
           ? html`<div part="search">
+              <span part="filter-icon" aria-hidden="true">
+                <slot name="filter-icon">
+                  <svg fill="currentColor" viewBox=${magnifyingGlass.viewBox}>
+                    ${unsafeSVG(magnifyingGlass.content)}
+                  </svg>
+                </slot>
+              </span>
               <input
                 part="search-field"
                 type="text"

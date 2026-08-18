@@ -17,14 +17,29 @@
  * tree, so the implicit `list-item` counter is shared between them and the
  * numbering needs nothing written by script and nothing counted on the server.
  *
- * `list-style-position: inside` so the marker sits within the row's own inset
- * rather than hanging into the page, which is what an outside marker does to a
- * row that is also a grid.
+ * **`outside`, with a gutter of our own for it to hang into.** It was `inside`,
+ * on the argument that an outside marker hangs into the page. It does, and the
+ * answer to that is to give it somewhere rather than to move it: an *inside*
+ * marker is laid out as the first inline box within the principal box, and the
+ * next thing in that box is `[part="row"]`, which is a block-level grid. A block
+ * after an inline breaks the line, so every marker got a line of its own and
+ * every row started underneath it. Measured before this: the item was 68px tall
+ * where the row is 45, and the row's top sat 23px below the item's.
+ *
+ * The two options were "hangs into the page" and "breaks the line", and the file
+ * picked the second without saying that the first had a fix. The fix is a
+ * `padding-inline-start` on the list, so the marker hangs into the component
+ * instead, which is what a `<ul>` has always done.
  */
+:host([kind="ordered"]),
+:host([kind="unordered"]) {
+  padding-inline-start: var(--list-marker-gutter, var(--helix-space-xl));
+}
+
 :host([kind="ordered"]) ::slotted(*),
 :host([kind="unordered"]) ::slotted(*) {
   display: list-item;
-  list-style-position: inside;
+  list-style-position: outside;
 }
 
 :host([kind="ordered"]) ::slotted(*) {

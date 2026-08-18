@@ -1,5 +1,28 @@
+/* A row when there is a reading to put beside the bar, and a bare block when
+   there is not: the grid only exists under `show-value`, so a plain progress
+   bar generates exactly the box it always did. */
 :host {
   display: block;
+}
+
+:host([show-value]) {
+  align-items: center;
+  display: grid;
+  gap: var(--helix-space-sm);
+  grid-template-columns: 1fr auto;
+}
+
+/* Tabular figures, so the number does not jog left and right as it counts: the
+   digits are the one thing on a progress bar that changes many times a second,
+   and proportional ones make the whole reading shuffle. Right-aligned with a
+   floor under it for the same reason, since `100%` is wider than `9%`. */
+[part="value"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  min-inline-size: 3ch;
+  text-align: end;
 }
 
 /* The whole length the work is measured against, and it is always fully drawn:

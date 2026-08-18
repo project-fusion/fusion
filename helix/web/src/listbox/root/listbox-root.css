@@ -85,6 +85,33 @@
   text-align: center;
 }
 
+/* The mark beside the field, and a slot so it can be something else.
+ *
+ * A bare text input in a panel of rows does not read as a place to type: the
+ * rows are the content and the field is chrome, and chrome that looks like
+ * content is chrome nobody uses. A magnifier is the one glyph a reader does not
+ * have to learn.
+ *
+ * Slotted with a fallback rather than a property, which is the house rule for
+ * content: `<helix-icon slot="filter-icon">` replaces it and the two can never
+ * both show. `aria-hidden` on the wrapper, because the field already carries
+ * `aria-label` and a decorative mark beside a labelled control is a second name
+ * for one thing. */
+[part="filter-icon"] {
+  align-items: center;
+  color: var(--helix-color-foreground-subtle);
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+[part="filter-icon"] svg,
+slot[name="filter-icon"]::slotted(*) {
+  --icon-size: var(--helix-size-icon-sm);
+
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
 /* The field that narrows the list.
  *
  * Above the options and outside the scroller, so it stays put while the list
@@ -94,13 +121,20 @@
  * A rule under it rather than a box around it, because it is part of the same
  * surface as the rows rather than a control sitting on one. The panel that
  * frames the list is already the frame. */
+/* A row now, holding the mark and the field. */
 [part="search"] {
+  align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-2xs);
   padding: var(--helix-space-2xs);
+  padding-inline-start: var(--helix-space-xs);
 }
 
 [part="search-field"] {
   appearance: none;
+  flex: 1 1 auto;
+  min-inline-size: 0;
   background-color: transparent;
   block-size: var(--helix-size-control-sm);
   border: none;

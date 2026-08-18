@@ -21,6 +21,7 @@ import { styles } from './carousel-root.css.js'
  *
  * @property appearance - Whether the controls sit beside the dots or on the slides.
  *
+ * @cssproperty --carousel-block-size - Height of a vertical track.
  * @cssproperty --carousel-gap - Space between slides.
  */
 @customElement('helix-carousel')
@@ -46,6 +47,21 @@ export class HelixCarousel extends HelixBaseCarousel {
    */
   @property({ reflect: true })
   appearance?: 'hero'
+
+  /**
+   * Where the dots sit along the bar they share with the arrows.
+   *
+   * Unset is `start`, under the slides where the reading begins. `center` and
+   * `end` are for a carousel whose bar is doing something else with the space:
+   * centred reads as a gallery, and at the end the two chrome groups sit
+   * together in one corner.
+   *
+   * It centres within the dots' own column rather than across the whole bar, so
+   * `center` is the middle of the space left over from the arrows and never
+   * underneath them.
+   */
+  @property({ attribute: 'indicator-placement', reflect: true })
+  indicatorPlacement?: 'center' | 'end' | 'start'
 
   /**
    * How many slides are shown across the track at once. Absent shows one.

@@ -95,10 +95,15 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* A step up from body weight. A radio's label is not prose, it is one of the
+   answers, and at 400 in a column of them the set read as a paragraph with
+   circles beside it. `medium` is the same step the button and the tab take for
+   the same reason: text that is part of a control rather than text you read. */
 [part="label"] {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-tight);
 }
 

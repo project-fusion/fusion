@@ -19,6 +19,7 @@ import { styles } from './list-root.css.js'
  * @documentation https://helix.fusion.dev/components/list
  *
  * @cssproperty --list-gap - Space between rows.
+ * @cssproperty --list-marker-gutter - Room the ordered and unordered markers hang into.
  */
 @customElement('helix-list')
 export class HelixList extends HelixBaseList {
