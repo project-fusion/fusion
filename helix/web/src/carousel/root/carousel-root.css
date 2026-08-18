@@ -219,15 +219,9 @@
 }
 
 /* Where the reader is, and a way to get anywhere. Dots rather than numbers,
-   because the count is rarely the point and a row of numerals reads as data. */
-[part="indicators"] {
-  align-items: center;
-  display: flex;
-  gap: var(--helix-space-2xs);
-  grid-area: 2 / 1;
-  justify-content: flex-start;
-  padding-block-start: var(--helix-space-sm);
-}
+   because the count is rarely the point and a row of numerals reads as data.
+   Placed by the frame at the top of this file; only the dots themselves are
+   described here. */
 
 [part="indicator"] {
   all: unset;
@@ -273,24 +267,35 @@
    centered on the slides rather than on the whole component. Positioning them
    against the host does not work: the host holds the indicator row too, so its
    middle is half that row below the track's, and the arrows came out high. */
-:host([appearance="hero"]) [part="controls"],
-:host([appearance="hero"]) [part="track"] {
+/* On the slides, which is the fifth place the chrome can go: the four edges and
+ * the middle.
+ *
+ * This was `appearance="hero"`, a third axis for something the two placement
+ * axes already describe. What `hero` meant was "the controls are over the
+ * content", and everything else it did followed from that: arrows at the
+ * track's own edges, a surface under each of them because a glyph drawn
+ * straight onto a photograph is legible against about half of one, and a bar
+ * that catches no presses so the slide underneath still does. None of that is a
+ * separate decision a consumer makes, so none of it needed a separate word.
+ *
+ * Only the controls take this value. Dots over a photograph are a different
+ * argument and nobody has made it. */
+:host([controls-placement="overlay"]) [part="controls"] {
   grid-area: 2 / 2;
   justify-self: stretch;
 }
 
-/* Back to the middle, because with the arrows on the slides the row below holds
-   nothing else and there is a real centre to sit on. */
-:host([appearance="hero"]) [part="indicators"] {
-  grid-area: 3 / 2;
-  justify-self: center;
-}
-
 /* The bar itself catches nothing, so a press between the arrows reaches the
    slide under it. The buttons take pointer events back. */
-:host([appearance="hero"]) [part="controls"] {
+:host([controls-placement="overlay"]) [part="controls"] {
   align-items: center;
-  justify-content: space-between;
+  /* `flex-start` with the forward arrow pushed over, not `space-between`.
+     Spreading three items puts one of them in the middle of the slide: with
+     `autoplay` the set is previous, next and the rotation toggle, and the next
+     arrow landed halfway across the picture. Pushing `next` to the far edge and
+     letting the toggle follow it groups the two that belong together and leaves
+     `previous` alone at the near edge. */
+  justify-content: flex-start;
   padding-block-start: var(--helix-space-none);
   padding-inline: var(--helix-space-md);
   pointer-events: none;
@@ -314,9 +319,9 @@
  * and had neither surface nor shadow, so on a light photograph it was a
  * bordered box with nothing behind it. It is only visible with `autoplay`,
  * which is why it stayed wrong. */
-:host([appearance="hero"]) [part="previous"],
-:host([appearance="hero"]) [part="next"],
-:host([appearance="hero"]) [part="rotation"] {
+:host([controls-placement="overlay"]) [part="previous"],
+:host([controls-placement="overlay"]) [part="next"],
+:host([controls-placement="overlay"]) [part="rotation"] {
   background-color: var(--helix-color-surface-overlay);
   border-color: transparent;
   box-shadow: var(--helix-shadow-md);
@@ -324,7 +329,12 @@
 }
 
 /* The rotation toggle stays at the trailing edge, beside the next arrow. */
-:host([appearance="hero"]) [part="rotation"] {
+:host([controls-placement="overlay"]) [part="next"] {
+  margin-inline-start: auto;
+}
+
+/* After the forward arrow, so the pair sits together at the far edge. */
+:host([controls-placement="overlay"]) [part="rotation"] {
   order: 1;
 }
 

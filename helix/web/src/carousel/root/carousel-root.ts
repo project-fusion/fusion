@@ -19,35 +19,12 @@ import { styles } from './carousel-root.css.js'
  * @aliases Slider, Gallery, Slideshow
  * @documentation https://helix.fusion.dev/components/carousel
  *
- * @property appearance - Whether the controls sit beside the dots or on the slides.
  *
  * @cssproperty --carousel-block-size - Height of a vertical track.
  * @cssproperty --carousel-gap - Space between slides.
  */
 @customElement('helix-carousel')
 export class HelixCarousel extends HelixBaseCarousel {
-  /**
-   * Whether the controls sit beside the dots or on the slides.
-   *
-   * Unset is one bar under the track, dots at the start of it and arrows at the
-   * end. That was three parts stacked in template order until it was measured,
-   * which put a bar of arrows *above* the slides and the dots below them: on a
-   * three-slide carousel with autoplay, sixty-four pixels of a hundred and
-   * seventeen were chrome, and the two things a reader uses to move were at
-   * opposite ends of the component. Nobody chose that arrangement; it is what
-   * stacking gives.
-   *
-   * `hero` puts the arrows against the track's own edges, over the content,
-   * which is what a full-bleed carousel wants: the slide is the page and the
-   * controls are on it rather than in a bar beneath it. The dots go back to the
-   * middle there, because the row below them holds nothing else and there is a
-   * real centre to sit on.
-   *
-   * Presentation only, so it lives here rather than on the headless tier.
-   */
-  @property({ reflect: true })
-  appearance?: 'hero'
-
   /**
    * Which side of the slides the dots sit on.
    *
@@ -77,9 +54,22 @@ export class HelixCarousel extends HelixBaseCarousel {
    * carousel that moves only one of them keeps the other where it was.
    * `inline-start` or `inline-end` stacks the arrows into a column, which is
    * what a vertical track usually wants.
+   *
+   * `overlay` puts them on the slides, at the track's own edges, which is what a
+   * full-bleed carousel wants: the slide is the page and the controls are on it
+   * rather than in a bar beneath it. It carries its own treatment with it, a
+   * surface and a shadow under each arrow, because a glyph drawn straight onto a
+   * photograph is legible against about half of one.
+   *
+   * **That was `appearance="hero"` and did not need to be.** A third axis for
+   * something these two already describe: what `hero` meant was "the controls
+   * are over the content", and the surface, the edge-to-edge arrows and the bar
+   * that catches no presses all followed from it rather than being separate
+   * decisions. One fewer property, and the two axes are now the whole of where
+   * a carousel's chrome can go.
    */
   @property({ attribute: 'controls-placement', reflect: true })
-  controlsPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start'
+  controlsPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay'
 
   /**
    * How many slides are shown across the track at once. Absent shows one.

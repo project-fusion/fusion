@@ -5730,16 +5730,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'hero' | undefined"
-              },
-              "description": "Whether the controls sit beside the dots or on the slides.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "indicatorPlacement",
               "type": {
                 "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | undefined"
@@ -5752,9 +5742,9 @@
               "kind": "field",
               "name": "controlsPlacement",
               "type": {
-                "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | undefined"
+                "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay' | undefined"
               },
-              "description": "Which side of the slides the arrows sit on.\n\nThe same four sides as `indicatorPlacement` and the same default, so a\ncarousel that moves only one of them keeps the other where it was.\n`inline-start` or `inline-end` stacks the arrows into a column, which is\nwhat a vertical track usually wants.",
+              "description": "Which side of the slides the arrows sit on.\n\nThe same four sides as `indicatorPlacement` and the same default, so a\ncarousel that moves only one of them keeps the other where it was.\n`inline-start` or `inline-end` stacks the arrows into a column, which is\nwhat a vertical track usually wants.\n\n`overlay` puts them on the slides, at the track's own edges, which is what a\nfull-bleed carousel wants: the slide is the page and the controls are on it\nrather than in a bar beneath it. It carries its own treatment with it, a\nsurface and a shadow under each arrow, because a glyph drawn straight onto a\nphotograph is legible against about half of one.\n\n**That was `appearance=\"hero\"` and did not need to be.** A third axis for\nsomething these two already describe: what `hero` meant was \"the controls\nare over the content\", and the surface, the edge-to-edge arrows and the bar\nthat catches no presses all followed from it rather than being separate\ndecisions. One fewer property, and the two axes are now the whole of where\na carousel's chrome can go.",
               "attribute": "controls-placement",
               "reflects": true
             },
@@ -6146,14 +6136,6 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
-              "type": {
-                "text": "'hero' | undefined"
-              },
-              "description": "Whether the controls sit beside the dots or on the slides.",
-              "fieldName": "appearance"
-            },
-            {
               "name": "indicator-placement",
               "type": {
                 "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | undefined"
@@ -6164,9 +6146,9 @@
             {
               "name": "controls-placement",
               "type": {
-                "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | undefined"
+                "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay' | undefined"
               },
-              "description": "Which side of the slides the arrows sit on.\n\nThe same four sides as `indicatorPlacement` and the same default, so a\ncarousel that moves only one of them keeps the other where it was.\n`inline-start` or `inline-end` stacks the arrows into a column, which is\nwhat a vertical track usually wants.",
+              "description": "Which side of the slides the arrows sit on.\n\nThe same four sides as `indicatorPlacement` and the same default, so a\ncarousel that moves only one of them keeps the other where it was.\n`inline-start` or `inline-end` stacks the arrows into a column, which is\nwhat a vertical track usually wants.\n\n`overlay` puts them on the slides, at the track's own edges, which is what a\nfull-bleed carousel wants: the slide is the page and the controls are on it\nrather than in a bar beneath it. It carries its own treatment with it, a\nsurface and a shadow under each arrow, because a glyph drawn straight onto a\nphotograph is legible against about half of one.\n\n**That was `appearance=\"hero\"` and did not need to be.** A third axis for\nsomething these two already describe: what `hero` meant was \"the controls\nare over the content\", and the surface, the edge-to-edge arrows and the bar\nthat catches no presses all followed from it rather than being separate\ndecisions. One fewer property, and the two axes are now the whole of where\na carousel's chrome can go.",
               "fieldName": "controlsPlacement"
             },
             {

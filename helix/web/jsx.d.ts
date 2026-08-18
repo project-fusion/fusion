@@ -1390,8 +1390,6 @@ export type HelixCarouselHelixSelectElementEvent =
   HelixCarouselElementEvent<HelixSelectEvent>;
 
 export type HelixCarouselProps = {
-  /** Whether the controls sit beside the dots or on the slides. */
-  appearance?: HelixCarousel["appearance"];
   /** Which side of the slides the dots sit on.
 
 Unset is `block-end`, under them. `block-start` puts them above,
@@ -1433,14 +1431,40 @@ rather than by a rule about the pair, so moving one leaves the other alone. */
 The same four sides as `indicatorPlacement` and the same default, so a
 carousel that moves only one of them keeps the other where it was.
 `inline-start` or `inline-end` stacks the arrows into a column, which is
-what a vertical track usually wants. */
+what a vertical track usually wants.
+
+`overlay` puts them on the slides, at the track's own edges, which is what a
+full-bleed carousel wants: the slide is the page and the controls are on it
+rather than in a bar beneath it. It carries its own treatment with it, a
+surface and a shadow under each arrow, because a glyph drawn straight onto a
+photograph is legible against about half of one.
+
+**That was `appearance="hero"` and did not need to be.** A third axis for
+something these two already describe: what `hero` meant was "the controls
+are over the content", and the surface, the edge-to-edge arrows and the bar
+that catches no presses all followed from it rather than being separate
+decisions. One fewer property, and the two axes are now the whole of where
+a carousel's chrome can go. */
   "controls-placement"?: HelixCarousel["controlsPlacement"];
   /** Which side of the slides the arrows sit on.
 
 The same four sides as `indicatorPlacement` and the same default, so a
 carousel that moves only one of them keeps the other where it was.
 `inline-start` or `inline-end` stacks the arrows into a column, which is
-what a vertical track usually wants. */
+what a vertical track usually wants.
+
+`overlay` puts them on the slides, at the track's own edges, which is what a
+full-bleed carousel wants: the slide is the page and the controls are on it
+rather than in a bar beneath it. It carries its own treatment with it, a
+surface and a shadow under each arrow, because a glyph drawn straight onto a
+photograph is legible against about half of one.
+
+**That was `appearance="hero"` and did not need to be.** A third axis for
+something these two already describe: what `hero` meant was "the controls
+are over the content", and the surface, the edge-to-edge arrows and the bar
+that catches no presses all followed from it rather than being separate
+decisions. One fewer property, and the two axes are now the whole of where
+a carousel's chrome can go. */
   controlsPlacement?: HelixCarousel["controlsPlacement"];
   /** How many slides are shown across the track at once. Absent shows one.
 
@@ -1501,8 +1525,6 @@ want. */
 };
 
 export type HelixCarouselSolidJsProps = {
-  /** Whether the controls sit beside the dots or on the slides. */
-  "prop:appearance"?: HelixCarousel["appearance"];
   /** Which side of the slides the dots sit on.
 
 Unset is `block-end`, under them. `block-start` puts them above,
@@ -1544,14 +1566,40 @@ rather than by a rule about the pair, so moving one leaves the other alone. */
 The same four sides as `indicatorPlacement` and the same default, so a
 carousel that moves only one of them keeps the other where it was.
 `inline-start` or `inline-end` stacks the arrows into a column, which is
-what a vertical track usually wants. */
+what a vertical track usually wants.
+
+`overlay` puts them on the slides, at the track's own edges, which is what a
+full-bleed carousel wants: the slide is the page and the controls are on it
+rather than in a bar beneath it. It carries its own treatment with it, a
+surface and a shadow under each arrow, because a glyph drawn straight onto a
+photograph is legible against about half of one.
+
+**That was `appearance="hero"` and did not need to be.** A third axis for
+something these two already describe: what `hero` meant was "the controls
+are over the content", and the surface, the edge-to-edge arrows and the bar
+that catches no presses all followed from it rather than being separate
+decisions. One fewer property, and the two axes are now the whole of where
+a carousel's chrome can go. */
   "attr:controls-placement"?: HelixCarousel["controlsPlacement"];
   /** Which side of the slides the arrows sit on.
 
 The same four sides as `indicatorPlacement` and the same default, so a
 carousel that moves only one of them keeps the other where it was.
 `inline-start` or `inline-end` stacks the arrows into a column, which is
-what a vertical track usually wants. */
+what a vertical track usually wants.
+
+`overlay` puts them on the slides, at the track's own edges, which is what a
+full-bleed carousel wants: the slide is the page and the controls are on it
+rather than in a bar beneath it. It carries its own treatment with it, a
+surface and a shadow under each arrow, because a glyph drawn straight onto a
+photograph is legible against about half of one.
+
+**That was `appearance="hero"` and did not need to be.** A third axis for
+something these two already describe: what `hero` meant was "the controls
+are over the content", and the surface, the edge-to-edge arrows and the bar
+that catches no presses all followed from it rather than being separate
+decisions. One fewer property, and the two axes are now the whole of where
+a carousel's chrome can go. */
   "prop:controlsPlacement"?: HelixCarousel["controlsPlacement"];
   /** How many slides are shown across the track at once. Absent shows one.
 
@@ -7074,7 +7122,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the controls sit beside the dots or on the slides.
    * - `indicator-placement`/`indicatorPlacement`: Which side of the slides the dots sit on.
    *
    * Unset is `block-end`, under them. `block-start` puts them above,
@@ -7098,6 +7145,19 @@ export type CustomElements = {
    * carousel that moves only one of them keeps the other where it was.
    * `inline-start` or `inline-end` stacks the arrows into a column, which is
    * what a vertical track usually wants.
+   *
+   * `overlay` puts them on the slides, at the track's own edges, which is what a
+   * full-bleed carousel wants: the slide is the page and the controls are on it
+   * rather than in a bar beneath it. It carries its own treatment with it, a
+   * surface and a shadow under each arrow, because a glyph drawn straight onto a
+   * photograph is legible against about half of one.
+   *
+   * **That was `appearance="hero"` and did not need to be.** A third axis for
+   * something these two already describe: what `hero` meant was "the controls
+   * are over the content", and the surface, the edge-to-edge arrows and the bar
+   * that catches no presses all followed from it rather than being separate
+   * decisions. One fewer property, and the two axes are now the whole of where
+   * a carousel's chrome can go.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * No default, because it reflects. A reflected property with a value writes
@@ -12095,7 +12155,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the controls sit beside the dots or on the slides.
    * - `indicator-placement`/`indicatorPlacement`: Which side of the slides the dots sit on.
    *
    * Unset is `block-end`, under them. `block-start` puts them above,
@@ -12119,6 +12178,19 @@ export type CustomElementsSolidJs = {
    * carousel that moves only one of them keeps the other where it was.
    * `inline-start` or `inline-end` stacks the arrows into a column, which is
    * what a vertical track usually wants.
+   *
+   * `overlay` puts them on the slides, at the track's own edges, which is what a
+   * full-bleed carousel wants: the slide is the page and the controls are on it
+   * rather than in a bar beneath it. It carries its own treatment with it, a
+   * surface and a shadow under each arrow, because a glyph drawn straight onto a
+   * photograph is legible against about half of one.
+   *
+   * **That was `appearance="hero"` and did not need to be.** A third axis for
+   * something these two already describe: what `hero` meant was "the controls
+   * are over the content", and the surface, the edge-to-edge arrows and the bar
+   * that catches no presses all followed from it rather than being separate
+   * decisions. One fewer property, and the two axes are now the whole of where
+   * a carousel's chrome can go.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * No default, because it reflects. A reflected property with a value writes
