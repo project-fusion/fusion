@@ -739,14 +739,31 @@
               "description": "Called after every update, which is when the marked child may have moved."
             },
             {
+              "kind": "field",
+              "name": "last",
+              "type": {
+                "text": "{ x: string; y: string } | undefined"
+              },
+              "privacy": "private",
+              "description": "Where the mark was last put, so a placement can tell a move from a resize."
+            },
+            {
+              "kind": "field",
+              "name": "settling",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private",
+              "description": "The guard behind `transitionend`, in case it never comes."
+            },
+            {
               "kind": "method",
               "name": "place",
               "return": {
                 "type": {
                   "text": "void"
                 }
-              },
-              "description": "Measures and writes, or gives up without writing anything.\n\nPublic because `slotchange` is not an update: children arriving is exactly\nwhen the first measurement becomes possible, and a component that only\nplaced on its own updates left the mark unplaced for the life of the page."
+              }
             }
           ],
           "helix": {}

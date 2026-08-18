@@ -97,6 +97,12 @@ export class IndicatorController implements ReactiveController {
    * when the first measurement becomes possible, and a component that only
    * placed on its own updates left the mark unplaced for the life of the page.
    */
+  /** Where the mark was last put, so a placement can tell a move from a resize. */
+  private last: { x: string; y: string } | undefined
+
+  /** The guard behind `transitionend`, in case it never comes. */
+  private settling: ReturnType<typeof setTimeout> | undefined
+
   place(): void {
     const indicator = this.options.indicator()
     const surface = this.options.surface()
@@ -125,10 +131,55 @@ export class IndicatorController implements ReactiveController {
       ? own.right - box.right - surface.clientLeft
       : box.left - own.left - surface.clientLeft
 
-    indicator.style.setProperty('--_indicator-x', `${rtl ? -inline : inline}px`)
-    indicator.style.setProperty('--_indicator-y', `${box.top - own.top - surface.clientTop}px`)
+    const x = `${rtl ? -inline : inline}px`
+    const y = `${box.top - own.top - surface.clientTop}px`
+
+    /* `data-moving` while it is on its way, so a stylesheet can say something
+     * about the travel itself.
+     *
+     * There is no CSS state for "a transition is running", and the effect this
+     * exists for wants one: a mark that swells as it leaves and settles back
+     * when it lands reads as a thing being carried rather than a rectangle
+     * being repositioned. The controller is the only thing that knows a move
+     * has been asked for, so it says so.
+     *
+     * Only on a *change*, and never on the first placement: the mark arrives by
+     * fading in, and swelling on arrival would be an animation about nothing.
+     *
+     * Cleared on `transitionend` with a timeout behind it. The event is the
+     * honest signal and it does not always come: a move under reduced motion
+     * has no transition to end, and neither does one whose computed position
+     * turns out identical after a resize. A marker that can stick is worse than
+     * one that clears a little early. */
+    const moved = this.last !== undefined && (this.last.x !== x || this.last.y !== y)
+    this.last = { x, y }
+
+    indicator.style.setProperty('--_indicator-x', x)
+    indicator.style.setProperty('--_indicator-y', y)
     indicator.style.setProperty('--_indicator-w', `${box.width}px`)
     indicator.style.setProperty('--_indicator-h', `${box.height}px`)
     indicator.toggleAttribute('data-placed', true)
+
+    if (!moved) {
+      return
+    }
+    indicator.toggleAttribute('data-moving', true)
+    clearTimeout(this.settling)
+    /* `translate` only. `transitionend` fires once per property, and a
+       stylesheet reacting to `data-moving` is very likely to transition
+       something shorter than the travel: the outline's mark widens over
+       `duration-fast` while it travels over `duration-normal`, so an unfiltered
+       listener had the width's own transition end the move that caused it, a
+       third of the way through. */
+    const settle = (event?: TransitionEvent): void => {
+      if (event && event.propertyName !== 'translate') {
+        return
+      }
+      clearTimeout(this.settling)
+      indicator.removeAttribute('data-moving')
+      indicator.removeEventListener('transitionend', settle)
+    }
+    indicator.addEventListener('transitionend', settle)
+    this.settling = setTimeout(settle, 1000)
   }
 }

@@ -57,13 +57,36 @@
  * Hidden until it has been measured, so it fades in where it belongs rather
  * than sliding down from the top of the list on first paint.
  */
+/* Three widths, and the middle one is the whole idea.
+ *
+ * At rest it is a hairline, thinner than the rail it sits in, because a mark
+ * that is only saying "you are here" does not need to be a bar. Hovering the
+ * list thickens it a step, which is the list acknowledging the pointer before
+ * anything has been chosen. And while it is travelling it takes the full rail,
+ * then settles back: a mark that swells as it leaves and thins as it lands
+ * reads as a thing being carried, where one that keeps its width the whole way
+ * reads as a rectangle being repositioned.
+ *
+ * `data-moving` is written by `IndicatorController` for the length of the
+ * travel, because CSS has no state for "a transition is running" and this
+ * wanted one.
+ *
+ * The width lives in a custom property because two declarations depend on it:
+ * the size and the inset that keeps it centred in the rail. Both are ordinary
+ * transitionable properties, so changing the variable animates them together
+ * and the mark grows about its own middle rather than off one edge.
+ *
+ * `fast` on the way out and `normal` on the way back, so the swell is quicker
+ * than the settle. Even durations make it pump. */
 [part="indicator"] {
+  --_mark-width: var(--helix-border-thin);
+
   background-color: var(--helix-color-primary);
   block-size: var(--_indicator-h, 0);
   border-radius: var(--helix-radii-full);
-  inline-size: var(--outline-rail);
+  inline-size: var(--_mark-width);
   inset-block-start: 0;
-  inset-inline-start: 0;
+  inset-inline-start: calc((var(--outline-rail) - var(--_mark-width)) / 2);
   opacity: 0;
   position: absolute;
   translate: 0 var(--_indicator-y, 0);
@@ -83,6 +106,8 @@
   transition:
     translate var(--helix-duration-normal) var(--helix-easing-spring),
     block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
+    inline-size var(--helix-duration-normal) var(--helix-easing-standard),
+    inset-inline-start var(--helix-duration-normal) var(--helix-easing-standard),
     opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -90,8 +115,35 @@
   opacity: 1;
 }
 
+/* Unless it is already on its way, where the travel's own width wins.
+ *
+ * Written as a `:not()` rather than left to the cascade, which had it backwards:
+ * `:host(:hover) [part="indicator"]` is (0,2,1) and `[part="indicator"][data-moving]`
+ * is (0,2,0), so hovering the list held the mark at the hover width for the
+ * whole travel and the swell never happened. Measured at 2.00px throughout,
+ * where the rail is 4. */
+:host(:hover) [part="indicator"]:not([data-moving]) {
+  --_mark-width: var(--helix-border-thick);
+}
+
+/* Widest while it is on its way, and quick about getting there. */
+[part="indicator"][data-moving] {
+  --_mark-width: var(--outline-rail);
+
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-spring),
+    block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
+    inline-size var(--helix-duration-fast) var(--helix-easing-decelerate),
+    inset-inline-start var(--helix-duration-fast) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The travel and the swell both go; the fade stays, being the mark arriving
+   rather than moving. Named one selector at a time, because a reduce rule
+   written looser than the rule it answers loses on specificity. */
 @media (prefers-reduced-motion: reduce) {
-  [part="indicator"] {
+  [part="indicator"],
+  [part="indicator"][data-moving] {
     transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   }
 }
