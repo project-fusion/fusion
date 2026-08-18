@@ -1,6 +1,14 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseInputDate } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+/* Side-effect import, because the headless tier's template names `helix-calendar`
+   rather than the base tag, and a custom element registers on import. Without it
+   a consumer importing this one family got a panel with an unknown element in
+   it: `helix-base-calendar` was registered by the tier below and the tag being
+   rendered was not, so the calendar was an empty inert box. It only ever looked
+   right because the sandbox imports the whole barrel. Same arrangement Select
+   uses for its listbox and Pagination for its select. */
+import '../../calendar/index.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './input-date-root.css.js'

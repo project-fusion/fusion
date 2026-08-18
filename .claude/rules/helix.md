@@ -60,6 +60,28 @@ shipped one package in five files.
   around it. Keep a wrapper only where it carries something real, as `<nav>`
   does in AppHeader, being a landmark whether or not it is filled.
 
+### A component that renders another names the public tag and imports it
+
+A custom element registers on import. A tag nobody imported is not an error and
+not a warning: it is an inert unknown element, laying out as an empty inline
+box. A panel built around one looks like a panel that failed to open.
+
+So a template names the **public** tag, `helix-calendar` rather than
+`helix-base-calendar`, and **each tier side-effect imports its own version of
+it**. A consumer on the styled tier then gets the styled calendar; one on the
+headless tier brings a calendar of their own under that name. Select does this
+for its listbox and Pagination for its select.
+
+**Both tiers, not just the one with the tag in it.** A styled component extends
+the headless class and almost never overrides `render`, so it inherits the
+template and the obligation with it, while having no `<helix-…>` of its own to
+remind anyone. Input Date shipped without the styled import for exactly that
+reason, and every example still looked right, because the sandbox and the docs
+site import the whole barrel. That is the condition under which this failure is
+invisible: it appears only for the consumer who imports one component.
+
+`bun run check:composed` enforces both halves.
+
 ## Server rendering
 
 Every component must render on a server with no DOM. The app no longer ships

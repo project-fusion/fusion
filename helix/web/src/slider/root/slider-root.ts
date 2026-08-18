@@ -28,6 +28,7 @@ import { styles } from './slider-root.css.js'
  * @cssproperty --slider-track-color - The part not yet chosen.
  * @cssproperty --slider-fill-color - The part behind the thumb.
  * @cssproperty --slider-marker-color - The ticks along the track.
+ * @cssproperty --slider-track-image - The whole track, for a slider whose colour is the value.
  */
 @customElement('helix-slider')
 export class HelixSlider extends HelixBaseSlider {

@@ -35,6 +35,24 @@
    * A track is a bar rather than a fill, so it takes a line's color: it is the
    * same weight of mark as the rules in a table, drawn thicker. */
   --_slider-track-color: var(--slider-track-color, var(--helix-color-border));
+  /* What the track is painted with, whole, so a slider can be a ramp.
+   *
+   * The fill and the track colour compose the default and cover every slider
+   * that reads as a proportion, which is nearly all of them. What they cannot
+   * express is a track whose colour is the value rather than a measure of it: a
+   * hue ramp has no filled half, and neither does an alpha bar. Input Color
+   * needs both, and the alternative was for it to reach through `::part(control)`
+   * into `::-webkit-slider-runnable-track` from outside, which is a consumer
+   * patching around a gap here and would have needed the Firefox pseudo-element
+   * too. One hook, used by both rules below. */
+  --_slider-track-image: var(
+    --slider-track-image,
+    linear-gradient(
+      to right,
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
+      var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
+    )
+  );
 }
 
 [part="field"] {
@@ -173,21 +191,13 @@
    the stop is the fraction the headless tier wrote, so the fill is arithmetic
    rather than a measurement of where the platform drew the thumb. */
 [part="control"]::-webkit-slider-runnable-track {
-  background: linear-gradient(
-    to right,
-    var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
-    var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
-  );
+  background: var(--_slider-track-image);
   block-size: var(--_slider-track);
   border-radius: var(--helix-radii-full);
 }
 
 [part="control"]::-moz-range-track {
-  background: linear-gradient(
-    to right,
-    var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
-    var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
-  );
+  background: var(--_slider-track-image);
   block-size: var(--_slider-track);
   border-radius: var(--helix-radii-full);
 }

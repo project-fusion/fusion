@@ -3052,6 +3052,7 @@ the thumb being dragged.
 | `--slider-track-color` | The part not yet chosen. |
 | `--slider-fill-color` | The part behind the thumb. |
 | `--slider-marker-color` | The ticks along the track. |
+| `--slider-track-image` | The whole track, for a slider whose colour is the value. |
 
 ## Spinner
 
