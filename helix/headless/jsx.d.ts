@@ -10772,6 +10772,23 @@ export type CustomElements = {
    * inside a splitter gives the cross back, and gives the three-pane and the
    * four-pane arrangements it never had.
    *
+   * **Where two of them cross, the inner one takes the pointer, and there is no
+   * handle that moves both.** Measured on a three-deep nest: every separator
+   * carries the same `z-index`, so a tie is broken by document order and a deeper
+   * splitter is always later. That is deterministic rather than accidental, and it
+   * is the right way round, since a reader pointing inside a pane is pointing at
+   * that pane's divider. What it costs is the length of one divider where the
+   * other crosses it: eight pixels of the outer one, reachable anywhere else along
+   * it.
+   *
+   * A corner that moved both at once is the one thing the sandbox has that nesting
+   * does not give back. It is deliberately not here: it would need the outer
+   * splitter to drive a slotted inner one, which is the parent-to-child
+   * coordination `Pagination.Summary` records as having no answer that survives a
+   * server render. A corner belongs to a composite that owns both positions
+   * directly, the way the sandbox does, not to the two-pane component underneath
+   * it.
+   *
    * **The divider is a real `role="separator"` with `aria-valuenow`, moved by the
    * arrow keys as well as by pointer.** A divider only a mouse can move is
    * unusable without one, which is the reason the sandbox's carries the same, and
@@ -16640,6 +16657,23 @@ export type CustomElementsSolidJs = {
    * part of it that is worth sharing is one divider between two panes. A splitter
    * inside a splitter gives the cross back, and gives the three-pane and the
    * four-pane arrangements it never had.
+   *
+   * **Where two of them cross, the inner one takes the pointer, and there is no
+   * handle that moves both.** Measured on a three-deep nest: every separator
+   * carries the same `z-index`, so a tie is broken by document order and a deeper
+   * splitter is always later. That is deterministic rather than accidental, and it
+   * is the right way round, since a reader pointing inside a pane is pointing at
+   * that pane's divider. What it costs is the length of one divider where the
+   * other crosses it: eight pixels of the outer one, reachable anywhere else along
+   * it.
+   *
+   * A corner that moved both at once is the one thing the sandbox has that nesting
+   * does not give back. It is deliberately not here: it would need the outer
+   * splitter to drive a slotted inner one, which is the parent-to-child
+   * coordination `Pagination.Summary` records as having no answer that survives a
+   * server render. A corner belongs to a composite that owns both positions
+   * directly, the way the sandbox does, not to the two-pane component underneath
+   * it.
    *
    * **The divider is a real `role="separator"` with `aria-valuenow`, moved by the
    * arrow keys as well as by pointer.** A divider only a mouse can move is
