@@ -64,7 +64,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 129 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 145 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 161 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 157 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 132 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 71 |
@@ -80,8 +80,8 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 46 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 116 |
-| `--helix-radii-md` | `var(--_helix-seed-radii)` | 6 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 118 |
+| `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
 | `--helix-radii-full` | `9999px` | 46 |
 
@@ -179,7 +179,7 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 0 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 198 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 214 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 87 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 12 |
 
@@ -189,8 +189,8 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 190 |
-| `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 34 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 192 |
+| `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 44 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 25 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
 | `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 4 |

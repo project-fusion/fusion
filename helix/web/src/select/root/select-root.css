@@ -129,8 +129,26 @@
    The controller positions asynchronously, so a panel revealed by the render
    sits at its stylesheet's position for one frame first. Opacity rather than
    `visibility`, so the panel still has a box for the controller to measure. */
+/* And it travels, a little, out of the edge it opened against.
+ *
+ * On `transform`, never on `translate`: the floating controller writes the
+ * panel's position onto `translate`, and a keyframe animating that property took
+ * the position over, so the panel travelled from the corner of the viewport
+ * instead of from its anchor. Measured, the two compose in the order translate,
+ * scale, transform, which means a `translateY` here is relative to wherever the
+ * controller placed the panel and leaves x alone.
+ *
+ * The direction follows the placement, so it always emerges from the control
+ * rather than always from above: a panel opening upward that slid down would
+ * read as arriving from the thing it is covering. `transform-origin` below keys
+ * on the same signal for the same reason.
+ *
+ * Small on purpose. `2xs` is enough to read as motion and short enough that a
+ * fast reader who opens and picks in one gesture is not waiting on it. */
 [part="surface"] {
   opacity: 0;
+  --_travel: calc(var(--helix-space-2xs) * -1);
+  transform: translateY(var(--_travel));
   /* The panel was already waiting on placement; this makes the wait visible.
      0.96 rather than 0: a list of options collapsed to nothing squashes its own
      rows on the way out and reads as a toy at panel size, where a tooltip at the
@@ -143,13 +161,22 @@
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
     display var(--helix-duration-fast) allow-discrete,
     overlay var(--helix-duration-fast) allow-discrete;
+}
+
+/* Opening upward, it comes up from the control rather than down onto it. Only
+   the custom property moves, so this rule cannot race the settled one below on
+   equal specificity: source order would decide it, and this sits above. */
+[part="surface"][data-placement^="top"] {
+  --_travel: var(--helix-space-2xs);
 }
 
 [part="surface"][data-placed] {
   opacity: 1;
   scale: 1;
+  transform: none;
 }
 
 /* Out of the edge it opened against. A select has no arrow, so the fallback
@@ -163,13 +190,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [part="surface"] {
-    scale: 1;
-    transition: none;
-  }
-
+  [part="surface"],
   [part="surface"][data-placed] {
     scale: 1;
+    transform: none;
+    transition: none;
   }
 }
 

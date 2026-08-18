@@ -77,17 +77,82 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* No border on the panel. A surface over the page is told apart by its shadow
-   and by what it covers, and a line around it as well reads as a box drawn
-   around something already separate. Select says the same. */
+/* The panel, in the house shape every floating surface here takes.
+ *
+ * `border: none` said rather than left out. The UA stylesheet gives `[popover]`
+ * `border: solid`, so dropping the declaration leaves a three-pixel medium
+ * border rather than none at all: this shipped with one, and the comment above
+ * it claimed there was none. Popover, Menu and Tooltip each carry the same
+ * sentence, which is what makes the omission embarrassing rather than
+ * surprising.
+ *
+ * The width is the field's, from the controller rather than a percentage: the
+ * panel is positioned `fixed`, so `100%` would be the viewport. `max-content` is
+ * the floor rather than a cap, so a narrow field gets a calendar that fits
+ * instead of a calendar folded into a column. Select's reasoning exactly. */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
-  border-radius: var(--helix-radii-md);
+  border: none;
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
+  inline-size: var(--_floating-anchor-width, 100%);
   inset: auto;
   margin: var(--helix-space-none);
+  min-inline-size: max-content;
   padding: var(--helix-space-xs);
   position: absolute;
+}
+
+/* And it travels, a little, out of the edge it opened against.
+ *
+ * On `transform`, never on `translate`: the floating controller writes the
+ * panel's position onto `translate`, and a keyframe animating that property took
+ * the position over, so the panel travelled from the corner of the viewport
+ * instead of from its anchor. Measured, the two compose in the order translate,
+ * scale, transform, which means a `translateY` here is relative to wherever the
+ * controller placed the panel and leaves x alone.
+ *
+ * The direction follows the placement, so it always emerges from the control
+ * rather than always from above: a panel opening upward that slid down would
+ * read as arriving from the thing it is covering. `transform-origin` below keys
+ * on the same signal for the same reason.
+ *
+ * Small on purpose. `2xs` is enough to read as motion and short enough that a
+ * fast reader who opens and picks in one gesture is not waiting on it. */
+[part="surface"] {
+  opacity: 0;
+  --_travel: calc(var(--helix-space-2xs) * -1);
+  transform: translateY(var(--_travel));
+  scale: 0.96;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
+}
+
+/* Opening upward, it comes up from the control rather than down onto it. Only
+   the custom property moves, so this rule cannot race the settled one below on
+   equal specificity: source order would decide it, and this sits above. */
+[part="surface"][data-placement^="top"] {
+  --_travel: var(--helix-space-2xs);
+}
+
+[part="surface"][data-placed] {
+  opacity: 1;
+  scale: 1;
+  transform: none;
+}
+
+/* Out of the edge it opened against. A calendar has no arrow, so the fallback
+   applies and it grows from the middle of the near edge, as Select does. */
+[part="surface"][data-placement^="top"] {
+  transform-origin: var(--_floating-arrow-x, 50%) 100%;
+}
+
+[part="surface"][data-placement^="bottom"] {
+  transform-origin: var(--_floating-arrow-x, 50%) 0;
 }
 
 [part="surface"][hidden] {
@@ -106,6 +171,15 @@
 @media (prefers-reduced-motion: reduce) {
   [part="field"],
   [part="trigger"] {
+    transition: none;
+  }
+
+  /* The panel still has to arrive, so what goes is the movement, not the
+     appearance: no travel and no scale, and it is simply there. */
+  [part="surface"],
+  [part="surface"][data-placed] {
+    scale: 1;
+    transform: none;
     transition: none;
   }
 }
