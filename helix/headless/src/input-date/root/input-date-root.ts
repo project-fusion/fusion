@@ -110,7 +110,11 @@ export class HelixBaseInputDate extends MixinControllerOpen(
   protected readonly panel = new PopoverController(this, {
     anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
     boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
-    offset: () => 4,
+    /* Wider than the four every other panel here takes. Those sit against a
+       control the same width as themselves and read as an extension of it; this
+       one is a calendar of its own size hanging off a field, so the gap is what
+       says the two are separate things rather than one control that grew. */
+    offset: () => 8,
     onDismiss: () => this.requestOpen(false),
     placement: 'bottom-start',
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
@@ -236,6 +240,38 @@ export class HelixBaseInputDate extends MixinControllerOpen(
     }
   }
 
+  /**
+   * Focusing the field opens the calendar.
+   *
+   * A reader who reaches this control is choosing a date, and making them find
+   * the trigger afterwards is a second action for something they have already
+   * asked for. Typing still works with it up, because the calendar follows the
+   * field rather than the other way round.
+   *
+   * **Only where focus arrived from outside this element**, which is the whole
+   * of the difficulty. Picking a date shuts the panel and puts the caret back in
+   * the field, and the first version of this reopened it on the way: the reader
+   * chose a date and the calendar came straight back, which the existing spec
+   * caught. `relatedTarget` is where focus came from, so a hand-off from the
+   * calendar or the trigger is left alone and only a genuine arrival opens
+   * anything.
+   *
+   * On the input rather than on the field, too. Focus does not bubble, so a
+   * listener here covers the text and not the trigger, which is what keeps
+   * pressing the trigger from opening the panel on focus and then shutting it
+   * again on the click.
+   */
+  private readonly handleFocus = (event: FocusEvent): void => {
+    const from = event.relatedTarget
+    if (this.open || this.isDisabled) {
+      return
+    }
+    if (from instanceof Node && this.renderRoot?.contains?.(from)) {
+      return
+    }
+    this.requestOpen(true)
+  }
+
   /** Puts the caret in the field, the way a label pointing at one would. */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
@@ -256,6 +292,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
           aria-describedby=${this.describedBy ?? nothing}
           ?disabled=${this.isDisabled}
           ?required=${this.required}
+          @focus=${this.handleFocus}
           @input=${this.handleInput}
         />
         <button

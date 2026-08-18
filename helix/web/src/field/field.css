@@ -25,6 +25,22 @@
  * renders these nodes, because `helix/headless` extends that mixin and must
  * never carry CSS. `helix/web` is the first tier that may. */
 
+/* Every placeholder in every field, which is where this belongs: the rule was
+ * copied identically into six stylesheets, and the seventh field written would
+ * have made it seven. `listbox` names `search-field` rather than `control`, so
+ * the subject is left off entirely: a bare `::placeholder` is `*::placeholder`,
+ * and every placeholder in the component is exactly what is meant.
+ *
+ * `medium` rather than regular. A placeholder is not filler, it is the one piece
+ * of instruction a field carries before anything is typed, and at
+ * `foreground-subtle` the colour has already taken most of its weight away.
+ * Regular on top of that reads as greyed-out rather than as guidance. Matching
+ * the label, which is the other short instruction in the same control. */
+::placeholder {
+  color: var(--helix-color-foreground-subtle);
+  font-weight: var(--helix-weight-medium);
+}
+
 [part="label"] {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);

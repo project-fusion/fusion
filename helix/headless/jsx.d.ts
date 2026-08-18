@@ -2135,13 +2135,21 @@ export type HelixBaseInputColorHelixCloseElementEvent =
 export type HelixBaseInputColorProps = {
   /** Whether the colour carries an alpha channel.
 
-Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
-and a consumer who did not ask for transparency should not have to strip a
-byte off every value they store. */
+Off by default, because it widens every value written, and a consumer who
+did not ask for transparency should not have to strip a byte off each one. */
   alpha?: HelixBaseInputColor["alpha"];
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+Only what is written. Everything is read whatever this says, so a field on
+`hex` still takes a pasted `rgb()` and stores the hex for it. */
+  format?: HelixBaseInputColor["format"];
+  /** Whether the reader may change the format from the panel. */
+  "no-format"?: HelixBaseInputColor["noFormat"];
+  /** Whether the reader may change the format from the panel. */
+  noFormat?: HelixBaseInputColor["noFormat"];
   /** What the field says before a colour is in it. */
   placeholder?: HelixBaseInputColor["placeholder"];
-  /** Colours offered under the sliders, as a comma-separated hex list. */
+  /** Colours offered under the panel, as a comma-separated list. */
   swatches?: HelixBaseInputColor["swatches"];
   /** Accessible name for the control that opens the panel. */
   "trigger-label"?: HelixBaseInputColor["triggerLabel"];
@@ -2253,13 +2261,21 @@ fire at all. */
 export type HelixBaseInputColorSolidJsProps = {
   /** Whether the colour carries an alpha channel.
 
-Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
-and a consumer who did not ask for transparency should not have to strip a
-byte off every value they store. */
+Off by default, because it widens every value written, and a consumer who
+did not ask for transparency should not have to strip a byte off each one. */
   "prop:alpha"?: HelixBaseInputColor["alpha"];
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+Only what is written. Everything is read whatever this says, so a field on
+`hex` still takes a pasted `rgb()` and stores the hex for it. */
+  "prop:format"?: HelixBaseInputColor["format"];
+  /** Whether the reader may change the format from the panel. */
+  "bool:no-format"?: HelixBaseInputColor["noFormat"];
+  /** Whether the reader may change the format from the panel. */
+  "prop:noFormat"?: HelixBaseInputColor["noFormat"];
   /** What the field says before a colour is in it. */
   "prop:placeholder"?: HelixBaseInputColor["placeholder"];
-  /** Colours offered under the sliders, as a comma-separated hex list. */
+  /** Colours offered under the panel, as a comma-separated list. */
   "prop:swatches"?: HelixBaseInputColor["swatches"];
   /** Accessible name for the control that opens the panel. */
   "attr:trigger-label"?: HelixBaseInputColor["triggerLabel"];
@@ -9075,33 +9091,36 @@ export type CustomElements = {
   >;
 
   /**
-   * **The channels are `helix-slider`, not four bespoke tracks.** A real
-   * `<input type="range">` brings the drag, the arrow keys, Home and End, the page
-   * keys, and a hit area the platform sizes for a finger. Every one of those is a
-   * thing a hand-built track gets wrong, and the last is the one nobody notices.
+   * **The panel is a saturation and brightness square with a hue ramp under it**,
+   * which is the shape of every colour picker a reader has already met. An earlier
+   * version of this component was three labelled sliders instead, on the grounds
+   * that a two-dimensional control has no semantics. That reasoning was right and
+   * the conclusion was wrong: it treated "no semantics" as the end of the question
+   * rather than as the thing to solve.
    *
-   * **There is no saturation-and-lightness square, and that is a deliberate loss.**
-   * The square is the convention, and it is faster for a sighted reader with a
-   * mouse. It is also a two-dimensional control with no semantics: `role="slider"`
-   * describes one axis, and the alternatives are to invent a widget a screen
-   * reader has never met or to ship a control a keyboard cannot reach. Three
-   * labelled sliders are slower and operable by everyone, which is the trade taken
-   * here. A square could be added later as a second way to reach the same
-   * channels; it cannot be added as the only way.
+   * **So the square is two real range inputs.** Saturation and brightness are each
+   * an `<input type="range">`, laid over the square and made invisible, and the
+   * handle is drawn from their values. The pointer gets the square; the keyboard
+   * gets the arrow keys, Home, End and the page keys; a screen reader gets two
+   * sliders that announce a name and a number. All of it is the platform's, and
+   * nothing here implements a key handler. There is no `role="application"`, which
+   * is the usual way this control is built and amounts to asking a screen reader
+   * to stop helping.
    *
-   * **The channels are the state, and the hex is derived from them.** The reverse
-   * loses colours: hex to channels and back is exact, but the channels of black
-   * are `hue: 0, saturation: 0`, so a reader who drags lightness to zero and back
-   * gets grey where they had red. Holding the channels means the hue survives a
-   * trip through a colour that has none. A value arriving from outside, or typed
-   * into the field, is read into the channels once, which is the only moment the
-   * conversion runs in that direction.
+   * **The working model is HSB, and the value is derived from it.** The reverse
+   * loses colours: black is `brightness: 0`, whose hue and saturation are both
+   * undefined, so a reader who drags to the bottom of the square and back would
+   * get grey where they had red. Holding the model means a colour survives a trip
+   * through one that has no hue. A value arriving from outside, or typed into the
+   * field, is read into the model once, which is the only moment the conversion
+   * runs in that direction.
    *
-   * **The value is hex, always**: `#rrggbb`, or `#rrggbbaa` where `alpha` is set.
-   * That is what a form submits and what `<input type="color">` speaks, so a
-   * server that already understands one understands this. What the field *shows*
-   * is the same string, for the reason Input Date gives about its dates: half-typed
-   * input does not survive a round trip through a formatter.
+   * **Every syntax is read; the one `format` names is written.** `#f00`,
+   * `#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)` and `hsl(0 100% 50%)` are all
+   * colours, and a field that refuses one because it prefers another is arguing
+   * with the person using it. Named colours are the exception, and deliberately:
+   * resolving `rebeccapurple` means shipping a table of a hundred and forty or
+   * asking the browser, and there is no browser during a server render.
    *
    * ## Attributes & Properties
    *
@@ -9109,11 +9128,15 @@ export type CustomElements = {
    *
    * - `alpha`: Whether the colour carries an alpha channel.
    *
-   * Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
-   * and a consumer who did not ask for transparency should not have to strip a
-   * byte off every value they store.
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a field on
+   * `hex` still takes a pasted `rgb()` and stores the hex for it.
+   * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
    * - `placeholder`: What the field says before a colour is in it.
-   * - `swatches`: Colours offered under the sliders, as a comma-separated hex list.
+   * - `swatches`: Colours offered under the panel, as a comma-separated list.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `open`: Whether the element is open.
    *
@@ -9258,12 +9281,21 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `field`: The box holding the text and the trigger.
-   * - `control`: The text input carrying the hex.
+   * - `control`: The text input carrying the value.
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the colour, inside the trigger.
    * - `surface`: The floating panel.
-   * - `channels`: The column of sliders.
-   * - `channel`: One slider.
+   * - `grid`: The saturation and brightness square.
+   * - `grid-handle`: The mark showing where in the square the colour sits.
+   * - `grid-saturation`: The range input for the square's horizontal axis.
+   * - `grid-brightness`: The range input for its vertical axis.
+   * - `controls`: The row under the square.
+   * - `sample`: The larger chip of the current colour, in that row.
+   * - `channels`: The ramps beside it.
+   * - `channel`: One ramp.
+   * - `footer`: The row holding the syntax toggle and the presets.
+   * - `eyedropper`: The control that samples a colour from the screen.
+   * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
    */
@@ -15505,33 +15537,36 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * **The channels are `helix-slider`, not four bespoke tracks.** A real
-   * `<input type="range">` brings the drag, the arrow keys, Home and End, the page
-   * keys, and a hit area the platform sizes for a finger. Every one of those is a
-   * thing a hand-built track gets wrong, and the last is the one nobody notices.
+   * **The panel is a saturation and brightness square with a hue ramp under it**,
+   * which is the shape of every colour picker a reader has already met. An earlier
+   * version of this component was three labelled sliders instead, on the grounds
+   * that a two-dimensional control has no semantics. That reasoning was right and
+   * the conclusion was wrong: it treated "no semantics" as the end of the question
+   * rather than as the thing to solve.
    *
-   * **There is no saturation-and-lightness square, and that is a deliberate loss.**
-   * The square is the convention, and it is faster for a sighted reader with a
-   * mouse. It is also a two-dimensional control with no semantics: `role="slider"`
-   * describes one axis, and the alternatives are to invent a widget a screen
-   * reader has never met or to ship a control a keyboard cannot reach. Three
-   * labelled sliders are slower and operable by everyone, which is the trade taken
-   * here. A square could be added later as a second way to reach the same
-   * channels; it cannot be added as the only way.
+   * **So the square is two real range inputs.** Saturation and brightness are each
+   * an `<input type="range">`, laid over the square and made invisible, and the
+   * handle is drawn from their values. The pointer gets the square; the keyboard
+   * gets the arrow keys, Home, End and the page keys; a screen reader gets two
+   * sliders that announce a name and a number. All of it is the platform's, and
+   * nothing here implements a key handler. There is no `role="application"`, which
+   * is the usual way this control is built and amounts to asking a screen reader
+   * to stop helping.
    *
-   * **The channels are the state, and the hex is derived from them.** The reverse
-   * loses colours: hex to channels and back is exact, but the channels of black
-   * are `hue: 0, saturation: 0`, so a reader who drags lightness to zero and back
-   * gets grey where they had red. Holding the channels means the hue survives a
-   * trip through a colour that has none. A value arriving from outside, or typed
-   * into the field, is read into the channels once, which is the only moment the
-   * conversion runs in that direction.
+   * **The working model is HSB, and the value is derived from it.** The reverse
+   * loses colours: black is `brightness: 0`, whose hue and saturation are both
+   * undefined, so a reader who drags to the bottom of the square and back would
+   * get grey where they had red. Holding the model means a colour survives a trip
+   * through one that has no hue. A value arriving from outside, or typed into the
+   * field, is read into the model once, which is the only moment the conversion
+   * runs in that direction.
    *
-   * **The value is hex, always**: `#rrggbb`, or `#rrggbbaa` where `alpha` is set.
-   * That is what a form submits and what `<input type="color">` speaks, so a
-   * server that already understands one understands this. What the field *shows*
-   * is the same string, for the reason Input Date gives about its dates: half-typed
-   * input does not survive a round trip through a formatter.
+   * **Every syntax is read; the one `format` names is written.** `#f00`,
+   * `#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)` and `hsl(0 100% 50%)` are all
+   * colours, and a field that refuses one because it prefers another is arguing
+   * with the person using it. Named colours are the exception, and deliberately:
+   * resolving `rebeccapurple` means shipping a table of a hundred and forty or
+   * asking the browser, and there is no browser during a server render.
    *
    * ## Attributes & Properties
    *
@@ -15539,11 +15574,15 @@ export type CustomElementsSolidJs = {
    *
    * - `alpha`: Whether the colour carries an alpha channel.
    *
-   * Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
-   * and a consumer who did not ask for transparency should not have to strip a
-   * byte off every value they store.
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a field on
+   * `hex` still takes a pasted `rgb()` and stores the hex for it.
+   * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
    * - `placeholder`: What the field says before a colour is in it.
-   * - `swatches`: Colours offered under the sliders, as a comma-separated hex list.
+   * - `swatches`: Colours offered under the panel, as a comma-separated list.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `open`: Whether the element is open.
    *
@@ -15688,12 +15727,21 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `field`: The box holding the text and the trigger.
-   * - `control`: The text input carrying the hex.
+   * - `control`: The text input carrying the value.
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the colour, inside the trigger.
    * - `surface`: The floating panel.
-   * - `channels`: The column of sliders.
-   * - `channel`: One slider.
+   * - `grid`: The saturation and brightness square.
+   * - `grid-handle`: The mark showing where in the square the colour sits.
+   * - `grid-saturation`: The range input for the square's horizontal axis.
+   * - `grid-brightness`: The range input for its vertical axis.
+   * - `controls`: The row under the square.
+   * - `sample`: The larger chip of the current colour, in that row.
+   * - `channels`: The ramps beside it.
+   * - `channel`: One ramp.
+   * - `footer`: The row holding the syntax toggle and the presets.
+   * - `eyedropper`: The control that samples a colour from the screen.
+   * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
    */

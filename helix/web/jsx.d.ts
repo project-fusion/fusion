@@ -2817,13 +2817,21 @@ being four of a kind rather than four of three kinds. */
   required?: HelixInputColor["required"];
   /** Whether the colour carries an alpha channel.
 
-Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
-and a consumer who did not ask for transparency should not have to strip a
-byte off every value they store. */
+Off by default, because it widens every value written, and a consumer who
+did not ask for transparency should not have to strip a byte off each one. */
   alpha?: HelixInputColor["alpha"];
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+Only what is written. Everything is read whatever this says, so a field on
+`hex` still takes a pasted `rgb()` and stores the hex for it. */
+  format?: HelixInputColor["format"];
+  /** Whether the reader may change the format from the panel. */
+  "no-format"?: HelixInputColor["noFormat"];
+  /** Whether the reader may change the format from the panel. */
+  noFormat?: HelixInputColor["noFormat"];
   /** What the field says before a colour is in it. */
   placeholder?: HelixInputColor["placeholder"];
-  /** Colours offered under the sliders, as a comma-separated hex list. */
+  /** Colours offered under the panel, as a comma-separated list. */
   swatches?: HelixInputColor["swatches"];
   /** Accessible name for the control that opens the panel. */
   "trigger-label"?: HelixInputColor["triggerLabel"];
@@ -2935,13 +2943,21 @@ being four of a kind rather than four of three kinds. */
   "prop:required"?: HelixInputColor["required"];
   /** Whether the colour carries an alpha channel.
 
-Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
-and a consumer who did not ask for transparency should not have to strip a
-byte off every value they store. */
+Off by default, because it widens every value written, and a consumer who
+did not ask for transparency should not have to strip a byte off each one. */
   "prop:alpha"?: HelixInputColor["alpha"];
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+Only what is written. Everything is read whatever this says, so a field on
+`hex` still takes a pasted `rgb()` and stores the hex for it. */
+  "prop:format"?: HelixInputColor["format"];
+  /** Whether the reader may change the format from the panel. */
+  "bool:no-format"?: HelixInputColor["noFormat"];
+  /** Whether the reader may change the format from the panel. */
+  "prop:noFormat"?: HelixInputColor["noFormat"];
   /** What the field says before a colour is in it. */
   "prop:placeholder"?: HelixInputColor["placeholder"];
-  /** Colours offered under the sliders, as a comma-separated hex list. */
+  /** Colours offered under the panel, as a comma-separated list. */
   "prop:swatches"?: HelixInputColor["swatches"];
   /** Accessible name for the control that opens the panel. */
   "attr:trigger-label"?: HelixInputColor["triggerLabel"];
@@ -10050,22 +10066,30 @@ export type CustomElements = {
   /**
    * The frame is the field rather than the input, so the trigger sits inside the
    * same box as the text and the focus ring is drawn once around the whole
-   * control. The trigger carries a chip of the colour itself, which is the only
-   * part of this component that says what it holds without being read.
+   * control. The trigger carries a chip of the colour, which is the only part of
+   * this component that says what it holds without being read.
    *
-   * **Every swatch sits on a checkerboard.** A colour with alpha painted on a
-   * solid background is just a different colour, and the one thing a preview owes
-   * a reader is the difference between "pale blue" and "blue, half transparent".
+   * **The square is painted in three layers, not composited from elements**: the
+   * hue underneath, white sliding in from the left to take the saturation out,
+   * black rising from the bottom to take the brightness out. One element, one
+   * declaration, and it repaints as the hue moves because the hue is a custom
+   * property the tier below writes.
    *
-   * **The channel tracks are painted with the colours they choose**, through
-   * `--slider-track-image` on the real slider. Saturation and lightness are built
-   * from wherever the other channels currently stand, so each track shows the
-   * colours actually reachable from here rather than a fixed ramp ending somewhere
-   * the reader cannot get to.
+   * **The two range inputs over it are invisible and still there.** Not
+   * `display: none` and not `visibility: hidden`, either of which would take them
+   * out of the tab order and out of the accessibility tree, which is the entire
+   * reason a square built this way is reachable at all. They carry
+   * `pointer-events: none` so the square answers the pointer itself, and the focus
+   * ring is drawn on the square rather than on them, so it lands where the reader
+   * is looking.
    *
-   * The hue track is the raw spectrum and takes no token. Every other colour here
-   * is a role a theme may change; the wheel is not one, and a themed hue slider
-   * would be a slider that lies about what it selects.
+   * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
+   * background is just a different colour, and the one thing a preview owes a
+   * reader is the difference between "pale blue" and "blue, half transparent".
+   *
+   * The hue ramp and the square's base take no token. Every other colour here is a
+   * role a theme may change; the wheel is not one, and a themed picker would be
+   * one that lies about what it selects.
    *
    * ## Attributes & Properties
    *
@@ -10112,11 +10136,15 @@ export type CustomElements = {
    * - `required`: Whether the form refuses to submit without it.
    * - `alpha`: Whether the colour carries an alpha channel.
    *
-   * Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
-   * and a consumer who did not ask for transparency should not have to strip a
-   * byte off every value they store.
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a field on
+   * `hex` still takes a pasted `rgb()` and stores the hex for it.
+   * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
    * - `placeholder`: What the field says before a colour is in it.
-   * - `swatches`: Colours offered under the sliders, as a comma-separated hex list.
+   * - `swatches`: Colours offered under the panel, as a comma-separated list.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -10222,18 +10250,28 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--input-color-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--input-color-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `field`: The box holding the text and the trigger.
-   * - `control`: The text input carrying the hex.
+   * - `control`: The text input carrying the value.
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the colour, inside the trigger.
    * - `surface`: The floating panel.
-   * - `channels`: The column of sliders.
-   * - `channel`: One slider.
+   * - `grid`: The saturation and brightness square.
+   * - `grid-handle`: The mark showing where in the square the colour sits.
+   * - `grid-saturation`: The range input for the square's horizontal axis.
+   * - `grid-brightness`: The range input for its vertical axis.
+   * - `controls`: The row under the square.
+   * - `sample`: The larger chip of the current colour, in that row.
+   * - `channels`: The ramps beside it.
+   * - `channel`: One ramp.
+   * - `footer`: The row holding the syntax toggle and the presets.
+   * - `eyedropper`: The control that samples a colour from the screen.
+   * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
    */
@@ -16424,22 +16462,30 @@ export type CustomElementsSolidJs = {
   /**
    * The frame is the field rather than the input, so the trigger sits inside the
    * same box as the text and the focus ring is drawn once around the whole
-   * control. The trigger carries a chip of the colour itself, which is the only
-   * part of this component that says what it holds without being read.
+   * control. The trigger carries a chip of the colour, which is the only part of
+   * this component that says what it holds without being read.
    *
-   * **Every swatch sits on a checkerboard.** A colour with alpha painted on a
-   * solid background is just a different colour, and the one thing a preview owes
-   * a reader is the difference between "pale blue" and "blue, half transparent".
+   * **The square is painted in three layers, not composited from elements**: the
+   * hue underneath, white sliding in from the left to take the saturation out,
+   * black rising from the bottom to take the brightness out. One element, one
+   * declaration, and it repaints as the hue moves because the hue is a custom
+   * property the tier below writes.
    *
-   * **The channel tracks are painted with the colours they choose**, through
-   * `--slider-track-image` on the real slider. Saturation and lightness are built
-   * from wherever the other channels currently stand, so each track shows the
-   * colours actually reachable from here rather than a fixed ramp ending somewhere
-   * the reader cannot get to.
+   * **The two range inputs over it are invisible and still there.** Not
+   * `display: none` and not `visibility: hidden`, either of which would take them
+   * out of the tab order and out of the accessibility tree, which is the entire
+   * reason a square built this way is reachable at all. They carry
+   * `pointer-events: none` so the square answers the pointer itself, and the focus
+   * ring is drawn on the square rather than on them, so it lands where the reader
+   * is looking.
    *
-   * The hue track is the raw spectrum and takes no token. Every other colour here
-   * is a role a theme may change; the wheel is not one, and a themed hue slider
-   * would be a slider that lies about what it selects.
+   * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
+   * background is just a different colour, and the one thing a preview owes a
+   * reader is the difference between "pale blue" and "blue, half transparent".
+   *
+   * The hue ramp and the square's base take no token. Every other colour here is a
+   * role a theme may change; the wheel is not one, and a themed picker would be
+   * one that lies about what it selects.
    *
    * ## Attributes & Properties
    *
@@ -16486,11 +16532,15 @@ export type CustomElementsSolidJs = {
    * - `required`: Whether the form refuses to submit without it.
    * - `alpha`: Whether the colour carries an alpha channel.
    *
-   * Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
-   * and a consumer who did not ask for transparency should not have to strip a
-   * byte off every value they store.
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a field on
+   * `hex` still takes a pasted `rgb()` and stores the hex for it.
+   * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
    * - `placeholder`: What the field says before a colour is in it.
-   * - `swatches`: Colours offered under the sliders, as a comma-separated hex list.
+   * - `swatches`: Colours offered under the panel, as a comma-separated list.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -16596,18 +16646,28 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--input-color-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--input-color-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `field`: The box holding the text and the trigger.
-   * - `control`: The text input carrying the hex.
+   * - `control`: The text input carrying the value.
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the colour, inside the trigger.
    * - `surface`: The floating panel.
-   * - `channels`: The column of sliders.
-   * - `channel`: One slider.
+   * - `grid`: The saturation and brightness square.
+   * - `grid-handle`: The mark showing where in the square the colour sits.
+   * - `grid-saturation`: The range input for the square's horizontal axis.
+   * - `grid-brightness`: The range input for its vertical axis.
+   * - `controls`: The row under the square.
+   * - `sample`: The larger chip of the current colour, in that row.
+   * - `channels`: The ramps beside it.
+   * - `channel`: One ramp.
+   * - `footer`: The row holding the syntax toggle and the presets.
+   * - `eyedropper`: The control that samples a colour from the screen.
+   * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
    */
@@ -21010,6 +21070,8 @@ export type CustomCssProperties = {
   "--icon-size"?: string;
   /** Fill behind the field. */
   "--input-color-background-color"?: string;
+  /** Width of the panel, and so of the square. */
+  "--input-color-panel-size"?: string;
   /** Fill behind the field. */
   "--input-date-background-color"?: string;
   /** Fill behind the field. */

@@ -126,10 +126,6 @@
   min-inline-size: 0;
 }
 
-[part="control"]::placeholder {
-  color: var(--helix-color-foreground-subtle);
-}
-
 /* The clear affordance a search field draws itself, which is a different shape
    in every browser and none of them this one's. */
 [part="control"]::-webkit-search-cancel-button {

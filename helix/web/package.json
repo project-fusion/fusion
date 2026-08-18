@@ -3,7 +3,7 @@
   "description": "Styled component tier. Extends the headless tier with token-driven presentation.",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

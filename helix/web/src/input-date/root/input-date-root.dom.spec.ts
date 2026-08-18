@@ -133,3 +133,46 @@ describe('input date', () => {
     expect(scope.getElementById(described as string)?.textContent).toContain('Any weekday')
   })
 })
+
+describe('input date opens on focus', () => {
+  const dateField = async (
+    attrs = '',
+  ): Promise<HTMLElement & { open: boolean; updateComplete: Promise<unknown> }> => {
+    const host = (await mount(
+      `<helix-input-date label="Starts" ${attrs}></helix-input-date>`,
+    )) as HTMLElement & {
+      open: boolean
+      updateComplete: Promise<unknown>
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('reaching the field from outside brings the calendar up', async () => {
+    const host = await dateField()
+    const control = part(host, 'control') as HTMLInputElement
+    control.dispatchEvent(new FocusEvent('focus', { relatedTarget: null }))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('but a hand-off from inside does not, or picking a date reopens it', async () => {
+    /* Choosing a day shuts the panel and puts the caret back in the field. The
+       first version of this opened on any focus at all, so the calendar came
+       straight back and the reader could not get out of it. */
+    const host = await dateField()
+    const control = part(host, 'control') as HTMLInputElement
+    const trigger = part(host, 'trigger') as HTMLElement
+    control.dispatchEvent(new FocusEvent('focus', { relatedTarget: trigger }))
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
+  test('and a disabled field stays shut', async () => {
+    const host = await dateField('disabled')
+    const control = part(host, 'control') as HTMLInputElement
+    control.dispatchEvent(new FocusEvent('focus', { relatedTarget: null }))
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+})

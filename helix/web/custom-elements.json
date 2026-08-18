@@ -12594,12 +12594,16 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The frame is the field rather than the input, so the trigger sits inside the\nsame box as the text and the focus ring is drawn once around the whole\ncontrol. The trigger carries a chip of the colour itself, which is the only\npart of this component that says what it holds without being read.\n\n**Every swatch sits on a checkerboard.** A colour with alpha painted on a\nsolid background is just a different colour, and the one thing a preview owes\na reader is the difference between \"pale blue\" and \"blue, half transparent\".\n\n**The channel tracks are painted with the colours they choose**, through\n`--slider-track-image` on the real slider. Saturation and lightness are built\nfrom wherever the other channels currently stand, so each track shows the\ncolours actually reachable from here rather than a fixed ramp ending somewhere\nthe reader cannot get to.\n\nThe hue track is the raw spectrum and takes no token. Every other colour here\nis a role a theme may change; the wheel is not one, and a themed hue slider\nwould be a slider that lies about what it selects.",
+          "description": "The frame is the field rather than the input, so the trigger sits inside the\nsame box as the text and the focus ring is drawn once around the whole\ncontrol. The trigger carries a chip of the colour, which is the only part of\nthis component that says what it holds without being read.\n\n**The square is painted in three layers, not composited from elements**: the\nhue underneath, white sliding in from the left to take the saturation out,\nblack rising from the bottom to take the brightness out. One element, one\ndeclaration, and it repaints as the hue moves because the hue is a custom\nproperty the tier below writes.\n\n**The two range inputs over it are invisible and still there.** Not\n`display: none` and not `visibility: hidden`, either of which would take them\nout of the tab order and out of the accessibility tree, which is the entire\nreason a square built this way is reachable at all. They carry\n`pointer-events: none` so the square answers the pointer itself, and the focus\nring is drawn on the square rather than on them, so it lands where the reader\nis looking.\n\n**Every chip sits on a checkerboard.** A colour with alpha painted on a solid\nbackground is just a different colour, and the one thing a preview owes a\nreader is the difference between \"pale blue\" and \"blue, half transparent\".\n\nThe hue ramp and the square's base take no token. Every other colour here is a\nrole a theme may change; the wheel is not one, and a themed picker would be\none that lies about what it selects.",
           "name": "HelixInputColor",
           "cssProperties": [
             {
               "description": "Fill behind the field.",
               "name": "--input-color-background-color"
+            },
+            {
+              "description": "Width of the panel, and so of the square.",
+              "name": "--input-color-panel-size"
             }
           ],
           "members": [
@@ -13131,9 +13135,38 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens the value from `#rrggbb` to `#rrggbbaa`\nand a consumer who did not ask for transparency should not have to strip a\nbyte off every value they store.",
+              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
               "attribute": "alpha",
               "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "format",
+              "type": {
+                "text": "ColorFormat"
+              },
+              "default": "'hex'",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a field on\n`hex` still takes a pasted `rgb()` and stores the hex for it.",
+              "attribute": "format",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "noFormat",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may change the format from the panel.",
+              "attribute": "no-format",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13160,7 +13193,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the sliders, as a comma-separated hex list.",
+              "description": "Colours offered under the panel, as a comma-separated list.",
               "attribute": "swatches",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
@@ -13185,10 +13218,24 @@
               "kind": "field",
               "name": "moved",
               "type": {
-                "text": "Channels | undefined"
+                "text": "Color | undefined"
               },
               "privacy": "private",
-              "description": "The channels the reader has moved, or nothing while none have been.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from somewhere other than\nthese sliders, so the next reading comes from that value instead.",
+              "description": "The colour the reader has moved to, or nothing while they have moved none.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from anywhere else, so the\nnext reading comes from that value instead.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "sampling",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether this browser can sample a colour off the screen.\n\nSettled after the first render rather than at construction, because there is\nno `window` on the server, and a button that ships in the markup and does\nnothing in Firefox is worse than one that is never offered.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13202,7 +13249,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the value on this element was produced by its own sliders.\n\nThe one bit that keeps the channels from being overwritten by the hex they\njust produced. Without it, moving lightness to zero writes `#000000`, which\nreads back as `hue: 0, saturation: 0`, and the next drag starts from grey.",
+              "description": "Whether the value on this element was produced by its own panel.\n\nThe one bit that keeps the model from being overwritten by the value it just\nproduced. Without it, dragging to the bottom of the square writes black,\nwhich reads back as hue 0 and saturation 0, and the next drag starts grey.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13213,7 +13260,7 @@
               "name": "panel",
               "privacy": "protected",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"field\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), offset: () => 4, onDismiss: () => this.requestOpen(false), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"field\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), offset: () => 8, onDismiss: () => this.requestOpen(false), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
               "description": "The overlay, placed against the field for the reason Input Date gives.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
@@ -13235,12 +13282,12 @@
             },
             {
               "kind": "field",
-              "name": "channels",
+              "name": "color",
               "type": {
-                "text": "Channels"
+                "text": "Color"
               },
               "privacy": "private",
-              "description": "Where the sliders stand: what was moved, or what the value says, or the start.\n\nA getter rather than state seeded in `updated`, which is what this was and\nis wrong on the server. `updated` never runs there, so every server render\nshipped the starting channels: `#3366ff` is hue 220, and the markup said\nhue 0, which paints the saturation and lightness tracks red under a blue\nthat is already in the field. Caught by the SSR spec, and invisible in a\nbrowser, where the first client render corrects it a frame later.",
+              "description": "Where the panel stands: what was moved, or what the value says, or the start.\n\nA getter rather than state seeded in `updated`, which is what an earlier\nversion did and is wrong on the server, where `updated` never runs. Every\nserver render shipped the starting colour, so the square painted a red ramp\nunder a blue already in the field and corrected it a frame later.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
@@ -13263,24 +13310,10 @@
             },
             {
               "kind": "field",
-              "name": "shown",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "description": "The colour the preview and the sliders paint, ready for CSS.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseInputColor",
-                "module": "src/input-color/root/input-color-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "moveChannel",
+              "name": "move",
               "privacy": "private",
               "readonly": true,
-              "description": "Moves one channel and writes the hex that follows from it.",
+              "description": "Moves part of the model and writes the value that follows from it.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13301,6 +13334,29 @@
               "name": "handleSwatch",
               "privacy": "private",
               "readonly": true,
+              "description": "Takes a preset, in this field's syntax rather than as the preset spelled it.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFormat",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Walks the format on, and rewrites the value in it.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleEyeDropper",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Samples a colour from anywhere on the screen.\n\nThe panel is shut for the duration and put back after. `EyeDropper` takes\nthe pointer over, and a floating panel left up during it is one the reader\ncannot dismiss and may well be trying to sample from underneath.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13315,7 +13371,7 @@
                   "text": "void"
                 }
               },
-              "description": "Puts the field back where the answer differs from what was typed.\n\n`requestValue` announces and decides; this is the other half, which Input and\nInput Date both need for the same reason: the native control has already\nchanged, so wherever the answer does not follow it, it has to be restored. A\nrefusal and a consumer who owns `value` and has not given a new one are the\nsame thing from here.",
+              "description": "Puts the field back where the answer differs from what was typed.\n\n`requestValue` announces and decides; this is the other half, which Input\nand Input Date both need for the same reason: the native control has already\nchanged, so wherever the answer does not follow it, it has to be restored. A\nrefusal and a consumer who owns `value` and has not given a new one are the\nsame thing from here.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13342,6 +13398,17 @@
               "privacy": "private",
               "readonly": true,
               "description": "Escape shuts the panel without moving the colour.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleGridPointer",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Dragging in the square.\n\nThe two ranges are the state, so this reads a point and writes to them\nrather than keeping a position of its own. Pointer capture, so a drag that\nleaves the square keeps going: leaving and coming back is how a reader\nreaches a corner, and without it the handle stops wherever the pointer left.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13384,9 +13451,9 @@
               },
               "parameters": [
                 {
-                  "name": "name",
+                  "name": "channel",
                   "type": {
-                    "text": "keyof Channels"
+                    "text": "'alpha' | 'hue'"
                   }
                 },
                 {
@@ -13408,7 +13475,7 @@
                   }
                 }
               ],
-              "description": "One labelled slider, since four of these differ only in their numbers.",
+              "description": "One of the ramps under the square.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13611,7 +13678,7 @@
             "name": "HelixBaseInputColor",
             "package": "@helix-io/headless"
           },
-          "summary": "A colour, typed as hex or moved on its channels.",
+          "summary": "A colour, typed in any syntax or picked from a panel.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
@@ -13736,8 +13803,34 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens the value from `#rrggbb` to `#rrggbbaa`\nand a consumer who did not ask for transparency should not have to strip a\nbyte off every value they store.",
+              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
               "fieldName": "alpha",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "name": "format",
+              "type": {
+                "text": "ColorFormat"
+              },
+              "default": "'hex'",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a field on\n`hex` still takes a pasted `rgb()` and stores the hex for it.",
+              "fieldName": "format",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "name": "no-format",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may change the format from the panel.",
+              "fieldName": "noFormat",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -13762,7 +13855,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the sliders, as a comma-separated hex list.",
+              "description": "Colours offered under the panel, as a comma-separated list.",
               "fieldName": "swatches",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
@@ -13845,7 +13938,7 @@
               }
             },
             {
-              "description": "The text input carrying the hex.",
+              "description": "The text input carrying the value.",
               "name": "control",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
@@ -13877,7 +13970,55 @@
               }
             },
             {
-              "description": "The column of sliders.",
+              "description": "The saturation and brightness square.",
+              "name": "grid",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The mark showing where in the square the colour sits.",
+              "name": "grid-handle",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The range input for the square's horizontal axis.",
+              "name": "grid-saturation",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The range input for its vertical axis.",
+              "name": "grid-brightness",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The row under the square.",
+              "name": "controls",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The larger chip of the current colour, in that row.",
+              "name": "sample",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The ramps beside it.",
               "name": "channels",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
@@ -13885,8 +14026,32 @@
               }
             },
             {
-              "description": "One slider.",
+              "description": "One ramp.",
               "name": "channel",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The row holding the syntax toggle and the presets.",
+              "name": "footer",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The control that samples a colour from the screen.",
+              "name": "eyedropper",
+              "inheritedFrom": {
+                "name": "HelixBaseInputColor",
+                "module": "src/input-color/root/input-color-root.ts"
+              }
+            },
+            {
+              "description": "The control that changes the syntax the value is written in.",
+              "name": "format",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -14658,7 +14823,7 @@
               "name": "panel",
               "privacy": "protected",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"field\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), offset: () => 4, onDismiss: () => this.requestOpen(false), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"field\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), /* Wider than the four every other panel here takes. Those sit against a control the same width as themselves and read as an extension of it; this one is a calendar of its own size hanging off a field, so the gap is what says the two are separate things rather than one control that grew. */ offset: () => 8, onDismiss: () => this.requestOpen(false), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
               "description": "The overlay, placed against the field rather than the trigger.\n\nAgainst the field because that is the box a reader sees as the control: a\ncalendar hung off a small button at one end of a wide field reads as\nbelonging to the button. `Select` anchors to its trigger for the opposite\nreason, its trigger being the whole control.",
               "inheritedFrom": {
                 "name": "HelixBaseInputDate",
@@ -14749,6 +14914,17 @@
               "privacy": "private",
               "readonly": true,
               "description": "Escape shuts the calendar without moving the date.",
+              "inheritedFrom": {
+                "name": "HelixBaseInputDate",
+                "module": "src/input-date/root/input-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFocus",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Focusing the field opens the calendar.\n\nA reader who reaches this control is choosing a date, and making them find\nthe trigger afterwards is a second action for something they have already\nasked for. Typing still works with it up, because the calendar follows the\nfield rather than the other way round.\n\n**Only where focus arrived from outside this element**, which is the whole\nof the difficulty. Picking a date shuts the panel and puts the caret back in\nthe field, and the first version of this reopened it on the way: the reader\nchose a date and the calendar came straight back, which the existing spec\ncaught. `relatedTarget` is where focus came from, so a hand-off from the\ncalendar or the trigger is left alone and only a genuine arrival opens\nanything.\n\nOn the input rather than on the field, too. Focus does not bubble, so a\nlistener here covers the text and not the trigger, which is what keeps\npressing the trigger from opening the panel on focus and then shutting it\nagain on the click.",
               "inheritedFrom": {
                 "name": "HelixBaseInputDate",
                 "module": "src/input-date/root/input-date-root.ts"

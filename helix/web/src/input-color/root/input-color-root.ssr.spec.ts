@@ -4,7 +4,7 @@ import { html } from 'lit'
 import '../index.js'
 
 const markup = ssr(html`<helix-input-color
-  hint="Any hex"
+  hint="Any syntax"
   label="Brand"
   name="brand"
   swatches="#ff0000,#00ff00"
@@ -28,22 +28,28 @@ describe('input color server output', () => {
     expect(partTag(markup, 'trigger')).toContain('aria-expanded="false"')
   })
 
-  test('the preview carries the colour on the server', () => {
-    // Not read back from a computed style, which does not exist here: the chip
-    // is painted from a custom property written into the markup.
-    expect(partTag(markup, 'preview')).toContain('#3366ff')
+  test('the square is painted on first paint, not on the first client render', () => {
+    // `#3366ff` is rgb(51, 102, 255): hue 225, saturation 80, brightness 100.
+    // The model used to be seeded in `updated`, which never runs here, so every
+    // server render shipped a red square under a blue already in the field.
+    expect(partTag(markup, 'surface')).toContain('--_hue: 225')
+    expect(partTag(markup, 'grid')).toContain('--_saturation: 80%')
+    expect(partTag(markup, 'grid')).toContain('--_brightness: 100%')
   })
 
-  test('the presets ship with it, since they are markup rather than state', () => {
+  test('both axes ship as real inputs, named', () => {
+    expect(partTag(markup, 'grid-saturation')).toContain('aria-label="Saturation"')
+    expect(partTag(markup, 'grid-brightness')).toContain('aria-label="Brightness"')
+  })
+
+  test('the eyedropper is not served, since the server cannot know about it', () => {
+    // A button that ships in the markup and does nothing in Firefox is worse
+    // than one that is never offered.
+    expect(hasPart(markup, 'eyedropper')).toBe(false)
+  })
+
+  test('the presets ship, since they are markup rather than state', () => {
     expect(hasPart(markup, 'swatches')).toBe(true)
     expect(markup).toContain('aria-label="#ff0000"')
-  })
-
-  test('the channels are written out, so the tracks are painted on first paint', () => {
-    // `#3366ff` is rgb(51, 102, 255): hue 225, saturation 100, lightness 60.
-    // Without this the sliders would paint a red ramp under a blue already in
-    // the field, and only correct it on the first client render.
-    expect(partTag(markup, 'channels')).toContain('--_hue: 225')
-    expect(partTag(markup, 'channels')).toContain('--_lightness: 60%')
   })
 })

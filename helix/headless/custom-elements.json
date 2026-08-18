@@ -9324,9 +9324,141 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/input-color/color.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "toRgb",
+          "return": {
+            "type": {
+              "text": "{ blue: number; green: number; red: number }"
+            }
+          },
+          "parameters": [
+            {
+              "name": "color",
+              "type": {
+                "text": "Color"
+              }
+            }
+          ],
+          "description": "HSB to bytes, which is the road every written syntax goes down."
+        },
+        {
+          "kind": "function",
+          "name": "parseColor",
+          "return": {
+            "type": {
+              "text": "Color | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Any of the syntaxes to the working model, or `null` where it is not a colour.\n\nNamed colours are not here. Resolving `rebeccapurple` means either shipping\nthe table of a hundred and forty or asking the browser, and the browser is not\npresent on the server: a field that accepted a name client-side and rejected\nit during a server render would be worse than one that never took it."
+        },
+        {
+          "kind": "function",
+          "name": "formatColor",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "color",
+              "type": {
+                "text": "Color"
+              }
+            },
+            {
+              "name": "format",
+              "type": {
+                "text": "ColorFormat"
+              }
+            },
+            {
+              "name": "withAlpha",
+              "type": {
+                "text": "boolean"
+              }
+            }
+          ],
+          "description": "The working model back out, in the syntax asked for.\n\nThe alpha is written only where the component carries one. A consumer who did\nnot ask for transparency should not have to strip `ff` off every hex or read\npast a fourth argument they never wanted."
+        },
+        {
+          "kind": "function",
+          "name": "toCss",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "color",
+              "type": {
+                "text": "Color"
+              }
+            }
+          ],
+          "description": "The colour as CSS, for the swatches and the tracks. Always with its alpha."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "toRgb",
+          "declaration": {
+            "name": "toRgb",
+            "module": "src/input-color/color.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseColor",
+          "declaration": {
+            "name": "parseColor",
+            "module": "src/input-color/color.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "formatColor",
+          "declaration": {
+            "name": "formatColor",
+            "module": "src/input-color/color.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "toCss",
+          "declaration": {
+            "name": "toCss",
+            "module": "src/input-color/color.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/input-color/index.ts",
       "declarations": [],
       "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/input-color/color.js"
+          }
+        },
         {
           "kind": "js",
           "name": "*",
@@ -9343,7 +9475,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**The channels are `helix-slider`, not four bespoke tracks.** A real\n`<input type=\"range\">` brings the drag, the arrow keys, Home and End, the page\nkeys, and a hit area the platform sizes for a finger. Every one of those is a\nthing a hand-built track gets wrong, and the last is the one nobody notices.\n\n**There is no saturation-and-lightness square, and that is a deliberate loss.**\nThe square is the convention, and it is faster for a sighted reader with a\nmouse. It is also a two-dimensional control with no semantics: `role=\"slider\"`\ndescribes one axis, and the alternatives are to invent a widget a screen\nreader has never met or to ship a control a keyboard cannot reach. Three\nlabelled sliders are slower and operable by everyone, which is the trade taken\nhere. A square could be added later as a second way to reach the same\nchannels; it cannot be added as the only way.\n\n**The channels are the state, and the hex is derived from them.** The reverse\nloses colours: hex to channels and back is exact, but the channels of black\nare `hue: 0, saturation: 0`, so a reader who drags lightness to zero and back\ngets grey where they had red. Holding the channels means the hue survives a\ntrip through a colour that has none. A value arriving from outside, or typed\ninto the field, is read into the channels once, which is the only moment the\nconversion runs in that direction.\n\n**The value is hex, always**: `#rrggbb`, or `#rrggbbaa` where `alpha` is set.\nThat is what a form submits and what `<input type=\"color\">` speaks, so a\nserver that already understands one understands this. What the field *shows*\nis the same string, for the reason Input Date gives about its dates: half-typed\ninput does not survive a round trip through a formatter.",
+          "description": "**The panel is a saturation and brightness square with a hue ramp under it**,\nwhich is the shape of every colour picker a reader has already met. An earlier\nversion of this component was three labelled sliders instead, on the grounds\nthat a two-dimensional control has no semantics. That reasoning was right and\nthe conclusion was wrong: it treated \"no semantics\" as the end of the question\nrather than as the thing to solve.\n\n**So the square is two real range inputs.** Saturation and brightness are each\nan `<input type=\"range\">`, laid over the square and made invisible, and the\nhandle is drawn from their values. The pointer gets the square; the keyboard\ngets the arrow keys, Home, End and the page keys; a screen reader gets two\nsliders that announce a name and a number. All of it is the platform's, and\nnothing here implements a key handler. There is no `role=\"application\"`, which\nis the usual way this control is built and amounts to asking a screen reader\nto stop helping.\n\n**The working model is HSB, and the value is derived from it.** The reverse\nloses colours: black is `brightness: 0`, whose hue and saturation are both\nundefined, so a reader who drags to the bottom of the square and back would\nget grey where they had red. Holding the model means a colour survives a trip\nthrough one that has no hue. A value arriving from outside, or typed into the\nfield, is read into the model once, which is the only moment the conversion\nruns in that direction.\n\n**Every syntax is read; the one `format` names is written.** `#f00`,\n`#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)` and `hsl(0 100% 50%)` are all\ncolours, and a field that refuses one because it prefers another is arguing\nwith the person using it. Named colours are the exception, and deliberately:\nresolving `rebeccapurple` means shipping a table of a hundred and forty or\nasking the browser, and there is no browser during a server render.",
           "name": "HelixBaseInputColor",
           "cssParts": [
             {
@@ -9351,7 +9483,7 @@
               "name": "field"
             },
             {
-              "description": "The text input carrying the hex.",
+              "description": "The text input carrying the value.",
               "name": "control"
             },
             {
@@ -9367,12 +9499,48 @@
               "name": "surface"
             },
             {
-              "description": "The column of sliders.",
+              "description": "The saturation and brightness square.",
+              "name": "grid"
+            },
+            {
+              "description": "The mark showing where in the square the colour sits.",
+              "name": "grid-handle"
+            },
+            {
+              "description": "The range input for the square's horizontal axis.",
+              "name": "grid-saturation"
+            },
+            {
+              "description": "The range input for its vertical axis.",
+              "name": "grid-brightness"
+            },
+            {
+              "description": "The row under the square.",
+              "name": "controls"
+            },
+            {
+              "description": "The larger chip of the current colour, in that row.",
+              "name": "sample"
+            },
+            {
+              "description": "The ramps beside it.",
               "name": "channels"
             },
             {
-              "description": "One slider.",
+              "description": "One ramp.",
               "name": "channel"
+            },
+            {
+              "description": "The row holding the syntax toggle and the presets.",
+              "name": "footer"
+            },
+            {
+              "description": "The control that samples a colour from the screen.",
+              "name": "eyedropper"
+            },
+            {
+              "description": "The control that changes the syntax the value is written in.",
+              "name": "format"
             },
             {
               "description": "The row of presets.",
@@ -9405,9 +9573,30 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens the value from `#rrggbb` to `#rrggbbaa`\nand a consumer who did not ask for transparency should not have to strip a\nbyte off every value they store.",
+              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
               "attribute": "alpha",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "format",
+              "type": {
+                "text": "ColorFormat"
+              },
+              "default": "'hex'",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a field on\n`hex` still takes a pasted `rgb()` and stores the hex for it.",
+              "attribute": "format",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "noFormat",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may change the format from the panel.",
+              "attribute": "no-format"
             },
             {
               "kind": "field",
@@ -9426,7 +9615,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the sliders, as a comma-separated hex list.",
+              "description": "Colours offered under the panel, as a comma-separated list.",
               "attribute": "swatches"
             },
             {
@@ -9443,10 +9632,20 @@
               "kind": "field",
               "name": "moved",
               "type": {
-                "text": "Channels | undefined"
+                "text": "Color | undefined"
               },
               "privacy": "private",
-              "description": "The channels the reader has moved, or nothing while none have been.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from somewhere other than\nthese sliders, so the next reading comes from that value instead."
+              "description": "The colour the reader has moved to, or nothing while they have moved none.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from anywhere else, so the\nnext reading comes from that value instead."
+            },
+            {
+              "kind": "field",
+              "name": "sampling",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether this browser can sample a colour off the screen.\n\nSettled after the first render rather than at construction, because there is\nno `window` on the server, and a button that ships in the markup and does\nnothing in Firefox is worse than one that is never offered."
             },
             {
               "kind": "field",
@@ -9456,14 +9655,14 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the value on this element was produced by its own sliders.\n\nThe one bit that keeps the channels from being overwritten by the hex they\njust produced. Without it, moving lightness to zero writes `#000000`, which\nreads back as `hue: 0, saturation: 0`, and the next drag starts from grey."
+              "description": "Whether the value on this element was produced by its own panel.\n\nThe one bit that keeps the model from being overwritten by the value it just\nproduced. Without it, dragging to the bottom of the square writes black,\nwhich reads back as hue 0 and saturation 0, and the next drag starts grey."
             },
             {
               "kind": "field",
               "name": "panel",
               "privacy": "protected",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"field\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), offset: () => 4, onDismiss: () => this.requestOpen(false), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"field\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), offset: () => 8, onDismiss: () => this.requestOpen(false), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
               "description": "The overlay, placed against the field for the reason Input Date gives."
             },
             {
@@ -9477,12 +9676,12 @@
             },
             {
               "kind": "field",
-              "name": "channels",
+              "name": "color",
               "type": {
-                "text": "Channels"
+                "text": "Color"
               },
               "privacy": "private",
-              "description": "Where the sliders stand: what was moved, or what the value says, or the start.\n\nA getter rather than state seeded in `updated`, which is what this was and\nis wrong on the server. `updated` never runs there, so every server render\nshipped the starting channels: `#3366ff` is hue 220, and the markup said\nhue 0, which paints the saturation and lightness tracks red under a blue\nthat is already in the field. Caught by the SSR spec, and invisible in a\nbrowser, where the first client render corrects it a frame later.",
+              "description": "Where the panel stands: what was moved, or what the value says, or the start.\n\nA getter rather than state seeded in `updated`, which is what an earlier\nversion did and is wrong on the server, where `updated` never runs. Every\nserver render shipped the starting colour, so the square painted a red ramp\nunder a blue already in the field and corrected it a frame later.",
               "readonly": true
             },
             {
@@ -9497,20 +9696,10 @@
             },
             {
               "kind": "field",
-              "name": "shown",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "description": "The colour the preview and the sliders paint, ready for CSS.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "moveChannel",
+              "name": "move",
               "privacy": "private",
               "readonly": true,
-              "description": "Moves one channel and writes the hex that follows from it."
+              "description": "Moves part of the model and writes the value that follows from it."
             },
             {
               "kind": "field",
@@ -9522,7 +9711,22 @@
               "kind": "field",
               "name": "handleSwatch",
               "privacy": "private",
-              "readonly": true
+              "readonly": true,
+              "description": "Takes a preset, in this field's syntax rather than as the preset spelled it."
+            },
+            {
+              "kind": "field",
+              "name": "handleFormat",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Walks the format on, and rewrites the value in it."
+            },
+            {
+              "kind": "field",
+              "name": "handleEyeDropper",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Samples a colour from anywhere on the screen.\n\nThe panel is shut for the duration and put back after. `EyeDropper` takes\nthe pointer over, and a floating panel left up during it is one the reader\ncannot dismiss and may well be trying to sample from underneath."
             },
             {
               "kind": "method",
@@ -9533,7 +9737,7 @@
                   "text": "void"
                 }
               },
-              "description": "Puts the field back where the answer differs from what was typed.\n\n`requestValue` announces and decides; this is the other half, which Input and\nInput Date both need for the same reason: the native control has already\nchanged, so wherever the answer does not follow it, it has to be restored. A\nrefusal and a consumer who owns `value` and has not given a new one are the\nsame thing from here."
+              "description": "Puts the field back where the answer differs from what was typed.\n\n`requestValue` announces and decides; this is the other half, which Input\nand Input Date both need for the same reason: the native control has already\nchanged, so wherever the answer does not follow it, it has to be restored. A\nrefusal and a consumer who owns `value` and has not given a new one are the\nsame thing from here."
             },
             {
               "kind": "method",
@@ -9552,6 +9756,13 @@
               "privacy": "private",
               "readonly": true,
               "description": "Escape shuts the panel without moving the colour."
+            },
+            {
+              "kind": "field",
+              "name": "handleGridPointer",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Dragging in the square.\n\nThe two ranges are the state, so this reads a point and writes to them\nrather than keeping a position of its own. Pointer capture, so a drag that\nleaves the square keeps going: leaving and coming back is how a reader\nreaches a corner, and without it the handle stops wherever the pointer left."
             },
             {
               "kind": "method",
@@ -9586,9 +9797,9 @@
               },
               "parameters": [
                 {
-                  "name": "name",
+                  "name": "channel",
                   "type": {
-                    "text": "keyof Channels"
+                    "text": "'alpha' | 'hue'"
                   }
                 },
                 {
@@ -9610,7 +9821,7 @@
                   }
                 }
               ],
-              "description": "One labelled slider, since four of these differ only in their numbers."
+              "description": "One of the ramps under the square."
             },
             {
               "kind": "field",
@@ -10359,8 +10570,26 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens the value from `#rrggbb` to `#rrggbbaa`\nand a consumer who did not ask for transparency should not have to strip a\nbyte off every value they store.",
+              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
               "fieldName": "alpha"
+            },
+            {
+              "name": "format",
+              "type": {
+                "text": "ColorFormat"
+              },
+              "default": "'hex'",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a field on\n`hex` still takes a pasted `rgb()` and stores the hex for it.",
+              "fieldName": "format"
+            },
+            {
+              "name": "no-format",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may change the format from the panel.",
+              "fieldName": "noFormat"
             },
             {
               "name": "placeholder",
@@ -10377,7 +10606,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the sliders, as a comma-separated hex list.",
+              "description": "Colours offered under the panel, as a comma-separated list.",
               "fieldName": "swatches"
             },
             {
@@ -10536,7 +10765,7 @@
             "name": "HelixFormElement",
             "package": "@helix-io/core"
           },
-          "summary": "A colour, typed as hex or moved on its channels.",
+          "summary": "A colour, typed in any syntax or picked from a panel.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
@@ -10720,7 +10949,7 @@
               "name": "panel",
               "privacy": "protected",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"field\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), offset: () => 4, onDismiss: () => this.requestOpen(false), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"field\"]'), boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), /* Wider than the four every other panel here takes. Those sit against a control the same width as themselves and read as an extension of it; this one is a calendar of its own size hanging off a field, so the gap is what says the two are separate things rather than one control that grew. */ offset: () => 8, onDismiss: () => this.requestOpen(false), placement: 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
               "description": "The overlay, placed against the field rather than the trigger.\n\nAgainst the field because that is the box a reader sees as the control: a\ncalendar hung off a small button at one end of a wide field reads as\nbelonging to the button. `Select` anchors to its trigger for the opposite\nreason, its trigger being the whole control."
             },
             {
@@ -10783,6 +11012,13 @@
               "privacy": "private",
               "readonly": true,
               "description": "Escape shuts the calendar without moving the date."
+            },
+            {
+              "kind": "field",
+              "name": "handleFocus",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Focusing the field opens the calendar.\n\nA reader who reaches this control is choosing a date, and making them find\nthe trigger afterwards is a second action for something they have already\nasked for. Typing still works with it up, because the calendar follows the\nfield rather than the other way round.\n\n**Only where focus arrived from outside this element**, which is the whole\nof the difficulty. Picking a date shuts the panel and puts the caret back in\nthe field, and the first version of this reopened it on the way: the reader\nchose a date and the calendar came straight back, which the existing spec\ncaught. `relatedTarget` is where focus came from, so a hand-off from the\ncalendar or the trigger is left alone and only a genuine arrival opens\nanything.\n\nOn the input rather than on the field, too. Focus does not bubble, so a\nlistener here covers the text and not the trigger, which is what keeps\npressing the trigger from opening the panel on focus and then shutting it\nagain on the click."
             },
             {
               "kind": "method",

@@ -28,10 +28,6 @@
   min-inline-size: 0;
 }
 
-[part="control"]::placeholder {
-  color: var(--helix-color-foreground-subtle);
-}
-
 :host(:not(:disabled)) [part="field"]:hover {
   border-color: var(--helix-color-primary);
 }
@@ -86,19 +82,21 @@
  * sentence, which is what makes the omission embarrassing rather than
  * surprising.
  *
- * The width is the field's, from the controller rather than a percentage: the
- * panel is positioned `fixed`, so `100%` would be the viewport. `max-content` is
- * the floor rather than a cap, so a narrow field gets a calendar that fits
- * instead of a calendar folded into a column. Select's reasoning exactly. */
+ * The width is the calendar's own, not the field's. It was matched to the field,
+ * copied from Select, and Select is the case where that is right: its panel is a
+ * list of the same options its trigger shows, so a list narrower or wider than
+ * the control reads as misaligned. A calendar is not a longer version of a date
+ * field. Seven columns have a width that belongs to them, and stretching them to
+ * a field that happens to be 600 pixels wide gives a month with its days spread
+ * across half a screen. */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
   border: none;
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
-  inline-size: var(--_floating-anchor-width, 100%);
+  inline-size: max-content;
   inset: auto;
   margin: var(--helix-space-none);
-  min-inline-size: max-content;
   padding: var(--helix-space-xs);
   position: absolute;
 }

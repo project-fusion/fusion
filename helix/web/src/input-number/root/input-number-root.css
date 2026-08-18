@@ -91,10 +91,6 @@
   text-align: center;
 }
 
-[part="control"]::placeholder {
-  color: var(--helix-color-foreground-subtle);
-}
-
 /* A unit or an icon at either end, and it had no rules at all: slotted content
    sat in the field's own colour, shrank when the field was narrow, and butted
    straight against the stepper because the padding that separates the number

@@ -146,10 +146,6 @@ slot[name="filter-icon"]::slotted(*) {
   padding-inline: var(--helix-space-xs);
 }
 
-[part="search-field"]::placeholder {
-  color: var(--helix-color-foreground-subtle);
-}
-
 /* No ring. The field is the only thing in this region that takes focus, and a
    ring drawn inside a panel that is itself the focused thing reads as a box in
    a box. The caret says where the typing goes. */
