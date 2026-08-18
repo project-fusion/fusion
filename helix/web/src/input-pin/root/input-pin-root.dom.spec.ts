@@ -139,6 +139,34 @@ describe('input pin', () => {
   })
 })
 
+describe('input pin deletion', () => {
+  test('emptying a box removes that character and the rest close up', async () => {
+    /* A Backspace in a *filled* box is the browser's own: the keydown handler
+       leaves it alone, the character goes, and `input` arrives carrying "".
+       That fell through to the write path, which returns early on empty, and the
+       repaint put the character straight back, so Backspace on a full code did
+       nothing at all. Measured with real keystrokes; every synthetic test in this
+       file passed over it. */
+    const host = await pin('default-value="123456"')
+    await arrive(host, 2, '')
+    expect(host.value).toBe('12456')
+    expect(cells(host).map((one) => one.value)).toEqual(['1', '2', '4', '5', '6', ''])
+  })
+
+  test('emptying the last box just shortens it', async () => {
+    const host = await pin('default-value="123456"')
+    await arrive(host, 5, '')
+    expect(host.value).toBe('12345')
+  })
+
+  test('and a code can be emptied one box at a time', async () => {
+    const host = await pin('default-value="12"')
+    await arrive(host, 1, '')
+    await arrive(host, 0, '')
+    expect(host.value).toBe('')
+  })
+})
+
 describe('input pin keyboard', () => {
   const press = async (host: Pin, at: number, key: string): Promise<KeyboardEvent> => {
     const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })

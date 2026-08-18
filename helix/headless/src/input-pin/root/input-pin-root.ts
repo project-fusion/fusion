@@ -175,6 +175,29 @@ export class HelixBaseInputPin extends MixinControllerValue(MixinField(HelixForm
     if (at === -1) {
       return
     }
+    /* **An emptied box is a deletion, and this used to be unreachable.** A
+       Backspace in a *filled* box is the browser's own: the keydown handler
+       leaves it alone, the character goes, and `input` arrives carrying "". That
+       fell through to `write`, which returns early on empty, and then `paint`
+       put the character straight back. Pressing Backspace on a full code changed
+       nothing at all, twice in a row, measured with real keystrokes rather than
+       dispatched events, which is why every spec and the whole state audit
+       passed over it.
+    
+       The rest collapse left, which is what the model already requires and what
+       a single text field does: "123456" with the 2 deleted is "13456", not a
+       hole. Focus stays where the reader was, so the box under the caret now
+       holds what followed. */
+    if (cell.value === '') {
+      const characters = this.characters
+      characters[at] = ''
+      this.requestValue(characters.join(''))
+      this.updateComplete.then(() => {
+        this.paint()
+        this.cells[at]?.focus()
+      })
+      return
+    }
     /* Longer than one character is a paste or an autofill, whichever box it
        landed in. A per-cell `maxlength` would have silently truncated it to the
        first character and lost the rest. */
