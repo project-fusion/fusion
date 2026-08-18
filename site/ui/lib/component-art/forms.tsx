@@ -193,8 +193,11 @@ export const formsArt: Record<string, ReactNode> = {
    * The value is centred rather than left-aligned, which is the other thing that
    * tells it from `Input` at a glance and is true of the component.
    *
-   * It counts on hover: the number ticks up by one step, which is the only thing
-   * a stepper does that a field does not.
+   * It counts on hover, and the first version did not: `--art-to: 0px` with a
+   * three pixel block offset parses, animates, and moves nothing a reader can
+   * see, which is the exact fault this file records against `Outline`. A value
+   * getting longer is what counting looks like, so it stretches, which is the
+   * archetype `Input` uses for the same thing.
    */
   'input-number': (
     <>
@@ -212,12 +215,12 @@ export const formsArt: Record<string, ReactNode> = {
       <rect className="artInk" fillOpacity="0.55" height="12" rx="1" width="2" x="251" y="86" />
       {/* Centred in what is left of the field, which is 89 to 232. */}
       <rect
-        className="artSolid artMotion artTravel"
+        className="artSolid artMotion artFill"
         height="8"
         rx="4"
-        style={{ '--art-to': '0px', '--art-to-block': '-3px' } as CSSProperties}
+        style={{ '--art-grow': 1.6 } as CSSProperties}
         width="24"
-        x="148"
+        x="140"
         y="88"
       />
     </>
@@ -235,8 +238,14 @@ export const formsArt: Record<string, ReactNode> = {
    * pin's ring is on the box the reader is in and never around the row, which is
    * the one thing its stylesheet is most careful about.
    *
-   * The character in the third box arrives on hover, which is the only thing
-   * this component does that a row of boxes does not.
+   * **The ring moves to the next box on hover**, which is what a pin actually
+   * does: a character lands and the focus steps along. The first version grew
+   * the character instead, with `--art-grow: 1`, which is `scaleX(1)` and is
+   * nothing at all. Same fault this file records against `Outline`'s
+   * `--art-to: 0`, and it survived because a still card looks correct. Caught by
+   * shooting the real gallery rather than a harness that approximates it.
+   *
+   * The four sides of the ring travel as a group, so they arrive together.
    */
   'input-pin': (
     <>
@@ -251,21 +260,14 @@ export const formsArt: Record<string, ReactNode> = {
           single character takes in the vocabulary the rest of the gallery uses. */}
       <rect className="artInk" fillOpacity="0.55" height="12" rx="2" width="8" x="64" y="94" />
       <rect className="artInk" fillOpacity="0.55" height="12" rx="2" width="8" x="116" y="94" />
-      {/* The box the reader is in, ringed rather than filled. */}
-      <rect className="artSolid" fillOpacity="0.12" height="42" rx="5" width="42" x="151" y="79" />
-      <rect className="artSolid" height="40" rx="4" width="2" x="152" y="80" />
-      <rect className="artSolid" height="40" rx="4" width="2" x="190" y="80" />
-      <rect className="artSolid" height="2" rx="1" width="40" x="152" y="80" />
-      <rect className="artSolid" height="2" rx="1" width="40" x="152" y="118" />
-      <rect
-        className="artSolid artMotion artFill"
-        height="12"
-        rx="2"
-        style={{ '--art-grow': 1 } as CSSProperties}
-        width="8"
-        x="168"
-        y="94"
-      />
+      {/* The box the reader is in, ringed rather than filled, and stepping to the
+          next one on hover. 52 is the pitch: a 40 box and a 12 gap. */}
+      <g className="artSolid artMotion artTravel" style={{ '--art-to': '52px' } as CSSProperties}>
+        <rect height="40" rx="4" width="2" x="152" y="80" />
+        <rect height="40" rx="4" width="2" x="190" y="80" />
+        <rect height="2" rx="1" width="40" x="152" y="80" />
+        <rect height="2" rx="1" width="40" x="152" y="118" />
+      </g>
     </>
   ),
 
