@@ -2087,15 +2087,12 @@ Chooses how many items a page holds.
 
 Extends `HelixBasePaginationSize`.
 
-The trigger wears the same frame every field wears, so a closed one is
-indistinguishable from a `Select`. What differs is only what happens while it
-is open, which for a list of four numbers is the half the platform does
-better: a wheel on a phone, and the widget a screen-reader user already
-knows.
+A `Select`, laid out on one row. Every other field stacks its label because it
+stands in a column of fields; this one stands in a footer beside a run of page
+numbers, where a two-line control makes the whole row two lines tall.
 
-The label is on the row rather than above it. Every other field stacks its
-label because it stands in a column of fields; this one stands in a footer,
-where a two-line control makes the whole row two lines tall.
+`Select`'s own parts are exported, so `::part(trigger)` and `::part(label)`
+reach through both boundaries and a consumer styles it as the select it is.
 
 #### Properties
 
@@ -2117,8 +2114,7 @@ where a two-line control makes the whole row two lines tall.
 
 | Part | Description |
 | --- | --- |
-| `label` | The words naming the control. |
-| `control` | The select itself. |
+| `control` | The select. |
 
 ### Summary — `helix-pagination-summary`
 

@@ -8697,21 +8697,24 @@ export type CustomElements = {
    * consumer's, and a control that can only sit at one end of one row has taken
    * that decision for them.
    *
-   * **A native `<select>`, which is a deliberate exception and worth the note.**
-   * The library ships `Select` because a closed list needs a panel it can style,
-   * and this is four numbers. The native control opens as the platform's own
-   * menu, which on a phone is a wheel and under a screen reader is the widget the
-   * reader already knows, and it needs no popover, no listbox and no second
-   * element to register. The trigger wears the same frame as every other field, so
-   * what differs from `Select` is only what happens while it is open, which for a
-   * list of four numbers is the half that native does better.
+   * **`Select`, not a native `<select>`.** It was native first, on the argument
+   * that the platform's own menu is a wheel on a phone and the widget a
+   * screen-reader user already knows. What that argument leaves out is that the
+   * library then has two dropdowns that are identical closed and different open,
+   * and a reader meets both in the same footer as a table's filters. Consistency
+   * is the whole product here, and it wins.
+   *
+   * What it takes back with it: the caret is `Select`'s again rather than a colour
+   * literal baked into a data URI, because a background image cannot read
+   * `currentColor`, and the label is a real `<label for>` against the trigger's
+   * own id, which `Select` already renders and already tests.
    *
    * **The label sits on the row, not above it.** Every other field in the library
    * stacks its label because it stands in a column of fields; this one stands in a
    * footer beside a run of page numbers, and a two-line control there makes the
-   * whole row two lines tall. It is a real `<label for>` against a real `<select>`
-   * in one shadow root, so the association is the platform's rather than an ARIA
-   * reconstruction of it.
+   * whole row two lines tall. `Select`'s host is a column, and an outer-tree rule
+   * beats a `:host` rule, so turning it into a row needs no property on `Select`
+   * and nothing written into the consumer's markup.
    *
    * `value` is the controlled property and `default-value` seeds one this owns,
    * the same contract every other stateful element here carries. Changing it
@@ -8747,8 +8750,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The words naming the control.
-   * - `control`: The select itself.
+   * - `control`: The select.
    */
   "helix-base-pagination-size": Partial<
     HelixBasePaginationSizeProps &
@@ -13984,21 +13986,24 @@ export type CustomElementsSolidJs = {
    * consumer's, and a control that can only sit at one end of one row has taken
    * that decision for them.
    *
-   * **A native `<select>`, which is a deliberate exception and worth the note.**
-   * The library ships `Select` because a closed list needs a panel it can style,
-   * and this is four numbers. The native control opens as the platform's own
-   * menu, which on a phone is a wheel and under a screen reader is the widget the
-   * reader already knows, and it needs no popover, no listbox and no second
-   * element to register. The trigger wears the same frame as every other field, so
-   * what differs from `Select` is only what happens while it is open, which for a
-   * list of four numbers is the half that native does better.
+   * **`Select`, not a native `<select>`.** It was native first, on the argument
+   * that the platform's own menu is a wheel on a phone and the widget a
+   * screen-reader user already knows. What that argument leaves out is that the
+   * library then has two dropdowns that are identical closed and different open,
+   * and a reader meets both in the same footer as a table's filters. Consistency
+   * is the whole product here, and it wins.
+   *
+   * What it takes back with it: the caret is `Select`'s again rather than a colour
+   * literal baked into a data URI, because a background image cannot read
+   * `currentColor`, and the label is a real `<label for>` against the trigger's
+   * own id, which `Select` already renders and already tests.
    *
    * **The label sits on the row, not above it.** Every other field in the library
    * stacks its label because it stands in a column of fields; this one stands in a
    * footer beside a run of page numbers, and a two-line control there makes the
-   * whole row two lines tall. It is a real `<label for>` against a real `<select>`
-   * in one shadow root, so the association is the platform's rather than an ARIA
-   * reconstruction of it.
+   * whole row two lines tall. `Select`'s host is a column, and an outer-tree rule
+   * beats a `:host` rule, so turning it into a row needs no property on `Select`
+   * and nothing written into the consumer's markup.
    *
    * `value` is the controlled property and `default-value` seeds one this owns,
    * the same contract every other stateful element here carries. Changing it
@@ -14034,8 +14039,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The words naming the control.
-   * - `control`: The select itself.
+   * - `control`: The select.
    */
   "helix-base-pagination-size": Partial<
     HelixBasePaginationSizeProps &

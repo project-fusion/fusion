@@ -8,18 +8,43 @@ beforeAll(async () => {
 
 type Size = HTMLElement & { updateComplete: Promise<unknown>; value: number }
 
-const control = (host: HTMLElement): HTMLSelectElement => part(host, 'control') as HTMLSelectElement
+const control = (host: HTMLElement): HTMLElement & { value: string } =>
+  part(host, 'control') as HTMLElement & { value: string }
+
+const options = (host: HTMLElement): string[] =>
+  [...(host.shadowRoot?.querySelectorAll('helix-option') ?? [])].map(
+    (one) => one.getAttribute('value') ?? '',
+  )
+
+/* What `Select` dispatches when a reader chooses. Bubbling and composed, which
+   is the half of this worth asserting on: left alone it would cross this
+   element's shadow boundary and be retargeted to look like its own. */
+const choose = (host: HTMLElement, value: string): CustomEvent =>
+  new CustomEvent('helix-change', {
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    detail: { name: '', value },
+  })
 
 describe('pagination size', () => {
+  test('is the library’s select, not a native one', async () => {
+    /* It was native first, on the argument that the platform's menu is a wheel
+       on a phone. What that leaves out is a library with two dropdowns that are
+       identical closed and different open, met in the same footer. */
+    const it = await mount('<helix-pagination-size></helix-pagination-size>')
+    expect(control(it).tagName).toBe('HELIX-SELECT')
+  })
+
   test('offers the sizes it was given, in order', async () => {
     const it = await mount('<helix-pagination-size sizes="10,25,50"></helix-pagination-size>')
-    expect([...control(it).options].map((one) => one.value)).toEqual(['10', '25', '50'])
+    expect(options(it)).toEqual(['10', '25', '50'])
   })
 
   test('anything that is not a size is dropped rather than offered', async () => {
     // An option that cannot mean anything is worse than a shorter list.
     const it = await mount('<helix-pagination-size sizes="10, ,x,-5,25"></helix-pagination-size>')
-    expect([...control(it).options].map((one) => one.value)).toEqual(['10', '25'])
+    expect(options(it)).toEqual(['10', '25'])
   })
 
   test('falls back to the first offered where nothing named one', async () => {
@@ -27,24 +52,45 @@ describe('pagination size', () => {
     expect(control(it).value).toBe('20')
   })
 
-  test('the label is a real label for a real select, in one shadow root', async () => {
-    // Ids are scoped to their root, so this collides with nothing in the
-    // document and needs none of the element-reference machinery a label
-    // outside a shadow boundary would.
+  test('the label is the select’s own, against the trigger’s own id', async () => {
+    /* Nothing here reconstructs the association. `Select` renders the label and
+       gives the trigger the id it points at, and that pairing has its own
+       specs one component over. */
     const it = await mount('<helix-pagination-size></helix-pagination-size>')
-    const label = part(it, 'label') as HTMLLabelElement
+    const select = control(it)
+    const label = select.shadowRoot?.querySelector('[part="label"]') as HTMLLabelElement
+    const trigger = select.shadowRoot?.querySelector('[part="trigger"]') as HTMLElement
     expect(label.textContent?.trim()).toBe('Per page')
-    expect(label.htmlFor).toBe(control(it).id)
+    expect(label.getAttribute('for')).toBe(trigger.id)
   })
 
   test('moves itself when nothing declared the value', async () => {
     const it = (await mount(
       '<helix-pagination-size default-value="10" sizes="10,25"></helix-pagination-size>',
     )) as Size
-    control(it).value = '25'
-    control(it).dispatchEvent(new Event('change', { bubbles: true }))
+    control(it).dispatchEvent(choose(it, '25'))
     await it.updateComplete
     expect(it.value).toBe(25)
+  })
+
+  test('the select’s own event does not escape as this one’s', async () => {
+    /* `Select`'s `helix-change` bubbles and is composed, so a consumer would
+       have heard two per change, one of them carrying `Select`'s idea of what a
+       name and a value are. */
+    const it = (await mount(
+      '<helix-pagination-size default-value="10" sizes="10,25"></helix-pagination-size>',
+    )) as Size
+    const heard: string[] = []
+    it.addEventListener('helix-change', (event) => {
+      heard.push(
+        `${(event as CustomEvent<{ name: string }>).detail.name}=${
+          (event as CustomEvent<{ value: string }>).detail.value
+        }`,
+      )
+    })
+    control(it).dispatchEvent(choose(it, '25'))
+    await it.updateComplete
+    expect(heard).toEqual(['page-size=25'])
   })
 
   test('announces before it moves, so a listener can refuse', async () => {
@@ -56,23 +102,22 @@ describe('pagination size', () => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
       event.preventDefault()
     })
-    control(it).value = '25'
-    control(it).dispatchEvent(new Event('change', { bubbles: true, cancelable: true }))
+    control(it).dispatchEvent(choose(it, '25'))
     await it.updateComplete
     expect(announced).toBe('25')
     expect(it.value).toBe(10)
   })
 
-  test('a refused change puts the native control back', async () => {
-    /* The one case `requestControlledChange` cannot announce ahead of: a
-       `<select>` changes itself and then tells you, so refusing it has to undo
-       what the platform already did. */
+  test('a refused change puts the select back', async () => {
+    /* A select changes itself and then tells you, which is the one case
+       `requestControlledChange` cannot get ahead of. Lit skips a property
+       binding whose value has not changed, so nothing else would undo it. */
     const it = (await mount(
       '<helix-pagination-size default-value="10" sizes="10,25"></helix-pagination-size>',
     )) as Size
     it.addEventListener('helix-change', (event) => event.preventDefault())
     control(it).value = '25'
-    control(it).dispatchEvent(new Event('change', { bubbles: true, cancelable: true }))
+    control(it).dispatchEvent(choose(it, '25'))
     await it.updateComplete
     await it.updateComplete
     expect(control(it).value).toBe('10')
@@ -86,8 +131,7 @@ describe('pagination size', () => {
     it.addEventListener('helix-change', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
-    control(it).value = '25'
-    control(it).dispatchEvent(new Event('change', { bubbles: true }))
+    control(it).dispatchEvent(choose(it, '25'))
     await it.updateComplete
     expect(announced).toBe('25')
     expect(it.value).toBe(10)

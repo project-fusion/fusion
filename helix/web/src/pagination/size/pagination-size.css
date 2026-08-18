@@ -1,73 +1,43 @@
-/* One row, which is the whole reason this is not a `Select` with a label.
-   Every other field in the library stacks its label because it stands in a
-   column of fields; this one stands in a footer beside a run of page numbers,
-   and a two-line control there makes the whole row two lines tall. */
+/* One row, which is the whole reason this element exists rather than a `Select`
+   written out by hand.
+
+   Every other field in the library stacks its label, because it stands in a
+   column of fields. This one stands in a footer beside a run of page numbers,
+   and a two-line control there makes the whole row two lines tall and pushes
+   everything beside it down with it. */
 :host {
-  align-items: center;
   display: inline-flex;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+}
+
+/* `Select`'s host is `flex-direction: column`, declared in its own `:host` rule.
+   An outer-tree rule beats a `:host` rule, so turning it into a row is four
+   declarations here and needs no property on `Select`, no wrapper, and nothing
+   written into the consumer's markup.
+
+   This is the same mechanism `Breadcrumb` uses to colour a slotted link, argued
+   there: the shadow root's own rules are the weakest thing that can style a
+   host, which is exactly what makes a component's layout adjustable by whatever
+   places it. */
+[part="control"] {
+  align-items: center;
+  flex-direction: row;
   gap: var(--helix-space-xs);
 }
 
-[part="label"] {
-  color: var(--helix-color-foreground-muted);
+/* The stacked sheet gives a label four pixels of padding under its text, so it
+   sits a step clear of the control below it. In a row centred on its items that
+   padding makes the label's box taller than its ink and the words read as
+   sitting high beside the control. `field-inline.css` exists for exactly this
+   and cannot be composed from out here, so the one declaration it would have
+   removed is removed directly. */
+[part="control"]::part(label) {
+  padding-block-end: var(--helix-space-none);
   white-space: nowrap;
 }
 
-/* The same frame every field wears, so the closed control is indistinguishable
-   from a `Select`'s trigger: what differs is only what happens while it is
-   open, which for a list of four numbers is the half the platform does better.
-
-   `appearance: none` takes the platform's own chrome, and the caret comes back
-   as a background image because a native `<select>` has nowhere to put a child.
-   Inline SVG in a `url()`, since a data URI is the only way to state a shape in
-   a background and the alternative is a wrapper element around a control that
-   does not need one. */
-[part="control"] {
-  appearance: none;
-  background-color: var(--helix-color-surface);
-  background-image: var(--_size-caret);
-  background-position: right var(--helix-space-xs) center;
-  background-repeat: no-repeat;
-  background-size: var(--helix-size-icon-sm);
+/* The trigger is sized for a form, where it stands in a column with inputs. In
+   a footer it stands beside controls a step smaller, so it takes their height
+   and only as much width as the widest number in it needs. */
+[part="control"]::part(trigger) {
   block-size: var(--helix-size-control-sm);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground);
-  cursor: pointer;
-  font: inherit;
-  font-variant-numeric: tabular-nums;
-  padding-inline: var(--helix-space-xs) var(--helix-space-lg);
-  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
-
-  /* `currentColor` cannot reach into a data URI, so the caret carries the muted
-     foreground as a literal. It is the one place in this family a colour is not
-     read from a token at use, and it is stated here so the next person changing
-     the palette knows to look. */
-  --_size-caret: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%23616a75'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E");
-}
-
-[part="control"]:hover {
-  border-color: var(--helix-color-foreground-muted);
-}
-
-[part="control"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
-}
-
-/* The caret is a picture and pictures do not move, so the border is the whole
-   of what this transitions. Named anyway, because a reduce rule written looser
-   than the rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  [part="control"] {
-    transition: none;
-  }
-}
-
-/* Right-to-left puts the caret on the other side, and a background position is
-   physical. */
-:host(:dir(rtl)) [part="control"] {
-  background-position: left var(--helix-space-xs) center;
 }
