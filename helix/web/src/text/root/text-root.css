@@ -14,10 +14,18 @@
   display: block;
 }
 
-/* No ramps here. They live once in the base layer, keyed on `data-text` for any
-   element and on this component's own `appearance` and `as` for this one, so a
-   `<h2 data-text="caption">` and a `<helix-text as="h2" appearance="caption">`
-   cannot drift apart.
+/* The ramps live here now, and the `data-text` recipe for a plain element stays
+   in the base layer.
+ 
+   They were all three in the document, on the reasoning that one declaration
+   cannot drift. What that cost is worse than the drift: a document rule reaches
+   inside every component that slots a `helix-text`, and beats that component's
+   own stylesheet whatever the specificity and whatever the layer, both measured.
+   A dialog asking for a smaller title got the ramp's heading size instead, and
+   nothing said why.
+ 
+   Split, the mapping is written twice and the values once, since both sides
+   reference the same tokens. Base keeps the helper; the component keeps itself.
 
    Those rules match the host, and this element takes them by inheritance:
    font, color, and tracking all cross a shadow boundary. `font: inherit` is
@@ -30,6 +38,87 @@
    lives in the base layer too, paired with the `data-button` recipe, and so do
    the link, list-item, card and navigation-item recipes. The base layer is not
    optional for this library; the sentence here used to imply it was. */
+:host([appearance="display"]),
+:host(:not([appearance])[as="h1"]) {
+  font-family: var(--helix-font-display);
+  font-size: var(--helix-text-3xl);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+}
+
+:host([appearance="heading"]),
+:host(:not([appearance])[as="h2"]) {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-2xl);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+}
+
+:host([appearance="subheading"]),
+:host(:not([appearance])[as="h3"]) {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xl);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+}
+
+:host([appearance="title"]),
+:host(:not([appearance])[as="h4"]) {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-tight);
+}
+
+:host([appearance="body"]) {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
+}
+
+:host([appearance="body-strong"]),
+:host(:not([appearance])[as="h5"]),
+:host(:not([appearance])[as="h6"]),
+:host(:not([appearance])[as="strong"]) {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
+}
+
+:host([appearance="caption"]) {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
+}
+
+:host([appearance="label"]),
+:host(:not([appearance])[as="label"]) {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-wide);
+  line-height: var(--helix-leading-normal);
+}
+
+:host([appearance="code"]),
+:host(:not([appearance])[as="code"]) {
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
+}
+
 [part="text"] {
   color: inherit;
   font: inherit;

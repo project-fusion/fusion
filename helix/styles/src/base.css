@@ -32,11 +32,24 @@ body {
   overflow-x: clip;
 }
 
+/* The margin reset is unscoped and the theming is not, which is the line this
+   file now draws. Zeroing a UA margin is a reset: nothing fights it, and a
+   component slotting a heading wants it too. Choosing a size and a weight is
+   theming, and a document rule doing that reaches inside every component that
+   slots a heading, where it beats the component's own stylesheet whatever the
+   specificity and whatever the layer. Both measured.
+
+   So theming is opt-in, on `[data-prose]`. Markdown, a CMS, anything the design
+   system did not render says so once on its container. */
 :where(h1, h2, h3, h4, h5, h6) {
+  margin: 0;
+}
+
+:where([data-prose] h1, [data-prose] h2, [data-prose] h3),
+:where([data-prose] h4, [data-prose] h5, [data-prose] h6) {
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
-  margin: 0;
 }
 
 /* The type scale lives here rather than in a `Text` component, so a heading is
@@ -44,27 +57,27 @@ body {
    tempt `size` to be set independently of it, which is how a page ends up with
    an <h4> that looks like a title. This also reaches prose the design system
    never renders, such as anything coming out of a CMS or a markdown file. */
-:where(h1) {
+:where([data-prose] h1) {
   font-size: var(--helix-text-3xl);
 }
 
-:where(h2) {
+:where([data-prose] h2) {
   font-size: var(--helix-text-2xl);
 }
 
-:where(h3) {
+:where([data-prose] h3) {
   font-size: var(--helix-text-xl);
 }
 
-:where(h4) {
+:where([data-prose] h4) {
   font-size: var(--helix-text-lg);
 }
 
-:where(h5) {
+:where([data-prose] h5) {
   font-size: var(--helix-text-md);
 }
 
-:where(h6) {
+:where([data-prose] h6) {
   font-size: var(--helix-text-sm);
 }
 
@@ -133,7 +146,7 @@ helix-card > [slot="media"] {
    So the line stays where it is and gains weight and color. The one pixel of
    thickness snaps and is imperceptible; the color is what a reader sees. It is
    listed in the transition anyway, in case it becomes animatable. */
-:where(a) {
+:where([data-prose] a) {
   color: var(--helix-color-primary);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
@@ -158,7 +171,7 @@ helix-card > [slot="media"] {
     text-decoration-thickness var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:where(a):hover {
+:where([data-prose] a):hover {
   color: var(--helix-color-primary-hover);
   text-decoration-color: currentColor;
   text-decoration-thickness: 2px;
@@ -268,9 +281,7 @@ helix-card > [slot="media"] {
  * element with no appearance and no pairing needs no rule to look right.
  */
 
-[data-text="display"],
-helix-text[appearance="display"],
-:where(helix-text:not([appearance])[as="h1"]) {
+[data-text="display"] {
   font-family: var(--helix-font-display);
   font-size: var(--helix-text-3xl);
   font-weight: var(--helix-weight-semibold);
@@ -278,9 +289,7 @@ helix-text[appearance="display"],
   line-height: var(--helix-leading-tight);
 }
 
-[data-text="heading"],
-helix-text[appearance="heading"],
-:where(helix-text:not([appearance])[as="h2"]) {
+[data-text="heading"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-2xl);
   font-weight: var(--helix-weight-semibold);
@@ -288,9 +297,7 @@ helix-text[appearance="heading"],
   line-height: var(--helix-leading-tight);
 }
 
-[data-text="subheading"],
-helix-text[appearance="subheading"],
-:where(helix-text:not([appearance])[as="h3"]) {
+[data-text="subheading"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
@@ -298,9 +305,7 @@ helix-text[appearance="subheading"],
   line-height: var(--helix-leading-tight);
 }
 
-[data-text="title"],
-helix-text[appearance="title"],
-:where(helix-text:not([appearance])[as="h4"]) {
+[data-text="title"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-lg);
   font-weight: var(--helix-weight-semibold);
@@ -308,8 +313,7 @@ helix-text[appearance="title"],
   line-height: var(--helix-leading-tight);
 }
 
-[data-text="body"],
-helix-text[appearance="body"] {
+[data-text="body"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-regular);
@@ -317,11 +321,7 @@ helix-text[appearance="body"] {
   line-height: var(--helix-leading-normal);
 }
 
-[data-text="body-strong"],
-helix-text[appearance="body-strong"],
-:where(helix-text:not([appearance])[as="h5"]),
-:where(helix-text:not([appearance])[as="h6"]),
-:where(helix-text:not([appearance])[as="strong"]) {
+[data-text="body-strong"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
@@ -329,8 +329,7 @@ helix-text[appearance="body-strong"],
   line-height: var(--helix-leading-normal);
 }
 
-[data-text="caption"],
-helix-text[appearance="caption"] {
+[data-text="caption"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-regular);
@@ -338,9 +337,7 @@ helix-text[appearance="caption"] {
   line-height: var(--helix-leading-normal);
 }
 
-[data-text="label"],
-helix-text[appearance="label"],
-:where(helix-text:not([appearance])[as="label"]) {
+[data-text="label"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
@@ -348,9 +345,7 @@ helix-text[appearance="label"],
   line-height: var(--helix-leading-normal);
 }
 
-[data-text="code"],
-helix-text[appearance="code"],
-:where(helix-text:not([appearance])[as="code"]) {
+[data-text="code"] {
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-regular);
@@ -826,33 +821,6 @@ helix-toggle[disabled]::part(item) {
  * out to these anchors: the gutter the rail and the travelling mark occupy is
  * one number, named once, in the file that draws them.
  */
-:where(helix-outline a) {
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-sm);
-  /* A step up from body weight even at rest. A contents page is scanned rather
-     than read, and at `regular` against `foreground-muted` the whole column sat
-     back far enough that the current item was doing all the work of saying
-     there was a list there at all. */
-  font-weight: var(--helix-weight-medium);
-  line-height: var(--helix-leading-normal);
-  /* Margin rather than more padding, so the hover fill starts after the rail
-     instead of covering it. A fill that swallowed the hairline made the rule
-     flicker as the pointer went down the list. */
-  margin-inline-start: var(--outline-rail, var(--helix-border-thick));
-  padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-sm);
-  text-decoration: none;
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-:where(helix-outline a):hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
-  color: var(--helix-color-foreground);
-  text-decoration: none;
-}
 
 /* The one being read. `aria-current` rather than a class, so what a screen
    reader is told and what the eye is shown are the same attribute and cannot
@@ -862,11 +830,6 @@ helix-toggle[disabled]::part(item) {
  * background here as well would leave the current link and a hovered link
  * competing to look chosen. Weight and full-strength color carry it before the
  * mark has been measured, which cannot happen on the server. */
-:where(helix-outline a[aria-current]) {
-  color: var(--helix-color-foreground);
-  /* One step above the rest, which is what it was before the rest moved up. */
-  font-weight: var(--helix-weight-semibold);
-}
 
 /* Nesting, said by the consumer.
  *
@@ -885,41 +848,6 @@ helix-toggle[disabled]::part(item) {
  *
  * Six is the depth of an HTML outline, which is what a contents list is made
  * of, so there is no seventh level to write. */
-:where(helix-outline a[data-level="2"]) {
-  padding-inline-start: calc(var(--helix-space-sm) + var(--outline-indent, var(--helix-space-sm)));
-}
-
-:where(helix-outline a[data-level="3"]) {
-  padding-inline-start: calc(
-    var(--helix-space-sm) +
-    2 *
-    var(--outline-indent, var(--helix-space-sm))
-  );
-}
-
-:where(helix-outline a[data-level="4"]) {
-  padding-inline-start: calc(
-    var(--helix-space-sm) +
-    3 *
-    var(--outline-indent, var(--helix-space-sm))
-  );
-}
-
-:where(helix-outline a[data-level="5"]) {
-  padding-inline-start: calc(
-    var(--helix-space-sm) +
-    4 *
-    var(--outline-indent, var(--helix-space-sm))
-  );
-}
-
-:where(helix-outline a[data-level="6"]) {
-  padding-inline-start: calc(
-    var(--helix-space-sm) +
-    5 *
-    var(--outline-indent, var(--helix-space-sm))
-  );
-}
 
 /* Above the marker, which sits behind every item. */
 :where([data-navigation-item], helix-navigation a) {
@@ -1093,7 +1021,7 @@ helix-toast:not([data-color-mode]) {
   color-scheme: var(--_helix-mode-inverted);
 }
 
-:where(code, kbd, samp, pre) {
+:where([data-prose] code, [data-prose] kbd, [data-prose] samp, [data-prose] pre) {
   font-family: var(--helix-font-mono);
 }
 
@@ -1149,18 +1077,4 @@ helix-toast:not([data-color-mode]) {
   helix-toggle::part(item) {
     transition: none;
   }
-}
-
-/* The dialog's header, here rather than in the component, and for the reason
-   the outline links moved: a `::slotted()` rule loses to any document rule
-   whatever the specificity, and `h1`-`h6` are styled above. So
-   `<h2 slot="header">`, which is the markup the dialog's own example ships,
-   came out at 32px where the component asked for `--helix-text-lg`. Measured
-   beside a `<span>` in the same slot at 18px, which is what made it look
-   correct in every other example. */
-:where(helix-dialog [slot="header"]) {
-  font-size: var(--helix-text-lg);
-  font-weight: var(--helix-weight-semibold);
-  line-height: var(--helix-leading-tight);
-  margin: var(--helix-space-none);
 }

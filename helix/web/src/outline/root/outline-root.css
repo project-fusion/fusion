@@ -147,3 +147,93 @@
     transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   }
 }
+
+/* The links, back here from the base layer.
+ *
+ * They lived in the document because `:where(a)` was unscoped and painted every
+ * contents-page link brand blue and underlined, and a `::slotted()` rule loses
+ * to a document rule whatever the specificity. Measured at the time:
+ * `margin-inline-start` and `font-weight` came through from the shadow, `color`
+ * and `text-decoration` did not. This component had asked for `foreground-muted`
+ * since it was written and no outline had ever shown it.
+ *
+ * Prose theming is behind `[data-prose]` now, so nothing contests these and the
+ * component draws its own list again. */
+::slotted(a) {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  /* A step up from body weight even at rest. A contents page is scanned rather
+     than read, and at `regular` against `foreground-muted` the whole column sat
+     back far enough that the current item was doing all the work of saying
+     there was a list there at all. */
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-normal);
+  /* Margin rather than more padding, so the hover fill starts after the rail
+     instead of covering it. A fill that swallowed the hairline made the rule
+     flicker as the pointer went down the list. */
+  margin-inline-start: var(--outline-rail, var(--helix-border-thick));
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+  text-decoration: none;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+::slotted(a):hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
+  color: var(--helix-color-foreground);
+  text-decoration: none;
+}
+
+::slotted(a[aria-current]) {
+  color: var(--helix-color-foreground);
+  /* One step above the rest, which is what it was before the rest moved up. */
+  font-weight: var(--helix-weight-semibold);
+}
+
+::slotted(a[data-level="2"]) {
+  padding-inline-start: calc(var(--helix-space-sm) + var(--outline-indent, var(--helix-space-sm)));
+}
+
+::slotted(a[data-level="3"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    2 *
+    var(--outline-indent, var(--helix-space-sm))
+  );
+}
+
+::slotted(a[data-level="4"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    3 *
+    var(--outline-indent, var(--helix-space-sm))
+  );
+}
+
+::slotted(a[data-level="5"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    4 *
+    var(--outline-indent, var(--helix-space-sm))
+  );
+}
+
+::slotted(a[data-level="6"]) {
+  padding-inline-start: calc(
+    var(--helix-space-sm) +
+    5 *
+    var(--outline-indent, var(--helix-space-sm))
+  );
+}
+
+/* The links move, so they answer the preference here rather than in the base
+   layer's block, which no longer names them. The selector is repeated exactly:
+   one written looser loses on specificity and does nothing. */
+@media (prefers-reduced-motion: reduce) {
+  ::slotted(a) {
+    transition: none;
+  }
+}

@@ -136,34 +136,15 @@
 /* The heading, whatever the consumer slotted, without a wrapper to give it a
    box of its own. A dialog with no header has no empty band where one is not.
  
-   Plain `::slotted`, and it stays plain. A `:host ` in front of it was tried to
-   win a specificity contest that turned out not to exist, and it matched
-   nothing at all: measured, even a literal `font-size: 30px` through that
-   selector was ignored. The base layer's own type ramp for `helix-text` is
-   written inside `:where()`, so it carries no specificity and this rule was
-   always winning. A dialog title is a size the dialog decides, the same way it
-   decides how big the mark above it is. */
+   Back here from the base layer, where it lived because `:where(h1)`-`:where(h6)`
+   were unscoped and a document rule beats a `::slotted()` one whatever the
+   specificity or the layer, both measured. Prose theming is behind
+   `[data-prose]` now, so nothing in the document contests this and a dialog
+   decides the size of its own title again. */
 ::slotted([slot="header"]) {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
-  /* **Raising this does nothing, and the reason is not yet found.** Left at `lg`
-     rather than set to a number that does not take.
-   
-     What is ruled out, all measured on a clean load of the built bundle: the
-     source carries exactly one rule for this slot and it names the token asked
-     for; `dist` and the frame bundle both carry it; the rule *applies*, because
-     its `font-weight`, `letter-spacing` and `margin` all land on the element;
-     and the token resolves to 24px on that very element, in the dialog and out
-     of it. `helix-text` is not the culprit either, since it declares no
-     font-size of its own and a plain `<span slot="header">` behaves the same.
-     Inheritance is not it: the slot computes 15px.
-   
-     So one declaration of a rule that otherwise applies is being ignored, and it
-     lands on exactly the previous value of this line. That signature says stale
-     styles somewhere, but the sheet read back from the live element already
-     holds the new value. Whoever picks this up should start there rather than
-     with the selector. */
-  font-size: var(--helix-text-lg);
+  font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);

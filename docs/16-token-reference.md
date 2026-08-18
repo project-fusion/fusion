@@ -63,7 +63,7 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 129 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 127 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 143 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 153 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 132 |
@@ -91,9 +91,9 @@ The three families.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-font-sans` | `var(--_helix-family-sans)` | 72 |
-| `--helix-font-mono` | `var(--_helix-family-mono)` | 16 |
-| `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 7 |
+| `--helix-font-sans` | `var(--_helix-family-sans)` | 86 |
+| `--helix-font-mono` | `var(--_helix-family-mono)` | 18 |
+| `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 9 |
 
 ## text
 
@@ -101,13 +101,13 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 52 |
-| `--helix-text-sm` | `var(--_helix-size-14)` | 82 |
-| `--helix-text-md` | `var(--_helix-size-15)` | 19 |
-| `--helix-text-lg` | `var(--_helix-size-18)` | 17 |
-| `--helix-text-xl` | `var(--_helix-size-24)` | 12 |
-| `--helix-text-2xl` | `var(--_helix-size-32)` | 5 |
-| `--helix-text-3xl` | `var(--_helix-size-44)` | 7 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 56 |
+| `--helix-text-sm` | `var(--_helix-size-14)` | 84 |
+| `--helix-text-md` | `var(--_helix-size-15)` | 23 |
+| `--helix-text-lg` | `var(--_helix-size-18)` | 15 |
+| `--helix-text-xl` | `var(--_helix-size-24)` | 16 |
+| `--helix-text-2xl` | `var(--_helix-size-32)` | 7 |
+| `--helix-text-3xl` | `var(--_helix-size-44)` | 9 |
 
 ## weight
 
@@ -115,9 +115,9 @@ The three weights.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-weight-regular` | `400` | 10 |
-| `--helix-weight-medium` | `500` | 66 |
-| `--helix-weight-semibold` | `600` | 37 |
+| `--helix-weight-regular` | `400` | 16 |
+| `--helix-weight-medium` | `500` | 70 |
+| `--helix-weight-semibold` | `600` | 43 |
 
 ## leading
 
@@ -125,8 +125,8 @@ Line height, unitless so it scales with the size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-leading-tight` | `1.2` | 39 |
-| `--helix-leading-normal` | `1.5` | 35 |
+| `--helix-leading-tight` | `1.2` | 45 |
+| `--helix-leading-normal` | `1.5` | 45 |
 | `--helix-leading-loose` | `1.7` | 0 |
 
 ## tracking
@@ -135,9 +135,9 @@ Letter spacing.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-tracking-tight` | `-0.01em` | 24 |
-| `--helix-tracking-normal` | `0` | 14 |
-| `--helix-tracking-wide` | `0.02em` | 6 |
+| `--helix-tracking-tight` | `-0.01em` | 30 |
+| `--helix-tracking-normal` | `0` | 24 |
+| `--helix-tracking-wide` | `0.02em` | 8 |
 
 ## border
 
