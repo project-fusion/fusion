@@ -37,6 +37,7 @@ import type {
   HelixBaseOption,
   HelixBaseOptionGroup,
   HelixBaseOutline,
+  HelixBasePagination,
   HelixBasePopover,
   HelixBaseProgress,
   HelixBaseQuote,
@@ -2966,6 +2967,137 @@ read at the click rather than cached, because a reader can change it while
 the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
   "prop:behavior"?: HelixBaseOutline["behavior"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBasePagination` component event */
+export type HelixBasePaginationElementEvent<E = Event> = TypedEvent<
+  HelixBasePagination,
+  E
+>;
+/** `helix-navigate` event type */
+export type HelixBasePaginationHelixNavigateElementEvent =
+  HelixBasePaginationElementEvent<HelixNavigateEvent>;
+
+export type HelixBasePaginationProps = {
+  /** How many pages there are in total.
+
+Clamped to at least one wherever it is read, so a result that has not
+loaded yet renders a single page rather than an empty control that then
+appears and pushes the layout down. */
+  pages?: HelixBasePagination["pages"];
+  /** The page on show, one-based.
+
+An accessor pair, the same shape as the calendar's `month`. Reading gives
+the page on show; writing declares it the consumer's, and `default-page`
+seeds one the element owns. */
+  page?: HelixBasePagination["page"];
+  /** Page to open on, where nothing declared one. */
+  "default-page"?: HelixBasePagination["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  defaultPage?: HelixBasePagination["defaultPage"];
+  /** How many pages to show either side of the current one. */
+  siblings?: HelixBasePagination["siblings"];
+  /** How many pages to show at each end, whatever the current one is. */
+  boundaries?: HelixBasePagination["boundaries"];
+  /** Address for a page, with `{page}` standing in for its number.
+
+Absent renders buttons. Present renders links, which is what a paged result
+with its own URL should be: a crawler follows them, a middle click opens
+one, and the back button works without the consumer wiring anything. */
+  href?: HelixBasePagination["href"];
+  /** Where the numbers are replaced by a reading of the two.
+
+A different structure rather than a different look, which is why it is
+here: the run of pages is gone and a single status line stands in its
+place. This is the shape a narrow screen wants, and the only shape possible
+where the total is large enough that no window over it is useful. */
+  compact?: HelixBasePagination["compact"];
+  /** Accessible name for the navigation landmark. */
+  label?: HelixBasePagination["label"];
+  /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
+  "page-label"?: HelixBasePagination["pageLabel"];
+  /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
+  pageLabel?: HelixBasePagination["pageLabel"];
+  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  "status-label"?: HelixBasePagination["statusLabel"];
+  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  statusLabel?: HelixBasePagination["statusLabel"];
+  /** Accessible name for the control that moves back. */
+  "previous-label"?: HelixBasePagination["previousLabel"];
+  /** Accessible name for the control that moves back. */
+  previousLabel?: HelixBasePagination["previousLabel"];
+  /** Accessible name for the control that moves forward. */
+  "next-label"?: HelixBasePagination["nextLabel"];
+  /** Accessible name for the control that moves forward. */
+  nextLabel?: HelixBasePagination["nextLabel"];
+
+  /** Fired before the page changes, and cancelable. The only way to refuse one. */
+  "onhelix-navigate"?: (
+    e: HelixBasePaginationHelixNavigateElementEvent,
+  ) => void;
+};
+
+export type HelixBasePaginationSolidJsProps = {
+  /** How many pages there are in total.
+
+Clamped to at least one wherever it is read, so a result that has not
+loaded yet renders a single page rather than an empty control that then
+appears and pushes the layout down. */
+  "prop:pages"?: HelixBasePagination["pages"];
+  /** The page on show, one-based.
+
+An accessor pair, the same shape as the calendar's `month`. Reading gives
+the page on show; writing declares it the consumer's, and `default-page`
+seeds one the element owns. */
+  "prop:page"?: HelixBasePagination["page"];
+  /** Page to open on, where nothing declared one. */
+  "attr:default-page"?: HelixBasePagination["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  "prop:defaultPage"?: HelixBasePagination["defaultPage"];
+  /** How many pages to show either side of the current one. */
+  "prop:siblings"?: HelixBasePagination["siblings"];
+  /** How many pages to show at each end, whatever the current one is. */
+  "prop:boundaries"?: HelixBasePagination["boundaries"];
+  /** Address for a page, with `{page}` standing in for its number.
+
+Absent renders buttons. Present renders links, which is what a paged result
+with its own URL should be: a crawler follows them, a middle click opens
+one, and the back button works without the consumer wiring anything. */
+  "prop:href"?: HelixBasePagination["href"];
+  /** Where the numbers are replaced by a reading of the two.
+
+A different structure rather than a different look, which is why it is
+here: the run of pages is gone and a single status line stands in its
+place. This is the shape a narrow screen wants, and the only shape possible
+where the total is large enough that no window over it is useful. */
+  "prop:compact"?: HelixBasePagination["compact"];
+  /** Accessible name for the navigation landmark. */
+  "prop:label"?: HelixBasePagination["label"];
+  /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
+  "attr:page-label"?: HelixBasePagination["pageLabel"];
+  /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
+  "prop:pageLabel"?: HelixBasePagination["pageLabel"];
+  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  "attr:status-label"?: HelixBasePagination["statusLabel"];
+  /** The reading shown in `compact`, with `{page}` and `{pages}` filled in. */
+  "prop:statusLabel"?: HelixBasePagination["statusLabel"];
+  /** Accessible name for the control that moves back. */
+  "attr:previous-label"?: HelixBasePagination["previousLabel"];
+  /** Accessible name for the control that moves back. */
+  "prop:previousLabel"?: HelixBasePagination["previousLabel"];
+  /** Accessible name for the control that moves forward. */
+  "attr:next-label"?: HelixBasePagination["nextLabel"];
+  /** Accessible name for the control that moves forward. */
+  "prop:nextLabel"?: HelixBasePagination["nextLabel"];
+  /** Fired before the page changes, and cancelable. The only way to refuse one. */
+  "on:helix-navigate"?: (
+    e: HelixBasePaginationHelixNavigateElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8138,6 +8270,97 @@ export type CustomElements = {
   >;
 
   /**
+   * The component is the truncation. Given a page and a total it works out which
+   * numbers to show and where the runs break, which is the whole of what a
+   * consumer would otherwise write by hand and get subtly wrong; everything else
+   * here is markup around that. So this is data-driven rather than composed:
+   * `<helix-pagination page="4" pages="12">` rather than twelve slotted children
+   * a consumer has to keep in step with their own query.
+   *
+   * **The width does not change as you page.** The run around the current page is
+   * `siblings` either side normally, and grows to absorb a gap slot when it meets
+   * a boundary, so the control holds the same number of slots from the first page
+   * to the last. Every arrangement that lets the count vary makes the buttons move
+   * under the pointer between one click and the next.
+   *
+   * **A gap is only drawn where it hides more than one page.** An ellipsis
+   * standing in for a single number costs the same space as the number and tells
+   * the reader less.
+   *
+   * **`href` is what makes these links.** Set it and every page renders an `<a>`
+   * with `{page}` filled in, so the server's output is crawlable, a middle click
+   * opens a tab, and the address bar is the state. Left unset they are buttons,
+   * which is right for a table paging in place. Either way the click announces
+   * `helix-navigate` first, and `preventDefault()` on it stops the navigation as
+   * well as the change: that is how a router takes over without the page reloading
+   * underneath it.
+   *
+   * **`helix-navigate` and not `helix-change`**, for the reason the calendar pages
+   * with it too. Moving to page four chooses nothing; it moves the view over a
+   * result that has not changed. A consumer driving the view has to be able to
+   * hear that without being told an answer changed.
+   *
+   * `page` is the controlled property and `default-page` seeds one the element
+   * owns. Naming `page` is a claim of ownership: the element announces and waits
+   * to be told, which is what a consumer paging through a router already wants.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `pages`: How many pages there are in total.
+   *
+   * Clamped to at least one wherever it is read, so a result that has not
+   * loaded yet renders a single page rather than an empty control that then
+   * appears and pushes the layout down.
+   * - `page`: The page on show, one-based.
+   *
+   * An accessor pair, the same shape as the calendar's `month`. Reading gives
+   * the page on show; writing declares it the consumer's, and `default-page`
+   * seeds one the element owns.
+   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
+   * - `siblings`: How many pages to show either side of the current one.
+   * - `boundaries`: How many pages to show at each end, whatever the current one is.
+   * - `href`: Address for a page, with `{page}` standing in for its number.
+   *
+   * Absent renders buttons. Present renders links, which is what a paged result
+   * with its own URL should be: a crawler follows them, a middle click opens
+   * one, and the back button works without the consumer wiring anything.
+   * - `compact`: Where the numbers are replaced by a reading of the two.
+   *
+   * A different structure rather than a different look, which is why it is
+   * here: the run of pages is gone and a single status line stands in its
+   * place. This is the shape a narrow screen wants, and the only shape possible
+   * where the total is large enough that no window over it is useful.
+   * - `label`: Accessible name for the navigation landmark.
+   * - `page-label`/`pageLabel`: Accessible name for one page, with `{page}` and `{pages}` filled in.
+   * - `status-label`/`statusLabel`: The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
+   * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `list`: The run of pages.
+   * - `item`: One slot in the run, holding a page or a gap.
+   * - `page`: The control for one page.
+   * - `gap`: The mark standing in for pages not shown.
+   * - `previous`: The control that moves back one page.
+   * - `next`: The control that moves forward one page.
+   * - `status`: The reading of where you are, in `compact`.
+   */
+  "helix-base-pagination": Partial<
+    HelixBasePaginationProps & BaseProps<HelixBasePagination> & BaseEvents
+  >;
+
+  /**
    * The general case the specific overlays are versions of. `Menu` holds
    * commands, `Select` holds options, `Tooltip` holds a description; this holds
    * whatever the consumer puts in it, which is why it has no keyboard of its own
@@ -13157,6 +13380,100 @@ export type CustomElementsSolidJs = {
     HelixBaseOutlineProps &
       HelixBaseOutlineSolidJsProps &
       BaseProps<HelixBaseOutline> &
+      BaseEvents
+  >;
+
+  /**
+   * The component is the truncation. Given a page and a total it works out which
+   * numbers to show and where the runs break, which is the whole of what a
+   * consumer would otherwise write by hand and get subtly wrong; everything else
+   * here is markup around that. So this is data-driven rather than composed:
+   * `<helix-pagination page="4" pages="12">` rather than twelve slotted children
+   * a consumer has to keep in step with their own query.
+   *
+   * **The width does not change as you page.** The run around the current page is
+   * `siblings` either side normally, and grows to absorb a gap slot when it meets
+   * a boundary, so the control holds the same number of slots from the first page
+   * to the last. Every arrangement that lets the count vary makes the buttons move
+   * under the pointer between one click and the next.
+   *
+   * **A gap is only drawn where it hides more than one page.** An ellipsis
+   * standing in for a single number costs the same space as the number and tells
+   * the reader less.
+   *
+   * **`href` is what makes these links.** Set it and every page renders an `<a>`
+   * with `{page}` filled in, so the server's output is crawlable, a middle click
+   * opens a tab, and the address bar is the state. Left unset they are buttons,
+   * which is right for a table paging in place. Either way the click announces
+   * `helix-navigate` first, and `preventDefault()` on it stops the navigation as
+   * well as the change: that is how a router takes over without the page reloading
+   * underneath it.
+   *
+   * **`helix-navigate` and not `helix-change`**, for the reason the calendar pages
+   * with it too. Moving to page four chooses nothing; it moves the view over a
+   * result that has not changed. A consumer driving the view has to be able to
+   * hear that without being told an answer changed.
+   *
+   * `page` is the controlled property and `default-page` seeds one the element
+   * owns. Naming `page` is a claim of ownership: the element announces and waits
+   * to be told, which is what a consumer paging through a router already wants.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `pages`: How many pages there are in total.
+   *
+   * Clamped to at least one wherever it is read, so a result that has not
+   * loaded yet renders a single page rather than an empty control that then
+   * appears and pushes the layout down.
+   * - `page`: The page on show, one-based.
+   *
+   * An accessor pair, the same shape as the calendar's `month`. Reading gives
+   * the page on show; writing declares it the consumer's, and `default-page`
+   * seeds one the element owns.
+   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
+   * - `siblings`: How many pages to show either side of the current one.
+   * - `boundaries`: How many pages to show at each end, whatever the current one is.
+   * - `href`: Address for a page, with `{page}` standing in for its number.
+   *
+   * Absent renders buttons. Present renders links, which is what a paged result
+   * with its own URL should be: a crawler follows them, a middle click opens
+   * one, and the back button works without the consumer wiring anything.
+   * - `compact`: Where the numbers are replaced by a reading of the two.
+   *
+   * A different structure rather than a different look, which is why it is
+   * here: the run of pages is gone and a single status line stands in its
+   * place. This is the shape a narrow screen wants, and the only shape possible
+   * where the total is large enough that no window over it is useful.
+   * - `label`: Accessible name for the navigation landmark.
+   * - `page-label`/`pageLabel`: Accessible name for one page, with `{page}` and `{pages}` filled in.
+   * - `status-label`/`statusLabel`: The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
+   * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `list`: The run of pages.
+   * - `item`: One slot in the run, holding a page or a gap.
+   * - `page`: The control for one page.
+   * - `gap`: The mark standing in for pages not shown.
+   * - `previous`: The control that moves back one page.
+   * - `next`: The control that moves forward one page.
+   * - `status`: The reading of where you are, in `compact`.
+   */
+  "helix-base-pagination": Partial<
+    HelixBasePaginationProps &
+      HelixBasePaginationSolidJsProps &
+      BaseProps<HelixBasePagination> &
       BaseEvents
   >;
 

@@ -1994,6 +1994,73 @@ document is not always where the headings are.
 | `--outline-rail` | Width of the gutter the rule and the travelling mark share. |
 | `--outline-indent` | How far each level is inset from the one above. |
 
+## Pagination
+
+### Root — `helix-pagination`
+
+Moves between pages of a longer result.
+
+Extends `HelixBasePagination`.
+
+One box for every control in the row, arrows and numbers alike, so the run has
+a single rhythm and the steps sit at the numbers' height rather than between
+them. Square, because a page number is one or two characters and a box sized
+to the widest would leave the short ones swimming; `min-inline-size` rather
+than a fixed one, so page 100 grows instead of overflowing.
+
+Figures are tabular throughout. A page number is the one thing here that
+changes under the pointer, and proportional digits make the whole row shuffle
+as it does.
+
+The current page is the only filled thing in the row, selected on
+`aria-current` rather than on a second attribute saying the same thing: the
+state is already in the accessibility tree, and a `data-current` beside it
+would be two places to keep in step.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `boundaries` | `boundaries` | `number` | `1` | `HelixBasePagination` | How many pages to show at each end, whatever the current one is. |
+| `compact` | `compact` | `boolean` | `false` | `HelixBasePagination` | Where the numbers are replaced by a reading of the two. |
+| `defaultPage` | `default-page` | `number` | `1` | `HelixBasePagination` | Page to open on, where nothing declared one. |
+| `href` | `href` | `string` | `''` | `HelixBasePagination` | Address for a page, with `{page}` standing in for its number. |
+| `label` | `label` | `string` | `'Pagination'` | `HelixBasePagination` | Accessible name for the navigation landmark. |
+| `nextLabel` | `next-label` | `string` | `'Next page'` | `HelixBasePagination` | Accessible name for the control that moves forward. |
+| `page` | `page` | `number` | - | `HelixBasePagination` | The page on show, one-based. |
+| `pageLabel` | `page-label` | `string` | `'Page {page}'` | `HelixBasePagination` | Accessible name for one page, with `{page}` and `{pages}` filled in. |
+| `pages` | `pages` | `number` | `1` | `HelixBasePagination` | How many pages there are in total. |
+| `previousLabel` | `previous-label` | `string` | `'Previous page'` | `HelixBasePagination` | Accessible name for the control that moves back. |
+| `siblings` | `siblings` | `number` | `1` | `HelixBasePagination` | How many pages to show either side of the current one. |
+| `statusLabel` | `status-label` | `string` | `'Page {page} of {pages}'` | `HelixBasePagination` | The reading shown in `compact`, with `{page}` and `{pages}` filled in. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-navigate` | `HelixNavigateEvent` | Fired before the page changes, and cancelable. The only way to refuse one. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `list` | The run of pages. |
+| `item` | One slot in the run, holding a page or a gap. |
+| `page` | The control for one page. |
+| `gap` | The mark standing in for pages not shown. |
+| `previous` | The control that moves back one page. |
+| `next` | The control that moves forward one page. |
+| `status` | The reading of where you are, in `compact`. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--pagination-current-color` | Fill behind the page you are on. |
+| `--pagination-gap` | Space between one control and the next. |
+| `--pagination-hover-color` | Fill behind a control under the pointer. |
+| `--pagination-size` | The box every control in the row takes. |
+
 ## Popover
 
 ### Root — `helix-popover`

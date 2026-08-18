@@ -9088,6 +9088,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/pagination/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/popover/index.js"
           }
         },
@@ -13831,6 +13839,534 @@
           "declaration": {
             "name": "HelixBaseOutline",
             "module": "src/outline/root/outline-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/pagination/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/pagination/root/pagination-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/pagination/root/pagination-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
+          "name": "HelixBasePagination",
+          "cssParts": [
+            {
+              "description": "The run of pages.",
+              "name": "list"
+            },
+            {
+              "description": "One slot in the run, holding a page or a gap.",
+              "name": "item"
+            },
+            {
+              "description": "The control for one page.",
+              "name": "page"
+            },
+            {
+              "description": "The mark standing in for pages not shown.",
+              "name": "gap"
+            },
+            {
+              "description": "The control that moves back one page.",
+              "name": "previous"
+            },
+            {
+              "description": "The control that moves forward one page.",
+              "name": "next"
+            },
+            {
+              "description": "The reading of where you are, in `compact`.",
+              "name": "status"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "pages",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.",
+              "attribute": "pages"
+            },
+            {
+              "kind": "field",
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "description": "The page on show, one-based.\n\nAn accessor pair, the same shape as the calendar's `month`. Reading gives\nthe page on show; writing declares it the consumer's, and `default-page`\nseeds one the element owns.",
+              "attribute": "page"
+            },
+            {
+              "kind": "field",
+              "name": "defaultPage",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Page to open on, where nothing declared one.",
+              "attribute": "default-page"
+            },
+            {
+              "kind": "field",
+              "name": "siblings",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many pages to show either side of the current one.",
+              "attribute": "siblings"
+            },
+            {
+              "kind": "field",
+              "name": "boundaries",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many pages to show at each end, whatever the current one is.",
+              "attribute": "boundaries"
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Address for a page, with `{page}` standing in for its number.\n\nAbsent renders buttons. Present renders links, which is what a paged result\nwith its own URL should be: a crawler follows them, a middle click opens\none, and the back button works without the consumer wiring anything.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "compact",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.",
+              "attribute": "compact",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Pagination'",
+              "description": "Accessible name for the navigation landmark.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "pageLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Page {page}'",
+              "description": "Accessible name for one page, with `{page}` and `{pages}` filled in.",
+              "attribute": "page-label"
+            },
+            {
+              "kind": "field",
+              "name": "statusLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Page {page} of {pages}'",
+              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.",
+              "attribute": "status-label"
+            },
+            {
+              "kind": "field",
+              "name": "previousLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Previous page'",
+              "description": "Accessible name for the control that moves back.",
+              "attribute": "previous-label"
+            },
+            {
+              "kind": "field",
+              "name": "nextLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Next page'",
+              "description": "Accessible name for the control that moves forward.",
+              "attribute": "next-label"
+            },
+            {
+              "kind": "field",
+              "name": "pageState",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The page on show, whoever set it, and `undefined` until somebody has."
+            },
+            {
+              "kind": "field",
+              "name": "pageMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the page, decided once and then fixed."
+            },
+            {
+              "kind": "field",
+              "name": "pageIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The total, clamped once, so every reader agrees on it.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The page on show, clamped into the total.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "slots",
+              "type": {
+                "text": "Slot[]"
+              },
+              "privacy": "private",
+              "description": "Which pages to show, and where the runs break.\n\n`most` is the number of slots the control holds at its widest: both\nboundaries, the run around the current page, and a gap on each side. Below\nthat there is nothing to hide, and the whole range is shown.\n\nAbove it, the two gaps are decided independently, and a gap standing over\nexactly one page is not drawn: `boundaries + 2` is the first page whose\npredecessor is not a boundary, so a run starting there is contiguous with\nwhat precedes it. Where one side has no gap the run on that side extends to\n`most` slots, which is what holds the width still.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "request",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Asks to move, and reports whether the request stood.\n\nAnnounced before it is applied, so `preventDefault()` is a refusal and\nnothing moves. In controlled mode nothing is written whatever the answer:\nthe consumer holds the page and this is the element telling them a reader\nasked for another one."
+            },
+            {
+              "kind": "field",
+              "name": "go",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The click handler, which is also what stops a link from following itself.\n\nA refused change has to refuse the navigation with it, or a router that\ncancels the event still loses the document underneath it. `preventDefault`\non a button's click does nothing and costs nothing, so this is one handler\nfor both shapes rather than two that have to stay in step."
+            },
+            {
+              "kind": "method",
+              "name": "renderPage",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "page",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "One page, as a link or a button.\n\n`aria-current=\"page\"` is what says which one you are on, and it stays a\ncontrol rather than becoming text: a reader who tabs into the run and finds\nthe current page missing from it has lost the only landmark in the row."
+            },
+            {
+              "kind": "method",
+              "name": "renderStep",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "back",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Previous or next, inert at the end it points at.\n\nInert rather than absent: a control that disappears at the first page takes\nthe row's width with it and moves everything else under the pointer. In\nlink mode the inert one is an `<a>` with no `href`, which is not a link and\nis not focusable, and is the platform's own way of saying there is nowhere\nto go."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixNavigateEvent"
+              },
+              "description": "Fired before the page changes, and cancelable. The only way to refuse one.",
+              "name": "helix-navigate",
+              "reactProp": "onhelix-navigate"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "pages",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many pages there are in total.\n\nClamped to at least one wherever it is read, so a result that has not\nloaded yet renders a single page rather than an empty control that then\nappears and pushes the layout down.",
+              "fieldName": "pages"
+            },
+            {
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "description": "The page on show, one-based.\n\nAn accessor pair, the same shape as the calendar's `month`. Reading gives\nthe page on show; writing declares it the consumer's, and `default-page`\nseeds one the element owns.",
+              "fieldName": "page"
+            },
+            {
+              "name": "default-page",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Page to open on, where nothing declared one.",
+              "fieldName": "defaultPage"
+            },
+            {
+              "name": "siblings",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many pages to show either side of the current one.",
+              "fieldName": "siblings"
+            },
+            {
+              "name": "boundaries",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many pages to show at each end, whatever the current one is.",
+              "fieldName": "boundaries"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Address for a page, with `{page}` standing in for its number.\n\nAbsent renders buttons. Present renders links, which is what a paged result\nwith its own URL should be: a crawler follows them, a middle click opens\none, and the back button works without the consumer wiring anything.",
+              "fieldName": "href"
+            },
+            {
+              "name": "compact",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Where the numbers are replaced by a reading of the two.\n\nA different structure rather than a different look, which is why it is\nhere: the run of pages is gone and a single status line stands in its\nplace. This is the shape a narrow screen wants, and the only shape possible\nwhere the total is large enough that no window over it is useful.",
+              "fieldName": "compact"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Pagination'",
+              "description": "Accessible name for the navigation landmark.",
+              "fieldName": "label"
+            },
+            {
+              "name": "page-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Page {page}'",
+              "description": "Accessible name for one page, with `{page}` and `{pages}` filled in.",
+              "fieldName": "pageLabel"
+            },
+            {
+              "name": "status-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Page {page} of {pages}'",
+              "description": "The reading shown in `compact`, with `{page}` and `{pages}` filled in.",
+              "fieldName": "statusLabel"
+            },
+            {
+              "name": "previous-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Previous page'",
+              "description": "Accessible name for the control that moves back.",
+              "fieldName": "previousLabel"
+            },
+            {
+              "name": "next-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Next page'",
+              "description": "Accessible name for the control that moves forward.",
+              "fieldName": "nextLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Moves between pages of a longer result.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/pagination",
+            "aliases": [
+              "Pager",
+              "Page nav"
+            ],
+            "tier": "headless",
+            "group": "BasePagination",
+            "part": "Root"
+          },
+          "tagName": "helix-base-pagination",
+          "customElement": true,
+          "modulePath": "src/pagination/root/pagination-root.ts",
+          "definitionPath": "src/pagination/root/pagination-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBasePagination",
+          "declaration": {
+            "name": "HelixBasePagination",
+            "module": "src/pagination/root/pagination-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-pagination",
+          "declaration": {
+            "name": "HelixBasePagination",
+            "module": "src/pagination/root/pagination-root.ts"
           }
         }
       ]

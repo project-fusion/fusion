@@ -309,6 +309,14 @@ declare global {
     'helix-close': HelixCloseEvent
     'helix-console': HelixConsoleEvent
     'helix-dismiss': HelixDismissEvent
+    /* Both of these were declared as classes, dispatched by the calendar, the
+       listbox and now the pagination, and left out of here, so the one thing
+       this augmentation exists to do was not done for them: a consumer writing
+       `addEventListener('helix-navigate', …)` got `Event` and had to reach into
+       `detail` through a cast. Nothing fails when an entry is missing, which is
+       why two of the nine went missing. */
+    'helix-filter': HelixFilterEvent
+    'helix-navigate': HelixNavigateEvent
     'helix-open': HelixOpenEvent
     'helix-select': HelixSelectEvent
   }

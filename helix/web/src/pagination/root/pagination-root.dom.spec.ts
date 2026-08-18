@@ -1,0 +1,232 @@
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
+
+beforeAll(async () => {
+  registerDom()
+  await import('../index.js')
+})
+
+/** Everything in the run, in order, with a gap reading as an ellipsis. */
+const run = (host: HTMLElement): string[] =>
+  [...(host.shadowRoot?.querySelectorAll('[part="page"], [part="gap"]') ?? [])].map(
+    (one) => one.textContent?.trim() ?? '',
+  )
+
+const pages = (host: HTMLElement): HTMLElement[] => [
+  ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part="page"]') ?? []),
+]
+
+describe('pagination', () => {
+  test('the host is the landmark, and carries a name it can be chosen by', async () => {
+    const nav = await mount('<helix-pagination pages="4"></helix-pagination>')
+    expect(role(nav)).toBe('navigation')
+    // On internals, so a consumer's own `aria-label` beats it without the
+    // element having written an attribute their server output never had.
+    expect(nav.getAttributeNames()).toEqual(['pages'])
+  })
+
+  test('shows the whole range while there is nothing to hide', async () => {
+    const nav = await mount('<helix-pagination default-page="3" pages="5"></helix-pagination>')
+    expect(run(nav)).toEqual(['1', '2', '3', '4', '5'])
+  })
+
+  test('hides the middle of a long range, keeping both ends and the current run', async () => {
+    const nav = await mount('<helix-pagination default-page="7" pages="12"></helix-pagination>')
+    expect(run(nav)).toEqual(['1', '…', '6', '7', '8', '…', '12'])
+  })
+
+  test('the number of slots does not change as you page', async () => {
+    // The claim the truncation is built around: every arrangement that lets the
+    // count vary moves the buttons under the pointer between one click and the
+    // next. The run around the current page absorbs a gap slot when it meets a
+    // boundary, which is what holds it still.
+    const widths = new Set<number>()
+    for (let page = 1; page <= 20; page += 1) {
+      const nav = await mount(
+        `<helix-pagination default-page="${page}" pages="20"></helix-pagination>`,
+      )
+      widths.add(run(nav).length)
+    }
+    expect([...widths]).toEqual([7])
+  })
+
+  test('never draws a gap over a single page', async () => {
+    // An ellipsis standing in for one number costs the same space as the number
+    // and tells the reader less.
+    for (let page = 1; page <= 20; page += 1) {
+      const nav = await mount(
+        `<helix-pagination default-page="${page}" pages="20"></helix-pagination>`,
+      )
+      const shown = run(nav)
+      for (const [index, slot] of shown.entries()) {
+        if (slot !== '…') {
+          continue
+        }
+        const before = Number(shown[index - 1])
+        const after = Number(shown[index + 1])
+        expect(after - before).toBeGreaterThan(2)
+      }
+    }
+  })
+
+  test('the window widens with `siblings` and the ends with `boundaries`', async () => {
+    const nav = await mount(
+      '<helix-pagination boundaries="2" default-page="9" pages="20" siblings="2"></helix-pagination>',
+    )
+    expect(run(nav)).toEqual(['1', '2', '…', '7', '8', '9', '10', '11', '…', '19', '20'])
+  })
+
+  test('the page you are on is marked, and is still a control', async () => {
+    // A reader who tabs into the run and finds the current page missing from it
+    // has lost the only landmark in the row.
+    const nav = await mount('<helix-pagination default-page="4" pages="12"></helix-pagination>')
+    const current = pages(nav).filter((one) => one.getAttribute('aria-current') === 'page')
+    expect(current).toHaveLength(1)
+    expect(current[0]?.textContent?.trim()).toBe('4')
+    expect(current[0]?.tagName).toBe('BUTTON')
+  })
+
+  test('the gap is out of the tree, so the list counts pages a reader can reach', async () => {
+    const nav = await mount('<helix-pagination default-page="7" pages="12"></helix-pagination>')
+    const items = [...(nav.shadowRoot?.querySelectorAll('[part="item"]') ?? [])]
+    const hidden = items.filter((one) => one.getAttribute('aria-hidden') === 'true')
+    expect(hidden).toHaveLength(2)
+    expect(items).toHaveLength(7)
+  })
+
+  test('the step pointing off the end is spent, and stays in the row', async () => {
+    // Inert rather than absent: a control that disappears at the first page
+    // takes the row's width with it and moves everything else under the pointer.
+    const first = await mount('<helix-pagination default-page="1" pages="4"></helix-pagination>')
+    expect((part(first, 'previous') as HTMLButtonElement).disabled).toBe(true)
+    expect((part(first, 'next') as HTMLButtonElement).disabled).toBe(false)
+
+    const last = await mount('<helix-pagination default-page="4" pages="4"></helix-pagination>')
+    expect((part(last, 'previous') as HTMLButtonElement).disabled).toBe(false)
+    expect((part(last, 'next') as HTMLButtonElement).disabled).toBe(true)
+  })
+})
+
+describe('pagination state', () => {
+  test('moves itself when nothing declared the page', async () => {
+    const nav = await mount('<helix-pagination default-page="2" pages="12"></helix-pagination>')
+    part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true }))
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect((nav as HTMLElement & { page: number }).page).toBe(3)
+  })
+
+  test('announces before it moves, so a listener can refuse', async () => {
+    const nav = await mount('<helix-pagination default-page="2" pages="12"></helix-pagination>')
+    let announced: string | undefined
+    nav.addEventListener('helix-navigate', (event) => {
+      announced = (event as CustomEvent<{ value: string }>).detail.value
+      // Read from inside the handler: nothing has moved yet, which is what
+      // makes `preventDefault()` a refusal rather than an undo.
+      expect((nav as HTMLElement & { page: number }).page).toBe(2)
+      event.preventDefault()
+    })
+    part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(announced).toBe('3')
+    expect((nav as HTMLElement & { page: number }).page).toBe(2)
+  })
+
+  test('declaring `page` hands it over: it announces and applies nothing', async () => {
+    const nav = await mount('<helix-pagination page="2" pages="12"></helix-pagination>')
+    let announced = ''
+    nav.addEventListener('helix-navigate', (event) => {
+      announced = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true }))
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(announced).toBe('3')
+    expect((nav as HTMLElement & { page: number }).page).toBe(2)
+  })
+
+  test('a step off either end asks for nothing', async () => {
+    const nav = await mount('<helix-pagination default-page="1" pages="3"></helix-pagination>')
+    let announced = false
+    nav.addEventListener('helix-navigate', () => {
+      announced = true
+    })
+    part(nav, 'previous')?.dispatchEvent(new Event('click', { bubbles: true }))
+    expect(announced).toBe(false)
+  })
+})
+
+describe('pagination links', () => {
+  test('`href` makes every page a real link, with the number filled in', async () => {
+    // The server's output is crawlable, a middle click opens a tab, and the
+    // address bar is the state. None of that is reachable from a button.
+    const nav = await mount(
+      '<helix-pagination default-page="2" href="/results?p={page}" pages="6"></helix-pagination>',
+    )
+    const shown = pages(nav)
+    expect(shown[0]?.tagName).toBe('A')
+    expect(shown.map((one) => one.getAttribute('href'))).toEqual([
+      '/results?p=1',
+      '/results?p=2',
+      '/results?p=3',
+      '/results?p=4',
+      '/results?p=5',
+      '/results?p=6',
+    ])
+  })
+
+  test('the spent step is an anchor with no href, which is not a link at all', async () => {
+    const nav = await mount(
+      '<helix-pagination default-page="1" href="/p/{page}" pages="6"></helix-pagination>',
+    )
+    const back = part(nav, 'previous') as HTMLElement
+    expect(back.tagName).toBe('A')
+    expect(back.hasAttribute('href')).toBe(false)
+    expect(back.getAttribute('aria-disabled')).toBe('true')
+  })
+
+  test('refusing the change refuses the navigation with it', async () => {
+    // Or a router that cancels the event still loses the document underneath
+    // it. This is the whole reason the click handler reports back.
+    const nav = await mount(
+      '<helix-pagination default-page="2" href="/p/{page}" pages="6"></helix-pagination>',
+    )
+    nav.addEventListener('helix-navigate', (event) => event.preventDefault())
+    const click = new Event('click', { bubbles: true, cancelable: true })
+    part(nav, 'next')?.dispatchEvent(click)
+    expect(click.defaultPrevented).toBe(true)
+  })
+
+  test('a change nobody refused leaves the link to follow itself', async () => {
+    const nav = await mount(
+      '<helix-pagination default-page="2" href="/p/{page}" pages="6"></helix-pagination>',
+    )
+    const click = new Event('click', { bubbles: true, cancelable: true })
+    part(nav, 'next')?.dispatchEvent(click)
+    expect(click.defaultPrevented).toBe(false)
+  })
+})
+
+describe('pagination compact', () => {
+  test('reads the two out instead of listing them', async () => {
+    const nav = await mount(
+      '<helix-pagination compact default-page="7" pages="24"></helix-pagination>',
+    )
+    expect(part(nav, 'status')?.textContent?.trim()).toBe('Page 7 of 24')
+    expect(part(nav, 'list')).toBeNull()
+  })
+
+  test('the reading is a template, so word order is the consumer’s', async () => {
+    const nav = await mount(
+      '<helix-pagination compact default-page="3" pages="9" status-label="{page} / {pages}"></helix-pagination>',
+    )
+    expect(part(nav, 'status')?.textContent?.trim()).toBe('3 / 9')
+  })
+
+  test('the steps still work, so it is the same control in a narrower row', async () => {
+    const nav = await mount(
+      '<helix-pagination compact default-page="3" pages="9"></helix-pagination>',
+    )
+    part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true }))
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(nav, 'status')?.textContent?.trim()).toBe('Page 4 of 9')
+  })
+})

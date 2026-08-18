@@ -1,0 +1,133 @@
+:host {
+  align-items: center;
+  display: flex;
+  font-size: var(--helix-text-sm);
+  gap: var(--pagination-gap, var(--helix-space-2xs));
+}
+
+[part="list"] {
+  align-items: center;
+  display: flex;
+  gap: var(--pagination-gap, var(--helix-space-2xs));
+  /* Markers are removed, which is why the headless tier sets `role="list"`:
+     Safari drops list semantics when it sees this. */
+  list-style: none;
+  margin: var(--helix-space-none);
+  padding: var(--helix-space-none);
+}
+
+/* `inline-flex` and not `display: contents`, which is what this wants
+   structurally and cannot have: `contents` removes the box, and removing a list
+   item's box has stripped its role in shipping engines. The headless tier goes
+   out of its way to keep list semantics here, so the stylesheet must not take
+   them back. The item wraps exactly one control, so the box costs nothing. */
+[part="item"] {
+  display: inline-flex;
+}
+
+/* One box for every control in the row, pages and steps alike, so the run has a
+   single rhythm and the arrows line up with the numbers rather than sitting
+   between them at some other height. Square by default: a page number is one or
+   two characters and a rectangle sized to the widest of them would leave the
+   short ones swimming. `min-inline-size` rather than a fixed one, so page 100
+   grows instead of overflowing. */
+[part="page"],
+[part="previous"],
+[part="next"] {
+  align-items: center;
+  appearance: none;
+  background-color: transparent;
+  block-size: var(--pagination-size, var(--helix-size-control-sm));
+  border: var(--helix-border-thin) solid transparent;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
+  justify-content: center;
+  min-inline-size: var(--pagination-size, var(--helix-size-control-sm));
+  padding-inline: var(--helix-space-2xs);
+  text-decoration: none;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="page"]:hover,
+[part="previous"]:hover,
+[part="next"]:hover {
+  background-color: var(--pagination-hover-color, var(--helix-color-surface-sunken));
+  color: var(--helix-color-foreground);
+}
+
+[part="page"]:focus-visible,
+[part="previous"]:focus-visible,
+[part="next"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Where you are, filled. `aria-current` is the selector rather than a second
+   attribute saying the same thing: the state is already in the accessibility
+   tree and a `data-current` beside it would be two places to keep in step. */
+[part="page"][aria-current="page"] {
+  background-color: var(--pagination-current-color, var(--helix-color-primary));
+  color: var(--helix-color-foreground-on-accent);
+}
+
+[part="page"][aria-current="page"]:hover {
+  background-color: var(--pagination-current-color, var(--helix-color-primary-hover));
+}
+
+/* Both shapes of spent step, and they need both selectors: the button form
+   carries `disabled` and the link form is an `<a>` with no `href`, which is not
+   a link at all and so cannot be disabled. */
+[part="previous"]:disabled,
+[part="next"]:disabled,
+[part="previous"][aria-disabled="true"],
+[part="next"][aria-disabled="true"] {
+  color: var(--helix-color-foreground-subtle);
+  cursor: default;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+[part="previous"] svg,
+[part="next"] svg {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+/* The gap takes the same box as a page, so the run keeps its rhythm across it
+   and the numbers either side of it stay on the grid the rest are on.
+
+   Centred, which was worth measuring rather than reasoning about: an ellipsis
+   is drawn at the baseline of its em box, and pushing the box down to "sit it on
+   the baseline" put the dots 1.5px below the digits'. Centring both aligns the
+   em boxes, which aligns the baselines, which is the whole of what is wanted. */
+[part="gap"] {
+  align-items: center;
+  block-size: var(--pagination-size, var(--helix-size-control-sm));
+  color: var(--helix-color-foreground-subtle);
+  display: inline-flex;
+  justify-content: center;
+  min-inline-size: var(--pagination-size, var(--helix-size-control-sm));
+  user-select: none;
+}
+
+[part="status"] {
+  color: var(--helix-color-foreground-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
+  padding-inline: var(--helix-space-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="page"],
+  [part="previous"],
+  [part="next"] {
+    transition: none;
+  }
+}

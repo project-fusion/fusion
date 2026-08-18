@@ -1,0 +1,57 @@
+import { describe, expect, test } from 'bun:test'
+import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { html } from 'lit'
+import '../index.js'
+
+const buttons = html`<helix-pagination default-page="7" pages="12"></helix-pagination>`
+const links = html`<helix-pagination
+  default-page="3"
+  href="/results?p={page}"
+  pages="6"
+></helix-pagination>`
+
+describe('pagination server output', () => {
+  test('the run is in the served markup, not built on connect', () => {
+    // The truncation is arithmetic over two numbers, both of which the server
+    // has, so there is nothing here to wait for hydration to work out.
+    expect(hasPart(ssr(buttons), 'list')).toBe(true)
+    expect(hasPart(ssr(buttons), 'page')).toBe(true)
+  })
+
+  test('the list ships with the role that list-style would otherwise strip', () => {
+    expect(partTag(ssr(buttons), 'list')).toContain('role="list"')
+  })
+
+  test('the landmark role is on internals, so the host stays as written', () => {
+    expect(hostAttributes(ssr(buttons), 'helix-pagination')).toEqual(['default-page', 'pages'])
+  })
+
+  test('the page on show is already marked in the served markup', () => {
+    expect(withoutStyles(ssr(buttons))).toContain('aria-current="page"')
+  })
+
+  test('links are real links in the served markup, so a crawler follows them', () => {
+    // The reason `href` exists at all. A button renders nothing a crawler can
+    // follow, and a paged result whose pages have their own URLs should have
+    // them reachable without the page running.
+    const markup = withoutStyles(ssr(links))
+    expect(markup).toContain('href="/results?p=1"')
+    expect(markup).toContain('href="/results?p=6"')
+  })
+
+  test('the spent step ships without an href rather than as a disabled link', () => {
+    const first = html`<helix-pagination
+      default-page="1"
+      href="/results?p={page}"
+      pages="6"
+    ></helix-pagination>`
+    expect(partTag(ssr(first), 'previous')).not.toContain('href=')
+    expect(partTag(ssr(first), 'previous')).toContain('aria-disabled="true"')
+  })
+
+  test('compact ships its reading rather than a run to be replaced', () => {
+    const compact = html`<helix-pagination compact default-page="7" pages="24"></helix-pagination>`
+    expect(hasPart(ssr(compact), 'list')).toBe(false)
+    expect(withoutStyles(ssr(compact))).toContain('Page 7 of 24')
+  })
+})
