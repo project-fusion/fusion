@@ -53,7 +53,13 @@
 /* And whatever is slotted into the middle breathes with it, in step, so a
    spinner carrying a count or a glyph is one thing rather than a still mark
    inside a moving ring. Nothing is slotted in the common case and this animates
-   an empty box, which costs nothing. */
+   an empty box, which costs nothing.
+
+   Further than the ring goes, and it has to be: the ring's swell is spread over
+   a whole circle at the edge of the picture, where a couple of hundredths of
+   opacity is plenty, and the mark is a small shape in the middle with nothing
+   around it to be read against. At the ring's numbers the centre was moving and
+   nobody could see it. */
 [part="mark"] {
   animation: helix-spinner-breathe-mark 2.4s ease-in-out infinite;
 }
@@ -72,10 +78,12 @@
 @keyframes helix-spinner-breathe-mark {
   0%,
   100% {
-    scale: 0.94;
+    opacity: 0.45;
+    scale: 0.82;
   }
 
   50% {
+    opacity: 1;
     scale: 1;
   }
 }

@@ -61,6 +61,7 @@
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
   inline-size: 100%;
   line-height: var(--helix-leading-normal);
   /* Down only. A field the reader can drag wider than the form holding it is a

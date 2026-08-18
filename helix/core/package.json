@@ -3,7 +3,7 @@
   "description": "Helix element primitives: base classes, mixins, decorators, utilities.",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -58,12 +58,17 @@
   margin-inline-start: var(--helix-space-2xs);
 }
 
+/* The space above is the one margin here that is not zero. A hint set hard
+   against the control reads as part of it, as a second line of the field rather
+   than as a note about it, and the two are different kinds of thing. Only above:
+   whatever follows the field owns the space below it. */
 [part="hint"],
 [part="feedback"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   line-height: var(--helix-leading-normal);
   margin: var(--helix-space-none);
+  margin-block-start: var(--helix-space-2xs);
 }
 
 [part="hint"] {

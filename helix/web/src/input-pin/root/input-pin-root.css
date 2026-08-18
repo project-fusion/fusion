@@ -29,6 +29,7 @@
   /* Tabular, so a 1 takes the same room as an 8 and the row does not breathe as
      a code is typed into it. */
   font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
   inline-size: var(--helix-size-control);
   text-align: center;
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);

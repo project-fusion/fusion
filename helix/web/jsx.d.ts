@@ -21,6 +21,7 @@ import type {
   HelixCheckbox,
   HelixCheckboxGroup,
   HelixCloseEvent,
+  HelixColor,
   HelixCompleteEvent,
   HelixDialog,
   HelixDismissEvent,
@@ -2048,6 +2049,172 @@ instead. */
   textContent?: string | number;
 };
 
+/** `HelixColor` component event */
+export type HelixColorElementEvent<E = Event> = TypedEvent<HelixColor, E>;
+/** `helix-change` event type */
+export type HelixColorHelixChangeElementEvent =
+  HelixColorElementEvent<HelixChangeEvent>;
+
+export type HelixColorProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixColor["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixColor["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixColor["value"];
+  /** Whether the colour carries an alpha channel.
+
+Off by default, because it widens every value written, and a consumer who
+did not ask for transparency should not have to strip a byte off each one. */
+  alpha?: HelixColor["alpha"];
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+Only what is written. Everything is read whatever this says, so a picker on
+`hex` still takes an `rgb()` handed to it and stores the hex for it. */
+  format?: HelixColor["format"];
+  /** Whether the reader may change the format. */
+  "no-format"?: HelixColor["noFormat"];
+  /** Whether the reader may change the format. */
+  noFormat?: HelixColor["noFormat"];
+  /** Whether the eyedropper is offered where the browser has one. */
+  "no-eyedropper"?: HelixColor["noEyedropper"];
+  /** Whether the eyedropper is offered where the browser has one. */
+  noEyedropper?: HelixColor["noEyedropper"];
+  /** Colours offered under the picker, as a comma-separated list. */
+  swatches?: HelixColor["swatches"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixColor["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixColor["name"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixColor["onValueChange"];
+
+  /** Fired when the colour changes. */
+  "onhelix-change"?: (e: HelixColorHelixChangeElementEvent) => void;
+};
+
+export type HelixColorSolidJsProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixColor["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixColor["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  "prop:value"?: HelixColor["value"];
+  /** Whether the colour carries an alpha channel.
+
+Off by default, because it widens every value written, and a consumer who
+did not ask for transparency should not have to strip a byte off each one. */
+  "prop:alpha"?: HelixColor["alpha"];
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+Only what is written. Everything is read whatever this says, so a picker on
+`hex` still takes an `rgb()` handed to it and stores the hex for it. */
+  "prop:format"?: HelixColor["format"];
+  /** Whether the reader may change the format. */
+  "bool:no-format"?: HelixColor["noFormat"];
+  /** Whether the reader may change the format. */
+  "prop:noFormat"?: HelixColor["noFormat"];
+  /** Whether the eyedropper is offered where the browser has one. */
+  "bool:no-eyedropper"?: HelixColor["noEyedropper"];
+  /** Whether the eyedropper is offered where the browser has one. */
+  "prop:noEyedropper"?: HelixColor["noEyedropper"];
+  /** Colours offered under the picker, as a comma-separated list. */
+  "prop:swatches"?: HelixColor["swatches"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixColor["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixColor["name"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixColor["onValueChange"];
+  /** Fired when the colour changes. */
+  "on:helix-change"?: (e: HelixColorHelixChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixDialog` component event */
 export type HelixDialogElementEvent<E = Event> = TypedEvent<HelixDialog, E>;
 /** `helix-open` event type */
@@ -2815,15 +2982,9 @@ being four of a kind rather than four of three kinds. */
   label?: HelixInputColor["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixInputColor["required"];
-  /** Whether the colour carries an alpha channel.
-
-Off by default, because it widens every value written, and a consumer who
-did not ask for transparency should not have to strip a byte off each one. */
+  /** Whether the colour carries an alpha channel. */
   alpha?: HelixInputColor["alpha"];
-  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
-
-Only what is written. Everything is read whatever this says, so a field on
-`hex` still takes a pasted `rgb()` and stores the hex for it. */
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
   format?: HelixInputColor["format"];
   /** Whether the reader may change the format from the panel. */
   "no-format"?: HelixInputColor["noFormat"];
@@ -2831,7 +2992,7 @@ Only what is written. Everything is read whatever this says, so a field on
   noFormat?: HelixInputColor["noFormat"];
   /** What the field says before a colour is in it. */
   placeholder?: HelixInputColor["placeholder"];
-  /** Colours offered under the panel, as a comma-separated list. */
+  /** Colours offered under the picker, as a comma-separated list. */
   swatches?: HelixInputColor["swatches"];
   /** Accessible name for the control that opens the panel. */
   "trigger-label"?: HelixInputColor["triggerLabel"];
@@ -2941,15 +3102,9 @@ being four of a kind rather than four of three kinds. */
   "prop:label"?: HelixInputColor["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixInputColor["required"];
-  /** Whether the colour carries an alpha channel.
-
-Off by default, because it widens every value written, and a consumer who
-did not ask for transparency should not have to strip a byte off each one. */
+  /** Whether the colour carries an alpha channel. */
   "prop:alpha"?: HelixInputColor["alpha"];
-  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
-
-Only what is written. Everything is read whatever this says, so a field on
-`hex` still takes a pasted `rgb()` and stores the hex for it. */
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
   "prop:format"?: HelixInputColor["format"];
   /** Whether the reader may change the format from the panel. */
   "bool:no-format"?: HelixInputColor["noFormat"];
@@ -2957,7 +3112,7 @@ Only what is written. Everything is read whatever this says, so a field on
   "prop:noFormat"?: HelixInputColor["noFormat"];
   /** What the field says before a colour is in it. */
   "prop:placeholder"?: HelixInputColor["placeholder"];
-  /** Colours offered under the panel, as a comma-separated list. */
+  /** Colours offered under the picker, as a comma-separated list. */
   "prop:swatches"?: HelixInputColor["swatches"];
   /** Accessible name for the control that opens the panel. */
   "attr:trigger-label"?: HelixInputColor["triggerLabel"];
@@ -9440,6 +9595,154 @@ export type CustomElements = {
   >;
 
   /**
+   * **The square is painted in three layers, not composited from elements**: the
+   * hue underneath, white sliding in from the left to take the saturation out,
+   * black rising from the bottom to take the brightness out. One element, one
+   * declaration, and it repaints as the hue moves because the hue is a custom
+   * property the tier below writes.
+   *
+   * **The two range inputs over it are invisible and still there.** Not
+   * `display: none` and not `visibility: hidden`, either of which would take them
+   * out of the tab order and out of the accessibility tree, which is the entire
+   * reason a square built this way is reachable at all. They carry
+   * `pointer-events: none` so the square answers the pointer itself, and the focus
+   * ring is drawn on the square rather than on them, so it lands where the reader
+   * is looking.
+   *
+   * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
+   * background is just a different colour, and the one thing a preview owes a
+   * reader is the difference between "pale blue" and "blue, half transparent".
+   *
+   * No padding and no surface of its own. Flat on a page it takes the space it is
+   * given, and in Input Color's panel the panel supplies both: a picker that
+   * brought its own card would be a card inside a card there.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `alpha`: Whether the colour carries an alpha channel.
+   *
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a picker on
+   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   * - `no-format`/`noFormat`: Whether the reader may change the format.
+   * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
+   * - `swatches`: Colours offered under the picker, as a comma-separated list.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `color`: Where the picker stands: what was moved, or what the value says, or the start. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the colour changes.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `focus(options?: FocusOptions) => void`: Puts the keyboard on the square, which is the control a reader wants.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--color-inset`: Inset of the rows under the square, and the bottom. (default: `undefined`)
+   * - `--color-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
+   * - `--color-grid-radii`: Corner radius of the square. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `grid`: The saturation and brightness square.
+   * - `grid-handle`: The mark showing where in the square the colour sits.
+   * - `grid-saturation`: The range input for the square's horizontal axis.
+   * - `grid-brightness`: The range input for its vertical axis.
+   * - `controls`: The row under the square.
+   * - `sample`: The chip of the current colour, in that row.
+   * - `channels`: The ramps beside it.
+   * - `channel`: One ramp.
+   * - `eyedropper`: The control that samples a colour from the screen.
+   * - `footer`: The row holding the syntax toggle and the presets.
+   * - `format`: The control that changes the syntax the value is written in.
+   * - `swatches`: The row of presets.
+   * - `swatch`: One preset.
+   */
+  "helix-color": Partial<HelixColorProps & BaseProps<HelixColor> & BaseEvents>;
+
+  /**
    * The panel is `surface-overlay` with a shadow, because that is what it is: a
    * thing over the page rather than on it. The scrim is drawn on `::backdrop`,
    * which is the platform's own element for it and sits in the top layer with the
@@ -10066,30 +10369,19 @@ export type CustomElements = {
   /**
    * The frame is the field rather than the input, so the trigger sits inside the
    * same box as the text and the focus ring is drawn once around the whole
-   * control. The trigger carries a chip of the colour, which is the only part of
-   * this component that says what it holds without being read.
+   * control.
    *
-   * **The square is painted in three layers, not composited from elements**: the
-   * hue underneath, white sliding in from the left to take the saturation out,
-   * black rising from the bottom to take the brightness out. One element, one
-   * declaration, and it repaints as the hue moves because the hue is a custom
-   * property the tier below writes.
+   * **The trigger fills the trailing end rather than sitting in it as an icon.** A
+   * colour field has one thing to show and it is a colour, so the swatch takes the
+   * height of the control and reads as a block of it. It is the one field here
+   * whose trailing affordance is the value itself: Input Date's calendar mark
+   * stands for an action, and an action stretched to field height is a large icon
+   * and nothing more.
    *
-   * **The two range inputs over it are invisible and still there.** Not
-   * `display: none` and not `visibility: hidden`, either of which would take them
-   * out of the tab order and out of the accessibility tree, which is the entire
-   * reason a square built this way is reachable at all. They carry
-   * `pointer-events: none` so the square answers the pointer itself, and the focus
-   * ring is drawn on the square rather than on them, so it lands where the reader
-   * is looking.
-   *
-   * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
-   * background is just a different colour, and the one thing a preview owes a
-   * reader is the difference between "pale blue" and "blue, half transparent".
-   *
-   * The hue ramp and the square's base take no token. Every other colour here is a
-   * role a theme may change; the wheel is not one, and a themed picker would be
-   * one that lies about what it selects.
+   * **The panel has no padding, and clips instead.** The square runs to its edge
+   * and takes the panel's rounded corners from being clipped by it, rather than
+   * sitting inset with a band of overlay showing on all four sides. The picker
+   * pads its own lower rows.
    *
    * ## Attributes & Properties
    *
@@ -10135,16 +10427,10 @@ export type CustomElements = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `alpha`: Whether the colour carries an alpha channel.
-   *
-   * Off by default, because it widens every value written, and a consumer who
-   * did not ask for transparency should not have to strip a byte off each one.
    * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
-   *
-   * Only what is written. Everything is read whatever this says, so a field on
-   * `hex` still takes a pasted `rgb()` and stores the hex for it.
    * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
    * - `placeholder`: What the field says before a colour is in it.
-   * - `swatches`: Colours offered under the panel, as a comma-separated list.
+   * - `swatches`: Colours offered under the picker, as a comma-separated list.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -10261,19 +10547,7 @@ export type CustomElements = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the colour, inside the trigger.
    * - `surface`: The floating panel.
-   * - `grid`: The saturation and brightness square.
-   * - `grid-handle`: The mark showing where in the square the colour sits.
-   * - `grid-saturation`: The range input for the square's horizontal axis.
-   * - `grid-brightness`: The range input for its vertical axis.
-   * - `controls`: The row under the square.
-   * - `sample`: The larger chip of the current colour, in that row.
-   * - `channels`: The ramps beside it.
-   * - `channel`: One ramp.
-   * - `footer`: The row holding the syntax toggle and the presets.
-   * - `eyedropper`: The control that samples a colour from the screen.
-   * - `format`: The control that changes the syntax the value is written in.
-   * - `swatches`: The row of presets.
-   * - `swatch`: One preset.
+   * - `picker`: The colour picker inside it.
    */
   "helix-input-color": Partial<
     HelixInputColorProps & BaseProps<HelixInputColor> & BaseEvents
@@ -15807,6 +16081,159 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * **The square is painted in three layers, not composited from elements**: the
+   * hue underneath, white sliding in from the left to take the saturation out,
+   * black rising from the bottom to take the brightness out. One element, one
+   * declaration, and it repaints as the hue moves because the hue is a custom
+   * property the tier below writes.
+   *
+   * **The two range inputs over it are invisible and still there.** Not
+   * `display: none` and not `visibility: hidden`, either of which would take them
+   * out of the tab order and out of the accessibility tree, which is the entire
+   * reason a square built this way is reachable at all. They carry
+   * `pointer-events: none` so the square answers the pointer itself, and the focus
+   * ring is drawn on the square rather than on them, so it lands where the reader
+   * is looking.
+   *
+   * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
+   * background is just a different colour, and the one thing a preview owes a
+   * reader is the difference between "pale blue" and "blue, half transparent".
+   *
+   * No padding and no surface of its own. Flat on a page it takes the space it is
+   * given, and in Input Color's panel the panel supplies both: a picker that
+   * brought its own card would be a card inside a card there.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `alpha`: Whether the colour carries an alpha channel.
+   *
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a picker on
+   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   * - `no-format`/`noFormat`: Whether the reader may change the format.
+   * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
+   * - `swatches`: Colours offered under the picker, as a comma-separated list.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `color`: Where the picker stands: what was moved, or what the value says, or the start. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the colour changes.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `focus(options?: FocusOptions) => void`: Puts the keyboard on the square, which is the control a reader wants.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--color-inset`: Inset of the rows under the square, and the bottom. (default: `undefined`)
+   * - `--color-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
+   * - `--color-grid-radii`: Corner radius of the square. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `grid`: The saturation and brightness square.
+   * - `grid-handle`: The mark showing where in the square the colour sits.
+   * - `grid-saturation`: The range input for the square's horizontal axis.
+   * - `grid-brightness`: The range input for its vertical axis.
+   * - `controls`: The row under the square.
+   * - `sample`: The chip of the current colour, in that row.
+   * - `channels`: The ramps beside it.
+   * - `channel`: One ramp.
+   * - `eyedropper`: The control that samples a colour from the screen.
+   * - `footer`: The row holding the syntax toggle and the presets.
+   * - `format`: The control that changes the syntax the value is written in.
+   * - `swatches`: The row of presets.
+   * - `swatch`: One preset.
+   */
+  "helix-color": Partial<
+    HelixColorProps &
+      HelixColorSolidJsProps &
+      BaseProps<HelixColor> &
+      BaseEvents
+  >;
+
+  /**
    * The panel is `surface-overlay` with a shadow, because that is what it is: a
    * thing over the page rather than on it. The scrim is drawn on `::backdrop`,
    * which is the platform's own element for it and sits in the top layer with the
@@ -16462,30 +16889,19 @@ export type CustomElementsSolidJs = {
   /**
    * The frame is the field rather than the input, so the trigger sits inside the
    * same box as the text and the focus ring is drawn once around the whole
-   * control. The trigger carries a chip of the colour, which is the only part of
-   * this component that says what it holds without being read.
+   * control.
    *
-   * **The square is painted in three layers, not composited from elements**: the
-   * hue underneath, white sliding in from the left to take the saturation out,
-   * black rising from the bottom to take the brightness out. One element, one
-   * declaration, and it repaints as the hue moves because the hue is a custom
-   * property the tier below writes.
+   * **The trigger fills the trailing end rather than sitting in it as an icon.** A
+   * colour field has one thing to show and it is a colour, so the swatch takes the
+   * height of the control and reads as a block of it. It is the one field here
+   * whose trailing affordance is the value itself: Input Date's calendar mark
+   * stands for an action, and an action stretched to field height is a large icon
+   * and nothing more.
    *
-   * **The two range inputs over it are invisible and still there.** Not
-   * `display: none` and not `visibility: hidden`, either of which would take them
-   * out of the tab order and out of the accessibility tree, which is the entire
-   * reason a square built this way is reachable at all. They carry
-   * `pointer-events: none` so the square answers the pointer itself, and the focus
-   * ring is drawn on the square rather than on them, so it lands where the reader
-   * is looking.
-   *
-   * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
-   * background is just a different colour, and the one thing a preview owes a
-   * reader is the difference between "pale blue" and "blue, half transparent".
-   *
-   * The hue ramp and the square's base take no token. Every other colour here is a
-   * role a theme may change; the wheel is not one, and a themed picker would be
-   * one that lies about what it selects.
+   * **The panel has no padding, and clips instead.** The square runs to its edge
+   * and takes the panel's rounded corners from being clipped by it, rather than
+   * sitting inset with a band of overlay showing on all four sides. The picker
+   * pads its own lower rows.
    *
    * ## Attributes & Properties
    *
@@ -16531,16 +16947,10 @@ export type CustomElementsSolidJs = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `alpha`: Whether the colour carries an alpha channel.
-   *
-   * Off by default, because it widens every value written, and a consumer who
-   * did not ask for transparency should not have to strip a byte off each one.
    * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
-   *
-   * Only what is written. Everything is read whatever this says, so a field on
-   * `hex` still takes a pasted `rgb()` and stores the hex for it.
    * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
    * - `placeholder`: What the field says before a colour is in it.
-   * - `swatches`: Colours offered under the panel, as a comma-separated list.
+   * - `swatches`: Colours offered under the picker, as a comma-separated list.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -16657,19 +17067,7 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the colour, inside the trigger.
    * - `surface`: The floating panel.
-   * - `grid`: The saturation and brightness square.
-   * - `grid-handle`: The mark showing where in the square the colour sits.
-   * - `grid-saturation`: The range input for the square's horizontal axis.
-   * - `grid-brightness`: The range input for its vertical axis.
-   * - `controls`: The row under the square.
-   * - `sample`: The larger chip of the current colour, in that row.
-   * - `channels`: The ramps beside it.
-   * - `channel`: One ramp.
-   * - `footer`: The row holding the syntax toggle and the presets.
-   * - `eyedropper`: The control that samples a colour from the screen.
-   * - `format`: The control that changes the syntax the value is written in.
-   * - `swatches`: The row of presets.
-   * - `swatch`: One preset.
+   * - `picker`: The colour picker inside it.
    */
   "helix-input-color": Partial<
     HelixInputColorProps &
@@ -21032,6 +21430,12 @@ export type CustomCssProperties = {
   "--checkbox-card-background-color"?: string;
   /** Edge around one. */
   "--checkbox-card-border-color"?: string;
+  /** Inset of the rows under the square, and the bottom. */
+  "--color-inset"?: string;
+  /** Aspect ratio of the square. */
+  "--color-grid-ratio"?: string;
+  /** Corner radius of the square. */
+  "--color-grid-radii"?: string;
   /** How big the mark above the title is. */
   "--dialog-icon-size"?: string;
   /** Width of the panel. */

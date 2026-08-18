@@ -25,6 +25,7 @@
   flex: 1 1 auto;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-medium);
   min-inline-size: 0;
 }
 
@@ -97,7 +98,7 @@
   inline-size: max-content;
   inset: auto;
   margin: var(--helix-space-none);
-  padding: var(--helix-space-xs);
+  padding: var(--helix-space-sm);
   position: absolute;
 }
 

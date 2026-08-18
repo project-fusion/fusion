@@ -156,29 +156,6 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
-   * Square at the control height, and the glyph is all of it.
-   *
-   * The glyph was three stacked bars, which is not a glyph, it is *the* menu
-   * icon: the card read as a hamburger button and the subject became what the
-   * button opens rather than what the button is. Three dots is the one mark in
-   * common use that means "this control's content is an icon, and the icon is
-   * not the point", and nothing else in the gallery uses it.
-   */
-  'icon-button': (
-    <>
-      <g className="artMotion artLift">
-        <g className="artLiftShadow" filter="url(#helixArtShadow)">
-          <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
-        </g>
-        <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
-        {[150, 160, 170].map((cx) => (
-          <circle className="artOnSolid" cx={cx} cy="100" key={cx} r="2" />
-        ))}
-      </g>
-    </>
-  ),
-
   /** More than one of them is the answer, and only those carry a band. */
   /**
    * The field an `Input` draws, with a button welded to each end.
@@ -220,6 +197,62 @@ export const formsArt: Record<string, ReactNode> = {
    * Three tracks with their handles at three different places says "channels"
    * without borrowing the attention.
    */
+  /**
+   * The square, and the ramp under it.
+   *
+   * Tonal rather than coloured, like every card here. A hue ramp is the one
+   * thing this component has that a picture could show literally, and showing it
+   * would make this the only card in the gallery painted in something other than
+   * the ink: the row would read as one card lit up and the rest switched off.
+   * The square's gradient carries the idea on its own.
+   */
+  color: (
+    <>
+      {/* Light at the top left, dark along the bottom, which is the shape of a
+          saturation and brightness square whatever colour it is drawn in. */}
+      <rect className="artSunken" height="96" rx="4" width="224" x="48" y="48" />
+      <rect className="artInk" fillOpacity="0.28" height="96" rx="4" width="224" x="48" y="48" />
+      <rect className="artEdge" height="95" rx="4" width="223" x="48.5" y="48.5" />
+      {/* The handle, moving across the square rather than growing on it: a
+          picker's mark travels, and `artFill` would have drawn it swelling in
+          place, which is what a loading state looks like. */}
+      <g className="artMotion artTravel" style={{ '--art-to': '48px' } as CSSProperties}>
+        <g filter="url(#helixArtShadow)">
+          <circle className="artOverlay" cx="132" cy="80" r="9" />
+        </g>
+      </g>
+      {/* The ramp, and the chip beside it that says what was chosen. */}
+      <rect className="artSolid" height="20" rx="4" width="20" x="48" y="160" />
+      <rect className="artRule" height="8" rx="4" width="188" x="84" y="166" />
+      <g filter="url(#helixArtShadow)">
+        <circle className="artOverlay" cx="200" cy="170" r="8" />
+      </g>
+    </>
+  ),
+
+  /**
+   * Square at the control height, and the glyph is all of it.
+   *
+   * The glyph was three stacked bars, which is not a glyph, it is *the* menu
+   * icon: the card read as a hamburger button and the subject became what the
+   * button opens rather than what the button is. Three dots is the one mark in
+   * common use that means "this control's content is an icon, and the icon is
+   * not the point", and nothing else in the gallery uses it.
+   */
+  'icon-button': (
+    <>
+      <g className="artMotion artLift">
+        <g className="artLiftShadow" filter="url(#helixArtShadow)">
+          <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
+        </g>
+        <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
+        {[150, 160, 170].map((cx) => (
+          <circle className="artOnSolid" cx={cx} cy="100" key={cx} r="2" />
+        ))}
+      </g>
+    </>
+  ),
+
   'input-color': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />

@@ -1,0 +1,284 @@
+/* The inset the rows under the square take, and the picker's own bottom.
+ *
+ * Zero by default, because flat on a page this element is the content and
+ * whatever holds it owns the margin. Input Color's panel sets it, so the square
+ * runs edge to edge and only the rows beneath are brought in: a square inset on
+ * all four sides leaves a band of overlay around it and reads as a picture of a
+ * picker rather than as one.
+ *
+ * On the rows rather than on the host, which is the whole point. Padding here
+ * would inset the square too, which is what it did first. */
+:host {
+  display: block;
+  padding-block-end: var(--color-inset, var(--helix-space-none));
+}
+
+/* The chip of the current colour, and every preset: one square, two sizes.
+ *
+ * A checkerboard behind the colour rather than a solid, so a colour carrying
+ * alpha reads as partly transparent instead of as a slightly different colour.
+ * Two gradients rather than an image, because a data URI would be a second thing
+ * to theme and this one only ever needs two greys. */
+[part="sample"],
+[part="swatch"] {
+  background-image:
+    linear-gradient(var(--_color, transparent), var(--_color, transparent)),
+    conic-gradient(
+      var(--helix-color-surface-sunken) 0 25%,
+      var(--helix-color-surface) 0 50%,
+      var(--helix-color-surface-sunken) 0 75%,
+      var(--helix-color-surface) 0
+    );
+  background-size:
+    100% 100%,
+    var(--helix-space-sm) var(--helix-space-sm);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+}
+
+/* The square: saturation left to right over brightness top to bottom, which is
+ * the picker every reader has already used.
+ *
+ * Three layers in one declaration, painted back to front: the hue underneath,
+ * white sliding in from the left to take the saturation out, black rising from
+ * the bottom to take the brightness out. The hue is `--_hue`, written by the
+ * tier below, so the square repaints as the ramp moves.
+ *
+ * The hue is raw `hsl()` and takes no token. Every other colour in this file is
+ * a role a theme may change; the wheel is not one, and a themed picker would be
+ * one that lies about what it selects. */
+[part="grid"] {
+  aspect-ratio: var(--color-grid-ratio, 1 / 0.7);
+  background-image:
+    linear-gradient(to top, hsl(0 0% 0%), transparent),
+    linear-gradient(to right, hsl(0 0% 100%), transparent),
+    linear-gradient(hsl(var(--_hue) 100% 50%), hsl(var(--_hue) 100% 50%));
+  border-radius: var(--color-grid-radii, var(--helix-radii-sm));
+  cursor: crosshair;
+  position: relative;
+  touch-action: none;
+}
+
+/* Where the colour is. Positioned from the two channels, which is the same pair
+   of numbers the two ranges hold: nothing here measures anything. */
+[part="grid-handle"] {
+  block-size: var(--helix-size-icon-sm);
+  border: var(--helix-border-thick) solid var(--helix-color-surface);
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-sm);
+  inline-size: var(--helix-size-icon-sm);
+  inset-block-start: calc(100% - var(--_brightness, 100%));
+  inset-inline-start: var(--_saturation, 100%);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* The two axes, as real range inputs.
+ *
+ * Invisible and laid over the square rather than hidden away from it, so the
+ * focus ring lands on the square a reader is looking at. `pointer-events: none`
+ * because the square handles the pointer itself: a native range would otherwise
+ * answer a click with its own one-dimensional idea of where the thumb goes, and
+ * the vertical one would fight the horizontal one for the same pixel.
+ *
+ * Not `display: none` and not `visibility: hidden`, either of which would take
+ * them out of the tab order and out of the accessibility tree, which is the
+ * whole reason they exist. */
+[part="grid-saturation"],
+[part="grid-brightness"] {
+  appearance: none;
+  background: none;
+  inline-size: 100%;
+  inset: 0;
+  margin: var(--helix-space-none);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+[part="grid"]:has(:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="controls"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-xs);
+  padding-block-start: var(--helix-space-sm);
+  padding-inline: var(--color-inset, var(--helix-space-none));
+}
+
+[part="sample"] {
+  block-size: var(--helix-size-icon-lg);
+  flex: none;
+  inline-size: var(--helix-size-icon-lg);
+}
+
+[part="channels"] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 0;
+}
+
+/* The ramps are labelled for a screen reader and not for the eye: a hue bar
+   needs no caption, and two lines of text would be the tallest thing beside a
+   square. Clipped rather than `display: none`, which would take the name away
+   from the control it names. */
+[part="channel"]::part(label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  padding: var(--helix-space-none);
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Each track is painted with the colours it chooses, through the one hook Slider
+   publishes for it. */
+[part="channel"][data-channel="hue"] {
+  --slider-track-image: linear-gradient(
+    to right,
+    hsl(0 100% 50%),
+    hsl(60 100% 50%),
+    hsl(120 100% 50%),
+    hsl(180 100% 50%),
+    hsl(240 100% 50%),
+    hsl(300 100% 50%),
+    hsl(360 100% 50%)
+  );
+}
+
+/* The checkerboard again, under a ramp from clear to the colour itself, because
+   an opacity track drawn on a solid shows the same bar at every value the
+   background happens to match. */
+[part="channel"][data-channel="alpha"] {
+  --slider-track-image:
+    linear-gradient(to right, transparent, hsl(var(--_hue) 100% 50%)),
+    conic-gradient(
+      var(--helix-color-surface-sunken) 0 25%,
+      var(--helix-color-surface) 0 50%,
+      var(--helix-color-surface-sunken) 0 75%,
+      var(--helix-color-surface) 0
+    );
+  background-size:
+    100% 100%,
+    var(--helix-space-sm) var(--helix-space-sm);
+}
+
+/* No fill and no unfilled remainder: on these two the track is the value rather
+   than a measure of it, so a coloured half would be a second reading of
+   something the ramp already says. */
+[part="channel"] {
+  --slider-fill-color: transparent;
+  --slider-track-color: transparent;
+}
+
+/* The syntax toggle and the presets share a row. Neither fills one, and the
+   alternative was a column beside the ramps, which left the hue bar eighty
+   pixels wide to pick one of three hundred and sixty out of. */
+[part="footer"] {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs);
+  padding-block-start: var(--helix-space-sm);
+  padding-inline: var(--color-inset, var(--helix-space-none));
+}
+
+/* Drawn only when it holds something. With no presets and no toggle this is an
+   empty box, and an empty box still takes its padding. */
+[part="footer"]:empty {
+  display: none;
+}
+
+[part="eyedropper"],
+[part="format"] {
+  all: unset;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="eyedropper"]:hover,
+[part="format"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+  color: var(--helix-color-foreground);
+}
+
+[part="eyedropper"]:focus-visible,
+[part="format"]:focus-visible,
+[part="swatch"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Drawn rather than slotted, the same stencil-over-a-coloured-box the checkbox
+   uses, so a colour picker costs no icon dependency and no element to fill. */
+[part="eyedropper"] {
+  background-color: currentColor;
+  block-size: var(--helix-size-icon);
+  flex: none;
+  inline-size: var(--helix-size-icon);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 4a2.8 2.8 0 0 1 4 4l-8 8-4 1 1-4z'/%3E%3Cpath d='M11 10 4 17v3h3l7-7'/%3E%3C/svg%3E");
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: 70%;
+}
+
+[part="eyedropper"]:hover {
+  background-color: var(--helix-color-foreground);
+}
+
+/* The syntax, written out. Uppercased in the stylesheet rather than in the
+   markup, so the accessible name stays a word rather than an abbreviation a
+   screen reader spells out. */
+[part="format"] {
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  min-block-size: var(--helix-size-icon);
+  padding-inline: var(--helix-space-2xs);
+  text-transform: uppercase;
+}
+
+[part="swatches"] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xs);
+  justify-content: flex-end;
+}
+
+[part="swatch"] {
+  block-size: var(--helix-size-icon-md);
+  cursor: pointer;
+  inline-size: var(--helix-size-icon-md);
+  padding: var(--helix-space-none);
+}
+
+/* The one already chosen, marked by a ring rather than by a check drawn over it:
+   a mark on top of a swatch covers the colour the swatch exists to show. */
+[part="swatch"][aria-pressed="true"] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-primary);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="eyedropper"],
+  [part="format"] {
+    transition: none;
+  }
+}

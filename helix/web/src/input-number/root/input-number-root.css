@@ -82,6 +82,7 @@
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
   inline-size: 100%;
   min-inline-size: 0;
   /* Tabular, because the digits are what changes when a step is pressed and

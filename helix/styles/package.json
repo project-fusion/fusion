@@ -3,7 +3,7 @@
   "description": "Design tokens and base layer. Pure CSS, no JavaScript.",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "exports": {
     "./base.css": "./src/base.css",

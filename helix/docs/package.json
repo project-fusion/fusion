@@ -3,7 +3,7 @@
   "description": "Versioned documentation content and registry for Helix.",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

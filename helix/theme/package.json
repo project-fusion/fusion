@@ -3,7 +3,7 @@
   "description": "Theme derivation engine. Computes a complete, contrast-guaranteed token set from intent inputs.",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

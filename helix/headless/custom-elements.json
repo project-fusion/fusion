@@ -6287,6 +6287,908 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/color/color.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "toRgb",
+          "return": {
+            "type": {
+              "text": "{ blue: number; green: number; red: number }"
+            }
+          },
+          "parameters": [
+            {
+              "name": "color",
+              "type": {
+                "text": "Color"
+              }
+            }
+          ],
+          "description": "HSB to bytes, which is the road every written syntax goes down."
+        },
+        {
+          "kind": "function",
+          "name": "parseColor",
+          "return": {
+            "type": {
+              "text": "Color | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Any of the syntaxes to the working model, or `null` where it is not a colour.\n\nNamed colours are not here. Resolving `rebeccapurple` means either shipping\nthe table of a hundred and forty or asking the browser, and the browser is not\npresent on the server: a field that accepted a name client-side and rejected\nit during a server render would be worse than one that never took it."
+        },
+        {
+          "kind": "function",
+          "name": "formatColor",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "color",
+              "type": {
+                "text": "Color"
+              }
+            },
+            {
+              "name": "format",
+              "type": {
+                "text": "ColorFormat"
+              }
+            },
+            {
+              "name": "withAlpha",
+              "type": {
+                "text": "boolean"
+              }
+            }
+          ],
+          "description": "The working model back out, in the syntax asked for.\n\nThe alpha is written only where the component carries one. A consumer who did\nnot ask for transparency should not have to strip `ff` off every hex or read\npast a fourth argument they never wanted."
+        },
+        {
+          "kind": "function",
+          "name": "toCss",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "color",
+              "type": {
+                "text": "Color"
+              }
+            }
+          ],
+          "description": "The colour as CSS, for the swatches and the tracks. Always with its alpha."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "toRgb",
+          "declaration": {
+            "name": "toRgb",
+            "module": "src/color/color.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseColor",
+          "declaration": {
+            "name": "parseColor",
+            "module": "src/color/color.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "formatColor",
+          "declaration": {
+            "name": "formatColor",
+            "module": "src/color/color.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "toCss",
+          "declaration": {
+            "name": "toCss",
+            "module": "src/color/color.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/color/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/color/color.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/color/root/color-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/color/root/color-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**The picker itself, with no field around it.** Input Color is this element in\na panel behind a text field, the same way Input Date is `helix-calendar` in a\npanel: a form wants a field, and a settings pane or a toolbar wants the picker\nsitting flat on the page with nothing to open. Neither should be the other one\nwith parts hidden.\n\n**The square is two real range inputs.** Saturation and brightness are each an\n`<input type=\"range\">`, laid over the square and made invisible, and the\nhandle is drawn from their values. The pointer gets the square; the keyboard\ngets the arrow keys, Home, End and the page keys; a screen reader gets two\nsliders that announce a name and a number. All of it is the platform's, and\nnothing here implements a key handler. There is no `role=\"application\"`, which\nis the usual way this control is built and amounts to asking a screen reader\nto stop helping.\n\n**The working model is HSB, and the value is derived from it.** The reverse\nloses colours: black is `brightness: 0`, whose hue and saturation are both\nundefined, so a reader who drags to the bottom of the square and back would\nget grey where they had red. Holding the model means a colour survives a trip\nthrough one that has no hue. A value arriving from outside is read into the\nmodel once, which is the only moment the conversion runs in that direction.\n\n**Every syntax is read; the one `format` names is written.** `#f00`,\n`#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)` and `hsl(0 100% 50%)` are all\ncolours. Named colours are the exception, and deliberately: resolving\n`rebeccapurple` means shipping a table of a hundred and forty or asking the\nbrowser, and there is no browser during a server render.",
+          "name": "HelixBaseColor",
+          "cssParts": [
+            {
+              "description": "The saturation and brightness square.",
+              "name": "grid"
+            },
+            {
+              "description": "The mark showing where in the square the colour sits.",
+              "name": "grid-handle"
+            },
+            {
+              "description": "The range input for the square's horizontal axis.",
+              "name": "grid-saturation"
+            },
+            {
+              "description": "The range input for its vertical axis.",
+              "name": "grid-brightness"
+            },
+            {
+              "description": "The row under the square.",
+              "name": "controls"
+            },
+            {
+              "description": "The chip of the current colour, in that row.",
+              "name": "sample"
+            },
+            {
+              "description": "The ramps beside it.",
+              "name": "channels"
+            },
+            {
+              "description": "One ramp.",
+              "name": "channel"
+            },
+            {
+              "description": "The control that samples a colour from the screen.",
+              "name": "eyedropper"
+            },
+            {
+              "description": "The row holding the syntax toggle and the presets.",
+              "name": "footer"
+            },
+            {
+              "description": "The control that changes the syntax the value is written in.",
+              "name": "format"
+            },
+            {
+              "description": "The row of presets.",
+              "name": "swatches"
+            },
+            {
+              "description": "One preset.",
+              "name": "swatch"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "alpha",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
+              "attribute": "alpha",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "format",
+              "type": {
+                "text": "ColorFormat"
+              },
+              "default": "'hex'",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a picker on\n`hex` still takes an `rgb()` handed to it and stores the hex for it.",
+              "attribute": "format",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "noFormat",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may change the format.",
+              "attribute": "no-format"
+            },
+            {
+              "kind": "field",
+              "name": "noEyedropper",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the eyedropper is offered where the browser has one.",
+              "attribute": "no-eyedropper"
+            },
+            {
+              "kind": "field",
+              "name": "swatches",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Colours offered under the picker, as a comma-separated list.",
+              "attribute": "swatches"
+            },
+            {
+              "kind": "field",
+              "name": "moved",
+              "type": {
+                "text": "Color | undefined"
+              },
+              "privacy": "private",
+              "description": "The colour the reader has moved to, or nothing while they have moved none.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from anywhere else, so the\nnext reading comes from that value instead."
+            },
+            {
+              "kind": "field",
+              "name": "sampling",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether this browser can sample a colour off the screen.\n\nSettled after the first render rather than at construction, because there is\nno `window` on the server, and a button that ships in the markup and does\nnothing in Firefox is worse than one that is never offered."
+            },
+            {
+              "kind": "field",
+              "name": "owned",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the value on this element was produced here.\n\nThe one bit that keeps the model from being overwritten by the value it just\nproduced. Without it, dragging to the bottom of the square writes black,\nwhich reads back as hue 0 and saturation 0, and the next drag starts grey."
+            },
+            {
+              "kind": "field",
+              "name": "color",
+              "type": {
+                "text": "Color"
+              },
+              "description": "Where the picker stands: what was moved, or what the value says, or the start.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "presets",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The presets, as written, with anything that is not a colour dropped.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "move",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Moves part of the model and announces the value that follows from it."
+            },
+            {
+              "kind": "field",
+              "name": "handleSwatch",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Takes a preset, in this picker's syntax rather than as the preset spelled it."
+            },
+            {
+              "kind": "field",
+              "name": "handleFormat",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Walks the format on, and rewrites the value in it."
+            },
+            {
+              "kind": "field",
+              "name": "handleEyeDropper",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Samples a colour from anywhere on the screen.\n\n`helix-sample-start` and `helix-sample-end` bracket it, because whatever is\nholding this picker may need to get out of the way: `EyeDropper` takes the\npointer over, and a floating panel left up during it is one the reader\ncannot dismiss and may well be trying to sample from underneath. This\nelement cannot know it is in a panel, so it says what it is doing and lets\nwhatever does know decide."
+            },
+            {
+              "kind": "field",
+              "name": "handleGridPointer",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Dragging in the square.\n\nThe two ranges are the state, so this reads a point and writes to them\nrather than keeping a position of its own. Pointer capture, so a drag that\nleaves the square keeps going: leaving and coming back is how a reader\nreaches a corner, and without it the handle stops wherever the pointer left."
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ],
+              "description": "Puts the keyboard on the square, which is the control a reader wants.",
+              "type": {
+                "text": "focus(options?: FocusOptions) => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderChannel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "channel",
+                  "type": {
+                    "text": "'alpha' | 'hue'"
+                  }
+                },
+                {
+                  "name": "label",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "max",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "One of the ramps under the square."
+            },
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onValueChange",
+              "type": {
+                "text": "((value: string) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestValue",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a new value, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. In uncontrolled mode the control then\nupdates itself; in controlled mode it applies nothing and waits for the\nconsumer to pass a new `value`, which is what controlled means.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "requestValue(next: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared.\n\nBoth halves are dropped, the consumer's and the control's, because a\nreset means the form is as it was served. Clearing only the internal one\nwould leave a control that had been written to stuck at that value.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "default": "false",
+              "description": "Whether an ancestor `<fieldset disabled>` has switched this control off.\n\nThe platform tells a form-associated element through `formDisabledCallback`\nand nothing here implemented it, so a control inside a disabled fieldset\nstayed fully typeable and announced itself as enabled. Measured: a\n`helix-input` in one accepted text, reported `disabled` as false, and\ncarried no `aria-disabled`.\n\nWhat the platform already did on its own is the submission half. The same\nmeasurement showed the fieldset's controls absent from the form's entry\nlist and the host matching `:disabled`, so the value never went anywhere.\nWhat was missing is everything a reader can see or touch.\n\nState rather than the `disabled` property. Writing that would reflect an\nattribute the consumer's server markup does not have, which React reports\non hydration and does not patch up, and it would also silently overwrite\nwhat the consumer set.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formDisabledCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "disabled",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The platform's notice that an ancestor fieldset changed.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              },
+              "type": {
+                "text": "formDisabledCallback(disabled: boolean) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired when the colour changes.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "alpha",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
+              "fieldName": "alpha"
+            },
+            {
+              "name": "format",
+              "type": {
+                "text": "ColorFormat"
+              },
+              "default": "'hex'",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a picker on\n`hex` still takes an `rgb()` handed to it and stores the hex for it.",
+              "fieldName": "format"
+            },
+            {
+              "name": "no-format",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may change the format.",
+              "fieldName": "noFormat"
+            },
+            {
+              "name": "no-eyedropper",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the eyedropper is offered where the browser has one.",
+              "fieldName": "noEyedropper"
+            },
+            {
+              "name": "swatches",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Colours offered under the picker, as a comma-separated list.",
+              "fieldName": "swatches"
+            },
+            {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinControllerValue",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixFormElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Picks a colour, from a square and two ramps.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/color",
+            "aliases": [
+              "ColorPicker",
+              "ColorArea",
+              "Swatch picker"
+            ],
+            "tier": "headless",
+            "group": "BaseColor",
+            "part": "Root"
+          },
+          "tagName": "helix-base-color",
+          "customElement": true,
+          "modulePath": "src/color/root/color-root.ts",
+          "definitionPath": "src/color/root/color-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseColor",
+          "declaration": {
+            "name": "HelixBaseColor",
+            "module": "src/color/root/color-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-color",
+          "declaration": {
+            "name": "HelixBaseColor",
+            "module": "src/color/root/color-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/dialog/index.ts",
       "declarations": [],
       "exports": [
@@ -8989,6 +9891,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/color/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/dialog/index.js"
           }
         },
@@ -9324,141 +10234,9 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/input-color/color.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "toRgb",
-          "return": {
-            "type": {
-              "text": "{ blue: number; green: number; red: number }"
-            }
-          },
-          "parameters": [
-            {
-              "name": "color",
-              "type": {
-                "text": "Color"
-              }
-            }
-          ],
-          "description": "HSB to bytes, which is the road every written syntax goes down."
-        },
-        {
-          "kind": "function",
-          "name": "parseColor",
-          "return": {
-            "type": {
-              "text": "Color | null"
-            }
-          },
-          "parameters": [
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "description": "Any of the syntaxes to the working model, or `null` where it is not a colour.\n\nNamed colours are not here. Resolving `rebeccapurple` means either shipping\nthe table of a hundred and forty or asking the browser, and the browser is not\npresent on the server: a field that accepted a name client-side and rejected\nit during a server render would be worse than one that never took it."
-        },
-        {
-          "kind": "function",
-          "name": "formatColor",
-          "return": {
-            "type": {
-              "text": "string"
-            }
-          },
-          "parameters": [
-            {
-              "name": "color",
-              "type": {
-                "text": "Color"
-              }
-            },
-            {
-              "name": "format",
-              "type": {
-                "text": "ColorFormat"
-              }
-            },
-            {
-              "name": "withAlpha",
-              "type": {
-                "text": "boolean"
-              }
-            }
-          ],
-          "description": "The working model back out, in the syntax asked for.\n\nThe alpha is written only where the component carries one. A consumer who did\nnot ask for transparency should not have to strip `ff` off every hex or read\npast a fourth argument they never wanted."
-        },
-        {
-          "kind": "function",
-          "name": "toCss",
-          "return": {
-            "type": {
-              "text": "string"
-            }
-          },
-          "parameters": [
-            {
-              "name": "color",
-              "type": {
-                "text": "Color"
-              }
-            }
-          ],
-          "description": "The colour as CSS, for the swatches and the tracks. Always with its alpha."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "toRgb",
-          "declaration": {
-            "name": "toRgb",
-            "module": "src/input-color/color.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "parseColor",
-          "declaration": {
-            "name": "parseColor",
-            "module": "src/input-color/color.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "formatColor",
-          "declaration": {
-            "name": "formatColor",
-            "module": "src/input-color/color.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "toCss",
-          "declaration": {
-            "name": "toCss",
-            "module": "src/input-color/color.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/input-color/index.ts",
       "declarations": [],
       "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/input-color/color.js"
-          }
-        },
         {
           "kind": "js",
           "name": "*",
@@ -9475,7 +10253,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**The panel is a saturation and brightness square with a hue ramp under it**,\nwhich is the shape of every colour picker a reader has already met. An earlier\nversion of this component was three labelled sliders instead, on the grounds\nthat a two-dimensional control has no semantics. That reasoning was right and\nthe conclusion was wrong: it treated \"no semantics\" as the end of the question\nrather than as the thing to solve.\n\n**So the square is two real range inputs.** Saturation and brightness are each\nan `<input type=\"range\">`, laid over the square and made invisible, and the\nhandle is drawn from their values. The pointer gets the square; the keyboard\ngets the arrow keys, Home, End and the page keys; a screen reader gets two\nsliders that announce a name and a number. All of it is the platform's, and\nnothing here implements a key handler. There is no `role=\"application\"`, which\nis the usual way this control is built and amounts to asking a screen reader\nto stop helping.\n\n**The working model is HSB, and the value is derived from it.** The reverse\nloses colours: black is `brightness: 0`, whose hue and saturation are both\nundefined, so a reader who drags to the bottom of the square and back would\nget grey where they had red. Holding the model means a colour survives a trip\nthrough one that has no hue. A value arriving from outside, or typed into the\nfield, is read into the model once, which is the only moment the conversion\nruns in that direction.\n\n**Every syntax is read; the one `format` names is written.** `#f00`,\n`#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)` and `hsl(0 100% 50%)` are all\ncolours, and a field that refuses one because it prefers another is arguing\nwith the person using it. Named colours are the exception, and deliberately:\nresolving `rebeccapurple` means shipping a table of a hundred and forty or\nasking the browser, and there is no browser during a server render.",
+          "description": "**The picker is `helix-color`, not a second one written here.** It owns the\nsquare, the ramps, the eyedropper and the syntax toggle, and it is worth\nhaving on its own: a settings pane wants a picker flat on the page with\nnothing to open. This element is the field, the overlay, and the form.\nExactly the arrangement Input Date has with `helix-calendar`.\n\n**Typed as well as picked, and the typing is the reason this is not\n`<input type=\"color\">`.** The native control gives a free picker and takes\nnearly all styling with it, which is a fair trade until a product needs the\npanel to match everything around it. What is kept from the native one is the\npart worth keeping: a real text field, so a reader who has the hex pastes it\nand never opens anything.\n\n**Every syntax is read; the one `format` names is written.** `#f00`,\n`#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)`, `rgb(255 0 0 / 50%)` and\n`hsl(0 100% 50%)` are all colours, and a field that refuses one because it\nprefers another is arguing with the person using it. What the field *shows* is\nthe value itself, for the reason Input Date gives about its dates: half-typed\ninput does not survive a round trip through a formatter.",
           "name": "HelixBaseInputColor",
           "cssParts": [
             {
@@ -9499,56 +10277,8 @@
               "name": "surface"
             },
             {
-              "description": "The saturation and brightness square.",
-              "name": "grid"
-            },
-            {
-              "description": "The mark showing where in the square the colour sits.",
-              "name": "grid-handle"
-            },
-            {
-              "description": "The range input for the square's horizontal axis.",
-              "name": "grid-saturation"
-            },
-            {
-              "description": "The range input for its vertical axis.",
-              "name": "grid-brightness"
-            },
-            {
-              "description": "The row under the square.",
-              "name": "controls"
-            },
-            {
-              "description": "The larger chip of the current colour, in that row.",
-              "name": "sample"
-            },
-            {
-              "description": "The ramps beside it.",
-              "name": "channels"
-            },
-            {
-              "description": "One ramp.",
-              "name": "channel"
-            },
-            {
-              "description": "The row holding the syntax toggle and the presets.",
-              "name": "footer"
-            },
-            {
-              "description": "The control that samples a colour from the screen.",
-              "name": "eyedropper"
-            },
-            {
-              "description": "The control that changes the syntax the value is written in.",
-              "name": "format"
-            },
-            {
-              "description": "The row of presets.",
-              "name": "swatches"
-            },
-            {
-              "description": "One preset.",
-              "name": "swatch"
+              "description": "The colour picker inside it.",
+              "name": "picker"
             }
           ],
           "slots": [
@@ -9573,7 +10303,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
+              "description": "Whether the colour carries an alpha channel.",
               "attribute": "alpha",
               "reflects": true
             },
@@ -9584,7 +10314,7 @@
                 "text": "ColorFormat"
               },
               "default": "'hex'",
-              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a field on\n`hex` still takes a pasted `rgb()` and stores the hex for it.",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.",
               "attribute": "format",
               "reflects": true
             },
@@ -9615,7 +10345,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the panel, as a comma-separated list.",
+              "description": "Colours offered under the picker, as a comma-separated list.",
               "attribute": "swatches"
             },
             {
@@ -9627,35 +10357,6 @@
               "default": "'Choose a colour'",
               "description": "Accessible name for the control that opens the panel.",
               "attribute": "trigger-label"
-            },
-            {
-              "kind": "field",
-              "name": "moved",
-              "type": {
-                "text": "Color | undefined"
-              },
-              "privacy": "private",
-              "description": "The colour the reader has moved to, or nothing while they have moved none.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from anywhere else, so the\nnext reading comes from that value instead."
-            },
-            {
-              "kind": "field",
-              "name": "sampling",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false",
-              "description": "Whether this browser can sample a colour off the screen.\n\nSettled after the first render rather than at construction, because there is\nno `window` on the server, and a button that ships in the markup and does\nnothing in Firefox is worse than one that is never offered."
-            },
-            {
-              "kind": "field",
-              "name": "owned",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false",
-              "description": "Whether the value on this element was produced by its own panel.\n\nThe one bit that keeps the model from being overwritten by the value it just\nproduced. Without it, dragging to the bottom of the square writes black,\nwhich reads back as hue 0 and saturation 0, and the next drag starts grey."
             },
             {
               "kind": "field",
@@ -9676,57 +10377,39 @@
             },
             {
               "kind": "field",
-              "name": "color",
+              "name": "painted",
               "type": {
-                "text": "Color"
+                "text": "string"
               },
               "privacy": "private",
-              "description": "Where the panel stands: what was moved, or what the value says, or the start.\n\nA getter rather than state seeded in `updated`, which is what an earlier\nversion did and is wrong on the server, where `updated` never runs. Every\nserver render shipped the starting colour, so the square painted a red ramp\nunder a blue already in the field and corrected it a frame later.",
+              "description": "What the picker should paint, which is only ever a colour.",
               "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "presets",
-              "type": {
-                "text": "string[]"
-              },
-              "privacy": "private",
-              "description": "The presets, as written, with anything that is not a colour dropped.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "move",
-              "privacy": "private",
-              "readonly": true,
-              "description": "Moves part of the model and writes the value that follows from it."
             },
             {
               "kind": "field",
               "name": "handleInput",
               "privacy": "private",
+              "readonly": true,
+              "description": "Relayed under this element's name, so a consumer hears one control."
+            },
+            {
+              "kind": "field",
+              "name": "handlePickerChange",
+              "privacy": "private",
               "readonly": true
             },
             {
               "kind": "field",
-              "name": "handleSwatch",
+              "name": "handleSampleStart",
               "privacy": "private",
               "readonly": true,
-              "description": "Takes a preset, in this field's syntax rather than as the preset spelled it."
+              "description": "The picker is about to take the pointer over, so the panel gets out of the\nway and comes back after.\n\n`helix-color` says what it is doing rather than reaching for a panel it\ncannot know it is in. A floating panel left up during an eyedropper is one\nthe reader cannot dismiss and may well be trying to sample from underneath."
             },
             {
               "kind": "field",
-              "name": "handleFormat",
+              "name": "handleSampleEnd",
               "privacy": "private",
-              "readonly": true,
-              "description": "Walks the format on, and rewrites the value in it."
-            },
-            {
-              "kind": "field",
-              "name": "handleEyeDropper",
-              "privacy": "private",
-              "readonly": true,
-              "description": "Samples a colour from anywhere on the screen.\n\nThe panel is shut for the duration and put back after. `EyeDropper` takes\nthe pointer over, and a floating panel left up during it is one the reader\ncannot dismiss and may well be trying to sample from underneath."
+              "readonly": true
             },
             {
               "kind": "method",
@@ -9737,7 +10420,7 @@
                   "text": "void"
                 }
               },
-              "description": "Puts the field back where the answer differs from what was typed.\n\n`requestValue` announces and decides; this is the other half, which Input\nand Input Date both need for the same reason: the native control has already\nchanged, so wherever the answer does not follow it, it has to be restored. A\nrefusal and a consumer who owns `value` and has not given a new one are the\nsame thing from here."
+              "description": "Puts the field back where the answer differs from what was typed.\n\n`requestValue` announces and decides; this is the other half, which Input\nand Input Date both need for the same reason: the native control has already\nchanged, so wherever the answer does not follow it, it has to be restored."
             },
             {
               "kind": "method",
@@ -9756,13 +10439,6 @@
               "privacy": "private",
               "readonly": true,
               "description": "Escape shuts the panel without moving the colour."
-            },
-            {
-              "kind": "field",
-              "name": "handleGridPointer",
-              "privacy": "private",
-              "readonly": true,
-              "description": "Dragging in the square.\n\nThe two ranges are the state, so this reads a point and writes to them\nrather than keeping a position of its own. Pointer capture, so a drag that\nleaves the square keeps going: leaving and coming back is how a reader\nreaches a corner, and without it the handle stops wherever the pointer left."
             },
             {
               "kind": "method",
@@ -9785,43 +10461,6 @@
               "type": {
                 "text": "focus(options?: FocusOptions) => void"
               }
-            },
-            {
-              "kind": "method",
-              "name": "renderChannel",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "channel",
-                  "type": {
-                    "text": "'alpha' | 'hue'"
-                  }
-                },
-                {
-                  "name": "label",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "max",
-                  "type": {
-                    "text": "number"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ],
-              "description": "One of the ramps under the square."
             },
             {
               "kind": "field",
@@ -10570,7 +11209,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
+              "description": "Whether the colour carries an alpha channel.",
               "fieldName": "alpha"
             },
             {
@@ -10579,7 +11218,7 @@
                 "text": "ColorFormat"
               },
               "default": "'hex'",
-              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a field on\n`hex` still takes a pasted `rgb()` and stores the hex for it.",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.",
               "fieldName": "format"
             },
             {
@@ -10606,7 +11245,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the panel, as a comma-separated list.",
+              "description": "Colours offered under the picker, as a comma-separated list.",
               "fieldName": "swatches"
             },
             {

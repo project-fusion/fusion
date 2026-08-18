@@ -23,33 +23,18 @@ describe('input color server output', () => {
     expect(markup).toContain('#3366ff')
   })
 
+  test('the preview carries the colour on the server', () => {
+    // Not read back from a computed style, which does not exist here: the swatch
+    // is painted from a custom property written into the markup.
+    expect(partTag(markup, 'preview')).toContain('51 102 255')
+  })
+
   test('the panel is served closed, and says so', () => {
     expect(partTag(markup, 'surface')).toContain('hidden')
     expect(partTag(markup, 'trigger')).toContain('aria-expanded="false"')
   })
 
-  test('the square is painted on first paint, not on the first client render', () => {
-    // `#3366ff` is rgb(51, 102, 255): hue 225, saturation 80, brightness 100.
-    // The model used to be seeded in `updated`, which never runs here, so every
-    // server render shipped a red square under a blue already in the field.
-    expect(partTag(markup, 'surface')).toContain('--_hue: 225')
-    expect(partTag(markup, 'grid')).toContain('--_saturation: 80%')
-    expect(partTag(markup, 'grid')).toContain('--_brightness: 100%')
-  })
-
-  test('both axes ship as real inputs, named', () => {
-    expect(partTag(markup, 'grid-saturation')).toContain('aria-label="Saturation"')
-    expect(partTag(markup, 'grid-brightness')).toContain('aria-label="Brightness"')
-  })
-
-  test('the eyedropper is not served, since the server cannot know about it', () => {
-    // A button that ships in the markup and does nothing in Firefox is worse
-    // than one that is never offered.
-    expect(hasPart(markup, 'eyedropper')).toBe(false)
-  })
-
-  test('the presets ship, since they are markup rather than state', () => {
-    expect(hasPart(markup, 'swatches')).toBe(true)
-    expect(markup).toContain('aria-label="#ff0000"')
+  test('the picker ships inside it, rather than being built on hydration', () => {
+    expect(partTag(markup, 'picker')).toContain('helix-color')
   })
 })
