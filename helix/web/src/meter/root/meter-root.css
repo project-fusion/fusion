@@ -32,7 +32,21 @@
 [part="track"] {
   background-color: var(--meter-track-color, var(--helix-color-surface-sunken));
   block-size: var(--meter-size, var(--helix-size-meter));
-  border-radius: var(--helix-radii-full);
+  /* The house radius, not the pill `Progress` wears, and the ticks are why.
+   *
+   * `radii-full` on an eight pixel bar resolves to a four pixel pill, so
+   * `Progress` has rendered at exactly `radii-sm` since the day it was written
+   * and nothing noticed. The token only starts to matter at twelve, and at
+   * twelve `full` makes this the roundest container in a library whose house
+   * value is four and is on nearly everything.
+   *
+   * The ticks settle it. They cut the fill into segments, so a pill-ended bar
+   * comes out as a run whose outer ends are round and whose inner ends are
+   * square: the first band reads as a capsule and the ones after it as offcuts.
+   * At four the segments agree with each other. `Progress` keeps its pill,
+   * because nothing cuts it and a bar reporting one quantity is a pill
+   * everywhere a reader has seen one. */
+  border-radius: var(--helix-radii-sm);
   inline-size: 100%;
   /* The fill has a radius of its own, and at low values its trailing corners
      would otherwise round outside the track. The ticks are clipped by it too,

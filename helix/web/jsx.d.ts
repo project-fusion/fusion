@@ -10078,13 +10078,19 @@ export type CustomElements = {
   "helix-menu": Partial<HelixMenuProps & BaseProps<HelixMenu> & BaseEvents>;
 
   /**
-   * The bar `Progress` draws, with the same corner and half again the height.
+   * The bar `Progress` draws, at half again the height and on the house corner
+   * rather than its pill.
    *
    * It shipped at the progress height, on the argument that the two stand beside
    * each other in a panel. Rendered side by side that turned out backwards: they
    * *are* two unrelated controls, and a reader telling a level from a task at a
    * glance is the point rather than the cost. A meter also carries more, a fill
    * and a mark at each threshold, and at eight pixels those marks are hairlines.
+   *
+   * The corner is the ticks' doing: they cut the fill into segments, and a
+   * pill-ended bar comes out as a run whose outer ends are round and whose inner
+   * ends are square. `radii-full` on an eight pixel bar was a four pixel pill
+   * anyway, so this is only a change at all because the bar grew.
    *
    * What else differs is what the colour means. A progress bar is one colour because
    * there is one thing to say; a meter's fill takes the success, warning or danger
@@ -15794,13 +15800,19 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * The bar `Progress` draws, with the same corner and half again the height.
+   * The bar `Progress` draws, at half again the height and on the house corner
+   * rather than its pill.
    *
    * It shipped at the progress height, on the argument that the two stand beside
    * each other in a panel. Rendered side by side that turned out backwards: they
    * *are* two unrelated controls, and a reader telling a level from a task at a
    * glance is the point rather than the cost. A meter also carries more, a fill
    * and a mark at each threshold, and at eight pixels those marks are hairlines.
+   *
+   * The corner is the ticks' doing: they cut the fill into segments, and a
+   * pill-ended bar comes out as a run whose outer ends are round and whose inner
+   * ends are square. `radii-full` on an eight pixel bar was a four pixel pill
+   * anyway, so this is only a change at all because the bar grew.
    *
    * What else differs is what the colour means. A progress bar is one colour because
    * there is one thing to say; a meter's fill takes the success, warning or danger
