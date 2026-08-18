@@ -209,6 +209,62 @@ export const formsArt: Record<string, ReactNode> = {
      below. Three rows of dots rather than a real month: at card scale the
      shapes are all a reader can see anyway, and drawing seven columns of
      numbers would be a picture of text. */
+  /**
+   * A field with a chip of the colour at its trailing end, and the three tracks
+   * it opens below.
+   *
+   * Tonal rather than coloured, like every card here. A hue ramp is the one
+   * thing this component has that a picture could show literally, and showing it
+   * would make this the only card on the page painted in something other than
+   * the ink: the row would read as one card lit up and the rest switched off.
+   * Three tracks with their handles at three different places says "channels"
+   * without borrowing the attention.
+   */
+  'input-color': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
+      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="60" />
+      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="60.5" />
+      {/* The hex, drawn as one run rather than as seven marks: it is a single
+          code, and a field showing a word here would be the wrong picture. */}
+      <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="64" x="64" y="76" />
+      {/* The chip. `artSolid`, because it is the one mark on this card standing
+          for a colour that was chosen rather than for furniture. */}
+      <rect className="artSolid" height="14" rx="3" width="14" x="240" y="73" />
+      {/* The panel: three tracks, each with its handle somewhere different, and
+          the top one moving. The pitch is 26, which is what puts the three in
+          the panel with the same gap above and below them. */}
+      <rect className="artSunken" height="90" rx="4" width="224" x="48" y="112" />
+      {[0, 1, 2].map((row) => (
+        <rect
+          className="artRule"
+          height="4"
+          key={row}
+          rx="2"
+          width="192"
+          x="64"
+          y={134 + row * 26}
+        />
+      ))}
+      {[
+        { at: 104, row: 1 },
+        { at: 176, row: 2 },
+      ].map(({ at, row }) => (
+        <g filter="url(#helixArtShadow)" key={row}>
+          <circle className="artOverlay" cx={at} cy={136 + row * 26} r="8" />
+        </g>
+      ))}
+      {/* `artTravel` rather than `artFill`: a handle moves along its track, and
+          the growing version of this drew a bar that got longer, which is what a
+          progress reading looks like and not what a channel does. */}
+      <g className="artMotion artTravel" style={{ '--art-to': '64px' } as CSSProperties}>
+        <g filter="url(#helixArtShadow)">
+          <circle className="artOverlay" cx="128" cy="136" r="8" />
+        </g>
+      </g>
+    </>
+  ),
+
   'input-date': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
@@ -236,12 +292,18 @@ export const formsArt: Record<string, ReactNode> = {
           />
         )),
       )}
+      {/* The selection moves to the next day. It had `artFill`, which scales,
+          so picking a date grew the circle by half rather than putting it
+          somewhere else, and `artFill` also pivots at `left center`, so it grew
+          sideways off its own column. Twenty eight units is the column pitch,
+          which is what makes the destination land on a day rather than between
+          two. */}
       <circle
-        className="artSolid artMotion artFill"
+        className="artSolid artMotion artTravel"
         cx="121"
         cy="151"
         r="9"
-        style={{ '--art-grow': 1.5 } as CSSProperties}
+        style={{ '--art-to': '28px' } as CSSProperties}
       />
     </>
   ),
@@ -450,7 +512,12 @@ export const formsArt: Record<string, ReactNode> = {
   switch: (
     <>
       <rect className="artSolid artMotion artOn" height="24" rx="12" width="42" x="139" y="88" />
-      <g className="artMotion artKnob" style={{ '--art-to': '20px' } as CSSProperties}>
+      {/* Eighteen, which is the distance between the two knob positions and
+          not a round number. The track runs 139 to 181 and the knob is inset
+          four, so on sits at 169 and off at 151. At twenty it drove two units
+          past the off position and pushed the knob into the track's own end
+          cap, which is what reads as an overshoot on the way left. */}
+      <g className="artMotion artKnob" style={{ '--art-to': '18px' } as CSSProperties}>
         <g filter="url(#helixArtShadow)">
           <circle className="artOverlay" cx="169" cy="100" r="8" />
         </g>

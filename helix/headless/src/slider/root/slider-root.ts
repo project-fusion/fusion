@@ -224,6 +224,19 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
   }
 
   protected override render(): TemplateResult {
+    /* The range's bounds are written before its value below, and that order is
+       the whole of this element's correctness on a wide scale. Lit commits
+       bindings in template order, and a range clamps whatever is assigned to the
+       bounds it holds at that moment: with the value first, a slider from 0 to
+       360 given 225 took the default max of 100, clamped to 100, and drew its
+       handle at 100/360.
+   *
+   * Found on Input Color's hue channel, where the handle sat at 28 per cent of a
+   * track whose fill said 62.5. The two disagreed because they are computed from
+   * different things: the fill is arithmetic on this element's property, and the
+   * handle is the platform's reading of the input's own clamped value. Every
+   * slider with a max above 100 had it, and the fill being right is what made it
+   * read as a drawing bug rather than a value one. */
     return html`${this.renderLabel()}
     <div part="field" data-markers=${this.markerValues.length > 0 ? '' : nothing}>
       <input
@@ -231,10 +244,10 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
         id="control"
         type="range"
         style="--_slider-fraction: ${this.fraction}"
-        .value=${this.value}
         min=${this.min}
         max=${this.max}
         step=${this.step}
+        .value=${this.value}
         name=${this.name || nothing}
         aria-describedby=${this.describedBy ?? nothing}
         ?disabled=${this.isDisabled}

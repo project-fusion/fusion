@@ -1516,6 +1516,108 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `--input-size` | Height of the field. |
 | `--input-background-color` | Fill behind the text. |
 
+## Input Color
+
+### Root — `helix-input-color`
+
+A colour, typed as hex or moved on its channels.
+
+Extends `HelixBaseInputColor`.
+
+The frame is the field rather than the input, so the trigger sits inside the
+same box as the text and the focus ring is drawn once around the whole
+control. The trigger carries a chip of the colour itself, which is the only
+part of this component that says what it holds without being read.
+
+**Every swatch sits on a checkerboard.** A colour with alpha painted on a
+solid background is just a different colour, and the one thing a preview owes
+a reader is the difference between "pale blue" and "blue, half transparent".
+
+**The channel tracks are painted with the colours they choose**, through
+`--slider-track-image` on the real slider. Saturation and lightness are built
+from wherever the other channels currently stand, so each track shows the
+colours actually reachable from here rather than a fixed ramp ending somewhere
+the reader cannot get to.
+
+The hue track is the raw spectrum and takes no token. Every other colour here
+is a role a theme may change; the wheel is not one, and a themed hue slider
+would be a slider that lies about what it selects.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseInputColor` | Whether the colour carries an alpha channel. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placeholder` | `placeholder` | `string` | `'#000000'` | `HelixBaseInputColor` | What the field says before a colour is in it. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `swatches` | `swatches` | `string` | `''` | `HelixBaseInputColor` | Colours offered under the sliders, as a comma-separated hex list. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a colour'` | `HelixBaseInputColor` | Accessible name for the control that opens the panel. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseInputColor` | Puts the caret in the field, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the colour changes. |
+| `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | The mark on the field saying a panel opens. |
+| `hint` | Help under the field. |
+| `feedback` | What is wrong with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding the text and the trigger. |
+| `control` | The text input carrying the hex. |
+| `trigger` | The control that opens the panel. |
+| `preview` | The chip showing the colour, inside the trigger. |
+| `surface` | The floating panel. |
+| `channels` | The column of sliders. |
+| `channel` | One slider. |
+| `swatches` | The row of presets. |
+| `swatch` | One preset. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--input-color-background-color` | Fill behind the field. |
+
 ## Input Date
 
 ### Root — `helix-input-date`

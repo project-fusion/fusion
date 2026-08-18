@@ -27,6 +27,7 @@ import type {
   HelixBaseIcon,
   HelixBaseIconButton,
   HelixBaseInput,
+  HelixBaseInputColor,
   HelixBaseInputDate,
   HelixBaseInputFile,
   HelixBaseInputNumber,
@@ -2109,6 +2110,261 @@ export type HelixBaseIconSolidJsProps = {
   "prop:name"?: HelixBaseIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixBaseIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseInputColor` component event */
+export type HelixBaseInputColorElementEvent<E = Event> = TypedEvent<
+  HelixBaseInputColor,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseInputColorHelixChangeElementEvent =
+  HelixBaseInputColorElementEvent<HelixChangeEvent>;
+/** `helix-open` event type */
+export type HelixBaseInputColorHelixOpenElementEvent =
+  HelixBaseInputColorElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBaseInputColorHelixCloseElementEvent =
+  HelixBaseInputColorElementEvent<HelixCloseEvent>;
+
+export type HelixBaseInputColorProps = {
+  /** Whether the colour carries an alpha channel.
+
+Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
+and a consumer who did not ask for transparency should not have to strip a
+byte off every value they store. */
+  alpha?: HelixBaseInputColor["alpha"];
+  /** What the field says before a colour is in it. */
+  placeholder?: HelixBaseInputColor["placeholder"];
+  /** Colours offered under the sliders, as a comma-separated hex list. */
+  swatches?: HelixBaseInputColor["swatches"];
+  /** Accessible name for the control that opens the panel. */
+  "trigger-label"?: HelixBaseInputColor["triggerLabel"];
+  /** Accessible name for the control that opens the panel. */
+  triggerLabel?: HelixBaseInputColor["triggerLabel"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixBaseInputColor["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixBaseInputColor["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixBaseInputColor["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseInputColor["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseInputColor["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixBaseInputColor["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseInputColor["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseInputColor["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseInputColor["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseInputColor["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixBaseInputColor["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseInputColor["name"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixBaseInputColor["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixBaseInputColor["onValueChange"];
+
+  /** Fired when the colour changes. */
+  "onhelix-change"?: (e: HelixBaseInputColorHelixChangeElementEvent) => void;
+  /** Fired when the panel opens. */
+  "onhelix-open"?: (e: HelixBaseInputColorHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "onhelix-close"?: (e: HelixBaseInputColorHelixCloseElementEvent) => void;
+};
+
+export type HelixBaseInputColorSolidJsProps = {
+  /** Whether the colour carries an alpha channel.
+
+Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
+and a consumer who did not ask for transparency should not have to strip a
+byte off every value they store. */
+  "prop:alpha"?: HelixBaseInputColor["alpha"];
+  /** What the field says before a colour is in it. */
+  "prop:placeholder"?: HelixBaseInputColor["placeholder"];
+  /** Colours offered under the sliders, as a comma-separated hex list. */
+  "prop:swatches"?: HelixBaseInputColor["swatches"];
+  /** Accessible name for the control that opens the panel. */
+  "attr:trigger-label"?: HelixBaseInputColor["triggerLabel"];
+  /** Accessible name for the control that opens the panel. */
+  "prop:triggerLabel"?: HelixBaseInputColor["triggerLabel"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixBaseInputColor["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixBaseInputColor["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixBaseInputColor["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseInputColor["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseInputColor["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  "prop:value"?: HelixBaseInputColor["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseInputColor["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseInputColor["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseInputColor["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseInputColor["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixBaseInputColor["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseInputColor["name"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixBaseInputColor["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixBaseInputColor["onValueChange"];
+  /** Fired when the colour changes. */
+  "on:helix-change"?: (e: HelixBaseInputColorHelixChangeElementEvent) => void;
+  /** Fired when the panel opens. */
+  "on:helix-open"?: (e: HelixBaseInputColorHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "on:helix-close"?: (e: HelixBaseInputColorHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8819,6 +9075,203 @@ export type CustomElements = {
   >;
 
   /**
+   * **The channels are `helix-slider`, not four bespoke tracks.** A real
+   * `<input type="range">` brings the drag, the arrow keys, Home and End, the page
+   * keys, and a hit area the platform sizes for a finger. Every one of those is a
+   * thing a hand-built track gets wrong, and the last is the one nobody notices.
+   *
+   * **There is no saturation-and-lightness square, and that is a deliberate loss.**
+   * The square is the convention, and it is faster for a sighted reader with a
+   * mouse. It is also a two-dimensional control with no semantics: `role="slider"`
+   * describes one axis, and the alternatives are to invent a widget a screen
+   * reader has never met or to ship a control a keyboard cannot reach. Three
+   * labelled sliders are slower and operable by everyone, which is the trade taken
+   * here. A square could be added later as a second way to reach the same
+   * channels; it cannot be added as the only way.
+   *
+   * **The channels are the state, and the hex is derived from them.** The reverse
+   * loses colours: hex to channels and back is exact, but the channels of black
+   * are `hue: 0, saturation: 0`, so a reader who drags lightness to zero and back
+   * gets grey where they had red. Holding the channels means the hue survives a
+   * trip through a colour that has none. A value arriving from outside, or typed
+   * into the field, is read into the channels once, which is the only moment the
+   * conversion runs in that direction.
+   *
+   * **The value is hex, always**: `#rrggbb`, or `#rrggbbaa` where `alpha` is set.
+   * That is what a form submits and what `<input type="color">` speaks, so a
+   * server that already understands one understands this. What the field *shows*
+   * is the same string, for the reason Input Date gives about its dates: half-typed
+   * input does not survive a round trip through a formatter.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `alpha`: Whether the colour carries an alpha channel.
+   *
+   * Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
+   * and a consumer who did not ask for transparency should not have to strip a
+   * byte off every value they store.
+   * - `placeholder`: What the field says before a colour is in it.
+   * - `swatches`: Colours offered under the sliders, as a comma-separated hex list.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the colour changes.
+   * - `helix-open`: Fired when the panel opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: The mark on the field saying a panel opens.
+   * - `hint`: Help under the field.
+   * - `feedback`: What is wrong with it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding the text and the trigger.
+   * - `control`: The text input carrying the hex.
+   * - `trigger`: The control that opens the panel.
+   * - `preview`: The chip showing the colour, inside the trigger.
+   * - `surface`: The floating panel.
+   * - `channels`: The column of sliders.
+   * - `channel`: One slider.
+   * - `swatches`: The row of presets.
+   * - `swatch`: One preset.
+   */
+  "helix-base-input-color": Partial<
+    HelixBaseInputColorProps & BaseProps<HelixBaseInputColor> & BaseEvents
+  >;
+
+  /**
    * **The calendar is `helix-calendar`, not a second one written here.** It
    * already knows about months, ranges, disabled days, the first day of the week
    * and every keyboard rule a grid owes a reader, and a picker that reimplemented
@@ -15048,6 +15501,206 @@ export type CustomElementsSolidJs = {
     HelixBaseIconProps &
       HelixBaseIconSolidJsProps &
       BaseProps<HelixBaseIcon> &
+      BaseEvents
+  >;
+
+  /**
+   * **The channels are `helix-slider`, not four bespoke tracks.** A real
+   * `<input type="range">` brings the drag, the arrow keys, Home and End, the page
+   * keys, and a hit area the platform sizes for a finger. Every one of those is a
+   * thing a hand-built track gets wrong, and the last is the one nobody notices.
+   *
+   * **There is no saturation-and-lightness square, and that is a deliberate loss.**
+   * The square is the convention, and it is faster for a sighted reader with a
+   * mouse. It is also a two-dimensional control with no semantics: `role="slider"`
+   * describes one axis, and the alternatives are to invent a widget a screen
+   * reader has never met or to ship a control a keyboard cannot reach. Three
+   * labelled sliders are slower and operable by everyone, which is the trade taken
+   * here. A square could be added later as a second way to reach the same
+   * channels; it cannot be added as the only way.
+   *
+   * **The channels are the state, and the hex is derived from them.** The reverse
+   * loses colours: hex to channels and back is exact, but the channels of black
+   * are `hue: 0, saturation: 0`, so a reader who drags lightness to zero and back
+   * gets grey where they had red. Holding the channels means the hue survives a
+   * trip through a colour that has none. A value arriving from outside, or typed
+   * into the field, is read into the channels once, which is the only moment the
+   * conversion runs in that direction.
+   *
+   * **The value is hex, always**: `#rrggbb`, or `#rrggbbaa` where `alpha` is set.
+   * That is what a form submits and what `<input type="color">` speaks, so a
+   * server that already understands one understands this. What the field *shows*
+   * is the same string, for the reason Input Date gives about its dates: half-typed
+   * input does not survive a round trip through a formatter.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `alpha`: Whether the colour carries an alpha channel.
+   *
+   * Off by default, because it widens the value from `#rrggbb` to `#rrggbbaa`
+   * and a consumer who did not ask for transparency should not have to strip a
+   * byte off every value they store.
+   * - `placeholder`: What the field says before a colour is in it.
+   * - `swatches`: Colours offered under the sliders, as a comma-separated hex list.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the colour changes.
+   * - `helix-open`: Fired when the panel opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: The mark on the field saying a panel opens.
+   * - `hint`: Help under the field.
+   * - `feedback`: What is wrong with it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding the text and the trigger.
+   * - `control`: The text input carrying the hex.
+   * - `trigger`: The control that opens the panel.
+   * - `preview`: The chip showing the colour, inside the trigger.
+   * - `surface`: The floating panel.
+   * - `channels`: The column of sliders.
+   * - `channel`: One slider.
+   * - `swatches`: The row of presets.
+   * - `swatch`: One preset.
+   */
+  "helix-base-input-color": Partial<
+    HelixBaseInputColorProps &
+      HelixBaseInputColorSolidJsProps &
+      BaseProps<HelixBaseInputColor> &
       BaseEvents
   >;
 

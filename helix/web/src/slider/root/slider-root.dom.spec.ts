@@ -95,3 +95,35 @@ describe('slider seeding', () => {
     expect(host.value).toBe('8')
   })
 })
+
+describe('slider bounds', () => {
+  test('a value above 100 survives, because the bounds are written first', async () => {
+    /* Lit commits bindings in template order and a range clamps to the bounds it
+       holds at that moment, so with `.value` written before `max` a hue slider
+       given 225 took the default max of 100 and kept 100. The fill went on
+       reading 62.5 per cent, because that is arithmetic on this element's own
+       property rather than on the input's, which is what made a value bug look
+       like a drawing one. */
+    const host = (await mount(
+      '<helix-slider label="Hue" max="360" min="0" default-value="225"></helix-slider>',
+    )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
+    await host.updateComplete
+    const range = host.shadowRoot?.querySelector('input') as HTMLInputElement
+    expect(range.max).toBe('360')
+    expect(range.value).toBe('225')
+    expect(host.value).toBe('225')
+  })
+
+  test('and it survives the bounds widening after the fact', async () => {
+    // The same ordering has to hold on every update, not only the first.
+    const host = (await mount(
+      '<helix-slider label="Hue" max="100" min="0" default-value="50"></helix-slider>',
+    )) as HTMLElement & { max: number; updateComplete: Promise<boolean>; value: string }
+    await host.updateComplete
+    host.max = 360
+    host.value = '300'
+    await host.updateComplete
+    const range = host.shadowRoot?.querySelector('input') as HTMLInputElement
+    expect(range.value).toBe('300')
+  })
+})
