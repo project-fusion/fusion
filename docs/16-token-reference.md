@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by
 `bun run tokens`. Do not edit.*
 
-122 semantic tokens in 15 categories, every one in exactly
+123 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -215,7 +215,8 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-tag-lg` | `calc(2rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-tag-md` | `calc(1.75rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-tag-sm` | `calc(1.5rem * var(--_helix-seed-density))` | 6 |
-| `--helix-size-progress` | `calc(0.5rem * var(--_helix-seed-density))` | 8 |
+| `--helix-size-progress` | `calc(0.5rem * var(--_helix-seed-density))` | 6 |
+| `--helix-size-meter` | `calc(0.75rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-checkbox` | `var(--helix-size-checkbox-md)` | 6 |
 | `--helix-size-checkbox-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-checkbox-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |

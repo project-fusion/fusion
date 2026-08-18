@@ -1,8 +1,9 @@
 /* A row when there is a reading beside the bar, and a bare block when there is
    not: the grid only exists under `show-value`, so a plain meter generates the
-   box it always did. Same arrangement `Progress` uses, because the two stand
-   beside each other in a panel and a reading that sits differently in each reads
-   as two unrelated controls. */
+   box it always did. Same arrangement `Progress` uses, because a reading that
+   sits differently in each would read as an accident.
+
+   The *height* is deliberately not the same: see `--helix-size-meter`. */
 :host {
   display: block;
 }
@@ -30,7 +31,7 @@
    has not reached leaves the reading without anything to be a reading of. */
 [part="track"] {
   background-color: var(--meter-track-color, var(--helix-color-surface-sunken));
-  block-size: var(--meter-size, var(--helix-size-progress));
+  block-size: var(--meter-size, var(--helix-size-meter));
   border-radius: var(--helix-radii-full);
   inline-size: 100%;
   /* The fill has a radius of its own, and at low values its trailing corners

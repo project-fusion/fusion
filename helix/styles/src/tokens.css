@@ -414,6 +414,20 @@
      seed like every other size here, so a dense region gets a thinner bar
      without the component having a size property to be told about it. */
   --helix-size-progress: calc(0.5rem * var(--_helix-seed-density));
+  /* And a meter is half again as thick, which is a difference on purpose.
+
+     `Meter` shipped at the progress height, on the argument that the two stand
+     beside each other in a panel and a reading that sits differently in each
+     reads as two unrelated controls. Rendered side by side that turned out
+     backwards: they *are* two unrelated controls, and a reader telling a level
+     from a task at a glance is the point rather than the cost. A progress bar is
+     thin, transient and one colour; a run of meters under it reads as readings.
+
+     The other half is that a meter carries more. A progress bar draws one
+     quantity; a meter draws a fill, a mark at each threshold and a band. At
+     eight the marks are hairlines, at twelve they are marks, and at sixteen the
+     bar reads as a segmented control rather than a reading. */
+  --helix-size-meter: calc(0.75rem * var(--_helix-seed-density));
   /* Sixteen, twenty, twenty-four: an even four pixels a step.
      `md` was eighteen and `lg` twenty-two, which made the top step two pixels
      while the bottom one was four. Moving `md` up to twenty is what was asked

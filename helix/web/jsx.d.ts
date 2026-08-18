@@ -10078,11 +10078,15 @@ export type CustomElements = {
   "helix-menu": Partial<HelixMenuProps & BaseProps<HelixMenu> & BaseEvents>;
 
   /**
-   * The bar `Progress` draws, at the same height and with the same corner, because
-   * the two stand beside each other in a panel and a reading that sits differently
-   * in each reads as two unrelated controls.
+   * The bar `Progress` draws, with the same corner and half again the height.
    *
-   * What differs is what the colour means. A progress bar is one colour because
+   * It shipped at the progress height, on the argument that the two stand beside
+   * each other in a panel. Rendered side by side that turned out backwards: they
+   * *are* two unrelated controls, and a reader telling a level from a task at a
+   * glance is the point rather than the cost. A meter also carries more, a fill
+   * and a mark at each threshold, and at eight pixels those marks are hairlines.
+   *
+   * What else differs is what the colour means. A progress bar is one colour because
    * there is one thing to say; a meter's fill takes the success, warning or danger
    * tone from the band its reading falls in, and only once thresholds have been
    * declared. An unbanded meter is neutral, because a gauge with nothing said
@@ -15790,11 +15794,15 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * The bar `Progress` draws, at the same height and with the same corner, because
-   * the two stand beside each other in a panel and a reading that sits differently
-   * in each reads as two unrelated controls.
+   * The bar `Progress` draws, with the same corner and half again the height.
    *
-   * What differs is what the colour means. A progress bar is one colour because
+   * It shipped at the progress height, on the argument that the two stand beside
+   * each other in a panel. Rendered side by side that turned out backwards: they
+   * *are* two unrelated controls, and a reader telling a level from a task at a
+   * glance is the point rather than the cost. A meter also carries more, a fill
+   * and a mark at each threshold, and at eight pixels those marks are hairlines.
+   *
+   * What else differs is what the colour means. A progress bar is one colour because
    * there is one thing to say; a meter's fill takes the success, warning or danger
    * tone from the band its reading falls in, and only once thresholds have been
    * declared. An unbanded meter is neutral, because a gauge with nothing said
