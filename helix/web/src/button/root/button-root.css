@@ -1,27 +1,169 @@
-/* The box lives in the base layer, paired with the `data-button` recipe so one
-   declaration serves both this control and a consumer's own anchor. What stays
-   here is what a document rule cannot reach: inside the shadow root.
+/* The button styles itself.
  *
- * The host is not on that list, which is a correction: this comment used to
- * claim it was, and `fill` sat here as `:host([fill])` on the strength of it.
- * `helix-button[fill="standard"]` is an ordinary selector on a light-DOM
- * element, so the base layer can reach the host and now does, which is what
- * lets `data-button-fill` be the same declaration rather than a second copy.
+ * It used to keep its whole box in the base layer, paired with the `data-button`
+ * recipe as `helix-button::part(button)` so one declaration served both this
+ * control and a consumer's own anchor. That pairing was real and the cost was
+ * not visible until something tried to use a button inside another component: a
+ * part selector crosses exactly one shadow boundary, so a document rule reaches
+ * a button on the page and stops one short of a button inside `helix-color`.
+ * Measured there: no background, no border, no radius and no padding at all. No
+ * component in the repo composed a button, which read as taste and was a wall.
  *
- * `display` stays because it is the host's resting state rather than a variant,
- * and nothing pairs with it: an anchor is already `inline-flex` from the recipe
- * that made it a button in the first place. */
+ * So the component owns its presentation and the base layer keeps the recipe,
+ * which is what the recipe was always for: `<Link data-button="primary">` is a
+ * router's own anchor, a thing this element cannot render, and it needs those
+ * declarations written for the light DOM. The two now say the same thing twice,
+ * deliberately, in the two places they have to be said.
+ *
+ * Density still crosses on its own, as `--helix-text-control` and
+ * `--helix-space-control` beside the `--helix-size-control` that was already
+ * doing it. A custom property is the only thing that reaches into a shadow root
+ * without being aimed at it.
+ */
 :host {
   display: inline-flex;
 }
 
-/* `all: unset` first, so the UA's own button styling is gone before the base
-   layer's `::part` rules land on it. Without it the UA border and background
-   win on properties the recipe does not name. */
+/* `all: unset` first, so the UA's own button styling is gone before anything
+   below lands. Without it the UA border and background win on properties these
+   rules do not name. */
 [part="button"] {
   all: unset;
+  align-items: center;
+  /* A wash of the foreground, inside a hairline.
+   *
+   * It was `surface` once, which on a white page is fifteen thousandths off the
+   * paper, so the fill was doing nothing. A percentage of the foreground is a
+   * step away from whatever it sits on in either mode, which a fixed neutral
+   * cannot be, and the same button drops onto a page, a card and a panel.
+   *
+   * The line is there because a footer row asked for it. Secondary and tertiary
+   * were separated by six points of the same wash and nothing else, so with all
+   * three appearances side by side the row read as one solid button and two
+   * ghosts of slightly different faintness. Giving the middle tier an edge
+   * separates the three by kind, nothing against a line against a fill, where
+   * six points of a wash separates them only by degree. */
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+  );
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
   box-sizing: border-box;
+  color: var(--button-foreground-color, var(--helix-color-foreground));
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-control);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-xs);
   inline-size: 100%;
+  justify-content: center;
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-tight);
+  padding-inline: var(--helix-space-control);
+  text-decoration: none;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+  white-space: nowrap;
+}
+
+/* Four corners rather than one `border-radius`, so a group can flatten the two
+ * it needs to.
+ *
+ * `--button-radii-start` and `--button-radii-end` are published for exactly
+ * that: `helix-button-group` sets them through `::slotted()`, which reaches the
+ * host and hands the value across the boundary the way a custom property can and
+ * a rule cannot. The group used to reach the corner itself with
+ * `::part(button)` from the base layer, and that stopped one boundary short in
+ * the same place everything else did. */
+[part="button"] {
+  border-end-end-radius: var(--button-radii-end, var(--button-radii, var(--helix-radii-sm)));
+  border-end-start-radius: var(--button-radii-start, var(--button-radii, var(--helix-radii-sm)));
+  border-start-end-radius: var(--button-radii-end, var(--button-radii, var(--helix-radii-sm)));
+  border-start-start-radius: var(--button-radii-start, var(--button-radii, var(--helix-radii-sm)));
+}
+
+/* Hover deepens the wash rather than drawing a line that was not there.
+ *
+ * A named fill wins outright, hover included, which is why this reads the hook
+ * as well: a consumer who names an exact colour and then watches it change under
+ * the pointer has been given a hook that half works. Wanting a different colour
+ * on hover is one line and the same hook, on the host, where a custom property
+ * crosses into this tree. */
+[part="button"]:hover {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+  );
+}
+
+[part="button"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host([appearance="primary"]) [part="button"] {
+  background-color: var(--button-background-color, var(--helix-color-primary));
+  border-color: transparent;
+  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
+}
+
+:host([appearance="primary"]) [part="button"]:hover {
+  background-color: var(--button-background-color, var(--helix-color-primary-hover));
+  border-color: transparent;
+}
+
+:host([appearance="tertiary"]) [part="button"] {
+  background-color: var(--button-background-color, transparent);
+  border-color: transparent;
+}
+
+/* A wash of the foreground, not a fixed surface.
+ *
+ * `--helix-color-surface-sunken` is an absolute value, and every one of these
+ * sits on a surface whose own lightness is not. Measured on a tertiary button
+ * inside a dialog: sunken is `oklch(0.15)` in dark mode against a panel at
+ * `oklch(0.29)`, so the hover was a 1.39 step darker than the surface it was on,
+ * which on a raised panel reads as a hole rather than as a press. On the page,
+ * where the token was chosen, the step is 1.11 and correct. A translucent mix
+ * composites against whatever is behind it, so one value is right on every
+ * surface and there is nothing to keep in sync. */
+:host([appearance="tertiary"]) [part="button"]:hover {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
+  border-color: transparent;
+}
+
+:host([appearance="danger"]) [part="button"] {
+  background-color: var(--button-background-color, var(--helix-color-danger));
+  border-color: transparent;
+  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
+}
+
+/* How much of the room available to it the button takes. On the host, since the
+   host is the box in the layout. */
+:host([fill="standard"]) {
+  inline-size: var(--button-inline-size, var(--helix-size-button));
+  /* Never wider than the room it has. A standard width is a floor for tidiness,
+     not a promise to overflow a narrow column to keep it. */
+  max-inline-size: 100%;
+}
+
+/* Block-level, not the resting `inline-flex`. A control that fills its container
+   should not be able to share a line with anything beside it. */
+:host([fill="full"]) {
+  display: flex;
+  inline-size: 100%;
+}
+
+:host([disabled]) [part="button"] {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* Icons scale with the label rather than holding the global icon size, so a
@@ -30,9 +172,8 @@
   --icon-size: 1.15em;
 }
 
-/* The base layer's focus rule is a light-DOM rule and does not reach in here,
-   so the ring is declared on the control itself. */
-[part="button"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+@media (prefers-reduced-motion: reduce) {
+  [part="button"] {
+    transition: none;
+  }
 }

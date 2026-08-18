@@ -375,6 +375,16 @@
      container changes it for everything inside. A control reads this; a
      control asking for its own size reads the scale directly. */
   --helix-size-control: var(--helix-size-control-md);
+
+  /* The type and the inset a control takes at the current density.
+   *
+   * Beside `--helix-size-control` and for the same reason it exists: density has
+   * to reach inside a shadow root, and a custom property is the only thing that
+   * crosses one on its own. These were `[data-density="sm"] helix-button::part(button)`
+   * rules in the base layer, which reach a button on the page and stop one short
+   * of a button inside another component. */
+  --helix-text-control: var(--helix-text-sm);
+  --helix-space-control: var(--helix-space-md);
   --helix-size-control-lg: calc(3rem * var(--_helix-seed-density));
   /* How wide a button is when it is asked to take a standard width rather than
      its label's. A real decision rather than a convenience: a row of actions

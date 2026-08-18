@@ -30,6 +30,8 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-foreground-color - Label and icon color.
  * @cssproperty --button-inline-size - Width taken by `fill="standard"`.
  * @cssproperty --button-radii - Corner radius of the control.
+ * @cssproperty --button-radii-start - Leading corners, which a group flattens.
+ * @cssproperty --button-radii-end - Trailing corners, which a group flattens.
  */
 @customElement('helix-button')
 export class HelixButton extends HelixBaseButton {

@@ -522,6 +522,8 @@ ring is declared here rather than inherited, because the base layer's
 | `--button-foreground-color` | Label and icon color. |
 | `--button-inline-size` | Width taken by `fill="standard"`. |
 | `--button-radii` | Corner radius of the control. |
+| `--button-radii-start` | Leading corners, which a group flattens. |
+| `--button-radii-end` | Trailing corners, which a group flattens. |
 
 ## Button Group
 
@@ -1750,6 +1752,8 @@ whatever holds it.
 | `locale` | `locale` | `string` | `''` | `HelixBaseInputDate` | Language tag the calendar names its months and days in. |
 | `max` | `max` | `string` | `''` | `HelixBaseInputDate` | Latest date that can be chosen, as `YYYY-MM-DD`. |
 | `min` | `min` | `string` | `''` | `HelixBaseInputDate` | Earliest date that can be chosen, as `YYYY-MM-DD`. |
+| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseInputDate` | How many dates can be held at once. |
+| `months` | `months` | `number` | `1` | `HelixBaseInputDate` | How many months the calendar shows, side by side. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |

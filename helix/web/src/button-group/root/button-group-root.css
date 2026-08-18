@@ -8,6 +8,27 @@
   margin-inline-start: calc(var(--helix-border-thin) * -1);
 }
 
+/* One shape, so the inner corners go flat and the outer ones keep their radius.
+ *
+ * Handed across as custom properties rather than reached for with a rule. The
+ * corner belongs to the control inside each button's shadow root, and nothing
+ * here can select it: `::slotted()` reaches the button host and stops, and the
+ * base layer's `::part` reached one boundary further and stopped there, which
+ * was fine until a group sat inside another component and the document was two
+ * boundaries away. A custom property set on the host crosses on its own,
+ * however deep the group is.
+ *
+ * `Button` publishes the two hooks and defaults them to `--button-radii`, so a
+ * button outside a group is unaffected and a consumer setting `--button-radii`
+ * still gets it on the ends. */
+::slotted(*:not(:first-child)) {
+  --button-radii-start: 0;
+}
+
+::slotted(*:not(:last-child)) {
+  --button-radii-end: 0;
+}
+
 /* A hovered or focused button has to draw above its neighbours, or the border
    it lights up is half covered by the one overlapping it. */
 ::slotted(*:hover),

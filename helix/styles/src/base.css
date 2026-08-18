@@ -375,40 +375,33 @@ helix-text[tone="danger"] {
   color: var(--helix-color-danger);
 }
 
-/* The button recipe.
+/* The button recipe, for elements this library does not render.
  *
- * Every rule names two selectors and they are one decision: `data-button` for
- * an element the consumer renders, and `helix-button::part(button)` for the
- * component's own control. `::part` from this document outranks the shadow's
- * rules, so this is the single definition and `button-root.css` keeps only what
- * cannot be reached from outside.
+ * `<Link data-button="primary">` is a router's own anchor, and `Button` renders
+ * no anchor because a router cannot render one inside a shadow root. So the
+ * declarations have to exist for the light DOM, and this is where they live.
  *
- * A link that looks like a button is styling, and this is where that styling
- * lives: `Button` renders no anchor, because a router renders its own `<a>` and
- * cannot render it inside a shadow root. `<Link data-button="primary">` is the
- * same control.
+ * **This used to be the only copy.** Every rule named two selectors,
+ * `data-button` and `helix-button::part(button)`, on the grounds that they were
+ * one decision and `::part` from this document outranks the shadow's own rules.
+ * Both of those are true and the arrangement still failed, because a part
+ * selector crosses exactly one shadow boundary: it reached a button on the page
+ * and stopped one short of a button inside another component. Measured in
+ * `helix-color`, which tried to use two: no background, no border, no radius, no
+ * padding. Nothing in the repo composed a button, which read as taste and was a
+ * wall.
  *
- * **The three hooks are read here, in every appearance and every state.**
- * `Button` documented `--button-background-color`, `--button-foreground-color`
- * and `--button-radii` and no rule read any of them: they were declared in the
- * shadow, the box moved to this file, and the rules that read them went with
- * the box. Three published hooks did nothing, silently, while the API page went
- * on listing them.
+ * The component owns its presentation now and this is the recipe alone. The two
+ * say the same thing twice, in the two places it has to be said, and the density
+ * axis is shared rather than repeated: `--helix-text-control` and
+ * `--helix-space-control` are read by both, because a custom property is the one
+ * thing that crosses a shadow boundary without being aimed at it.
  *
  * A named fill wins outright, hover included, which is why `:hover` reads the
  * hook as well. A consumer who names an exact colour and then watches it change
- * under the pointer has been given a hook that half works. Wanting a different
- * colour on hover is one line and it is the same hook:
- *
- * ```css
- * helix-button:hover { --button-background-color: rebeccapurple; }
- * ```
- *
- * That works because the hook is a custom property on the host, and a custom
- * property crosses into the shadow tree where a rule cannot.
+ * under the pointer has been given a hook that half works.
  */
-[data-button],
-helix-button::part(button) {
+[data-button] {
   align-items: center;
   /* A wash of the foreground, inside a hairline.
    *
@@ -443,13 +436,13 @@ helix-button::part(button) {
   cursor: pointer;
   display: inline-flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--helix-text-control);
   font-weight: var(--helix-weight-medium);
   gap: var(--helix-space-xs);
   justify-content: center;
   letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-tight);
-  padding-inline: var(--helix-space-md);
+  padding-inline: var(--helix-space-control);
   text-decoration: none;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -459,8 +452,7 @@ helix-button::part(button) {
 }
 
 /* Hover deepens the wash rather than drawing a line that was not there. */
-[data-button]:hover,
-helix-button::part(button):hover {
+[data-button]:hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
@@ -490,11 +482,11 @@ helix-button::part(button):hover {
  *
  * `data-button-fill` rather than a bare `data-fill`, following `data-link-size`:
  * a second axis on a recipe carries the recipe's name. It cannot ride in the
- * `data-button` value either, because that value is the appearance and the
- * rules above match it exactly.
+ * `data-button` value either, because that value is the appearance and the rules
+ * above match it exactly. The component's own `fill` lives on its host, in its
+ * own stylesheet.
  */
-[data-button][data-button-fill="standard"],
-helix-button[fill="standard"] {
+[data-button][data-button-fill="standard"] {
   inline-size: var(--button-inline-size, var(--helix-size-button));
   /* Never wider than the room it has. A standard width is a floor for tidiness,
      not a promise to overflow a narrow column to keep it. */
@@ -503,50 +495,45 @@ helix-button[fill="standard"] {
 
 /* Block-level, not the recipe's `inline-flex`. A control that fills its
    container should not be able to share a line with anything beside it. */
-[data-button][data-button-fill="full"],
-helix-button[fill="full"] {
+[data-button][data-button-fill="full"] {
   display: flex;
   inline-size: 100%;
 }
 
-[data-button="primary"],
-helix-button[appearance="primary"]::part(button) {
+[data-button="primary"] {
   background-color: var(--button-background-color, var(--helix-color-primary));
   border-color: transparent;
   color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
 }
 
-[data-button="primary"]:hover,
-helix-button[appearance="primary"]::part(button):hover {
+[data-button="primary"]:hover {
   background-color: var(--button-background-color, var(--helix-color-primary-hover));
   border-color: transparent;
 }
 
-/* A button group is one shape, so the inner corners go flat and the outer ones
- * keep their radius.
+/* A group of a consumer's own anchors is one shape, so the inner corners go flat
+ * and the outer ones keep their radius.
  *
- * Here rather than in the component, for the same reason the button's box is
- * here: the corner belongs to the control inside each button's shadow root, and
- * a rule inside the group cannot reach through a second boundary. `::part` from
- * this document can. Pairing it with `data-button` means a consumer's own
- * anchor joins the group the same way.
+ * The component half of this left with everything else. `helix-button-group`
+ * flattens a `helix-button` by handing it `--button-radii-start` and
+ * `--button-radii-end` through `::slotted()`, which is a custom property
+ * crossing a boundary rather than a rule reaching through two of them. This half
+ * stays, because a `<Link data-button>` is in the light DOM and there is nothing
+ * to cross.
  */
 helix-button-group:not([appearance="spaced"]) > :not(:first-child) [data-button],
-helix-button-group:not([appearance="spaced"]) > :not(:first-child)::part(button),
 helix-button-group:not([appearance="spaced"]) > [data-button]:not(:first-child) {
   border-start-start-radius: 0;
   border-end-start-radius: 0;
 }
 
 helix-button-group:not([appearance="spaced"]) > :not(:last-child) [data-button],
-helix-button-group:not([appearance="spaced"]) > :not(:last-child)::part(button),
 helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }
 
-[data-button="tertiary"],
-helix-button[appearance="tertiary"]::part(button) {
+[data-button="tertiary"] {
   background-color: var(--button-background-color, transparent);
   border-color: transparent;
 }
@@ -565,8 +552,7 @@ helix-button[appearance="tertiary"]::part(button) {
  * buttons have always worked this way, which is why they measured identically
  * on both panels while tertiary did not, and `IconButton` was moved to it
  * earlier for the same reason. 8% wherever the resting state is transparent. */
-[data-button="tertiary"]:hover,
-helix-button[appearance="tertiary"]::part(button):hover {
+[data-button="tertiary"]:hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
@@ -574,8 +560,7 @@ helix-button[appearance="tertiary"]::part(button):hover {
   border-color: transparent;
 }
 
-[data-button="danger"],
-helix-button[appearance="danger"]::part(button) {
+[data-button="danger"] {
   background-color: var(--button-background-color, var(--helix-color-danger));
   border-color: transparent;
   color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
@@ -592,14 +577,12 @@ helix-button[appearance="danger"]::part(button) {
  * 12px and 12px. Only the height moved, because that travels as a custom
  * property and never went through this rule. */
 [data-density="sm"] [data-button],
-[data-density="sm"] helix-button::part(button),
 [data-density="sm"][data-button] {
   font-size: var(--helix-text-xs);
   padding-inline: var(--helix-space-sm);
 }
 
 [data-density="lg"] [data-button],
-[data-density="lg"] helix-button::part(button),
 [data-density="lg"][data-button] {
   font-size: var(--helix-text-md);
   padding-inline: var(--helix-space-lg);
@@ -614,8 +597,7 @@ helix-button[appearance="danger"]::part(button) {
   font-size: var(--helix-text-md);
 }
 
-[data-button][aria-disabled="true"],
-helix-button[disabled]::part(button) {
+[data-button][aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -635,6 +617,8 @@ helix-button[disabled]::part(button) {
  * shadow boundary on its own and costs no component any API.
  */
 [data-density="sm"] {
+  --helix-text-control: var(--helix-text-xs);
+  --helix-space-control: var(--helix-space-sm);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
@@ -651,6 +635,8 @@ helix-button[disabled]::part(button) {
 }
 
 [data-density="lg"] {
+  --helix-text-control: var(--helix-text-md);
+  --helix-space-control: var(--helix-space-lg);
   --helix-size-checkbox: var(--helix-size-checkbox-lg);
   --helix-size-icon: var(--helix-size-icon-lg);
   --helix-size-control: var(--helix-size-control-lg);
@@ -1065,15 +1051,17 @@ helix-toast:not([data-color-mode]) {
   /* biome-ignore-end lint/complexity/noImportantStyles: user preference must win over author styles */
 }
 
-/* The two moving declarations this file writes *into* shadow trees.
+/* The one moving declaration this file writes *into* a shadow tree.
  *
- * A component cannot turn these off for itself: an outer-tree `::part` rule
- * beats an inner-tree `:host` rule for normal declarations, so a
- * `transition: none` in `button-root.css` or `toggle-root.css` would be a rule
- * that never applies. `check:motion` cannot see them either until it scans this
- * directory, which it now does. */
+ * The component cannot turn it off for itself: an outer-tree `::part` rule beats
+ * an inner-tree `:host` rule for normal declarations, so a `transition: none` in
+ * `toggle-root.css` would be a rule that never applies. `check:motion` cannot
+ * see it either until it scans this directory, which it now does.
+ *
+ * Button was here too and no longer is. Its transition is declared in its own
+ * stylesheet now, so its own reduced-motion rule reaches it, and at any depth:
+ * this one only ever reached a button sitting in the document. */
 @media (prefers-reduced-motion: reduce) {
-  helix-button::part(button),
   helix-toggle::part(item) {
     transition: none;
   }
