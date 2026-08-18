@@ -759,9 +759,10 @@ which is what a run of cards wants rather than a run of full-width panels.
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'hero' \| undefined` | - | - | Whether the controls sit beside the dots or on the slides. |
 | `autoplay` | `autoplay` | `boolean` | `false` | `HelixBaseCarousel` | Whether the carousel advances on its own. |
+| `controlsPlacement` | `controls-placement` | `'block-end' \| 'block-start' \| 'inline-end' \| 'inline-start' \| undefined` | - | - | Which side of the slides the arrows sit on. |
 | `defaultIndex` | `default-index` | `number` | `0` | `HelixBaseCarousel` | Slide to start on, where nothing declared one. |
 | `index` | `index` | `number` | - | `HelixBaseCarousel` | The slide in view, counted from zero. |
-| `indicatorPlacement` | `indicator-placement` | `'center' \| 'end' \| 'start' \| undefined` | - | - | Where the dots sit along the bar they share with the arrows. |
+| `indicatorPlacement` | `indicator-placement` | `'block-end' \| 'block-start' \| 'inline-end' \| 'inline-start' \| undefined` | - | - | Which side of the slides the dots sit on. |
 | `interval` | `interval` | `number` | `5000` | `HelixBaseCarousel` | How long each slide is held, in milliseconds. |
 | `label` | `label` | `string` | `'Carousel'` | `HelixBaseCarousel` | Accessible name for the carousel. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseCarousel` | Whether moving past either end wraps to the other. |

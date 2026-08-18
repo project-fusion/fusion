@@ -5742,10 +5742,20 @@
               "kind": "field",
               "name": "indicatorPlacement",
               "type": {
-                "text": "'center' | 'end' | 'start' | undefined"
+                "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | undefined"
               },
-              "description": "Where the dots sit along the bar they share with the arrows.\n\nUnset is `start`, under the slides where the reading begins. `center` and\n`end` are for a carousel whose bar is doing something else with the space:\ncentred reads as a gallery, and at the end the two chrome groups sit\ntogether in one corner.\n\nIt centres within the dots' own column rather than across the whole bar, so\n`center` is the middle of the space left over from the arrows and never\nunderneath them.",
+              "description": "Which side of the slides the dots sit on.\n\nUnset is `block-end`, under them. `block-start` puts them above,\n`inline-start` and `inline-end` beside, where a run of dots becomes a\ncolumn.\n\n**The sides of the content, not positions along a bar.** This was\n`start | center | end`, which answered \"where along the row\" when the\nquestion is \"which edge\", and could not say \"above\" at all. The logical\nnames rather than `top`/`left`, because the component is already careful\nabout writing direction everywhere else and an `inline-start` carousel\nshould put its dots on the right in Arabic without being told.\n\nIndependent of `controlsPlacement`. Both default to the block end, where\nthey share the row and split it, dots to the start and arrows to the end.\nThat is the arrangement the old shared bar gave, arrived at by two defaults\nrather than by a rule about the pair, so moving one leaves the other alone.",
               "attribute": "indicator-placement",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "controlsPlacement",
+              "type": {
+                "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | undefined"
+              },
+              "description": "Which side of the slides the arrows sit on.\n\nThe same four sides as `indicatorPlacement` and the same default, so a\ncarousel that moves only one of them keeps the other where it was.\n`inline-start` or `inline-end` stacks the arrows into a column, which is\nwhat a vertical track usually wants.",
+              "attribute": "controls-placement",
               "reflects": true
             },
             {
@@ -6146,10 +6156,18 @@
             {
               "name": "indicator-placement",
               "type": {
-                "text": "'center' | 'end' | 'start' | undefined"
+                "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | undefined"
               },
-              "description": "Where the dots sit along the bar they share with the arrows.\n\nUnset is `start`, under the slides where the reading begins. `center` and\n`end` are for a carousel whose bar is doing something else with the space:\ncentred reads as a gallery, and at the end the two chrome groups sit\ntogether in one corner.\n\nIt centres within the dots' own column rather than across the whole bar, so\n`center` is the middle of the space left over from the arrows and never\nunderneath them.",
+              "description": "Which side of the slides the dots sit on.\n\nUnset is `block-end`, under them. `block-start` puts them above,\n`inline-start` and `inline-end` beside, where a run of dots becomes a\ncolumn.\n\n**The sides of the content, not positions along a bar.** This was\n`start | center | end`, which answered \"where along the row\" when the\nquestion is \"which edge\", and could not say \"above\" at all. The logical\nnames rather than `top`/`left`, because the component is already careful\nabout writing direction everywhere else and an `inline-start` carousel\nshould put its dots on the right in Arabic without being told.\n\nIndependent of `controlsPlacement`. Both default to the block end, where\nthey share the row and split it, dots to the start and arrows to the end.\nThat is the arrangement the old shared bar gave, arrived at by two defaults\nrather than by a rule about the pair, so moving one leaves the other alone.",
               "fieldName": "indicatorPlacement"
+            },
+            {
+              "name": "controls-placement",
+              "type": {
+                "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | undefined"
+              },
+              "description": "Which side of the slides the arrows sit on.\n\nThe same four sides as `indicatorPlacement` and the same default, so a\ncarousel that moves only one of them keeps the other where it was.\n`inline-start` or `inline-end` stacks the arrows into a column, which is\nwhat a vertical track usually wants.",
+              "fieldName": "controlsPlacement"
             },
             {
               "name": "per-view",

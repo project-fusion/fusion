@@ -5,40 +5,95 @@
   --_carousel-per-view: 1;
 }
 
-/* One bar under the track, holding the dots and the arrows.
+/* A frame around the track, and each group of chrome placed on a side of it.
  *
- * The three parts render in template order, controls then track then
- * indicators, and left in that order they stacked: a bar of arrows above the
- * slides and a row of dots below them. Nobody chose that, it is what stacking
- * gives, and it measured badly. On a three-slide carousel with autoplay:
- * `host 117px, controls 0..32, track 44..97, dots 97..117`. Sixty-four pixels
- * of a hundred and seventeen were chrome, and the two things a reader uses to
- * move were at opposite ends of the component.
+ * Three rows and three columns with the slides in the middle, so `indicators`
+ * and `controls` each name an edge rather than a position in a shared bar. It
+ * was `start | center | end`, which answered "where along the bar" when the
+ * question was "which side of the content", and could not say "above" at all.
  *
- * A grid puts them in one row without touching the template: the track spans
- * both columns of row one, the dots take the start of row two and the arrows
- * the end of it. The chrome halves, and everything a reader reaches for is in
- * one place.
+ * The middle cell takes all the room and the eight around it take none, so the
+ * frame costs nothing on the sides nothing is placed.
  *
- * Dots at the start rather than centred. Centring them in the column that is
- * left over from the arrows is not centring them on the track, and the half-
- * truth is worse than the honest alignment. */
+ * Both default to the block end, where they share a row and split it: dots to
+ * the start of it, arrows to the end. That is the arrangement the split bar
+ * gave, arrived at by two independent defaults rather than by a rule about
+ * their pairing, so moving one leaves the other where it was. */
 :host {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 [part="track"] {
-  grid-area: 1 / 1 / 2 / 3;
+  grid-area: 2 / 2;
 }
 
-[part="controls"] {
+[part="controls"],
+[part="indicators"] {
   align-items: center;
   display: flex;
   gap: var(--helix-space-2xs);
-  grid-area: 2 / 2;
-  justify-content: flex-end;
+}
+
+/* The block end is the default for both, so they share the row under the
+   slides. Two items in one cell overlap by default, which is what
+   `justify-self` is for: the dots take the start of the row and the arrows the
+   end, and neither is placed relative to the other. */
+[part="indicators"] {
+  grid-area: 3 / 2;
+  justify-self: start;
   padding-block-start: var(--helix-space-sm);
+}
+
+[part="controls"] {
+  grid-area: 3 / 2;
+  justify-self: end;
+  padding-block-start: var(--helix-space-sm);
+}
+
+/* Above the slides. The padding swaps ends with the placement, so the gap is
+   always between the chrome and the content rather than on a fixed side. */
+:host([indicator-placement="block-start"]) [part="indicators"] {
+  grid-area: 1 / 2;
+  padding-block: var(--helix-space-none) var(--helix-space-sm);
+}
+
+:host([controls-placement="block-start"]) [part="controls"] {
+  grid-area: 1 / 2;
+  padding-block: var(--helix-space-none) var(--helix-space-sm);
+}
+
+/* Beside the slides, where a run of dots becomes a column and the arrows stack.
+   `align-self` splits the column the way `justify-self` splits the row. */
+:host([indicator-placement="inline-start"]) [part="indicators"],
+:host([indicator-placement="inline-end"]) [part="indicators"],
+:host([controls-placement="inline-start"]) [part="controls"],
+:host([controls-placement="inline-end"]) [part="controls"] {
+  align-self: center;
+  flex-direction: column;
+  justify-self: center;
+  padding-block-start: var(--helix-space-none);
+}
+
+:host([indicator-placement="inline-start"]) [part="indicators"] {
+  grid-area: 2 / 1;
+  padding-inline-end: var(--helix-space-sm);
+}
+
+:host([controls-placement="inline-start"]) [part="controls"] {
+  grid-area: 2 / 1;
+  padding-inline-end: var(--helix-space-sm);
+}
+
+:host([indicator-placement="inline-end"]) [part="indicators"] {
+  grid-area: 2 / 3;
+  padding-inline-start: var(--helix-space-sm);
+}
+
+:host([controls-placement="inline-end"]) [part="controls"] {
+  grid-area: 2 / 3;
+  padding-inline-start: var(--helix-space-sm);
 }
 
 [part="rotation"],
@@ -126,21 +181,6 @@
       (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
       var(--_carousel-per-view)
     );
-}
-
-/* Where the dots sit in the column they have. `center` is the middle of the
-   space left over from the arrows rather than of the whole bar, so they never
-   end up underneath them. */
-:host([indicator-placement="center"]) [part="indicators"] {
-  justify-content: center;
-}
-
-:host([indicator-placement="end"]) [part="indicators"] {
-  justify-content: flex-end;
-}
-
-:host([indicator-placement="start"]) [part="indicators"] {
-  justify-content: flex-start;
 }
 
 [part="track"] ::slotted(*) {
@@ -235,14 +275,15 @@
    middle is half that row below the track's, and the arrows came out high. */
 :host([appearance="hero"]) [part="controls"],
 :host([appearance="hero"]) [part="track"] {
-  grid-area: 1 / 1 / 2 / 3;
+  grid-area: 2 / 2;
+  justify-self: stretch;
 }
 
 /* Back to the middle, because with the arrows on the slides the row below holds
    nothing else and there is a real centre to sit on. */
 :host([appearance="hero"]) [part="indicators"] {
-  grid-area: 2 / 1 / 3 / 3;
-  justify-content: center;
+  grid-area: 3 / 2;
+  justify-self: center;
 }
 
 /* The bar itself catches nothing, so a press between the arrows reaches the

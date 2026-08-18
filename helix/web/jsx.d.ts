@@ -1392,28 +1392,56 @@ export type HelixCarouselHelixSelectElementEvent =
 export type HelixCarouselProps = {
   /** Whether the controls sit beside the dots or on the slides. */
   appearance?: HelixCarousel["appearance"];
-  /** Where the dots sit along the bar they share with the arrows.
+  /** Which side of the slides the dots sit on.
 
-Unset is `start`, under the slides where the reading begins. `center` and
-`end` are for a carousel whose bar is doing something else with the space:
-centred reads as a gallery, and at the end the two chrome groups sit
-together in one corner.
+Unset is `block-end`, under them. `block-start` puts them above,
+`inline-start` and `inline-end` beside, where a run of dots becomes a
+column.
 
-It centres within the dots' own column rather than across the whole bar, so
-`center` is the middle of the space left over from the arrows and never
-underneath them. */
+**The sides of the content, not positions along a bar.** This was
+`start | center | end`, which answered "where along the row" when the
+question is "which edge", and could not say "above" at all. The logical
+names rather than `top`/`left`, because the component is already careful
+about writing direction everywhere else and an `inline-start` carousel
+should put its dots on the right in Arabic without being told.
+
+Independent of `controlsPlacement`. Both default to the block end, where
+they share the row and split it, dots to the start and arrows to the end.
+That is the arrangement the old shared bar gave, arrived at by two defaults
+rather than by a rule about the pair, so moving one leaves the other alone. */
   "indicator-placement"?: HelixCarousel["indicatorPlacement"];
-  /** Where the dots sit along the bar they share with the arrows.
+  /** Which side of the slides the dots sit on.
 
-Unset is `start`, under the slides where the reading begins. `center` and
-`end` are for a carousel whose bar is doing something else with the space:
-centred reads as a gallery, and at the end the two chrome groups sit
-together in one corner.
+Unset is `block-end`, under them. `block-start` puts them above,
+`inline-start` and `inline-end` beside, where a run of dots becomes a
+column.
 
-It centres within the dots' own column rather than across the whole bar, so
-`center` is the middle of the space left over from the arrows and never
-underneath them. */
+**The sides of the content, not positions along a bar.** This was
+`start | center | end`, which answered "where along the row" when the
+question is "which edge", and could not say "above" at all. The logical
+names rather than `top`/`left`, because the component is already careful
+about writing direction everywhere else and an `inline-start` carousel
+should put its dots on the right in Arabic without being told.
+
+Independent of `controlsPlacement`. Both default to the block end, where
+they share the row and split it, dots to the start and arrows to the end.
+That is the arrangement the old shared bar gave, arrived at by two defaults
+rather than by a rule about the pair, so moving one leaves the other alone. */
   indicatorPlacement?: HelixCarousel["indicatorPlacement"];
+  /** Which side of the slides the arrows sit on.
+
+The same four sides as `indicatorPlacement` and the same default, so a
+carousel that moves only one of them keeps the other where it was.
+`inline-start` or `inline-end` stacks the arrows into a column, which is
+what a vertical track usually wants. */
+  "controls-placement"?: HelixCarousel["controlsPlacement"];
+  /** Which side of the slides the arrows sit on.
+
+The same four sides as `indicatorPlacement` and the same default, so a
+carousel that moves only one of them keeps the other where it was.
+`inline-start` or `inline-end` stacks the arrows into a column, which is
+what a vertical track usually wants. */
+  controlsPlacement?: HelixCarousel["controlsPlacement"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 No default, because it reflects. A reflected property with a value writes
@@ -1475,28 +1503,56 @@ want. */
 export type HelixCarouselSolidJsProps = {
   /** Whether the controls sit beside the dots or on the slides. */
   "prop:appearance"?: HelixCarousel["appearance"];
-  /** Where the dots sit along the bar they share with the arrows.
+  /** Which side of the slides the dots sit on.
 
-Unset is `start`, under the slides where the reading begins. `center` and
-`end` are for a carousel whose bar is doing something else with the space:
-centred reads as a gallery, and at the end the two chrome groups sit
-together in one corner.
+Unset is `block-end`, under them. `block-start` puts them above,
+`inline-start` and `inline-end` beside, where a run of dots becomes a
+column.
 
-It centres within the dots' own column rather than across the whole bar, so
-`center` is the middle of the space left over from the arrows and never
-underneath them. */
+**The sides of the content, not positions along a bar.** This was
+`start | center | end`, which answered "where along the row" when the
+question is "which edge", and could not say "above" at all. The logical
+names rather than `top`/`left`, because the component is already careful
+about writing direction everywhere else and an `inline-start` carousel
+should put its dots on the right in Arabic without being told.
+
+Independent of `controlsPlacement`. Both default to the block end, where
+they share the row and split it, dots to the start and arrows to the end.
+That is the arrangement the old shared bar gave, arrived at by two defaults
+rather than by a rule about the pair, so moving one leaves the other alone. */
   "attr:indicator-placement"?: HelixCarousel["indicatorPlacement"];
-  /** Where the dots sit along the bar they share with the arrows.
+  /** Which side of the slides the dots sit on.
 
-Unset is `start`, under the slides where the reading begins. `center` and
-`end` are for a carousel whose bar is doing something else with the space:
-centred reads as a gallery, and at the end the two chrome groups sit
-together in one corner.
+Unset is `block-end`, under them. `block-start` puts them above,
+`inline-start` and `inline-end` beside, where a run of dots becomes a
+column.
 
-It centres within the dots' own column rather than across the whole bar, so
-`center` is the middle of the space left over from the arrows and never
-underneath them. */
+**The sides of the content, not positions along a bar.** This was
+`start | center | end`, which answered "where along the row" when the
+question is "which edge", and could not say "above" at all. The logical
+names rather than `top`/`left`, because the component is already careful
+about writing direction everywhere else and an `inline-start` carousel
+should put its dots on the right in Arabic without being told.
+
+Independent of `controlsPlacement`. Both default to the block end, where
+they share the row and split it, dots to the start and arrows to the end.
+That is the arrangement the old shared bar gave, arrived at by two defaults
+rather than by a rule about the pair, so moving one leaves the other alone. */
   "prop:indicatorPlacement"?: HelixCarousel["indicatorPlacement"];
+  /** Which side of the slides the arrows sit on.
+
+The same four sides as `indicatorPlacement` and the same default, so a
+carousel that moves only one of them keeps the other where it was.
+`inline-start` or `inline-end` stacks the arrows into a column, which is
+what a vertical track usually wants. */
+  "attr:controls-placement"?: HelixCarousel["controlsPlacement"];
+  /** Which side of the slides the arrows sit on.
+
+The same four sides as `indicatorPlacement` and the same default, so a
+carousel that moves only one of them keeps the other where it was.
+`inline-start` or `inline-end` stacks the arrows into a column, which is
+what a vertical track usually wants. */
+  "prop:controlsPlacement"?: HelixCarousel["controlsPlacement"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 No default, because it reflects. A reflected property with a value writes
@@ -7019,16 +7075,29 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: Whether the controls sit beside the dots or on the slides.
-   * - `indicator-placement`/`indicatorPlacement`: Where the dots sit along the bar they share with the arrows.
+   * - `indicator-placement`/`indicatorPlacement`: Which side of the slides the dots sit on.
    *
-   * Unset is `start`, under the slides where the reading begins. `center` and
-   * `end` are for a carousel whose bar is doing something else with the space:
-   * centred reads as a gallery, and at the end the two chrome groups sit
-   * together in one corner.
+   * Unset is `block-end`, under them. `block-start` puts them above,
+   * `inline-start` and `inline-end` beside, where a run of dots becomes a
+   * column.
    *
-   * It centres within the dots' own column rather than across the whole bar, so
-   * `center` is the middle of the space left over from the arrows and never
-   * underneath them.
+   * **The sides of the content, not positions along a bar.** This was
+   * `start | center | end`, which answered "where along the row" when the
+   * question is "which edge", and could not say "above" at all. The logical
+   * names rather than `top`/`left`, because the component is already careful
+   * about writing direction everywhere else and an `inline-start` carousel
+   * should put its dots on the right in Arabic without being told.
+   *
+   * Independent of `controlsPlacement`. Both default to the block end, where
+   * they share the row and split it, dots to the start and arrows to the end.
+   * That is the arrangement the old shared bar gave, arrived at by two defaults
+   * rather than by a rule about the pair, so moving one leaves the other alone.
+   * - `controls-placement`/`controlsPlacement`: Which side of the slides the arrows sit on.
+   *
+   * The same four sides as `indicatorPlacement` and the same default, so a
+   * carousel that moves only one of them keeps the other where it was.
+   * `inline-start` or `inline-end` stacks the arrows into a column, which is
+   * what a vertical track usually wants.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * No default, because it reflects. A reflected property with a value writes
@@ -12027,16 +12096,29 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `appearance`: Whether the controls sit beside the dots or on the slides.
-   * - `indicator-placement`/`indicatorPlacement`: Where the dots sit along the bar they share with the arrows.
+   * - `indicator-placement`/`indicatorPlacement`: Which side of the slides the dots sit on.
    *
-   * Unset is `start`, under the slides where the reading begins. `center` and
-   * `end` are for a carousel whose bar is doing something else with the space:
-   * centred reads as a gallery, and at the end the two chrome groups sit
-   * together in one corner.
+   * Unset is `block-end`, under them. `block-start` puts them above,
+   * `inline-start` and `inline-end` beside, where a run of dots becomes a
+   * column.
    *
-   * It centres within the dots' own column rather than across the whole bar, so
-   * `center` is the middle of the space left over from the arrows and never
-   * underneath them.
+   * **The sides of the content, not positions along a bar.** This was
+   * `start | center | end`, which answered "where along the row" when the
+   * question is "which edge", and could not say "above" at all. The logical
+   * names rather than `top`/`left`, because the component is already careful
+   * about writing direction everywhere else and an `inline-start` carousel
+   * should put its dots on the right in Arabic without being told.
+   *
+   * Independent of `controlsPlacement`. Both default to the block end, where
+   * they share the row and split it, dots to the start and arrows to the end.
+   * That is the arrangement the old shared bar gave, arrived at by two defaults
+   * rather than by a rule about the pair, so moving one leaves the other alone.
+   * - `controls-placement`/`controlsPlacement`: Which side of the slides the arrows sit on.
+   *
+   * The same four sides as `indicatorPlacement` and the same default, so a
+   * carousel that moves only one of them keeps the other where it was.
+   * `inline-start` or `inline-end` stacks the arrows into a column, which is
+   * what a vertical track usually wants.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * No default, because it reflects. A reflected property with a value writes
