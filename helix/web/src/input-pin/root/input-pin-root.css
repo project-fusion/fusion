@@ -1,0 +1,83 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+/* A row of boxes with real space between them, which is the whole picture: a
+   code is read as separate characters and boxes shoulder to shoulder read as one
+   field with lines drawn in it. */
+[part="field"] {
+  display: flex;
+  gap: var(--pin-gap, var(--helix-space-xs));
+}
+
+/* Square at the control height, so the row reads as boxes rather than as short
+   fields. `all: unset` takes `box-sizing` with it, back to `content-box`, and
+   the `border-box` every shadow root is given comes from a rule this one
+   outranks. */
+[part="cell"] {
+  all: unset;
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-lg);
+  /* Tabular, so a 1 takes the same room as an 8 and the row does not breathe as
+     a code is typed into it. */
+  font-variant-numeric: tabular-nums;
+  inline-size: var(--helix-size-control);
+  text-align: center;
+  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* `:host(:not(:disabled))`, not `[disabled]`. The pseudo-class also matches an
+   ancestor `<fieldset disabled>`, where the attribute selector only ever sees
+   the element's own. */
+:host(:not(:disabled)) [part="cell"]:hover {
+  border-color: var(--helix-color-foreground-muted);
+}
+
+/* The ring is on the box the reader is in, not on the row. A code is entered one
+   character at a time and the whole point of the boxes is to say which one is
+   next, so a ring around all six would answer the question the component exists
+   to answer. */
+[part="cell"]:focus-visible {
+  border-color: var(--helix-color-primary);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* `data-invalid` rather than `:user-invalid`, which cannot match: it tracks
+   interaction with the element it is on, and the reader interacts with an input
+   in the shadow root. `MixinField` mirrors the flag onto the host. `Input`
+   carries the measurement. */
+:host([data-invalid]) [part="cell"] {
+  border-color: var(--helix-color-danger);
+}
+
+:host(:disabled) [part="cell"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Still readable, and still submitted. A read-only code is not a disabled one:
+   it is a value the reader may take and may not change. */
+:host([read-only]) [part="cell"] {
+  background-color: var(--helix-color-surface);
+}
+
+/* A masked box shows a dot rather than a character, and the dot wants the room a
+   character had: `password` renders a bullet that sits high in a small box. */
+:host([mask]) [part="cell"] {
+  font-size: var(--helix-text-xl);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="cell"] {
+    transition: none;
+  }
+}

@@ -1599,6 +1599,83 @@ three times as long to cross.
 | `decrement` | The control that steps down. |
 | `increment` | The control that steps up. |
 
+## Input Pin
+
+### Root — `helix-input-pin`
+
+A short code, one character to a box.
+
+Extends `HelixBaseInputPin`.
+
+Square boxes at the control height with real space between them, which is the
+whole picture: a code is read as separate characters, and boxes shoulder to
+shoulder read as one field with lines drawn in it.
+
+The focus ring is on the box the reader is in rather than around the row. A
+code is entered one character at a time and the boxes exist to say which one
+is next, so a ring around all six would answer the question the component is
+for.
+
+Figures are tabular, so a 1 takes the room an 8 does and the row does not
+breathe as a code is typed into it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cellLabel` | `cell-label` | `string` | `'Character {index} of {length}'` | `HelixBaseInputPin` | Accessible name for one box, with `{index}` and `{length}` filled in. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `length` | `length` | `number` | `6` | `HelixBaseInputPin` | How many characters the code has. |
+| `mask` | `mask` | `boolean` | `false` | `HelixBaseInputPin` | Whether the characters are hidden, the way a password is. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInputPin` | Whether the boxes refuse input while still submitting their value. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInputPin` | Focus is delegated, so the host is never the focus target. |
+| `type` | `type` | `PinType` | `'numeric'` | `HelixBaseInputPin` | What a box accepts, which decides the keyboard a phone offers. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `clear()` | `HelixBaseInputPin` | Empties every box and returns to the first. |
+| `focus()` | `HelixBaseInputPin` | Puts the caret in the first empty box, which is where a reader resumes. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired as the code changes, and cancelable. |
+| `helix-complete` | `HelixCompleteEvent` | Fired when the last box is filled. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The row of boxes. |
+| `cell` | One box. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--pin-gap` | Space between one box and the next. |
+
 ## Kbd
 
 ### Root — `helix-kbd`

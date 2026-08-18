@@ -1239,6 +1239,28 @@
         },
         {
           "kind": "class",
+          "description": "Fired when a control that fills up has filled.\n\nThe moment a code entry exists for: a six-character field is worth submitting\nthe instant the sixth character lands, and a consumer watching `helix-change`\nhas to know the length and compare it on every keystroke to find that moment\nthemselves.\n\nSeparate from `helix-change` rather than a flag on it, because they are\nanswered by different code: one keeps a value in step and the other decides\nwhether to send a form. A listener that only cares about the second says so by\nwhich event it listens for.\n\n`complete` is free as a verb. React's synthetic system claims `change`,\n`input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`, `focus` and\n`blur`, measured, and this is none of them.\n\nNot cancelable. It reports that something already happened, which is the same\nreason `helix-caret` is not: there is nothing left to refuse once the last\ncharacter is in the box.",
+          "name": "HelixCompleteEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-complete'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Fired when a component narrows what it is showing.\n\nFiltering hides rather than removes, so nothing about the value changes and\n`helix-change` would be a lie. What a consumer wants to know is that the list\nin front of the reader is no longer the whole list.",
           "name": "HelixFilterEvent",
           "members": [
@@ -1336,6 +1358,14 @@
           "name": "HelixNavigateEvent",
           "declaration": {
             "name": "HelixNavigateEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixCompleteEvent",
+          "declaration": {
+            "name": "HelixCompleteEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -1869,6 +1899,14 @@
         },
         {
           "kind": "js",
+          "name": "CompleteDetail",
+          "declaration": {
+            "name": "CompleteDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "ConsoleDetail",
           "declaration": {
             "name": "ConsoleDetail",
@@ -1912,6 +1950,14 @@
           "name": "HelixCloseEvent",
           "declaration": {
             "name": "HelixCloseEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixCompleteEvent",
+          "declaration": {
+            "name": "HelixCompleteEvent",
             "module": "./events/events.js"
           }
         },

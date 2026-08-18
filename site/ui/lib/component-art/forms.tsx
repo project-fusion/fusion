@@ -223,6 +223,52 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * Boxes with real air between them, which is the whole silhouette.
+   *
+   * Four rather than six, because the card is 320 wide and six at the control
+   * step would leave no margin either side. What has to survive at thumbnail
+   * size is "separate boxes", not the count.
+   *
+   * Two are filled and two are not, so the row reads as a code part way in
+   * rather than as four empty fields, and the third carries the focus edge: a
+   * pin's ring is on the box the reader is in and never around the row, which is
+   * the one thing its stylesheet is most careful about.
+   *
+   * The character in the third box arrives on hover, which is the only thing
+   * this component does that a row of boxes does not.
+   */
+  'input-pin': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="60" />
+      {[48, 100, 152, 204].map((x) => (
+        <rect className="artSunken" height="40" key={x} rx="4" width="40" x={x} y="80" />
+      ))}
+      {[48, 100, 204].map((x) => (
+        <rect className="artEdge" height="39" key={x} rx="4" width="39" x={x + 0.5} y="80.5" />
+      ))}
+      {/* The two already entered. A bar rather than a glyph, at the width a
+          single character takes in the vocabulary the rest of the gallery uses. */}
+      <rect className="artInk" fillOpacity="0.55" height="12" rx="2" width="8" x="64" y="94" />
+      <rect className="artInk" fillOpacity="0.55" height="12" rx="2" width="8" x="116" y="94" />
+      {/* The box the reader is in, ringed rather than filled. */}
+      <rect className="artSolid" fillOpacity="0.12" height="42" rx="5" width="42" x="151" y="79" />
+      <rect className="artSolid" height="40" rx="4" width="2" x="152" y="80" />
+      <rect className="artSolid" height="40" rx="4" width="2" x="190" y="80" />
+      <rect className="artSolid" height="2" rx="1" width="40" x="152" y="80" />
+      <rect className="artSolid" height="2" rx="1" width="40" x="152" y="118" />
+      <rect
+        className="artSolid artMotion artFill"
+        height="12"
+        rx="2"
+        style={{ '--art-grow': 1 } as CSSProperties}
+        width="8"
+        x="168"
+        y="94"
+      />
+    </>
+  ),
+
   listbox: (
     <>
       {[

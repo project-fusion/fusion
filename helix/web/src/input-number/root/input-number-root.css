@@ -64,6 +64,15 @@
   opacity: 0.5;
 }
 
+/* Still readable, and still submitted. A read-only field is not a disabled one:
+   it is a value the reader may take and may not change. Same treatment `Input`
+   and `Textarea` give it, and the reason `read-only` reflects at all: a
+   reflected attribute nothing selects on is one more thing written onto a host
+   that a server's output never had. */
+:host([read-only]) [part="field"] {
+  background-color: var(--helix-color-surface);
+}
+
 [part="control"] {
   all: unset;
   /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
