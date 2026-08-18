@@ -8,12 +8,12 @@ import { toolingArt } from './tooling'
 /**
  * Abstract art for a family's gallery card, keyed by slug.
  *
- * All sixty families have an entry, and the five files are split by kind
- * rather than by anything the build cares about: one file of sixty is hard
+ * All sixty-one families have an entry, and the five files are split by kind
+ * rather than by anything the build cares about: one file of sixty-one is hard
  * to navigate and every entry would sit beside a neighbour it has nothing to do
  * with. The system they all obey is documented at the top of `core.tsx`.
  *
- * **Sixty, not the fifty-eight folders in `helix/web/src`.** The catalog is
+ * **Sixty-one, not the fifty-nine folders in `helix/web/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@helix-io/sandbox`. Counting directories is how five families were missed on
  * the first pass, and the count that matters is whatever `getFamilies` returns.
@@ -67,6 +67,11 @@ const art: Record<string, ReactNode> = {
  * No background, no border and no radius of its own. The media region runs edge
  * to edge inside the card and the card's `overflow: hidden` clips it to the
  * corner, so anything stated here would be a second frame inside the first.
+ *
+ * `artBody` wraps the drawing so the baseline hover motion in `site.css` has
+ * something to move that is not the whole `<svg>`. The dot lattice is a
+ * substrate: it is the field the geometry was measured against, and a field
+ * that swells with the thing measured on it is not a field.
  *
  * The shadow filter lives here rather than in each drawing. A `<filter>` has to
  * be in the same document fragment as the shape referencing it, and every card
@@ -123,7 +128,7 @@ export function ComponentArt({ slug }: { slug: string }) {
         x="0"
         y="0"
       />
-      {body}
+      <g className="artBody">{body}</g>
     </svg>
   )
 }

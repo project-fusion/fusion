@@ -27,6 +27,7 @@ import type {
   HelixBaseIcon,
   HelixBaseIconButton,
   HelixBaseInput,
+  HelixBaseInputDate,
   HelixBaseInputFile,
   HelixBaseInputNumber,
   HelixBaseInputPin,
@@ -2108,6 +2109,281 @@ export type HelixBaseIconSolidJsProps = {
   "prop:name"?: HelixBaseIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixBaseIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseInputDate` component event */
+export type HelixBaseInputDateElementEvent<E = Event> = TypedEvent<
+  HelixBaseInputDate,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseInputDateHelixChangeElementEvent =
+  HelixBaseInputDateElementEvent<HelixChangeEvent>;
+/** `helix-open` event type */
+export type HelixBaseInputDateHelixOpenElementEvent =
+  HelixBaseInputDateElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBaseInputDateHelixCloseElementEvent =
+  HelixBaseInputDateElementEvent<HelixCloseEvent>;
+
+export type HelixBaseInputDateProps = {
+  /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
+  min?: HelixBaseInputDate["min"];
+  /** Latest date that can be chosen, as `YYYY-MM-DD`. */
+  max?: HelixBaseInputDate["max"];
+  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  "disable-dates"?: HelixBaseInputDate["disableDates"];
+  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  disableDates?: HelixBaseInputDate["disableDates"];
+  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  "disable-days"?: HelixBaseInputDate["disableDays"];
+  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  disableDays?: HelixBaseInputDate["disableDays"];
+  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  "first-day-of-week"?: HelixBaseInputDate["firstDayOfWeek"];
+  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  firstDayOfWeek?: HelixBaseInputDate["firstDayOfWeek"];
+  /** Language tag the calendar names its months and days in. */
+  locale?: HelixBaseInputDate["locale"];
+  /** What the field says before a date is in it. */
+  placeholder?: HelixBaseInputDate["placeholder"];
+  /** Accessible name for the control that opens the calendar. */
+  "trigger-label"?: HelixBaseInputDate["triggerLabel"];
+  /** Accessible name for the control that opens the calendar. */
+  triggerLabel?: HelixBaseInputDate["triggerLabel"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixBaseInputDate["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixBaseInputDate["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixBaseInputDate["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseInputDate["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseInputDate["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixBaseInputDate["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseInputDate["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseInputDate["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseInputDate["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseInputDate["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixBaseInputDate["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseInputDate["name"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixBaseInputDate["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixBaseInputDate["onValueChange"];
+
+  /** Fired when the date changes. */
+  "onhelix-change"?: (e: HelixBaseInputDateHelixChangeElementEvent) => void;
+  /** Fired when the calendar opens. */
+  "onhelix-open"?: (e: HelixBaseInputDateHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "onhelix-close"?: (e: HelixBaseInputDateHelixCloseElementEvent) => void;
+};
+
+export type HelixBaseInputDateSolidJsProps = {
+  /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
+  "prop:min"?: HelixBaseInputDate["min"];
+  /** Latest date that can be chosen, as `YYYY-MM-DD`. */
+  "prop:max"?: HelixBaseInputDate["max"];
+  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  "attr:disable-dates"?: HelixBaseInputDate["disableDates"];
+  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  "prop:disableDates"?: HelixBaseInputDate["disableDates"];
+  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  "attr:disable-days"?: HelixBaseInputDate["disableDays"];
+  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  "prop:disableDays"?: HelixBaseInputDate["disableDays"];
+  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  "attr:first-day-of-week"?: HelixBaseInputDate["firstDayOfWeek"];
+  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  "prop:firstDayOfWeek"?: HelixBaseInputDate["firstDayOfWeek"];
+  /** Language tag the calendar names its months and days in. */
+  "prop:locale"?: HelixBaseInputDate["locale"];
+  /** What the field says before a date is in it. */
+  "prop:placeholder"?: HelixBaseInputDate["placeholder"];
+  /** Accessible name for the control that opens the calendar. */
+  "attr:trigger-label"?: HelixBaseInputDate["triggerLabel"];
+  /** Accessible name for the control that opens the calendar. */
+  "prop:triggerLabel"?: HelixBaseInputDate["triggerLabel"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixBaseInputDate["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixBaseInputDate["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixBaseInputDate["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseInputDate["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseInputDate["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  "prop:value"?: HelixBaseInputDate["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseInputDate["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseInputDate["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseInputDate["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseInputDate["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixBaseInputDate["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseInputDate["name"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixBaseInputDate["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixBaseInputDate["onValueChange"];
+  /** Fired when the date changes. */
+  "on:helix-change"?: (e: HelixBaseInputDateHelixChangeElementEvent) => void;
+  /** Fired when the calendar opens. */
+  "on:helix-open"?: (e: HelixBaseInputDateHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "on:helix-close"?: (e: HelixBaseInputDateHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8543,6 +8819,197 @@ export type CustomElements = {
   >;
 
   /**
+   * **The calendar is `helix-calendar`, not a second one written here.** It
+   * already knows about months, ranges, disabled days, the first day of the week
+   * and every keyboard rule a grid owes a reader, and a picker that reimplemented
+   * a tenth of that would be a worse grid that also had to be maintained. This
+   * element is the field, the overlay, and the translation between them.
+   *
+   * **Typed as well as picked, and the typing is the reason it is not
+   * `<input type="date">`.** The native control gives a free picker and a free
+   * locale and takes almost all styling with it, which is a fair trade until a
+   * product needs the calendar to match everything around it. What is kept from
+   * the native one is the part worth keeping: a real text field, so a reader who
+   * knows the date types it and never opens anything.
+   *
+   * **The value is `YYYY-MM-DD`, always.** That is what a form submits, what
+   * `min` and `max` compare against, and what the calendar speaks. What the field
+   * *shows* is the same string: a locale-formatted display would have to be parsed
+   * back on every keystroke, and half-typed input does not survive a round trip
+   * through a formatter. The same reasoning the sandbox records for its two
+   * syntaxes, which is that a document being edited must not be a rendering of
+   * something else.
+   *
+   * **Opening does not commit.** The calendar announces a date, this element takes
+   * it, and the overlay shuts, because a single date has nothing more to say. A
+   * consumer who owns `value` answers the announcement the way they answer any
+   * other control here.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
+   * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
+   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
+   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
+   * - `locale`: Language tag the calendar names its months and days in.
+   * - `placeholder`: What the field says before a date is in it.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the date changes.
+   * - `helix-open`: Fired when the calendar opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: The mark on the field saying a calendar opens.
+   * - `hint`: Help under the field.
+   * - `feedback`: What is wrong with it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding the text and the trigger.
+   * - `control`: The text input.
+   * - `trigger`: The control that opens the calendar.
+   * - `surface`: The floating panel.
+   * - `calendar`: The calendar inside it.
+   */
+  "helix-base-input-date": Partial<
+    HelixBaseInputDateProps & BaseProps<HelixBaseInputDate> & BaseEvents
+  >;
+
+  /**
    * **A real `<input type="file">`, kept and made invisible rather than
    * replaced.** It is the only way to open a file picker: the dialog is a
    * privileged action a script cannot start on its own, and it opens for a click
@@ -14581,6 +15048,200 @@ export type CustomElementsSolidJs = {
     HelixBaseIconProps &
       HelixBaseIconSolidJsProps &
       BaseProps<HelixBaseIcon> &
+      BaseEvents
+  >;
+
+  /**
+   * **The calendar is `helix-calendar`, not a second one written here.** It
+   * already knows about months, ranges, disabled days, the first day of the week
+   * and every keyboard rule a grid owes a reader, and a picker that reimplemented
+   * a tenth of that would be a worse grid that also had to be maintained. This
+   * element is the field, the overlay, and the translation between them.
+   *
+   * **Typed as well as picked, and the typing is the reason it is not
+   * `<input type="date">`.** The native control gives a free picker and a free
+   * locale and takes almost all styling with it, which is a fair trade until a
+   * product needs the calendar to match everything around it. What is kept from
+   * the native one is the part worth keeping: a real text field, so a reader who
+   * knows the date types it and never opens anything.
+   *
+   * **The value is `YYYY-MM-DD`, always.** That is what a form submits, what
+   * `min` and `max` compare against, and what the calendar speaks. What the field
+   * *shows* is the same string: a locale-formatted display would have to be parsed
+   * back on every keystroke, and half-typed input does not survive a round trip
+   * through a formatter. The same reasoning the sandbox records for its two
+   * syntaxes, which is that a document being edited must not be a rendering of
+   * something else.
+   *
+   * **Opening does not commit.** The calendar announces a date, this element takes
+   * it, and the overlay shuts, because a single date has nothing more to say. A
+   * consumer who owns `value` answers the announcement the way they answer any
+   * other control here.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
+   * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
+   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
+   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
+   * - `locale`: Language tag the calendar names its months and days in.
+   * - `placeholder`: What the field says before a date is in it.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the date changes.
+   * - `helix-open`: Fired when the calendar opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: The mark on the field saying a calendar opens.
+   * - `hint`: Help under the field.
+   * - `feedback`: What is wrong with it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding the text and the trigger.
+   * - `control`: The text input.
+   * - `trigger`: The control that opens the calendar.
+   * - `surface`: The floating panel.
+   * - `calendar`: The calendar inside it.
+   */
+  "helix-base-input-date": Partial<
+    HelixBaseInputDateProps &
+      HelixBaseInputDateSolidJsProps &
+      BaseProps<HelixBaseInputDate> &
       BaseEvents
   >;
 

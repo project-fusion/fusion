@@ -205,6 +205,47 @@ export const formsArt: Record<string, ReactNode> = {
      been told. The dashes are drawn as a run of short bars rather than stroked,
      for the reason the rules are: a stroke half-renders at the card's
      three-quarter scale. */
+  /* A field with a calendar mark at its trailing end, and the grid it opens
+     below. Three rows of dots rather than a real month: at card scale the
+     shapes are all a reader can see anyway, and drawing seven columns of
+     numbers would be a picture of text. */
+  'input-date': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
+      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="60" />
+      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="60.5" />
+      <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="72" x="64" y="76" />
+      {/* The calendar mark: a box with a torn-off top and two rings. */}
+      <rect className="artRule" height="14" width="14" x="240" y="73" />
+      <rect className="artInk" fillOpacity="0.55" height="1" width="14" x="240" y="77" />
+      <rect className="artInk" fillOpacity="0.55" height="4" width="1" x="244" y="70" />
+      <rect className="artInk" fillOpacity="0.55" height="4" width="1" x="251" y="70" />
+      {/* The panel, and the one date that is chosen. */}
+      <rect className="artSunken" height="72" rx="4" width="224" x="48" y="112" />
+      {[0, 1, 2].map((row) =>
+        [0, 1, 2, 3, 4, 5, 6].map((column) => (
+          <rect
+            className="artInk"
+            fillOpacity="0.28"
+            height="6"
+            key={`${row}-${column}`}
+            rx="3"
+            width="6"
+            x={62 + column * 28}
+            y={128 + row * 20}
+          />
+        )),
+      )}
+      <circle
+        className="artSolid artMotion artFill"
+        cx="121"
+        cy="151"
+        r="9"
+        style={{ '--art-grow': 1.5 } as CSSProperties}
+      />
+    </>
+  ),
+
   'input-file': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="56" x="48" y="44" />
@@ -229,23 +270,26 @@ export const formsArt: Record<string, ReactNode> = {
           y="119"
         />
       ))}
-      {/* The trigger, centred in the box the way the label is. */}
-      <rect
-        className="artSolid artMotion artFill"
-        height="8"
-        rx="4"
-        style={{ '--art-grow': 1.4 } as CSSProperties}
-        width="64"
-        x="128"
-        y="88"
-      />
-      {/* Two chosen files under it, each with the mark that takes it back out. */}
+      {/* The trigger, centred in the box the way the label is, and static.
+          It carried `artFill` and so the one thing this card animated was a
+          label growing forty percent wider, which is not a thing a file input
+          does to anything. `artFill` is for a value filling a track. */}
+      <rect className="artSolid" height="8" rx="4" width="64" x="128" y="88" />
+      {/* Two chosen files under it, each with the mark that takes it back out.
+          The second one slides in, because accepting a file is the whole of
+          what this component does and the list is where that shows. It comes
+          from the right rather than fading in place: a row that appears where
+          it already was is indistinguishable from a row that was always there.
+          Forty units, which puts its far edge at 312 and so inside the frame
+          with no clip needed. */}
       <rect className="artSunken" height="16" rx="4" width="224" x="48" y="128" />
       <rect className="artInk" fillOpacity="0.4" height="6" rx="3" width="96" x="56" y="133" />
       <rect className="artInk" fillOpacity="0.28" height="2" rx="1" width="8" x="256" y="135" />
-      <rect className="artSunken" height="16" rx="4" width="224" x="48" y="152" />
-      <rect className="artInk" fillOpacity="0.4" height="6" rx="3" width="72" x="56" y="157" />
-      <rect className="artInk" fillOpacity="0.28" height="2" rx="1" width="8" x="256" y="159" />
+      <g className="artMotion artEdgeIn" style={{ '--art-from': '40px' } as CSSProperties}>
+        <rect className="artSunken" height="16" rx="4" width="224" x="48" y="152" />
+        <rect className="artInk" fillOpacity="0.4" height="6" rx="3" width="72" x="56" y="157" />
+        <rect className="artInk" fillOpacity="0.28" height="2" rx="1" width="8" x="256" y="159" />
+      </g>
     </>
   ),
 

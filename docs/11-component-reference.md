@@ -1516,6 +1516,102 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `--input-size` | Height of the field. |
 | `--input-background-color` | Fill behind the text. |
 
+## Input Date
+
+### Root — `helix-input-date`
+
+A date, typed or picked from a calendar.
+
+Extends `HelixBaseInputDate`.
+
+The frame is the field rather than the input, so the trigger sits inside the
+same box as the text and the focus ring is drawn once around the whole
+control. The trigger is a mark within that box rather than a button beside it:
+a second frame inside the first is two controls where a reader sees one.
+
+The calendar is the real `helix-calendar`, in a panel with no border of its
+own. A surface over the page is told apart by its shadow and by what it
+covers, and a line around it as well reads as a box drawn around something
+already separate.
+
+Height comes from the region, like every other control: `data-density` on
+whatever holds it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseInputDate` | Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. |
+| `disableDays` | `disable-days` | `string` | `''` | `HelixBaseInputDate` | Days of the week that cannot be chosen, `0` for Sunday through `6`. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseInputDate` | First column of the week in the calendar, `0` for Sunday through `6`. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseInputDate` | Language tag the calendar names its months and days in. |
+| `max` | `max` | `string` | `''` | `HelixBaseInputDate` | Latest date that can be chosen, as `YYYY-MM-DD`. |
+| `min` | `min` | `string` | `''` | `HelixBaseInputDate` | Earliest date that can be chosen, as `YYYY-MM-DD`. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placeholder` | `placeholder` | `string` | `'YYYY-MM-DD'` | `HelixBaseInputDate` | What the field says before a date is in it. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixBaseInputDate` | Accessible name for the control that opens the calendar. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseInputDate` | Puts the caret in the field, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the date changes. |
+| `helix-open` | `HelixOpenEvent` | Fired when the calendar opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | The mark on the field saying a calendar opens. |
+| `hint` | Help under the field. |
+| `feedback` | What is wrong with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding the text and the trigger. |
+| `control` | The text input. |
+| `trigger` | The control that opens the calendar. |
+| `surface` | The floating panel. |
+| `calendar` | The calendar inside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--input-date-background-color` | Fill behind the field. |
+
 ## Input File
 
 ### Root — `helix-input-file`
