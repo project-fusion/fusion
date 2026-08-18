@@ -4321,10 +4321,6 @@
             {
               "description": "One of them, and a way to reach that slide.",
               "name": "indicator"
-            },
-            {
-              "description": "The mark that travels to the slide you are on.",
-              "name": "indicator-mark"
             }
           ],
           "slots": [
@@ -4334,13 +4330,6 @@
             }
           ],
           "members": [
-            {
-              "kind": "field",
-              "name": "indicator",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new IndicatorController(this, { active: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"][data-current]'), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator-mark\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicators\"]'), })"
-            },
             {
               "kind": "field",
               "name": "label",

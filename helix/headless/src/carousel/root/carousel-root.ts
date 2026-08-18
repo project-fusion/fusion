@@ -3,7 +3,6 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
-  IndicatorController,
   requestControlledChange,
 } from '@helix-io/core'
 import { caretLeft, caretRight, play, stop } from '@helix-io/icons'
@@ -45,18 +44,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart track - The scroller the slides sit in.
  * @csspart indicators - The row of controls saying where the reader is.
  * @csspart indicator - One of them, and a way to reach that slide.
- * @csspart indicator-mark - The mark that travels to the slide you are on.
  */
 @customElement('helix-base-carousel')
 export class HelixBaseCarousel extends HelixElement {
-  /* The mark. Same controller as the nav bar, the tab row and the page nav, and
-     the carousel was the one run in the library still doing this per item. */
-  private readonly indicator = new IndicatorController(this, {
-    active: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"][data-current]'),
-    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator-mark"]'),
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicators"]'),
-  })
-
   /** Accessible name for the carousel. */
   @property()
   label = 'Carousel'
@@ -388,18 +378,6 @@ export class HelixBaseCarousel extends HelixElement {
     this.addEventListener('pointerenter', this.pause)
   }
 
-  /* Straight away, and again after a frame. Same pair as `Tabs`, for the reason
-     given there: the first call places the mark in a document already laid out,
-     the second covers a first paint that has not happened, where every dot
-     measures zero and `place` refuses rather than writing a wrong position. The
-     frame alone is not enough, because `requestAnimationFrame` does not run in a
-     document the browser is not painting. */
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    this.indicator.place()
-    requestAnimationFrame(() => this.indicator.place())
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('focusin', this.pause)
@@ -553,23 +531,6 @@ export class HelixBaseCarousel extends HelixElement {
                   @click=${() => this.goTo(at)}
                 ></button>`,
               )}
-              ${
-                /* The mark that travels, drawn once rather than per dot.
-                 *
-                 * Every dot used to carry its own current state and grow into
-                 * it, so a move was two dots resizing in two places: the old one
-                 * deflating here, a new one inflating there, and nothing going
-                 * between them. Frozen at 40ms intervals it was plain that the
-                 * mark does not travel at all, it disappears and reappears, and
-                 * every dot between the two slides sideways while it happens
-                 * because the row is relaid out. One mark that moves is what a
-                 * reader reads as the same mark.
-                 *
-                 * `aria-hidden`, because the state it draws is already on the
-                 * dot it lands on, as `aria-current`. */
-                ''
-              }
-              <span part="indicator-mark" aria-hidden="true"></span>
             </div>`
           : nothing
       }`

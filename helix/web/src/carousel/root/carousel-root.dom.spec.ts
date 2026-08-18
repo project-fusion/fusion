@@ -315,19 +315,20 @@ describe('carousel settling', () => {
   })
 })
 
-describe('carousel indicator mark', () => {
-  test('one mark for the run, rather than a state on every dot', async () => {
-    // A move used to be two dots resizing in two places, with nothing going
-    // between them and every dot between the two sliding sideways as the row
-    // was laid out again.
-    const host = await carousel()
-    expect(part(host, 'indicator-mark')).not.toBeNull()
-    expect(part(host, 'indicator-mark')?.getAttribute('aria-hidden')).toBe('true')
+describe('carousel indicators', () => {
+  test('the run is the dots themselves, each one its own state', async () => {
+    /* A single travelling mark was tried here and taken out again. The pill is
+       three times a dot's width, so a mark that takes no room in the row has to
+       sit over its neighbours, and the pitch had to grow from 12 to 20 to make
+       space for it. The run stopped reading as a run. */
+    const host = await carousel('default-index="1"')
+    await host.updateComplete
+    const dots = [...(host.shadowRoot?.querySelectorAll('[part="indicator"]') ?? [])]
+    expect(dots).toHaveLength(3)
+    expect(dots.map((dot) => dot.hasAttribute('data-current'))).toEqual([false, true, false])
   })
 
-  test('the state a reader hears is still on the dot', async () => {
-    // The mark is a picture of it. `aria-current` is what says which slide you
-    // are on, and it stays where a screen reader will find it.
+  test('the state a reader hears is on the dot, where a screen reader finds it', async () => {
     const host = await carousel('default-index="1"')
     await host.updateComplete
     const dots = [...(host.shadowRoot?.querySelectorAll('[part="indicator"]') ?? [])]

@@ -44,10 +44,6 @@
   grid-area: 3 / 2;
   justify-self: start;
   padding-block-start: var(--helix-space-sm);
-  /* The mark's containing block. It is placed against the *padding* box, which
-     is why the controller is handed this element rather than the host: the host
-     holds the arrows and the track as well. */
-  position: relative;
 }
 
 [part="controls"] {
@@ -226,127 +222,81 @@
    Placed by the frame at the top of this file; only the dots themselves are
    described here. */
 
-/* **A fixed slot per dot, because the row must not move.**
- *
- * Each dot used to carry its own current state and grow into it, which relaid
- * the row out on every change: measured across a four-slide jump, every dot
- * between the two ends slid 16px sideways while the old one deflated in one
- * place and a new one inflated in another. Frozen at 40ms intervals the mark
- * plainly does not travel, it disappears and reappears. So the dots are all one
- * size now and never change, and the only thing that moves is the mark.
- *
- * The slot is `space-md` against a `space-xs` dot, which doubles the target from
- * 8px to 16px on the way past. It costs row width: the pitch goes from 12 to 20,
- * so five dots take 96px where they took 72. That is the price of the mark
- * having somewhere to sit without covering its neighbours, and the arithmetic is
- * forced: a `space-lg` mark centred on a dot reaches half of each neighbour at a
- * pitch of 12, and clears them by 4px at 20. */
+/* The dots, at the spacing they have always had: `space-xs` across on a
+   `space-2xs` gap, so the run is tight and reads as one object.
+
+   A travelling mark was tried here instead, on the argument that one thing
+   moving is more legible than two things resizing, and it is not: the pill is
+   three times a dot's width, so a mark that does not take room in the row has to
+   sit over its neighbours, and the pitch had to go from 12 to 20 to make space
+   for it. The run stopped being a run. What the reader wants is the growth
+   itself, so the growth is what this animates. */
 [part="indicator"] {
   all: unset;
-  block-size: var(--helix-space-md);
-  box-sizing: border-box;
-  cursor: pointer;
-  display: grid;
-  inline-size: var(--helix-space-md);
-  place-items: center;
-}
-
-/* The dot itself, drawn inside the slot so the slot can be a target without the
-   dot growing to fill it. */
-[part="indicator"]::before {
   background-color: var(--helix-color-border);
   block-size: var(--helix-space-xs);
   border-radius: var(--helix-radii-full);
-  content: "";
+  box-sizing: border-box;
+  cursor: pointer;
   inline-size: var(--helix-space-xs);
-  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+  transition:
+    background-color var(--_carousel-indicator-motion),
+    inline-size var(--_carousel-indicator-motion);
+
+  /* **One duration and one curve for both, which is the whole of the fix.**
+   *
+   * Colour ran over `fast` and size over `normal`, 120ms against 200ms, so the
+   * two halves of one change finished 80ms apart: the arriving dot was fully
+   * blue while still four fifths grown, and the leaving one fully grey while
+   * still a fifth wide. Measured across the handoff, the middle of every move
+   * was a fat grey stub beside a short blue one, and the colour arriving ahead
+   * of the shape is what read as a jump rather than as a glide. Stated once so
+   * they cannot drift apart again.
+   *
+   * `slow` rather than `normal`, because this is the one transition in the
+   * component a reader is meant to watch: at 200ms the pill had arrived before
+   * the eye found it. */
+  --_carousel-indicator-motion: var(--helix-duration-slow) var(--helix-easing-emphasized);
+}
+
+/* The current one lengthens rather than only changing color, so the set reads
+   at a glance and still reads without color. */
+[part="indicator"][data-current] {
+  background-color: var(--helix-color-primary);
+  inline-size: var(--helix-space-lg);
+}
+
+/* The current dot stretches along the run, whichever way the run goes.
+ *
+ * It grew on the inline axis wherever it was, so a column of dots beside the
+ * slides had one lying on its side across the column: an oval pointing the way
+ * the reader is not travelling. Beside the track it lengthens on the block axis
+ * instead, and the transition follows it, or the growth is instant on the one
+ * axis and animated on the other. */
+:host([indicator-placement="inline-start"]) [part="indicator"],
+:host([indicator-placement="inline-end"]) [part="indicator"] {
+  transition:
+    background-color var(--_carousel-indicator-motion),
+    block-size var(--_carousel-indicator-motion);
+}
+
+:host([indicator-placement="inline-start"]) [part="indicator"][data-current],
+:host([indicator-placement="inline-end"]) [part="indicator"][data-current] {
+  block-size: var(--helix-space-lg);
+  inline-size: var(--helix-space-xs);
 }
 
 /* Neutral, not brand. This is the one `border-strong` in the library that was
-   never a border: it is the fill of an inactive dot. Brand is the mark's, so a
-   hovered dot in brand would be the same colour and the set would read as
-   having two current slides. */
-[part="indicator"]:hover::before {
+   never a border: it is the fill of an inactive dot. Brand is taken, by
+   `[data-current]` directly above, so a hovered dot in brand would be the same
+   colour as the current one and the set would read as having two. */
+[part="indicator"]:hover {
   background-color: var(--helix-color-foreground-muted);
 }
 
 [part="indicator"]:focus-visible {
-  border-radius: var(--helix-radii-full);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
-}
-
-/* The mark, which is the whole of what moves.
- *
- * Same controller as the nav bar, the tab row and the page nav, and the carousel
- * was the last run in the library still doing this per item. It writes the
- * active dot's box as four properties and the stylesheet decides what to make of
- * them: here, a pill longer than the dot on the axis the run goes, centred on
- * whichever slot is current.
- *
- * Both axes are centred from `--_indicator-w` and `-h`, so the same two lines
- * serve the row and the column and neither needs to know which it is in. */
-[part="indicator-mark"] {
-  background-color: var(--helix-color-primary);
-  block-size: var(--_carousel-mark-block);
-  border-radius: var(--helix-radii-full);
-  inline-size: var(--_carousel-mark-inline);
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-  transition:
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-normal) var(--helix-easing-emphasized),
-    translate var(--helix-duration-normal) var(--helix-easing-emphasized);
-  translate: calc(var(--_indicator-x) - (var(--_carousel-mark-inline) - var(--_indicator-w)) / 2)
-    calc(var(--_indicator-y) - (var(--_carousel-mark-block) - var(--_indicator-h)) / 2);
-
-  --_carousel-mark-block: var(--helix-space-xs);
-  --_carousel-mark-inline: var(--helix-space-lg);
-}
-
-/* Nothing is written until there is something to measure, so the mark waits
-   rather than sliding in from the corner on first paint. */
-[part="indicator-mark"][data-placed] {
-  opacity: 1;
-}
-
-/* It swells while it is on its way and settles when it lands, which is what
-   reads as a thing being carried rather than a rectangle being repositioned.
-   `scale` rather than a width, so the centring above stays true and the swell
-   is composited: `translate` applies before `scale`, and the origin is the
-   mark's own centre.
-
-   The swell comes on over `fast` and goes off over `normal`, so it leads the
-   travel and trails it: a swell that faded at the same rate it arrived would
-   read as the mark breathing in place rather than as it being carried.
-
-   `easing-spring` for the travel itself, which is what `Outline` uses and for
-   the same reason: the mark overshoots slightly and settles, which is what
-   makes a landing read as a landing. */
-[part="indicator-mark"][data-moving] {
-  scale: 1.2 1;
-  transition:
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-decelerate),
-    translate var(--helix-duration-normal) var(--helix-easing-spring);
-}
-
-/* Beside the track the run is a column, so the pill is long on the block axis
-   and swells along it. It stretched on the inline axis wherever it was, so a
-   column of dots had one oval lying on its side across it, pointing the way the
-   reader is not travelling. */
-:host([indicator-placement="inline-start"]) [part="indicator-mark"],
-:host([indicator-placement="inline-end"]) [part="indicator-mark"] {
-  --_carousel-mark-block: var(--helix-space-lg);
-  --_carousel-mark-inline: var(--helix-space-xs);
-}
-
-:host([indicator-placement="inline-start"]) [part="indicator-mark"][data-moving],
-:host([indicator-placement="inline-end"]) [part="indicator-mark"][data-moving] {
-  scale: 1 1.2;
 }
 
 /* Hero. The two arrows leave the controls bar and sit against the track's own
@@ -433,23 +383,11 @@
 
 /* Named one selector at a time, because a reduce rule written looser than the
    rule it answers loses on specificity and does nothing. `check:motion`
-   compares them, which is what turned this from invisible into mechanical, and
-   what caught the swell here on the first run.
-
-   The fade stays and everything else goes. A mark arriving by opacity is not
-   motion, and it is what stops the first placement sliding in from the corner;
-   the travel and the swell are, and the swell says nothing the position does
-   not. */
+   compares them, which is what turned this from invisible into mechanical. */
 @media (prefers-reduced-motion: reduce) {
-  [part="indicator"]::before,
-  [part="indicator-mark"],
-  [part="indicator-mark"][data-moving] {
-    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
-  }
-
-  [part="indicator-mark"][data-moving],
-  :host([indicator-placement="inline-start"]) [part="indicator-mark"][data-moving],
-  :host([indicator-placement="inline-end"]) [part="indicator-mark"][data-moving] {
-    scale: none;
+  [part="indicator"],
+  :host([indicator-placement="inline-start"]) [part="indicator"],
+  :host([indicator-placement="inline-end"]) [part="indicator"] {
+    transition: none;
   }
 }

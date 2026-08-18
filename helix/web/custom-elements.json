@@ -5760,17 +5760,6 @@
             },
             {
               "kind": "field",
-              "name": "indicator",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new IndicatorController(this, { active: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator\"][data-current]'), indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicator-mark\"]'), surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"indicators\"]'), })",
-              "inheritedFrom": {
-                "name": "HelixBaseCarousel",
-                "module": "src/carousel/root/carousel-root.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -6367,14 +6356,6 @@
             {
               "description": "One of them, and a way to reach that slide.",
               "name": "indicator",
-              "inheritedFrom": {
-                "name": "HelixBaseCarousel",
-                "module": "src/carousel/root/carousel-root.ts"
-              }
-            },
-            {
-              "description": "The mark that travels to the slide you are on.",
-              "name": "indicator-mark",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"

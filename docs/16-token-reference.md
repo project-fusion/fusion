@@ -65,9 +65,9 @@ The spacing scale, used for gaps, padding and margins alike.
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 125 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 145 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 129 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 127 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 130 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 69 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 65 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 56 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 19 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 27 |
@@ -83,7 +83,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 102 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
-| `--helix-radii-full` | `9999px` | 52 |
+| `--helix-radii-full` | `9999px` | 48 |
 
 ## font
 
@@ -179,9 +179,9 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 0 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 182 |
-| `--helix-duration-normal` | `var(--_helix-ms-200)` | 91 |
-| `--helix-duration-slow` | `var(--_helix-ms-320)` | 10 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 172 |
+| `--helix-duration-normal` | `var(--_helix-ms-200)` | 85 |
+| `--helix-duration-slow` | `var(--_helix-ms-320)` | 12 |
 
 ## easing
 
@@ -189,11 +189,11 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 172 |
-| `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 36 |
-| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 25 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 164 |
+| `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 34 |
+| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 23 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
-| `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 6 |
+| `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 4 |
 
 ## size
 
