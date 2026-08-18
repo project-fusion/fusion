@@ -9097,6 +9097,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/meter/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/navigation/index.js"
           }
         },
@@ -15037,6 +15045,389 @@
           "declaration": {
             "name": "HelixBaseMenu",
             "module": "src/menu/root/menu-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/meter/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/meter/root/meter-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/meter/root/meter-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**Not `Progress`, and the difference is the whole component.** A progress bar\nreports how far along a task is: it starts empty, ends full, and full is\nalways the good end. A meter reports a level in a range that is not going\nanywhere, and which end is good is a fact about the thing being measured.\nDisk usage, a battery, a score, a rate limit. So there is no `indeterminate`\nhere: a measurement whose value is unknown is not a measurement.\n\n**`low`, `high` and `optimum` are the reason it exists**, and they follow the\nHTML specification's own rule. The three thresholds cut the range into a low\nband, a middle and a high band, and `optimum` says which of the three is the\none to be in. The band the value falls in is then the good one, the one next\nto it is fair, and the one two away is poor.\n\n**Without thresholds there are no bands, and this is where it parts company\nwith `<meter>`.** The platform defaults `optimum` to the midpoint and both\nthresholds to the ends, so a bare `<meter value=\"20\" max=\"100\">` computes as\noptimum and every browser paints it green. A gauge with nothing said about it\nis not good news; it is a reading. Declared thresholds turn the colour on.\n\n**And the bands are drawn as well as coloured.** A tick sits at `low` and at\n`high`, so the reading can be placed against them without seeing colour at\nall, which is the same call the carousel's current dot makes by lengthening\nrather than only changing colour.",
+          "name": "HelixBaseMeter",
+          "cssParts": [
+            {
+              "description": "The whole range.",
+              "name": "track"
+            },
+            {
+              "description": "The part of it the value fills.",
+              "name": "indicator"
+            },
+            {
+              "description": "A mark at `low` or at `high`.",
+              "name": "tick"
+            },
+            {
+              "description": "The reading, under `show-value`.",
+              "name": "value"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Meter'",
+              "description": "Accessible name for the reading.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Bottom of the range.",
+              "attribute": "min"
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Top of the range.\n\nA hundred rather than the platform's one, which is what `Progress` already\ntakes and what a consumer writing `value=\"72\"` means. A range of zero to one\nis a fraction, and a component that reads `value=\"72\"` as seventy-two times\nover its maximum is a trap that costs nothing to avoid.",
+              "attribute": "max"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The reading.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "low",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Top of the low band. Absent leaves the range unbanded.",
+              "attribute": "low"
+            },
+            {
+              "kind": "field",
+              "name": "high",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Bottom of the high band. Absent leaves the range unbanded.",
+              "attribute": "high"
+            },
+            {
+              "kind": "field",
+              "name": "optimum",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Where in the range it is best to be.\n\nDefaults to the middle of whatever bands are declared, which is the\nplatform's own default and the right one for a score. A meter where low is\ngood, like disk usage, says `optimum=\"0\"`; one where high is good, like a\nbattery, says `optimum=\"100\"`.",
+              "attribute": "optimum"
+            },
+            {
+              "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reading is shown beside the bar.",
+              "attribute": "show-value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "valueText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the reading says, where a number is not the whole story.\n\n`value-text=\"18 GB of 32 GB\"` is announced and shown instead of `56%`. The\nsame property `Progress` carries, for the same reason: a percentage is a\nfair summary of a task and a poor one of a quantity.",
+              "attribute": "value-text"
+            },
+            {
+              "kind": "field",
+              "name": "span",
+              "type": {
+                "text": "{ max: number; min: number }"
+              },
+              "privacy": "private",
+              "description": "The range, clamped so `max` is never at or below `min`.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "reading",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The reading, pulled into the range.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "fraction",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How much of the track is filled, from zero to one.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "thresholds",
+              "type": {
+                "text": "{ high: number; low: number } | undefined"
+              },
+              "privacy": "private",
+              "description": "The thresholds, in order, or nothing where the consumer declared none.\n\nBoth are clamped into the range and to each other, because a `low` above a\n`high` describes no bands at all and the spec's own answer is to raise the\none that is out of order rather than to give up.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "band",
+              "type": {
+                "text": "MeterBand | undefined"
+              },
+              "privacy": "private",
+              "description": "Which band the reading is in, by the specification's rule.\n\n`optimum` names a point, and the band containing it is the good one. A\nreading in that band is good, one in a band beside it is fair, and one two\nbands away is poor. Undefined where nothing was declared, which is what\nkeeps an unbanded meter from being painted as good news.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "text",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What the reading says, which is the consumer's words or a percentage.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Meter'",
+              "description": "Accessible name for the reading.",
+              "fieldName": "label"
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Bottom of the range.",
+              "fieldName": "min"
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Top of the range.\n\nA hundred rather than the platform's one, which is what `Progress` already\ntakes and what a consumer writing `value=\"72\"` means. A range of zero to one\nis a fraction, and a component that reads `value=\"72\"` as seventy-two times\nover its maximum is a trap that costs nothing to avoid.",
+              "fieldName": "max"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The reading.",
+              "fieldName": "value"
+            },
+            {
+              "name": "low",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Top of the low band. Absent leaves the range unbanded.",
+              "fieldName": "low"
+            },
+            {
+              "name": "high",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Bottom of the high band. Absent leaves the range unbanded.",
+              "fieldName": "high"
+            },
+            {
+              "name": "optimum",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Where in the range it is best to be.\n\nDefaults to the middle of whatever bands are declared, which is the\nplatform's own default and the right one for a score. A meter where low is\ngood, like disk usage, says `optimum=\"0\"`; one where high is good, like a\nbattery, says `optimum=\"100\"`.",
+              "fieldName": "optimum"
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reading is shown beside the bar.",
+              "fieldName": "showValue"
+            },
+            {
+              "name": "value-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the reading says, where a number is not the whole story.\n\n`value-text=\"18 GB of 32 GB\"` is announced and shown instead of `56%`. The\nsame property `Progress` carries, for the same reason: a percentage is a\nfair summary of a task and a poor one of a quantity.",
+              "fieldName": "valueText"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A measurement in a known range, and whether it is where you want it.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/meter",
+            "aliases": [
+              "Gauge",
+              "Level",
+              "Capacity"
+            ],
+            "tier": "headless",
+            "group": "BaseMeter",
+            "part": "Root"
+          },
+          "tagName": "helix-base-meter",
+          "customElement": true,
+          "modulePath": "src/meter/root/meter-root.ts",
+          "definitionPath": "src/meter/root/meter-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseMeter",
+          "declaration": {
+            "name": "HelixBaseMeter",
+            "module": "src/meter/root/meter-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-meter",
+          "declaration": {
+            "name": "HelixBaseMeter",
+            "module": "src/meter/root/meter-root.ts"
           }
         }
       ]

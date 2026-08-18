@@ -35,6 +35,7 @@ import type {
   HelixBaseListbox,
   HelixBaseMenu,
   HelixBaseMenuItem,
+  HelixBaseMeter,
   HelixBaseNavigation,
   HelixBaseOption,
   HelixBaseOptionGroup,
@@ -3245,6 +3246,97 @@ instead. */
   "on:helix-close"?: (e: HelixBaseMenuHelixCloseElementEvent) => void;
   /** Fired when an item is chosen. */
   "on:helix-select"?: (e: HelixBaseMenuHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseMeterProps = {
+  /** Accessible name for the reading. */
+  label?: HelixBaseMeter["label"];
+  /** Bottom of the range. */
+  min?: HelixBaseMeter["min"];
+  /** Top of the range.
+
+A hundred rather than the platform's one, which is what `Progress` already
+takes and what a consumer writing `value="72"` means. A range of zero to one
+is a fraction, and a component that reads `value="72"` as seventy-two times
+over its maximum is a trap that costs nothing to avoid. */
+  max?: HelixBaseMeter["max"];
+  /** The reading. */
+  value?: HelixBaseMeter["value"];
+  /** Top of the low band. Absent leaves the range unbanded. */
+  low?: HelixBaseMeter["low"];
+  /** Bottom of the high band. Absent leaves the range unbanded. */
+  high?: HelixBaseMeter["high"];
+  /** Where in the range it is best to be.
+
+Defaults to the middle of whatever bands are declared, which is the
+platform's own default and the right one for a score. A meter where low is
+good, like disk usage, says `optimum="0"`; one where high is good, like a
+battery, says `optimum="100"`. */
+  optimum?: HelixBaseMeter["optimum"];
+  /** Whether the reading is shown beside the bar. */
+  "show-value"?: HelixBaseMeter["showValue"];
+  /** Whether the reading is shown beside the bar. */
+  showValue?: HelixBaseMeter["showValue"];
+  /** What the reading says, where a number is not the whole story.
+
+`value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
+same property `Progress` carries, for the same reason: a percentage is a
+fair summary of a task and a poor one of a quantity. */
+  "value-text"?: HelixBaseMeter["valueText"];
+  /** What the reading says, where a number is not the whole story.
+
+`value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
+same property `Progress` carries, for the same reason: a percentage is a
+fair summary of a task and a poor one of a quantity. */
+  valueText?: HelixBaseMeter["valueText"];
+};
+
+export type HelixBaseMeterSolidJsProps = {
+  /** Accessible name for the reading. */
+  "prop:label"?: HelixBaseMeter["label"];
+  /** Bottom of the range. */
+  "prop:min"?: HelixBaseMeter["min"];
+  /** Top of the range.
+
+A hundred rather than the platform's one, which is what `Progress` already
+takes and what a consumer writing `value="72"` means. A range of zero to one
+is a fraction, and a component that reads `value="72"` as seventy-two times
+over its maximum is a trap that costs nothing to avoid. */
+  "prop:max"?: HelixBaseMeter["max"];
+  /** The reading. */
+  "prop:value"?: HelixBaseMeter["value"];
+  /** Top of the low band. Absent leaves the range unbanded. */
+  "prop:low"?: HelixBaseMeter["low"];
+  /** Bottom of the high band. Absent leaves the range unbanded. */
+  "prop:high"?: HelixBaseMeter["high"];
+  /** Where in the range it is best to be.
+
+Defaults to the middle of whatever bands are declared, which is the
+platform's own default and the right one for a score. A meter where low is
+good, like disk usage, says `optimum="0"`; one where high is good, like a
+battery, says `optimum="100"`. */
+  "prop:optimum"?: HelixBaseMeter["optimum"];
+  /** Whether the reading is shown beside the bar. */
+  "bool:show-value"?: HelixBaseMeter["showValue"];
+  /** Whether the reading is shown beside the bar. */
+  "prop:showValue"?: HelixBaseMeter["showValue"];
+  /** What the reading says, where a number is not the whole story.
+
+`value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
+same property `Progress` carries, for the same reason: a percentage is a
+fair summary of a task and a poor one of a quantity. */
+  "attr:value-text"?: HelixBaseMeter["valueText"];
+  /** What the reading says, where a number is not the whole story.
+
+`value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
+same property `Progress` carries, for the same reason: a percentage is a
+fair summary of a task and a poor one of a quantity. */
+  "prop:valueText"?: HelixBaseMeter["valueText"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9070,6 +9162,72 @@ export type CustomElements = {
   >;
 
   /**
+   * **Not `Progress`, and the difference is the whole component.** A progress bar
+   * reports how far along a task is: it starts empty, ends full, and full is
+   * always the good end. A meter reports a level in a range that is not going
+   * anywhere, and which end is good is a fact about the thing being measured.
+   * Disk usage, a battery, a score, a rate limit. So there is no `indeterminate`
+   * here: a measurement whose value is unknown is not a measurement.
+   *
+   * **`low`, `high` and `optimum` are the reason it exists**, and they follow the
+   * HTML specification's own rule. The three thresholds cut the range into a low
+   * band, a middle and a high band, and `optimum` says which of the three is the
+   * one to be in. The band the value falls in is then the good one, the one next
+   * to it is fair, and the one two away is poor.
+   *
+   * **Without thresholds there are no bands, and this is where it parts company
+   * with `<meter>`.** The platform defaults `optimum` to the midpoint and both
+   * thresholds to the ends, so a bare `<meter value="20" max="100">` computes as
+   * optimum and every browser paints it green. A gauge with nothing said about it
+   * is not good news; it is a reading. Declared thresholds turn the colour on.
+   *
+   * **And the bands are drawn as well as coloured.** A tick sits at `low` and at
+   * `high`, so the reading can be placed against them without seeing colour at
+   * all, which is the same call the carousel's current dot makes by lengthening
+   * rather than only changing colour.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the reading.
+   * - `min`: Bottom of the range.
+   * - `max`: Top of the range.
+   *
+   * A hundred rather than the platform's one, which is what `Progress` already
+   * takes and what a consumer writing `value="72"` means. A range of zero to one
+   * is a fraction, and a component that reads `value="72"` as seventy-two times
+   * over its maximum is a trap that costs nothing to avoid.
+   * - `value`: The reading.
+   * - `low`: Top of the low band. Absent leaves the range unbanded.
+   * - `high`: Bottom of the high band. Absent leaves the range unbanded.
+   * - `optimum`: Where in the range it is best to be.
+   *
+   * Defaults to the middle of whatever bands are declared, which is the
+   * platform's own default and the right one for a score. A meter where low is
+   * good, like disk usage, says `optimum="0"`; one where high is good, like a
+   * battery, says `optimum="100"`.
+   * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
+   * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
+   *
+   * `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
+   * same property `Progress` carries, for the same reason: a percentage is a
+   * fair summary of a task and a poor one of a quantity.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `track`: The whole range.
+   * - `indicator`: The part of it the value fills.
+   * - `tick`: A mark at `low` or at `high`.
+   * - `value`: The reading, under `show-value`.
+   */
+  "helix-base-meter": Partial<
+    HelixBaseMeterProps & BaseProps<HelixBaseMeter> & BaseEvents
+  >;
+
+  /**
    * Renders a real `<nav>`, which is the landmark a screen-reader user jumps to.
    * It exists as its own component rather than as a region of `AppHeader` because
    * a header is not inherently navigation, and navigation is not only ever in a
@@ -14716,6 +14874,75 @@ export type CustomElementsSolidJs = {
     HelixBaseMenuProps &
       HelixBaseMenuSolidJsProps &
       BaseProps<HelixBaseMenu> &
+      BaseEvents
+  >;
+
+  /**
+   * **Not `Progress`, and the difference is the whole component.** A progress bar
+   * reports how far along a task is: it starts empty, ends full, and full is
+   * always the good end. A meter reports a level in a range that is not going
+   * anywhere, and which end is good is a fact about the thing being measured.
+   * Disk usage, a battery, a score, a rate limit. So there is no `indeterminate`
+   * here: a measurement whose value is unknown is not a measurement.
+   *
+   * **`low`, `high` and `optimum` are the reason it exists**, and they follow the
+   * HTML specification's own rule. The three thresholds cut the range into a low
+   * band, a middle and a high band, and `optimum` says which of the three is the
+   * one to be in. The band the value falls in is then the good one, the one next
+   * to it is fair, and the one two away is poor.
+   *
+   * **Without thresholds there are no bands, and this is where it parts company
+   * with `<meter>`.** The platform defaults `optimum` to the midpoint and both
+   * thresholds to the ends, so a bare `<meter value="20" max="100">` computes as
+   * optimum and every browser paints it green. A gauge with nothing said about it
+   * is not good news; it is a reading. Declared thresholds turn the colour on.
+   *
+   * **And the bands are drawn as well as coloured.** A tick sits at `low` and at
+   * `high`, so the reading can be placed against them without seeing colour at
+   * all, which is the same call the carousel's current dot makes by lengthening
+   * rather than only changing colour.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the reading.
+   * - `min`: Bottom of the range.
+   * - `max`: Top of the range.
+   *
+   * A hundred rather than the platform's one, which is what `Progress` already
+   * takes and what a consumer writing `value="72"` means. A range of zero to one
+   * is a fraction, and a component that reads `value="72"` as seventy-two times
+   * over its maximum is a trap that costs nothing to avoid.
+   * - `value`: The reading.
+   * - `low`: Top of the low band. Absent leaves the range unbanded.
+   * - `high`: Bottom of the high band. Absent leaves the range unbanded.
+   * - `optimum`: Where in the range it is best to be.
+   *
+   * Defaults to the middle of whatever bands are declared, which is the
+   * platform's own default and the right one for a score. A meter where low is
+   * good, like disk usage, says `optimum="0"`; one where high is good, like a
+   * battery, says `optimum="100"`.
+   * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
+   * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
+   *
+   * `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
+   * same property `Progress` carries, for the same reason: a percentage is a
+   * fair summary of a task and a poor one of a quantity.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `track`: The whole range.
+   * - `indicator`: The part of it the value fills.
+   * - `tick`: A mark at `low` or at `high`.
+   * - `value`: The reading, under `show-value`.
+   */
+  "helix-base-meter": Partial<
+    HelixBaseMeterProps &
+      HelixBaseMeterSolidJsProps &
+      BaseProps<HelixBaseMeter> &
       BaseEvents
   >;
 

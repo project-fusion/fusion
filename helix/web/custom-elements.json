@@ -12294,6 +12294,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/meter/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/navigation/index.js"
           }
         },
@@ -19272,6 +19280,539 @@
           "declaration": {
             "name": "HelixMenu",
             "module": "src/menu/root/menu-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/meter/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/meter/root/meter-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/meter/root/meter-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/meter/root/meter-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/meter/root/meter-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The bar `Progress` draws, at the same height and with the same corner, because\nthe two stand beside each other in a panel and a reading that sits differently\nin each reads as two unrelated controls.\n\nWhat differs is what the colour means. A progress bar is one colour because\nthere is one thing to say; a meter's fill takes the success, warning or danger\ntone from the band its reading falls in, and only once thresholds have been\ndeclared. An unbanded meter is neutral, because a gauge with nothing said\nabout it is a reading rather than good news.\n\nA tick marks each threshold, so the reading can be placed against the bands\nwithout seeing colour at all.",
+          "name": "HelixMeter",
+          "cssProperties": [
+            {
+              "description": "The fill, overriding the band's own tone.",
+              "name": "--meter-color"
+            },
+            {
+              "description": "How thick the bar is.",
+              "name": "--meter-size"
+            },
+            {
+              "description": "The mark at a threshold.",
+              "name": "--meter-tick-color"
+            },
+            {
+              "description": "The groove behind the fill.",
+              "name": "--meter-track-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The whole range.",
+              "name": "track",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "description": "The part of it the value fills.",
+              "name": "indicator",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "description": "A mark at `low` or at `high`.",
+              "name": "tick",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "description": "The reading, under `show-value`.",
+              "name": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Meter'",
+              "description": "Accessible name for the reading.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Bottom of the range.",
+              "attribute": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Top of the range.\n\nA hundred rather than the platform's one, which is what `Progress` already\ntakes and what a consumer writing `value=\"72\"` means. A range of zero to one\nis a fraction, and a component that reads `value=\"72\"` as seventy-two times\nover its maximum is a trap that costs nothing to avoid.",
+              "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The reading.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "low",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Top of the low band. Absent leaves the range unbanded.",
+              "attribute": "low",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "high",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Bottom of the high band. Absent leaves the range unbanded.",
+              "attribute": "high",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "optimum",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Where in the range it is best to be.\n\nDefaults to the middle of whatever bands are declared, which is the\nplatform's own default and the right one for a score. A meter where low is\ngood, like disk usage, says `optimum=\"0\"`; one where high is good, like a\nbattery, says `optimum=\"100\"`.",
+              "attribute": "optimum",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reading is shown beside the bar.",
+              "attribute": "show-value",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the reading says, where a number is not the whole story.\n\n`value-text=\"18 GB of 32 GB\"` is announced and shown instead of `56%`. The\nsame property `Progress` carries, for the same reason: a percentage is a\nfair summary of a task and a poor one of a quantity.",
+              "attribute": "value-text",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "span",
+              "type": {
+                "text": "{ max: number; min: number }"
+              },
+              "privacy": "private",
+              "description": "The range, clamped so `max` is never at or below `min`.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "reading",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The reading, pulled into the range.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "fraction",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How much of the track is filled, from zero to one.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "thresholds",
+              "type": {
+                "text": "{ high: number; low: number } | undefined"
+              },
+              "privacy": "private",
+              "description": "The thresholds, in order, or nothing where the consumer declared none.\n\nBoth are clamped into the range and to each other, because a `low` above a\n`high` describes no bands at all and the spec's own answer is to raise the\none that is out of order rather than to give up.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "band",
+              "type": {
+                "text": "MeterBand | undefined"
+              },
+              "privacy": "private",
+              "description": "Which band the reading is in, by the specification's rule.\n\n`optimum` names a point, and the band containing it is the good one. A\nreading in that band is good, one in a band beside it is fair, and one two\nbands away is poor. Undefined where nothing was declared, which is what\nkeeps an unbanded meter from being painted as good news.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "text",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What the reading says, which is the consumer's words or a percentage.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseMeter",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A measurement in a known range, and whether it is where you want it.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/meter",
+            "aliases": [
+              "Gauge",
+              "Level",
+              "Capacity"
+            ],
+            "tier": "styled",
+            "group": "Meter",
+            "part": "Root"
+          },
+          "tagName": "helix-meter",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Meter'",
+              "description": "Accessible name for the reading.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Bottom of the range.",
+              "fieldName": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Top of the range.\n\nA hundred rather than the platform's one, which is what `Progress` already\ntakes and what a consumer writing `value=\"72\"` means. A range of zero to one\nis a fraction, and a component that reads `value=\"72\"` as seventy-two times\nover its maximum is a trap that costs nothing to avoid.",
+              "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The reading.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "low",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Top of the low band. Absent leaves the range unbanded.",
+              "fieldName": "low",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "high",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Bottom of the high band. Absent leaves the range unbanded.",
+              "fieldName": "high",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "optimum",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Where in the range it is best to be.\n\nDefaults to the middle of whatever bands are declared, which is the\nplatform's own default and the right one for a score. A meter where low is\ngood, like disk usage, says `optimum=\"0\"`; one where high is good, like a\nbattery, says `optimum=\"100\"`.",
+              "fieldName": "optimum",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reading is shown beside the bar.",
+              "fieldName": "showValue",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "value-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the reading says, where a number is not the whole story.\n\n`value-text=\"18 GB of 32 GB\"` is announced and shown instead of `56%`. The\nsame property `Progress` carries, for the same reason: a percentage is a\nfair summary of a task and a poor one of a quantity.",
+              "fieldName": "valueText",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/meter/root/meter-root.ts",
+          "definitionPath": "src/meter/root/meter-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixMeter",
+          "declaration": {
+            "name": "HelixMeter",
+            "module": "src/meter/root/meter-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-meter",
+          "declaration": {
+            "name": "HelixMeter",
+            "module": "src/meter/root/meter-root.ts"
           }
         }
       ]

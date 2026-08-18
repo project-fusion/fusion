@@ -1,0 +1,105 @@
+/* A row when there is a reading beside the bar, and a bare block when there is
+   not: the grid only exists under `show-value`, so a plain meter generates the
+   box it always did. Same arrangement `Progress` uses, because the two stand
+   beside each other in a panel and a reading that sits differently in each reads
+   as two unrelated controls. */
+:host {
+  display: block;
+}
+
+:host([show-value]) {
+  align-items: center;
+  display: grid;
+  gap: var(--helix-space-sm);
+  grid-template-columns: 1fr auto;
+}
+
+/* Tabular figures, right-aligned with a floor under them, for the reason
+   `Progress` gives: `100%` is wider than `9%` and a reading that changes should
+   not shuffle the words around it. */
+[part="value"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  min-inline-size: 3ch;
+  text-align: end;
+}
+
+/* The whole range, always fully drawn: a track that only appears where the fill
+   has not reached leaves the reading without anything to be a reading of. */
+[part="track"] {
+  background-color: var(--meter-track-color, var(--helix-color-surface-sunken));
+  block-size: var(--meter-size, var(--helix-size-progress));
+  border-radius: var(--helix-radii-full);
+  inline-size: 100%;
+  /* The fill has a radius of its own, and at low values its trailing corners
+     would otherwise round outside the track. The ticks are clipped by it too,
+     which is what keeps one at the very end from spilling past the corner. */
+  overflow: hidden;
+  position: relative;
+}
+
+/* `scale` on the inline axis rather than a width, because a transform is
+   composited and a meter fed by live data updates often. The origin is the
+   inline start, so it grows from the same edge in both writing directions
+   without the component knowing which one it is in. */
+[part="indicator"] {
+  background-color: var(--meter-color, var(--helix-color-primary));
+  block-size: 100%;
+  border-radius: inherit;
+  inline-size: 100%;
+  scale: var(--_meter-fraction, 0) 1;
+  transform-origin: left center;
+  transition:
+    background-color var(--helix-duration-normal) var(--helix-easing-standard),
+    scale var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+:host(:dir(rtl)) [part="indicator"] {
+  transform-origin: right center;
+}
+
+/* The three bands. Colour is the obvious half and the ticks below are the other:
+   a reading that only says "poor" in red says nothing to a reader who cannot see
+   red, and says nothing at all in a screenshot printed in grey. */
+[part="indicator"][data-band="good"] {
+  background-color: var(--meter-color, var(--helix-color-success));
+}
+
+[part="indicator"][data-band="fair"] {
+  background-color: var(--meter-color, var(--helix-color-warning));
+}
+
+[part="indicator"][data-band="poor"] {
+  background-color: var(--meter-color, var(--helix-color-danger));
+}
+
+/* A mark where a band begins, drawn on the track rather than over the fill, so
+   the reading is placed against it whichever side of it the value lands. Two
+   pixels wide against a track that is eight tall: any wider and a threshold near
+   the end reads as part of the fill.
+
+   `inset-inline-start` in per cent, which resolves against the track and flips
+   on its own in a right-to-left document, where a `left` would not. */
+[part="tick"] {
+  background-color: var(--meter-tick-color, var(--helix-color-background));
+  block-size: 100%;
+  inline-size: var(--helix-border-thick);
+  inset-block-start: 0;
+  inset-inline-start: var(--_meter-at, 0%);
+  position: absolute;
+  /* Centred on the threshold rather than starting at it, so the mark says where
+     the band begins rather than where it begins plus two pixels. */
+  translate: -50%;
+  z-index: var(--helix-layer-raised);
+}
+
+/* It arrives at its reading rather than travelling to it, for a reader who asked
+   not to be moved. The reading is still correct: what goes is the sense of it
+   moving, which is what the preference is about. */
+@media (prefers-reduced-motion: reduce) {
+  [part="indicator"] {
+    transition: none;
+  }
+}

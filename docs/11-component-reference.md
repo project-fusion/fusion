@@ -1988,6 +1988,59 @@ than as a ragged list.
 | --- | --- |
 | `--menu-item-hover-color` | Fill under the pointer. |
 
+## Meter
+
+### Root — `helix-meter`
+
+A measurement in a known range, and whether it is where you want it.
+
+Extends `HelixBaseMeter`.
+
+The bar `Progress` draws, at the same height and with the same corner, because
+the two stand beside each other in a panel and a reading that sits differently
+in each reads as two unrelated controls.
+
+What differs is what the colour means. A progress bar is one colour because
+there is one thing to say; a meter's fill takes the success, warning or danger
+tone from the band its reading falls in, and only once thresholds have been
+declared. An unbanded meter is neutral, because a gauge with nothing said
+about it is a reading rather than good news.
+
+A tick marks each threshold, so the reading can be placed against the bands
+without seeing colour at all.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `high` | `high` | `number \| undefined` | - | `HelixBaseMeter` | Bottom of the high band. Absent leaves the range unbanded. |
+| `label` | `label` | `string` | `'Meter'` | `HelixBaseMeter` | Accessible name for the reading. |
+| `low` | `low` | `number \| undefined` | - | `HelixBaseMeter` | Top of the low band. Absent leaves the range unbanded. |
+| `max` | `max` | `number` | `100` | `HelixBaseMeter` | Top of the range. |
+| `min` | `min` | `number` | `0` | `HelixBaseMeter` | Bottom of the range. |
+| `optimum` | `optimum` | `number \| undefined` | - | `HelixBaseMeter` | Where in the range it is best to be. |
+| `showValue` | `show-value` | `boolean` | `false` | `HelixBaseMeter` | Whether the reading is shown beside the bar. |
+| `value` | `value` | `number` | `0` | `HelixBaseMeter` | The reading. |
+| `valueText` | `value-text` | `string` | `''` | `HelixBaseMeter` | What the reading says, where a number is not the whole story. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `track` | The whole range. |
+| `indicator` | The part of it the value fills. |
+| `tick` | A mark at `low` or at `high`. |
+| `value` | The reading, under `show-value`. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--meter-color` | The fill, overriding the band's own tone. |
+| `--meter-size` | How thick the bar is. |
+| `--meter-tick-color` | The mark at a threshold. |
+| `--meter-track-color` | The groove behind the fill. |
+
 ## Navigation
 
 ### Root — `helix-navigation`
