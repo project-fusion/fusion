@@ -37,3 +37,23 @@ describe('pagination summary', () => {
     expect(text(it)).toBe('11 bis 20 von 1.500')
   })
 })
+
+describe('pagination summary out of range', () => {
+  test('a page past the end reads as the last one, not as a backwards range', async () => {
+    /* Only the end was clamped, so page 99 of a ten-page result produced a start
+       past the total and an end pinned to it: "2,451-248 of 248". A count is the
+       one number in a footer a reader cannot check against anything else on
+       screen, so a wrong one is the worst kind here. */
+    const it = await mount(
+      '<helix-pagination-summary page="99" page-size="25" total="248"></helix-pagination-summary>',
+    )
+    expect(text(it)).toBe('226-248 of 248')
+  })
+
+  test('and it agrees with the run beside it, which clamps the same way', async () => {
+    const it = await mount(
+      '<helix-pagination-summary page="0" page-size="25" total="248"></helix-pagination-summary>',
+    )
+    expect(text(it)).toBe('1-25 of 248')
+  })
+})

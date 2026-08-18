@@ -189,10 +189,20 @@ export class HelixBasePagination extends HelixElement {
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
    * the page on show; writing declares it the consumer's, and `default-page`
    * seeds one the element owns.
+   *
+   * **Clamped on the way out, because "the page on show" is what it says it
+   * gives.** It returned whatever had been written, so `default-page="99"` on a
+   * ten-page result rendered page 10, marked page 10 with `aria-current`, and
+   * reported 99. A consumer syncing their query from this read a page that does
+   * not exist while the control in front of them said otherwise. Not a
+   * far-fetched value: it is a bookmarked link after the result shrank.
+   *
+   * Rounded here too, so `2.7` reads as the 2 it renders.
    */
   @property({ type: Number })
   get page(): number {
-    return this.pageState ?? this.defaultPage
+    const asked = this.pageState ?? this.defaultPage
+    return Math.min(this.count, Math.max(1, Math.floor(asked) || 1))
   }
 
   set page(next: number) {
@@ -340,9 +350,9 @@ export class HelixBasePagination extends HelixElement {
     return 1
   }
 
-  /** The page on show, clamped into the total. */
+  /** The page on show. `page` does the clamping now; this is the older name. */
   private get current(): number {
-    return Math.min(this.count, Math.max(1, Math.floor(this.page) || 1))
+    return this.page
   }
 
   /**

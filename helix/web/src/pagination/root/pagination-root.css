@@ -140,6 +140,24 @@
   inline-size: var(--helix-size-icon-sm);
 }
 
+/* **A caret is physical and "previous" is not.**
+ *
+ * The row already flips: it is a flex line, so in a right-to-left document the
+ * back controls sit at the right edge, which is the inline start and is where
+ * they belong. The glyphs inside them did not, so `previous` sat on the right
+ * pointing left, which in that reading direction points *forward*. Every control
+ * in the row said the opposite of what it did.
+ *
+ * Mirrored rather than swapped for the other icon, so the pair stays one
+ * decision: `caret-double-left` reversed is exactly `caret-double-right`, and
+ * two sets of icon imports that must agree is the kind of thing that drifts. */
+:host(:dir(rtl)) [part="first"] svg,
+:host(:dir(rtl)) [part="last"] svg,
+:host(:dir(rtl)) [part="previous"] svg,
+:host(:dir(rtl)) [part="next"] svg {
+  scale: -1 1;
+}
+
 /* The gap is a control, so it takes the control box above and needs only what
    makes it quieter than a page: it is a way through rather than a destination.
 

@@ -370,3 +370,28 @@ describe('pagination count', () => {
     expect(nav.shadowRoot?.querySelector('slot')).toBeNull()
   })
 })
+
+describe('pagination out of range', () => {
+  test('`page` reports the page on show, not the one it was handed', async () => {
+    /* It returned whatever had been written, so a ten-page result rendered page
+       10, marked page 10, and reported 99: a consumer syncing their query from
+       it read a page that does not exist while the control said otherwise. Not
+       a far-fetched value, either. It is a bookmarked link after the result
+       shrank. */
+    const nav = await mount(
+      '<helix-pagination default-page="99" page-size="25" total="248"></helix-pagination>',
+    )
+    expect((nav as HTMLElement & { page: number }).page).toBe(10)
+    expect(nav.shadowRoot?.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe('10')
+  })
+
+  test('and rounds, so a fractional page reads as the one it renders', async () => {
+    const nav = await mount('<helix-pagination default-page="2.7" pages="10"></helix-pagination>')
+    expect((nav as HTMLElement & { page: number }).page).toBe(2)
+  })
+
+  test('a page below the first reads as the first', async () => {
+    const nav = await mount('<helix-pagination default-page="-4" pages="10"></helix-pagination>')
+    expect((nav as HTMLElement & { page: number }).page).toBe(1)
+  })
+})

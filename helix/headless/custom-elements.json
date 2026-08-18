@@ -13985,7 +13985,7 @@
               "type": {
                 "text": "number"
               },
-              "description": "The page on show, one-based.\n\nAn accessor pair, the same shape as the calendar's `month`. Reading gives\nthe page on show; writing declares it the consumer's, and `default-page`\nseeds one the element owns.",
+              "description": "The page on show, one-based.\n\nAn accessor pair, the same shape as the calendar's `month`. Reading gives\nthe page on show; writing declares it the consumer's, and `default-page`\nseeds one the element owns.\n\n**Clamped on the way out, because \"the page on show\" is what it says it\ngives.** It returned whatever had been written, so `default-page=\"99\"` on a\nten-page result rendered page 10, marked page 10 with `aria-current`, and\nreported 99. A consumer syncing their query from this read a page that does\nnot exist while the control in front of them said otherwise. Not a\nfar-fetched value: it is a bookmarked link after the result shrank.\n\nRounded here too, so `2.7` reads as the 2 it renders.",
               "attribute": "page"
             },
             {
@@ -14193,7 +14193,7 @@
                 "text": "number"
               },
               "privacy": "private",
-              "description": "The page on show, clamped into the total.",
+              "description": "The page on show. `page` does the clamping now; this is the older name.",
               "readonly": true
             },
             {
@@ -14470,7 +14470,7 @@
               "type": {
                 "text": "number"
               },
-              "description": "The page on show, one-based.\n\nAn accessor pair, the same shape as the calendar's `month`. Reading gives\nthe page on show; writing declares it the consumer's, and `default-page`\nseeds one the element owns.",
+              "description": "The page on show, one-based.\n\nAn accessor pair, the same shape as the calendar's `month`. Reading gives\nthe page on show; writing declares it the consumer's, and `default-page`\nseeds one the element owns.\n\n**Clamped on the way out, because \"the page on show\" is what it says it\ngives.** It returned whatever had been written, so `default-page=\"99\"` on a\nten-page result rendered page 10, marked page 10 with `aria-current`, and\nreported 99. A consumer syncing their query from this read a page that does\nnot exist while the control in front of them said otherwise. Not a\nfar-fetched value: it is a bookmarked link after the result shrank.\n\nRounded here too, so `2.7` reads as the 2 it renders.",
               "fieldName": "page"
             },
             {

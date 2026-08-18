@@ -3028,7 +3028,16 @@ move they actually want. */
 
 An accessor pair, the same shape as the calendar's `month`. Reading gives
 the page on show; writing declares it the consumer's, and `default-page`
-seeds one the element owns. */
+seeds one the element owns.
+
+**Clamped on the way out, because "the page on show" is what it says it
+gives.** It returned whatever had been written, so `default-page="99"` on a
+ten-page result rendered page 10, marked page 10 with `aria-current`, and
+reported 99. A consumer syncing their query from this read a page that does
+not exist while the control in front of them said otherwise. Not a
+far-fetched value: it is a bookmarked link after the result shrank.
+
+Rounded here too, so `2.7` reads as the 2 it renders. */
   page?: HelixBasePagination["page"];
   /** Page to open on, where nothing declared one. */
   "default-page"?: HelixBasePagination["defaultPage"];
@@ -3153,7 +3162,16 @@ move they actually want. */
 
 An accessor pair, the same shape as the calendar's `month`. Reading gives
 the page on show; writing declares it the consumer's, and `default-page`
-seeds one the element owns. */
+seeds one the element owns.
+
+**Clamped on the way out, because "the page on show" is what it says it
+gives.** It returned whatever had been written, so `default-page="99"` on a
+ten-page result rendered page 10, marked page 10 with `aria-current`, and
+reported 99. A consumer syncing their query from this read a page that does
+not exist while the control in front of them said otherwise. Not a
+far-fetched value: it is a bookmarked link after the result shrank.
+
+Rounded here too, so `2.7` reads as the 2 it renders. */
   "prop:page"?: HelixBasePagination["page"];
   /** Page to open on, where nothing declared one. */
   "attr:default-page"?: HelixBasePagination["defaultPage"];
@@ -8601,6 +8619,15 @@ export type CustomElements = {
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
    * the page on show; writing declares it the consumer's, and `default-page`
    * seeds one the element owns.
+   *
+   * **Clamped on the way out, because "the page on show" is what it says it
+   * gives.** It returned whatever had been written, so `default-page="99"` on a
+   * ten-page result rendered page 10, marked page 10 with `aria-current`, and
+   * reported 99. A consumer syncing their query from this read a page that does
+   * not exist while the control in front of them said otherwise. Not a
+   * far-fetched value: it is a bookmarked link after the result shrank.
+   *
+   * Rounded here too, so `2.7` reads as the 2 it renders.
    * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
    * - `siblings`: How many pages to show either side of the current one.
    * - `boundaries`: How many pages to show at each end, whatever the current one is.
@@ -13876,6 +13903,15 @@ export type CustomElementsSolidJs = {
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
    * the page on show; writing declares it the consumer's, and `default-page`
    * seeds one the element owns.
+   *
+   * **Clamped on the way out, because "the page on show" is what it says it
+   * gives.** It returned whatever had been written, so `default-page="99"` on a
+   * ten-page result rendered page 10, marked page 10 with `aria-current`, and
+   * reported 99. A consumer syncing their query from this read a page that does
+   * not exist while the control in front of them said otherwise. Not a
+   * far-fetched value: it is a bookmarked link after the result shrank.
+   *
+   * Rounded here too, so `2.7` reads as the 2 it renders.
    * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
    * - `siblings`: How many pages to show either side of the current one.
    * - `boundaries`: How many pages to show at each end, whatever the current one is.
