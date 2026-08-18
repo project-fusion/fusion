@@ -117,6 +117,40 @@ const toHsl = (color: Color): { hue: number; lightness: number; saturation: numb
 }
 
 /**
+ * Splits a comma-separated list of colours, ignoring the commas inside them.
+ *
+ * A plain `split(',')` is what this was, and it cannot hold the legacy syntaxes:
+ * `#ef4444, rgb(249 115 22), rgba(34,197,94,.5)` came apart into six fragments,
+ * four of them not colours, and the row quietly rendered three swatches instead
+ * of four. The modern space-separated forms survived it, which is what made the
+ * list look like it worked.
+ *
+ * Depth rather than a regular expression, because the thing that matters is
+ * whether a comma is inside a function call and that is exactly what a counter
+ * answers. No colour syntax nests, so a single counter is enough.
+ */
+export const splitColors = (value: string): string[] => {
+  const found: string[] = []
+  let depth = 0
+  let current = ''
+  for (const character of value) {
+    if (character === '(') {
+      depth += 1
+    } else if (character === ')') {
+      depth = Math.max(0, depth - 1)
+    }
+    if (character === ',' && depth === 0) {
+      found.push(current.trim())
+      current = ''
+    } else {
+      current += character
+    }
+  }
+  found.push(current.trim())
+  return found.filter(Boolean)
+}
+
+/**
  * Any of the syntaxes to the working model, or `null` where it is not a colour.
  *
  * Named colours are not here. Resolving `rebeccapurple` means either shipping

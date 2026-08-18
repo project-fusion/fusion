@@ -1016,6 +1016,7 @@ brought its own card would be a card inside a card there.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-change` | `HelixChangeEvent` | Fired when the colour changes. |
+| `helix-copy` | `HelixCopyEvent` | Fired when the colour is put on the clipboard. |
 
 #### Parts
 
@@ -1026,7 +1027,7 @@ brought its own card would be a card inside a card there.
 | `grid-saturation` | The range input for the square's horizontal axis. |
 | `grid-brightness` | The range input for its vertical axis. |
 | `controls` | The row under the square. |
-| `sample` | The chip of the current colour, in that row. |
+| `sample` | The chip of the current colour, which copies it when pressed. |
 | `channels` | The ramps beside it. |
 | `channel` | One ramp. |
 | `actions` | The group holding the eyedropper and the syntax toggle. |
@@ -1041,6 +1042,7 @@ brought its own card would be a card inside a card there.
 | Property | Description |
 | --- | --- |
 | `--color-inset` | Inset of the rows under the square, and the bottom. |
+| `--color-sample-size` | Edge length of the chip that copies the value. |
 | `--color-grid-ratio` | Aspect ratio of the square. |
 | `--color-grid-radii` | Corner radius of the square. |
 

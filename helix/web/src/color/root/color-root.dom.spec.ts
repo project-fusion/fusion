@@ -178,6 +178,65 @@ describe('color picker', () => {
     expect(host.value).toBe('rgb(0 255 0)')
   })
 
+  test('presets may be written in any syntax, mixed', async () => {
+    // The question is whether a row can hold `#ef4444` beside `rgb(...)` beside
+    // `hsl(...)`. It can: each is parsed the same way the field is, and each is
+    // handed to CSS as written, which understands all three.
+    const host = await picker(
+      'swatches="#ef4444, rgb(249 115 22), hsl(48 96% 53%), rgba(34,197,94,.5)"',
+    )
+    const swatches = [...(host.shadowRoot?.querySelectorAll('[part="swatch"]') ?? [])]
+    expect(swatches).toHaveLength(4)
+    // Painted from the string as given, so the browser resolves each syntax.
+    expect(swatches[1]?.getAttribute('style')).toContain('rgb(249 115 22)')
+    // And taken in the picker's own format, whatever the preset was written in.
+    ;(swatches[2] as HTMLElement).click()
+    await host.updateComplete
+    // hsl(48 96% 53%) is rgb(250, 204, 20), and it survives the trip through the
+    // HSB model the panel holds rather than landing a rounding step away.
+    expect(host.value).toBe('#facc14')
+  })
+
+  test('the chosen preset is not marked with a ring, but is still announced', async () => {
+    // A ring on one swatch is a focus ring in another colour sitting there
+    // permanently, and what the swatch was chosen for is already showing on the
+    // chip. A screen reader has neither, so `aria-pressed` stays.
+    const host = await picker('default-value="#00ff00" swatches="#ff0000,#00ff00"')
+    const swatches = [...(host.shadowRoot?.querySelectorAll('[part="swatch"]') ?? [])]
+    expect(swatches.map((one) => one.getAttribute('aria-pressed'))).toEqual(['false', 'true'])
+  })
+
+  test('the chip copies the value, and says so for as long as it shows', async () => {
+    const written: string[] = []
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: (text: string) => {
+          written.push(text)
+          return Promise.resolve()
+        },
+      },
+    })
+    const host = await picker('default-value="#ff0000"')
+    const said: string[] = []
+    host.addEventListener('helix-copy', (event) => {
+      said.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    const sample = part(host, 'sample') as HTMLButtonElement
+    sample.click()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    expect(written).toEqual(['#ff0000'])
+    expect(said).toEqual(['#ff0000'])
+    expect(sample.hasAttribute('data-copied')).toBe(true)
+    expect(sample.getAttribute('aria-label')).toBe('Copied')
+  })
+
+  test('and there is nothing to copy from an empty picker', async () => {
+    const host = await picker()
+    expect((part(host, 'sample') as HTMLButtonElement).disabled).toBe(true)
+  })
+
   test('the format toggle can be withheld', async () => {
     const host = await picker('no-format')
     expect(host.shadowRoot?.querySelector('[part="format"]')).toBeNull()

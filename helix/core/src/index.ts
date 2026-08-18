@@ -9,6 +9,10 @@ export {
   supportsInvokers,
 } from './controllers/command-controller/command-controller.js'
 export {
+  CopyController,
+  type CopyOptions,
+} from './controllers/copy-controller/copy-controller.js'
+export {
   DisabledCascadeController,
   type DisabledCascadeOptions,
 } from './controllers/disabled-cascade-controller/disabled-cascade-controller.js'
@@ -44,6 +48,7 @@ export {
   type ChangeDetail,
   type CompleteDetail,
   type ConsoleDetail,
+  type CopyDetail,
   type DismissDetail,
   type FilterDetail,
   HelixCaretEvent,
@@ -51,6 +56,7 @@ export {
   HelixCloseEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
+  HelixCopyEvent,
   HelixDismissEvent,
   HelixFilterEvent,
   HelixNavigateEvent,

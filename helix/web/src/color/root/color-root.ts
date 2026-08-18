@@ -5,6 +5,8 @@ import type { CSSResultGroup } from 'lit'
    custom element registers on import. Inherited from the base along with the
    template, which is why it has to be restated here: this file has no
    `<helix-slider>` in it to remind anyone. `check:composed` enforces it. */
+import '../../button/index.js'
+import '../../button-group/index.js'
 import '../../icon/index.js'
 import '../../slider/index.js'
 import { styles } from './color-root.css.js'
@@ -41,6 +43,7 @@ import { styles } from './color-root.css.js'
  * @documentation https://helix.fusion.dev/components/color
  *
  * @cssproperty --color-inset - Inset of the rows under the square, and the bottom.
+ * @cssproperty --color-sample-size - Edge length of the chip that copies the value.
  * @cssproperty --color-grid-ratio - Aspect ratio of the square.
  * @cssproperty --color-grid-radii - Corner radius of the square.
  */

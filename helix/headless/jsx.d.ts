@@ -80,6 +80,7 @@ import type {
   HelixChangeEvent,
   HelixCloseEvent,
   HelixCompleteEvent,
+  HelixCopyEvent,
   HelixDismissEvent,
   HelixFilterEvent,
   HelixFormElement,
@@ -1502,6 +1503,9 @@ export type HelixBaseColorElementEvent<E = Event> = TypedEvent<
 /** `helix-change` event type */
 export type HelixBaseColorHelixChangeElementEvent =
   HelixBaseColorElementEvent<HelixChangeEvent>;
+/** `helix-copy` event type */
+export type HelixBaseColorHelixCopyElementEvent =
+  HelixBaseColorElementEvent<HelixCopyEvent>;
 
 export type HelixBaseColorProps = {
   /** Whether the colour carries an alpha channel.
@@ -1579,6 +1583,8 @@ fire at all. */
 
   /** Fired when the colour changes. */
   "onhelix-change"?: (e: HelixBaseColorHelixChangeElementEvent) => void;
+  /** Fired when the colour is put on the clipboard. */
+  "onhelix-copy"?: (e: HelixBaseColorHelixCopyElementEvent) => void;
 };
 
 export type HelixBaseColorSolidJsProps = {
@@ -1656,6 +1662,8 @@ fire at all. */
   "prop:onValueChange"?: HelixBaseColor["onValueChange"];
   /** Fired when the colour changes. */
   "on:helix-change"?: (e: HelixBaseColorHelixChangeElementEvent) => void;
+  /** Fired when the colour is put on the clipboard. */
+  "on:helix-copy"?: (e: HelixBaseColorHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2562,6 +2570,18 @@ export type HelixBaseInputDateHelixCloseElementEvent =
   HelixBaseInputDateElementEvent<HelixCloseEvent>;
 
 export type HelixBaseInputDateProps = {
+  /** How many dates can be held at once.
+
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value: a form field
+submits a string, and two fields for one question is a different control. */
+  mode?: HelixBaseInputDate["mode"];
+  /** How many months the calendar shows, side by side.
+
+Worth more than one mainly for a range, where picking a start in March and
+an end in April otherwise means paging between them and losing sight of the
+first. The panel is sized by its content, so this widens it. */
+  months?: HelixBaseInputDate["months"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   min?: HelixBaseInputDate["min"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
@@ -2690,6 +2710,18 @@ fire at all. */
 };
 
 export type HelixBaseInputDateSolidJsProps = {
+  /** How many dates can be held at once.
+
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value: a form field
+submits a string, and two fields for one question is a different control. */
+  "prop:mode"?: HelixBaseInputDate["mode"];
+  /** How many months the calendar shows, side by side.
+
+Worth more than one mainly for a range, where picking a start in March and
+an end in April otherwise means paging between them and losing sight of the
+first. The panel is sized by its content, so this widens it. */
+  "prop:months"?: HelixBaseInputDate["months"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   "prop:min"?: HelixBaseInputDate["min"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
@@ -8760,6 +8792,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the colour changes.
+   * - `helix-copy`: Fired when the colour is put on the clipboard.
    *
    * ## Methods
    *
@@ -8793,7 +8826,7 @@ export type CustomElements = {
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
-   * - `sample`: The chip of the current colour, in that row.
+   * - `sample`: The chip of the current colour, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
@@ -9612,6 +9645,16 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `mode`: How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   * - `months`: How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
    * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
    * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
@@ -15302,6 +15345,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the colour changes.
+   * - `helix-copy`: Fired when the colour is put on the clipboard.
    *
    * ## Methods
    *
@@ -15335,7 +15379,7 @@ export type CustomElementsSolidJs = {
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
-   * - `sample`: The chip of the current colour, in that row.
+   * - `sample`: The chip of the current colour, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
@@ -16184,6 +16228,16 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `mode`: How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   * - `months`: How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
    * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
    * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.

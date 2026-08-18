@@ -1,4 +1,5 @@
 import {
+  CopyController,
   customElement,
   type HelixChangeEvent,
   HelixFormElement,
@@ -10,9 +11,18 @@ import { property, state } from 'lit/decorators.js'
    root and a custom element registers on import. The public tag rather than the
    base one: a consumer on the styled tier gets the styled slider, and one on the
    headless tier brings a slider of their own under that name. */
+import '../../button/index.js'
+import '../../button-group/index.js'
 import '../../icon/index.js'
 import '../../slider/index.js'
-import { type Color, type ColorFormat, formatColor, parseColor, toCss } from '../color.js'
+import {
+  type Color,
+  type ColorFormat,
+  formatColor,
+  parseColor,
+  splitColors,
+  toCss,
+} from '../color.js'
 
 /** The formats the toggle walks through, in the order it walks them. */
 const FORMATS: ColorFormat[] = ['hex', 'rgb', 'hsl']
@@ -71,13 +81,14 @@ interface EyeDropperConstructor {
  * @documentation https://helix.fusion.dev/components/color
  *
  * @event {HelixChangeEvent} helix-change - Fired when the colour changes.
+ * @event {HelixCopyEvent} helix-copy - Fired when the colour is put on the clipboard.
  *
  * @csspart grid - The saturation and brightness square.
  * @csspart grid-handle - The mark showing where in the square the colour sits.
  * @csspart grid-saturation - The range input for the square's horizontal axis.
  * @csspart grid-brightness - The range input for its vertical axis.
  * @csspart controls - The row under the square.
- * @csspart sample - The chip of the current colour, in that row.
+ * @csspart sample - The chip of the current colour, which copies it when pressed.
  * @csspart channels - The ramps beside it.
  * @csspart channel - One ramp.
  * @csspart actions - The group holding the eyedropper and the syntax toggle.
@@ -167,10 +178,7 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
 
   /** The presets, as written, with anything that is not a colour dropped. */
   private get presets(): string[] {
-    return this.swatches
-      .split(',')
-      .map((one) => one.trim())
-      .filter((one) => parseColor(one) !== null)
+    return splitColors(this.swatches).filter((one) => parseColor(one) !== null)
   }
 
   /** Moves part of the model and announces the value that follows from it. */
@@ -179,6 +187,21 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
     this.owned = true
     this.requestValue(formatColor(this.moved, this.format, this.alpha))
   }
+
+  /**
+   * Copying the value, which is the one thing here worth taking away.
+   *
+   * A reader who has just built a colour wants it in a stylesheet, and the
+   * alternative is selecting text out of a field that may not be on screen. The
+   * chip is the obvious target: it is the colour, at the size of a control, and
+   * it had no job at all before this.
+   *
+   * The controller rather than the four lines it replaces, because a copy button
+   * is coming and the two share everything that is easy to get wrong: the write,
+   * the confirmation, the timer that ends it, the event, and a failure that is
+   * correctly silent.
+   */
+  private readonly copier = new CopyController(this)
 
   /** Takes a preset, in this picker's syntax rather than as the preset spelled it. */
   private readonly handleSwatch = (preset: string): void => {
@@ -299,21 +322,6 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
     ></helix-slider>`
   }
 
-  /*
-   * The tools are plain buttons in a group of this element's own, rather than
-   * helix-button inside helix-button-group.
-   *
-   * That was the first version and it rendered two unstyled words. helix-button
-   * carries its whole appearance in the base layer, as rules on
-   * helix-button::part(button), and a part selector pierces exactly one shadow
-   * boundary: from the document it reaches a button on the page and stops one
-   * short of a button inside this element. Measured, both came out with no
-   * background, no border, no radius and no padding at all.
-   *
-   * So no component can compose a helix-button today, which is why none does.
-   * helix-icon is fine and is used here: it styles itself from its own
-   * stylesheet, so it works at any depth.
-   */
   protected override render(): TemplateResult {
     const color = this.color
     const painted = toCss(color)
@@ -349,7 +357,14 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
       </div>
 
       <div part="controls" style="--_hue: ${color.hue}; --_color: ${painted}">
-        <span part="sample"></span>
+        <button
+          part="sample"
+          type="button"
+          aria-label=${this.copier.copied ? 'Copied' : `Copy ${this.value || 'the colour'}`}
+          data-copied=${this.copier.copied ? '' : nothing}
+          ?disabled=${this.isDisabled || this.value === ''}
+          @click=${() => this.copier.copy(this.value)}
+        ></button>
         <div part="channels">
           ${this.renderChannel('hue', 'Hue', 360, color.hue)}
           ${this.alpha ? this.renderChannel('alpha', 'Opacity', 100, color.alpha) : nothing}
@@ -363,40 +378,42 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
       <div part="footer">
         ${
           this.tools
-            ? html`<div part="actions" role="group" aria-label="Colour tools">
+            ? html`<helix-button-group part="actions" label="Colour tools">
                 ${
                   this.sampling && !this.noEyedropper
-                    ? html`<button
+                    ? html`<helix-button
                         part="eyedropper"
-                        type="button"
+                        appearance="secondary"
                         aria-label="Sample a colour from the screen"
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
                       >
                         <helix-icon name="eyedropper"></helix-icon>
-                      </button>`
+                      </helix-button>`
                     : nothing
                 }
                 ${
                   this.noFormat
                     ? nothing
-                    : html`<button
+                    : html`<helix-button
                         part="format"
-                        type="button"
+                        appearance="secondary"
                         aria-label=${`Syntax: ${this.format}. Change it.`}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
                       >
                         ${this.format}
-                      </button>`
+                      </helix-button>`
                 }
-              </div>`
+              </helix-button-group>`
             : nothing
         }
-        ${
-          this.presets.length === 0
-            ? nothing
-            : html`<div part="swatches" role="group" aria-label="Presets">
+      </div>
+
+      ${
+        this.presets.length === 0
+          ? nothing
+          : html`<div part="swatches" role="group" aria-label="Presets">
                 ${this.presets.map((preset) => {
                   const parsed = parseColor(preset)
                   return html`<button
@@ -410,7 +427,7 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
                   ></button>`
                 })}
               </div>`
-        }
+      }
       </div>`
   }
 }

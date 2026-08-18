@@ -15,6 +15,19 @@ import '../../calendar/index.js'
 const isIso = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value)
 
 /**
+ * The dates in a value, which may hold more than one.
+ *
+ * A range is two and a multiple is any number, comma separated, which is what
+ * the calendar announces and what a form field can carry as one string. Empty
+ * entries are dropped so a trailing comma while typing is not a date.
+ */
+const dates = (value: string): string[] =>
+  value
+    .split(',')
+    .map((one) => one.trim())
+    .filter(Boolean)
+
+/**
  * @summary A date, typed or picked from a calendar.
  *
  * @description
@@ -67,6 +80,26 @@ const isIso = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value)
 export class HelixBaseInputDate extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /**
+   * How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   */
+  @property({ reflect: true })
+  mode?: 'range' | 'multiple'
+
+  /**
+   * How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
+   */
+  @property({ type: Number })
+  months = 1
+
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   @property()
   min = ''
@@ -136,7 +169,8 @@ export class HelixBaseInputDate extends MixinControllerOpen(
    * complete.
    */
   private get picked(): string {
-    return isIso(this.value) ? this.value : ''
+    const held = dates(this.value)
+    return held.length > 0 && held.every(isIso) ? held.join(',') : ''
   }
 
   /** Relayed under this element's name, so a consumer hears one control. */
@@ -151,9 +185,14 @@ export class HelixBaseInputDate extends MixinControllerOpen(
     const { value } = (event as HelixChangeEvent).detail
     this.requestValue(value)
     this.restore()
-    // A single date has nothing more to say, so the panel gets out of the way.
-    this.requestOpen(false)
-    this.updateComplete.then(() => this.control?.focus())
+    /* A single date has nothing more to say, so the panel gets out of the way.
+       A range or a multiple has: the reader is still choosing, and shutting the
+       calendar under them after the first date is taking the control away
+       mid-answer. */
+    if (this.mode === undefined) {
+      this.requestOpen(false)
+      this.updateComplete.then(() => this.control?.focus())
+    }
   }
 
   /**
@@ -185,14 +224,22 @@ export class HelixBaseInputDate extends MixinControllerOpen(
        nothing, and `type="date"` is what was given up to own the calendar.
        String comparison is enough because ISO dates sort lexically, which is
        the whole reason the value is that shape. */
-    const value = this.value
+    /* Every date in the value, not the value itself: a range is two of them and
+       a multiple is any number, so a string comparison against `min` would be
+       comparing a bound to a list. */
+    const held = dates(this.value)
     let message = ''
-    if (value !== '' && !isIso(value)) {
-      message = 'Enter a date as YYYY-MM-DD.'
-    } else if (value !== '' && this.min !== '' && value < this.min) {
+    if (held.length > 0 && !held.every(isIso)) {
+      message =
+        this.mode === undefined
+          ? 'Enter a date as YYYY-MM-DD.'
+          : 'Enter dates as YYYY-MM-DD, separated by commas.'
+    } else if (this.min !== '' && held.some((one) => one < this.min)) {
       message = `Choose a date on or after ${this.min}.`
-    } else if (value !== '' && this.max !== '' && value > this.max) {
+    } else if (this.max !== '' && held.some((one) => one > this.max)) {
       message = `Choose a date on or before ${this.max}.`
+    } else if (this.mode === 'range' && held.length > 2) {
+      message = 'A range is two dates.'
     }
     if (message === '') {
       this.internals.setValidity(control.validity, control.validationMessage, control)
@@ -312,6 +359,8 @@ export class HelixBaseInputDate extends MixinControllerOpen(
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
         <helix-calendar
           part="calendar"
+          mode=${this.mode ?? nothing}
+          months=${this.months}
           .value=${this.picked}
           disable-dates=${this.disableDates || nothing}
           disable-days=${this.disableDays || nothing}

@@ -171,6 +171,31 @@ export class HelixChangeEvent extends CustomEvent<ChangeDetail> {
   }
 }
 
+/** Detail carried by `helix-copy`. */
+export interface CopyDetail {
+  /** What was put on the clipboard. */
+  value: string
+}
+
+/**
+ * Something was copied to the clipboard.
+ *
+ * Not cancelable, and deliberately: it is announced after the write, because a
+ * clipboard write is a permission the platform may refuse and there is nothing
+ * useful to report until it has either happened or not.
+ */
+export class HelixCopyEvent extends CustomEvent<CopyDetail> {
+  static readonly eventName = 'helix-copy'
+
+  constructor(detail: CopyDetail) {
+    super(HelixCopyEvent.eventName, {
+      bubbles: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** Detail carried by `helix-console`. */
 export interface ConsoleDetail {
   /** How the message was logged. */
@@ -349,6 +374,7 @@ declare global {
     'helix-close': HelixCloseEvent
     'helix-complete': HelixCompleteEvent
     'helix-console': HelixConsoleEvent
+    'helix-copy': HelixCopyEvent
     'helix-dismiss': HelixDismissEvent
     /* Both of these were declared as classes, dispatched by the calendar, the
        listbox and now the pagination, and left out of here, so the one thing

@@ -218,6 +218,84 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/copy-controller/copy-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Puts text on the clipboard and holds a confirmation for a moment.\n\nA controller rather than a component, because copying is a behaviour and not a\nshape. Colour's chip is a swatch that copies, and a copy button is a button\nthat copies, and those two have nothing in common to look at: what they share\nis the write, the confirmation that follows it, the timer that ends it and the\nevent that announces it. Written twice, the second one would get the failure\ncase wrong.\n\n**The failure case is silence.** `navigator.clipboard` is refused on an\ninsecure origin, refused without a user gesture in some browsers, and refused\noutright by permission policy in an iframe, and each of those arrives as a\nrejected promise. There is nothing to recover from and nothing worth saying: a\nmessage about a clipboard is worse than a chip that did not flash. So the\nconfirmation simply does not appear, which is the honest report.\n\n**The event is announced after the write, not before it.** It is not\ncancelable for the same reason: by the time anything could be said, the text\nis already on the clipboard, and an event that cannot prevent what it\ndescribes should not pretend otherwise.\n\nThe timer is cleared when the host leaves the document, or a component removed\nmid-confirmation asks a detached element to re-render.",
+          "name": "CopyController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "copied",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the last write succeeded and is still being confirmed."
+            },
+            {
+              "kind": "field",
+              "name": "timer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "copy",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Writes to the clipboard, and confirms it if the platform allowed it.\n\nEmpty text is not copied. An empty clipboard is not a thing a reader ever\nasks for, and confirming one is worse than doing nothing."
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CopyController",
+          "declaration": {
+            "name": "CopyController",
+            "module": "src/controllers/copy-controller/copy-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/controllers/disabled-cascade-controller/disabled-cascade-controller.ts",
       "declarations": [
         {
@@ -1173,6 +1251,28 @@
         },
         {
           "kind": "class",
+          "description": "Something was copied to the clipboard.\n\nNot cancelable, and deliberately: it is announced after the write, because a\nclipboard write is a permission the platform may refuse and there is nothing\nuseful to report until it has either happened or not.",
+          "name": "HelixCopyEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-copy'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Fired when something being previewed writes to the console.\n\nCarries text rather than the logged values. The preview is a separate\ndocument, so what arrives has crossed `postMessage` and been through\nstructured clone: a DOM node or a function does not survive that, and half a\nvalue is worse than a string of it.",
           "name": "HelixConsoleEvent",
           "members": [
@@ -1334,6 +1434,14 @@
           "name": "HelixChangeEvent",
           "declaration": {
             "name": "HelixChangeEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixCopyEvent",
+          "declaration": {
+            "name": "HelixCopyEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -1747,6 +1855,22 @@
         },
         {
           "kind": "js",
+          "name": "CopyController",
+          "declaration": {
+            "name": "CopyController",
+            "module": "./controllers/copy-controller/copy-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CopyOptions",
+          "declaration": {
+            "name": "CopyOptions",
+            "module": "./controllers/copy-controller/copy-controller.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "DisabledCascadeController",
           "declaration": {
             "name": "DisabledCascadeController",
@@ -1915,6 +2039,14 @@
         },
         {
           "kind": "js",
+          "name": "CopyDetail",
+          "declaration": {
+            "name": "CopyDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "DismissDetail",
           "declaration": {
             "name": "DismissDetail",
@@ -1966,6 +2098,14 @@
           "name": "HelixConsoleEvent",
           "declaration": {
             "name": "HelixConsoleEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixCopyEvent",
+          "declaration": {
+            "name": "HelixCopyEvent",
             "module": "./events/events.js"
           }
         },

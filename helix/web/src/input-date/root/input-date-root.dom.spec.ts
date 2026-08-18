@@ -176,3 +176,80 @@ describe('input date opens on focus', () => {
     expect(host.open).toBe(false)
   })
 })
+
+describe('input date holds more than one', () => {
+  const many = async (
+    attrs: string,
+  ): Promise<HTMLElement & { open: boolean; updateComplete: Promise<unknown>; value: string }> => {
+    const host = (await mount(
+      `<helix-input-date label="Stay" ${attrs}></helix-input-date>`,
+    )) as HTMLElement & {
+      open: boolean
+      updateComplete: Promise<unknown>
+      value: string
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('the mode and the month count reach the calendar', async () => {
+    const host = await many('mode="range" months="2"')
+    const calendar = part(host, 'calendar')
+    expect(calendar?.getAttribute('mode')).toBe('range')
+    expect(calendar?.getAttribute('months')).toBe('2')
+  })
+
+  test('a range is two dates in one value, which is what a form submits', async () => {
+    const host = await many('default-value="2026-08-04,2026-08-11" mode="range"')
+    expect(
+      part(host, 'calendar')?.getAttribute('value') ??
+        (part(host, 'calendar') as unknown as { value: string }).value,
+    ).toBe('2026-08-04,2026-08-11')
+  })
+
+  test('bounds are checked against every date, not against the list', async () => {
+    /* A string comparison of `2026-08-04,2026-09-01` against a `max` would be
+       comparing a bound to a list and would pass whatever the second date was. */
+    const host = await many('default-value="2026-08-04,2026-09-01" max="2026-08-31" mode="range"')
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    expect(internals.validationMessage).toContain('2026-08-31')
+  })
+
+  test('and a range refuses a third date', async () => {
+    const host = await many('default-value="2026-08-04,2026-08-11,2026-08-18" mode="range"')
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    expect(internals.validationMessage).toBe('A range is two dates.')
+  })
+
+  test('the panel stays up while more than one date is being chosen', async () => {
+    /* A single date has nothing more to say. A range does: shutting the calendar
+       after the first one is taking the control away mid-answer. */
+    const host = await many('mode="range"')
+    host.open = true
+    await host.updateComplete
+    part(host, 'calendar')?.dispatchEvent(
+      new CustomEvent('helix-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'date', value: '2026-08-04' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('but shuts for a single date, as it always did', async () => {
+    const host = await many('')
+    host.open = true
+    await host.updateComplete
+    part(host, 'calendar')?.dispatchEvent(
+      new CustomEvent('helix-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'date', value: '2026-08-04' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+})

@@ -111,10 +111,62 @@
   padding-inline: var(--color-inset, var(--helix-space-none));
 }
 
+/* The chip, and it copies.
+ *
+ * 36 rather than a token, because it is measured against the two ramps beside
+ * it rather than against the icon scale: at `icon-lg` it was 24 against a stack
+ * of 36 and sat in the middle of a gap it did not fill. A hook, so a consumer
+ * whose panel is a different width can bring it back in line.
+ *
+ * A `<button>` rather than a `<span>`, so the copy is reachable by keyboard and
+ * announced. The cursor is a copy cursor rather than a pointer: pressing it does
+ * not navigate or open anything, and `copy` is the one cursor that says exactly
+ * what will happen. */
 [part="sample"] {
-  block-size: var(--helix-size-icon-lg);
+  /* Reset by name rather than with `all: unset`, which is what this had and
+     which silently wiped the chip. `all` resets every property the rule does not
+     restate, and the fill and the checkerboard are set in the shared rule
+     *above* this one: measured, `background-image` came back `none` and the chip
+     painted nothing at all. Only the UA's button styling needs removing here. */
+  appearance: none;
+  background-color: transparent;
+  block-size: var(--color-sample-size, 36px);
+  box-sizing: border-box;
+  cursor: copy;
   flex: none;
-  inline-size: var(--helix-size-icon-lg);
+  font: inherit;
+  inline-size: var(--color-sample-size, 36px);
+  padding: var(--helix-space-none);
+  position: relative;
+  transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+[part="sample"]:disabled {
+  cursor: not-allowed;
+}
+
+[part="sample"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* A press, and a mark over the colour for as long as it lasts. The mark is drawn
+   rather than slotted, the same stencil the checkbox uses, and it sits on a wash
+   of the page so a tick lands legibly on any colour underneath it. */
+[part="sample"][data-copied] {
+  scale: 0.94;
+}
+
+[part="sample"][data-copied]::after {
+  background-color: var(--helix-color-surface-overlay);
+  block-size: 100%;
+  content: "";
+  inset: 0;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: 60%;
+  position: absolute;
 }
 
 /* `sm` between the ramps, not `2xs`. They are two separate decisions that
@@ -183,19 +235,11 @@
   --slider-track-color: transparent;
 }
 
-/* The syntax toggle and the presets share a row. Neither fills one, and the
-   alternative was a column beside the ramps, which left the hue bar eighty
-   pixels wide to pick one of three hundred and sixty out of. */
 [part="footer"] {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-xs);
-  padding-block-start: var(--helix-space-sm);
   padding-inline: var(--color-inset, var(--helix-space-none));
 }
 
-/* Drawn only when it holds something. With no presets and no toggle this is an
+/* Drawn only when it holds something. With no presets and no tools this is an
    empty box, and an empty box still takes its padding. */
 [part="footer"]:empty {
   display: none;
@@ -211,101 +255,46 @@
  * `[data-density="sm"]` rule cannot help here, being a document rule that
  * reaches `helix-button::part(button)` and so stopping at the first shadow
  * boundary, which this row is two inside. */
-/* The two tools, joined into one control.
+/* The tools take the width, one half each.
  *
- * Their own rules rather than `helix-button` inside `helix-button-group`, which
- * was tried and rendered two unstyled words. The button keeps its whole
- * appearance in the base layer as `helix-button::part(button)`, and a part
- * selector crosses exactly one shadow boundary: a document rule reaches a button
- * on the page and stops one short of a button inside this element. Measured, it
- * came out with no background, no border, no radius and no padding.
+ * `helix-button-group` and two `helix-button`s, which was the first thing tried
+ * here and rendered two unstyled words: the button kept its whole appearance in
+ * the base layer as `helix-button::part(button)`, and a part selector crosses
+ * one shadow boundary, so it reached a button on the page and stopped one short
+ * of a button inside this element. That is fixed at the source now, in
+ * `button-root.css`, and this is the first component to hold a real one.
  *
- * What is borrowed is the arrangement rather than the element. The second button
- * is pulled onto the first's border so the two share one line, which is what
- * Button Group does and for the same reason. */
+ * Full width because there are two of them and the row is theirs. Sized to their
+ * labels they were a glyph and a three-letter word floating at one end of a
+ * panel, with the swatches under them starting somewhere else again. */
 [part="actions"] {
   display: flex;
-  flex: none;
+  margin-block-start: var(--helix-space-sm);
 }
 
-[part="eyedropper"],
-[part="format"] {
-  all: unset;
-  align-items: center;
-  background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  min-block-size: var(--helix-size-control-sm);
-  padding-inline: var(--helix-space-2xs);
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-/* Round at the ends and square at the join, so the pair reads as one control
-   rather than as two that happen to touch. Logical corners, so it holds when the
-   row is mirrored. */
-[part="actions"] > *:first-child {
-  border-end-start-radius: var(--helix-radii-sm);
-  border-start-start-radius: var(--helix-radii-sm);
-}
-
-[part="actions"] > *:last-child {
-  border-end-end-radius: var(--helix-radii-sm);
-  border-start-end-radius: var(--helix-radii-sm);
-}
-
-[part="actions"] > *:not(:first-child) {
-  margin-inline-start: calc(var(--helix-border-thin) * -1);
-}
-
-/* A hovered or focused button draws above its neighbour, or the border it lights
-   up is half covered by the one overlapping it. The same note Button Group
-   carries, for the same overlap. */
-[part="eyedropper"]:hover,
-[part="format"]:hover {
-  background-color: var(--helix-color-surface-sunken);
-  color: var(--helix-color-foreground);
-  position: relative;
-  z-index: var(--helix-layer-raised);
-}
-
-[part="eyedropper"]:focus-visible,
-[part="format"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
-  position: relative;
-  z-index: var(--helix-layer-raised);
-}
-
-/* The mark comes from the icon set rather than being drawn here. It was a mask
-   with a hand-written path in it, which meant this component owned an eyedropper
-   nothing else could reuse and nobody would think to fix. `helix-icon` styles
-   itself from its own stylesheet, so unlike `helix-button` it works at any
-   depth. */
-[part="eyedropper"] helix-icon {
-  --icon-size: var(--helix-size-icon-sm);
+[part="actions"] helix-button {
+  flex: 1 1 0;
 }
 
 /* Small caps rather than uppercased text: `text-transform` would leave a screen
    reader reading a shouted token, and the accessible name is the word. */
 [part="format"] {
   font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
   font-variant-caps: all-small-caps;
-  font-weight: var(--helix-weight-medium);
 }
 
+/* Under a rule, because they are a different kind of thing from everything
+   above: the square and the ramps build a colour and these hand one over
+   finished. Its own row rather than sharing one with the tools, which is what it
+   did and which put eight swatches and two buttons on a line that had room for
+   about half of it. */
 [part="swatches"] {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
-  flex: 1 1 auto;
   flex-wrap: wrap;
   gap: var(--helix-space-2xs);
-  justify-content: flex-end;
+  margin-block-start: var(--helix-space-sm);
+  padding-block-start: var(--helix-space-sm);
 }
 
 [part="swatch"] {
@@ -315,15 +304,28 @@
   padding: var(--helix-space-none);
 }
 
-/* The one already chosen, marked by a ring rather than by a check drawn over it:
-   a mark on top of a swatch covers the colour the swatch exists to show. */
-[part="swatch"][aria-pressed="true"] {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-primary);
-  outline-offset: var(--helix-size-focus-offset);
-}
+/* The one in use is not marked at all.
+ *
+ * It carried a ring, which is a focus ring in another colour sitting permanently
+ * on one swatch: a row of eight then has a mark on it before anything is
+ * touched, and pressing another moves the mark rather than doing something. What
+ * the swatch is chosen *for* is already showing, twice, on the chip and in the
+ * field. `aria-pressed` stays, because a screen reader has neither of those. */
 @media (prefers-reduced-motion: reduce) {
   [part="eyedropper"],
   [part="format"] {
     transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The confirmation still has to read, so what goes is the press rather than
+     the mark: the tick over the chip stays and the chip stops shrinking. */
+  [part="sample"] {
+    transition: none;
+  }
+
+  [part="sample"][data-copied] {
+    scale: 1;
   }
 }

@@ -6309,6 +6309,24 @@
         },
         {
           "kind": "function",
+          "name": "splitColors",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Splits a comma-separated list of colours, ignoring the commas inside them.\n\nA plain `split(',')` is what this was, and it cannot hold the legacy syntaxes:\n`#ef4444, rgb(249 115 22), rgba(34,197,94,.5)` came apart into six fragments,\nfour of them not colours, and the row quietly rendered three swatches instead\nof four. The modern space-separated forms survived it, which is what made the\nlist look like it worked.\n\nDepth rather than a regular expression, because the thing that matters is\nwhether a comma is inside a function call and that is exactly what a counter\nanswers. No colour syntax nests, so a single counter is enough."
+        },
+        {
+          "kind": "function",
           "name": "parseColor",
           "return": {
             "type": {
@@ -6380,6 +6398,14 @@
           "name": "toRgb",
           "declaration": {
             "name": "toRgb",
+            "module": "src/color/color.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "splitColors",
+          "declaration": {
+            "name": "splitColors",
             "module": "src/color/color.ts"
           }
         },
@@ -6462,7 +6488,7 @@
               "name": "controls"
             },
             {
-              "description": "The chip of the current colour, in that row.",
+              "description": "The chip of the current colour, which copies it when pressed.",
               "name": "sample"
             },
             {
@@ -6615,6 +6641,14 @@
               "privacy": "private",
               "readonly": true,
               "description": "Moves part of the model and announces the value that follows from it."
+            },
+            {
+              "kind": "field",
+              "name": "copier",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new CopyController(this)",
+              "description": "Copying the value, which is the one thing here worth taking away.\n\nA reader who has just built a colour wants it in a stylesheet, and the\nalternative is selecting text out of a field that may not be on screen. The\nchip is the obvious target: it is the colour, at the size of a control, and\nit had no job at all before this.\n\nThe controller rather than the four lines it replaces, because a copy button\nis coming and the two share everything that is easy to get wrong: the write,\nthe confirmation, the timer that ends it, the event, and a failure that is\ncorrectly silent."
             },
             {
               "kind": "field",
@@ -7052,6 +7086,14 @@
               "description": "Fired when the colour changes.",
               "name": "helix-change",
               "reactProp": "onhelix-change"
+            },
+            {
+              "type": {
+                "text": "HelixCopyEvent"
+              },
+              "description": "Fired when the colour is put on the clipboard.",
+              "name": "helix-copy",
+              "reactProp": "onhelix-copy"
             }
           ],
           "attributes": [
@@ -11539,6 +11581,26 @@
           "members": [
             {
               "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value: a form field\nsubmits a string, and two fields for one question is a different control.",
+              "attribute": "mode",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months the calendar shows, side by side.\n\nWorth more than one mainly for a range, where picking a start in March and\nan end in April otherwise means paging between them and losing sight of the\nfirst. The panel is sized by its content, so this widens it.",
+              "attribute": "months"
+            },
+            {
+              "kind": "field",
               "name": "min",
               "type": {
                 "text": "string"
@@ -12456,6 +12518,23 @@
             }
           ],
           "attributes": [
+            {
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value: a form field\nsubmits a string, and two fields for one question is a different control.",
+              "fieldName": "mode"
+            },
+            {
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months the calendar shows, side by side.\n\nWorth more than one mainly for a range, where picking a start in March and\nan end in April otherwise means paging between them and losing sight of the\nfirst. The panel is sized by its content, so this widens it.",
+              "fieldName": "months"
+            },
             {
               "name": "min",
               "type": {

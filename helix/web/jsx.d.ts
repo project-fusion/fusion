@@ -23,6 +23,7 @@ import type {
   HelixCloseEvent,
   HelixColor,
   HelixCompleteEvent,
+  HelixCopyEvent,
   HelixDialog,
   HelixDismissEvent,
   HelixDivider,
@@ -2054,6 +2055,9 @@ export type HelixColorElementEvent<E = Event> = TypedEvent<HelixColor, E>;
 /** `helix-change` event type */
 export type HelixColorHelixChangeElementEvent =
   HelixColorElementEvent<HelixChangeEvent>;
+/** `helix-copy` event type */
+export type HelixColorHelixCopyElementEvent =
+  HelixColorElementEvent<HelixCopyEvent>;
 
 export type HelixColorProps = {
   /** The value the markup declared, which is where a reset returns to. */
@@ -2131,6 +2135,8 @@ fire at all. */
 
   /** Fired when the colour changes. */
   "onhelix-change"?: (e: HelixColorHelixChangeElementEvent) => void;
+  /** Fired when the colour is put on the clipboard. */
+  "onhelix-copy"?: (e: HelixColorHelixCopyElementEvent) => void;
 };
 
 export type HelixColorSolidJsProps = {
@@ -2208,6 +2214,8 @@ fire at all. */
   "prop:onValueChange"?: HelixColor["onValueChange"];
   /** Fired when the colour changes. */
   "on:helix-change"?: (e: HelixColorHelixChangeElementEvent) => void;
+  /** Fired when the colour is put on the clipboard. */
+  "on:helix-copy"?: (e: HelixColorHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3241,6 +3249,18 @@ being four of a kind rather than four of three kinds. */
   label?: HelixInputDate["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixInputDate["required"];
+  /** How many dates can be held at once.
+
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value: a form field
+submits a string, and two fields for one question is a different control. */
+  mode?: HelixInputDate["mode"];
+  /** How many months the calendar shows, side by side.
+
+Worth more than one mainly for a range, where picking a start in March and
+an end in April otherwise means paging between them and losing sight of the
+first. The panel is sized by its content, so this widens it. */
+  months?: HelixInputDate["months"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   min?: HelixInputDate["min"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
@@ -3369,6 +3389,18 @@ being four of a kind rather than four of three kinds. */
   "prop:label"?: HelixInputDate["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixInputDate["required"];
+  /** How many dates can be held at once.
+
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value: a form field
+submits a string, and two fields for one question is a different control. */
+  "prop:mode"?: HelixInputDate["mode"];
+  /** How many months the calendar shows, side by side.
+
+Worth more than one mainly for a range, where picking a start in March and
+an end in April otherwise means paging between them and losing sight of the
+first. The panel is sized by its content, so this widens it. */
+  "prop:months"?: HelixInputDate["months"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   "prop:min"?: HelixInputDate["min"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
@@ -8961,6 +8993,8 @@ export type CustomElements = {
    * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
    * - `--button-inline-size`: Width taken by `fill="standard"`. (default: `undefined`)
    * - `--button-radii`: Corner radius of the control. (default: `undefined`)
+   * - `--button-radii-start`: Leading corners, which a group flattens. (default: `undefined`)
+   * - `--button-radii-end`: Trailing corners, which a group flattens. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -9690,6 +9724,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the colour changes.
+   * - `helix-copy`: Fired when the colour is put on the clipboard.
    *
    * ## Methods
    *
@@ -9719,6 +9754,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--color-inset`: Inset of the rows under the square, and the bottom. (default: `undefined`)
+   * - `--color-sample-size`: Edge length of the chip that copies the value. (default: `undefined`)
    * - `--color-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
    * - `--color-grid-radii`: Corner radius of the square. (default: `undefined`)
    *
@@ -9731,7 +9767,7 @@ export type CustomElements = {
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
-   * - `sample`: The chip of the current colour, in that row.
+   * - `sample`: The chip of the current colour, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
@@ -10611,6 +10647,16 @@ export type CustomElements = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `mode`: How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   * - `months`: How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
    * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
    * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
@@ -15428,6 +15474,8 @@ export type CustomElementsSolidJs = {
    * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
    * - `--button-inline-size`: Width taken by `fill="standard"`. (default: `undefined`)
    * - `--button-radii`: Corner radius of the control. (default: `undefined`)
+   * - `--button-radii-start`: Leading corners, which a group flattens. (default: `undefined`)
+   * - `--button-radii-end`: Trailing corners, which a group flattens. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16177,6 +16225,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the colour changes.
+   * - `helix-copy`: Fired when the colour is put on the clipboard.
    *
    * ## Methods
    *
@@ -16206,6 +16255,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--color-inset`: Inset of the rows under the square, and the bottom. (default: `undefined`)
+   * - `--color-sample-size`: Edge length of the chip that copies the value. (default: `undefined`)
    * - `--color-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
    * - `--color-grid-radii`: Corner radius of the square. (default: `undefined`)
    *
@@ -16218,7 +16268,7 @@ export type CustomElementsSolidJs = {
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
-   * - `sample`: The chip of the current colour, in that row.
+   * - `sample`: The chip of the current colour, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
@@ -17135,6 +17185,16 @@ export type CustomElementsSolidJs = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `mode`: How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   * - `months`: How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
    * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
    * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
@@ -21386,6 +21446,10 @@ export type CustomCssProperties = {
   "--button-inline-size"?: string;
   /** Corner radius of the control. */
   "--button-radii"?: string;
+  /** Leading corners, which a group flattens. */
+  "--button-radii-start"?: string;
+  /** Trailing corners, which a group flattens. */
+  "--button-radii-end"?: string;
   /** Width and height of a day. */
   "--calendar-day-size"?: string;
   /** Width of a column, which is what sets the space between days. */
@@ -21434,6 +21498,8 @@ export type CustomCssProperties = {
   "--checkbox-card-border-color"?: string;
   /** Inset of the rows under the square, and the bottom. */
   "--color-inset"?: string;
+  /** Edge length of the chip that copies the value. */
+  "--color-sample-size"?: string;
   /** Aspect ratio of the square. */
   "--color-grid-ratio"?: string;
   /** Corner radius of the square. */

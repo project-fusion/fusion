@@ -3277,6 +3277,14 @@
             {
               "description": "Corner radius of the control.",
               "name": "--button-radii"
+            },
+            {
+              "description": "Leading corners, which a group flattens.",
+              "name": "--button-radii-start"
+            },
+            {
+              "description": "Trailing corners, which a group flattens.",
+              "name": "--button-radii-end"
             }
           ],
           "cssParts": [
@@ -8266,6 +8274,10 @@
               "name": "--color-inset"
             },
             {
+              "description": "Edge length of the chip that copies the value.",
+              "name": "--color-sample-size"
+            },
+            {
               "description": "Aspect ratio of the square.",
               "name": "--color-grid-ratio"
             },
@@ -8583,6 +8595,18 @@
               "privacy": "private",
               "readonly": true,
               "description": "Moves part of the model and announces the value that follows from it.",
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "copier",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new CopyController(this)",
+              "description": "Copying the value, which is the one thing here worth taking away.\n\nA reader who has just built a colour wants it in a stylesheet, and the\nalternative is selecting text out of a field that may not be on screen. The\nchip is the obvious target: it is the colour, at the size of a control, and\nit had no job at all before this.\n\nThe controller rather than the four lines it replaces, because a copy button\nis coming and the two share everything that is easy to get wrong: the write,\nthe confirmation, the timer that ends it, the event, and a failure that is\ncorrectly silent.",
               "inheritedFrom": {
                 "name": "HelixBaseColor",
                 "module": "src/color/root/color-root.ts"
@@ -9072,7 +9096,7 @@
               }
             },
             {
-              "description": "The chip of the current colour, in that row.",
+              "description": "The chip of the current colour, which copies it when pressed.",
               "name": "sample",
               "inheritedFrom": {
                 "name": "HelixBaseColor",
@@ -9152,6 +9176,18 @@
               "description": "Fired when the colour changes.",
               "name": "helix-change",
               "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixCopyEvent"
+              },
+              "description": "Fired when the colour is put on the clipboard.",
+              "name": "helix-copy",
+              "reactProp": "onhelix-copy",
               "inheritedFrom": {
                 "name": "HelixBaseColor",
                 "module": "src/color/root/color-root.ts"
@@ -15493,6 +15529,34 @@
             },
             {
               "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value: a form field\nsubmits a string, and two fields for one question is a different control.",
+              "attribute": "mode",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInputDate",
+                "module": "src/input-date/root/input-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months the calendar shows, side by side.\n\nWorth more than one mainly for a range, where picking a start in March and\nan end in April otherwise means paging between them and losing sight of the\nfirst. The panel is sized by its content, so this widens it.",
+              "attribute": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseInputDate",
+                "module": "src/input-date/root/input-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "min",
               "type": {
                 "text": "string"
@@ -16055,6 +16119,31 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value: a form field\nsubmits a string, and two fields for one question is a different control.",
+              "fieldName": "mode",
+              "inheritedFrom": {
+                "name": "HelixBaseInputDate",
+                "module": "src/input-date/root/input-date-root.ts"
+              }
+            },
+            {
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months the calendar shows, side by side.\n\nWorth more than one mainly for a range, where picking a start in March and\nan end in April otherwise means paging between them and losing sight of the\nfirst. The panel is sized by its content, so this widens it.",
+              "fieldName": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseInputDate",
+                "module": "src/input-date/root/input-date-root.ts"
               }
             },
             {
