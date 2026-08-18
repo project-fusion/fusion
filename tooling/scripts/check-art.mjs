@@ -75,8 +75,22 @@ for (const slug of [...drawn].sort()) {
   }
 }
 
-/* And the numbers the prose states. Written out as words, which is the house
-   style everywhere else in these files, so they are matched as words. */
+/* And the numbers the prose states, under a convention that makes the question
+ * answerable: **in these two files a number written as a word is the family
+ * count or the folder count, and every other count is written as digits.**
+ *
+ * The rule earns itself. Without it there are three shapes to chase: the
+ * headline "All fifty-seven families", the folder comparison, and sentences like
+ * "stated once rather than fifty-seven times" that carry the same number with no
+ * noun to match on. Matching only the first two let a partial bump through,
+ * measured: changing one of three occurrences in `core.tsx` passed. Forbidding
+ * every number word was wrong the other way, and flagged a true sentence about
+ * how many cards move.
+ *
+ * Digits for anything else is the cheap half of the rule and costs the prose
+ * nothing, so a word in range is always one of two values and the check is
+ * total rather than heuristic.
+ */
 const WORDS = [
   'forty-nine',
   'fifty',
@@ -98,6 +112,7 @@ const WORDS = [
 ]
 const wordFor = (count) => WORDS[count - 49]
 const said = wordFor(families.size)
+
 /* Folders that are *families*, which is the question the prose is answering:
    how many more entries there are than there are components in `helix/web`. A
    directory with an `index.ts` is what the barrel exports and what
@@ -116,7 +131,8 @@ for (const file of ['index.tsx', 'core.tsx']) {
     if (word !== said && word !== foldersSaid) {
       problems.push(
         `${ART}/${file}: says "${word}" where the catalog has ${families.size} families ` +
-          `("${said}") over ${folders} folders in helix/web/src ("${foldersSaid}").`,
+          `("${said}") over ${folders} folders in helix/web/src ("${foldersSaid}"). A number ` +
+          `word in these files is one of those two; write any other count as digits.`,
       )
     }
   }
