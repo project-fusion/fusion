@@ -10,8 +10,16 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
-/** What a slot in the run holds: a page number, or the gap between two runs. */
-type Slot = number | 'gap'
+/** A run of pages nobody can see, and what a gap stands over. */
+interface Hidden {
+  /** First page it covers. */
+  from: number
+  /** Last page it covers. */
+  to: number
+}
+
+/** What a slot in the run holds: a page number, or the pages between two runs. */
+type Slot = Hidden | number
 
 /**
  * Fills `{page}` and `{pages}` in a template a consumer wrote.
@@ -20,9 +28,19 @@ type Slot = number | 'gap'
  * `page-label="Page"` that this glued a number onto would produce the English
  * order in every language. `href="/products?page={page}"` is the same mechanism
  * doing a second job, which is why there is one placeholder syntax and not two.
+ *
+ * `format` is what makes the numbers local as well as the words. It is the
+ * identity for an address and an `Intl.NumberFormat` for anything a person
+ * reads: a URL is machine-facing and `?page=1,234` is a different page from
+ * `?page=1234`, where a label read aloud should say the number the way the
+ * reader's locale says it.
  */
-const fill = (template: string, page: number, pages: number): string =>
-  template.replaceAll('{page}', String(page)).replaceAll('{pages}', String(pages))
+const fill = (
+  template: string,
+  page: number,
+  pages: number,
+  format: (value: number) => string = String,
+): string => template.replaceAll('{page}', format(page)).replaceAll('{pages}', format(pages))
 
 /**
  * @summary Moves between pages of a longer result.
@@ -44,6 +62,12 @@ const fill = (template: string, page: number, pages: number): string =>
  * **A gap is only drawn where it hides more than one page.** An ellipsis
  * standing in for a single number costs the same space as the number and tells
  * the reader less.
+ *
+ * **And a gap is a control.** It goes to the middle of the run it stands over,
+ * which is the binary-search step: any page in a set of any size is a handful of
+ * presses, where a jump of a fixed size would need forty of them on a set of a
+ * hundred and twenty-eight. A menu listing the hidden pages was the other idea
+ * and the arithmetic refuses it, for the reasons on `renderGap`.
  *
  * **`href` is what makes these links.** Set it and every page renders an `<a>`
  * with `{page}` filled in, so the server's output is crawlable, a middle click
@@ -70,7 +94,7 @@ const fill = (template: string, page: number, pages: number): string =>
  * @csspart list - The run of pages.
  * @csspart item - One slot in the run, holding a page or a gap.
  * @csspart page - The control for one page.
- * @csspart gap - The mark standing in for pages not shown.
+ * @csspart gap - The control standing over pages not shown, which jumps into them.
  * @csspart previous - The control that moves back one page.
  * @csspart next - The control that moves forward one page.
  * @csspart status - The reading of where you are, in `compact`.
@@ -144,6 +168,22 @@ export class HelixBasePagination extends HelixElement {
   @property()
   label = 'Pagination'
 
+  /**
+   * Locale for the page numbers. Absent uses the runtime's own.
+   *
+   * The same property the calendar takes, doing the same job one layer down:
+   * the templates make the *words* the consumer's, and this makes the *numbers*
+   * theirs. A page number is a number like any other, so `1234` is `1,234` in
+   * `en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that
+   * lets a consumer translate "Page {page} of {pages}" and then prints Latin
+   * digits into it has done half the job.
+   *
+   * Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
+   * different address from `?page=1234`.
+   */
+  @property()
+  locale = ''
+
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   @property({ attribute: 'page-label' })
   pageLabel = 'Page {page}'
@@ -160,6 +200,10 @@ export class HelixBasePagination extends HelixElement {
   @property({ attribute: 'next-label' })
   nextLabel = 'Next page'
 
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  @property({ attribute: 'gap-label' })
+  gapLabel = 'Skip to page {page}'
+
   /** The page on show, whoever set it, and `undefined` until somebody has. */
   private pageState: number | undefined = undefined
 
@@ -168,6 +212,28 @@ export class HelixBasePagination extends HelixElement {
 
   private get pageIsControlled(): boolean {
     return this.pageMode === true
+  }
+
+  /**
+   * The number formatter, built once per locale rather than per render.
+   *
+   * `Intl.NumberFormat` is expensive to construct and this depends on nothing
+   * but `locale`, where a render builds one per page in the run. Keyed on the
+   * locale so a change to it is picked up, which a plain lazy field would not
+   * do. Same shape as the calendar's three date formatters, for the same
+   * reasons its own note gives.
+   */
+  private cachedFormat: { format: Intl.NumberFormat; locale: string } | undefined
+
+  private get numbers(): (value: number) => string {
+    if (this.cachedFormat?.locale !== this.locale) {
+      this.cachedFormat = {
+        format: new Intl.NumberFormat(this.locale || undefined),
+        locale: this.locale,
+      }
+    }
+    const { format } = this.cachedFormat
+    return (value) => format.format(value)
   }
 
   /** The total, clamped once, so every reader agrees on it. */
@@ -211,17 +277,27 @@ export class HelixBasePagination extends HelixElement {
     const before = current - siblings > boundaries + 2
     const after = current + siblings < total - boundaries - 1
 
+    /* A gap carries the run it stands over rather than being a bare marker,
+       because it is a control now and a control has to say where it goes. */
+    const gap = (from: number, to: number): Hidden => ({ from, to })
+
     if (!before) {
-      return [...range(1, most - boundaries - 1), 'gap', ...range(total - boundaries + 1, total)]
+      const head = most - boundaries - 1
+      return [
+        ...range(1, head),
+        gap(head + 1, total - boundaries),
+        ...range(total - boundaries + 1, total),
+      ]
     }
     if (!after) {
-      return [...range(1, boundaries), 'gap', ...range(total - (most - boundaries - 2), total)]
+      const tail = total - (most - boundaries - 2)
+      return [...range(1, boundaries), gap(boundaries + 1, tail - 1), ...range(tail, total)]
     }
     return [
       ...range(1, boundaries),
-      'gap',
+      gap(boundaries + 1, current - siblings - 1),
       ...range(current - siblings, current + siblings),
-      'gap',
+      gap(current + siblings + 1, total - boundaries),
       ...range(total - boundaries + 1, total),
     ]
   }
@@ -293,6 +369,8 @@ export class HelixBasePagination extends HelixElement {
    */
   private renderPage(page: number): TemplateResult {
     const current = page === this.current
+    const shown = this.numbers(page)
+    const name = fill(this.pageLabel, page, this.total, this.numbers)
     return html`<li part="item">
       ${
         this.href
@@ -300,18 +378,64 @@ export class HelixBasePagination extends HelixElement {
               part="page"
               href=${fill(this.href, page, this.total)}
               aria-current=${current ? 'page' : nothing}
-              aria-label=${fill(this.pageLabel, page, this.total)}
+              aria-label=${name}
               @click=${(event: Event) => this.go(page, event)}
-              >${page}</a
+              >${shown}</a
             >`
           : html`<button
               part="page"
               type="button"
               aria-current=${current ? 'page' : nothing}
-              aria-label=${fill(this.pageLabel, page, this.total)}
+              aria-label=${name}
               @click=${(event: Event) => this.go(page, event)}
             >
-              ${page}
+              ${shown}
+            </button>`
+      }
+    </li>`
+  }
+
+  /**
+   * A gap, which is a control and not a mark.
+   *
+   * **It goes to the middle of what it hides**, and the label says so. That is
+   * the binary-search step, so an arbitrary page in a set of any size is a
+   * handful of presses: 128 pages is `1 … 96 97 98 … 128`, and the leading gap
+   * lands on 48, whose gaps land on 24 and 88, and so on. A jump of a fixed size
+   * would need forty presses on that set.
+   *
+   * **A menu over these pages was the other idea and it does not survive the
+   * arithmetic.** The run a gap covers is unbounded by construction: two pages
+   * on a twelve-page set, ninety-four on a hundred-and-twenty-eight-page one. A
+   * menu is pleasant at the first and is a scroll of ninety-four items at the
+   * second, which is worse than the ellipsis it replaced, and there is no total
+   * at which it stops being possible. It would also make `Pagination` depend on
+   * `Menu` and `Popover` for a case a button already covers.
+   *
+   * So it is announced rather than hidden, which is the change from when it was
+   * a decoration: a control a reader can reach has to be in the tree, and the
+   * label naming its destination is the whole affordance.
+   */
+  private renderGap(hidden: Hidden): TemplateResult {
+    const to = Math.round((hidden.from + hidden.to) / 2)
+    const name = fill(this.gapLabel, to, this.total, this.numbers)
+    return html`<li part="item">
+      ${
+        this.href
+          ? html`<a
+              part="gap"
+              href=${fill(this.href, to, this.total)}
+              aria-label=${name}
+              @click=${(event: Event) => this.go(to, event)}
+              >&hellip;</a
+            >`
+          : html`<button
+              part="gap"
+              type="button"
+              aria-label=${name}
+              @click=${(event: Event) => this.go(to, event)}
+            >
+              &hellip;
             </button>`
       }
     </li>`
@@ -370,23 +494,15 @@ export class HelixBasePagination extends HelixElement {
   protected override render(): TemplateResult {
     if (this.compact) {
       return html`${this.renderStep(true)}
-        <span part="status">${fill(this.statusLabel, this.current, this.total)}</span>
+        <span part="status"
+          >${fill(this.statusLabel, this.current, this.total, this.numbers)}</span
+        >
         ${this.renderStep(false)}`
     }
     return html`${this.renderStep(true)}
       <ol part="list" role="list">
         ${this.slots.map((slot) =>
-          slot === 'gap'
-            ? /* The whole item is out of the tree, not just the mark inside it.
-                 An `aria-hidden` span in a listed item leaves an item with
-                 nothing in it, announced as blank; hidden outright, the list's
-                 count is the pages a reader can actually reach. Nothing is lost
-                 by it: a jump from 3 to 11 is audible from the two labels
-                 either side, and the ellipsis is how that gap is drawn. */
-              html`<li part="item" aria-hidden="true">
-                <span part="gap">&hellip;</span>
-              </li>`
-            : this.renderPage(slot),
+          typeof slot === 'number' ? this.renderPage(slot) : this.renderGap(slot),
         )}
       </ol>
       ${this.renderStep(false)}`

@@ -3019,6 +3019,18 @@ where the total is large enough that no window over it is useful. */
   compact?: HelixBasePagination["compact"];
   /** Accessible name for the navigation landmark. */
   label?: HelixBasePagination["label"];
+  /** Locale for the page numbers. Absent uses the runtime's own.
+
+The same property the calendar takes, doing the same job one layer down:
+the templates make the *words* the consumer's, and this makes the *numbers*
+theirs. A page number is a number like any other, so `1234` is `1,234` in
+`en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that
+lets a consumer translate "Page {page} of {pages}" and then prints Latin
+digits into it has done half the job.
+
+Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
+different address from `?page=1234`. */
+  locale?: HelixBasePagination["locale"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   "page-label"?: HelixBasePagination["pageLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
@@ -3035,6 +3047,10 @@ where the total is large enough that no window over it is useful. */
   "next-label"?: HelixBasePagination["nextLabel"];
   /** Accessible name for the control that moves forward. */
   nextLabel?: HelixBasePagination["nextLabel"];
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  "gap-label"?: HelixBasePagination["gapLabel"];
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  gapLabel?: HelixBasePagination["gapLabel"];
 
   /** Fired before the page changes, and cancelable. The only way to refuse one. */
   "onhelix-navigate"?: (
@@ -3078,6 +3094,18 @@ where the total is large enough that no window over it is useful. */
   "prop:compact"?: HelixBasePagination["compact"];
   /** Accessible name for the navigation landmark. */
   "prop:label"?: HelixBasePagination["label"];
+  /** Locale for the page numbers. Absent uses the runtime's own.
+
+The same property the calendar takes, doing the same job one layer down:
+the templates make the *words* the consumer's, and this makes the *numbers*
+theirs. A page number is a number like any other, so `1234` is `1,234` in
+`en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that
+lets a consumer translate "Page {page} of {pages}" and then prints Latin
+digits into it has done half the job.
+
+Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
+different address from `?page=1234`. */
+  "prop:locale"?: HelixBasePagination["locale"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   "attr:page-label"?: HelixBasePagination["pageLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
@@ -3094,6 +3122,10 @@ where the total is large enough that no window over it is useful. */
   "attr:next-label"?: HelixBasePagination["nextLabel"];
   /** Accessible name for the control that moves forward. */
   "prop:nextLabel"?: HelixBasePagination["nextLabel"];
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  "attr:gap-label"?: HelixBasePagination["gapLabel"];
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  "prop:gapLabel"?: HelixBasePagination["gapLabel"];
   /** Fired before the page changes, and cancelable. The only way to refuse one. */
   "on:helix-navigate"?: (
     e: HelixBasePaginationHelixNavigateElementEvent,
@@ -8288,6 +8320,12 @@ export type CustomElements = {
    * standing in for a single number costs the same space as the number and tells
    * the reader less.
    *
+   * **And a gap is a control.** It goes to the middle of the run it stands over,
+   * which is the binary-search step: any page in a set of any size is a handful of
+   * presses, where a jump of a fixed size would need forty of them on a set of a
+   * hundred and twenty-eight. A menu listing the hidden pages was the other idea
+   * and the arithmetic refuses it, for the reasons on `renderGap`.
+   *
    * **`href` is what makes these links.** Set it and every page renders an `<a>`
    * with `{page}` filled in, so the server's output is crawlable, a middle click
    * opens a tab, and the address bar is the state. Left unset they are buttons,
@@ -8334,10 +8372,22 @@ export type CustomElements = {
    * place. This is the shape a narrow screen wants, and the only shape possible
    * where the total is large enough that no window over it is useful.
    * - `label`: Accessible name for the navigation landmark.
+   * - `locale`: Locale for the page numbers. Absent uses the runtime's own.
+   *
+   * The same property the calendar takes, doing the same job one layer down:
+   * the templates make the *words* the consumer's, and this makes the *numbers*
+   * theirs. A page number is a number like any other, so `1234` is `1,234` in
+   * `en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that
+   * lets a consumer translate "Page {page} of {pages}" and then prints Latin
+   * digits into it has done half the job.
+   *
+   * Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
+   * different address from `?page=1234`.
    * - `page-label`/`pageLabel`: Accessible name for one page, with `{page}` and `{pages}` filled in.
    * - `status-label`/`statusLabel`: The reading shown in `compact`, with `{page}` and `{pages}` filled in.
    * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
    * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
+   * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
    *
    * ## Events
    *
@@ -8352,7 +8402,7 @@ export type CustomElements = {
    * - `list`: The run of pages.
    * - `item`: One slot in the run, holding a page or a gap.
    * - `page`: The control for one page.
-   * - `gap`: The mark standing in for pages not shown.
+   * - `gap`: The control standing over pages not shown, which jumps into them.
    * - `previous`: The control that moves back one page.
    * - `next`: The control that moves forward one page.
    * - `status`: The reading of where you are, in `compact`.
@@ -13403,6 +13453,12 @@ export type CustomElementsSolidJs = {
    * standing in for a single number costs the same space as the number and tells
    * the reader less.
    *
+   * **And a gap is a control.** It goes to the middle of the run it stands over,
+   * which is the binary-search step: any page in a set of any size is a handful of
+   * presses, where a jump of a fixed size would need forty of them on a set of a
+   * hundred and twenty-eight. A menu listing the hidden pages was the other idea
+   * and the arithmetic refuses it, for the reasons on `renderGap`.
+   *
    * **`href` is what makes these links.** Set it and every page renders an `<a>`
    * with `{page}` filled in, so the server's output is crawlable, a middle click
    * opens a tab, and the address bar is the state. Left unset they are buttons,
@@ -13449,10 +13505,22 @@ export type CustomElementsSolidJs = {
    * place. This is the shape a narrow screen wants, and the only shape possible
    * where the total is large enough that no window over it is useful.
    * - `label`: Accessible name for the navigation landmark.
+   * - `locale`: Locale for the page numbers. Absent uses the runtime's own.
+   *
+   * The same property the calendar takes, doing the same job one layer down:
+   * the templates make the *words* the consumer's, and this makes the *numbers*
+   * theirs. A page number is a number like any other, so `1234` is `1,234` in
+   * `en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that
+   * lets a consumer translate "Page {page} of {pages}" and then prints Latin
+   * digits into it has done half the job.
+   *
+   * Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
+   * different address from `?page=1234`.
    * - `page-label`/`pageLabel`: Accessible name for one page, with `{page}` and `{pages}` filled in.
    * - `status-label`/`statusLabel`: The reading shown in `compact`, with `{page}` and `{pages}` filled in.
    * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
    * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
+   * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
    *
    * ## Events
    *
@@ -13467,7 +13535,7 @@ export type CustomElementsSolidJs = {
    * - `list`: The run of pages.
    * - `item`: One slot in the run, holding a page or a gap.
    * - `page`: The control for one page.
-   * - `gap`: The mark standing in for pages not shown.
+   * - `gap`: The control standing over pages not shown, which jumps into them.
    * - `previous`: The control that moves back one page.
    * - `next`: The control that moves forward one page.
    * - `status`: The reading of where you are, in `compact`.

@@ -31,6 +31,7 @@
    two characters and a rectangle sized to the widest of them would leave the
    short ones swimming. `min-inline-size` rather than a fixed one, so page 100
    grows instead of overflowing. */
+[part="gap"],
 [part="page"],
 [part="previous"],
 [part="next"] {
@@ -55,6 +56,7 @@
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+[part="gap"]:hover,
 [part="page"]:hover,
 [part="previous"]:hover,
 [part="next"]:hover {
@@ -62,6 +64,7 @@
   color: var(--helix-color-foreground);
 }
 
+[part="gap"]:focus-visible,
 [part="page"]:focus-visible,
 [part="previous"]:focus-visible,
 [part="next"]:focus-visible {
@@ -69,16 +72,41 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Where you are, filled. `aria-current` is the selector rather than a second
-   attribute saying the same thing: the state is already in the accessibility
-   tree and a `data-current` beside it would be two places to keep in step. */
-[part="page"][aria-current="page"] {
-  background-color: var(--pagination-current-color, var(--helix-color-primary));
-  color: var(--helix-color-foreground-on-accent);
-}
-
+/* Where you are: a raised chip, not a brand fill.
+ *
+ * Same treatment `Tabs` gives its selected tab, `surface-raised` under
+ * `shadow-sm`, and for the same reason. Brand on a page number claims more than
+ * the state deserves: it is not a choice the reader made about anything, it is
+ * where they happen to be standing, and a row of grey numbers with one blue one
+ * reads as the blue one being an action. Lifting it says the same thing in the
+ * register the rest of the library uses for it.
+ *
+ * `aria-current` is the selector rather than a second attribute saying the same
+ * thing: the state is already in the accessibility tree and a `data-current`
+ * beside it would be two places to keep in step.
+ *
+ * **The border is what actually distinguishes it, and that is a measurement.**
+ * The first pass carried `surface-raised` under `shadow-sm` and nothing else,
+ * and the two greys in play are `oklch(0.97 0 258)` for raised against
+ * `oklch(0.96 0 258)` for the sunken fill a hovered page takes: one per cent of
+ * lightness apart, so the page you are on and the page under the pointer were
+ * the same chip. A shadow at this size cannot carry a distinction that fine.
+ *
+ * So the edge does it, and the shadow goes with it. Nothing else in the row is
+ * framed, which is exactly the argument the gallery's own note makes for when an
+ * edge earns its place: it is the only mark here doing work no other state
+ * claims. The box already reserves a transparent border, so nothing moves when
+ * it is coloured in.
+ *
+ * The hover rule is repeated rather than left to the cascade, so the chip keeps
+ * its own surface under the pointer. It is already the one you are on and does
+ * not need telling twice. */
+[part="page"][aria-current="page"],
 [part="page"][aria-current="page"]:hover {
-  background-color: var(--pagination-current-color, var(--helix-color-primary-hover));
+  background-color: var(--pagination-current-color, var(--helix-color-surface-raised));
+  border-color: var(--helix-color-border);
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
 }
 
 /* Both shapes of spent step, and they need both selectors: the button form
@@ -100,20 +128,16 @@
   inline-size: var(--helix-size-icon-sm);
 }
 
-/* The gap takes the same box as a page, so the run keeps its rhythm across it
-   and the numbers either side of it stay on the grid the rest are on.
+/* The gap is a control, so it takes the control box above and needs only what
+   makes it quieter than a page: it is a way through rather than a destination.
 
-   Centred, which was worth measuring rather than reasoning about: an ellipsis
-   is drawn at the baseline of its em box, and pushing the box down to "sit it on
-   the baseline" put the dots 1.5px below the digits'. Centring both aligns the
-   em boxes, which aligns the baselines, which is the whole of what is wanted. */
+   Nothing about its position is stated here. It was centred by hand once, on
+   the theory that an ellipsis needed pushing onto the baseline, and measured at
+   1.5px *below* the digits for it: the glyph is already drawn at its baseline,
+   so aligning the em boxes is the whole of the job and the shared box does that
+   already. */
 [part="gap"] {
-  align-items: center;
-  block-size: var(--pagination-size, var(--helix-size-control-sm));
   color: var(--helix-color-foreground-subtle);
-  display: inline-flex;
-  justify-content: center;
-  min-inline-size: var(--pagination-size, var(--helix-size-control-sm));
   user-select: none;
 }
 
@@ -125,6 +149,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  [part="gap"],
   [part="page"],
   [part="previous"],
   [part="next"] {

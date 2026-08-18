@@ -2013,10 +2013,19 @@ Figures are tabular throughout. A page number is the one thing here that
 changes under the pointer, and proportional digits make the whole row shuffle
 as it does.
 
-The current page is the only filled thing in the row, selected on
-`aria-current` rather than on a second attribute saying the same thing: the
-state is already in the accessibility tree, and a `data-current` beside it
-would be two places to keep in step.
+The current page is a raised chip rather than a brand fill, which is the
+treatment `Tabs` gives its selected tab. Brand on a page number claims more
+than the state deserves: it is not a choice the reader made about anything,
+it is where they happen to be standing, and a row of grey numbers with one
+blue one reads as the blue one being an action.
+
+Selected on `aria-current` rather than on a second attribute saying the same
+thing: the state is already in the accessibility tree, and a `data-current`
+beside it would be two places to keep in step.
+
+The gap takes the same box as everything else in the row and only sits back a
+shade in colour. It is a control, so it answers hover and focus like one; it
+is a way through rather than a destination, so it does not compete.
 
 #### Properties
 
@@ -2025,8 +2034,10 @@ would be two places to keep in step.
 | `boundaries` | `boundaries` | `number` | `1` | `HelixBasePagination` | How many pages to show at each end, whatever the current one is. |
 | `compact` | `compact` | `boolean` | `false` | `HelixBasePagination` | Where the numbers are replaced by a reading of the two. |
 | `defaultPage` | `default-page` | `number` | `1` | `HelixBasePagination` | Page to open on, where nothing declared one. |
+| `gapLabel` | `gap-label` | `string` | `'Skip to page {page}'` | `HelixBasePagination` | Accessible name for a gap, with `{page}` filled in as where it goes. |
 | `href` | `href` | `string` | `''` | `HelixBasePagination` | Address for a page, with `{page}` standing in for its number. |
 | `label` | `label` | `string` | `'Pagination'` | `HelixBasePagination` | Accessible name for the navigation landmark. |
+| `locale` | `locale` | `string` | `''` | `HelixBasePagination` | Locale for the page numbers. Absent uses the runtime's own. |
 | `nextLabel` | `next-label` | `string` | `'Next page'` | `HelixBasePagination` | Accessible name for the control that moves forward. |
 | `page` | `page` | `number` | - | `HelixBasePagination` | The page on show, one-based. |
 | `pageLabel` | `page-label` | `string` | `'Page {page}'` | `HelixBasePagination` | Accessible name for one page, with `{page}` and `{pages}` filled in. |
@@ -2048,7 +2059,7 @@ would be two places to keep in step.
 | `list` | The run of pages. |
 | `item` | One slot in the run, holding a page or a gap. |
 | `page` | The control for one page. |
-| `gap` | The mark standing in for pages not shown. |
+| `gap` | The control standing over pages not shown, which jumps into them. |
 | `previous` | The control that moves back one page. |
 | `next` | The control that moves forward one page. |
 | `status` | The reading of where you are, in `compact`. |

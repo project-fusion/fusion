@@ -86,12 +86,33 @@ describe('pagination', () => {
     expect(current[0]?.tagName).toBe('BUTTON')
   })
 
-  test('the gap is out of the tree, so the list counts pages a reader can reach', async () => {
+  test('a gap goes to the middle of what it hides, and its label says so', async () => {
+    // The binary-search step. `1 … 96 97 98 … 128` hides 2 to 95 on the left and
+    // 99 to 127 on the right, so the two gaps land on 49 and 113 and an
+    // arbitrary page in a set of any size is a handful of presses.
+    const nav = await mount('<helix-pagination default-page="97" pages="128"></helix-pagination>')
+    const gaps = [...(nav.shadowRoot?.querySelectorAll('[part="gap"]') ?? [])]
+    expect(gaps.map((gap) => gap.getAttribute('aria-label'))).toEqual([
+      'Skip to page 49',
+      'Skip to page 113',
+    ])
+  })
+
+  test('pressing a gap lands on the page its label named', async () => {
+    const nav = await mount('<helix-pagination default-page="97" pages="128"></helix-pagination>')
+    nav.shadowRoot
+      ?.querySelector('[part="gap"]')
+      ?.dispatchEvent(new Event('click', { bubbles: true }))
+    await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect((nav as HTMLElement & { page: number }).page).toBe(49)
+  })
+
+  test('a gap is announced, because a reader can reach it', async () => {
+    // It was `aria-hidden` while it was a decoration. A control cannot be.
     const nav = await mount('<helix-pagination default-page="7" pages="12"></helix-pagination>')
     const items = [...(nav.shadowRoot?.querySelectorAll('[part="item"]') ?? [])]
-    const hidden = items.filter((one) => one.getAttribute('aria-hidden') === 'true')
-    expect(hidden).toHaveLength(2)
     expect(items).toHaveLength(7)
+    expect(items.filter((one) => one.hasAttribute('aria-hidden'))).toEqual([])
   })
 
   test('the step pointing off the end is spent, and stays in the row', async () => {
@@ -228,5 +249,49 @@ describe('pagination compact', () => {
     part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true }))
     await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     expect(part(nav, 'status')?.textContent?.trim()).toBe('Page 4 of 9')
+  })
+})
+
+describe('pagination in another language', () => {
+  test('every word is a template, so word order stays the consumer’s', async () => {
+    // The whole of the i18n contract on the visible strings: nothing here glues
+    // a number onto a prefix, so a language that puts them the other way round
+    // is written the other way round.
+    const nav = await mount(
+      `<helix-pagination
+        default-page="2"
+        gap-label="Passer à la page {page}"
+        next-label="Page suivante"
+        page-label="Page {page} sur {pages}"
+        pages="40"
+        previous-label="Page précédente"
+      ></helix-pagination>`,
+    )
+    const first = nav.shadowRoot?.querySelector('[part="page"]')
+    expect(first?.getAttribute('aria-label')).toBe('Page 1 sur 40')
+    expect(part(nav, 'previous')?.getAttribute('aria-label')).toBe('Page précédente')
+    expect(nav.shadowRoot?.querySelector('[part="gap"]')?.getAttribute('aria-label')).toBe(
+      'Passer à la page 23',
+    )
+  })
+
+  test('and the numbers are local too, not just the words', async () => {
+    // A component that lets a consumer translate "Page {page} of {pages}" and
+    // then prints Latin digits into it has done half the job.
+    const nav = await mount(
+      '<helix-pagination compact default-page="1234" locale="de-DE" pages="5678"></helix-pagination>',
+    )
+    expect(part(nav, 'status')?.textContent?.trim()).toBe('Page 1.234 of 5.678')
+  })
+
+  test('the visible page number is formatted, and the address is not', async () => {
+    // `?page=1,234` is a different address from `?page=1234`, so `href` keeps
+    // the raw number while everything a person reads gets the local one.
+    const nav = await mount(
+      '<helix-pagination default-page="1234" href="/r?p={page}" locale="en-US" pages="2000"></helix-pagination>',
+    )
+    const current = nav.shadowRoot?.querySelector('[aria-current="page"]')
+    expect(current?.textContent?.trim()).toBe('1,234')
+    expect(current?.getAttribute('href')).toBe('/r?p=1234')
   })
 })

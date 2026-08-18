@@ -13892,7 +13892,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
+          "description": "The component is the truncation. Given a page and a total it works out which\nnumbers to show and where the runs break, which is the whole of what a\nconsumer would otherwise write by hand and get subtly wrong; everything else\nhere is markup around that. So this is data-driven rather than composed:\n`<helix-pagination page=\"4\" pages=\"12\">` rather than twelve slotted children\na consumer has to keep in step with their own query.\n\n**The width does not change as you page.** The run around the current page is\n`siblings` either side normally, and grows to absorb a gap slot when it meets\na boundary, so the control holds the same number of slots from the first page\nto the last. Every arrangement that lets the count vary makes the buttons move\nunder the pointer between one click and the next.\n\n**A gap is only drawn where it hides more than one page.** An ellipsis\nstanding in for a single number costs the same space as the number and tells\nthe reader less.\n\n**And a gap is a control.** It goes to the middle of the run it stands over,\nwhich is the binary-search step: any page in a set of any size is a handful of\npresses, where a jump of a fixed size would need forty of them on a set of a\nhundred and twenty-eight. A menu listing the hidden pages was the other idea\nand the arithmetic refuses it, for the reasons on `renderGap`.\n\n**`href` is what makes these links.** Set it and every page renders an `<a>`\nwith `{page}` filled in, so the server's output is crawlable, a middle click\nopens a tab, and the address bar is the state. Left unset they are buttons,\nwhich is right for a table paging in place. Either way the click announces\n`helix-navigate` first, and `preventDefault()` on it stops the navigation as\nwell as the change: that is how a router takes over without the page reloading\nunderneath it.\n\n**`helix-navigate` and not `helix-change`**, for the reason the calendar pages\nwith it too. Moving to page four chooses nothing; it moves the view over a\nresult that has not changed. A consumer driving the view has to be able to\nhear that without being told an answer changed.\n\n`page` is the controlled property and `default-page` seeds one the element\nowns. Naming `page` is a claim of ownership: the element announces and waits\nto be told, which is what a consumer paging through a router already wants.",
           "name": "HelixBasePagination",
           "cssParts": [
             {
@@ -13908,7 +13908,7 @@
               "name": "page"
             },
             {
-              "description": "The mark standing in for pages not shown.",
+              "description": "The control standing over pages not shown, which jumps into them.",
               "name": "gap"
             },
             {
@@ -14007,6 +14007,16 @@
             },
             {
               "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the page numbers. Absent uses the runtime's own.\n\nThe same property the calendar takes, doing the same job one layer down:\nthe templates make the *words* the consumer's, and this makes the *numbers*\ntheirs. A page number is a number like any other, so `1234` is `1,234` in\n`en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that\nlets a consumer translate \"Page {page} of {pages}\" and then prints Latin\ndigits into it has done half the job.\n\nNot applied to `href`. That one is machine-facing, and `?page=1,234` is a\ndifferent address from `?page=1234`.",
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
               "name": "pageLabel",
               "type": {
                 "text": "string"
@@ -14047,6 +14057,16 @@
             },
             {
               "kind": "field",
+              "name": "gapLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Skip to page {page}'",
+              "description": "Accessible name for a gap, with `{page}` filled in as where it goes.",
+              "attribute": "gap-label"
+            },
+            {
+              "kind": "field",
               "name": "pageState",
               "type": {
                 "text": "number | undefined"
@@ -14070,6 +14090,24 @@
               "name": "pageIsControlled",
               "type": {
                 "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "cachedFormat",
+              "type": {
+                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
+              },
+              "privacy": "private",
+              "description": "The number formatter, built once per locale rather than per render.\n\n`Intl.NumberFormat` is expensive to construct and this depends on nothing\nbut `locale`, where a render builds one per page in the run. Keyed on the\nlocale so a change to it is picked up, which a plain lazy field would not\ndo. Same shape as the calendar's three date formatters, for the same\nreasons its own note gives."
+            },
+            {
+              "kind": "field",
+              "name": "numbers",
+              "type": {
+                "text": "(value: number) => string"
               },
               "privacy": "private",
               "readonly": true
@@ -14148,6 +14186,25 @@
                 }
               ],
               "description": "One page, as a link or a button.\n\n`aria-current=\"page\"` is what says which one you are on, and it stays a\ncontrol rather than becoming text: a reader who tabs into the run and finds\nthe current page missing from it has lost the only landmark in the row."
+            },
+            {
+              "kind": "method",
+              "name": "renderGap",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hidden",
+                  "type": {
+                    "text": "Hidden"
+                  }
+                }
+              ],
+              "description": "A gap, which is a control and not a mark.\n\n**It goes to the middle of what it hides**, and the label says so. That is\nthe binary-search step, so an arbitrary page in a set of any size is a\nhandful of presses: 128 pages is `1 … 96 97 98 … 128`, and the leading gap\nlands on 48, whose gaps land on 24 and 88, and so on. A jump of a fixed size\nwould need forty presses on that set.\n\n**A menu over these pages was the other idea and it does not survive the\narithmetic.** The run a gap covers is unbounded by construction: two pages\non a twelve-page set, ninety-four on a hundred-and-twenty-eight-page one. A\nmenu is pleasant at the first and is a scroll of ninety-four items at the\nsecond, which is worse than the ellipsis it replaced, and there is no total\nat which it stops being possible. It would also make `Pagination` depend on\n`Menu` and `Popover` for a case a button already covers.\n\nSo it is announced rather than hidden, which is the change from when it was\na decoration: a control a reader can reach has to be in the tree, and the\nlabel naming its destination is the whole affordance."
             },
             {
               "kind": "method",
@@ -14321,6 +14378,15 @@
               "fieldName": "label"
             },
             {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the page numbers. Absent uses the runtime's own.\n\nThe same property the calendar takes, doing the same job one layer down:\nthe templates make the *words* the consumer's, and this makes the *numbers*\ntheirs. A page number is a number like any other, so `1234` is `1,234` in\n`en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that\nlets a consumer translate \"Page {page} of {pages}\" and then prints Latin\ndigits into it has done half the job.\n\nNot applied to `href`. That one is machine-facing, and `?page=1,234` is a\ndifferent address from `?page=1234`.",
+              "fieldName": "locale"
+            },
+            {
               "name": "page-label",
               "type": {
                 "text": "string"
@@ -14355,6 +14421,15 @@
               "default": "'Next page'",
               "description": "Accessible name for the control that moves forward.",
               "fieldName": "nextLabel"
+            },
+            {
+              "name": "gap-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Skip to page {page}'",
+              "description": "Accessible name for a gap, with `{page}` filled in as where it goes.",
+              "fieldName": "gapLabel"
             }
           ],
           "superclass": {

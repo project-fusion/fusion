@@ -680,10 +680,10 @@ export function SandboxWorkbench({ families }: Props) {
     <>
       <helix-flex align="center" class="examplesHeader" data-density="sm" gap="2xs">
         <helix-input
-          class="examplesFilter"
-          ref={setFilterField}
           aria-label="Filter examples"
+          class="examplesFilter"
           placeholder="Filter"
+          ref={setFilterField}
           type="search"
           value={filter}
         >

@@ -18175,7 +18175,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "One box for every control in the row, arrows and numbers alike, so the run has\na single rhythm and the steps sit at the numbers' height rather than between\nthem. Square, because a page number is one or two characters and a box sized\nto the widest would leave the short ones swimming; `min-inline-size` rather\nthan a fixed one, so page 100 grows instead of overflowing.\n\nFigures are tabular throughout. A page number is the one thing here that\nchanges under the pointer, and proportional digits make the whole row shuffle\nas it does.\n\nThe current page is the only filled thing in the row, selected on\n`aria-current` rather than on a second attribute saying the same thing: the\nstate is already in the accessibility tree, and a `data-current` beside it\nwould be two places to keep in step.",
+          "description": "One box for every control in the row, arrows and numbers alike, so the run has\na single rhythm and the steps sit at the numbers' height rather than between\nthem. Square, because a page number is one or two characters and a box sized\nto the widest would leave the short ones swimming; `min-inline-size` rather\nthan a fixed one, so page 100 grows instead of overflowing.\n\nFigures are tabular throughout. A page number is the one thing here that\nchanges under the pointer, and proportional digits make the whole row shuffle\nas it does.\n\nThe current page is a raised chip rather than a brand fill, which is the\ntreatment `Tabs` gives its selected tab. Brand on a page number claims more\nthan the state deserves: it is not a choice the reader made about anything,\nit is where they happen to be standing, and a row of grey numbers with one\nblue one reads as the blue one being an action.\n\nSelected on `aria-current` rather than on a second attribute saying the same\nthing: the state is already in the accessibility tree, and a `data-current`\nbeside it would be two places to keep in step.\n\nThe gap takes the same box as everything else in the row and only sits back a\nshade in colour. It is a control, so it answers hover and focus like one; it\nis a way through rather than a destination, so it does not compete.",
           "name": "HelixPagination",
           "cssProperties": [
             {
@@ -18221,7 +18221,7 @@
               }
             },
             {
-              "description": "The mark standing in for pages not shown.",
+              "description": "The control standing over pages not shown, which jumps into them.",
               "name": "gap",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
@@ -18368,6 +18368,20 @@
             },
             {
               "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the page numbers. Absent uses the runtime's own.\n\nThe same property the calendar takes, doing the same job one layer down:\nthe templates make the *words* the consumer's, and this makes the *numbers*\ntheirs. A page number is a number like any other, so `1234` is `1,234` in\n`en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that\nlets a consumer translate \"Page {page} of {pages}\" and then prints Latin\ndigits into it has done half the job.\n\nNot applied to `href`. That one is machine-facing, and `?page=1,234` is a\ndifferent address from `?page=1234`.",
+              "attribute": "locale",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "pageLabel",
               "type": {
                 "text": "string"
@@ -18424,6 +18438,20 @@
             },
             {
               "kind": "field",
+              "name": "gapLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Skip to page {page}'",
+              "description": "Accessible name for a gap, with `{page}` filled in as where it goes.",
+              "attribute": "gap-label",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "pageState",
               "type": {
                 "text": "number | undefined"
@@ -18455,6 +18483,32 @@
               "name": "pageIsControlled",
               "type": {
                 "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "cachedFormat",
+              "type": {
+                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
+              },
+              "privacy": "private",
+              "description": "The number formatter, built once per locale rather than per render.\n\n`Intl.NumberFormat` is expensive to construct and this depends on nothing\nbut `locale`, where a render builds one per page in the run. Keyed on the\nlocale so a change to it is picked up, which a plain lazy field would not\ndo. Same shape as the calendar's three date formatters, for the same\nreasons its own note gives.",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "numbers",
+              "type": {
+                "text": "(value: number) => string"
               },
               "privacy": "private",
               "readonly": true,
@@ -18557,6 +18611,29 @@
                 }
               ],
               "description": "One page, as a link or a button.\n\n`aria-current=\"page\"` is what says which one you are on, and it stays a\ncontrol rather than becoming text: a reader who tabs into the run and finds\nthe current page missing from it has lost the only landmark in the row.",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderGap",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hidden",
+                  "type": {
+                    "text": "Hidden"
+                  }
+                }
+              ],
+              "description": "A gap, which is a control and not a mark.\n\n**It goes to the middle of what it hides**, and the label says so. That is\nthe binary-search step, so an arbitrary page in a set of any size is a\nhandful of presses: 128 pages is `1 … 96 97 98 … 128`, and the leading gap\nlands on 48, whose gaps land on 24 and 88, and so on. A jump of a fixed size\nwould need forty presses on that set.\n\n**A menu over these pages was the other idea and it does not survive the\narithmetic.** The run a gap covers is unbounded by construction: two pages\non a twelve-page set, ninety-four on a hundred-and-twenty-eight-page one. A\nmenu is pleasant at the first and is a scroll of ninety-four items at the\nsecond, which is worse than the ellipsis it replaced, and there is no total\nat which it stops being possible. It would also make `Pagination` depend on\n`Menu` and `Popover` for a case a button already covers.\n\nSo it is announced rather than hidden, which is the change from when it was\na decoration: a control a reader can reach has to be in the tree, and the\nlabel naming its destination is the whole affordance.",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -18779,6 +18856,19 @@
               }
             },
             {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the page numbers. Absent uses the runtime's own.\n\nThe same property the calendar takes, doing the same job one layer down:\nthe templates make the *words* the consumer's, and this makes the *numbers*\ntheirs. A page number is a number like any other, so `1234` is `1,234` in\n`en-US`, `1.234` in `de-DE` and `١٢٣٤` in `ar-EG`, and a component that\nlets a consumer translate \"Page {page} of {pages}\" and then prints Latin\ndigits into it has done half the job.\n\nNot applied to `href`. That one is machine-facing, and `?page=1,234` is a\ndifferent address from `?page=1234`.",
+              "fieldName": "locale",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
               "name": "page-label",
               "type": {
                 "text": "string"
@@ -18825,6 +18915,19 @@
               "default": "'Next page'",
               "description": "Accessible name for the control that moves forward.",
               "fieldName": "nextLabel",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "name": "gap-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Skip to page {page}'",
+              "description": "Accessible name for a gap, with `{page}` filled in as where it goes.",
+              "fieldName": "gapLabel",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
