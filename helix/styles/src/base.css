@@ -1007,7 +1007,27 @@ helix-toggle[disabled]::part(item) {
   border-radius: var(--card-radii, var(--helix-radii-sm));
   color: inherit;
   display: block;
+  /* Drawn transparent at rest rather than appearing on hover.
+   *
+   * The hover set `outline: 2px solid` outright, so the card's border faded to
+   * the brand colour through the transition it already carries and the outline
+   * around it snapped on in the same instant. Two halves of one gesture moving
+   * at different speeds is what a reader notices even when they cannot say
+   * what. An outline takes no space at any width, so keeping it there and
+   * colouring it costs nothing and gives the transition something to move.
+   *
+   * `border-thick` rather than a literal 2, which is what every other rule in
+   * this file that draws a line of this weight names. */
+  outline: var(--helix-border-thick) solid transparent;
+  outline-offset: 0;
   text-decoration: none;
+  transition: outline-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where([data-card]) {
+    transition: none;
+  }
 }
 
 /* Hover goes to the brand, not to a darker grey.
@@ -1039,8 +1059,7 @@ helix-toggle[disabled]::part(item) {
  * cannot tell where they are. */
 :where([data-card]):hover {
   --card-border-color: var(--helix-color-primary);
-  outline: 2px solid var(--helix-color-primary);
-  outline-offset: 0;
+  outline-color: var(--helix-color-primary);
 }
 
 :where([data-card])[aria-current] {

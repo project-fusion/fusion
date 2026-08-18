@@ -1,0 +1,5 @@
+/* A vertical track needs a height where a horizontal one does not: width comes
+   from the page and height does not. */
+.stack {
+  --carousel-block-size: 9rem;
+}

@@ -94,8 +94,14 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* Monotone, which is what the note under the checked rule has always claimed:
+   colour is reserved for state, and being ticked is an answer rather than a
+   state. Both of these named `--helix-color-primary`, so the comment and the
+   code disagreed and the code won, and a box that turns brand-blue under a
+   pointer says "recommended" about whichever one it happens to be over. Same
+   correction `Radio` took. */
 :host(:not(:disabled)) [part="field"]:hover [part="control"] {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-foreground-muted);
 }
 
 /* No color, which is the same rule the segmented control's thumb follows:
@@ -109,7 +115,7 @@
    because it means "some", not "neither". */
 :host([data-checked]) [part="control"],
 :host([indeterminate]) [part="control"] {
-  border-color: var(--checkbox-checked-color, var(--helix-color-primary));
+  border-color: var(--checkbox-checked-color, var(--helix-color-foreground));
 }
 
 /* The tick and the dash, as masks rather than glyphs, so their weight is ours.
@@ -254,7 +260,7 @@
 }
 
 :host(:not([disabled])[appearance="card"]) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-foreground-muted);
 }
 
 /* Lifted rather than colored, which is the rule the tick already follows. */
