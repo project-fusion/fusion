@@ -221,8 +221,66 @@ for (const file of walk(root)) {
   }
 }
 
+/* The third rule, and the one the other two could not see: a token named after
+ * a component, that no component reads.
+ *
+ * `check:tokens` has always asked that every token *referenced* exists, which
+ * catches a rename. It cannot ask that every token *declared* is read, because
+ * most of the ones that are not are scale rungs: `--helix-radii-lg` has no
+ * reader today and is still part of a complete scale a consumer reaches into.
+ * A check that fires on all seven of those is worse than no check.
+ *
+ * But a token whose last word is a component's name is not a rung. It is a
+ * promise about that component, and when the component stops reading it the
+ * promise is left standing: `--helix-layer-popover` sat at 1100 with no reader
+ * at all, offering a consumer a number to sit between two of ours that had
+ * stopped meaning anything the day `popover` moved to the top layer. That is
+ * the fault, it is the whole of the fault, and it is mechanical.
+ *
+ * The reference doc lists every unread token for a human to look at, which is
+ * the honest treatment of the rest.
+ */
+const FAMILIES = new Set(
+  readdirSync('helix/web/src', { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name),
+)
+
+const declared = [
+  ...readFileSync('helix/styles/src/tokens.css', 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .matchAll(/^\s*(--helix-[a-z0-9-]+):/gm),
+].map(([, name]) => name)
+
+const readAnywhere = new Set()
+for (const root of ['helix', 'site']) {
+  for (const path of walk(root)) {
+    if (path.endsWith('tokens.css') || path.endsWith('primitives.css')) {
+      continue
+    }
+    for (const [, name] of readFileSync(path, 'utf8').matchAll(/var\((--helix-[a-z0-9-]+)/g)) {
+      readAnywhere.add(name)
+    }
+  }
+}
+
+for (const name of declared) {
+  const leaf = name.split('-').at(-1) ?? ''
+  if (FAMILIES.has(leaf) && !readAnywhere.has(name)) {
+    violations.push({
+      at: 'helix/styles/src/tokens.css',
+      line: name,
+      message:
+        `Named after the \`${leaf}\` component and read by nothing. A token naming a ` +
+        'component is a promise about it: either that component should read it, or it ' +
+        'should go. A scale rung with no reader is fine and this is not one.',
+      rule: 'no-dead-component-token',
+    })
+  }
+}
+
 if (violations.length === 0) {
-  console.log('tokens: no raw values or primitive access in component CSS')
+  console.log('tokens: no raw values, no primitive access, no dead component tokens')
   process.exit(0)
 }
 

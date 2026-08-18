@@ -3338,6 +3338,17 @@
             },
             {
               "kind": "field",
+              "name": "aria",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new AriaForwardController(this, { target: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"button\"]') ?? null, })",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "type",
               "type": {
                 "text": "'button' | 'submit' | 'reset'"
@@ -11194,6 +11205,17 @@
               "description": "How much visual weight the button carries.",
               "attribute": "appearance",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "aria",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new AriaForwardController(this, { target: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"button\"]') ?? null, })",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
             },
             {
               "kind": "field",

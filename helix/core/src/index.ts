@@ -1,4 +1,8 @@
 export {
+  AriaForwardController,
+  type AriaForwardOptions,
+} from './controllers/aria-forward-controller/aria-forward-controller.js'
+export {
   CommandController,
   type CommandOptions,
   HelixFallbackCommandEvent,

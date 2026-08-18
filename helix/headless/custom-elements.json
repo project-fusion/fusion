@@ -2472,6 +2472,13 @@
           "members": [
             {
               "kind": "field",
+              "name": "aria",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new AriaForwardController(this, { target: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"button\"]') ?? null, })"
+            },
+            {
+              "kind": "field",
               "name": "type",
               "type": {
                 "text": "'button' | 'submit' | 'reset'"
@@ -8255,6 +8262,17 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "aria",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new AriaForwardController(this, { target: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"button\"]') ?? null, })",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
             {
               "kind": "field",
               "name": "type",

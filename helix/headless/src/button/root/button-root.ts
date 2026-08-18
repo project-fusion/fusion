@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   customElement,
   HelixFallbackCommandEvent,
   HelixFormElement,
@@ -43,6 +44,15 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-button')
 export class HelixBaseButton extends HelixFormElement {
+  /* A consumer's `aria-describedby` names ids in their tree and this control is
+     in a shadow root, so the reference has to be carried down as an element
+     rather than copied as an id. See the controller: measured, the host held
+     the description and the accessibility tree exposed the inner control
+     without it. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="button"]') ?? null,
+  })
+
   /** What activating the button does to its form. */
   @property()
   type: 'button' | 'submit' | 'reset' = 'button'
