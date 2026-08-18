@@ -90,6 +90,27 @@
   background-color: var(--meter-color, var(--helix-color-danger));
 }
 
+/* Past an end, where the bar has run out of room to say so.
+ *
+ * A fill at its maximum and a fill well past it are the same picture, so the
+ * words carry it and this carries what a picture can: the trailing corner
+ * squares off, which is the convention for a quantity continuing past the frame
+ * it is drawn in. Only the corner, because "over" is not a judgement: a hundred
+ * and ten per cent of a stretch goal is good news and of a disk is not, and the
+ * band is what says which. */
+[part="indicator"][data-beyond="over"] {
+  border-end-end-radius: var(--helix-radii-none);
+  border-start-end-radius: var(--helix-radii-none);
+}
+
+/* And a value below the floor, which draws nothing at all: the same square edge
+   on the leading corner, so an empty-looking bar is distinguishable from one
+   that is empty because the reading fell off the bottom. */
+[part="indicator"][data-beyond="under"] {
+  border-end-start-radius: var(--helix-radii-none);
+  border-start-start-radius: var(--helix-radii-none);
+}
+
 /* A mark where a band begins, drawn on the track rather than over the fill, so
    the reading is placed against it whichever side of it the value lands. Two
    pixels wide against a track that is eight tall: any wider and a threshold near

@@ -128,3 +128,69 @@ describe('meter geometry', () => {
     expect(part(host, 'indicator')?.getAttribute('style')).toContain('--_meter-fraction: 0')
   })
 })
+
+describe('meter beyond its range', () => {
+  test('a value past the end says so, where the bar cannot', async () => {
+    /* The bar filled and the reading said "100%", so 110 and 250 were
+       indistinguishable from exactly full. A meter that cannot say "you are
+       over" is worse than no meter in the one case anybody checks it for, and it
+       is the same fault as a pagination reporting a page it is not on. */
+    const host = await meter('show-value value="110"')
+    expect(part(host, 'value')?.textContent?.trim()).toBe('110%')
+    expect(part(host, 'indicator')?.getAttribute('data-beyond')).toBe('over')
+  })
+
+  test('and the bar still stops at its end, because that is what an end is', async () => {
+    const host = await meter('value="250"')
+    expect(part(host, 'indicator')?.getAttribute('style')).toContain('--_meter-fraction: 1')
+  })
+
+  test('the accessible reading carries it too', async () => {
+    // `aria-valuenow` has to sit inside the range, so `aria-valuetext` is the
+    // only place a reader can be told that 250 is not 100.
+    const host = await meter('value="250"')
+    expect(internals(host).ariaValueNow).toBe('100')
+    expect(internals(host).ariaValueText).toBe('250%')
+  })
+
+  test('a value under the floor is marked at the other end', async () => {
+    const host = await meter('min="10" value="4"')
+    expect(part(host, 'indicator')?.getAttribute('data-beyond')).toBe('under')
+  })
+
+  test('and a reading inside the range is marked at neither', async () => {
+    const host = await meter('value="40"')
+    expect(part(host, 'indicator')?.getAttribute('data-beyond')).toBeNull()
+    expect(internals(host).ariaValueText).toBeNull()
+  })
+})
+
+describe('meter band, said outright', () => {
+  test('a written band wins over the thresholds', async () => {
+    /* Three bands and a point can express a direction in three grades or a
+       target in two, and never a target in three: with `low="15" high="25"
+       optimum="20"` the readings 28 and 90 both come out fair, because from a
+       middle band nothing is ever two bands away. A consumer whose rule is more
+       than three buckets already knows the answer. */
+    const host = await meter('band="poor" high="25" low="15" optimum="20" value="28"')
+    expect(band(host)).toBe('poor')
+  })
+
+  test('it works with no thresholds at all', async () => {
+    const host = await meter('band="good" value="28"')
+    expect(band(host)).toBe('good')
+  })
+
+  test('and the thresholds still draw their ticks', async () => {
+    // Written, the band wins outright and the thresholds are only for drawing.
+    const host = await meter('band="poor" high="25" low="15" value="20"')
+    expect([...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])]).toHaveLength(2)
+  })
+
+  test('the middle-target gap this exists for is real', async () => {
+    const near = await meter('high="25" low="15" optimum="20" value="28"')
+    const far = await meter('high="25" low="15" optimum="20" value="90"')
+    expect(band(near)).toBe('fair')
+    expect(band(far)).toBe('fair')
+  })
+})

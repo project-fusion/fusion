@@ -3278,6 +3278,27 @@ platform's own default and the right one for a score. A meter where low is
 good, like disk usage, says `optimum="0"`; one where high is good, like a
 battery, says `optimum="100"`. */
   optimum?: HelixBaseMeter["optimum"];
+  /** The band, said outright, where the three thresholds cannot say it.
+
+**The specification's model has a shape, and it is worth knowing before
+reaching for this.** Three bands and a point mean it can express a
+*direction* in three grades, or a *target* in two, and never a target in
+three. Measured across a grid: with `low="25" high="50" optimum="0"` the
+readings 5, 28 and 60 come out good, fair and poor; with `low="15"
+high="25" optimum="20"` the readings 28 and 90 both come out fair, because
+from a middle band nothing is ever two bands away.
+
+So a target you can miss badly in either direction has no expression in
+`low`, `high` and `optimum`, and neither has a rule that is not about
+distance at all: 28 against a target of 20 is fine for a room's temperature
+and is not fine for a dosage, and no arrangement of thresholds knows which
+one it is looking at.
+
+Written, this wins outright and the thresholds are only for drawing the
+ticks. A consumer whose rule is more than three buckets already knows the
+answer, and asking them to encode it as thresholds so this can decode it
+again is a worse API than letting them say it. */
+  band?: HelixBaseMeter["band"];
   /** Whether the reading is shown beside the bar. */
   "show-value"?: HelixBaseMeter["showValue"];
   /** Whether the reading is shown beside the bar. */
@@ -3321,6 +3342,27 @@ platform's own default and the right one for a score. A meter where low is
 good, like disk usage, says `optimum="0"`; one where high is good, like a
 battery, says `optimum="100"`. */
   "prop:optimum"?: HelixBaseMeter["optimum"];
+  /** The band, said outright, where the three thresholds cannot say it.
+
+**The specification's model has a shape, and it is worth knowing before
+reaching for this.** Three bands and a point mean it can express a
+*direction* in three grades, or a *target* in two, and never a target in
+three. Measured across a grid: with `low="25" high="50" optimum="0"` the
+readings 5, 28 and 60 come out good, fair and poor; with `low="15"
+high="25" optimum="20"` the readings 28 and 90 both come out fair, because
+from a middle band nothing is ever two bands away.
+
+So a target you can miss badly in either direction has no expression in
+`low`, `high` and `optimum`, and neither has a rule that is not about
+distance at all: 28 against a target of 20 is fine for a room's temperature
+and is not fine for a dosage, and no arrangement of thresholds knows which
+one it is looking at.
+
+Written, this wins outright and the thresholds are only for drawing the
+ticks. A consumer whose rule is more than three buckets already knows the
+answer, and asking them to encode it as thresholds so this can decode it
+again is a worse API than letting them say it. */
+  "prop:band"?: HelixBaseMeter["band"];
   /** Whether the reading is shown beside the bar. */
   "bool:show-value"?: HelixBaseMeter["showValue"];
   /** Whether the reading is shown beside the bar. */
@@ -9207,6 +9249,26 @@ export type CustomElements = {
    * platform's own default and the right one for a score. A meter where low is
    * good, like disk usage, says `optimum="0"`; one where high is good, like a
    * battery, says `optimum="100"`.
+   * - `band`: The band, said outright, where the three thresholds cannot say it.
+   *
+   * **The specification's model has a shape, and it is worth knowing before
+   * reaching for this.** Three bands and a point mean it can express a
+   * *direction* in three grades, or a *target* in two, and never a target in
+   * three. Measured across a grid: with `low="25" high="50" optimum="0"` the
+   * readings 5, 28 and 60 come out good, fair and poor; with `low="15"
+   * high="25" optimum="20"` the readings 28 and 90 both come out fair, because
+   * from a middle band nothing is ever two bands away.
+   *
+   * So a target you can miss badly in either direction has no expression in
+   * `low`, `high` and `optimum`, and neither has a rule that is not about
+   * distance at all: 28 against a target of 20 is fine for a room's temperature
+   * and is not fine for a dosage, and no arrangement of thresholds knows which
+   * one it is looking at.
+   *
+   * Written, this wins outright and the thresholds are only for drawing the
+   * ticks. A consumer whose rule is more than three buckets already knows the
+   * answer, and asking them to encode it as thresholds so this can decode it
+   * again is a worse API than letting them say it.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
    * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
    *
@@ -14923,6 +14985,26 @@ export type CustomElementsSolidJs = {
    * platform's own default and the right one for a score. A meter where low is
    * good, like disk usage, says `optimum="0"`; one where high is good, like a
    * battery, says `optimum="100"`.
+   * - `band`: The band, said outright, where the three thresholds cannot say it.
+   *
+   * **The specification's model has a shape, and it is worth knowing before
+   * reaching for this.** Three bands and a point mean it can express a
+   * *direction* in three grades, or a *target* in two, and never a target in
+   * three. Measured across a grid: with `low="25" high="50" optimum="0"` the
+   * readings 5, 28 and 60 come out good, fair and poor; with `low="15"
+   * high="25" optimum="20"` the readings 28 and 90 both come out fair, because
+   * from a middle band nothing is ever two bands away.
+   *
+   * So a target you can miss badly in either direction has no expression in
+   * `low`, `high` and `optimum`, and neither has a rule that is not about
+   * distance at all: 28 against a target of 20 is fine for a room's temperature
+   * and is not fine for a dosage, and no arrangement of thresholds knows which
+   * one it is looking at.
+   *
+   * Written, this wins outright and the thresholds are only for drawing the
+   * ticks. A consumer whose rule is more than three buckets already knows the
+   * answer, and asking them to encode it as thresholds so this can decode it
+   * again is a worse API than letting them say it.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
    * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
    *

@@ -87,6 +87,31 @@ export class HelixBaseMeter extends HelixElement {
   @property({ type: Number })
   optimum?: number
 
+  /**
+   * The band, said outright, where the three thresholds cannot say it.
+   *
+   * **The specification's model has a shape, and it is worth knowing before
+   * reaching for this.** Three bands and a point mean it can express a
+   * *direction* in three grades, or a *target* in two, and never a target in
+   * three. Measured across a grid: with `low="25" high="50" optimum="0"` the
+   * readings 5, 28 and 60 come out good, fair and poor; with `low="15"
+   * high="25" optimum="20"` the readings 28 and 90 both come out fair, because
+   * from a middle band nothing is ever two bands away.
+   *
+   * So a target you can miss badly in either direction has no expression in
+   * `low`, `high` and `optimum`, and neither has a rule that is not about
+   * distance at all: 28 against a target of 20 is fine for a room's temperature
+   * and is not fine for a dosage, and no arrangement of thresholds knows which
+   * one it is looking at.
+   *
+   * Written, this wins outright and the thresholds are only for drawing the
+   * ticks. A consumer whose rule is more than three buckets already knows the
+   * answer, and asking them to encode it as thresholds so this can decode it
+   * again is a worse API than letting them say it.
+   */
+  @property({ reflect: true })
+  band?: MeterBand
+
   /** Whether the reading is shown beside the bar. */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
@@ -114,10 +139,42 @@ export class HelixBaseMeter extends HelixElement {
     return Math.min(max, Math.max(min, Number.isFinite(this.value) ? this.value : min))
   }
 
-  /** How much of the track is filled, from zero to one. */
+  /**
+   * How much of the track is filled, from zero to one.
+   *
+   * Clamped, because a bar cannot draw past its own end. What the reading *says*
+   * is not clamped: see `ratio`.
+   */
   private get fraction(): number {
     const { max, min } = this.span
     return (this.reading - min) / (max - min)
+  }
+
+  /**
+   * Where the value really sits, which is what the words report.
+   *
+   * **A value past the end used to be swallowed twice.** The bar filled and the
+   * reading said "100%", so 110 and 250 were indistinguishable from exactly
+   * full, measured. A meter that cannot say "you are over" is worse than no
+   * meter for the one case anybody checks it in, and it is the same fault as a
+   * pagination reporting a page it is not on: the number shown and the number
+   * given disagree, quietly.
+   *
+   * The bar still stops at its end, because that is what an end is. The words
+   * and the accessible reading carry the truth, and `data-over` is on the fill
+   * so a consumer can say more about it.
+   */
+  private get ratio(): number {
+    const { max, min } = this.span
+    const raw = Number.isFinite(this.value) ? this.value : min
+    return (raw - min) / (max - min)
+  }
+
+  /** Whether the value is past an end, which the bar itself cannot show. */
+  private get beyond(): 'over' | 'under' | undefined {
+    const { max, min } = this.span
+    const raw = Number.isFinite(this.value) ? this.value : min
+    return raw > max ? 'over' : raw < min ? 'under' : undefined
   }
 
   /**
@@ -145,7 +202,10 @@ export class HelixBaseMeter extends HelixElement {
    * bands away is poor. Undefined where nothing was declared, which is what
    * keeps an unbanded meter from being painted as good news.
    */
-  private get band(): MeterBand | undefined {
+  private get computedBand(): MeterBand | undefined {
+    if (this.band) {
+      return this.band
+    }
     const bounds = this.thresholds
     if (!bounds) {
       return undefined
@@ -159,7 +219,7 @@ export class HelixBaseMeter extends HelixElement {
 
   /** What the reading says, which is the consumer's words or a percentage. */
   private get text(): string {
-    return this.valueText || `${Math.round(this.fraction * 100)}%`
+    return this.valueText || `${Math.round(this.ratio * 100)}%`
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -175,7 +235,11 @@ export class HelixBaseMeter extends HelixElement {
     this.internals.ariaValueNow = String(this.reading)
     /* Spoken instead of the number wherever the consumer gave words, which is
        what `value-text` is for: "18 GB of 32 GB" rather than "56". */
-    this.internals.ariaValueText = this.valueText || null
+    /* The consumer's words where they gave any, and otherwise nothing at all
+       *unless* the value is past an end. `ariaValueNow` has to sit inside the
+       range, so it is the only place a reader can be told that 250 is not 100. */
+    this.internals.ariaValueText =
+      this.valueText || (this.beyond ? `${Math.round(this.ratio * 100)}%` : null)
   }
 
   protected override render(): TemplateResult {
@@ -191,7 +255,8 @@ export class HelixBaseMeter extends HelixElement {
         }
         <div
           part="indicator"
-          data-band=${this.band ?? nothing}
+          data-band=${this.computedBand ?? nothing}
+          data-beyond=${this.beyond ?? nothing}
           style="--_meter-fraction: ${this.fraction}"
         ></div>
       </div>

@@ -30,6 +30,11 @@ import { styles } from './meter-root.css.js'
  * A tick marks each threshold, so the reading can be placed against the bands
  * without seeing colour at all.
  *
+ * A reading past either end squares the corner it ran out at, which is the
+ * convention for a quantity continuing past the frame it is drawn in. The bar
+ * itself stops, because that is what an end is; the words and the accessible
+ * reading are what say how far past.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases Gauge, Level, Capacity

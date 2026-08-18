@@ -19325,7 +19325,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The bar `Progress` draws, at half again the height and on the house corner\nrather than its pill.\n\nIt shipped at the progress height, on the argument that the two stand beside\neach other in a panel. Rendered side by side that turned out backwards: they\n*are* two unrelated controls, and a reader telling a level from a task at a\nglance is the point rather than the cost. A meter also carries more, a fill\nand a mark at each threshold, and at eight pixels those marks are hairlines.\n\nThe corner is the ticks' doing: they cut the fill into segments, and a\npill-ended bar comes out as a run whose outer ends are round and whose inner\nends are square. `radii-full` on an eight pixel bar was a four pixel pill\nanyway, so this is only a change at all because the bar grew.\n\nWhat else differs is what the colour means. A progress bar is one colour because\nthere is one thing to say; a meter's fill takes the success, warning or danger\ntone from the band its reading falls in, and only once thresholds have been\ndeclared. An unbanded meter is neutral, because a gauge with nothing said\nabout it is a reading rather than good news.\n\nA tick marks each threshold, so the reading can be placed against the bands\nwithout seeing colour at all.",
+          "description": "The bar `Progress` draws, at half again the height and on the house corner\nrather than its pill.\n\nIt shipped at the progress height, on the argument that the two stand beside\neach other in a panel. Rendered side by side that turned out backwards: they\n*are* two unrelated controls, and a reader telling a level from a task at a\nglance is the point rather than the cost. A meter also carries more, a fill\nand a mark at each threshold, and at eight pixels those marks are hairlines.\n\nThe corner is the ticks' doing: they cut the fill into segments, and a\npill-ended bar comes out as a run whose outer ends are round and whose inner\nends are square. `radii-full` on an eight pixel bar was a four pixel pill\nanyway, so this is only a change at all because the bar grew.\n\nWhat else differs is what the colour means. A progress bar is one colour because\nthere is one thing to say; a meter's fill takes the success, warning or danger\ntone from the band its reading falls in, and only once thresholds have been\ndeclared. An unbanded meter is neutral, because a gauge with nothing said\nabout it is a reading rather than good news.\n\nA tick marks each threshold, so the reading can be placed against the bands\nwithout seeing colour at all.\n\nA reading past either end squares the corner it ran out at, which is the\nconvention for a quantity continuing past the frame it is drawn in. The bar\nitself stops, because that is what an end is; the words and the accessible\nreading are what say how far past.",
           "name": "HelixMeter",
           "cssProperties": [
             {
@@ -19477,6 +19477,20 @@
             },
             {
               "kind": "field",
+              "name": "band",
+              "type": {
+                "text": "MeterBand | undefined"
+              },
+              "description": "The band, said outright, where the three thresholds cannot say it.\n\n**The specification's model has a shape, and it is worth knowing before\nreaching for this.** Three bands and a point mean it can express a\n*direction* in three grades, or a *target* in two, and never a target in\nthree. Measured across a grid: with `low=\"25\" high=\"50\" optimum=\"0\"` the\nreadings 5, 28 and 60 come out good, fair and poor; with `low=\"15\"\nhigh=\"25\" optimum=\"20\"` the readings 28 and 90 both come out fair, because\nfrom a middle band nothing is ever two bands away.\n\nSo a target you can miss badly in either direction has no expression in\n`low`, `high` and `optimum`, and neither has a rule that is not about\ndistance at all: 28 against a target of 20 is fine for a room's temperature\nand is not fine for a dosage, and no arrangement of thresholds knows which\none it is looking at.\n\nWritten, this wins outright and the thresholds are only for drawing the\nticks. A consumer whose rule is more than three buckets already knows the\nanswer, and asking them to encode it as thresholds so this can decode it\nagain is a worse API than letting them say it.",
+              "attribute": "band",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "showValue",
               "type": {
                 "text": "boolean"
@@ -19539,7 +19553,35 @@
                 "text": "number"
               },
               "privacy": "private",
-              "description": "How much of the track is filled, from zero to one.",
+              "description": "How much of the track is filled, from zero to one.\n\nClamped, because a bar cannot draw past its own end. What the reading *says*\nis not clamped: see `ratio`.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ratio",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "Where the value really sits, which is what the words report.\n\n**A value past the end used to be swallowed twice.** The bar filled and the\nreading said \"100%\", so 110 and 250 were indistinguishable from exactly\nfull, measured. A meter that cannot say \"you are over\" is worse than no\nmeter for the one case anybody checks it in, and it is the same fault as a\npagination reporting a page it is not on: the number shown and the number\ngiven disagree, quietly.\n\nThe bar still stops at its end, because that is what an end is. The words\nand the accessible reading carry the truth, and `data-over` is on the fill\nso a consumer can say more about it.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "beyond",
+              "type": {
+                "text": "'over' | 'under' | undefined"
+              },
+              "privacy": "private",
+              "description": "Whether the value is past an end, which the bar itself cannot show.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseMeter",
@@ -19562,7 +19604,7 @@
             },
             {
               "kind": "field",
-              "name": "band",
+              "name": "computedBand",
               "type": {
                 "text": "MeterBand | undefined"
               },
@@ -19762,6 +19804,18 @@
               },
               "description": "Where in the range it is best to be.\n\nDefaults to the middle of whatever bands are declared, which is the\nplatform's own default and the right one for a score. A meter where low is\ngood, like disk usage, says `optimum=\"0\"`; one where high is good, like a\nbattery, says `optimum=\"100\"`.",
               "fieldName": "optimum",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "band",
+              "type": {
+                "text": "MeterBand | undefined"
+              },
+              "description": "The band, said outright, where the three thresholds cannot say it.\n\n**The specification's model has a shape, and it is worth knowing before\nreaching for this.** Three bands and a point mean it can express a\n*direction* in three grades, or a *target* in two, and never a target in\nthree. Measured across a grid: with `low=\"25\" high=\"50\" optimum=\"0\"` the\nreadings 5, 28 and 60 come out good, fair and poor; with `low=\"15\"\nhigh=\"25\" optimum=\"20\"` the readings 28 and 90 both come out fair, because\nfrom a middle band nothing is ever two bands away.\n\nSo a target you can miss badly in either direction has no expression in\n`low`, `high` and `optimum`, and neither has a rule that is not about\ndistance at all: 28 against a target of 20 is fine for a room's temperature\nand is not fine for a dosage, and no arrangement of thresholds knows which\none it is looking at.\n\nWritten, this wins outright and the thresholds are only for drawing the\nticks. A consumer whose rule is more than three buckets already knows the\nanswer, and asking them to encode it as thresholds so this can decode it\nagain is a worse API than letting them say it.",
+              "fieldName": "band",
               "inheritedFrom": {
                 "name": "HelixBaseMeter",
                 "module": "src/meter/root/meter-root.ts"
