@@ -112,6 +112,23 @@
     block-size var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* **The one being pointed at paints over the other.**
+ *
+ * Every separator sits on the same layer, so where two cross, the deeper one
+ * wins on document order: at rest that is invisible, because both lines are one
+ * pixel of the same colour and the overlap is a single pixel nobody sees. It
+ * stops being invisible the moment one of them is hovered. A hovered divider is
+ * two pixels and dark, and the light one crossing it starts exactly at its
+ * centre, so it repaints the right half of the dark stroke and leaves a notch
+ * in it. Reported from a screenshot, and it is only ever the hovered state.
+ *
+ * One step of the layer is enough, because a hovered inner divider is later
+ * again and wins the tie the same way. The rule is simply that interest wins. */
+[part="separator"]:hover,
+[part="separator"]:focus-visible {
+  z-index: calc(var(--helix-layer-raised) + 1);
+}
+
 /* **What lights is the divider, not the target.** The target is eight pixels of
    hit area and the divider is a line, and lighting the first to say something
    about the second made the line appear to change width. The line thickens and

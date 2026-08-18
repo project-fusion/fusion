@@ -243,7 +243,7 @@ Position in the stack. Positional, never named after a component.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-layer-base` | `0` | 8 |
-| `--helix-layer-raised` | `10` | 20 |
+| `--helix-layer-raised` | `10` | 22 |
 | `--helix-layer-sticky` | `100` | 2 |
 | `--helix-layer-overlay` | `1000` | 2 |
 | `--helix-layer-toast` | `1200` | 2 |
