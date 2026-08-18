@@ -16,12 +16,13 @@ import type {
   HelixDrawer,
   HelixInput,
   HelixMenu,
+  HelixSplitter,
   HelixTabs,
   HelixToggleGroup,
   HelixTree,
   HelixTreeItem,
 } from '@helix-io/web'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
 import { useElementRef, useHelixEvent } from '../../../../lib/use-helix-event'
 import { PreferencesDrawer } from '../../../preferences'
@@ -88,6 +89,9 @@ type Pane = 'source' | 'css'
  * deciding for every consumer that it should, under a key it chose.
  */
 const ARRANGEMENT = 'fusion-sandbox-arrangement'
+
+/** How wide the examples rail opens to, in pixels. The 17rem it always was. */
+const RAIL_OPEN = 272
 
 interface Arrangement {
   panelSize?: number
@@ -201,11 +205,68 @@ export function SandboxWorkbench({ families }: Props) {
   // shut. Once the button is pressed it is an answer, and it holds.
   const [expandAll, setExpandAll] = useState<boolean | null>(null)
   const [railOpen, setRailOpen] = useState(false)
+  /* How wide the examples rail is, in pixels.
+   *
+   * Pixels rather than the share of the window a splitter works in, and for the
+   * same reason the sandbox holds its panel that way: a navigation column is a
+   * column of names, and a share of a wide screen makes it a column of names
+   * with half a screen of space after them. The conversion happens here, where
+   * the box is known.
+   */
+  const [railSize, setRailSize] = useState(RAIL_OPEN)
+  const [railSplitter, setRailSplitter] = useElementRef<HelixSplitter>()
+  const [bodyWidth, setBodyWidth] = useState(0)
   // The rail on a wide screen, which is a different thing from the drawer a
   // phone gets: one is a region of the layout and the other is an overlay.
   const [showRail, setShowRail] = useState(DEFAULTS.panes.includes('rail'))
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [narrow, setNarrow] = useState(false)
+
+  /* Measured on layout and then watched, so a rail asked for at 272px keeps
+     that width when the window changes rather than the share of it that
+     happened to be.
+   *
+     The measurement is taken here rather than left to the observer's first
+     callback. `ResizeObserver` delivers from the rendering lifecycle, so a
+     document that is not being painted runs none of them, and a width of zero
+     reads as a rail shut: the column simply never appeared. The sandbox learned
+     the same thing about its panel. */
+  useLayoutEffect(() => {
+    if (!railSplitter) {
+      return
+    }
+    setBodyWidth(railSplitter.getBoundingClientRect().width)
+    const watch = new ResizeObserver(([entry]) => {
+      setBodyWidth(entry?.contentRect.width ?? 0)
+    })
+    watch.observe(railSplitter)
+    return () => watch.disconnect()
+  }, [railSplitter])
+
+  /* A hundred is the rail shut, which puts the divider on the trailing edge
+     where the splitter draws no line: a boundary needs two sides, and it takes
+     that away itself rather than needing the border switched off here. */
+  const railPosition =
+    showRail && bodyWidth > 0 ? Math.max(0, 100 - (railSize / bodyWidth) * 100) : 100
+
+  /* Where a double click on the divider puts it back to, which is the width the
+     rail opens at rather than the splitter's own half-and-half. Shut, the
+     divider is still there and still takes a double click, so this is the way
+     back from nothing without reaching for the toggle. */
+  const railHome = bodyWidth > 0 ? Math.max(0, 100 - (RAIL_OPEN / bodyWidth) * 100) : 100
+
+  useHelixEvent(railSplitter, 'helix-change', (event) => {
+    if (event.detail.name !== 'position' || bodyWidth <= 0) {
+      return
+    }
+    const width = ((100 - Number(event.detail.value)) / 100) * bodyWidth
+    // Dragged off the edge is a reader opening it, which the toggle has to hear
+    // or its label goes on saying "Show examples" over an open rail.
+    setShowRail(width > 1)
+    if (width > 1) {
+      setRailSize(width)
+    }
+  })
 
   // Read the URL after mount, not during render: the page is static, so the
   // server has no query string and reading one would make the first paint
@@ -827,198 +888,209 @@ export function SandboxWorkbench({ families }: Props) {
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
-      <div className="workbenchBody" data-rail={narrow || showRail ? undefined : 'hidden'}>
-        <helix-sandbox
-          orientation={narrow ? 'vertical' : 'horizontal'}
-          ref={sandbox}
-          split={showEditor ? split : 0}
-        >
-          {/* One declaration for the region, rather than `size="sm"` on each
+      {/* The body is a splitter now, so the rail is a pane a reader can size
+          rather than a column at whatever width this file chose. It is rendered
+          on every viewport, the rail pane simply going empty on a narrow one:
+          wrapping the sandbox conditionally would unmount it at the breakpoint,
+          and the preview is an iframe that reloads when it does. */}
+      <helix-splitter
+        className="workbenchBody"
+        default-position={railHome}
+        position={railPosition}
+        ref={setRailSplitter}
+      >
+        <div className="workbenchMain" slot="start">
+          <helix-sandbox
+            orientation={narrow ? 'vertical' : 'horizontal'}
+            ref={sandbox}
+            split={showEditor ? split : 0}
+          >
+            {/* One declaration for the region, rather than `size="sm"` on each
               control in it. Nothing inside can be missed, and adding a control
               later cannot forget. */}
-          <helix-sandbox-toolbar data-density="sm" slot="toolbar">
-            {/* A toggle group, not a tab list. A tab in the toolbar would carry
+            <helix-sandbox-toolbar data-density="sm" slot="toolbar">
+              {/* A toggle group, not a tab list. A tab in the toolbar would carry
                 `aria-controls` for a panel down in the source pane, and an
                 IDREF cannot leave the tab's shadow root to reach it: the
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
-            <helix-toggle-group appearance="plain" aria-label="Files" ref={files} value={pane}>
-              <helix-toggle value="source">{current.file}</helix-toggle>
-              <helix-toggle value="css">styles.css</helix-toggle>
-            </helix-toggle-group>
+              <helix-toggle-group appearance="plain" aria-label="Files" ref={files} value={pane}>
+                <helix-toggle value="source">{current.file}</helix-toggle>
+                <helix-toggle value="css">styles.css</helix-toggle>
+              </helix-toggle-group>
 
-            <helix-toolbar label="Sandbox actions" slot="end">
-              <helix-tooltip
-                content={copied ? 'Link copied' : 'Copy a link to this example'}
-                placement="bottom"
-              >
-                <helix-icon-button
-                  label={copied ? 'Link copied' : 'Copy a link to this example'}
-                  onClick={share}
+              <helix-toolbar label="Sandbox actions" slot="end">
+                <helix-tooltip
+                  content={copied ? 'Link copied' : 'Copy a link to this example'}
+                  placement="bottom"
                 >
-                  <helix-icon name={copied ? 'check' : 'share-network'}></helix-icon>
-                </helix-icon-button>
-              </helix-tooltip>
-
-              {/* Layout and Direction drill down; the last three tick. The menu
-                  reads its state from here rather than holding its own, so what
-                  is ticked is what is showing. */}
-              <helix-menu label="Environment" ref={settings}>
-                <helix-tooltip content="Sandbox settings" placement="bottom" slot="trigger">
-                  <helix-icon-button label="Sandbox settings">
-                    <helix-icon name="sliders-horizontal"></helix-icon>
+                  <helix-icon-button
+                    label={copied ? 'Link copied' : 'Copy a link to this example'}
+                    onClick={share}
+                  >
+                    <helix-icon name={copied ? 'check' : 'share-network'}></helix-icon>
                   </helix-icon-button>
                 </helix-tooltip>
 
-                <helix-menu-item value="syntax">
-                  Environment
-                  {SYNTAXES.map((option) => (
+                {/* Layout and Direction drill down; the last three tick. The menu
+                  reads its state from here rather than holding its own, so what
+                  is ticked is what is showing. */}
+                <helix-menu label="Environment" ref={settings}>
+                  <helix-tooltip content="Sandbox settings" placement="bottom" slot="trigger">
+                    <helix-icon-button label="Sandbox settings">
+                      <helix-icon name="sliders-horizontal"></helix-icon>
+                    </helix-icon-button>
+                  </helix-tooltip>
+
+                  <helix-menu-item value="syntax">
+                    Environment
+                    {SYNTAXES.map((option) => (
+                      <helix-menu-item
+                        checkable
+                        checked={syntax === option.value ? true : undefined}
+                        key={option.value}
+                        slot="submenu"
+                        value={`syntax:${option.value}`}
+                      >
+                        {option.label}
+                      </helix-menu-item>
+                    ))}
+                  </helix-menu-item>
+
+                  <helix-menu-item value="layout">
+                    Layout
+                    {LAYOUTS.map((option) => (
+                      <helix-menu-item
+                        checkable
+                        checked={layout === option.value ? true : undefined}
+                        key={option.value}
+                        slot="submenu"
+                        value={`layout:${option.value}`}
+                      >
+                        {option.label}
+                      </helix-menu-item>
+                    ))}
+                  </helix-menu-item>
+
+                  <helix-menu-item value="color">
+                    Color mode
                     <helix-menu-item
                       checkable
-                      checked={syntax === option.value ? true : undefined}
-                      key={option.value}
+                      checked={previewTheme === null ? true : undefined}
                       slot="submenu"
-                      value={`syntax:${option.value}`}
+                      value="color:site"
                     >
-                      {option.label}
+                      Follow the site
                     </helix-menu-item>
-                  ))}
-                </helix-menu-item>
-
-                <helix-menu-item value="layout">
-                  Layout
-                  {LAYOUTS.map((option) => (
                     <helix-menu-item
                       checkable
-                      checked={layout === option.value ? true : undefined}
-                      key={option.value}
+                      checked={previewTheme === 'light' ? true : undefined}
                       slot="submenu"
-                      value={`layout:${option.value}`}
+                      value="color:light"
                     >
-                      {option.label}
+                      Light
                     </helix-menu-item>
-                  ))}
-                </helix-menu-item>
-
-                <helix-menu-item value="color">
-                  Color mode
-                  <helix-menu-item
-                    checkable
-                    checked={previewTheme === null ? true : undefined}
-                    slot="submenu"
-                    value="color:site"
-                  >
-                    Follow the site
-                  </helix-menu-item>
-                  <helix-menu-item
-                    checkable
-                    checked={previewTheme === 'light' ? true : undefined}
-                    slot="submenu"
-                    value="color:light"
-                  >
-                    Light
-                  </helix-menu-item>
-                  <helix-menu-item
-                    checkable
-                    checked={previewTheme === 'dark' ? true : undefined}
-                    slot="submenu"
-                    value="color:dark"
-                  >
-                    Dark
-                  </helix-menu-item>
-                </helix-menu-item>
-
-                <helix-menu-item value="direction">
-                  Direction
-                  {DIRECTIONS.map((option) => (
                     <helix-menu-item
                       checkable
-                      checked={direction === option.value ? true : undefined}
-                      key={option.value}
+                      checked={previewTheme === 'dark' ? true : undefined}
                       slot="submenu"
-                      value={`direction:${option.value}`}
+                      value="color:dark"
                     >
-                      {option.label}
+                      Dark
                     </helix-menu-item>
-                  ))}
-                </helix-menu-item>
+                  </helix-menu-item>
 
-                <helix-divider announced></helix-divider>
+                  <helix-menu-item value="direction">
+                    Direction
+                    {DIRECTIONS.map((option) => (
+                      <helix-menu-item
+                        checkable
+                        checked={direction === option.value ? true : undefined}
+                        key={option.value}
+                        slot="submenu"
+                        value={`direction:${option.value}`}
+                      >
+                        {option.label}
+                      </helix-menu-item>
+                    ))}
+                  </helix-menu-item>
 
-                <helix-menu-item checkable checked={showEditor ? true : undefined} value="editor">
-                  Editor
-                </helix-menu-item>
-                <helix-menu-item checkable checked={showPanel ? true : undefined} value="panel">
-                  Panel
-                </helix-menu-item>
-                <helix-menu-item checkable checked={showStatus ? true : undefined} value="status">
-                  Status bar
-                </helix-menu-item>
-              </helix-menu>
+                  <helix-divider announced></helix-divider>
 
-              {/* Beside the settings, because it is the same kind of thing: a
+                  <helix-menu-item checkable checked={showEditor ? true : undefined} value="editor">
+                    Editor
+                  </helix-menu-item>
+                  <helix-menu-item checkable checked={showPanel ? true : undefined} value="panel">
+                    Panel
+                  </helix-menu-item>
+                  <helix-menu-item checkable checked={showStatus ? true : undefined} value="status">
+                    Status bar
+                  </helix-menu-item>
+                </helix-menu>
+
+                {/* Beside the settings, because it is the same kind of thing: a
                   switch for a region of the tool rather than anything to do
                   with the example. */}
-              <helix-tooltip
-                content={showRail ? 'Hide examples' : 'Show examples'}
-                placement="bottom"
-              >
-                <helix-icon-button
-                  class="railToggle"
-                  label={showRail ? 'Hide examples' : 'Show examples'}
-                  onClick={() => setShowRail((open) => !open)}
+                <helix-tooltip
+                  content={showRail ? 'Hide examples' : 'Show examples'}
+                  placement="bottom"
                 >
-                  <helix-icon name="sidebar-simple"></helix-icon>
-                </helix-icon-button>
-              </helix-tooltip>
-            </helix-toolbar>
-          </helix-sandbox-toolbar>
+                  <helix-icon-button
+                    class="railToggle"
+                    label={showRail ? 'Hide examples' : 'Show examples'}
+                    onClick={() => setShowRail((open) => !open)}
+                  >
+                    <helix-icon name="sidebar-simple"></helix-icon>
+                  </helix-icon-button>
+                </helix-tooltip>
+              </helix-toolbar>
+            </helix-sandbox-toolbar>
 
-          {/* Both stay mounted, so switching files does not discard what was
+            {/* Both stay mounted, so switching files does not discard what was
               typed in the other, and they share one cell so the hidden one
               costs no height. */}
-          <div className="sourceFiles" slot="source">
-            {/* One editor, keyed on the syntax so a change of environment
+            <div className="sourceFiles" slot="source">
+              {/* One editor, keyed on the syntax so a change of environment
                 rebuilds it rather than reconfiguring a document in place. What
                 is on screen is what runs: an edit here is read back into the
                 markup, and the markup is what the preview renders. */}
-            <div data-file hidden={pane !== 'source'}>
-              <helix-sandbox-editor
-                field-label={`Example, as ${current.label}`}
-                key={`${activeValue}-${syntax}`}
-                language={current.language}
-                name="source"
-                ref={(node: HelixSandboxEditor | null) => {
-                  editors.current.source = node
-                }}
-                value={markup}
-              ></helix-sandbox-editor>
+              <div data-file hidden={pane !== 'source'}>
+                <helix-sandbox-editor
+                  field-label={`Example, as ${current.label}`}
+                  key={`${activeValue}-${syntax}`}
+                  language={current.language}
+                  name="source"
+                  ref={(node: HelixSandboxEditor | null) => {
+                    editors.current.source = node
+                  }}
+                  value={markup}
+                ></helix-sandbox-editor>
+              </div>
+
+              <div data-file hidden={pane !== 'css'}>
+                <helix-sandbox-editor
+                  field-label="Example stylesheet"
+                  key={`${activeValue}-css`}
+                  language="css"
+                  name="css"
+                  ref={(node: HelixSandboxEditor | null) => {
+                    editors.current.css = node
+                  }}
+                  value={css}
+                ></helix-sandbox-editor>
+              </div>
             </div>
 
-            <div data-file hidden={pane !== 'css'}>
-              <helix-sandbox-editor
-                field-label="Example stylesheet"
-                key={`${activeValue}-css`}
-                language="css"
-                name="css"
-                ref={(node: HelixSandboxEditor | null) => {
-                  editors.current.css = node
-                }}
-                value={css}
-              ></helix-sandbox-editor>
-            </div>
-          </div>
+            <helix-sandbox-preview
+              data-color-mode={previewTheme ?? siteTheme}
+              direction={direction === 'rtl' ? 'rtl' : undefined}
+              layout={layout === 'padded' ? undefined : layout}
+              ref={preview}
+              slot="preview"
+              src="/sandbox/frame.html"
+            ></helix-sandbox-preview>
 
-          <helix-sandbox-preview
-            data-color-mode={previewTheme ?? siteTheme}
-            direction={direction === 'rtl' ? 'rtl' : undefined}
-            layout={layout === 'padded' ? undefined : layout}
-            ref={preview}
-            slot="preview"
-            src="/sandbox/frame.html"
-          ></helix-sandbox-preview>
-
-          {/* The panel's tabs are `helix-tabs`, not a second tab set built
+            {/* The panel's tabs are `helix-tabs`, not a second tab set built
               into the sandbox: tabs are the only behavior the region has, and
               that behavior already exists.
 
@@ -1026,42 +1098,42 @@ export function SandboxWorkbench({ families }: Props) {
               controls in it follow; this one did not, so its tabs took the
               default control height and stood eight pixels taller than the file
               tabs across the split from them. */}
-          {showPanel && (
-            <helix-tabs
-              data-density="sm"
-              defaultActive="terminal"
-              label="Panel"
-              ref={panelTabs}
-              slot="panel"
-            >
-              <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
-              <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
-              <helix-tabs-panel slot="panels" value="terminal">
-                <helix-sandbox-terminal ref={terminal}></helix-sandbox-terminal>
-              </helix-tabs-panel>
-              <helix-tabs-panel slot="panels" value="specs">
-                {/* The family, not the example: specs belong to a component, and
+            {showPanel && (
+              <helix-tabs
+                data-density="sm"
+                defaultActive="terminal"
+                label="Panel"
+                ref={panelTabs}
+                slot="panel"
+              >
+                <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
+                <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
+                <helix-tabs-panel slot="panels" value="terminal">
+                  <helix-sandbox-terminal ref={terminal}></helix-sandbox-terminal>
+                </helix-tabs-panel>
+                <helix-tabs-panel slot="panels" value="specs">
+                  {/* The family, not the example: specs belong to a component, and
                   every example of it runs the same ones. */}
-                <helix-sandbox-specs
-                  family={family.slug}
-                  src="/design/sandbox/specs"
-                ></helix-sandbox-specs>
-              </helix-tabs-panel>
-            </helix-tabs>
-          )}
+                  <helix-sandbox-specs
+                    family={family.slug}
+                    src="/design/sandbox/specs"
+                  ></helix-sandbox-specs>
+                </helix-tabs-panel>
+              </helix-tabs>
+            )}
 
-          {/* Fed by the sandbox, not from here. `line` and `column` are never
+            {/* Fed by the sandbox, not from here. `line` and `column` are never
               passed as props, so React leaves them alone and the element
               writes them on every cursor move without a re-render. */}
-          {showStatus && (
-            <helix-sandbox-status-bar
-              language={pane === 'css' ? 'css' : current.value}
-              slot="status"
-            ></helix-sandbox-status-bar>
-          )}
-        </helix-sandbox>
+            {showStatus && (
+              <helix-sandbox-status-bar
+                language={pane === 'css' ? 'css' : current.value}
+                slot="status"
+              ></helix-sandbox-status-bar>
+            )}
+          </helix-sandbox>
 
-        {/* Asked before the conversion, not after.
+          {/* Asked before the conversion, not after.
  
             Changing the environment does not throw the text away, it runs it
             through `htmlToJsx` or `jsxToHtml`, and that is the problem: the
@@ -1072,57 +1144,62 @@ export function SandboxWorkbench({ families }: Props) {
             Rendered always rather than gated on `pendingSyntax`, because a
             dialog that unmounts cannot animate out, and `open` is what drives
             `showModal()`. */}
-        <helix-dialog
-          align="center"
-          label="Change environment"
-          open={pendingSyntax !== null}
-          ref={confirmSyntax}
-          size="sm"
-        >
-          <helix-icon className="dialogWarning" name="warning-fill" slot="icon"></helix-icon>
-          <h2 slot="header">Change environment?</h2>
-          You have edited this example.
-          <helix-flex gap="sm" slot="footer">
-            <helix-button
-              appearance="primary"
-              fill="standard"
-              onClick={() => {
-                const next = pendingSyntax
-                setPendingSyntax(null)
-                if (next) {
-                  applySyntax(next)
-                }
-              }}
-            >
-              Change anyway
-            </helix-button>
-            <helix-button
-              appearance="secondary"
-              fill="standard"
-              onClick={() => setPendingSyntax(null)}
-            >
-              Keep editing
-            </helix-button>
-          </helix-flex>
-        </helix-dialog>
+          <helix-dialog
+            align="center"
+            label="Change environment"
+            open={pendingSyntax !== null}
+            ref={confirmSyntax}
+            size="sm"
+          >
+            <helix-icon className="dialogWarning" name="warning-fill" slot="icon"></helix-icon>
+            <helix-text as="h2" slot="header">
+              Change environment?
+            </helix-text>
+            You have edited this example.
+            <helix-flex gap="sm" slot="footer">
+              <helix-button
+                appearance="primary"
+                fill="standard"
+                onClick={() => {
+                  const next = pendingSyntax
+                  setPendingSyntax(null)
+                  if (next) {
+                    applySyntax(next)
+                  }
+                }}
+              >
+                Change anyway
+              </helix-button>
+              <helix-button
+                appearance="secondary"
+                fill="standard"
+                onClick={() => setPendingSyntax(null)}
+              >
+                Keep editing
+              </helix-button>
+            </helix-flex>
+          </helix-dialog>
+        </div>
 
         {/* A real drawer on a phone: focus trapped, Escape closes, page behind
-            covered. The CSS transform it replaced was none of those. */}
-        {narrow ? (
-          <helix-drawer label="Examples" open={railOpen} placement="end" ref={setRail}>
-            {examplesPane}
-          </helix-drawer>
-        ) : (
-          /* Always rendered, because a region that unmounts cannot animate out.
-             `inert` while it is shut, so what a reader cannot see is also
+            covered. The CSS transform it replaced was none of those. It lives
+            outside the splitter, because a drawer is not a pane. */}
+        {!narrow && (
+          /* `inert` while it is shut, so what a reader cannot see is also
              something the keyboard cannot reach and a screen reader does not
-             read: `overflow: hidden` on a zero-width column takes it off the
-             screen and leaves it in the page. */
-          <aside className="examplesRail" inert={!showRail}>
+             read: a pane closed to nothing takes it off the screen and leaves it
+             in the page. */
+          <aside className="examplesRail" inert={!showRail} slot="end">
             {examplesPane}
           </aside>
         )}
-      </div>
+      </helix-splitter>
+
+      {narrow && (
+        <helix-drawer label="Examples" open={railOpen} placement="end" ref={setRail}>
+          {examplesPane}
+        </helix-drawer>
+      )}
     </>
   )
 }

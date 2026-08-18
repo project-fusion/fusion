@@ -38,7 +38,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 21 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 110 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 109 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 85 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 7 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
@@ -105,7 +105,7 @@ Font size.
 | `--helix-text-sm` | `var(--_helix-size-14)` | 80 |
 | `--helix-text-md` | `var(--_helix-size-15)` | 17 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 17 |
-| `--helix-text-xl` | `var(--_helix-size-24)` | 12 |
+| `--helix-text-xl` | `var(--_helix-size-24)` | 14 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 5 |
 | `--helix-text-3xl` | `var(--_helix-size-44)` | 7 |
 
@@ -145,7 +145,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 114 |
+| `--helix-border-thin` | `1px` | 112 |
 | `--helix-border-thick` | `2px` | 33 |
 
 ## shadow
@@ -180,7 +180,7 @@ How long something takes.
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 0 |
 | `--helix-duration-fast` | `var(--_helix-ms-120)` | 186 |
-| `--helix-duration-normal` | `var(--_helix-ms-200)` | 89 |
+| `--helix-duration-normal` | `var(--_helix-ms-200)` | 87 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 12 |
 
 ## easing
@@ -189,7 +189,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 180 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 178 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 34 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 25 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |

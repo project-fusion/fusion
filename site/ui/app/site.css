@@ -860,18 +860,31 @@ helix-drawer {
    a change any browser can animate, so the rail vanished between frames. Two
    tracks always, and the second one goes to nothing. */
 .workbenchBody {
-  --rail-open: 17rem;
-  --rail-size: var(--rail-open);
-
-  display: grid;
   flex: 1 1 auto;
-  grid-template-columns: minmax(0, 1fr) var(--rail-size);
   min-block-size: 0;
-  transition: grid-template-columns var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
-.workbenchBody[data-rail="hidden"] {
-  --rail-size: 0rem;
+/* **The rail opens and closes without a transition, and that is not an
+   oversight.** It was `transition: flex-basis` on the pane, to keep the reveal
+   the old grid animated. Measured, it did not slow the change down, it stopped
+   it happening: the inline style went to `--_splitter-position: 100%` and the
+   computed `flex-basis` stayed at `60%` for good, with the pane frozen at its
+   old width. A transition on a property whose value is substituted from an
+   unregistered custom property has nothing it can interpolate, and it holds the
+   start value rather than declining to run.
+
+   Animating it needs `@property` registration for the splitter's own position,
+   which is the splitter's to declare rather than something to reach in and
+   register from here. Left instant until then, which is correct if abrupt. */
+
+.workbenchMain {
+  block-size: 100%;
+  min-inline-size: 0;
+}
+
+.workbenchMain helix-sandbox {
+  block-size: 100%;
+  min-inline-size: 0;
 }
 
 /* Mirrored, because the glyph draws its panel against the leading edge and the
@@ -886,52 +899,31 @@ helix-drawer {
   scale: -1 1;
 }
 
-.workbenchBody helix-sandbox {
-  block-size: 100%;
-  min-inline-size: 0;
-}
-
 /* The header holds still and the list moves under it. Two rows rather than one
    scrolling box: a filter that scrolls away is a filter you have to scroll back
    to in order to change, which is the moment you most want it. */
 .examplesRail {
-  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  block-size: 100%;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   min-block-size: 0;
   /* What makes the narrowing a reveal rather than a squeeze. */
   overflow: hidden;
-  transition: border-inline-start-width var(--helix-duration-normal) var(--helix-easing-standard);
-}
-
-/* The rule goes with it. A zero-width element still draws its border, so
-   closing the rail left a hairline standing at the window edge with nothing
-   behind it. */
-.workbenchBody[data-rail="hidden"] .examplesRail {
-  border-inline-start-width: 0;
 }
 
 /* The contents hold the width the rail has when it is open, so the column
    closes over them and clips. Left to fill the track they would reflow the
    whole way: the filter field shrinking, every label rewrapping, the tree
    reflowing on each frame. That is the accordion's lesson, which is that
-   whatever is inside a box being animated has to hold still. */
+   whatever is inside a box being animated has to hold still.
+
+   A minimum rather than a fixed size now the rail can be dragged: it holds
+   still while the column closes over it, and grows with the pane when a reader
+   makes the rail wider than it opened. */
 .examplesRail > * {
-  inline-size: calc(var(--rail-open) - var(--helix-border-thin));
+  min-inline-size: var(--rail-open, 17rem);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .workbenchBody,
-  .examplesRail {
-    transition: none;
-  }
-}
-
-/* The same figure the sandbox toolbar takes, because these two bars sit either
-   side of the split and a reader sees them as one line across the window. It
-   was eight pixels of padding around a thirty-two pixel field, so it stood at
-   forty-eight against the toolbar's forty and the two rules were nowhere near
-   each other. */
 .examplesHeader {
   /* The toolbar's surface, not the page's. These two bars are the same height
      and sit either side of the split, so the same fill is what makes them read

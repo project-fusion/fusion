@@ -153,6 +153,13 @@ export class HelixBaseSplitter extends HelixElement {
   set position(next: number) {
     const previous = this.position
     this.positionState = next
+    /* The consumer has spoken, so the drag stops standing in for them.
+       Without this the divider flashed back: `dragging` goes false on
+       `pointerup`, `showing` fell straight back to the position they had set
+       before the gesture, and it was drawn there for the frame it took them to
+       answer the announcement. Snapping to where it started and then jumping to
+       where it was dropped, on every drag. */
+    this.reached = undefined
     this.requestUpdate('position', previous)
   }
 
@@ -279,7 +286,7 @@ export class HelixBaseSplitter extends HelixElement {
    * this component: write the size on every pointer move, tell anyone once.
    */
   private get showing(): number {
-    return this.dragging && this.reached !== undefined ? this.clamp(this.reached) : this.position
+    return this.reached === undefined ? this.position : this.clamp(this.reached)
   }
 
   /**
@@ -537,8 +544,9 @@ export class HelixBaseSplitter extends HelixElement {
     }
     this.origin = null
     this.dragging = false
+    /* `reached` is deliberately left standing. It is what the divider is drawn
+       from until the consumer answers, and the setter is what clears it. */
     this.settle(this.reached ?? this.position)
-    this.reached = undefined
   }
 
   /**
@@ -752,8 +760,6 @@ export class HelixBaseSplitter extends HelixElement {
     this.cornerOrigin = null
     this.moveTo(this.reached ?? this.position, true)
     origin.by.moveTo(origin.by.reached ?? origin.by.position, true)
-    this.reached = undefined
-    origin.by.reached = undefined
     this.leaveSeparator(event)
   }
 

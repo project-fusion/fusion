@@ -543,6 +543,46 @@ describe('splitter under a consumer that owns the position', () => {
     expect(said).toEqual(['80'])
   })
 
+  test('and holds where it was dropped until the consumer answers', async () => {
+    /* `dragging` goes false on `pointerup`. If the drawn position fell back to
+       `position` there and then, the divider snapped to where the gesture began
+       and jumped again a frame later when the answer arrived: a flash on every
+       drag, reported against the examples rail. */
+    const host = await splitter('position="50"')
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
+    })
+    const bar = separator(host)
+    let held = false
+    bar.setPointerCapture = () => {
+      held = true
+    }
+    bar.releasePointerCapture = () => {
+      held = false
+    }
+    bar.hasPointerCapture = () => held
+    const at = (type: string, fraction: number) =>
+      bar.dispatchEvent(
+        new (globalThis as unknown as { PointerEvent: typeof MouseEvent }).PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: 200 * fraction,
+          clientY: 50,
+        }) as PointerEvent,
+      )
+    at('pointerdown', 0.5)
+    at('pointermove', 0.9)
+    at('pointerup', 0.9)
+    await host.updateComplete
+    // A consumer that has not answered yet: still drawn where it was dropped.
+    expect(part(host, 'start')?.getAttribute('style')).toContain('90%')
+
+    // And the moment they do, whatever they say is what is drawn.
+    host.position = 40
+    await host.updateComplete
+    expect(part(host, 'start')?.getAttribute('style')).toContain('40%')
+  })
+
   test('an uncontrolled one is unchanged by the same path', async () => {
     const host = await splitter('default-position="50"')
     Object.defineProperty(host, 'getBoundingClientRect', {
