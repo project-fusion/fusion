@@ -25,6 +25,7 @@ import type { Family } from '../../../../lib/catalog'
 import { useElementRef, useHelixEvent } from '../../../../lib/use-helix-event'
 import { PreferencesDrawer } from '../../../preferences'
 import { Wordmark } from '../../../wordmark'
+import { readHashState, writeHashState } from './hash-state'
 import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state'
 
 /**
@@ -154,6 +155,28 @@ export function SandboxWorkbench({ families }: Props) {
      `undefined` meaning "the default", which is not a size: it reached the
      stylesheet as `undefined%` and cost the sandbox its entire grid template. */
   const [split, setSplit] = useState(50)
+  /* What the address bar carried in, read during render because the seeding
+     effect below runs before anything that could have written it, and paired
+     with *which example it was meant for*.
+   *
+   * The pairing is the whole of it. The workbench seeds a default example one
+   * render before the query's `e=` has been resolved into state, so an edit
+   * consumed on the first seed lands on the wrong component entirely: traced,
+   * a fragment arriving for `card.default` was spent on `accordion/default`,
+   * and by the time the card was seeded there was nothing left to give it.
+   * Which is why the first attempt at this looked like the fragment being
+   * ignored, when it was being applied to something nobody was looking at.
+   *
+   * Null on the server, where there is no address to read. */
+  const arrived = useRef(
+    typeof window === 'undefined'
+      ? null
+      : {
+          ...readHashState(window.location.hash),
+          ...(({ example, family }) => ({ example, family }))(readUrlState(window.location.search)),
+        },
+  )
+
   const [markup, setMarkup] = useState('')
   const [css, setCss] = useState(CSS_START)
   // Unset means the preview follows the page. A reader who has chosen a mode
@@ -369,7 +392,21 @@ export function SandboxWorkbench({ families }: Props) {
       panes,
       syntax,
     })
-    window.history.replaceState(null, '', `${window.location.pathname}${query}`)
+    /* The fragment is only ours to write once the editor has been seeded.
+       Before that it is still the one the page arrived with, and this effect
+       runs before the seeding one and again on every render, so an empty state
+       overwrote it within a frame of the load. */
+    const hash =
+      seeded.current && example
+        ? writeHashState(
+            { css, markup },
+            {
+              css: example.css || CSS_START,
+              markup: syntax === 'html' ? example.html : htmlToJsx(example.html),
+            },
+          )
+        : window.location.hash
+    window.history.replaceState(null, '', `${window.location.pathname}${query}${hash}`)
   }, [
     direction,
     exampleSlug,
@@ -381,6 +418,9 @@ export function SandboxWorkbench({ families }: Props) {
     showRail,
     showStatus,
     syntax,
+    css,
+    example,
+    markup,
   ])
 
   /* Seeding and converting are one effect, because they are the same question
@@ -438,15 +478,31 @@ export function SandboxWorkbench({ families }: Props) {
     const address = `${family.slug}/${example.slug}`
     const last = seeded.current
     if (!last || last.example !== address) {
-      setMarkup(syntax === 'html' ? example.html : htmlToJsx(example.html))
+      /* Only for the example the address named. A fragment carries an edit to
+         one component, and every other seed has to leave it alone. Where the
+         query named a family without an example, the first of that family's
+         examples is what it meant; where it named nothing at all, the first
+         seed is the only candidate there is. */
+      const waiting = arrived.current
+      const meant =
+        waiting === null ||
+        (waiting.family === null && waiting.example === null) ||
+        (waiting.example !== null
+          ? address === `${waiting.family}/${waiting.example}`
+          : address.startsWith(`${waiting.family}/`))
+      const carried = meant ? waiting : null
+      if (meant) {
+        arrived.current = null
+      }
+      setMarkup(carried?.markup ?? (syntax === 'html' ? example.html : htmlToJsx(example.html)))
       /* The example's own stylesheet where it ships one, and the placeholder
          where it does not. Pushed at the preview here as well as in the effect
          that follows every edit: that effect runs after this render, so seeding
          only the state showed one frame of the example unstyled, which on the
          examples that lay themselves out is the whole preview jumping. */
-      setCss(example.css || CSS_START)
+      setCss(carried?.css ?? (example.css || CSS_START))
       if (preview.current) {
-        preview.current.styles = example.css
+        preview.current.styles = carried?.css ?? example.css
       }
       // Output belongs to the example that wrote it. Carrying it across reads
       // as the new example having produced warnings it never produced.
