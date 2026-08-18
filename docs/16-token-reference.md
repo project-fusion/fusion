@@ -63,7 +63,7 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 125 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 127 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 145 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 127 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 130 |

@@ -42,14 +42,46 @@
    end, and neither is placed relative to the other. */
 [part="indicators"] {
   grid-area: 3 / 2;
-  justify-self: start;
+  justify-self: var(--_carousel-indicators-along);
   padding-block-start: var(--helix-space-sm);
 }
 
 [part="controls"] {
   grid-area: 3 / 2;
-  justify-self: end;
+  justify-self: var(--_carousel-controls-along);
   padding-block-start: var(--helix-space-sm);
+}
+
+/* ========================================================= along the edge ==
+ *
+ * `*-placement` says which edge, and this says where along it. The two together
+ * are the nine positions a consumer asks for in words: bottom left, bottom
+ * centre, top right, and so on.
+ *
+ * **One property, read by whichever axis the edge implies.** On a block edge the
+ * run is a row and its position along that edge is `justify-self`; on an inline
+ * edge it is a column and the same question is `align-self`. Writing both
+ * attributes against both axes would be twelve rules per group and a consumer
+ * having to know which of `align` and `justify` their edge wanted. One value in
+ * one custom property, and the rule for each edge picks up whichever property
+ * the geometry there calls for.
+ *
+ * The defaults are stated here as the value of that property rather than as a
+ * `justify-self`, so an edge rule can change the default and the attribute still
+ * beats it: a block edge splits the row, dots to the start and arrows to the
+ * end, and an inline edge centres both because a column beside the slides has
+ * nothing to split with.
+ *
+ * **Both on the same edge with the same alignment will overlap**, because they
+ * are two items in one grid cell and always were. That is what the two
+ * different defaults exist to avoid, and centring both is a consumer asking for
+ * them in the same place. Move one, or give them different edges. */
+[part="indicators"] {
+  --_carousel-indicators-along: start;
+}
+
+[part="controls"] {
+  --_carousel-controls-along: end;
 }
 
 /* Above the slides. The padding swaps ends with the placement, so the gap is
@@ -65,15 +97,73 @@
 }
 
 /* Beside the slides, where a run of dots becomes a column and the arrows stack.
-   `align-self` splits the column the way `justify-self` splits the row. */
+   `align-self` splits the column the way `justify-self` splits the row, so the
+   two swap roles here: the position along the edge moves onto the block axis
+   and the inline one is centred in the gutter. */
 :host([indicator-placement="inline-start"]) [part="indicators"],
-:host([indicator-placement="inline-end"]) [part="indicators"],
-:host([controls-placement="inline-start"]) [part="controls"],
-:host([controls-placement="inline-end"]) [part="controls"] {
-  align-self: center;
+:host([indicator-placement="inline-end"]) [part="indicators"] {
+  align-self: var(--_carousel-indicators-along);
   flex-direction: column;
   justify-self: center;
   padding-block-start: var(--helix-space-none);
+}
+
+:host([controls-placement="inline-start"]) [part="controls"],
+:host([controls-placement="inline-end"]) [part="controls"] {
+  align-self: var(--_carousel-controls-along);
+  flex-direction: column;
+  justify-self: center;
+  padding-block-start: var(--helix-space-none);
+}
+
+/* A column beside the slides has nothing to split the edge with, so both centre
+   there rather than keeping the row's start-and-end pairing. Before the
+   attribute rules below, so the attribute wins at equal specificity. */
+:host([indicator-placement="inline-start"]) [part="indicators"],
+:host([indicator-placement="inline-end"]) [part="indicators"] {
+  --_carousel-indicators-along: center;
+}
+
+/* And over them, for the same reason: an arrow on a photograph belongs at its
+   middle unless somebody says otherwise.
+
+   Up here with the other defaults rather than beside the overlay rules it
+   belongs to, and that placement is the whole of whether it works. Every one of
+   these selectors is `:host([attr]) [part]`, so they are all the same
+   specificity and source order is the entire cascade: written down there it
+   came after the attribute and pinned the arrows to the middle whatever
+   `controls-align` said. Measured across all twelve combinations, which is how
+   the one that did not move was found. */
+:host([controls-placement="inline-start"]) [part="controls"],
+:host([controls-placement="inline-end"]) [part="controls"],
+:host([controls-placement="overlay"]) [part="controls"] {
+  --_carousel-controls-along: center;
+}
+
+/* And the attribute, last, so it beats every default above whichever edge it is
+   asked for on. */
+:host([indicator-align="start"]) [part="indicators"] {
+  --_carousel-indicators-along: start;
+}
+
+:host([indicator-align="center"]) [part="indicators"] {
+  --_carousel-indicators-along: center;
+}
+
+:host([indicator-align="end"]) [part="indicators"] {
+  --_carousel-indicators-along: end;
+}
+
+:host([controls-align="start"]) [part="controls"] {
+  --_carousel-controls-along: start;
+}
+
+:host([controls-align="center"]) [part="controls"] {
+  --_carousel-controls-along: center;
+}
+
+:host([controls-align="end"]) [part="controls"] {
+  --_carousel-controls-along: end;
 }
 
 :host([indicator-placement="inline-start"]) [part="indicators"] {
@@ -330,8 +420,12 @@
 
 /* The bar itself catches nothing, so a press between the arrows reaches the
    slide under it. The buttons take pointer events back. */
+/* `controls-align` still means "along the edge", and here the edge is the whole
+   slide: the bar is stretched across it, so the word moves the arrows up and
+   down within it rather than moving the bar. `align-items` on the flex line
+   rather than `align-self` on the grid item, for that reason. */
 :host([controls-placement="overlay"]) [part="controls"] {
-  align-items: center;
+  align-items: var(--_carousel-controls-along);
   /* `flex-start` with the forward arrow pushed over, not `space-between`.
      Spreading three items puts one of them in the middle of the slide: with
      `autoplay` the set is previous, next and the rotation toggle, and the next

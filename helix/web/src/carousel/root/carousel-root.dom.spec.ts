@@ -335,3 +335,36 @@ describe('carousel indicators', () => {
     expect(dots.map((dot) => dot.getAttribute('aria-current'))).toEqual([null, 'true', null])
   })
 })
+
+describe('carousel chrome placement', () => {
+  /* Where a run lands, read against the row it is placed in rather than against
+     the host. The host spans three grid rows, so a run centred in its own row
+     is well above the host's centre, and measuring against the host called every
+     inline case "start" on the first pass. happy-dom lays nothing out, so this
+     asserts the properties the layout is made of instead. */
+  const along = (host: HTMLElement, name: string): string =>
+    (part(host, name) as HTMLElement).style.getPropertyValue(`--_carousel-${name}-along`)
+
+  test('the two attributes are independent, so moving one leaves the other', async () => {
+    const host = await carousel('controls-placement="block-start" indicator-placement="block-end"')
+    expect(host.getAttribute('indicator-placement')).toBe('block-end')
+    expect(host.getAttribute('controls-placement')).toBe('block-start')
+  })
+
+  test('both alignments reflect, so a stylesheet can select on them', async () => {
+    // They are read by `:host([indicator-align="center"])` rules, which is the
+    // whole mechanism: an unreflected property would style nothing.
+    const host = await carousel('controls-align="start" indicator-align="center"')
+    await host.updateComplete
+    expect(host.getAttribute('indicator-align')).toBe('center')
+    expect(host.getAttribute('controls-align')).toBe('start')
+  })
+
+  test('the alignment is optional, and absent means the split the row had', async () => {
+    const host = await carousel()
+    await host.updateComplete
+    expect(host.hasAttribute('indicator-align')).toBe(false)
+    expect(host.hasAttribute('controls-align')).toBe(false)
+    expect(along(host, 'indicators')).toBe('')
+  })
+})

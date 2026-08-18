@@ -5740,12 +5740,32 @@
             },
             {
               "kind": "field",
+              "name": "indicatorAlign",
+              "type": {
+                "text": "'center' | 'end' | 'start' | undefined"
+              },
+              "description": "Where along that side the dots sit.\n\nThe second half of the answer to \"where do they go\". `indicatorPlacement`\nsays which edge and this says where along it, so the pair spells out the\nnine positions a consumer asks for in words: bottom left, bottom centre,\ntop right, and so on. One attribute with nine values was the alternative\nand it multiplies rather than composing, since every value has to name both\nfacts and a consumer changing one has to rewrite the other.\n\n**One word for both axes, because the edge decides which axis it is.** On a\nblock edge the run is a row and this is `justify-self`; on an inline edge it\nis a column and the same question is `align-self`. A consumer should not\nhave to know which of those two words their edge wanted.\n\nLogical, like the placement: `start` is the left in English and the right in\nArabic on a horizontal run, and the top on a vertical one.\n\nUnset splits the row, dots to the start and arrows to the end, which is\nwhat keeps two items in one grid cell from landing on each other. Beside the\nslides, and over them, both centre instead, because a column there has\nnothing to split the edge with. Putting both groups on the same edge with\nthe same alignment does overlap them, and always did: that is what the two\ndifferent defaults exist to avoid.",
+              "attribute": "indicator-align",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "controlsPlacement",
               "type": {
                 "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay' | undefined"
               },
               "description": "Which side of the slides the arrows sit on.\n\nThe same four sides as `indicatorPlacement` and the same default, so a\ncarousel that moves only one of them keeps the other where it was.\n`inline-start` or `inline-end` stacks the arrows into a column, which is\nwhat a vertical track usually wants.\n\n`overlay` puts them on the slides, at the track's own edges, which is what a\nfull-bleed carousel wants: the slide is the page and the controls are on it\nrather than in a bar beneath it. It carries its own treatment with it, a\nsurface and a shadow under each arrow, because a glyph drawn straight onto a\nphotograph is legible against about half of one.\n\n**That was `appearance=\"hero\"` and did not need to be.** A third axis for\nsomething these two already describe: what `hero` meant was \"the controls\nare over the content\", and the surface, the edge-to-edge arrows and the bar\nthat catches no presses all followed from it rather than being separate\ndecisions. One fewer property, and the two axes are now the whole of where\na carousel's chrome can go.",
               "attribute": "controls-placement",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "controlsAlign",
+              "type": {
+                "text": "'center' | 'end' | 'start' | undefined"
+              },
+              "description": "Where along that side the arrows sit. See `indicatorAlign`.\n\n`overlay` answers it too, and the edge there is the whole slide: the bar is\nstretched across the picture, so this moves the arrows up and down within\nit rather than moving the bar. Centred unless asked otherwise, which is\nwhere an arrow over a photograph belongs.",
+              "attribute": "controls-align",
               "reflects": true
             },
             {
@@ -6169,12 +6189,28 @@
               "fieldName": "indicatorPlacement"
             },
             {
+              "name": "indicator-align",
+              "type": {
+                "text": "'center' | 'end' | 'start' | undefined"
+              },
+              "description": "Where along that side the dots sit.\n\nThe second half of the answer to \"where do they go\". `indicatorPlacement`\nsays which edge and this says where along it, so the pair spells out the\nnine positions a consumer asks for in words: bottom left, bottom centre,\ntop right, and so on. One attribute with nine values was the alternative\nand it multiplies rather than composing, since every value has to name both\nfacts and a consumer changing one has to rewrite the other.\n\n**One word for both axes, because the edge decides which axis it is.** On a\nblock edge the run is a row and this is `justify-self`; on an inline edge it\nis a column and the same question is `align-self`. A consumer should not\nhave to know which of those two words their edge wanted.\n\nLogical, like the placement: `start` is the left in English and the right in\nArabic on a horizontal run, and the top on a vertical one.\n\nUnset splits the row, dots to the start and arrows to the end, which is\nwhat keeps two items in one grid cell from landing on each other. Beside the\nslides, and over them, both centre instead, because a column there has\nnothing to split the edge with. Putting both groups on the same edge with\nthe same alignment does overlap them, and always did: that is what the two\ndifferent defaults exist to avoid.",
+              "fieldName": "indicatorAlign"
+            },
+            {
               "name": "controls-placement",
               "type": {
                 "text": "'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay' | undefined"
               },
               "description": "Which side of the slides the arrows sit on.\n\nThe same four sides as `indicatorPlacement` and the same default, so a\ncarousel that moves only one of them keeps the other where it was.\n`inline-start` or `inline-end` stacks the arrows into a column, which is\nwhat a vertical track usually wants.\n\n`overlay` puts them on the slides, at the track's own edges, which is what a\nfull-bleed carousel wants: the slide is the page and the controls are on it\nrather than in a bar beneath it. It carries its own treatment with it, a\nsurface and a shadow under each arrow, because a glyph drawn straight onto a\nphotograph is legible against about half of one.\n\n**That was `appearance=\"hero\"` and did not need to be.** A third axis for\nsomething these two already describe: what `hero` meant was \"the controls\nare over the content\", and the surface, the edge-to-edge arrows and the bar\nthat catches no presses all followed from it rather than being separate\ndecisions. One fewer property, and the two axes are now the whole of where\na carousel's chrome can go.",
               "fieldName": "controlsPlacement"
+            },
+            {
+              "name": "controls-align",
+              "type": {
+                "text": "'center' | 'end' | 'start' | undefined"
+              },
+              "description": "Where along that side the arrows sit. See `indicatorAlign`.\n\n`overlay` answers it too, and the edge there is the whole slide: the bar is\nstretched across the picture, so this moves the arrows up and down within\nit rather than moving the bar. Centred unless asked otherwise, which is\nwhere an arrow over a photograph belongs.",
+              "fieldName": "controlsAlign"
             },
             {
               "name": "per-view",

@@ -48,6 +48,34 @@ export class HelixCarousel extends HelixBaseCarousel {
   indicatorPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start'
 
   /**
+   * Where along that side the dots sit.
+   *
+   * The second half of the answer to "where do they go". `indicatorPlacement`
+   * says which edge and this says where along it, so the pair spells out the
+   * nine positions a consumer asks for in words: bottom left, bottom centre,
+   * top right, and so on. One attribute with nine values was the alternative
+   * and it multiplies rather than composing, since every value has to name both
+   * facts and a consumer changing one has to rewrite the other.
+   *
+   * **One word for both axes, because the edge decides which axis it is.** On a
+   * block edge the run is a row and this is `justify-self`; on an inline edge it
+   * is a column and the same question is `align-self`. A consumer should not
+   * have to know which of those two words their edge wanted.
+   *
+   * Logical, like the placement: `start` is the left in English and the right in
+   * Arabic on a horizontal run, and the top on a vertical one.
+   *
+   * Unset splits the row, dots to the start and arrows to the end, which is
+   * what keeps two items in one grid cell from landing on each other. Beside the
+   * slides, and over them, both centre instead, because a column there has
+   * nothing to split the edge with. Putting both groups on the same edge with
+   * the same alignment does overlap them, and always did: that is what the two
+   * different defaults exist to avoid.
+   */
+  @property({ attribute: 'indicator-align', reflect: true })
+  indicatorAlign?: 'center' | 'end' | 'start'
+
+  /**
    * Which side of the slides the arrows sit on.
    *
    * The same four sides as `indicatorPlacement` and the same default, so a
@@ -70,6 +98,17 @@ export class HelixCarousel extends HelixBaseCarousel {
    */
   @property({ attribute: 'controls-placement', reflect: true })
   controlsPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay'
+
+  /**
+   * Where along that side the arrows sit. See `indicatorAlign`.
+   *
+   * `overlay` answers it too, and the edge there is the whole slide: the bar is
+   * stretched across the picture, so this moves the arrows up and down within
+   * it rather than moving the bar. Centred unless asked otherwise, which is
+   * where an arrow over a photograph belongs.
+   */
+  @property({ attribute: 'controls-align', reflect: true })
+  controlsAlign?: 'center' | 'end' | 'start'
 
   /**
    * How many slides are shown across the track at once. Absent shows one.
